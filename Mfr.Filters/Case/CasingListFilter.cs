@@ -66,12 +66,13 @@ namespace Mfr.Filters.Case
                 "Casing-list setup must complete before transform."
             );
 
-            if (value.Length == 0 || lowerWordToCasing.Count == 0)
+            if (value.Length == 0)
             {
                 return value;
             }
 
-            var transformed = _ApplyCasingList(value, item.WordSeparator, lowerWordToCasing);
+            var transformed =
+                lowerWordToCasing.Count == 0 ? value : _ApplyCasingList(value, item.WordSeparator, lowerWordToCasing);
             if (!Options.UppercaseSentenceInitial)
             {
                 return transformed;

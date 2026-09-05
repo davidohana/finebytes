@@ -8,6 +8,37 @@ namespace Mfr.Tests.Models.Filters.Case
     public sealed class CasingListParserTests
     {
         /// <summary>
+        /// Verifies whitespace-separated editor text parses into words.
+        /// </summary>
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void ParseEditorText_Blank_ReturnsEmpty(string? text)
+        {
+            Assert.Empty(CasingListParser.ParseEditorText(text));
+        }
+
+        /// <summary>
+        /// Verifies editor text splits on any whitespace and trims entries.
+        /// </summary>
+        [Fact]
+        public void ParseEditorText_SplitsOnWhitespace()
+        {
+            Assert.Equal(["and", "or", "RMX"], CasingListParser.ParseEditorText("  and   or\tRMX  "));
+        }
+
+        /// <summary>
+        /// Verifies stored words round-trip through space-separated editor text.
+        /// </summary>
+        [Fact]
+        public void FormatEditorText_JoinsWithSpaces()
+        {
+            Assert.Equal(string.Empty, CasingListParser.FormatEditorText([]));
+            Assert.Equal("and or RMX", CasingListParser.FormatEditorText(["and", "or", "RMX"]));
+        }
+
+        /// <summary>
         /// Verifies an empty word list yields an empty map.
         /// </summary>
         [Fact]

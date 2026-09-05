@@ -6,8 +6,8 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 
 | Property        | Type          | Description                                                           |
 | --------------- | ------------- | --------------------------------------------------------------------- |
-| `find`          | string        | Search pattern (meaning depends on `mode`).                           |
-| `replacement`   | string        | Replacement text.                                                     |
+| `find`          | string        | Search pattern (meaning depends on `mode`). Empty → no-op.            |
+| `replacement`   | string        | Replacement text. In `Regex` mode, `$0` / `$1`… are substitutions; in `Literal` / `Wildcard` they are plain text. |
 | `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — see **Modes**.                    |
 | `caseSensitive` | bool          | Match case when searching.                                            |
 | `replaceAll`    | bool          | If `true`, replace every match; if `false`, only the **first** match. |
@@ -44,6 +44,9 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
   - Before: `Category`
   - After: `Category`
   - Comment: No standalone word `cat` in `Category` (substring doesn’t count).
+- `find`: `""`; `replacement`: `"X"`; `mode`: `Literal` — input unchanged (empty find is a no-op).
+- `find`: `"a"`; `replacement`: `"$1"`; `mode`: `Literal` — `a` → `$1` (`$` is literal outside Regex mode).
+- `find`: `@"(a)(b)"`; `replacement`: `"$2$1"`; `mode`: `Regex` — `ab` → `ba`
 
 For many rules in one step, use [ReplaceList](ReplaceList.md).
 

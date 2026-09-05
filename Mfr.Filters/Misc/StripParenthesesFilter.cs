@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace Mfr.Filters.Misc
 {
     /// <summary>
@@ -27,7 +25,7 @@ namespace Mfr.Filters.Misc
     /// <param name="Options">Parenthesis-strip options.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     [FilterPalette(FilterGroup.Misc, "Strip Parentheses")]
-    public sealed partial record StripParenthesesFilter(
+    public sealed record StripParenthesesFilter(
         FilterTarget Target,
         StripParenthesesOptions Options,
         StringApplyScope? ApplyScope = null
@@ -49,31 +47,73 @@ namespace Mfr.Filters.Misc
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            return Options.Type switch
+            var (open, close) = Options.Type switch
             {
-                ParenthesisType.Round => Strip(value, _RoundParenRegex(), "(", ")"),
-                ParenthesisType.Square => Strip(value, _SquareParenRegex(), "[", "]"),
-                ParenthesisType.Curly => Strip(value, _CurlyParenRegex(), "{", "}"),
-                ParenthesisType.Angle => Strip(value, _AngleParenRegex(), "<", ">"),
-                _ => value,
+                ParenthesisType.Round => ('(', ')'),
+                ParenthesisType.Square => ('[', ']'),
+                ParenthesisType.Curly => ('{', '}'),
+                ParenthesisType.Angle => ('<', '>'),
+                _ => ('\0', '\0'),
             };
 
-            string Strip(string s, Regex regex, string open, string close)
+            if (open == '\0')
             {
-                return Options.RemoveContents ? regex.Replace(s, "") : s.Replace(open, "").Replace(close, "");
+                return value;
             }
+
+            return _StripPairs(value, open, close, Options.RemoveContents);
         }
 
-        [GeneratedRegex(@"\([^)]*\)", RegexOptions.Compiled)]
-        private static partial Regex _RoundParenRegex();
+        /// <summary>
+        /// Strips matched open/close pairs innermost-first (MFR7 StripParFilter), leaving unmatched delimiters.
+        /// </summary>
+        /// <param name="value">Input string.</param>
+        /// <param name="open">Opening delimiter.</param>
+        /// <param name="close">Closing delimiter.</param>
+        /// <param name="removeContents">When true, remove delimiters and interior; otherwise remove delimiters only.</param>
+        /// <returns>The stripped string.</returns>
+        private static string _StripPairs(string value, char open, char close, bool removeContents)
+        {
+            var endPos = 0;
+            while (true)
+            {
+                endPos = value.IndexOf(close, endPos);
+                if (endPos < 0)
+                {
+                    break;
+                }
 
-        [GeneratedRegex(@"\[[^\]]*\]", RegexOptions.Compiled)]
-        private static partial Regex _SquareParenRegex();
+                var startPos = -1;
+                for (var i = endPos - 1; i >= 0; i--)
+                {
+                    if (value[i] != open)
+                    {
+                        continue;
+                    }
 
-        [GeneratedRegex(@"\{[^}]*\}", RegexOptions.Compiled)]
-        private static partial Regex _CurlyParenRegex();
+                    startPos = i;
+                    break;
+                }
 
-        [GeneratedRegex(@"<[^>]*>", RegexOptions.Compiled)]
-        private static partial Regex _AngleParenRegex();
+                if (startPos < 0)
+                {
+                    endPos += 1;
+                    continue;
+                }
+
+                if (removeContents)
+                {
+                    value = value.Remove(startPos, endPos - startPos + 1);
+                    endPos = startPos;
+                    continue;
+                }
+
+                // Remove close first (higher index), then open.
+                value = value.Remove(endPos, 1).Remove(startPos, 1);
+                endPos = startPos;
+            }
+
+            return value;
+        }
     }
 }

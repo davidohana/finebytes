@@ -26,7 +26,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
         [CounterLeadingZerosMode.None, CounterLeadingZerosMode.Automatic, CounterLeadingZerosMode.Custom];
 
         /// <summary>
-        /// Gets or sets the counter start value (index 0).
+        /// Gets or sets the counter value used for the first file (rename-list or in-folder index 0).
         /// </summary>
         [ObservableProperty]
         private decimal _start = 1;

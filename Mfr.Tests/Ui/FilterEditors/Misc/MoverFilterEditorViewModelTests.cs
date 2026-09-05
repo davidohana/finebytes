@@ -1,5 +1,6 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
+using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters.Misc;
 
 namespace Mfr.Tests.Ui.FilterEditors.Misc
@@ -100,6 +101,35 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
 
             Assert.Equal(@"C:\", editor.RootFolder);
             Assert.Equal(@"C:\", ((MoverFilter)step.Filter).Options.RootFolder);
+        }
+
+        /// <summary>
+        /// Verifies folder-path resolution for File List drops onto path fields.
+        /// </summary>
+        [Fact]
+        public void File_drop_resolves_folder_or_parent()
+        {
+            var dir = Path.Combine(Path.GetTempPath(), "mfr-filter-drop-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(dir);
+            try
+            {
+                var nested = Path.Combine(dir, "Nested");
+                Directory.CreateDirectory(nested);
+                var filePath = Path.Combine(nested, "a.txt");
+                File.WriteAllText(filePath, "x");
+
+                Assert.Equal(nested, FilterEditorFileDrop.TryResolveFolderPath([nested]));
+                Assert.Equal(nested, FilterEditorFileDrop.TryResolveFolderPath([filePath]));
+                Assert.Null(FilterEditorFileDrop.TryResolveFolderPath([]));
+            }
+            finally
+            {
+                try
+                {
+                    Directory.Delete(dir, recursive: true);
+                }
+                catch (IOException) { }
+            }
         }
     }
 }

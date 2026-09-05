@@ -21,7 +21,7 @@
               <TextBlock Classes="rich-tip-bullet" Text="• Shorter numbers are padded with leading zeros." />
               <TextBlock
                 Classes="rich-tip-bullet"
-                Text="• Longer numbers stay unchanged unless the shrink option below is checked."
+                Text="• Longer numbers stay unchanged unless surplus zeros are stripped below."
               />
             </controls:RichToolTip>
           </ToolTip.Tip>
@@ -39,7 +39,7 @@
         </StackPanel>
         <controls:CompactCheckBox
           x:Name="RemoveExtraZerosCheckBox"
-          Content="Also shrink longer numbers to this width"
+          Content="Strip surplus leading zeros first"
           IsChecked="{Binding RemoveExtraZeros}"
         >
           <ToolTip.Tip>
@@ -48,6 +48,10 @@
               <TextBlock
                 Classes="rich-tip-bullet"
                 Text="• Checked: strip surplus leading zeros first so over-padded numbers shrink (e.g. width 3: 0007 → 007)."
+              />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Numbers with no extra zeros stay at full length (e.g. 12345 is not truncated)."
               />
             </controls:RichToolTip>
           </ToolTip.Tip>
@@ -63,6 +67,10 @@
             <controls:RichToolTip>
               <TextBlock Classes="rich-tip-body" Text="Limit how many digit groups are changed, left to right." />
               <TextBlock Classes="rich-tip-bullet" Text="• 0 means fix every match." />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Groups that are already the right width do not count toward the limit."
+              />
             </controls:RichToolTip>
           </ToolTip.Tip>
           <TextBlock

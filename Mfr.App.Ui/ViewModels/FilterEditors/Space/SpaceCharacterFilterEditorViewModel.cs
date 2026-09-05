@@ -9,10 +9,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
     /// </summary>
     internal sealed partial class SpaceCharacterFilterEditorViewModel : FilterOptionsEditorViewModel
     {
-        private const string _percent20Replacement = "%20";
-        private const string _spaceReplacement = " ";
-        private const string _underscoreReplacement = "_";
-
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
@@ -97,6 +93,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
             _ApplyOptions();
         }
 
+        /// <summary>
+        /// Loads editor fields from the step's <see cref="SpaceCharacterFilter"/> without applying.
+        /// </summary>
         private void _SyncFromFilter()
         {
             if (Step.Filter is not SpaceCharacterFilter filter)
@@ -108,14 +107,17 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
             {
                 var options = filter.Options;
                 (Definition, OtherCharacter) = _ResolveDefinition(options.SpaceCharacter);
-                ReplacePercent20 = options.Replacements.Contains(_percent20Replacement);
-                ReplaceSpaces = options.Replacements.Contains(_spaceReplacement);
-                ReplaceUnderscores = options.Replacements.Contains(_underscoreReplacement);
+                ReplacePercent20 = options.Replacements.Contains(SpaceCharacterOptions.Percent20Replacement);
+                ReplaceSpaces = options.Replacements.Contains(SpaceCharacterOptions.SpaceReplacement);
+                ReplaceUnderscores = options.Replacements.Contains(SpaceCharacterOptions.UnderscoreReplacement);
                 CustomText = _ResolveCustomReplacementText(options.Replacements);
                 ReplaceCustom = CustomText.Length > 0;
             });
         }
 
+        /// <summary>
+        /// Writes current editor fields onto the step filter when options changed.
+        /// </summary>
         private void _ApplyOptions()
         {
             if (IsLoading || Step.Filter is not SpaceCharacterFilter filter)
@@ -130,22 +132,26 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
             ApplyIfChanged(filter, filter with { Options = options });
         }
 
+        /// <summary>
+        /// Builds the replacements list from checkbox and custom-text state (known tokens first).
+        /// </summary>
+        /// <returns>Ordered replacement substrings for <see cref="SpaceCharacterOptions.Replacements"/>.</returns>
         private List<string> _BuildReplacements()
         {
             var replacements = new List<string>(capacity: 4);
             if (ReplacePercent20)
             {
-                replacements.Add(_percent20Replacement);
+                replacements.Add(SpaceCharacterOptions.Percent20Replacement);
             }
 
             if (ReplaceSpaces)
             {
-                replacements.Add(_spaceReplacement);
+                replacements.Add(SpaceCharacterOptions.SpaceReplacement);
             }
 
             if (ReplaceUnderscores)
             {
-                replacements.Add(_underscoreReplacement);
+                replacements.Add(SpaceCharacterOptions.UnderscoreReplacement);
             }
 
             if (ReplaceCustom && CustomText.Length > 0)
@@ -156,11 +162,23 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
             return replacements;
         }
 
+        /// <summary>
+        /// Returns the first replacement that is not a built-in %20 / space / underscore token.
+        /// </summary>
+        /// <param name="replacements">Persisted replacement list.</param>
+        /// <returns>Custom substring, or empty when none.</returns>
         private static string _ResolveCustomReplacementText(IReadOnlyList<string> replacements)
         {
             foreach (var replacement in replacements)
             {
-                if (replacement is not (_percent20Replacement or _spaceReplacement or _underscoreReplacement))
+                if (
+                    replacement
+                    is not (
+                        SpaceCharacterOptions.Percent20Replacement
+                        or SpaceCharacterOptions.SpaceReplacement
+                        or SpaceCharacterOptions.UnderscoreReplacement
+                    )
+                )
                 {
                     return replacement;
                 }
@@ -169,6 +187,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
             return string.Empty;
         }
 
+        /// <summary>
+        /// Resolves the separator character from definition radios and the Other text box.
+        /// </summary>
+        /// <returns>Word separator to persist; empty Other falls back to U+0020 SPACE.</returns>
         private char _ResolveSpaceCharacter()
         {
             return Definition switch
@@ -176,7 +198,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                 SpaceCharacterDefinition.Space => ' ',
                 SpaceCharacterDefinition.Underscore => '_',
                 SpaceCharacterDefinition.Other when OtherCharacter.Length > 0 => OtherCharacter[0],
-                SpaceCharacterDefinition.Other => ' ',
                 _ => ' ',
             };
         }

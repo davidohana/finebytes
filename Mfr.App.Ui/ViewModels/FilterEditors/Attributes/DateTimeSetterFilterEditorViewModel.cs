@@ -31,7 +31,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             : base(step)
         {
             (IsDateMode, ValuePhrase) = _ResolveMode(step.Filter);
-            _selectedTimestampField = s_TimestampFields[1];
+            _selectedTimestampField = _ChoiceFor(TimestampField.LastWrite);
             _SyncFromFilter();
         }
 
@@ -94,6 +94,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             TimeText = DateTime.Now.ToString(TimeFormat, CultureInfo.InvariantCulture);
         }
 
+        /// <summary>
+        /// Loads combo + value text from the step filter without pushing option replaces.
+        /// </summary>
         private void _SyncFromFilter()
         {
             LoadWithoutApplying(() =>
@@ -113,6 +116,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             });
         }
 
+        /// <summary>
+        /// Parses the visible value and replaces step options when the parse succeeds.
+        /// </summary>
         private void _ApplyOptions()
         {
             if (IsLoading || SelectedTimestampField is null)
@@ -124,7 +130,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             {
                 if (
                     !DateOnly.TryParseExact(
-                        (DateText ?? string.Empty).Trim(),
+                        DateText.Trim(),
                         DateFormat,
                         CultureInfo.InvariantCulture,
                         DateTimeStyles.None,
@@ -135,10 +141,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                     return;
                 }
 
-                var options = new DateSetterOptions(
-                    TimestampField: SelectedTimestampField.Field,
-                    Date: date
-                );
+                var options = new DateSetterOptions(TimestampField: SelectedTimestampField.Field, Date: date);
                 ApplyIfChanged(dateSetter, dateSetter with { Options = options });
                 return;
             }
@@ -147,7 +150,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             {
                 if (
                     !TimeOnly.TryParseExact(
-                        (TimeText ?? string.Empty).Trim(),
+                        TimeText.Trim(),
                         TimeFormat,
                         CultureInfo.InvariantCulture,
                         DateTimeStyles.None,
@@ -158,27 +161,23 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                     return;
                 }
 
-                var options = new TimeSetterOptions(
-                    TimestampField: SelectedTimestampField.Field,
-                    Time: time
-                );
+                var options = new TimeSetterOptions(TimestampField: SelectedTimestampField.Field, Time: time);
                 ApplyIfChanged(timeSetter, timeSetter with { Options = options });
             }
         }
 
+        /// <summary>
+        /// Maps a <see cref="TimestampField"/> to its combo row; unknown values fall back to Last Write.
+        /// </summary>
         private static TimestampFieldChoice _ChoiceFor(TimestampField field)
         {
-            foreach (var choice in s_TimestampFields)
-            {
-                if (choice.Field == field)
-                {
-                    return choice;
-                }
-            }
-
-            return s_TimestampFields[1];
+            return s_TimestampFields.FirstOrDefault(c => c.Field == field)
+                ?? s_TimestampFields.First(c => c.Field == TimestampField.LastWrite);
         }
 
+        /// <summary>
+        /// Resolves date vs time UI mode and the trailing phrase from the step filter type.
+        /// </summary>
         private static (bool IsDateMode, string ValuePhrase) _ResolveMode(BaseFilter filter)
         {
             return filter switch

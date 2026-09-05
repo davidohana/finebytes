@@ -15,6 +15,7 @@ namespace Mfr.App.Ui.Views.FilterEditors.Misc
         public MoverFilterEditorView()
         {
             InitializeComponent();
+            FilterEditorFileDrop.AttachFolderDrop(RootFolderDropTarget, _ApplyDroppedRootFolder);
         }
 
         /// <inheritdoc />
@@ -30,6 +31,14 @@ namespace Mfr.App.Ui.Views.FilterEditors.Misc
                         title: "Select root folder",
                         cancellationToken: cancellationToken
                     );
+            }
+        }
+
+        private void _ApplyDroppedRootFolder(string folderPath)
+        {
+            if (DataContext is MoverFilterEditorViewModel vm)
+            {
+                vm.RootFolder = folderPath;
             }
         }
     }

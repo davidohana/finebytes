@@ -31,7 +31,6 @@ using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
-using Mfr.Models.Media;
 using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.FilterEditors
@@ -1056,7 +1055,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Dispatcher.UIThread.RunJobs();
 
             Assert.IsType<DateTimeSetterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
-            var editorVm = (DateTimeSetterFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!;
+            var editorVm = (DateTimeSetterFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor;
 
             var editor = editorView.GetVisualDescendants().OfType<DateTimeSetterFilterEditorView>().Single();
             var fieldCombo = editor.FindControl<ComboBox>("TimestampFieldCombo");
@@ -1102,7 +1101,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Dispatcher.UIThread.RunJobs();
 
             Assert.IsType<DateTimeSetterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
-            var editorVm = (DateTimeSetterFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!;
+            var editorVm = (DateTimeSetterFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor;
 
             var editor = editorView.GetVisualDescendants().OfType<DateTimeSetterFilterEditorView>().Single();
             var fieldCombo = editor.FindControl<ComboBox>("TimestampFieldCombo");

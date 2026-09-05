@@ -1,10 +1,10 @@
 using Avalonia.Controls;
+using Mfr.Filters.Space;
 
 namespace Mfr.App.Ui.Views.FilterEditors.Space
 {
     /// <summary>
-    /// Shared option editor for <see cref="Filters.Space.SpaceAfterFilter"/> and
-    /// <see cref="Filters.Space.SpaceAroundFilter"/>.
+    /// Shared option editor for <see cref="SpaceAfterFilter"/> and <see cref="SpaceAroundFilter"/>.
     /// </summary>
     public partial class SpaceTriggerFilterEditorView : UserControl
     {

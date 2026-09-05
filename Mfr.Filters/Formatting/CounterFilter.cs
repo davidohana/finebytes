@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Mfr.Filters.Formatting
 {
     /// <summary>
@@ -89,10 +91,16 @@ namespace Mfr.Filters.Formatting
                 CounterPosition.Replace => formatted,
                 CounterPosition.Prepend => formatted + Options.Separator + value,
                 CounterPosition.Append => value + Options.Separator + formatted,
-                _ => value,
+                _ => throw new UnreachableException(),
             };
         }
 
+        /// <summary>
+        /// Resolves leading-zero digit width for the active list scope and padding mode.
+        /// </summary>
+        /// <param name="item">Current rename item (list / folder counts for Automatic).</param>
+        /// <param name="usePerFolder">When true, pad from folder sibling counts; otherwise rename-list totals.</param>
+        /// <returns>Digit width for <see cref="CounterPadding.Format"/>; <c>0</c> means no padding.</returns>
         private int _ResolvePadWidth(RenameItem item, bool usePerFolder)
         {
             switch (Options.LeadingZerosMode)
@@ -108,12 +116,11 @@ namespace Mfr.Filters.Formatting
                         return 0;
                     }
 
-                    var maxIndex = Math.Max(listCount - 1, 0);
-                    return CounterPadding.AutomaticDigitWidth(Options.Start, Options.Step, maxIndex);
+                    return CounterPadding.AutomaticDigitWidth(Options.Start, Options.Step, maxIndex: listCount - 1);
                 case CounterLeadingZerosMode.Custom:
                     return Math.Max(Options.CustomLength, 1);
                 default:
-                    return 0;
+                    throw new UnreachableException();
             }
         }
     }

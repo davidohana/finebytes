@@ -1,10 +1,41 @@
 namespace Mfr.Filters.Case
 {
     /// <summary>
-    /// Validates casing-list words and builds the lookup used at apply time.
+    /// Parses Filter Configuration editor text and builds the casing-list lookup used at apply time.
     /// </summary>
-    internal static class CasingListParser
+    public static class CasingListParser
     {
+        /// <summary>
+        /// Formats stored words as space-separated editor text.
+        /// </summary>
+        /// <param name="words">Canonical word spellings.</param>
+        /// <returns>Editor text; empty when <paramref name="words"/> is empty.</returns>
+        public static string FormatEditorText(IReadOnlyList<string> words)
+        {
+            ArgumentNullException.ThrowIfNull(words);
+
+            return string.Join(' ', words);
+        }
+
+        /// <summary>
+        /// Parses space-separated (any whitespace) words from the Filter Configuration editor.
+        /// </summary>
+        /// <remarks>
+        /// Does not throw; empty/whitespace-only text yields an empty list. Length and single-word
+        /// rules are enforced when the filter is set up.
+        /// </remarks>
+        /// <param name="text">Space-separated editor text.</param>
+        /// <returns>Parsed words in order.</returns>
+        public static IReadOnlyList<string> ParseEditorText(string? text)
+        {
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                return [];
+            }
+
+            return text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        }
+
         /// <summary>
         /// Builds a case-insensitive map from configured words (last duplicate wins).
         /// </summary>

@@ -65,13 +65,15 @@ namespace Mfr.Filters.Space
                     continue;
                 }
 
-                if (i > 0)
+                // Use builder output for "already present": consecutive triggers may have just
+                // appended a separator after the previous trigger, which value[i-1] still hides.
+                if (
+                    i > 0
+                    && builder[^1] != sep
+                    && SpaceTriggerInsertion.ShouldInsertBeside(value[i - 1], sep, onlyWhenNeighbor)
+                )
                 {
-                    var prev = value[i - 1];
-                    if (SpaceTriggerInsertion.ShouldInsertBeside(prev, sep, onlyWhenNeighbor))
-                    {
-                        builder.Append(sep);
-                    }
+                    builder.Append(sep);
                 }
 
                 builder.Append(c);

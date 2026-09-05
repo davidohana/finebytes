@@ -54,18 +54,12 @@ namespace Mfr.Filters.Attributes
             }
         }
 
+        /// <summary>
+        /// Replaces the calendar date while keeping the existing time-of-day and <see cref="DateTime.Kind"/>.
+        /// </summary>
         private static DateTime _SetDatePreserveTime(DateTime current, DateOnly date)
         {
-            return new(
-                date.Year,
-                date.Month,
-                date.Day,
-                current.Hour,
-                current.Minute,
-                current.Second,
-                current.Millisecond,
-                current.Kind
-            );
+            return date.ToDateTime(TimeOnly.FromDateTime(current), current.Kind);
         }
     }
 }

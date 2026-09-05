@@ -1,6 +1,6 @@
 # ReplaceList
 
-Applies **search/replace pairs** embedded in the filter options, in list order—like multiple [Replacer](Replacer.md) steps sharing the same mode and flags. Replacement values may include formatter tokens (for example `<counter:…>`) where supported. An empty list is a no-op.
+Applies **search/replace pairs** embedded in the filter options, in list order, sharing one mode and match flags (same matching rules as [Replacer](Replacer.md)). Each replacement is a format string—formatter tokens such as `<counter:…>` expand per item before the replace runs (Replacer does not compile replacements as format strings). An empty list is a no-op.
 
 ## Options
 

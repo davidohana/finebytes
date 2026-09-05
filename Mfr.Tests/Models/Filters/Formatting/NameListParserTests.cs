@@ -40,6 +40,29 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
+        /// Verifies null list elements do not throw during length validation.
+        /// </summary>
+        [Fact]
+        public void Validate_NullElement_DoesNotThrow()
+        {
+            var entries = NameListParser.Validate(["A", null!, "B"]);
+
+            Assert.Equal(3, entries.Count);
+        }
+
+        /// <summary>
+        /// Verifies format treats a trailing null element like a trailing blank.
+        /// </summary>
+        [Fact]
+        public void FormatEditorText_TrailingNull_PreservesBlankSlot()
+        {
+            var text = NameListParser.FormatEditorText(["Alpha", null!]);
+
+            Assert.Equal("Alpha\n\n", text);
+            Assert.Equal(["Alpha", ""], NameListParser.ParseEditorText(text));
+        }
+
+        /// <summary>
         /// Verifies overly long entries are rejected.
         /// </summary>
         [Fact]
