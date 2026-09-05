@@ -623,66 +623,39 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies Date Setter option edits replace the step filter options.
+        /// Verifies Date/Time Setter option edits replace the step filter options.
         /// </summary>
         [Fact]
-        public void Date_setter_options_update_step_options()
+        public void Date_time_setter_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Date Setter", new DateSetterFilter());
+            var step = new AppliedFilterStepViewModel("Date/Time Setter", new DateTimeSetterFilter());
             var editor = new DateTimeSetterFilterEditorViewModel(step);
 
-            Assert.True(editor.IsDateMode);
-            Assert.Equal("date to:", editor.ValuePhrase);
+            Assert.True(editor.SetDate);
+            Assert.True(editor.SetTime);
             Assert.Equal(TimestampField.LastWrite, editor.SelectedTimestampField.Field);
             Assert.Equal(
                 DateTime.Today.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
                 editor.DateText
             );
+            Assert.False(string.IsNullOrWhiteSpace(editor.TimeText));
 
             editor.SelectedTimestampField = editor.TimestampFields.Single(c => c.Field == TimestampField.Creation);
             editor.DateText = "2020-12-25";
-
-            var options = ((DateSetterFilter)step.Filter).Options;
-            Assert.Equal(TimestampField.Creation, options.TimestampField);
-            Assert.Equal(new DateOnly(2020, 12, 25), options.Date);
-
-            editor.SetCurrentCommand.Execute(null);
-            options = ((DateSetterFilter)step.Filter).Options;
-            Assert.Equal(DateOnly.FromDateTime(DateTime.Today), options.Date);
-
-            var beforeInvalid = options;
-            editor.DateText = "2020-13-40";
-            Assert.Same(beforeInvalid, ((DateSetterFilter)step.Filter).Options);
-        }
-
-        /// <summary>
-        /// Verifies Time Setter option edits replace the step filter options.
-        /// </summary>
-        [Fact]
-        public void Time_setter_options_update_step_options()
-        {
-            var step = new AppliedFilterStepViewModel("Time Setter", new TimeSetterFilter());
-            var editor = new DateTimeSetterFilterEditorViewModel(step);
-
-            Assert.True(editor.IsTimeMode);
-            Assert.Equal("time to:", editor.ValuePhrase);
-            Assert.Equal(TimestampField.LastWrite, editor.SelectedTimestampField.Field);
-            Assert.False(string.IsNullOrWhiteSpace(editor.TimeText));
-
-            editor.SelectedTimestampField = editor.TimestampFields.Single(c => c.Field == TimestampField.LastAccess);
             editor.TimeText = "09:00:15";
+            editor.SetTime = false;
 
-            var options = ((TimeSetterFilter)step.Filter).Options;
-            Assert.Equal(TimestampField.LastAccess, options.TimestampField);
+            var options = ((DateTimeSetterFilter)step.Filter).Options;
+            Assert.Equal(TimestampField.Creation, options.TimestampField);
+            Assert.True(options.SetDate);
+            Assert.Equal(new DateOnly(2020, 12, 25), options.Date);
+            Assert.False(options.SetTime);
             Assert.Equal(new TimeOnly(9, 0, 15), options.Time);
 
-            var beforeInvalid = options;
-            editor.TimeText = "25:61:99";
-            Assert.Same(beforeInvalid, ((TimeSetterFilter)step.Filter).Options);
-
-            editor.TimeText = "09:00:15";
+            editor.SetTime = true;
             editor.SetCurrentCommand.Execute(null);
-            options = ((TimeSetterFilter)step.Filter).Options;
+            options = ((DateTimeSetterFilter)step.Filter).Options;
+            Assert.Equal(DateOnly.FromDateTime(DateTime.Today), options.Date);
             Assert.Equal(
                 editor.TimeText,
                 options.Time.ToString("HH':'mm':'ss", System.Globalization.CultureInfo.InvariantCulture)

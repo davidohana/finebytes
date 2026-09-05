@@ -51,7 +51,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 InserterFilter => new InserterFilterEditorViewModel(step),
                 NameListFilter => new NameListFilterEditorViewModel(step),
                 TokenMoverFilter => new TokenMoverFilterEditorViewModel(step),
-                DateSetterFilter or TimeSetterFilter => new DateTimeSetterFilterEditorViewModel(step),
+                DateTimeSetterFilter => new DateTimeSetterFilterEditorViewModel(step),
                 _ => null,
             };
         }

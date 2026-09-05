@@ -55,8 +55,7 @@ namespace Mfr.Engine.Presets
             new(typeof(AudioTagSetterFilter), "AudioTagSetter"),
             new(typeof(Id3v2FieldSetterFilter), "Id3v2FieldSetter"),
             new(typeof(TagRemoverFilter), "TagRemover"),
-            new(typeof(DateSetterFilter), "DateSetter"),
-            new(typeof(TimeSetterFilter), "TimeSetter"),
+            new(typeof(DateTimeSetterFilter), "DateTimeSetter"),
             new(typeof(TimeShifterFilter), "TimeShifter"),
         ];
 

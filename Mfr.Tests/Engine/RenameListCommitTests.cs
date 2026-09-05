@@ -1557,8 +1557,14 @@ namespace Mfr.Tests.Engine
         {
             return _CreatePresetAllEnabled(
                 name,
-                new DateSetterFilter(
-                    Options: new DateSetterOptions(TimestampField: TimestampField.LastWrite, Date: date)
+                new DateTimeSetterFilter(
+                    Options: new DateTimeSetterOptions(
+                        TimestampField: TimestampField.LastWrite,
+                        SetDate: true,
+                        Date: date,
+                        SetTime: false,
+                        Time: new TimeOnly(0, 0, 0)
+                    )
                 )
             );
         }

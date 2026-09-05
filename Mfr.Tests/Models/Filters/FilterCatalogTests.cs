@@ -88,7 +88,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.Equal(FilterGroup.Trimming, byType["ExtractLeft"].Group);
             Assert.Equal(FilterGroup.Replace, byType["Cleaner"].Group);
             Assert.Equal(FilterGroup.Formatting, byType["Counter"].Group);
-            Assert.Equal(FilterGroup.Attributes, byType["DateSetter"].Group);
+            Assert.Equal(FilterGroup.Attributes, byType["DateTimeSetter"].Group);
         }
 
         /// <summary>
