@@ -834,7 +834,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies Attributes Setter tri-state checkbox edits replace the step filter options.
+        /// Verifies Attributes Setter On/Off/Keep radio edits replace the step filter options.
         /// </summary>
         [Fact]
         public void Attributes_setter_options_update_step_options()
@@ -842,10 +842,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             var step = new AppliedFilterStepViewModel("Attributes Setter", new AttributesSetterFilter());
             var editor = new AttributesSetterFilterEditorViewModel(step);
 
-            Assert.Null(editor.ReadOnlyChecked);
-            Assert.Null(editor.HiddenChecked);
-            Assert.Null(editor.ArchiveChecked);
-            Assert.Null(editor.SystemChecked);
+            Assert.Equal(AttributeTriState.Keep, editor.ReadOnly);
+            Assert.Equal(AttributeTriState.Keep, editor.Hidden);
+            Assert.Equal(AttributeTriState.Keep, editor.Archive);
+            Assert.Equal(AttributeTriState.Keep, editor.System);
 
             var defaults = ((AttributesSetterFilter)step.Filter).Options;
             Assert.Equal(AttributeTriState.Keep, defaults.ReadOnly);
@@ -853,10 +853,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(AttributeTriState.Keep, defaults.Archive);
             Assert.Equal(AttributeTriState.Keep, defaults.System);
 
-            editor.HiddenChecked = true;
-            editor.ArchiveChecked = false;
-            editor.ReadOnlyChecked = true;
-            editor.SystemChecked = null;
+            editor.Hidden = AttributeTriState.Set;
+            editor.Archive = AttributeTriState.Clear;
+            editor.ReadOnly = AttributeTriState.Set;
+            editor.System = AttributeTriState.Keep;
 
             var options = ((AttributesSetterFilter)step.Filter).Options;
             Assert.Equal(AttributeTriState.Set, options.ReadOnly);

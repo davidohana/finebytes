@@ -6,7 +6,7 @@ Each option uses a tri-state:
 
 - **`Set`** — turn the flag on.
 - **`Clear`** — turn the flag off.
-- **`Keep`** — leave the flag as it is on the current preview (default in the UI as an indeterminate / gray checkbox).
+- **`Keep`** — leave the flag as it is on the current preview (default in the UI as the Keep radio).
 
 Other attribute bits (for example `Directory`) are preserved; only the four flags above are modified according to options.
 

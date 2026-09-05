@@ -1245,7 +1245,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies Attributes Setter tri-state checkbox edits persist on the applied step.
+        /// Verifies Attributes Setter On/Off/Keep radio edits persist on the applied step.
         /// </summary>
         [AvaloniaFact]
         public void Attributes_setter_controls_update_chain_options()
@@ -1258,24 +1258,29 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.IsType<AttributesSetterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<AttributesSetterFilterEditorView>().Single();
-            var readOnlyBox = editor.FindControl<CheckBox>("ReadOnlyCheckBox");
-            var hiddenBox = editor.FindControl<CheckBox>("HiddenCheckBox");
-            var archiveBox = editor.FindControl<CheckBox>("ArchiveCheckBox");
-            var systemBox = editor.FindControl<CheckBox>("SystemCheckBox");
-            Assert.NotNull(readOnlyBox);
-            Assert.NotNull(hiddenBox);
-            Assert.NotNull(archiveBox);
-            Assert.NotNull(systemBox);
-            Assert.True(readOnlyBox.IsThreeState);
-            Assert.Null(readOnlyBox.IsChecked);
-            Assert.Null(hiddenBox.IsChecked);
-            Assert.Null(archiveBox.IsChecked);
-            Assert.Null(systemBox.IsChecked);
+            var readOnlyKeep = editor.FindControl<RadioButton>("ReadOnlyKeepRadio");
+            var hiddenKeep = editor.FindControl<RadioButton>("HiddenKeepRadio");
+            var archiveKeep = editor.FindControl<RadioButton>("ArchiveKeepRadio");
+            var systemKeep = editor.FindControl<RadioButton>("SystemKeepRadio");
+            Assert.NotNull(readOnlyKeep);
+            Assert.NotNull(hiddenKeep);
+            Assert.NotNull(archiveKeep);
+            Assert.NotNull(systemKeep);
+            Assert.True(readOnlyKeep.IsChecked);
+            Assert.True(hiddenKeep.IsChecked);
+            Assert.True(archiveKeep.IsChecked);
+            Assert.True(systemKeep.IsChecked);
 
-            hiddenBox.IsChecked = true;
-            archiveBox.IsChecked = false;
-            readOnlyBox.IsChecked = true;
-            systemBox.IsChecked = null;
+            var hiddenOn = editor.FindControl<RadioButton>("HiddenOnRadio");
+            var archiveOff = editor.FindControl<RadioButton>("ArchiveOffRadio");
+            var readOnlyOn = editor.FindControl<RadioButton>("ReadOnlyOnRadio");
+            Assert.NotNull(hiddenOn);
+            Assert.NotNull(archiveOff);
+            Assert.NotNull(readOnlyOn);
+
+            hiddenOn.IsChecked = true;
+            archiveOff.IsChecked = true;
+            readOnlyOn.IsChecked = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

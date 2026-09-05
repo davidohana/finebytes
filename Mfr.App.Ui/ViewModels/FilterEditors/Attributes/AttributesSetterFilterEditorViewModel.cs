@@ -20,39 +20,39 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         }
 
         /// <summary>
-        /// Gets or sets the read-only flag tri-state (<see langword="true"/> set, <see langword="false"/> clear, <see langword="null"/> keep).
+        /// Gets or sets the read-only flag mode (On / Off / Keep).
         /// </summary>
         [ObservableProperty]
-        private bool? _readOnlyChecked;
+        private AttributeTriState _readOnly;
 
         /// <summary>
-        /// Gets or sets the hidden flag tri-state (<see langword="true"/> set, <see langword="false"/> clear, <see langword="null"/> keep).
+        /// Gets or sets the hidden flag mode (On / Off / Keep).
         /// </summary>
         [ObservableProperty]
-        private bool? _hiddenChecked;
+        private AttributeTriState _hidden;
 
         /// <summary>
-        /// Gets or sets the archive flag tri-state (<see langword="true"/> set, <see langword="false"/> clear, <see langword="null"/> keep).
+        /// Gets or sets the archive flag mode (On / Off / Keep).
         /// </summary>
         [ObservableProperty]
-        private bool? _archiveChecked;
+        private AttributeTriState _archive;
 
         /// <summary>
-        /// Gets or sets the system flag tri-state (<see langword="true"/> set, <see langword="false"/> clear, <see langword="null"/> keep).
+        /// Gets or sets the system flag mode (On / Off / Keep).
         /// </summary>
         [ObservableProperty]
-        private bool? _systemChecked;
+        private AttributeTriState _system;
 
-        partial void OnReadOnlyCheckedChanged(bool? value) => _ApplyOptions();
+        partial void OnReadOnlyChanged(AttributeTriState value) => _ApplyOptions();
 
-        partial void OnHiddenCheckedChanged(bool? value) => _ApplyOptions();
+        partial void OnHiddenChanged(AttributeTriState value) => _ApplyOptions();
 
-        partial void OnArchiveCheckedChanged(bool? value) => _ApplyOptions();
+        partial void OnArchiveChanged(AttributeTriState value) => _ApplyOptions();
 
-        partial void OnSystemCheckedChanged(bool? value) => _ApplyOptions();
+        partial void OnSystemChanged(AttributeTriState value) => _ApplyOptions();
 
         /// <summary>
-        /// Loads checkbox states from the step filter without pushing option replaces.
+        /// Loads radio states from the step filter without pushing option replaces.
         /// </summary>
         private void _SyncFromFilter()
         {
@@ -63,15 +63,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 
             LoadWithoutApplying(() =>
             {
-                ReadOnlyChecked = _ToChecked(filter.Options.ReadOnly);
-                HiddenChecked = _ToChecked(filter.Options.Hidden);
-                ArchiveChecked = _ToChecked(filter.Options.Archive);
-                SystemChecked = _ToChecked(filter.Options.System);
+                ReadOnly = filter.Options.ReadOnly;
+                Hidden = filter.Options.Hidden;
+                Archive = filter.Options.Archive;
+                System = filter.Options.System;
             });
         }
 
         /// <summary>
-        /// Builds options from the four tri-state checkboxes and replaces the step filter when changed.
+        /// Builds options from the four attribute modes and replaces the step filter when changed.
         /// </summary>
         private void _ApplyOptions()
         {
@@ -81,39 +81,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             }
 
             var options = new AttributesSetterOptions(
-                ReadOnly: _FromChecked(ReadOnlyChecked),
-                Hidden: _FromChecked(HiddenChecked),
-                Archive: _FromChecked(ArchiveChecked),
-                System: _FromChecked(SystemChecked)
+                ReadOnly: ReadOnly,
+                Hidden: Hidden,
+                Archive: Archive,
+                System: System
             );
             ApplyIfChanged(filter, filter with { Options = options });
-        }
-
-        /// <summary>
-        /// Maps a filter tri-state to a three-state checkbox value.
-        /// </summary>
-        private static bool? _ToChecked(AttributeTriState state)
-        {
-            return state switch
-            {
-                AttributeTriState.Set => true,
-                AttributeTriState.Clear => false,
-                AttributeTriState.Keep => null,
-                _ => null,
-            };
-        }
-
-        /// <summary>
-        /// Maps a three-state checkbox value to a filter tri-state.
-        /// </summary>
-        private static AttributeTriState _FromChecked(bool? isChecked)
-        {
-            return isChecked switch
-            {
-                true => AttributeTriState.Set,
-                false => AttributeTriState.Clear,
-                _ => AttributeTriState.Keep,
-            };
         }
     }
 }
