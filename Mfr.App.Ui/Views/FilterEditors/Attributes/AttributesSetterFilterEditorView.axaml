@@ -17,7 +17,12 @@
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
         <controls:FilterEditorLabeledRow Label="Read-only:">
-          <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
+          <StackPanel
+            Margin="16,0,0,0"
+            Orientation="Horizontal"
+            Spacing="16"
+            HorizontalAlignment="Left"
+          >
             <controls:CompactRadioButton
               x:Name="ReadOnlyOnRadio"
               GroupName="AttributesSetterReadOnly"
@@ -39,7 +44,12 @@
           </StackPanel>
         </controls:FilterEditorLabeledRow>
         <controls:FilterEditorLabeledRow Label="Hidden:">
-          <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
+          <StackPanel
+            Margin="16,0,0,0"
+            Orientation="Horizontal"
+            Spacing="16"
+            HorizontalAlignment="Left"
+          >
             <controls:CompactRadioButton
               x:Name="HiddenOnRadio"
               GroupName="AttributesSetterHidden"
@@ -61,7 +71,12 @@
           </StackPanel>
         </controls:FilterEditorLabeledRow>
         <controls:FilterEditorLabeledRow Label="Archive:">
-          <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
+          <StackPanel
+            Margin="16,0,0,0"
+            Orientation="Horizontal"
+            Spacing="16"
+            HorizontalAlignment="Left"
+          >
             <controls:CompactRadioButton
               x:Name="ArchiveOnRadio"
               GroupName="AttributesSetterArchive"
@@ -83,7 +98,12 @@
           </StackPanel>
         </controls:FilterEditorLabeledRow>
         <controls:FilterEditorLabeledRow Label="System:">
-          <StackPanel Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
+          <StackPanel
+            Margin="16,0,0,0"
+            Orientation="Horizontal"
+            Spacing="16"
+            HorizontalAlignment="Left"
+          >
             <controls:CompactRadioButton
               x:Name="SystemOnRadio"
               GroupName="AttributesSetterSystem"
