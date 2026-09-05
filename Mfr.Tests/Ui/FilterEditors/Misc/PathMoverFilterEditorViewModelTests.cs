@@ -6,9 +6,9 @@ using Mfr.Filters.Misc;
 namespace Mfr.Tests.Ui.FilterEditors.Misc
 {
     /// <summary>
-    /// Unit tests for <see cref="MoverFilterEditorViewModel"/>.
+    /// Unit tests for <see cref="PathMoverFilterEditorViewModel"/>.
     /// </summary>
-    public sealed class MoverFilterEditorViewModelTests
+    public sealed class PathMoverFilterEditorViewModelTests
     {
         /// <summary>
         /// Verifies Mover option edits replace the step filter options.
@@ -16,8 +16,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public void Options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step);
+            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var editor = new PathMoverFilterEditorViewModel(step);
 
             Assert.Equal(@"C:\", editor.RootFolder);
             Assert.Equal("MFR", editor.SubFolder);
@@ -25,7 +25,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             editor.RootFolder = @"D:\Music";
             editor.SubFolder = @"<parent-folder>\<file-name>";
 
-            var options = ((MoverFilter)step.Filter).Options;
+            var options = ((PathMoverFilter)step.Filter).Options;
             Assert.Equal(@"D:\Music", options.RootFolder);
             Assert.Equal(@"<parent-folder>\<file-name>", options.SubFolder);
         }
@@ -36,8 +36,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public async Task Browse_applies_picked_root_folder()
         {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step)
+            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var editor = new PathMoverFilterEditorViewModel(step)
             {
                 PickRootFolderAsync = (current, _) =>
                 {
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             await editor.BrowseRootFolderCommand.ExecuteAsync(null);
 
             Assert.Equal(@"D:\Picked", editor.RootFolder);
-            Assert.Equal(@"D:\Picked", ((MoverFilter)step.Filter).Options.RootFolder);
+            Assert.Equal(@"D:\Picked", ((PathMoverFilter)step.Filter).Options.RootFolder);
         }
 
         /// <summary>
@@ -58,8 +58,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public async Task Browse_cancelled_leaves_root_unchanged()
         {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step)
+            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var editor = new PathMoverFilterEditorViewModel(step)
             {
                 PickRootFolderAsync = (_, _) => Task.FromResult<string?>(null),
             };
@@ -67,7 +67,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             await editor.BrowseRootFolderCommand.ExecuteAsync(null);
 
             Assert.Equal(@"C:\", editor.RootFolder);
-            Assert.Equal(@"C:\", ((MoverFilter)step.Filter).Options.RootFolder);
+            Assert.Equal(@"C:\", ((PathMoverFilter)step.Filter).Options.RootFolder);
         }
 
         /// <summary>
@@ -76,8 +76,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public async Task Browse_whitespace_pick_leaves_root_unchanged()
         {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step)
+            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var editor = new PathMoverFilterEditorViewModel(step)
             {
                 PickRootFolderAsync = (_, _) => Task.FromResult<string?>("   "),
             };
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             await editor.BrowseRootFolderCommand.ExecuteAsync(null);
 
             Assert.Equal(@"C:\", editor.RootFolder);
-            Assert.Equal(@"C:\", ((MoverFilter)step.Filter).Options.RootFolder);
+            Assert.Equal(@"C:\", ((PathMoverFilter)step.Filter).Options.RootFolder);
         }
 
         /// <summary>
@@ -94,13 +94,13 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public async Task Browse_without_picker_leaves_root_unchanged()
         {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step);
+            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var editor = new PathMoverFilterEditorViewModel(step);
 
             await editor.BrowseRootFolderCommand.ExecuteAsync(null);
 
             Assert.Equal(@"C:\", editor.RootFolder);
-            Assert.Equal(@"C:\", ((MoverFilter)step.Filter).Options.RootFolder);
+            Assert.Equal(@"C:\", ((PathMoverFilter)step.Filter).Options.RootFolder);
         }
 
         /// <summary>

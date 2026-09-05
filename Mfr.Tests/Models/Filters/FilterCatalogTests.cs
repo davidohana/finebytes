@@ -75,6 +75,9 @@ namespace Mfr.Tests.Models.Filters
             Assert.Equal("Audio Tag Remover", byType["TagRemover"].DisplayName);
             Assert.Equal(FilterGroup.Audio, byType["TagRemover"].Group);
 
+            Assert.Equal("Path Mover", byType["PathMover"].DisplayName);
+            Assert.Equal(FilterGroup.Misc, byType["PathMover"].Group);
+
             Assert.Equal("Fix Leading 0's", byType["FixLeadingZeros"].DisplayName);
             Assert.Equal(FilterGroup.Misc, byType["FixLeadingZeros"].Group);
 

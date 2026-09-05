@@ -1,4 +1,4 @@
-# Mover
+# PathMover
 
 Moves items to a destination folder by combining a required static **root** with an optional dynamic **sub-folder** template. It applies to **files and folders** in the rename list the same way (folder rows store the folder name with an empty extension).
 
@@ -36,7 +36,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 
 ```json
 {
-  "type": "Mover",
+  "type": "PathMover",
   "options": {
     "rootFolder": "C:\\Music\\New",
     "subFolder": "<parent-folder>\\<file-name>"

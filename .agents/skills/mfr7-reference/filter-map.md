@@ -53,7 +53,7 @@ Maps legacy `[FilterInfo]` entries to finebytes types. Help files live under `He
 | Date/Time Setter            | `DateTimeSetterFilter`    | `datefilter.html` / `timefilter.html` | `DateTimeSetter`            | Combined MFR7 Date + Time Setter; optional `setDate` / `setTime` |
 | Time Shifter                | `TimeShifterFilter`       | `timeshiftfilter.html`                | `TimeShifter`               | Screenshot: `timeshifterfilter.png`                              |
 | Fix Leading 0's             | `FixLZFilter`             | `fixlzfilter.html`                    | `FixLeadingZeros`           | Display name kept                                                |
-| Mover                       | `MoverFilter`             | `moverfilter.html`                    | `Mover`                     |                                                                  |
+| Path Mover                  | `PathMoverFilter`         | `moverfilter.html`                    | `PathMover`                 |                                                                  |
 | Strip Parentheses           | `StripParFilter`          | `stripparfilter.html`                 | `StripParentheses`          |                                                                  |
 
 ## Not yet in finebytes (MFR7 only)

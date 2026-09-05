@@ -42,7 +42,7 @@ namespace Mfr.Engine.Presets
             new(typeof(CleanerFilter), "Cleaner"),
             new(typeof(ReplaceListFilter), "ReplaceList"),
             new(typeof(FixLeadingZerosFilter), "FixLeadingZeros"),
-            new(typeof(MoverFilter), "Mover"),
+            new(typeof(PathMoverFilter), "PathMover"),
             new(typeof(StripParenthesesFilter), "StripParentheses"),
             new(typeof(CapitalizeAfterFilter), "CapitalizeAfter"),
             new(typeof(UppercaseInitialsFilter), "UppercaseInitials"),

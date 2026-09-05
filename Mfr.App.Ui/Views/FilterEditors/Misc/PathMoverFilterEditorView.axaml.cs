@@ -5,14 +5,14 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 namespace Mfr.App.Ui.Views.FilterEditors.Misc
 {
     /// <summary>
-    /// Option editor for <see cref="Filters.Misc.MoverFilter"/>.
+    /// Option editor for <see cref="Filters.Misc.PathMoverFilter"/>.
     /// </summary>
-    public partial class MoverFilterEditorView : UserControl
+    public partial class PathMoverFilterEditorView : UserControl
     {
         /// <summary>
-        /// Initializes the Mover option editor.
+        /// Initializes the Path Mover option editor.
         /// </summary>
-        public MoverFilterEditorView()
+        public PathMoverFilterEditorView()
         {
             InitializeComponent();
             FilterEditorFileDrop.AttachFolderDrop(RootFolderDropTarget, _ApplyDroppedRootFolder);
@@ -22,7 +22,7 @@ namespace Mfr.App.Ui.Views.FilterEditors.Misc
         protected override void OnDataContextChanged(EventArgs e)
         {
             base.OnDataContextChanged(e);
-            if (DataContext is MoverFilterEditorViewModel vm)
+            if (DataContext is PathMoverFilterEditorViewModel vm)
             {
                 vm.PickRootFolderAsync = (currentRoot, cancellationToken) =>
                     FolderPicker.PickFolderAsync(
@@ -36,7 +36,7 @@ namespace Mfr.App.Ui.Views.FilterEditors.Misc
 
         private void _ApplyDroppedRootFolder(string folderPath)
         {
-            if (DataContext is MoverFilterEditorViewModel vm)
+            if (DataContext is PathMoverFilterEditorViewModel vm)
             {
                 vm.RootFolder = folderPath;
             }

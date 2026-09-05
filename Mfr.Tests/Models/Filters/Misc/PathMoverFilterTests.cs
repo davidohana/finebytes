@@ -4,9 +4,9 @@ using Mfr.Utils;
 namespace Mfr.Tests.Models.Filters.Misc
 {
     /// <summary>
-    /// Tests for <see cref="MoverFilter"/>.
+    /// Tests for <see cref="PathMoverFilter"/>.
     /// </summary>
-    public class MoverFilterTests
+    public class PathMoverFilterTests
     {
         private static string Dest => TestPaths.Absolute("Dest");
         private static string Source => TestPaths.Absolute("Source");
@@ -19,7 +19,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_RootOnly_SetsDirectoryToRoot()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest));
             var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
             Assert.Equal(Dest, item.Preview.DirectoryPath);
@@ -31,7 +31,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_EmptySubFolder_SetsDirectoryToRoot()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: ""));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: ""));
             var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
             Assert.Equal(Dest, item.Preview.DirectoryPath);
@@ -43,10 +43,10 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void With_ClearingSubFolder_DropsPreviousCompiledTemplate()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: "1"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: "1"));
             filter.Setup();
 
-            var cleared = filter with { Options = new MoverOptions(Dest, SubFolder: "") };
+            var cleared = filter with { Options = new PathMoverOptions(Dest, SubFolder: "") };
             var item = FilterTestHelpers.ApplyReturnItem(cleared, "track", directory: Source);
 
             Assert.Equal(Dest, item.Preview.DirectoryPath);
@@ -58,7 +58,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_StaticSubFolder_CombinesRootAndSubFolder()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: "Albums"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: "Albums"));
             var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
             Assert.Equal(Path.Combine(Dest, "Albums"), item.Preview.DirectoryPath);
@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_MultiLevelSubFolder_CombinesRootAndDeepPath()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: @"Artist\Album"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: @"Artist\Album"));
             var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
             Assert.Equal(Path.Combine(Dest, "Artist", "Album"), item.Preview.DirectoryPath);
@@ -82,7 +82,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_DoesNotChangePrefix()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: "Sub"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: "Sub"));
             var item = FilterTestHelpers.ApplyReturnItem(filter, "my-track", directory: Source);
 
             Assert.Equal("my-track", item.Preview.Prefix);
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_DoesNotChangeExtension()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest));
             var item = FilterTestHelpers.ApplyReturnItem(filter, "track", extension: ".flac", directory: Source);
 
             Assert.Equal(".flac", item.Preview.Extension);
@@ -106,7 +106,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_TemplateSubFolder_ResolvesToken()
         {
-            var filter = new MoverFilter(new MoverOptions(Music, SubFolder: "<file-name>"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Music, SubFolder: "<file-name>"));
             var item = FilterTestHelpers.ApplyReturnItem(
                 filter,
                 "Blue Moon",
@@ -122,7 +122,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_TemplateWithStaticSegment_ProducesCompoundPath()
         {
-            var filter = new MoverFilter(new MoverOptions(Music, SubFolder: @"Artists\<parent-folder>"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Music, SubFolder: @"Artists\<parent-folder>"));
             var item = FilterTestHelpers.ApplyReturnItem(
                 filter,
                 "track",
@@ -138,7 +138,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_SubFolderWithLeadingSeparator_StripsAndCombines()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: @"\Sub"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: @"\Sub"));
             var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
             Assert.Equal(Path.Combine(Dest, "Sub"), item.Preview.DirectoryPath);
@@ -150,7 +150,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_DriveAbsoluteSubFolder_Throws()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: @"D:\OtherRoot"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: @"D:\OtherRoot"));
             filter.Setup();
             var item = FilterTestHelpers.CreateRenameItem(prefix: "track", directory: Source);
 
@@ -163,7 +163,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_UncAbsoluteSubFolder_Throws()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: @"\\server\share"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: @"\\server\share"));
             filter.Setup();
             var item = FilterTestHelpers.CreateRenameItem(prefix: "track", directory: Source);
 
@@ -176,7 +176,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_DriveRelativeSubFolder_Throws()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: "C:foo"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: "C:foo"));
             filter.Setup();
             var item = FilterTestHelpers.CreateRenameItem(prefix: "track", directory: Source);
 
@@ -189,7 +189,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Setup_EmptyRootFolder_Throws()
         {
-            var filter = new MoverFilter(new MoverOptions(""));
+            var filter = new PathMoverFilter(new PathMoverOptions(""));
 
             Assert.Throws<ArgumentException>(filter.Setup);
         }
@@ -200,7 +200,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Setup_WhitespaceRootFolder_Throws()
         {
-            var filter = new MoverFilter(new MoverOptions("   "));
+            var filter = new PathMoverFilter(new PathMoverOptions("   "));
 
             Assert.Throws<ArgumentException>(filter.Setup);
         }
@@ -211,7 +211,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Setup_RelativeRootFolder_Throws()
         {
-            var filter = new MoverFilter(new MoverOptions(@"relative\path"));
+            var filter = new PathMoverFilter(new PathMoverOptions(@"relative\path"));
 
             Assert.Throws<ArgumentException>(filter.Setup);
         }
@@ -222,7 +222,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_OriginalDirectoryUnchanged()
         {
-            var filter = new MoverFilter(new MoverOptions(Dest));
+            var filter = new PathMoverFilter(new PathMoverOptions(Dest));
             var item = FilterTestHelpers.ApplyReturnItem(filter, "track", directory: Source);
 
             Assert.Equal(Source, item.Original.DirectoryPath);
@@ -236,7 +236,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_FolderEntry_MultipliesPreviewDirectoryAndKeepsFolderName()
         {
-            var filter = new MoverFilter(new MoverOptions(Archive, SubFolder: "Sorted"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Archive, SubFolder: "Sorted"));
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "Photos",
                 extension: string.Empty,
@@ -259,7 +259,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         [Fact]
         public void Apply_FolderEntry_TemplateUsesOriginalParentSegment()
         {
-            var filter = new MoverFilter(new MoverOptions(Music, SubFolder: "<parent-folder>"));
+            var filter = new PathMoverFilter(new PathMoverOptions(Music, SubFolder: "<parent-folder>"));
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "TheTrinitySession",
                 extension: string.Empty,

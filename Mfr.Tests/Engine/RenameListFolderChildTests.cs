@@ -8,7 +8,7 @@ namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// End-to-end tests covering rename batches that mix folder renames with their descendants,
-    /// folder swaps, case-only renames, and the <see cref="MoverFilter"/> directing items into a
+    /// folder swaps, case-only renames, and the <see cref="PathMoverFilter"/> directing items into a
     /// folder that is itself being renamed in the same batch.
     /// </summary>
     public sealed class RenameListFolderChildTests : IDisposable
@@ -193,7 +193,7 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// A <see cref="MoverFilter"/> moves a file into a folder that is itself being renamed in the same batch.
+        /// A <see cref="PathMoverFilter"/> moves a file into a folder that is itself being renamed in the same batch.
         /// The planner must commit the folder rename first so the destination directory exists when the file is moved.
         /// </summary>
         [Fact]
@@ -216,7 +216,7 @@ namespace Mfr.Tests.Engine
             // and a Replacer renames the folder's prefix from "Sink" -> "SinkRenamed".
             var preset = _CreatePresetAllEnabled(
                 "mover-into-renamed",
-                new MoverFilter(new MoverOptions(RootFolder: newFolder)),
+                new PathMoverFilter(new PathMoverOptions(RootFolder: newFolder)),
                 _LiteralPrefixReplacer("Sink", "SinkRenamed")
             );
             var plan = _SetupPreview(renameList, preset);

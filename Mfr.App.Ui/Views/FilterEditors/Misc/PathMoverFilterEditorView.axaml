@@ -8,8 +8,8 @@
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="180"
-  x:Class="Mfr.App.Ui.Views.FilterEditors.Misc.MoverFilterEditorView"
-  x:DataType="vm:MoverFilterEditorViewModel"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Misc.PathMoverFilterEditorView"
+  x:DataType="vm:PathMoverFilterEditorViewModel"
 >
   <StackPanel Spacing="8">
     <controls:FieldsetGroup Header="Options">

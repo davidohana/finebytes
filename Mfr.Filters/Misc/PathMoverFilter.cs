@@ -4,7 +4,7 @@ using Mfr.Utils;
 namespace Mfr.Filters.Misc
 {
     /// <summary>
-    /// Options for the mover filter.
+    /// Options for the path mover filter.
     /// </summary>
     /// <param name="RootFolder">
     /// Required absolute destination directory. All items are moved under this root.
@@ -15,7 +15,7 @@ namespace Mfr.Filters.Misc
     /// hierarchy levels to build deep structures dynamically. Use <c>string.Empty</c> when none; items then
     /// land directly in <paramref name="RootFolder"/>.
     /// </param>
-    public sealed record MoverOptions(string RootFolder, string SubFolder = "");
+    public sealed record PathMoverOptions(string RootFolder, string SubFolder = "");
 
     /// <summary>
     /// Moves items to a destination folder built from a static root and an optional dynamic sub-folder template.
@@ -37,36 +37,40 @@ namespace Mfr.Filters.Misc
     /// movement happen during commit. The filter does not erase original source folders.
     /// </para>
     /// </remarks>
-    /// <param name="Options">Mover options.</param>
-    [FilterPalette(FilterGroup.Misc, "Mover")]
-    public sealed record MoverFilter(MoverOptions Options) : BaseFilter
+    /// <param name="Options">Path mover options.</param>
+    [FilterPalette(FilterGroup.Misc, "Path Mover")]
+    public sealed record PathMoverFilter(PathMoverOptions Options) : BaseFilter
     {
         private Formatter? _compiledSubFolder;
 
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (<c>C:\</c> root, <c>MFR</c> sub-folder).
         /// </summary>
-        public MoverFilter()
-            : this(new MoverOptions(RootFolder: @"C:\", SubFolder: "MFR")) { }
+        public PathMoverFilter()
+            : this(new PathMoverOptions(RootFolder: @"C:\", SubFolder: "MFR")) { }
 
         /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
-        public override string Type => "Mover";
+        public override string Type => "PathMover";
 
         /// <inheritdoc />
-        /// <exception cref="ArgumentException">Thrown when <see cref="MoverOptions.RootFolder"/> is empty, whitespace-only, or not an absolute path.</exception>
+        /// <exception cref="ArgumentException">Thrown when <see cref="PathMoverOptions.RootFolder"/> is empty, whitespace-only, or not an absolute path.</exception>
         protected override void _Setup()
         {
             var root = Options.RootFolder;
             var rootIsBlank = string.IsNullOrWhiteSpace(root);
-            Require.That(!rootIsBlank, "MoverFilter: RootFolder must not be empty.", nameof(MoverOptions.RootFolder));
+            Require.That(
+                !rootIsBlank,
+                "PathMoverFilter: RootFolder must not be empty.",
+                nameof(PathMoverOptions.RootFolder)
+            );
 
             var rootIsAbsolute = Path.IsPathFullyQualified(root);
             Require.That(
                 rootIsAbsolute,
-                $"MoverFilter: RootFolder must be an absolute path (got '{root}').",
-                nameof(MoverOptions.RootFolder)
+                $"PathMoverFilter: RootFolder must be an absolute path (got '{root}').",
+                nameof(PathMoverOptions.RootFolder)
             );
 
             // Unconditional assign (BaseFilter._Setup): `with` copies this field; empty SubFolder must clear it.
@@ -106,8 +110,8 @@ namespace Mfr.Filters.Misc
             var resolvedIsWindowsAbsolute = _IsWindowsAbsoluteSubFolder(resolved);
             Require.That(
                 !resolvedIsWindowsAbsolute,
-                $"MoverFilter: SubFolder must resolve under RootFolder (got absolute path '{resolved}').",
-                nameof(MoverOptions.SubFolder)
+                $"PathMoverFilter: SubFolder must resolve under RootFolder (got absolute path '{resolved}').",
+                nameof(PathMoverOptions.SubFolder)
             );
 
             // SubFolder templates use Windows-style '\' for nested levels (MFR7). Normalize to the host
@@ -127,8 +131,8 @@ namespace Mfr.Filters.Misc
             var relativeIsRooted = Path.IsPathRooted(relative);
             Require.That(
                 !relativeIsRooted,
-                $"MoverFilter: SubFolder must resolve under RootFolder (got rooted path '{relative}').",
-                nameof(MoverOptions.SubFolder)
+                $"PathMoverFilter: SubFolder must resolve under RootFolder (got rooted path '{relative}').",
+                nameof(PathMoverOptions.SubFolder)
             );
 
             return Path.Combine(Options.RootFolder, relative);

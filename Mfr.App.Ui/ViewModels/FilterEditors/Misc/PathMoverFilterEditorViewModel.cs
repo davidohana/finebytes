@@ -6,15 +6,15 @@ using Mfr.Filters.Misc;
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
 {
     /// <summary>
-    /// Filter Configuration editor for <see cref="MoverFilter"/>.
+    /// Filter Configuration editor for <see cref="PathMoverFilter"/>.
     /// </summary>
-    internal sealed partial class MoverFilterEditorViewModel : FilterOptionsEditorViewModel
+    internal sealed partial class PathMoverFilterEditorViewModel : FilterOptionsEditorViewModel
     {
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public MoverFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public PathMoverFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
             _SyncFromFilter();
@@ -70,7 +70,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
 
         private void _SyncFromFilter()
         {
-            if (Step.Filter is not MoverFilter filter)
+            if (Step.Filter is not PathMoverFilter filter)
             {
                 return;
             }
@@ -84,12 +84,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
 
         private void _ApplyOptions()
         {
-            if (IsLoading || Step.Filter is not MoverFilter filter)
+            if (IsLoading || Step.Filter is not PathMoverFilter filter)
             {
                 return;
             }
 
-            var options = new MoverOptions(RootFolder: RootFolder, SubFolder: SubFolder);
+            var options = new PathMoverOptions(RootFolder: RootFolder, SubFolder: SubFolder);
             ApplyIfChanged(filter, filter with { Options = options });
         }
     }

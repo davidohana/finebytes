@@ -45,7 +45,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 TrimBetweenFilter => new TrimBetweenFilterEditorViewModel(step),
                 FixLeadingZerosFilter => new FixLeadingZerosFilterEditorViewModel(step),
                 StripParenthesesFilter => new StripParenthesesFilterEditorViewModel(step),
-                MoverFilter => new MoverFilterEditorViewModel(step),
+                PathMoverFilter => new PathMoverFilterEditorViewModel(step),
                 CleanerFilter => new CleanerFilterEditorViewModel(step),
                 ReplacerFilter => new ReplacerFilterEditorViewModel(step),
                 ReplaceListFilter => new ReplaceListFilterEditorViewModel(step),

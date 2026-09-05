@@ -12,9 +12,9 @@ using Mfr.Tests.Ui.RenameList;
 namespace Mfr.Tests.Ui.FilterEditors.Misc
 {
     /// <summary>
-    /// Headless tests for <see cref="MoverFilterEditorView"/>.
+    /// Headless tests for <see cref="PathMoverFilterEditorView"/>.
     /// </summary>
-    public sealed class MoverFilterEditorViewTests
+    public sealed class PathMoverFilterEditorViewTests
     {
         /// <summary>
         /// Verifies Mover option edits persist on the applied step.
@@ -23,13 +23,13 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Mover"));
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.IsType<MoverFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+            Assert.IsType<PathMoverFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
-            var editor = editorView.GetVisualDescendants().OfType<MoverFilterEditorView>().Single();
+            var editor = editorView.GetVisualDescendants().OfType<PathMoverFilterEditorView>().Single();
             var rootFolder = editor.FindControl<TextBox>("RootFolderBox");
             var subFolder = editor.FindControl<TextBox>("SubFolderBox");
             var browse = editor.FindControl<HyperlinkButton>("BrowseRootButton");
@@ -39,7 +39,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             Assert.Equal(@"C:\", rootFolder.Text);
             Assert.Equal("MFR", subFolder.Text);
             Assert.Same(
-                ((MoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor).BrowseRootFolderCommand,
+                ((PathMoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor).BrowseRootFolderCommand,
                 browse.Command
             );
 
@@ -48,7 +48,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (MoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (PathMoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(@"E:\Archive", filter.Options.RootFolder);
             Assert.Equal("<now:yyyy>", filter.Options.SubFolder);
 
@@ -61,7 +61,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [AvaloniaFact]
         public async Task Root_folder_drop_folder_sets_path()
         {
-            var dir = Path.Combine(Path.GetTempPath(), "mfr-mover-drop-" + Guid.NewGuid().ToString("N"));
+            var dir = Path.Combine(Path.GetTempPath(), "mfr-path-mover-drop-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(dir);
             try
             {
@@ -69,11 +69,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 Directory.CreateDirectory(dest);
 
                 var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-                mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Mover"));
+                mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
-                var editor = editorView.GetVisualDescendants().OfType<MoverFilterEditorView>().Single();
+                var editor = editorView.GetVisualDescendants().OfType<PathMoverFilterEditorView>().Single();
                 var dropTarget = editor.FindControl<StackPanel>("RootFolderDropTarget");
                 Assert.NotNull(dropTarget);
 
@@ -97,11 +97,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
-                var moverFilter = (MoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+                var moverFilter = (PathMoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
                 Assert.Equal(dest, moverFilter.Options.RootFolder);
                 Assert.Equal(
                     dest,
-                    ((MoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!).RootFolder
+                    ((PathMoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!).RootFolder
                 );
 
                 window.Close();
@@ -122,7 +122,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [AvaloniaFact]
         public async Task Root_folder_drop_file_uses_parent()
         {
-            var dir = Path.Combine(Path.GetTempPath(), "mfr-mover-drop-file-" + Guid.NewGuid().ToString("N"));
+            var dir = Path.Combine(Path.GetTempPath(), "mfr-path-mover-drop-file-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(dir);
             try
             {
@@ -130,11 +130,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 File.WriteAllText(filePath, "x");
 
                 var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-                mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Mover"));
+                mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
-                var editor = editorView.GetVisualDescendants().OfType<MoverFilterEditorView>().Single();
+                var editor = editorView.GetVisualDescendants().OfType<PathMoverFilterEditorView>().Single();
                 var dropTarget = editor.FindControl<StackPanel>("RootFolderDropTarget");
                 Assert.NotNull(dropTarget);
 
@@ -145,7 +145,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
-                var moverFilter = (MoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+                var moverFilter = (PathMoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
                 Assert.Equal(dir, moverFilter.Options.RootFolder);
 
                 window.Close();
@@ -167,11 +167,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Root_folder_drag_over_rejects_non_file()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Mover"));
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var editor = editorView.GetVisualDescendants().OfType<MoverFilterEditorView>().Single();
+            var editor = editorView.GetVisualDescendants().OfType<PathMoverFilterEditorView>().Single();
             var dropTarget = editor.FindControl<StackPanel>("RootFolderDropTarget");
             Assert.NotNull(dropTarget);
 
@@ -192,7 +192,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             Assert.Equal(DragDropEffects.None, dragOver.DragEffects);
             Assert.Equal(
                 @"C:\",
-                ((MoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter).Options.RootFolder
+                ((PathMoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter).Options.RootFolder
             );
 
             window.Close();
