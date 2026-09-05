@@ -65,7 +65,7 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
-        /// Verifies an empty word list leaves the segment unchanged.
+        /// Verifies an empty word list leaves the segment unchanged when sentence-initial is off.
         /// </summary>
         [Fact]
         public void Apply_EmptyWords_IsNoOp()
@@ -75,6 +75,19 @@ namespace Mfr.Tests.Models.Filters.Case
             var result = FilterTestHelpers.ApplyToPrefix(filter, "WiTH Or Without");
 
             Assert.Equal("WiTH Or Without", result);
+        }
+
+        /// <summary>
+        /// Verifies an empty word list still applies sentence-initial uppercasing when enabled.
+        /// </summary>
+        [Fact]
+        public void Apply_EmptyWords_WithUppercaseSentenceInitial_UppercasesStart()
+        {
+            var filter = _CreateFilter(words: [], uppercaseSentenceInitial: true);
+
+            var result = FilterTestHelpers.ApplyToPrefix(filter, "hello world");
+
+            Assert.Equal("Hello world", result);
         }
 
         /// <summary>

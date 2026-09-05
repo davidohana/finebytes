@@ -44,7 +44,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
 
             LoadWithoutApplying(() =>
             {
-                WordsText = string.Join(' ', filter.Options.Words);
+                WordsText = CasingListParser.FormatEditorText(filter.Options.Words);
                 UppercaseSentenceInitial = filter.Options.UppercaseSentenceInitial;
             });
         }
@@ -57,23 +57,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
             }
 
             var options = new CasingListOptions(
-                Words: _ParseWords(WordsText),
+                Words: CasingListParser.ParseEditorText(WordsText),
                 UppercaseSentenceInitial: UppercaseSentenceInitial
             );
             ApplyIfChanged(filter, filter with { Options = options });
-        }
-
-        /// <summary>
-        /// Splits space-separated editor text into words.
-        /// </summary>
-        private static string[] _ParseWords(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return [];
-            }
-
-            return text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         }
     }
 }
