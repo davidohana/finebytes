@@ -7,7 +7,7 @@ namespace Mfr.Filters.Misc
     /// </summary>
     /// <param name="Width">Target numeric width.</param>
     /// <param name="RemoveExtraZeros">Whether extra leading zeros are removed before padding.</param>
-    /// <param name="MaxCount">Maximum count of numbers to fix (0 for all).</param>
+    /// <param name="MaxCount">Maximum count of digit groups to change (0 for all).</param>
     /// <param name="WholeWordOnly">Whether to fix only numbers that form a whole word (not part of a word).</param>
     public sealed record FixLeadingZerosOptions(
         int Width,
@@ -50,52 +50,66 @@ namespace Mfr.Filters.Misc
                 return value;
             }
 
-            var count = 0;
+            var changedCount = 0;
             return _DigitsRegex()
                 .Replace(
                     value,
                     m =>
                     {
-                        if (Options.WholeWordOnly)
-                        {
-                            var start = m.Index;
-                            var end = m.Index + m.Length;
-
-                            var isLetterBefore = start > 0 && char.IsLetter(value[start - 1]);
-                            var isLetterAfter = end < value.Length && char.IsLetter(value[end]);
-
-                            if (isLetterBefore || isLetterAfter)
-                            {
-                                return m.Value;
-                            }
-                        }
-
-                        if (Options.MaxCount > 0 && count >= Options.MaxCount)
+                        if (Options.WholeWordOnly && !_IsWholeWordDigitGroup(value, m.Index, m.Length))
                         {
                             return m.Value;
                         }
 
-                        count++;
-
-                        var digits = m.Value;
-                        if (Options.RemoveExtraZeros)
+                        var normalized = _NormalizeDigitGroup(m.Value, Options);
+                        if (normalized == m.Value)
                         {
-                            digits = digits.TrimStart('0');
+                            return m.Value;
                         }
 
-                        if (digits.Length == 0)
+                        if (Options.MaxCount > 0 && changedCount >= Options.MaxCount)
                         {
-                            digits = "0";
+                            return m.Value;
                         }
 
-                        if (digits.Length >= Options.Width)
-                        {
-                            return digits;
-                        }
-
-                        return digits.PadLeft(Options.Width, '0');
+                        changedCount++;
+                        return normalized;
                     }
                 );
+        }
+
+        /// <summary>
+        /// Returns whether the digit span is not adjacent to a letter (MFR7 whole-word for numeric runs).
+        /// </summary>
+        private static bool _IsWholeWordDigitGroup(string value, int start, int length)
+        {
+            var end = start + length;
+            var isLetterBefore = start > 0 && char.IsLetter(value[start - 1]);
+            var isLetterAfter = end < value.Length && char.IsLetter(value[end]);
+            return !isLetterBefore && !isLetterAfter;
+        }
+
+        /// <summary>
+        /// Pads or optionally strips leading zeros so the digit group meets <see cref="FixLeadingZerosOptions.Width"/>.
+        /// </summary>
+        private static string _NormalizeDigitGroup(string digits, FixLeadingZerosOptions options)
+        {
+            if (options.RemoveExtraZeros)
+            {
+                digits = digits.TrimStart('0');
+            }
+
+            if (digits.Length == 0)
+            {
+                digits = "0";
+            }
+
+            if (digits.Length >= options.Width)
+            {
+                return digits;
+            }
+
+            return digits.PadLeft(options.Width, '0');
         }
 
         [GeneratedRegex(@"\d+", RegexOptions.Compiled)]

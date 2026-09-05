@@ -7,7 +7,8 @@ Finds **runs of digits** in the segment and rewrites them so their length matche
 - **`width`** (int, required) — Desired minimum digit count after normalization.
 - **`removeExtraZeros`** (bool, required)
   - If `true`, strip leading zeros from the match first, then pad to `width` when shorter.
-- **`maxCount`** (int, default `0`) — Maximum number of digit groups to change; `0` = all matches.
+- **`maxCount`** (int, default `0`) — Maximum number of digit groups to **change**; `0` = all matches.
+  - Already-wide (or otherwise unchanged) groups do not consume the budget — same idea as MFR7 “first number only.”
 - **`wholeWordOnly`** (bool, default `true`)
   - If `true`, skip digit groups that have a letter immediately before or after.
 
@@ -23,7 +24,11 @@ Finds **runs of digits** in the segment and rewrites them so their length matche
 - `width`: `3`; `removeExtraZeros`: `false`; `maxCount`: `1`
   - Before: `05-Opus 40`
   - After: `005-Opus 40`
-  - Comment: Only first digit run affected.
+  - Comment: Only first digit run that changes is affected.
+- `width`: `3`; `removeExtraZeros`: `false`; `maxCount`: `1`
+  - Before: `123-45`
+  - After: `123-045`
+  - Comment: `123` is already wide, so it does not consume `maxCount`.
 - `width`: `3`; `removeExtraZeros`: `false`; `maxCount`: `2` — `05-Opus 40 (1)` → `005-Opus 040 (1)`
 
 ## Sample preset (JSON)

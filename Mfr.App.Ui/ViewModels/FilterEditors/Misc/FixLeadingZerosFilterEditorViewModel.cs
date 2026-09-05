@@ -32,8 +32,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
         private bool _removeExtraZeros;
 
         /// <summary>
-        /// Gets or sets the maximum number of digit groups to fix (<c>0</c> = all).
+        /// Gets or sets the maximum number of digit groups to change (<c>0</c> = all).
         /// </summary>
+        /// <remarks>
+        /// <para>Unchanged groups (already wide / no-op) do not consume this budget.</para>
+        /// </remarks>
         [ObservableProperty]
         private decimal _maxCount = 1;
 
