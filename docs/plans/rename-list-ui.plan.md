@@ -192,11 +192,11 @@ After **10a–10d**. Enable **preview** column variants for catalog fields that 
 
 ### Scope (MFR7 parity)
 
-| Group | Preview columns | Why |
-| ----- | --------------- | --- |
+| Group                          | Preview columns                                                              | Why                                                                                                                                                                                                                                                       |
+| ------------------------------ | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Extended** (File Properties) | **Creation Date**, **Last Write Date**, **Last Access Date**, **Attributes** | **Done (12a).** MFR7 `PropertyType.ReadWrite`. `DateTimeSetter` / `TimeShifter` write `item.Preview.CreationTime` / `LastWriteTime` / `LastAccessTime`; attributes filters write preview attrs. Size / Folder File Count stay original-only (`ReadOnly`). |
-| **AudioTag** (ID3 etc.) | Writable tag fields | MFR7 `ReadWriteApply` — preview when tag-setter filters change tags. |
-| **Image / Jpeg** | None in this phase | MFR7 EXIF incl. Date/Time Taken is `ReadOnly` — originals only (Phase 6). |
+| **AudioTag** (ID3 etc.)        | Writable tag fields                                                          | MFR7 `ReadWriteApply` — preview when tag-setter filters change tags.                                                                                                                                                                                      |
+| **Image / Jpeg**               | None in this phase                                                           | MFR7 EXIF incl. Date/Time Taken is `ReadOnly` — originals only (Phase 6).                                                                                                                                                                                 |
 
 Shuttle **Preview** tab lists every field with `SupportsPreview` that is not already visible as a preview column (same rule as today for Basic).
 

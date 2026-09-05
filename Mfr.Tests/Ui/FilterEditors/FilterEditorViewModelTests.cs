@@ -666,5 +666,37 @@ namespace Mfr.Tests.Ui.FilterEditors
                 options.Time.ToString("HH':'mm':'ss", System.Globalization.CultureInfo.InvariantCulture)
             );
         }
+
+        /// <summary>
+        /// Verifies Attributes Setter tri-state checkbox edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Attributes_setter_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Attributes Setter", new AttributesSetterFilter());
+            var editor = new AttributesSetterFilterEditorViewModel(step);
+
+            Assert.Null(editor.ReadOnlyChecked);
+            Assert.Null(editor.HiddenChecked);
+            Assert.Null(editor.ArchiveChecked);
+            Assert.Null(editor.SystemChecked);
+
+            var defaults = ((AttributesSetterFilter)step.Filter).Options;
+            Assert.Equal(AttributeTriState.Keep, defaults.ReadOnly);
+            Assert.Equal(AttributeTriState.Keep, defaults.Hidden);
+            Assert.Equal(AttributeTriState.Keep, defaults.Archive);
+            Assert.Equal(AttributeTriState.Keep, defaults.System);
+
+            editor.HiddenChecked = true;
+            editor.ArchiveChecked = false;
+            editor.ReadOnlyChecked = true;
+            editor.SystemChecked = null;
+
+            var options = ((AttributesSetterFilter)step.Filter).Options;
+            Assert.Equal(AttributeTriState.Set, options.ReadOnly);
+            Assert.Equal(AttributeTriState.Set, options.Hidden);
+            Assert.Equal(AttributeTriState.Clear, options.Archive);
+            Assert.Equal(AttributeTriState.Keep, options.System);
+        }
     }
 }
