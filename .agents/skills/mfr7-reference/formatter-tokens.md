@@ -17,25 +17,25 @@ finebytes implements tokens under `Mfr.Filters/Formatting/Tokens/` as `IFormatTo
 
 ## Class → token map
 
-| MFR7 class                       | Help               | finebytes token(s)         |
-| -------------------------------- | ------------------ | -------------------------- |
-| `FileNameFormattingParameter`    | `filenamefp.html`  | `FileNameToken`            |
-| `ExtensionFormattingParameter`   | `filenamefp.html`  | `FileExtensionToken`       |
-| `FullNameFormattingParameter`    | `filenamefp.html`  | `FullNameToken`            |
-| `FolderFormattingParameter`      | `filepropsfp.html` | `ParentFolderToken`        |
-| `DriveFormattingParameter`       | `filepropsfp.html` | `DriveLetterToken`         |
-| `VolumeLabelFormattingParameter` | `filepropsfp.html` | `VolumeLabelToken`         |
-| `SizeFormattingParameter`        | `filepropsfp.html` | `FileSizeToken`            |
-| `DateFormattingParameter`        | `filepropsfp.html` | `FileDateToken`            |
-| `FileCountFormattingParameter`   | `filepropsfp.html` | `FileCountToken`           |
-| `CounterFormattingParameter`     | `counterfp.html`   | `CounterToken`             |
-| `ItemCountFormattingParameter`   | `itemcountfp.html` | `ItemCountToken`           |
-| `NameListFormattingParameter`    | `namelistfp.html`  | `NameListEntryToken`       |
-| `SubstringFormattingParameter`   | `substringfp.html` | `SubstringToken`           |
-| `TokenFormattingParameter`       | `tokenfp.html`     | `TokenExtractToken`        |
-| `RandomCharFormattingParameter`  | (generalfp)        | `RandomCharToken`          |
-| `Id3FieldFormattingParameter`    | `id3fp.html`       | `SemanticAudioFieldTokens` |
-| `Id3V2FieldFormattingParameter`  | `id3v2fp.html`     | `Id3v2Token`               |
+| MFR7 class                       | Help               | finebytes token(s)                                         |
+| -------------------------------- | ------------------ | ---------------------------------------------------------- |
+| `FileNameFormattingParameter`    | `filenamefp.html`  | `FileNameToken`                                            |
+| `ExtensionFormattingParameter`   | `filenamefp.html`  | `FileExtensionToken`                                       |
+| `FullNameFormattingParameter`    | `filenamefp.html`  | `FullNameToken`                                            |
+| `FolderFormattingParameter`      | `filepropsfp.html` | `ParentFolderToken`                                        |
+| `DriveFormattingParameter`       | `filepropsfp.html` | `DriveLetterToken`                                         |
+| `VolumeLabelFormattingParameter` | `filepropsfp.html` | `VolumeLabelToken`                                         |
+| `SizeFormattingParameter`        | `filepropsfp.html` | `FileSizeToken`                                            |
+| `DateFormattingParameter`        | `filepropsfp.html` | `FileDateToken`                                            |
+| `FileCountFormattingParameter`   | `filepropsfp.html` | `FileCountToken`                                           |
+| `CounterFormattingParameter`     | `counterfp.html`   | `CounterToken`                                             |
+| `ItemCountFormattingParameter`   | `itemcountfp.html` | `ItemCountToken`                                           |
+| `NameListFormattingParameter`    | `namelistfp.html`  | *(not ported; Name List filter uses embedded editor text)* |
+| `SubstringFormattingParameter`   | `substringfp.html` | `SubstringToken`                                           |
+| `TokenFormattingParameter`       | `tokenfp.html`     | `TokenExtractToken`                                        |
+| `RandomCharFormattingParameter`  | (generalfp)        | `RandomCharToken`                                          |
+| `Id3FieldFormattingParameter`    | `id3fp.html`       | `SemanticAudioFieldTokens`                                 |
+| `Id3V2FieldFormattingParameter`  | `id3v2fp.html`     | `Id3v2Token`                                               |
 
 Also check `FullPathToken`, `FullPathLengthToken`, `FileNameLengthToken`, `FileOrFolderToken`, `FileNameNumericValueToken`, `NowToken`, `ExifToken`, `ExifDateToken`, `ExifPropertyTokens`, `ImagePropertyTokens`, `MediaPropertyTokens`, `MpegAudioPropertyTokens` — added or reorganized in the rewrite; grep finebytes for the angle-bracket token name if no MFR7 class name match.
 
