@@ -26,27 +26,27 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             editor.RemoveAll = false;
             Assert.False(editor.RemoveAll);
             Assert.True(editor.AreBlockTypesEnabled);
-            Assert.False(editor.RemoveId3v1);
-            Assert.False(editor.RemoveId3v2);
+            Assert.False(_Row(editor, AudioTagBlockKind.Id3v1).IsSelected);
+            Assert.False(_Row(editor, AudioTagBlockKind.Id3v2).IsSelected);
             // Selective UI with no blocks yet keeps nuclear options on the step.
             Assert.True(((TagRemoverFilter)step.Filter).Options.All);
 
-            editor.RemoveId3v1 = true;
+            _Row(editor, AudioTagBlockKind.Id3v1).IsSelected = true;
             var options = ((TagRemoverFilter)step.Filter).Options;
             Assert.False(options.All);
             Assert.Equal([AudioTagBlockKind.Id3v1], options.Blocks);
 
-            editor.RemoveId3v2 = true;
+            _Row(editor, AudioTagBlockKind.Id3v2).IsSelected = true;
             options = ((TagRemoverFilter)step.Filter).Options;
             Assert.False(options.All);
             Assert.Equal([AudioTagBlockKind.Id3v1, AudioTagBlockKind.Id3v2], options.Blocks);
 
-            editor.RemoveId3v2 = false;
+            _Row(editor, AudioTagBlockKind.Id3v2).IsSelected = false;
             options = ((TagRemoverFilter)step.Filter).Options;
             Assert.False(options.All);
             Assert.Equal([AudioTagBlockKind.Id3v1], options.Blocks);
 
-            editor.RemoveId3v1 = false;
+            _Row(editor, AudioTagBlockKind.Id3v1).IsSelected = false;
             Assert.True(editor.RemoveAll);
             Assert.False(editor.AreBlockTypesEnabled);
             Assert.True(((TagRemoverFilter)step.Filter).Options.All);
@@ -67,11 +67,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             var editor = new TagRemoverFilterEditorViewModel(step);
 
             Assert.True(editor.RemoveAll);
-            Assert.False(editor.RemoveId3v2);
-            Assert.False(editor.RemoveXiph);
+            Assert.False(_Row(editor, AudioTagBlockKind.Id3v2).IsSelected);
+            Assert.False(_Row(editor, AudioTagBlockKind.Xiph).IsSelected);
 
             editor.RemoveAll = false;
-            Assert.False(editor.RemoveId3v2);
+            Assert.False(_Row(editor, AudioTagBlockKind.Id3v2).IsSelected);
             Assert.True(((TagRemoverFilter)step.Filter).Options.All);
         }
 
@@ -89,6 +89,24 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
 
             Assert.True(editor.RemoveAll);
             Assert.False(editor.AreBlockTypesEnabled);
+        }
+
+        /// <summary>
+        /// Verifies the block-row catalog covers every <see cref="AudioTagBlockKind"/> once.
+        /// </summary>
+        [Fact]
+        public void Tag_remover_block_rows_match_enum_catalog()
+        {
+            var step = new AppliedFilterStepViewModel("Audio Tag Remover", new TagRemoverFilter());
+            var editor = new TagRemoverFilterEditorViewModel(step);
+
+            Assert.Equal(Enum.GetValues<AudioTagBlockKind>(), editor.BlockRows.Select(row => row.Kind));
+            Assert.Equal(AudioTagBlockKindChoice.All.Count, editor.BlockRows.Count);
+        }
+
+        private static TagRemoverBlockRowViewModel _Row(TagRemoverFilterEditorViewModel editor, AudioTagBlockKind kind)
+        {
+            return editor.BlockRows.Single(row => row.Kind == kind);
         }
     }
 }

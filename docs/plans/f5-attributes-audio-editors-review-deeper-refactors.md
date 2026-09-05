@@ -28,16 +28,13 @@ This doc lists **not done** work only.
 - `FileTimestampDateLimits` shared range owner (#30)
 - Per-editor Filter Configuration test suites under `Mfr.Tests/Ui/FilterEditors/<Group>/` (master after #24–#30)
 - Shared timestamp-field combo catalog on `TimestampFieldChoice` (autofix)
+- Tag Remover block-kind catalog UI (`AudioTagBlockKindChoice` + row VMs + `ItemsControl`)
 
 ## Ranked follow-ups (best cost-to-value first)
 
-### 1. Tag Remover block-kind catalog UI — **high**
+### 1. Tag Remover block-kind catalog UI — **done**
 
-- **Sites:** `TagRemoverFilterEditorViewModel` (7 bools + helpers) + `TagRemoverFilterEditorView.axaml` (7 checkboxes)
-- **Target:** `ItemsControl` (or small row VM list) over `AudioTagBlockKind`; selection = list/set
-- **Value:** deletes ~100 LOC of parallel bool/AXAML; enum growth is one place
-- **Cost:** medium (VM + AXAML + headless `FindControl` names); low behavior risk after selective-default fix
-- **Rank:** high — do first when next touching Tag Remover
+- Shipped: `AudioTagBlockKindChoice` + `TagRemoverBlockRowViewModel` + `ItemsControl` over rows; selection = `IsSelected` → `Blocks` list.
 
 ### 2. Time Shifter DateTime overflow policy — **medium / high**
 
@@ -55,13 +52,13 @@ This doc lists **not done** work only.
 - **Cost:** low–medium AXAML; weak until a tip wording change is needed
 - **Rank:** medium — later / ride along
 
-### 4. AudioTagBlockKind UI display names — **medium**
+### 4. AudioTagBlockKind UI display names — **partial / medium**
 
-- **Sites:** Tag Remover AXAML `Content` strings vs `AudioTagContainerPolicy` describe helpers
-- **Target:** small UI-facing name map (do **not** bind AXAML to private domain helpers)
-- **Value:** one label source when Audio Tag Setter / more block UIs land
-- **Cost:** low–medium; wait for a second consumer
-- **Rank:** medium — later
+- **Sites:** `AudioTagBlockKindChoice` (Tag Remover labels/tips) vs `AudioTagContainerPolicy` describe helpers
+- **Target:** promote/reuse the choice catalog when Audio Tag Setter / more block UIs land (do **not** bind AXAML to private domain helpers)
+- **Value:** one label source across block UIs
+- **Cost:** low once a second consumer appears
+- **Rank:** medium — wait for a second consumer
 
 ### 5. Attributes Setter radio-row control — **medium / low**
 

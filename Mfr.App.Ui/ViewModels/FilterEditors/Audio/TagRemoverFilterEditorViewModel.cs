@@ -17,8 +17,20 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         public TagRemoverFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
+            BlockRows =
+            [
+                .. AudioTagBlockKindChoice.All.Select(choice => new TagRemoverBlockRowViewModel(
+                    choice,
+                    _OnBlockChanged
+                )),
+            ];
             _SyncFromFilter();
         }
+
+        /// <summary>
+        /// Gets the selective block-type checkbox rows (one per <see cref="AudioTagBlockKind"/>).
+        /// </summary>
+        public IReadOnlyList<TagRemoverBlockRowViewModel> BlockRows { get; }
 
         /// <summary>
         /// Gets or sets whether every TagLib tag type is stripped (nuclear mode).
@@ -26,48 +38,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(AreBlockTypesEnabled))]
         private bool _removeAll = true;
-
-        /// <summary>
-        /// Gets or sets whether ID3v1 blocks are removed in selective mode.
-        /// </summary>
-        [ObservableProperty]
-        private bool _removeId3v1;
-
-        /// <summary>
-        /// Gets or sets whether ID3v2 blocks are removed in selective mode.
-        /// </summary>
-        [ObservableProperty]
-        private bool _removeId3v2;
-
-        /// <summary>
-        /// Gets or sets whether Xiph comment blocks are removed in selective mode.
-        /// </summary>
-        [ObservableProperty]
-        private bool _removeXiph;
-
-        /// <summary>
-        /// Gets or sets whether APEv2 blocks are removed in selective mode.
-        /// </summary>
-        [ObservableProperty]
-        private bool _removeApe;
-
-        /// <summary>
-        /// Gets or sets whether Apple/iTunes blocks are removed in selective mode.
-        /// </summary>
-        [ObservableProperty]
-        private bool _removeApple;
-
-        /// <summary>
-        /// Gets or sets whether ASF blocks are removed in selective mode.
-        /// </summary>
-        [ObservableProperty]
-        private bool _removeAsf;
-
-        /// <summary>
-        /// Gets or sets whether RIFF INFO blocks are removed in selective mode.
-        /// </summary>
-        [ObservableProperty]
-        private bool _removeRiffInfo;
 
         /// <summary>
         /// Gets whether selective block-type checkboxes are enabled.
@@ -85,20 +55,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             // Stay on nuclear options until the user checks at least one type.
             _ApplyOptions();
         }
-
-        partial void OnRemoveId3v1Changed(bool value) => _OnBlockChanged();
-
-        partial void OnRemoveId3v2Changed(bool value) => _OnBlockChanged();
-
-        partial void OnRemoveXiphChanged(bool value) => _OnBlockChanged();
-
-        partial void OnRemoveApeChanged(bool value) => _OnBlockChanged();
-
-        partial void OnRemoveAppleChanged(bool value) => _OnBlockChanged();
-
-        partial void OnRemoveAsfChanged(bool value) => _OnBlockChanged();
-
-        partial void OnRemoveRiffInfoChanged(bool value) => _OnBlockChanged();
 
         /// <summary>
         /// Snaps empty selective mode back to nuclear, then applies options.
@@ -140,18 +96,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
                 RemoveAll = all;
                 if (all)
                 {
-                    _ClearBlockFlags();
+                    _ClearBlockSelections();
                     return;
                 }
 
                 var selected = blocks.ToHashSet();
-                RemoveId3v1 = selected.Contains(AudioTagBlockKind.Id3v1);
-                RemoveId3v2 = selected.Contains(AudioTagBlockKind.Id3v2);
-                RemoveXiph = selected.Contains(AudioTagBlockKind.Xiph);
-                RemoveApe = selected.Contains(AudioTagBlockKind.Ape);
-                RemoveApple = selected.Contains(AudioTagBlockKind.Apple);
-                RemoveAsf = selected.Contains(AudioTagBlockKind.Asf);
-                RemoveRiffInfo = selected.Contains(AudioTagBlockKind.RiffInfo);
+                foreach (var row in BlockRows)
+                {
+                    row.IsSelected = selected.Contains(row.Kind);
+                }
             });
         }
 
@@ -190,21 +143,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// </summary>
         private bool _AnyBlockSelected()
         {
-            return RemoveId3v1 || RemoveId3v2 || RemoveXiph || RemoveApe || RemoveApple || RemoveAsf || RemoveRiffInfo;
+            return BlockRows.Any(row => row.IsSelected);
         }
 
         /// <summary>
         /// Clears all selective block checkboxes (nuclear UI state).
         /// </summary>
-        private void _ClearBlockFlags()
+        private void _ClearBlockSelections()
         {
-            RemoveId3v1 = false;
-            RemoveId3v2 = false;
-            RemoveXiph = false;
-            RemoveApe = false;
-            RemoveApple = false;
-            RemoveAsf = false;
-            RemoveRiffInfo = false;
+            foreach (var row in BlockRows)
+            {
+                row.IsSelected = false;
+            }
         }
 
         /// <summary>
@@ -212,43 +162,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// </summary>
         private List<AudioTagBlockKind> _SelectedBlocks()
         {
-            var blocks = new List<AudioTagBlockKind>(7);
-            if (RemoveId3v1)
-            {
-                blocks.Add(AudioTagBlockKind.Id3v1);
-            }
-
-            if (RemoveId3v2)
-            {
-                blocks.Add(AudioTagBlockKind.Id3v2);
-            }
-
-            if (RemoveXiph)
-            {
-                blocks.Add(AudioTagBlockKind.Xiph);
-            }
-
-            if (RemoveApe)
-            {
-                blocks.Add(AudioTagBlockKind.Ape);
-            }
-
-            if (RemoveApple)
-            {
-                blocks.Add(AudioTagBlockKind.Apple);
-            }
-
-            if (RemoveAsf)
-            {
-                blocks.Add(AudioTagBlockKind.Asf);
-            }
-
-            if (RemoveRiffInfo)
-            {
-                blocks.Add(AudioTagBlockKind.RiffInfo);
-            }
-
-            return blocks;
+            return [.. BlockRows.Where(row => row.IsSelected).Select(row => row.Kind)];
         }
     }
 }

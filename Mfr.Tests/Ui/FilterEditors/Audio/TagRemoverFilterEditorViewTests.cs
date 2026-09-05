@@ -32,21 +32,22 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
 
             var editor = editorView.GetVisualDescendants().OfType<TagRemoverFilterEditorView>().Single();
             var removeAll = editor.FindControl<CompactCheckBox>("RemoveAllCheckBox");
-            var id3v1 = editor.FindControl<CompactCheckBox>("Id3v1CheckBox");
-            var id3v2 = editor.FindControl<CompactCheckBox>("Id3v2CheckBox");
+            var blockKinds = editor.FindControl<ItemsControl>("BlockKindsItemsControl");
             Assert.NotNull(removeAll);
-            Assert.NotNull(id3v1);
-            Assert.NotNull(id3v2);
+            Assert.NotNull(blockKinds);
             Assert.True(removeAll.IsChecked);
             Assert.False(editorVm.AreBlockTypesEnabled);
-            Assert.False(id3v1.IsEnabled);
+            Assert.False(blockKinds.IsEnabled);
 
             removeAll.IsChecked = false;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(editorVm.AreBlockTypesEnabled);
-            Assert.True(id3v1.IsEnabled);
+            Assert.True(blockKinds.IsEnabled);
+
+            var id3v1 = _FindBlockCheckBox(editor, AudioTagBlockKind.Id3v1);
+            var id3v2 = _FindBlockCheckBox(editor, AudioTagBlockKind.Id3v2);
             Assert.False(id3v1.IsChecked);
             Assert.False(id3v2.IsChecked);
 
@@ -71,6 +72,14 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.False(editorVm.AreBlockTypesEnabled);
 
             window.Close();
+        }
+
+        private static CompactCheckBox _FindBlockCheckBox(TagRemoverFilterEditorView editor, AudioTagBlockKind kind)
+        {
+            return editor
+                .GetVisualDescendants()
+                .OfType<CompactCheckBox>()
+                .Single(box => box.Tag is AudioTagBlockKind tagged && tagged == kind);
         }
     }
 }
