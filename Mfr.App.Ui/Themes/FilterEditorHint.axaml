@@ -1,0 +1,36 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="clr-namespace:Mfr.App.Ui.Views.Controls"
+>
+  <StreamGeometry x:Key="FilterEditorBulbGeometry">
+    M8,1.2 C5.4,1.2 3.3,3.3 3.3,5.9 C3.3,7.7 4.2,9.3 5.6,10.2 L5.6,12.4 C5.6,13 6.1,13.5 6.7,13.5 L9.3,13.5 C9.9,13.5 10.4,13 10.4,12.4 L10.4,10.2 C11.8,9.3 12.7,7.7 12.7,5.9 C12.7,3.3 10.6,1.2 8,1.2 Z M6.2,14.3 H9.8 V15 H6.2 Z M6.6,15.5 H9.4 V16.2 H6.6 Z
+  </StreamGeometry>
+
+  <ControlTheme x:Key="{x:Type controls:FilterEditorHint}" TargetType="controls:FilterEditorHint">
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:FilterEditorHint">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <Viewbox Width="14" Height="14" VerticalAlignment="Top" Margin="0,1,0,0">
+            <Canvas Width="16" Height="16">
+              <Path
+                Fill="#E6B422"
+                Stroke="#A67C12"
+                StrokeThickness="0.7"
+                StrokeJoin="Round"
+                Data="{StaticResource FilterEditorBulbGeometry}"
+              />
+              <Ellipse Canvas.Left="6.2" Canvas.Top="4.2" Width="3.6" Height="3.2" Fill="#66FFFFFF" />
+            </Canvas>
+          </Viewbox>
+          <TextBlock
+            Classes="filter-editor-hint"
+            VerticalAlignment="Center"
+            TextWrapping="Wrap"
+            Text="{TemplateBinding Text}"
+          />
+        </StackPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

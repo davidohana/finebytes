@@ -70,6 +70,7 @@
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
+        <controls:FilterEditorHint Text="Tag removal cannot be undone with Undo." />
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>

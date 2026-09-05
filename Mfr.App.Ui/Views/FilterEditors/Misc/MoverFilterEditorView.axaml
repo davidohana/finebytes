@@ -79,6 +79,7 @@
             Text="{Binding SubFolder}"
           />
         </StackPanel>
+        <controls:FilterEditorHint Text="Sub-folder may use formatter tokens; \ makes nested folders." />
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>

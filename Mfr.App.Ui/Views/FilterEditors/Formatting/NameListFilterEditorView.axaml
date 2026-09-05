@@ -35,6 +35,7 @@
           Watermark="Alpha&#x0a;Beta&#x0a;Gamma"
           Text="{Binding EntriesText}"
         />
+        <controls:FilterEditorHint Text="One name per line; line n applies to Rename List item n." />
       </StackPanel>
     </controls:FieldsetGroup>
     <controls:FieldsetGroup Header="Options">

@@ -10,6 +10,7 @@
         <ResourceInclude Source="/Themes/FileList.axaml" />
         <ResourceInclude Source="/Themes/FieldsetGroup.axaml" />
         <ResourceInclude Source="/Themes/FilterEditorLabeledRow.axaml" />
+        <ResourceInclude Source="/Themes/FilterEditorHint.axaml" />
         <ResourceInclude Source="/Assets/Icons.axaml" />
       </ResourceDictionary.MergedDictionaries>
       <ResourceDictionary.ThemeDictionaries>

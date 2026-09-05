@@ -74,7 +74,7 @@
             Value="{Binding MoveBy}"
           />
         </controls:FilterEditorLabeledRow>
-        <TextBlock Classes="filter-editor-label" Text="(Negative value moves left)" Opacity="0.75" />
+        <controls:FilterEditorHint Text="Negative value moves left." />
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>

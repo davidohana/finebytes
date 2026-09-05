@@ -60,9 +60,8 @@
             </ToolTip.Tip>
           </ComboBox>
         </StackPanel>
-        <TextBlock
-          Classes="filter-editor-label"
-          Text="Hint: set a negative value to shift time backwards."
+        <controls:FilterEditorHint
+          Text="Set a negative value to shift time backwards."
           ToolTip.Tip="Negative amounts move the timestamp earlier; positive amounts move it later."
         />
       </StackPanel>

@@ -60,6 +60,7 @@
             />
           </StackPanel>
         </StackPanel>
+        <controls:FilterEditorHint Text="This sets the word separator used by later filters (e.g. Capitalize)." />
       </StackPanel>
     </controls:FieldsetGroup>
     <controls:FieldsetGroup Header="Replace">

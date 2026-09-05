@@ -37,6 +37,7 @@
           Watermark="{Binding EntriesWatermark}"
           Text="{Binding EntriesText}"
         />
+        <controls:FilterEditorHint Text="One pair per line: search => replacement (lone search removes)." />
       </StackPanel>
     </controls:FieldsetGroup>
     <controls:ReplacerMatchOptionsFieldset x:Name="MatchOptionsFieldset" DataContext="{Binding Match}" />

@@ -135,11 +135,7 @@ namespace Mfr.Tests.Models.Filters.Attributes
         {
             var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
             var filter = new TimeShifterFilter(
-                Options: new TimeShifterOptions(
-                    TimestampField: TimestampField.LastWrite,
-                    Amount: amount,
-                    Unit: unit
-                )
+                Options: new TimeShifterOptions(TimestampField: TimestampField.LastWrite, Amount: amount, Unit: unit)
             );
             filter.Setup();
             filter.Apply(item);
@@ -158,11 +154,7 @@ namespace Mfr.Tests.Models.Filters.Attributes
         {
             var item = FilterTestHelpers.CreateRenameItem(lastAccessTime: s_Base);
             var filter = new TimeShifterFilter(
-                Options: new TimeShifterOptions(
-                    TimestampField: TimestampField.LastAccess,
-                    Amount: amount,
-                    Unit: unit
-                )
+                Options: new TimeShifterOptions(TimestampField: TimestampField.LastAccess, Amount: amount, Unit: unit)
             );
             filter.Setup();
             filter.Apply(item);

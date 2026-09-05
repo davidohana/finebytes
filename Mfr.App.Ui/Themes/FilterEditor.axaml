@@ -42,6 +42,12 @@
     <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
     <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
   </Style>
+  <Style Selector="TextBlock.filter-editor-hint">
+    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="Opacity" Value="0.85" />
+  </Style>
   <Style Selector="TextBox.filter-editor-field, ComboBox.filter-editor-field, TextBox.filter-editor-field-wrap">
     <Setter Property="MinHeight" Value="22" />
     <Setter Property="Padding" Value="4,2" />
