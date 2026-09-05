@@ -137,6 +137,25 @@ namespace Mfr.Tests.Models.Filters.Attributes
             Assert.Equal(new DateTime(2020, 12, 25, 9, 0, 15, DateTimeKind.Local), item.Preview.LastWriteTime);
         }
 
+        [Fact]
+        public void Out_of_range_file_date_is_no_op()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
+            var filter = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: TimestampField.LastWrite,
+                    SetDate: true,
+                    Date: new DateOnly(1600, 12, 31),
+                    SetTime: true,
+                    Time: new TimeOnly(12, 0, 0)
+                )
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal(s_Base, item.Preview.LastWriteTime);
+        }
+
         private static void _AssertOtherFieldsUnchanged(FileMeta preview, TimestampField selected)
         {
             foreach (var field in Enum.GetValues<TimestampField>())

@@ -1108,6 +1108,28 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(DateOnly.FromDateTime(DateTime.Today), filter.Options.Date);
             Assert.True(filter.Options.SetTime);
 
+            timeBox.Text = "25:19:01";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(
+                filter.Options.Time.ToString("HH':'mm':'ss", System.Globalization.CultureInfo.InvariantCulture),
+                timeBox.Text
+            );
+            Assert.NotEqual("25:19:01", timeBox.Text);
+
+            dateBox.Text = "2024-02-30";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(
+                filter.Options.Date.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+                dateBox.Text
+            );
+            Assert.NotEqual("2024-02-30", dateBox.Text);
+
             window.Close();
         }
 
