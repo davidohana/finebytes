@@ -121,6 +121,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
 
         partial void OnWholeWordChanged(bool value) => _ApplyOptions();
 
+        /// <summary>
+        /// Loads option fields from the applied <see cref="ReplacerFilter"/> without writing back.
+        /// </summary>
         private void _SyncFromFilter()
         {
             if (Step.Filter is not ReplacerFilter filter)
@@ -139,6 +142,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
             });
         }
 
+        /// <summary>
+        /// Writes the current editor fields onto the step filter when they differ.
+        /// </summary>
         private void _ApplyOptions()
         {
             if (IsLoading || Step.Filter is not ReplacerFilter filter)

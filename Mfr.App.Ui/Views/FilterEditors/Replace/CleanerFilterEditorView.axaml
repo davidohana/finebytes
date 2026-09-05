@@ -80,14 +80,14 @@
         </Grid>
         <controls:CompactCheckBox
           x:Name="RemoveIllegalCharsCheckBox"
-          Content="Also remove illegal file-name characters"
+          Content="Also clean illegal file-name characters"
           IsChecked="{Binding RemoveIllegalChars}"
         >
           <ToolTip.Tip>
             <controls:RichToolTip>
               <TextBlock
                 Classes="rich-tip-body"
-                Text="Also clean characters that are illegal in file names on this OS."
+                Text="Also clean characters that are illegal in Windows file names (fixed set, host OS independent)."
               />
               <TextBlock Classes="rich-tip-bullet" Text="• Examples: \ / : * ? &quot; &lt; &gt; |" />
             </controls:RichToolTip>

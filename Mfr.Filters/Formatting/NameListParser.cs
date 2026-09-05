@@ -20,7 +20,7 @@ namespace Mfr.Filters.Formatting
             }
 
             var text = string.Join('\n', entries);
-            if (entries[^1].Length == 0)
+            if (string.IsNullOrEmpty(entries[^1]))
             {
                 return text + "\n";
             }
@@ -60,8 +60,9 @@ namespace Mfr.Filters.Formatting
         /// Validates embedded entries for apply-time use.
         /// </summary>
         /// <remarks>
-        /// Empty list is allowed (no-op). Blank lines are kept as empty names. Each entry is limited
-        /// to the configured list-line maximum (default 1000 characters).
+        /// Empty list is allowed (no-op). Blank lines are kept as empty names. Null elements are
+        /// treated as empty for length checks (apply coalesces them the same way). Each entry is
+        /// limited to the configured list-line maximum (default 1000 characters).
         /// </remarks>
         /// <param name="entries">Configured names in rename-list index order. Null is treated as empty.</param>
         /// <returns>The same <paramref name="entries"/> list after checks succeed, or empty when null.</returns>
@@ -71,7 +72,7 @@ namespace Mfr.Filters.Formatting
 
             for (var i = 0; i < entries.Count; i++)
             {
-                ListEntryLength.ThrowIfTooLong(entries[i], $"Name-list entry {i + 1}");
+                ListEntryLength.ThrowIfTooLong(entries[i] ?? string.Empty, $"Name-list entry {i + 1}");
             }
 
             return entries;

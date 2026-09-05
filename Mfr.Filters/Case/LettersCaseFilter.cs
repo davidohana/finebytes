@@ -136,7 +136,7 @@ namespace Mfr.Filters.Case
             {
                 LettersCaseMode.UpperCase => value.ToUpperInvariant(),
                 LettersCaseMode.LowerCase => value.ToLowerInvariant(),
-                LettersCaseMode.FirstLetterUp => _FirstLetterUp(value),
+                LettersCaseMode.FirstLetterUp => _UpperFirstLowerRest(value),
                 LettersCaseMode.WeirdCase => _ApplyWeirdCase(
                     input: value,
                     item: item,
@@ -150,21 +150,9 @@ namespace Mfr.Filters.Case
             };
         }
 
-        private static string _FirstLetterUp(string input)
-        {
-            if (input.Length == 0)
-            {
-                return input;
-            }
-
-            if (input.Length == 1)
-            {
-                return char.ToUpperInvariant(input[0]).ToString();
-            }
-
-            return char.ToUpperInvariant(input[0]) + input[1..].ToLowerInvariant();
-        }
-
+        /// <summary>
+        /// Applies mixed casing using a deterministic percent score per character position (and optional item seed).
+        /// </summary>
         private static string _ApplyWeirdCase(
             string input,
             RenameItem item,
@@ -205,6 +193,9 @@ namespace Mfr.Filters.Case
             return new string(chars);
         }
 
+        /// <summary>
+        /// Returns a stable 0..99 score from character position and rename-list seed (FNV-1a style).
+        /// </summary>
         private static int _GetPseudoRandomPercent(int position, int itemSeed)
         {
             unchecked
@@ -216,6 +207,9 @@ namespace Mfr.Filters.Case
             }
         }
 
+        /// <summary>
+        /// Capitalizes each word between <paramref name="wordSeparator"/> runs; skip words stay lowercased.
+        /// </summary>
         private static string _ApplyCapitalize(string input, IReadOnlyList<string> skipWords, char wordSeparator)
         {
             if (input.Length == 0)
@@ -252,6 +246,9 @@ namespace Mfr.Filters.Case
             return sb.ToString();
         }
 
+        /// <summary>
+        /// Capitalizes one word, or lowercases it when it matches a skip word.
+        /// </summary>
         private static string _CapitalizeOneWord(string word, HashSet<string> skipWordToIsExcluded)
         {
             if (skipWordToIsExcluded.Contains(word))
@@ -259,16 +256,30 @@ namespace Mfr.Filters.Case
                 return word.ToLowerInvariant();
             }
 
-            if (word.Length == 0)
-            {
-                return word;
-            }
-
-            return word.Length == 1
-                ? word.ToUpperInvariant()
-                : char.ToUpperInvariant(word[0]) + word[1..].ToLowerInvariant();
+            return _UpperFirstLowerRest(word);
         }
 
+        /// <summary>
+        /// Uppercases the first character and lowercases the remainder (empty input unchanged).
+        /// </summary>
+        private static string _UpperFirstLowerRest(string text)
+        {
+            if (text.Length == 0)
+            {
+                return text;
+            }
+
+            if (text.Length == 1)
+            {
+                return char.ToUpperInvariant(text[0]).ToString();
+            }
+
+            return char.ToUpperInvariant(text[0]) + text[1..].ToLowerInvariant();
+        }
+
+        /// <summary>
+        /// Lowercases the segment, then uppercases sentence starts (string start and after end+separator).
+        /// </summary>
         private static string _ApplySentenceCase(string input, char wordSeparator, string sentenceEndChars)
         {
             if (input.Length == 0)
@@ -277,10 +288,7 @@ namespace Mfr.Filters.Case
             }
 
             var chars = input.ToLowerInvariant().ToCharArray();
-            if (char.IsAsciiLetterLower(chars[0]))
-            {
-                chars[0] = char.ToUpperInvariant(chars[0]);
-            }
+            _TryUppercaseLetterAt(chars, 0);
 
             for (var i = 0; i < chars.Length - 1; i++)
             {
@@ -296,17 +304,34 @@ namespace Mfr.Filters.Case
                     j++;
                 }
 
-                if (j >= chars.Length || !char.IsAsciiLetterLower(chars[j]))
+                if (j >= chars.Length)
                 {
                     continue;
                 }
 
-                chars[j] = char.ToUpperInvariant(chars[j]);
+                _TryUppercaseLetterAt(chars, j);
             }
 
             return new string(chars);
         }
 
+        /// <summary>
+        /// Uppercases the character at <paramref name="index"/> when it is a letter (any script).
+        /// </summary>
+        private static void _TryUppercaseLetterAt(char[] chars, int index)
+        {
+            var c = chars[index];
+            if (!char.IsLetter(c))
+            {
+                return;
+            }
+
+            chars[index] = char.ToUpperInvariant(c);
+        }
+
+        /// <summary>
+        /// Swaps upper ↔ lower for letters; non-letters unchanged.
+        /// </summary>
         private static string _InvertCase(string input)
         {
             var chars = input.ToCharArray();

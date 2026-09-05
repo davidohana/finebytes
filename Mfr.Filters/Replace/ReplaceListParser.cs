@@ -13,6 +13,11 @@ namespace Mfr.Filters.Replace
         /// <summary>
         /// Formats stored entries as line-separated <c>search =&gt; replacement</c> pairs.
         /// </summary>
+        /// <remarks>
+        /// Lossy when <paramref name="entries"/> contain <see cref="EditorSeparator"/> inside
+        /// <see cref="ReplaceListEntry.Search"/> — the editor text cannot round-trip that case
+        /// (JSON/structured options can). Prefer keeping structured entries when only mode/flags change.
+        /// </remarks>
         /// <param name="entries">Search/replace pairs in apply order.</param>
         /// <returns>Editor text; a line with no separator means strip (empty replacement).</returns>
         public static string FormatEditorText(IReadOnlyList<ReplaceListEntry> entries)

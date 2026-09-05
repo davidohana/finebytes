@@ -23,6 +23,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         /// Gets or sets the selected casing mode.
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasCapitalizeSkipWords))]
+        [NotifyPropertyChangedFor(nameof(HasWeirdCaseOptions))]
         private LettersCaseMode _mode;
 
         /// <summary>
@@ -53,12 +55,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         [ObservableProperty]
         private bool _weirdFixedPlaces;
 
-        partial void OnModeChanged(LettersCaseMode value)
-        {
-            OnPropertyChanged(nameof(HasCapitalizeSkipWords));
-            OnPropertyChanged(nameof(HasWeirdCaseOptions));
-            _ApplyOptions();
-        }
+        partial void OnModeChanged(LettersCaseMode value) => _ApplyOptions();
 
         partial void OnCapitalizeSkipWordsTextChanged(string value) => _ApplyOptions();
 
@@ -100,6 +97,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
             ApplyIfChanged(filter, filter with { Options = options });
         }
 
+        /// <summary>
+        /// Splits comma-separated editor text into skip words.
+        /// </summary>
         private static IReadOnlyList<string> _ParseCapitalizeSkipWords(string text)
         {
             if (string.IsNullOrWhiteSpace(text))

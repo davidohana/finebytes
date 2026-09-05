@@ -1,6 +1,9 @@
 # StripParentheses
 
-Removes **one kind** of bracket pair: round `()`, square `[]`, curly `{}`, or angle `<>`. Either delete **only the delimiters** or **the whole bracketed region** (delimiters + inside), depending on options.
+Removes **one kind** of bracket pair: round `()`, square `[]`, curly `{}`, or angle `<>`.
+Either delete **only the delimiters** or **the whole bracketed region** (delimiters + inside),
+depending on options. Matched pairs are stripped innermost-first (MFR7 parity); unmatched
+open or close characters are left alone.
 
 ## Options
 
@@ -9,15 +12,17 @@ Removes **one kind** of bracket pair: round `()`, square `[]`, curly `{}`, or an
     filter’s top-level `type`.)
 - **`removeContents`** (bool)
   - If `true`, remove opening + closing + everything between. If `false`, remove only the opening and closing
-    characters (content stays).
+    characters of matched pairs (content stays).
 
 ## Examples
 
-| Options                                      | Before    | After  | Comment                              |
-| -------------------------------------------- | --------- | ------ | ------------------------------------ |
-| `type`: `Round`<br>`removeContents`: `true`  | `a(rem)b` | `ab`   |                                      |
-| `type`: `Round`<br>`removeContents`: `false` | `a(rem)`  | `arem` | Delimiters removed; inner text kept. |
-| `type`: `Square`<br>`removeContents`: `true` | `a[xx]b`  | `ab`   |                                      |
+| Options                                      | Before      | After  | Comment                                |
+| -------------------------------------------- | ----------- | ------ | -------------------------------------- |
+| `type`: `Round`<br>`removeContents`: `true`  | `a(rem)b`   | `ab`   |                                        |
+| `type`: `Round`<br>`removeContents`: `false` | `a(rem)`    | `arem` | Delimiters removed; inner text kept.   |
+| `type`: `Square`<br>`removeContents`: `true` | `a[xx]b`    | `ab`   |                                        |
+| `type`: `Round`<br>`removeContents`: `true`  | `a(b(c)d)e` | `ae`   | Nested pairs stripped innermost-first. |
+| `type`: `Round`<br>`removeContents`: `true`  | `a(b`       | `a(b`  | Unmatched open left alone.             |
 
 ## Sample preset (JSON)
 

@@ -24,7 +24,9 @@ namespace Mfr.Filters.Misc
     /// <para>
     /// The target parent path is <c>RootFolder</c> + <c>\</c> + resolved <c>SubFolder</c>. If
     /// <c>SubFolder</c> is empty the item lands directly in <c>RootFolder</c>. Backslashes in
-    /// <c>SubFolder</c> create nested directory levels.
+    /// <c>SubFolder</c> create nested directory levels. A resolved sub-folder that is a Windows
+    /// absolute path (drive or UNC) or that remains rooted after stripping a leading separator is
+    /// rejected so <see cref="Path.Combine(string, string)"/> cannot discard <c>RootFolder</c>.
     /// </para>
     /// <para>
     /// Applies to filesystem directory rows in the rename list as well as files (directories use an empty extension
@@ -81,6 +83,16 @@ namespace Mfr.Filters.Misc
             item.Preview.DirectoryPath = _ResolveTargetDirectory(item);
         }
 
+        /// <summary>
+        /// Builds <c>RootFolder</c> plus the resolved relative <c>SubFolder</c> (or root alone when empty).
+        /// </summary>
+        /// <param name="item">Rename list row used when evaluating formatter tokens in <c>SubFolder</c>.</param>
+        /// <returns>Absolute preview parent directory for <paramref name="item"/>.</returns>
+        /// <exception cref="ArgumentException">
+        /// Thrown when the resolved sub-folder is a Windows absolute path (drive or UNC) or remains rooted
+        /// after stripping a leading separator. <see cref="Path.Combine(string, string)"/> would otherwise
+        /// discard <c>RootFolder</c>.
+        /// </exception>
         private string _ResolveTargetDirectory(RenameItem item)
         {
             if (_compiledSubFolder is null)
@@ -89,6 +101,15 @@ namespace Mfr.Filters.Misc
             }
 
             var resolved = _compiledSubFolder(item);
+            // Reject drive/UNC forms using Windows path shape (templates use '\'), before host normalize.
+            // A single leading '\' (MFR7 "\Sub") is not absolute here and is stripped below.
+            var resolvedIsWindowsAbsolute = _IsWindowsAbsoluteSubFolder(resolved);
+            Require.That(
+                !resolvedIsWindowsAbsolute,
+                $"MoverFilter: SubFolder must resolve under RootFolder (got absolute path '{resolved}').",
+                nameof(MoverOptions.SubFolder)
+            );
+
             // SubFolder templates use Windows-style '\' for nested levels (MFR7). Normalize to the host
             // separator so Path.Combine builds real nested segments on Linux CI as well as Windows.
             var normalized = resolved.Replace('\\', Path.DirectorySeparatorChar);
@@ -102,7 +123,39 @@ namespace Mfr.Filters.Misc
                 return Options.RootFolder;
             }
 
+            // Host-rooted leftovers after TrimStart (e.g. odd forms) must not discard RootFolder.
+            var relativeIsRooted = Path.IsPathRooted(relative);
+            Require.That(
+                !relativeIsRooted,
+                $"MoverFilter: SubFolder must resolve under RootFolder (got rooted path '{relative}').",
+                nameof(MoverOptions.SubFolder)
+            );
+
             return Path.Combine(Options.RootFolder, relative);
+        }
+
+        /// <summary>
+        /// Returns whether <paramref name="path"/> is a Windows drive or UNC absolute (or drive-relative) path.
+        /// </summary>
+        /// <param name="path">Resolved sub-folder text before host separator normalization.</param>
+        /// <returns><see langword="true"/> when the value must not be combined under <c>RootFolder</c>.</returns>
+        private static bool _IsWindowsAbsoluteSubFolder(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+
+            var isUnc =
+                path.StartsWith(@"\\", StringComparison.Ordinal) || path.StartsWith("//", StringComparison.Ordinal);
+            if (isUnc)
+            {
+                return true;
+            }
+
+            // Drive absolute (X:\ / X:/) or drive-relative (X:foo).
+            var hasDrivePrefix = path.Length >= 2 && char.IsAsciiLetter(path[0]) && path[1] == ':';
+            return hasDrivePrefix;
         }
     }
 }

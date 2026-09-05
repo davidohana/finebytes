@@ -202,5 +202,74 @@ namespace Mfr.Tests.Models.Filters.Formatting
             f.Apply(item);
             Assert.Equal("-9", item.Preview.Prefix);
         }
+
+        /// <summary>
+        /// Verifies Automatic with missing list counts leaves the value unpadded.
+        /// </summary>
+        [Fact]
+        public void Apply_Automatic_MissingListCount_NoPadding()
+        {
+            var f = new CounterFilter(
+                _target,
+                new CounterOptions(
+                    Start: 1,
+                    Step: 1,
+                    LeadingZerosMode: CounterLeadingZerosMode.Automatic,
+                    CustomLength: 2,
+                    Position: CounterPosition.Replace,
+                    Separator: "",
+                    ResetPerFolder: false
+                )
+            );
+
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "x", renameListIndex: 0, renameListTotalCount: 0);
+            f.Setup();
+            f.Apply(item);
+            Assert.Equal("1", item.Preview.Prefix);
+        }
+
+        /// <summary>
+        /// Verifies Custom length below 1 is treated as width 1.
+        /// </summary>
+        [Fact]
+        public void Apply_Custom_ZeroLength_PadsToOneDigit()
+        {
+            var f = new CounterFilter(
+                _target,
+                new CounterOptions(
+                    Start: 7,
+                    Step: 1,
+                    LeadingZerosMode: CounterLeadingZerosMode.Custom,
+                    CustomLength: 0,
+                    Position: CounterPosition.Replace,
+                    Separator: "",
+                    ResetPerFolder: false
+                )
+            );
+
+            Assert.Equal("7", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
+        }
+
+        /// <summary>
+        /// Verifies prepend with an empty separator concatenates without a gap.
+        /// </summary>
+        [Fact]
+        public void Apply_Prepend_EmptySeparator_Concatenates()
+        {
+            var f = new CounterFilter(
+                _target,
+                new CounterOptions(
+                    Start: 1,
+                    Step: 1,
+                    LeadingZerosMode: CounterLeadingZerosMode.None,
+                    CustomLength: 2,
+                    Position: CounterPosition.Prepend,
+                    Separator: "",
+                    ResetPerFolder: false
+                )
+            );
+
+            Assert.Equal("1name", FilterTestHelpers.ApplyToPrefix(f, "name", renameListIndex: 0));
+        }
     }
 }

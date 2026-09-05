@@ -137,5 +137,22 @@ namespace Mfr.Tests.Models.Filters.Replace
             Assert.Equal("a => b\nBlue Train => Blue_Train\nx", text);
             Assert.Equal(entries, parsed);
         }
+
+        /// <summary>
+        /// Verifies editor text cannot round-trip a search that embeds <c>=&gt;</c>.
+        /// </summary>
+        [Fact]
+        public void FormatEditorText_SearchContainingSeparator_IsLossyThroughParse()
+        {
+            ReplaceListEntry[] entries = [new("a=>b", "x")];
+
+            var text = ReplaceListParser.FormatEditorText(entries);
+            var parsed = ReplaceListParser.ParseEditorText(text);
+
+            Assert.Equal("a=>b => x", text);
+            Assert.Single(parsed);
+            Assert.Equal("a", parsed[0].Search);
+            Assert.Equal("b => x", parsed[0].Replacement);
+        }
     }
 }

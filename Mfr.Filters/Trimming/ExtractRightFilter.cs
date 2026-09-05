@@ -32,7 +32,6 @@ namespace Mfr.Filters.Trimming
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            // Ensure count is within [0, value.Length] to avoid IndexOutOfRangeException
             var count = Math.Clamp(Options.Count, 0, value.Length);
             return value[^count..];
         }

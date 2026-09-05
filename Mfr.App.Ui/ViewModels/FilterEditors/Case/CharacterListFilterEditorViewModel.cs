@@ -44,16 +44,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         {
             LoadWithoutApplying(() =>
             {
-                if (Step.Filter is CapitalizeAfterFilter after)
-                {
-                    Chars = after.Options.CapitalizeAfterChars;
-                    return;
-                }
-
-                if (Step.Filter is SentenceEndCharactersFilter sentenceEnd)
-                {
-                    Chars = sentenceEnd.Options.Characters;
-                }
+                Chars = _ReadChars(Step.Filter);
             });
         }
 
@@ -65,22 +56,42 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
             }
 
             var chars = Chars ?? string.Empty;
-            if (Step.Filter is CapitalizeAfterFilter after)
+            switch (Step.Filter)
             {
-                ApplyIfChanged(after, after with { Options = new CapitalizeAfterOptions(CapitalizeAfterChars: chars) });
-                return;
+                case CapitalizeAfterFilter after:
+                    ApplyIfChanged(
+                        after,
+                        after with
+                        {
+                            Options = new CapitalizeAfterOptions(CapitalizeAfterChars: chars),
+                        }
+                    );
+                    return;
+                case SentenceEndCharactersFilter sentenceEnd:
+                    ApplyIfChanged(
+                        sentenceEnd,
+                        sentenceEnd with
+                        {
+                            Options = new SentenceEndCharactersOptions(Characters: chars),
+                        }
+                    );
+                    return;
+                default:
+                    throw _UnsupportedFilter(Step.Filter);
             }
+        }
 
-            if (Step.Filter is SentenceEndCharactersFilter sentenceEnd)
+        /// <summary>
+        /// Reads the character-list option from a supported filter.
+        /// </summary>
+        private static string _ReadChars(BaseFilter filter)
+        {
+            return filter switch
             {
-                ApplyIfChanged(
-                    sentenceEnd,
-                    sentenceEnd with
-                    {
-                        Options = new SentenceEndCharactersOptions(Characters: chars),
-                    }
-                );
-            }
+                CapitalizeAfterFilter after => after.Options.CapitalizeAfterChars,
+                SentenceEndCharactersFilter sentenceEnd => sentenceEnd.Options.Characters,
+                _ => throw _UnsupportedFilter(filter),
+            };
         }
 
         private static (string CharsPrompt, string CharsToolTip) _ResolveLabels(BaseFilter filter)
@@ -95,10 +106,13 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
                     "The following characters indicate that a sentence had ended:",
                     "Characters that end a sentence for Letters Case (sentence mode) and Casing List (sentence initials).\nThis filter does not change the name text."
                 ),
-                _ => throw new InvalidOperationException(
-                    $"Character list editor does not support {filter.GetType().Name}."
-                ),
+                _ => throw _UnsupportedFilter(filter),
             };
+        }
+
+        private static InvalidOperationException _UnsupportedFilter(BaseFilter filter)
+        {
+            return new InvalidOperationException($"Character list editor does not support {filter.GetType().Name}.");
         }
     }
 }

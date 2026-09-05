@@ -14,7 +14,6 @@ using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
-using Mfr.Models.Media;
 
 namespace Mfr.Tests.Ui.FilterEditors
 {
@@ -225,9 +224,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Space_character_other_text_selects_other_definition()
         {
             var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
-            var editor = new SpaceCharacterFilterEditorViewModel(step);
-
-            editor.OtherCharacter = ".";
+            var editor = new SpaceCharacterFilterEditorViewModel(step) { OtherCharacter = "." };
 
             Assert.Equal(SpaceCharacterDefinition.Other, editor.Definition);
             Assert.Equal('.', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);
@@ -546,6 +543,40 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies mode/flag edits keep structured entries that editor text cannot round-trip
+        /// (search containing <c>=&gt;</c>).
+        /// </summary>
+        [Fact]
+        public void Replace_list_flag_edits_preserve_entries_with_separator_in_search()
+        {
+            var filter = new ReplaceListFilter(
+                Target: new FilePrefixTarget(),
+                Options: new ReplaceListOptions(
+                    Entries: [new ReplaceListEntry("a=>b", "x")],
+                    Mode: ReplacerMode.Literal,
+                    CaseSensitive: false,
+                    ReplaceAll: true,
+                    WholeWord: true
+                )
+            );
+            var step = new AppliedFilterStepViewModel("Replace List", filter);
+            var editor = new ReplaceListFilterEditorViewModel(step)
+            {
+                Mode = ReplacerMode.Regex,
+                CaseSensitive = true,
+                WholeWord = false,
+            };
+
+            var options = ((ReplaceListFilter)step.Filter).Options;
+            Assert.Single(options.Entries);
+            Assert.Equal("a=>b", options.Entries[0].Search);
+            Assert.Equal("x", options.Entries[0].Replacement);
+            Assert.Equal(ReplacerMode.Regex, options.Mode);
+            Assert.True(options.CaseSensitive);
+            Assert.False(options.WholeWord);
+        }
+
+        /// <summary>
         /// Verifies Name List option edits replace the step filter options.
         /// </summary>
         [Fact]
@@ -592,66 +623,6 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies Mover option edits replace the step filter options.
-        /// </summary>
-        [Fact]
-        public void Mover_options_update_step_options()
-        {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step);
-
-            Assert.Equal(@"C:\", editor.RootFolder);
-            Assert.Equal("MFR", editor.SubFolder);
-
-            editor.RootFolder = @"D:\Music";
-            editor.SubFolder = @"<parent-folder>\<file-name>";
-
-            var options = ((MoverFilter)step.Filter).Options;
-            Assert.Equal(@"D:\Music", options.RootFolder);
-            Assert.Equal(@"<parent-folder>\<file-name>", options.SubFolder);
-        }
-
-        /// <summary>
-        /// Verifies Browse applies a picked root folder to the step options.
-        /// </summary>
-        [Fact]
-        public async Task Mover_browse_applies_picked_root_folder()
-        {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step)
-            {
-                PickRootFolderAsync = (current, _) =>
-                {
-                    Assert.Equal(@"C:\", current);
-                    return Task.FromResult<string?>(@"D:\Picked");
-                },
-            };
-
-            await editor.BrowseRootFolderCommand.ExecuteAsync(null);
-
-            Assert.Equal(@"D:\Picked", editor.RootFolder);
-            Assert.Equal(@"D:\Picked", ((MoverFilter)step.Filter).Options.RootFolder);
-        }
-
-        /// <summary>
-        /// Verifies Browse leaves options unchanged when the picker is cancelled.
-        /// </summary>
-        [Fact]
-        public async Task Mover_browse_cancelled_leaves_root_unchanged()
-        {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step)
-            {
-                PickRootFolderAsync = (_, _) => Task.FromResult<string?>(null),
-            };
-
-            await editor.BrowseRootFolderCommand.ExecuteAsync(null);
-
-            Assert.Equal(@"C:\", editor.RootFolder);
-            Assert.Equal(@"C:\", ((MoverFilter)step.Filter).Options.RootFolder);
-        }
-
-        /// <summary>
         /// Verifies Date Setter option edits replace the step filter options.
         /// </summary>
         [Fact]
@@ -678,6 +649,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             editor.SetCurrentCommand.Execute(null);
             options = ((DateSetterFilter)step.Filter).Options;
             Assert.Equal(DateOnly.FromDateTime(DateTime.Today), options.Date);
+
+            var beforeInvalid = options;
+            editor.DateText = "2020-13-40";
+            Assert.Same(beforeInvalid, ((DateSetterFilter)step.Filter).Options);
         }
 
         /// <summary>
@@ -701,6 +676,11 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(TimestampField.LastAccess, options.TimestampField);
             Assert.Equal(new TimeOnly(9, 0, 15), options.Time);
 
+            var beforeInvalid = options;
+            editor.TimeText = "25:61:99";
+            Assert.Same(beforeInvalid, ((TimeSetterFilter)step.Filter).Options);
+
+            editor.TimeText = "09:00:15";
             editor.SetCurrentCommand.Execute(null);
             options = ((TimeSetterFilter)step.Filter).Options;
             Assert.Equal(

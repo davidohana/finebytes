@@ -78,6 +78,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                 return;
             }
 
+            var chars = Chars ?? string.Empty;
             if (Step.Filter is SpaceAfterFilter after)
             {
                 ApplyIfChanged(
@@ -85,7 +86,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                     after with
                     {
                         Options = new SpaceAfterOptions(
-                            AfterChars: Chars ?? string.Empty,
+                            AfterChars: chars,
                             OnlyWhenNextIsLetterOrDigit: OnlyWhenNeighborLetterOrDigit
                         ),
                     }
@@ -100,7 +101,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                     around with
                     {
                         Options = new SpaceAroundOptions(
-                            AroundChars: Chars ?? string.Empty,
+                            AroundChars: chars,
                             OnlyWhenNeighboringAreLettersOrDigits: OnlyWhenNeighborLetterOrDigit
                         ),
                     }
@@ -108,6 +109,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
             }
         }
 
+        /// <summary>
+        /// Returns After vs Around prompt, checkbox label, and checkbox tooltip for <paramref name="filter"/>.
+        /// </summary>
         private static (string CharsPrompt, string NeighborCheckLabel, string NeighborCheckToolTip) _ResolveLabels(
             BaseFilter filter
         )

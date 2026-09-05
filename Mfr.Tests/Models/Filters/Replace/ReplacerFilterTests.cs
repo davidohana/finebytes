@@ -156,5 +156,78 @@ namespace Mfr.Tests.Models.Filters.Replace
             Assert.Equal("dog", FilterTestHelpers.ApplyToPrefix(f, "cat"));
             Assert.Equal("Category", FilterTestHelpers.ApplyToPrefix(f, "Category"));
         }
+
+        /// <summary>
+        /// Verifies an empty find pattern is a no-op in every mode (MFR7; empty regex would match every position).
+        /// </summary>
+        [Theory]
+        [InlineData(ReplacerMode.Literal)]
+        [InlineData(ReplacerMode.Wildcard)]
+        [InlineData(ReplacerMode.Regex)]
+        public void Apply_EmptyFind_IsNoOp(ReplacerMode mode)
+        {
+            var f = new ReplacerFilter(
+                _target,
+                new ReplacerOptions("", "X", mode, CaseSensitive: true, ReplaceAll: true, WholeWord: false)
+            );
+            Assert.Equal("aba", FilterTestHelpers.ApplyToPrefix(f, "aba"));
+        }
+
+        /// <summary>
+        /// Verifies Literal/Wildcard insert <c>$</c> in the replacement as plain text, not regex substitutions.
+        /// </summary>
+        [Theory]
+        [InlineData(ReplacerMode.Literal)]
+        [InlineData(ReplacerMode.Wildcard)]
+        public void Apply_NonRegexMode_TreatsDollarInReplacementAsLiteral(ReplacerMode mode)
+        {
+            var find = mode == ReplacerMode.Wildcard ? "a*" : "a";
+            var f = new ReplacerFilter(
+                _target,
+                new ReplacerOptions(find, "$1", mode, CaseSensitive: true, ReplaceAll: true, WholeWord: false)
+            );
+            Assert.Equal("$1", FilterTestHelpers.ApplyToPrefix(f, "a"));
+        }
+
+        /// <summary>
+        /// Verifies Regex mode still expands substitution references in the replacement.
+        /// </summary>
+        [Fact]
+        public void Apply_RegexMode_ExpandsReplacementGroups()
+        {
+            var f = new ReplacerFilter(
+                _target,
+                new ReplacerOptions(
+                    @"(a)(b)",
+                    "$2$1",
+                    ReplacerMode.Regex,
+                    CaseSensitive: true,
+                    ReplaceAll: true,
+                    WholeWord: false
+                )
+            );
+            Assert.Equal("ba", FilterTestHelpers.ApplyToPrefix(f, "ab"));
+        }
+
+        /// <summary>
+        /// Verifies invalid regex patterns fail during setup (preview marks all items).
+        /// </summary>
+        [Fact]
+        public void Setup_InvalidRegex_ThrowsArgumentException()
+        {
+            var f = new ReplacerFilter(
+                _target,
+                new ReplacerOptions(
+                    "(",
+                    "X",
+                    ReplacerMode.Regex,
+                    CaseSensitive: true,
+                    ReplaceAll: true,
+                    WholeWord: false
+                )
+            );
+            var ex = Assert.Throws<ArgumentException>(f.Setup);
+            Assert.Contains("Invalid regular expression", ex.Message, StringComparison.Ordinal);
+        }
     }
 }

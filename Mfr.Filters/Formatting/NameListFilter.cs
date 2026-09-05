@@ -14,6 +14,16 @@ namespace Mfr.Filters.Formatting
         /// Gets names in rename-list index order. Missing or null becomes empty (no-op).
         /// </summary>
         public IReadOnlyList<string> Entries { get; init; } = Entries ?? [];
+
+        /// <summary>
+        /// Gets the format string prepended to each list entry. Null becomes empty.
+        /// </summary>
+        public string Prefix { get; init; } = Prefix ?? "";
+
+        /// <summary>
+        /// Gets the format string appended after each list entry. Null becomes empty.
+        /// </summary>
+        public string Suffix { get; init; } = Suffix ?? "";
     }
 
     /// <summary>
@@ -82,7 +92,7 @@ namespace Mfr.Filters.Formatting
                 );
             }
 
-            var middle = entries[index];
+            var middle = entries[index] ?? string.Empty;
             return compiledPrefix(item) + middle + compiledSuffix(item);
         }
     }

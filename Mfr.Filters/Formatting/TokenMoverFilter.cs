@@ -39,7 +39,7 @@ namespace Mfr.Filters.Formatting
         /// <inheritdoc />
         protected override string _TransformValue(string value, RenameItem item)
         {
-            if (string.IsNullOrEmpty(Options.Delimiter))
+            if (string.IsNullOrEmpty(Options.Delimiter) || Options.MoveBy == 0)
             {
                 return value;
             }
@@ -62,10 +62,13 @@ namespace Mfr.Filters.Formatting
             return _MoveToken(tokens, sourceIndex, targetIndex, Options.Delimiter);
         }
 
+        /// <summary>
+        /// Removes the token at <paramref name="sourceIndex"/> and reinserts it at <paramref name="targetIndex"/>
+        /// (indices computed against the pre-removal list, matching MFR7 remove-then-insert).
+        /// </summary>
         private static string _MoveToken(string[] tokens, int sourceIndex, int targetIndex, string delimiter)
         {
-            var list = new List<string>(tokens.Length);
-            list.AddRange(tokens);
+            var list = new List<string>(tokens);
             var moved = list[sourceIndex];
             list.RemoveAt(sourceIndex);
             list.Insert(targetIndex, moved);

@@ -1,3 +1,4 @@
+using System.Text;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Replace
@@ -53,17 +54,17 @@ namespace Mfr.Filters.Replace
                 return value;
             }
 
-            var sb = new System.Text.StringBuilder(value.Length);
+            var replacement = Options.Replacement ?? "";
+            var sb = new StringBuilder(value.Length);
             foreach (var c in value)
             {
-                if (chars.Contains(c))
-                {
-                    sb.Append(Options.Replacement);
-                }
-                else
+                if (!chars.Contains(c))
                 {
                     sb.Append(c);
+                    continue;
                 }
+
+                sb.Append(replacement);
             }
 
             return sb.ToString();
