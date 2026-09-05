@@ -90,8 +90,11 @@ todos:
     content: "Phase 11: Preview highlighting — red changed cells, preview-error rows, Show Preview Error"
     status: completed
   - id: phase-12
-    content: "Phase 12: preview cols — Extended dates/attrs + ID3/audio tags (after Phase 10)"
+    content: "Phase 12: preview cols — Extended dates/attrs done; ID3/audio tags remaining"
     status: pending
+  - id: phase-12a
+    content: "12a: Extended File Properties preview — Creation/LastWrite/LastAccess Date + Attributes"
+    status: completed
   - id: phase-13
     content: "Phase 13: hygiene — glyph styles + RenameListUiTestContext; entry props kept"
     status: completed
@@ -189,24 +192,26 @@ After **10a–10d**. Enable **preview** column variants for catalog fields that 
 
 ### Scope (MFR7 parity)
 
-| Group                          | Preview columns                                                              | Why                                                                                                                                                                                                                                       |
-| ------------------------------ | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Extended** (File Properties) | **Creation Date**, **Last Write Date**, **Last Access Date**, **Attributes** | MFR7 `PropertyType.ReadWrite`. `DateTimeSetter` / `TimeShifter` write `item.Preview.CreationTime` / `LastWriteTime` / `LastAccessTime`; attributes filters write preview attrs. Size / Folder File Count stay original-only (`ReadOnly`). |
-| **AudioTag** (ID3 etc.)        | Writable tag fields                                                          | MFR7 `ReadWriteApply` — preview when tag-setter filters change tags.                                                                                                                                                                      |
-| **Image / Jpeg**               | None in this phase                                                           | MFR7 EXIF incl. Date/Time Taken is `ReadOnly` — originals only (Phase 6).                                                                                                                                                                 |
+| Group                          | Preview columns                                                              | Why                                                                                                                                                                                                                                                       |
+| ------------------------------ | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Extended** (File Properties) | **Creation Date**, **Last Write Date**, **Last Access Date**, **Attributes** | **Done (12a).** MFR7 `PropertyType.ReadWrite`. `DateTimeSetter` / `TimeShifter` write `item.Preview.CreationTime` / `LastWriteTime` / `LastAccessTime`; attributes filters write preview attrs. Size / Folder File Count stay original-only (`ReadOnly`). |
+| **AudioTag** (ID3 etc.)        | Writable tag fields                                                          | MFR7 `ReadWriteApply` — preview when tag-setter filters change tags.                                                                                                                                                                                      |
+| **Image / Jpeg**               | None in this phase                                                           | MFR7 EXIF incl. Date/Time Taken is `ReadOnly` — originals only (Phase 6).                                                                                                                                                                                 |
 
 Shuttle **Preview** tab lists every field with `SupportsPreview` that is not already visible as a preview column (same rule as today for Basic).
 
 ### Work
 
-- **Catalog:** stop treating Extended dates/attrs (and AudioTag writable fields) as `OriginalOnlyRenameListField` / `supportsPreview: false`. Preview key resolve uses **preview** `FileMeta` (dates via existing `FormatFileDate`); original columns keep original meta.
+- **Catalog (12a done):** Extended dates/attrs are no longer `OriginalOnlyRenameListField` / `supportsPreview: false`. Preview key resolve uses **preview** `FileMeta` (dates via existing `FormatFileDate`); original columns keep original meta. Size / Folder File Count stay original-only.
+- **Catalog (remaining):** flip `SupportsPreview` on AudioTag writable fields the same way.
 - **Grid / red cells:** Phase 11 highlighting already compares original vs preview text — once preview cols exist, Date/Time Setter changes show red on the matching date preview column.
-- **Tests:** DateTimeSetter (and/or TimeShifter) → Creation/LastWrite/LastAccess preview text differs from original; unchanged dates do not highlight; Attributes preview when an attributes filter mutates; AudioTag smoke for one writable tag; Size / Jpeg DateTaken remain non-previewable in shuttle.
+- **Tests (12a done):** DateTimeSetter → Creation preview text differs from original; unchanged dates do not highlight; Attributes preview when an attributes filter mutates; Size remains non-previewable in shuttle.
+- **Tests (remaining):** AudioTag smoke for one writable tag; Jpeg DateTaken remains non-previewable.
 - **14c/14d note:** MFR7 Free Names / Manual Rename require `ReadWriteApply` — Extended dates are `ReadWrite` only (preview yes, Free-Edit / F2 no). Do not invent `SupportsWrite` for dates here; tag fields that are `ReadWriteApply` get write when 14c ships.
 
 ### Exit
 
-Shuttle Preview tab offers Extended date/attrs + AudioTag preview fields; live preview + red changed cells work for Date/Time Setter against those date columns; Image/Jpeg stay original-only.
+Shuttle Preview tab offers Extended date/attrs (**done**); AudioTag preview fields remaining. Live preview + red changed cells work for Date/Time Setter against those date columns; Image/Jpeg stay original-only.
 
 ______________________________________________________________________
 
