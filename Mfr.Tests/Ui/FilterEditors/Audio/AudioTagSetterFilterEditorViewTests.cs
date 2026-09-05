@@ -135,7 +135,10 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             var titleCheck = _FindFieldCheckBox(editor, AudioTagSetterFieldKind.Title);
             Assert.False(titleCheck.IsChecked);
 
-            var label = titleCheck.GetVisualDescendants().OfType<TextBlock>().Single(block => block.Text == "Set title:");
+            var label = titleCheck
+                .GetVisualDescendants()
+                .OfType<TextBlock>()
+                .Single(block => block.Text == "Set title:");
             var local = new Point(Math.Max(2, label.Bounds.Width / 2), Math.Max(2, label.Bounds.Height / 2));
             var windowPoint = label.TranslatePoint(local, window);
             Assert.True(windowPoint.HasValue);

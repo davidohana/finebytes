@@ -1,6 +1,7 @@
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Ape;
 using Mfr.Models.Tags.Asf;
+using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
 using Mfr.Models.Tags.RiffInfo;
 using Mfr.Models.Tags.Xiph;
@@ -46,6 +47,22 @@ namespace Mfr.Tests.Metadata
             var common = SemanticAudioTag.FromOverlay(overlay);
 
             Assert.Null(common.Title);
+        }
+
+        /// <summary>
+        /// Verifies ID3v1 genre index 0 projects as Blues, while a null genre projects as unset.
+        /// </summary>
+        [Fact]
+        public void FromOverlay_Id3v1Genre_NullIsUnset_ZeroIsBlues()
+        {
+            var unset = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Title = "Song" } };
+            var blues = new AudioTagOverlay
+            {
+                Id3v1 = new Id3v1TagData { Title = "Song", Genre = 0 },
+            };
+
+            Assert.Null(SemanticAudioTag.FromOverlay(unset).Genre);
+            Assert.Equal("Blues", SemanticAudioTag.FromOverlay(blues).Genre);
         }
 
         /// <summary>

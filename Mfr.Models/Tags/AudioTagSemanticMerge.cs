@@ -72,8 +72,8 @@ namespace Mfr.Models.Tags
         {
             var parts = DelimitedText.Split(common.Performers);
             var artist = parts.Length > 0 ? parts[0] : null;
-            var genreByte = string.IsNullOrWhiteSpace(common.Genre)
-                ? (byte)0
+            byte? genreByte = string.IsNullOrWhiteSpace(common.Genre)
+                ? null
                 : Id3v1Genres.AudioToIndex(common.Genre.Trim());
             byte? track = common.Track is null ? null : (byte)Math.Min(common.Track.Value, 255u);
 
@@ -633,7 +633,7 @@ namespace Mfr.Models.Tags
                 && data.Year is null
                 && string.IsNullOrWhiteSpace(data.Comment)
                 && data.Track is null
-                && data.Genre == 0;
+                && data.Genre is null;
         }
     }
 }

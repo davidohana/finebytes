@@ -92,7 +92,8 @@ Text normalization is shared with `Mfr.Models` through `Mfr.Utils`: `TrimmedOrNu
 tag. `ContainerFormat` is stamped at Read and preserved across `Clone` / `ClearAllBlocks` (so strip-then-set
 can still create the recommended block). It is **excluded** from equality (dirty checks compare tag content).
 
-- **Id3v1** — Scalars: Title, Artist, Album, Year, Comment, Track, Genre
+- **Id3v1** — Scalars: Title, Artist, Album, Year, Comment, Track, Genre (`byte?`;
+  `null` = unset, `0` = Blues — never use `0` as an empty sentinel)
 - **Id3v2**
   - `byte Version` + modeled text frames. Singletons keyed by FrameId; multi-instance by FrameId + language/description
 - **Xiph** — Known-key multimap (covers `SemanticAudioTag` fields). Unknown keys left on disk

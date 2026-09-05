@@ -36,8 +36,14 @@ namespace Mfr.Models.Tags.Id3v1
         public byte? Track { get; init; }
 
         /// <summary>
-        /// WinAmp genre table index (0–255).
+        /// WinAmp genre table index (0–255), or <see langword="null"/> when unset.
         /// </summary>
-        public byte Genre { get; init; }
+        /// <remarks>
+        /// <para>
+        /// Index <c>0</c> is Blues; do not use <c>0</c> as an empty sentinel (that used to make “clear genre”
+        /// read back as Blues).
+        /// </para>
+        /// </remarks>
+        public byte? Genre { get; init; }
     }
 }

@@ -44,9 +44,9 @@ namespace Mfr.Models.Tags
                 Id3v1Field.Track => block.Track is null
                     ? string.Empty
                     : block.Track.Value.ToString(CultureInfo.InvariantCulture),
-                Id3v1Field.Genre => block.Genre == 0
-                    ? string.Empty
-                    : Id3v1Genres.IndexToAudio(block.Genre) ?? string.Empty,
+                Id3v1Field.Genre => block.Genre is { } genreIndex
+                    ? Id3v1Genres.IndexToAudio(genreIndex) ?? string.Empty
+                    : string.Empty,
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
         }
@@ -370,14 +370,14 @@ namespace Mfr.Models.Tags
                 && data.Year is null
                 && string.IsNullOrWhiteSpace(data.Comment)
                 && data.Track is null
-                && data.Genre == 0;
+                && data.Genre is null;
         }
 
-        private static byte _ParseGenreByte(string trimmed)
+        private static byte? _ParseGenreByte(string trimmed)
         {
             if (trimmed.Length == 0)
             {
-                return 0;
+                return null;
             }
 
             if (byte.TryParse(trimmed, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index))

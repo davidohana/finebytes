@@ -617,12 +617,12 @@ namespace Mfr.Models.Tags
 
         private static string? _ReadId3v1Genre(Id3v1TagData? data)
         {
-            if (data is null)
+            if (data?.Genre is not { } genreIndex)
             {
                 return null;
             }
 
-            return Id3v1Genres.IndexToAudio(data.Genre).TrimmedOrNull();
+            return Id3v1Genres.IndexToAudio(genreIndex).TrimmedOrNull();
         }
 
         private static string? _ReadApplePlainText(AppleTagData? apple, ReadOnlySpan<byte> atomType)

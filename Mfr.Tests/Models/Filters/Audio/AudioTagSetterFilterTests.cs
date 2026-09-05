@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Mfr.Filters.Audio;
 using Mfr.Metadata;
+using Mfr.Models.Tags.Id3v1;
 
 namespace Mfr.Tests.Models.Filters.Audio
 {
@@ -92,6 +93,46 @@ namespace Mfr.Tests.Models.Filters.Audio
             filter.Apply(item);
 
             Assert.Equal("Alice; Bob", item.Preview.AudioTagOverlay.Semantic().Performers);
+        }
+
+        /// <summary>
+        /// Verifies empty genre text clears the field and does not read back as Blues (ID3v1 index 0).
+        /// </summary>
+        [Fact]
+        public void Apply_Genre_EmptyText_ClearsWithoutBecomingBlues()
+        {
+            var overlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Song", genre: "Rock");
+            overlay.Id3v1 = new Id3v1TagData { Title = "Song", Genre = Id3v1Genres.AudioToIndex("Rock") };
+            var item = _CreateAudioItem(configureOriginal: m => m.AudioTagOverlay = overlay);
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Genre: new AudioTagStringFieldOptions(Text: string.Empty))
+            );
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Null(item.Preview.AudioTagOverlay.Semantic().Genre);
+            Assert.Null(item.Preview.AudioTagOverlay.Id3v1!.Genre);
+        }
+
+        /// <summary>
+        /// Verifies setting Blues stores ID3v1 index 0 and still projects as Blues (not treated as empty).
+        /// </summary>
+        [Fact]
+        public void Apply_Genre_Blues_PreservesId3v1IndexZero()
+        {
+            var overlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Song");
+            overlay.Id3v1 = new Id3v1TagData { Title = "Song" };
+            var item = _CreateAudioItem(configureOriginal: m => m.AudioTagOverlay = overlay);
+            var filter = new AudioTagSetterFilter(
+                new AudioTagSetterOptions(Genre: new AudioTagStringFieldOptions(Text: "Blues"))
+            );
+
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("Blues", item.Preview.AudioTagOverlay.Semantic().Genre);
+            Assert.Equal((byte)0, item.Preview.AudioTagOverlay.Id3v1!.Genre);
         }
 
         /// <summary>

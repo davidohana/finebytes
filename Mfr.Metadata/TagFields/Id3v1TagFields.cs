@@ -11,7 +11,8 @@ namespace Mfr.Metadata.TagFields
     /// <remarks>
     /// <para>
     /// The trailer has no per-field presence, so there is nothing to diff: any change rewrites all scalars.
-    /// Numeric fields clear to <c>0</c> on disk and read back as <see langword="null"/>.
+    /// Year/track clear to <c>0</c> on disk and read back as <see langword="null"/>. Genre clears to an empty
+    /// TagLib genres list and reads/writes as <see langword="null"/> on <see cref="Id3v1TagData"/> (index <c>0</c> is Blues).
     /// </para>
     /// </remarks>
     internal static class Id3v1TagFields
@@ -33,7 +34,7 @@ namespace Mfr.Metadata.TagFields
                 return null;
             }
 
-            var genreByte = live.FirstGenre is null ? (byte)0 : Genres.AudioToIndex(live.FirstGenre);
+            byte? genreByte = live.FirstGenre is null ? null : Genres.AudioToIndex(live.FirstGenre);
 
             return new Id3v1TagData
             {
@@ -69,7 +70,7 @@ namespace Mfr.Metadata.TagFields
             live.Comment = preview.Comment ?? string.Empty;
             live.Track = preview.Track ?? 0;
 
-            var genreName = Id3v1Genres.IndexToAudio(preview.Genre);
+            var genreName = preview.Genre is { } genreIndex ? Id3v1Genres.IndexToAudio(genreIndex) : null;
             live.Genres = string.IsNullOrEmpty(genreName) ? [] : [genreName];
         }
 
