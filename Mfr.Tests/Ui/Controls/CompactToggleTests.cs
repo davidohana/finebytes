@@ -83,7 +83,7 @@ namespace Mfr.Tests.Ui.Controls
 
             Assert.True(glyphLeft > 0, "Expected a glyph bounds to measure.");
             var gap = content.Bounds.Left - glyphLeft;
-            Assert.InRange(gap, 2, 10);
+            Assert.InRange(gap, 1, 6);
         }
     }
 }

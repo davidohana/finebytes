@@ -4,7 +4,7 @@
     <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
     <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
     <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-    <Setter Property="Padding" Value="6,0,0,0" />
+    <Setter Property="Padding" Value="4,0,0,0" />
     <Setter Property="MinHeight" Value="22" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
@@ -28,7 +28,7 @@
     <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
     <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
     <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-    <Setter Property="Padding" Value="6,0,0,0" />
+    <Setter Property="Padding" Value="4,0,0,0" />
     <Setter Property="MinHeight" Value="22" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>

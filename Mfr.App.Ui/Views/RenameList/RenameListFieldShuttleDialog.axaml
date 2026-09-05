@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
   xmlns:models="using:Mfr.Models.RenameList"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
   d:DesignWidth="720"
   d:DesignHeight="440"
@@ -47,29 +48,12 @@
       <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
       <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
     </Style>
+    <!-- StyleKey is RadioButton (CompactRadioButton override); type selector would not match. -->
     <Style Selector="RadioButton.field-shuttle-subtab">
       <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
       <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
       <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Padding" Value="4,0,0,0" />
       <Setter Property="Margin" Value="0,0,12,0" />
-      <Setter Property="MinHeight" Value="18" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-    <Style Selector="RadioButton.field-shuttle-subtab /template/ Ellipse#OuterEllipse">
-      <Setter Property="Width" Value="12" />
-      <Setter Property="Height" Value="12" />
-    </Style>
-    <Style Selector="RadioButton.field-shuttle-subtab /template/ Ellipse#CheckOuterEllipse">
-      <Setter Property="Width" Value="12" />
-      <Setter Property="Height" Value="12" />
-    </Style>
-    <Style Selector="RadioButton.field-shuttle-subtab /template/ Ellipse#CheckGlyph">
-      <Setter Property="Width" Value="5" />
-      <Setter Property="Height" Value="5" />
-    </Style>
-    <Style Selector="RadioButton.field-shuttle-subtab /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Margin" Value="4,0,0,0" />
     </Style>
     <Style Selector="ListBox.field-shuttle-list">
       <Setter Property="MinHeight" Value="180" />
@@ -228,13 +212,13 @@
                 MinHeight="22"
                 VerticalAlignment="Bottom"
               >
-                <RadioButton
+                <controls:CompactRadioButton
                   Classes="field-shuttle-subtab"
                   GroupName="ColumnAvailableFields"
                   Content="Original Fields"
                   IsChecked="{Binding IsOriginalColumnsTab}"
                 />
-                <RadioButton
+                <controls:CompactRadioButton
                   Classes="field-shuttle-subtab"
                   GroupName="ColumnAvailableFields"
                   Content="Preview Fields"

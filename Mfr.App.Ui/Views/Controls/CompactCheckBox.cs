@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.Views.Controls
     /// Check box with a tight glyph-to-label gap for compact dialogs and filter editors.
     /// <para>
     /// Fluent's default template reserves a 20px glyph column and 8px padding; this type
-    /// keeps the Fluent visuals but packs the label closer to the box.
+    /// keeps the Fluent visuals but packs the label closer to the box (4px padding).
     /// </para>
     /// </summary>
     public sealed class CompactCheckBox : CheckBox
@@ -19,7 +19,7 @@ namespace Mfr.App.Ui.Views.Controls
 
         static CompactCheckBox()
         {
-            PaddingProperty.OverrideDefaultValue<CompactCheckBox>(new Thickness(6, 0, 0, 0));
+            PaddingProperty.OverrideDefaultValue<CompactCheckBox>(new Thickness(4, 0, 0, 0));
             MinHeightProperty.OverrideDefaultValue<CompactCheckBox>(_MinHeightValue);
             VerticalAlignmentProperty.OverrideDefaultValue<CompactCheckBox>(VerticalAlignment.Center);
         }
