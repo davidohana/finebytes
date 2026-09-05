@@ -1,0 +1,11 @@
+{
+  "name": "finebytes (.NET 10 + Avalonia)",
+  "user": "ubuntu",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "install": "bash .cursor/install.sh",
+  "start": "Xvfb :99 -screen 0 1400x900x24 -ac >/tmp/xvfb.log 2>&1 & sleep 1",
+  "terminals": []
+}
