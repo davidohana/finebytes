@@ -20,13 +20,25 @@
           Label="Find:"
           ToolTip.Tip="{Binding FindToolTip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
         >
-          <TextBox x:Name="FindBox" Classes="filter-editor-field" MinWidth="240" Text="{Binding Find}" />
+          <TextBox
+            x:Name="FindBox"
+            Classes="filter-editor-field"
+            MinWidth="240"
+            Text="{Binding Find}"
+            Watermark="{Binding FindWatermark}"
+          />
         </controls:FilterEditorLabeledRow>
         <controls:FilterEditorLabeledRow
           Label="Replace:"
           ToolTip.Tip="{Binding ReplacementToolTip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
         >
-          <TextBox x:Name="ReplacementBox" Classes="filter-editor-field" MinWidth="240" Text="{Binding Replacement}" />
+          <TextBox
+            x:Name="ReplacementBox"
+            Classes="filter-editor-field"
+            MinWidth="240"
+            Text="{Binding Replacement}"
+            Watermark="{Binding ReplacementWatermark}"
+          />
         </controls:FilterEditorLabeledRow>
       </StackPanel>
     </controls:FieldsetGroup>
