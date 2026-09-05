@@ -10,16 +10,17 @@ namespace Mfr.Tests.Models.Filters.Misc
         private static readonly FilePrefixTarget _target = new();
 
         /// <summary>
-        /// Verifies round parentheses and contents are removed.
+        /// Verifies each bracket type removes matched pairs and contents.
         /// </summary>
-        [Fact]
-        public void Apply_RoundRemoveContents_RemovesParenthetical()
+        [Theory]
+        [InlineData(ParenthesisType.Round, "a(rem)b", "ab")]
+        [InlineData(ParenthesisType.Square, "a[xx]b", "ab")]
+        [InlineData(ParenthesisType.Curly, "a{xx}b", "ab")]
+        [InlineData(ParenthesisType.Angle, "a<xx>b", "ab")]
+        public void Apply_RemoveContents_RemovesMatchedRegion(ParenthesisType type, string input, string expected)
         {
-            var f = new StripParenthesesFilter(
-                _target,
-                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
-            );
-            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a(rem)b"));
+            var f = new StripParenthesesFilter(_target, new StripParenthesesOptions(Type: type, RemoveContents: true));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
         }
 
         /// <summary>
@@ -36,42 +37,72 @@ namespace Mfr.Tests.Models.Filters.Misc
         }
 
         /// <summary>
-        /// Verifies square bracket stripping.
+        /// Verifies nested pairs are stripped innermost-first (MFR7 parity).
         /// </summary>
         [Fact]
-        public void Apply_SquareRemoveContents_RemovesBracketed()
+        public void Apply_NestedRemoveContents_RemovesAllMatchedRegions()
         {
             var f = new StripParenthesesFilter(
                 _target,
-                new StripParenthesesOptions(Type: ParenthesisType.Square, RemoveContents: true)
+                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
             );
-            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a[xx]b"));
+            Assert.Equal("ae", FilterTestHelpers.ApplyToPrefix(f, "a(b(c)d)e"));
         }
 
         /// <summary>
-        /// Verifies curly brace stripping when removing contents.
+        /// Verifies nested pairs keep interior text when only delimiters are stripped.
         /// </summary>
         [Fact]
-        public void Apply_CurlyRemoveContents_RemovesBracedRegion()
+        public void Apply_NestedKeepContents_RemovesOnlyDelimiters()
         {
             var f = new StripParenthesesFilter(
                 _target,
-                new StripParenthesesOptions(Type: ParenthesisType.Curly, RemoveContents: true)
+                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: false)
             );
-            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a{xx}b"));
+            Assert.Equal("abcde", FilterTestHelpers.ApplyToPrefix(f, "a(b(c)d)e"));
         }
 
         /// <summary>
-        /// Verifies angle bracket stripping when removing contents.
+        /// Verifies multiple disjoint pairs are all stripped.
         /// </summary>
         [Fact]
-        public void Apply_AngleRemoveContents_RemovesAngleRegion()
+        public void Apply_MultiplePairsRemoveContents_RemovesEachRegion()
         {
             var f = new StripParenthesesFilter(
                 _target,
-                new StripParenthesesOptions(Type: ParenthesisType.Angle, RemoveContents: true)
+                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
             );
-            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a<xx>b"));
+            Assert.Equal("ace", FilterTestHelpers.ApplyToPrefix(f, "a(b)c(d)e"));
+        }
+
+        /// <summary>
+        /// Verifies unmatched delimiters are left alone when removing contents.
+        /// </summary>
+        [Fact]
+        public void Apply_UnmatchedRemoveContents_LeavesUnmatchedDelimiters()
+        {
+            var f = new StripParenthesesFilter(
+                _target,
+                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
+            );
+            Assert.Equal("a(b", FilterTestHelpers.ApplyToPrefix(f, "a(b"));
+            Assert.Equal("a)b", FilterTestHelpers.ApplyToPrefix(f, "a)b"));
+            Assert.Equal("a(bd", FilterTestHelpers.ApplyToPrefix(f, "a(b(c)d"));
+            Assert.Equal("ac)", FilterTestHelpers.ApplyToPrefix(f, "a(b)c)"));
+        }
+
+        /// <summary>
+        /// Verifies unmatched delimiters are left alone when keeping contents.
+        /// </summary>
+        [Fact]
+        public void Apply_UnmatchedKeepContents_LeavesUnmatchedDelimiters()
+        {
+            var f = new StripParenthesesFilter(
+                _target,
+                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: false)
+            );
+            Assert.Equal("a(bcd", FilterTestHelpers.ApplyToPrefix(f, "a(b(c)d"));
+            Assert.Equal("abc)", FilterTestHelpers.ApplyToPrefix(f, "a(b)c)"));
         }
     }
 }
