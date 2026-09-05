@@ -3,7 +3,7 @@ using Avalonia.Controls;
 namespace Mfr.App.Ui.Views.FilterEditors.Trimming
 {
     /// <summary>
-    /// Option editor for <see cref="Filters.Trimming.TrimBetweenFilter"/>.
+    /// Option editor for <see cref="Mfr.Filters.Trimming.TrimBetweenFilter"/>.
     /// </summary>
     public partial class TrimBetweenFilterEditorView : UserControl
     {

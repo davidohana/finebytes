@@ -64,16 +64,20 @@ namespace Mfr.Filters.Trimming
             var startIndex = _GetAbsoluteIndex(Options.Start, value.Length);
             var endIndex = _GetAbsoluteIndex(Options.End, value.Length);
 
-            // Reorder if start is after end
             if (startIndex > endIndex)
             {
                 (startIndex, endIndex) = (endIndex, startIndex);
             }
 
-            // Remove characters from startIndex to endIndex (inclusive)
             return value.Remove(startIndex, endIndex - startIndex + 1);
         }
 
+        /// <summary>
+        /// Maps a 1-based left/right <see cref="Position"/> to a 0-based index in <paramref name="length"/>.
+        /// </summary>
+        /// <param name="position">Inclusive trim endpoint.</param>
+        /// <param name="length">Non-zero string length (caller skips empty values).</param>
+        /// <returns>Index clamped to <c>0..length-1</c>.</returns>
         private static int _GetAbsoluteIndex(Position position, int length)
         {
             var index = position.Anchor switch
