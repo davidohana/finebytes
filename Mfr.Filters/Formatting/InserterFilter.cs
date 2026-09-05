@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting
@@ -66,6 +67,9 @@ namespace Mfr.Filters.Formatting
             _compiledText = _CompileInsertText(Options.Text);
         }
 
+        /// <summary>
+        /// Compiles <paramref name="text"/> as a formatter template when it contains likely tokens; otherwise returns a literal.
+        /// </summary>
         private static Formatter _CompileInsertText(string text)
         {
             if (!FormatStringCompiler.ContainsLikelyFormatTokens(text))
@@ -95,6 +99,10 @@ namespace Mfr.Filters.Formatting
             return string.Concat(value.AsSpan(0, insertIndex), inserted, value.AsSpan(insertIndex));
         }
 
+        /// <summary>
+        /// Replaces characters starting at <paramref name="insertIndex"/> with <paramref name="inserted"/>
+        /// (extends past the segment end when the replacement is longer than the remainder).
+        /// </summary>
         private static string _OverwriteAt(string segment, int insertIndex, string inserted)
         {
             var remainderStart = insertIndex + inserted.Length;
@@ -117,12 +125,12 @@ namespace Mfr.Filters.Formatting
         {
             var oneBased = position < 1 ? 1 : position;
 
-            if (startFrom == InserterOrigin.Beginning)
+            return startFrom switch
             {
-                return Math.Min(oneBased - 1, length);
-            }
-
-            return Math.Max(0, length - oneBased + 1);
+                InserterOrigin.Beginning => Math.Min(oneBased - 1, length),
+                InserterOrigin.End => Math.Max(0, length - oneBased + 1),
+                _ => throw new UnreachableException(),
+            };
         }
     }
 }

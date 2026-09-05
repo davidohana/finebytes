@@ -23,68 +23,65 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies that a large position appends at the end of the segment.
+        /// Verifies beginning-origin insert index clamping and append-past-end behavior.
         /// </summary>
-        [Fact]
-        public void Apply_FromBeginning_PositionPastLength_AppendsAtEnd()
+        [Theory]
+        [InlineData("X", 99, "ab", "abX")]
+        [InlineData("X", 0, "ab", "Xab")]
+        [InlineData("X", 1, "", "X")]
+        [InlineData("", 1, "ab", "ab")]
+        public void Apply_FromBeginning_InsertsAtComputedIndex(string text, int position, string input, string expected)
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "X", Position: 99, StartFrom: InserterOrigin.Beginning, Overwrite: false)
+                new InserterOptions(
+                    Text: text,
+                    Position: position,
+                    StartFrom: InserterOrigin.Beginning,
+                    Overwrite: false
+                )
             );
-            Assert.Equal("abX", FilterTestHelpers.ApplyToPrefix(f, "ab"));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
         }
 
         /// <summary>
-        /// Verifies MFR7 end counting: position 1 appends after the last character.
+        /// Verifies MFR7 end counting: position 1 appends; larger positions walk left; oversized prepends.
         /// </summary>
-        [Fact]
-        public void Apply_FromEnd_Position1_AppendsAtEnd()
+        [Theory]
+        [InlineData("_", 1, "ab", "ab_")]
+        [InlineData("_", 2, "ab", "a_b")]
+        [InlineData("^", 9, "ab", "^ab")]
+        [InlineData("X", 1, "", "X")]
+        public void Apply_FromEnd_InsertsAtComputedIndex(string text, int position, string input, string expected)
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "_", Position: 1, StartFrom: InserterOrigin.End, Overwrite: false)
+                new InserterOptions(Text: text, Position: position, StartFrom: InserterOrigin.End, Overwrite: false)
             );
-            Assert.Equal("ab_", FilterTestHelpers.ApplyToPrefix(f, "ab"));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
         }
 
         /// <summary>
-        /// Verifies end counting: position 2 inserts before the last character.
+        /// Verifies overwrite replaces characters at the insert index, including past the segment end and from the end.
         /// </summary>
-        [Fact]
-        public void Apply_FromEnd_Position2_InsertsBeforeLastCharacter()
+        [Theory]
+        [InlineData("**", 2, InserterOrigin.Beginning, "abcd", "a**d")]
+        [InlineData("YZ", 3, InserterOrigin.Beginning, "ab", "abYZ")]
+        [InlineData("*", 2, InserterOrigin.End, "ab", "a*")]
+        [InlineData("YZ", 1, InserterOrigin.Beginning, "", "YZ")]
+        public void Apply_Overwrite_ReplacesCharactersAtIndex(
+            string text,
+            int position,
+            InserterOrigin startFrom,
+            string input,
+            string expected
+        )
         {
             var f = new InserterFilter(
                 _target,
-                new InserterOptions(Text: "_", Position: 2, StartFrom: InserterOrigin.End, Overwrite: false)
+                new InserterOptions(Text: text, Position: position, StartFrom: startFrom, Overwrite: true)
             );
-            Assert.Equal("a_b", FilterTestHelpers.ApplyToPrefix(f, "ab"));
-        }
-
-        /// <summary>
-        /// Verifies that an oversized position from the end inserts at the beginning.
-        /// </summary>
-        [Fact]
-        public void Apply_FromEnd_PositionPastLength_InsertsAtStart()
-        {
-            var f = new InserterFilter(
-                _target,
-                new InserterOptions(Text: "^", Position: 9, StartFrom: InserterOrigin.End, Overwrite: false)
-            );
-            Assert.Equal("^ab", FilterTestHelpers.ApplyToPrefix(f, "ab"));
-        }
-
-        /// <summary>
-        /// Verifies overwrite replaces characters at the insert index.
-        /// </summary>
-        [Fact]
-        public void Apply_Overwrite_ReplacesCharactersAtIndex()
-        {
-            var f = new InserterFilter(
-                _target,
-                new InserterOptions(Text: "**", Position: 2, StartFrom: InserterOrigin.Beginning, Overwrite: true)
-            );
-            Assert.Equal("a**d", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
         }
 
         /// <summary>
