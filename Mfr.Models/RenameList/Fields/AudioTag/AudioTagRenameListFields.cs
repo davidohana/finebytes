@@ -4,8 +4,12 @@ using Mfr.Models.Tags;
 namespace Mfr.Models.RenameList.Fields.AudioTag
 {
     /// <summary>
-    /// All MFR7 Audio Tag Rename List fields (original columns only; preview deferred to Phase 9).
+    /// All MFR7 Audio Tag Rename List fields.
     /// </summary>
+    /// <remarks>
+    /// Semantic fields are <c>ReadWriteApply</c> (previewable). First-segment and Tag Types stay
+    /// original-only (<c>ReadOnly</c>), matching MFR7 <c>AudioTagPgInfo</c>.
+    /// </remarks>
     public static class AudioTagRenameListFields
     {
         /// <summary>
