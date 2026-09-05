@@ -13,7 +13,7 @@ Applies **search/replace pairs** embedded in the filter options, in list order, 
 
 | Property        | Type          | Description                                                              |
 | --------------- | ------------- | ------------------------------------------------------------------------ |
-| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — applies to **every** pair.           |
+| `mode`          | string (enum) | `Literal`, `Wildcard`, or `Regex` — applies to **every** pair. Invalid `Regex` search patterns fail at setup. |
 | `caseSensitive` | bool          | Matching flag for all pairs.                                             |
 | `replaceAll`    | bool          | Replace all matches per pair.                                            |
 | `wholeWord`     | bool          | Whole-word restriction for all pairs. Default: `true` (unlike Replacer). |

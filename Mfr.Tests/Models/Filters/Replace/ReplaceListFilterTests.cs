@@ -183,6 +183,23 @@ namespace Mfr.Tests.Models.Filters.Replace
             Assert.Equal("x", secondItem.Preview.Prefix);
         }
 
+        /// <summary>
+        /// Verifies invalid regex search patterns fail during setup (preview marks all items).
+        /// </summary>
+        [Fact]
+        public void Setup_InvalidRegex_ThrowsArgumentException()
+        {
+            var filter = _CreateFilter(
+                entries: [new ReplaceListEntry("ok", "x"), new ReplaceListEntry("(", "y")],
+                mode: ReplacerMode.Regex,
+                caseSensitive: true,
+                replaceAll: true,
+                wholeWord: false
+            );
+            var ex = Assert.Throws<ArgumentException>(filter.Setup);
+            Assert.Contains("Invalid regular expression", ex.Message, StringComparison.Ordinal);
+        }
+
         private static ReplaceListFilter _CreateFilter(
             IReadOnlyList<ReplaceListEntry> entries,
             ReplacerMode mode,

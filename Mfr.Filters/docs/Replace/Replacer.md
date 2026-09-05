@@ -25,7 +25,7 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 | ---------- | ------------------------------------------------- |
 | `Literal`  | Exact substring.                                  |
 | `Wildcard` | `*` = any run of characters, `?` = one character. |
-| `Regex`    | .NET regular expression.                          |
+| `Regex`    | .NET regular expression. Invalid patterns fail at setup. |
 
 ## Examples
 

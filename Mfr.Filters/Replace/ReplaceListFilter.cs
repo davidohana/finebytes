@@ -55,6 +55,16 @@ namespace Mfr.Filters.Replace
         {
             var entries = ReplaceListParser.Validate(Options.Entries);
             _compiledEntries = [.. entries.Select(e => (e.Search, FormatStringCompiler.Compile(e.Replacement)))];
+
+            if (Options.Match.Mode != ReplacerMode.Regex)
+            {
+                return;
+            }
+
+            foreach (var entry in entries)
+            {
+                ReplacerMatching.ValidateRegexPattern(entry.Search, nameof(Options));
+            }
         }
 
         protected override string _TransformValue(string value, RenameItem item)
@@ -70,7 +80,7 @@ namespace Mfr.Filters.Replace
             {
                 var replacement = compiledReplacement(item);
                 var replacerOptions = new ReplacerOptions(Find: search, Replacement: replacement, Match: Options.Match);
-                transformed = ReplacerFilter.ReplaceSegment(transformed, replacerOptions);
+                transformed = ReplacerMatching.ReplaceSegment(transformed, replacerOptions);
             }
 
             return transformed;
