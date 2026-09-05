@@ -1,3 +1,4 @@
+using Mfr.Tests.TestSupport;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Utils
@@ -7,7 +8,7 @@ namespace Mfr.Tests.Utils
     /// </summary>
     public sealed class PathRelationsTests
     {
-        private static string Root => OperatingSystem.IsWindows() ? @"C:\" : "/";
+        private static string Root => TestPaths.VolumeRoot;
         private static char Sep => Path.DirectorySeparatorChar;
 
         /// <summary>

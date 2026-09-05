@@ -31,7 +31,8 @@ namespace Mfr.Engine.RenameList
         private const int ProgressRefreshMilliseconds = 200;
 
         private readonly IProgress<RenameListProgress>? _progress = progress;
-        private long _lastReportTicks = Environment.TickCount64;
+        // 0 so the first OnScanned/OnAdded reports immediately (same as BeginMetadataPhase).
+        private long _lastReportTicks;
         private RenameListProgressPhase _phase = RenameListProgressPhase.ResolveSources;
         private int _metadataProcessedCount;
         private int _metadataTotalCount;

@@ -1,3 +1,4 @@
+using Mfr.Tests.TestSupport;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Utils
@@ -7,7 +8,7 @@ namespace Mfr.Tests.Utils
     /// </summary>
     public sealed class DirectoryPathAncestorTests
     {
-        private static string Root => OperatingSystem.IsWindows() ? @"C:\" : "/";
+        private static string Root => TestPaths.VolumeRoot;
 
         /// <summary>
         /// Verifies level-1 read returns immediate folder name.
@@ -147,7 +148,7 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void ReplaceSegment_non_positive_level_Throws_ArgumentOutOfRange()
         {
-            var path = $"{(OperatingSystem.IsWindows() ? @"C:\" : "/")}a{Path.DirectorySeparatorChar}b";
+            var path = $"{Root}a{Path.DirectorySeparatorChar}b";
 
             foreach (var badLevel in new[] { 0, -1, -99 })
             {
@@ -164,7 +165,7 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void ReplaceSegment_empty_NewSegment_throws_argument()
         {
-            var directory = $"{(OperatingSystem.IsWindows() ? @"C:\" : "/")}a{Path.DirectorySeparatorChar}b";
+            var directory = $"{Root}a{Path.DirectorySeparatorChar}b";
 
             var ex = Assert.Throws<ArgumentException>(() =>
                 DirectoryPathAncestor.ReplaceSegment(directory, level: 1, newSegmentName: "")

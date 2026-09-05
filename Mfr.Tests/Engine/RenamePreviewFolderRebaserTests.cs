@@ -1,3 +1,5 @@
+using Mfr.Tests.TestSupport;
+
 namespace Mfr.Tests.Engine
 {
     /// <summary>
@@ -5,7 +7,7 @@ namespace Mfr.Tests.Engine
     /// </summary>
     public sealed class RenamePreviewFolderRebaserTests
     {
-        private static string Root => OperatingSystem.IsWindows() ? @"C:\" : "/";
+        private static string Root => TestPaths.VolumeRoot;
 
         /// <summary>
         /// Verifies an item whose preview directory equals a renamed folder's original path is rebased.

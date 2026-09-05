@@ -1096,17 +1096,22 @@ namespace Mfr.Tests.Engine
             }
 
             using var cts = new CancellationTokenSource();
-            cts.Cancel();
             var renameList = new RenameList();
             renameList.AddSources([keepPath]);
 
-            // Already-canceled token: resolve must return without throwing and must not keep a partial batch.
             renameList.AddSources(
                 sources: [_tempRoot.CombinePath("*.txt")],
                 includeFiles: true,
                 includeFolders: false,
                 includeSubdirs: true,
-                cancellationToken: cts.Token
+                cancellationToken: cts.Token,
+                progress: new SynchronousProgress<RenameListProgress>(report =>
+                {
+                    if (report.Phase == RenameListProgressPhase.ResolveSources && report.ScannedCount >= 1)
+                    {
+                        cts.Cancel();
+                    }
+                })
             );
 
             Assert.True(cts.IsCancellationRequested);

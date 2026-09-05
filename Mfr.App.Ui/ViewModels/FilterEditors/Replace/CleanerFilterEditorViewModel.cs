@@ -20,7 +20,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         }
 
         /// <summary>
-        /// Gets or sets whether OS-illegal file-name characters are cleaned.
+        /// Gets or sets whether Windows-illegal file-name characters are cleaned.
         /// </summary>
         [ObservableProperty]
         private bool _removeIllegalChars;

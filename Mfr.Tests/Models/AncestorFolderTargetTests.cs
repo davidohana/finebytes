@@ -1,5 +1,6 @@
 using Mfr.Filters.Replace;
 using Mfr.Tests.Models.Filters;
+using Mfr.Tests.TestSupport;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Models
@@ -9,6 +10,8 @@ namespace Mfr.Tests.Models
     /// </summary>
     public sealed class AncestorFolderTargetTests
     {
+        private static string Root => TestPaths.VolumeRoot;
+
         private static ReplacerFilter _Replacer(FilterTarget target, string find, string replacement)
         {
             return new(
@@ -30,7 +33,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Replacer_WithAncestor_target_matches_DirectoryPathAncestor_replace_segment()
         {
-            var root = OperatingSystem.IsWindows() ? @"C:\" : "/";
+            var root = Root;
             var sep = Path.DirectorySeparatorChar;
             var directoryPath = $"{root}a{sep}b{sep}c";
             var expected = DirectoryPathAncestor.ReplaceSegment(directoryPath, level: 1, newSegmentName: "cRenamed");
@@ -50,7 +53,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Replacer_trailing_separator_on_directory_matches_DirectoryPathAncestor()
         {
-            var root = OperatingSystem.IsWindows() ? @"C:\" : "/";
+            var root = Root;
             var sep = Path.DirectorySeparatorChar;
             var directoryWithTrail = $"{root}a{sep}b{sep}c{sep}";
             var expected = DirectoryPathAncestor.ReplaceSegment(
@@ -96,7 +99,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Replacer_empty_segment_replacement_throws_matching_DirectoryPathAncestor()
         {
-            var directory = $"{(OperatingSystem.IsWindows() ? @"C:\" : "/")}a{Path.DirectorySeparatorChar}b";
+            var directory = $"{Root}a{Path.DirectorySeparatorChar}b";
             var item = FilterTestHelpers.CreateRenameItem(directory: directory);
             var filter = _Replacer(target: new AncestorFolderTarget(Level: 1), find: "b", replacement: "");
             filter.Setup();

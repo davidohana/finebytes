@@ -12,10 +12,29 @@ namespace Mfr.Utils
     /// </remarks>
     public static class WindowsFileNameChars
     {
+        private static readonly char[] s_invalid = _BuildInvalid();
+
         /// <summary>
-        /// Characters that are illegal in Windows file names (control chars, reserved punctuation).
+        /// Whether <paramref name="value"/> contains a character illegal in Windows file names.
         /// </summary>
-        public static char[] Invalid { get; } = _BuildInvalid();
+        /// <param name="value">Candidate file or folder name segment.</param>
+        /// <returns><see langword="true"/> when any Windows-illegal character is present.</returns>
+        public static bool ContainsInvalid(string value)
+        {
+            return value.AsSpan().IndexOfAny(s_invalid) >= 0;
+        }
+
+        /// <summary>
+        /// Adds Windows-illegal file-name characters to <paramref name="chars"/>.
+        /// </summary>
+        /// <param name="chars">Set to populate.</param>
+        public static void AddInvalidTo(ISet<char> chars)
+        {
+            foreach (var c in s_invalid)
+            {
+                chars.Add(c);
+            }
+        }
 
         private static char[] _BuildInvalid()
         {

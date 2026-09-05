@@ -41,9 +41,12 @@ namespace Mfr.Filters.Replace
         protected override string _TransformValue(string value, RenameItem item)
         {
             // Windows illegal-name set: this product renames Windows files (see WindowsFileNameChars).
-            var invalidChars = Options.RemoveIllegalChars ? WindowsFileNameChars.Invalid : [];
             var customChars = Options.CustomCharsToRemove ?? "";
-            var chars = invalidChars.Concat(customChars).ToHashSet();
+            var chars = customChars.ToHashSet();
+            if (Options.RemoveIllegalChars)
+            {
+                WindowsFileNameChars.AddInvalidTo(chars);
+            }
 
             if (chars.Count == 0)
             {

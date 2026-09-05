@@ -139,7 +139,7 @@ namespace Mfr.Utils
                 );
             }
 
-            if (newSegmentName.IndexOfAny(WindowsFileNameChars.Invalid) >= 0)
+            if (WindowsFileNameChars.ContainsInvalid(newSegmentName))
             {
                 throw new ArgumentException(
                     $"Ancestor folder segment '{newSegmentName}' contains invalid characters for Windows file names.",
