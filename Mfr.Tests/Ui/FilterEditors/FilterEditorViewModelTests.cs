@@ -543,6 +543,40 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies mode/flag edits keep structured entries that editor text cannot round-trip
+        /// (search containing <c>=&gt;</c>).
+        /// </summary>
+        [Fact]
+        public void Replace_list_flag_edits_preserve_entries_with_separator_in_search()
+        {
+            var filter = new ReplaceListFilter(
+                Target: new FilePrefixTarget(),
+                Options: new ReplaceListOptions(
+                    Entries: [new ReplaceListEntry("a=>b", "x")],
+                    Mode: ReplacerMode.Literal,
+                    CaseSensitive: false,
+                    ReplaceAll: true,
+                    WholeWord: true
+                )
+            );
+            var step = new AppliedFilterStepViewModel("Replace List", filter);
+            var editor = new ReplaceListFilterEditorViewModel(step)
+            {
+                Mode = ReplacerMode.Regex,
+                CaseSensitive = true,
+                WholeWord = false,
+            };
+
+            var options = ((ReplaceListFilter)step.Filter).Options;
+            Assert.Single(options.Entries);
+            Assert.Equal("a=>b", options.Entries[0].Search);
+            Assert.Equal("x", options.Entries[0].Replacement);
+            Assert.Equal(ReplacerMode.Regex, options.Mode);
+            Assert.True(options.CaseSensitive);
+            Assert.False(options.WholeWord);
+        }
+
+        /// <summary>
         /// Verifies Name List option edits replace the step filter options.
         /// </summary>
         [Fact]
