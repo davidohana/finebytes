@@ -17,16 +17,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         private const string TimeFormatWithSeconds = "HH':'mm':'ss";
         private const string TimeFormatMinutes = "HH':'mm";
         private const int DateTextLength = 10;
+        private const int TimeTextLengthMinutes = 5;
         private const int TimeTextLengthWithSeconds = 8;
 
         private static readonly string[] s_TimeFormats = [TimeFormatWithSeconds, TimeFormatMinutes];
-
-        private static readonly IReadOnlyList<TimestampFieldChoice> s_TimestampFields =
-        [
-            new(TimestampField.Creation, "Creation"),
-            new(TimestampField.LastWrite, "Last Write"),
-            new(TimestampField.LastAccess, "Last Access"),
-        ];
 
         /// <summary>
         /// Initializes the editor from the current step filter.
@@ -35,14 +29,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         public DateTimeSetterFilterEditorViewModel(AppliedFilterStepViewModel step)
             : base(step)
         {
-            _selectedTimestampField = s_TimestampFields[1];
+            _selectedTimestampField = TimestampFieldChoice.For(TimestampField.LastWrite);
             _SyncFromFilter();
         }
 
         /// <summary>
         /// Gets the timestamp-field combo choices (MFR7 labels).
         /// </summary>
-        public IReadOnlyList<TimestampFieldChoice> TimestampFields => s_TimestampFields;
+        public IReadOnlyList<TimestampFieldChoice> TimestampFields => TimestampFieldChoice.All;
 
         /// <summary>
         /// Gets or sets which filesystem timestamp to set.
@@ -101,6 +95,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             }
         }
 
+        /// <summary>
+        /// Copies current filter options into editor properties without live replace.
+        /// </summary>
         private void _SyncFromFilter()
         {
             LoadWithoutApplying(() =>
@@ -110,7 +107,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
                     return;
                 }
 
-                SelectedTimestampField = _ChoiceFor(filter.Options.TimestampField);
+                SelectedTimestampField = TimestampFieldChoice.For(filter.Options.TimestampField);
                 SetDate = filter.Options.SetDate;
                 DateText = filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture);
                 SetTime = filter.Options.SetTime;
@@ -118,6 +115,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             });
         }
 
+        /// <summary>
+        /// Parses enabled date/time text and replaces the step filter when options change.
+        /// </summary>
         private void _ApplyOptions()
         {
             if (IsLoading || SelectedTimestampField is null || Step.Filter is not DateTimeSetterFilter filter)
@@ -126,17 +126,17 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             }
 
             // Resolve each enabled field independently so an incomplete sibling cannot block a valid edit
-            // (e.g. date 2026-09-05 must still apply while time text is mid-edit "18:14").
+            // (e.g. date 2026-09-05 must still apply while time text is mid-edit "18:1").
             var date = filter.Options.Date;
             var time = filter.Options.Time;
             if (SetDate)
             {
-                _ = _TryResolveDate(filter, ref date);
+                _ResolveDate(filter, ref date);
             }
 
             if (SetTime)
             {
-                _ = _TryResolveTime(filter, ref time);
+                _ResolveTime(filter, ref time);
             }
 
             var options = new DateTimeSetterOptions(
@@ -152,8 +152,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         /// <summary>
         /// Parses <see cref="DateText"/> into a supported file date, or reverts complete illegal input.
         /// </summary>
-        /// <returns><see langword="false"/> when the text is incomplete or was just reverted.</returns>
-        private bool _TryResolveDate(DateTimeSetterFilter filter, ref DateOnly date)
+        private void _ResolveDate(DateTimeSetterFilter filter, ref DateOnly date)
         {
             var text = (DateText ?? string.Empty).Trim();
             if (
@@ -167,22 +166,24 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             )
             {
                 date = parsed;
-                return true;
+                return;
             }
 
             if (text.Length >= DateTextLength)
             {
-                _RevertDateText(filter);
+                _RevertBoundText(
+                    () => DateText,
+                    value => DateText = value,
+                    filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture),
+                    text
+                );
             }
-
-            return false;
         }
 
         /// <summary>
         /// Parses <see cref="TimeText"/> as <c>HH:mm:ss</c> or <c>HH:mm</c>, or reverts complete illegal input.
         /// </summary>
-        /// <returns><see langword="false"/> when the text is incomplete or was just reverted.</returns>
-        private bool _TryResolveTime(DateTimeSetterFilter filter, ref TimeOnly time)
+        private void _ResolveTime(DateTimeSetterFilter filter, ref TimeOnly time)
         {
             var text = (TimeText ?? string.Empty).Trim();
             if (
@@ -196,40 +197,32 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
             )
             {
                 time = parsed;
-                return true;
+                return;
             }
 
-            if (text.Length >= TimeTextLengthWithSeconds)
+            var looksComplete = text.Length is TimeTextLengthMinutes or >= TimeTextLengthWithSeconds;
+            if (looksComplete)
             {
-                _RevertTimeText(filter);
+                _RevertBoundText(
+                    () => TimeText,
+                    value => TimeText = value,
+                    filter.Options.Time.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture),
+                    text
+                );
             }
-
-            return false;
-        }
-
-        private void _RevertDateText(DateTimeSetterFilter filter)
-        {
-            var restored = filter.Options.Date.ToString(DateFormat, CultureInfo.InvariantCulture);
-            LoadWithoutApplying(() => DateText = restored);
-            _NudgeBoundText(() => DateText, value => DateText = value, restored);
-        }
-
-        private void _RevertTimeText(DateTimeSetterFilter filter)
-        {
-            var restored = filter.Options.Time.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture);
-            LoadWithoutApplying(() => TimeText = restored);
-            _NudgeBoundText(() => TimeText, value => TimeText = value, restored);
         }
 
         /// <summary>
-        /// Re-pushes a restored value after the current TwoWay TextBox write settles.
+        /// Restores bound TextBox text after complete illegal input, without clobbering a newer edit.
         /// </summary>
         /// <remarks>
         /// Avalonia can ignore a same-stack source write while applying a TextBox edit; posting a
-        /// clear-then-restore forces the bound control to show the reverted value.
+        /// clear-then-restore forces the bound control to show the reverted value when it is still
+        /// showing the rejected text. If the user typed again before the post runs, leave that text.
         /// </remarks>
-        private void _NudgeBoundText(Func<string> getText, Action<string> setText, string restored)
+        private void _RevertBoundText(Func<string> getText, Action<string> setText, string restored, string rejected)
         {
+            LoadWithoutApplying(() => setText(restored));
             Dispatcher.UIThread.Post(() =>
             {
                 if (IsLoading)
@@ -239,29 +232,22 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
 
                 LoadWithoutApplying(() =>
                 {
-                    if (getText() != restored)
+                    var current = getText();
+                    if (current != restored && current != rejected)
                     {
+                        return;
+                    }
+
+                    if (current == restored)
+                    {
+                        setText(string.Empty);
                         setText(restored);
                         return;
                     }
 
-                    setText(string.Empty);
                     setText(restored);
                 });
             });
-        }
-
-        private static TimestampFieldChoice _ChoiceFor(TimestampField field)
-        {
-            foreach (var choice in s_TimestampFields)
-            {
-                if (choice.Field == field)
-                {
-                    return choice;
-                }
-            }
-
-            return s_TimestampFields[1];
         }
     }
 }

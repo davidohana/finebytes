@@ -25,7 +25,7 @@ namespace Mfr.Filters.Attributes
     /// <remarks>
     /// <para>
     /// Calendar dates must stay in <see cref="FileTimestampDateLimits.Min"/>..<see cref="FileTimestampDateLimits.Max"/>.
-    /// Out-of-range dates are ignored at apply time so preview/commit cannot request illegal timestamps.
+    /// Out-of-range dates skip only the date half so a valid <see cref="DateTimeSetterOptions.SetTime"/> still applies.
     /// </para>
     /// </remarks>
     [FilterPalette(FilterGroup.Attributes, "Date/Time Setter")]
@@ -51,31 +51,32 @@ namespace Mfr.Filters.Attributes
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
         {
-            if (!Options.SetDate && !Options.SetTime)
+            var applyDate = Options.SetDate && FileTimestampDateLimits.IsInRange(Options.Date);
+            var applyTime = Options.SetTime;
+            if (!applyDate && !applyTime)
             {
                 return;
             }
 
-            if (Options.SetDate && !FileTimestampDateLimits.IsInRange(Options.Date))
-            {
-                return;
-            }
-
-            TimestampFields.Update(item.Preview, Options.TimestampField, _Apply);
+            TimestampFields.Update(
+                item.Preview,
+                Options.TimestampField,
+                current => _Apply(current, applyDate, applyTime)
+            );
         }
 
         /// <summary>
         /// Applies optional date and/or time replacements while preserving <see cref="DateTime.Kind"/>.
         /// </summary>
-        private DateTime _Apply(DateTime current)
+        private DateTime _Apply(DateTime current, bool applyDate, bool applyTime)
         {
             var result = current;
-            if (Options.SetDate)
+            if (applyDate)
             {
                 result = Options.Date.ToDateTime(TimeOnly.FromDateTime(result), result.Kind);
             }
 
-            if (Options.SetTime)
+            if (applyTime)
             {
                 result = DateOnly.FromDateTime(result).ToDateTime(Options.Time, result.Kind);
             }

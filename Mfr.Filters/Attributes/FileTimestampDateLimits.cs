@@ -5,9 +5,9 @@ namespace Mfr.Filters.Attributes
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Lower bound matches Windows FILETIME (<c>1601-01-01</c>). Upper bound is capped at
+    /// Lower bound matches Windows FILETIME (<c>1601-01-01</c>). Upper bound is a product ceiling at
     /// <c>2100-12-31</c> so absurd far-future years (typos like <c>3026</c>) are rejected while
-    /// still covering normal file-timestamp use.
+    /// still covering normal file-timestamp use (not the OS FILETIME max of 9999).
     /// </para>
     /// </remarks>
     public static class FileTimestampDateLimits
@@ -18,7 +18,7 @@ namespace Mfr.Filters.Attributes
         public static readonly DateOnly Min = new(1601, 1, 1);
 
         /// <summary>
-        /// Latest calendar date accepted by Date/Time Setter (inclusive).
+        /// Latest calendar date accepted by Date/Time Setter (inclusive product ceiling).
         /// </summary>
         public static readonly DateOnly Max = new(2100, 12, 31);
 
@@ -26,7 +26,9 @@ namespace Mfr.Filters.Attributes
         /// Returns whether <paramref name="date"/> is inside <see cref="Min"/>..<see cref="Max"/>.
         /// </summary>
         /// <param name="date">Candidate calendar date.</param>
-        /// <returns><see langword="true"/> when the date may be written to a filesystem timestamp.</returns>
+        /// <returns>
+        /// <see langword="true"/> when the date is inside the product-accepted setter range.
+        /// </returns>
         public static bool IsInRange(DateOnly date)
         {
             return date >= Min && date <= Max;

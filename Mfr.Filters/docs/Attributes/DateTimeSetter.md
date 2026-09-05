@@ -39,4 +39,4 @@ Preview updates the corresponding `DateTime` on `FileMeta`; commit applies the f
 }
 ```
 
-`date` is an ISO **date-only** value (`yyyy-MM-DD`) in **1601-01-01** through **2100-12-31** (Windows FILETIME minimum; far-future years are rejected). `time` uses **`HH:mm:ss`** or **`HH:mm`** (hours 00–23). The Filter Configuration editor rejects illegal values and restores the last valid text; an incomplete time no longer blocks a valid date edit (and vice versa).
+`date` is an ISO **date-only** value (`yyyy-MM-DD`) in **1601-01-01** through **2100-12-31** (Windows FILETIME minimum; far-future years are rejected). `time` uses **`HH:mm:ss`** or **`HH:mm`** (hours 00–23). The Filter Configuration editor rejects illegal values and restores the last valid text; an incomplete time no longer blocks a valid date edit (and vice versa). At apply time, an out-of-range `date` skips only the date half so a valid `setTime` still applies.
