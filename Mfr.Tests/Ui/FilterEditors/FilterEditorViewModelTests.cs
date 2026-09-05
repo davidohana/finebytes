@@ -390,6 +390,8 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(string.Empty, editor.Find);
             Assert.Equal(string.Empty, editor.Replacement);
             Assert.Equal(ReplacerMode.Literal, editor.Mode);
+            Assert.Equal("feat.", editor.FindWatermark);
+            Assert.Equal("feature.", editor.ReplacementWatermark);
             Assert.Contains("literally", editor.FindToolTip, StringComparison.Ordinal);
             Assert.DoesNotContain("$0", editor.ReplacementToolTip, StringComparison.Ordinal);
             Assert.False(editor.CaseSensitive);
@@ -397,6 +399,8 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.False(editor.WholeWord);
 
             editor.Mode = ReplacerMode.Wildcard;
+            Assert.Equal("DSC*.JPG", editor.FindWatermark);
+            Assert.Equal("photo.jpg", editor.ReplacementWatermark);
             Assert.Contains("*", editor.FindToolTip, StringComparison.Ordinal);
             Assert.DoesNotContain("$0", editor.ReplacementToolTip, StringComparison.Ordinal);
 
@@ -407,6 +411,8 @@ namespace Mfr.Tests.Ui.FilterEditors
             editor.ReplaceAll = false;
             editor.WholeWord = true;
 
+            Assert.Equal(@"\((.+)\)", editor.FindWatermark);
+            Assert.Equal("$1", editor.ReplacementWatermark);
             Assert.Contains("regex", editor.FindToolTip, StringComparison.OrdinalIgnoreCase);
             Assert.Contains("$0", editor.ReplacementToolTip, StringComparison.Ordinal);
 
