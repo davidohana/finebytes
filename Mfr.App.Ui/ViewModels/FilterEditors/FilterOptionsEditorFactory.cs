@@ -47,6 +47,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 CounterFilter => new CounterFilterEditorViewModel(step),
                 InserterFilter => new InserterFilterEditorViewModel(step),
                 NameListFilter => new NameListFilterEditorViewModel(step),
+                TokenMoverFilter => new TokenMoverFilterEditorViewModel(step),
                 _ => null,
             };
         }

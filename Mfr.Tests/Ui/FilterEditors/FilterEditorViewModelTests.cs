@@ -482,5 +482,28 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal("pre_", options.Prefix);
             Assert.Equal("_suf", options.Suffix);
         }
+
+        /// <summary>
+        /// Verifies Token Mover option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Token_mover_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Token Mover", new TokenMoverFilter());
+            var editor = new TokenMoverFilterEditorViewModel(step);
+
+            Assert.Equal("-", editor.Delimiter);
+            Assert.Equal(1, editor.TokenNumber);
+            Assert.Equal(1, editor.MoveBy);
+
+            editor.Delimiter = ",";
+            editor.TokenNumber = 2;
+            editor.MoveBy = -1;
+
+            var options = ((TokenMoverFilter)step.Filter).Options;
+            Assert.Equal(",", options.Delimiter);
+            Assert.Equal(2, options.TokenNumber);
+            Assert.Equal(-1, options.MoveBy);
+        }
     }
 }

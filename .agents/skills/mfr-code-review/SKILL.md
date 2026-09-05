@@ -3,11 +3,11 @@ name: mfr-code-review
 description: >-
   Reviews finebytes/MFR changes for correctness, KISS, YAGNI, naming, stale
   APIs, layering, leftover flags, fragile heuristics, dedup/reuse (local and
-  cross-file), and test coverage; applies high-confidence cleanup and adds
-  worthwhile tests; surfaces deeper refactor/dedup options ranked by
-  cost-to-value (risk, LOC, churn vs payoff) even when not auto-applied; may
-  delegate to explore/bugbot/security-review when triggers match. Use when the
-  user asks for a code review, deep review, KISS/YAGNI pass,
+  cross-file), and test coverage; always applies high-confidence cleanup and
+  worthwhile tests unless the user asks for findings-only; surfaces deeper
+  refactor/dedup options ranked by cost-to-value (risk, LOC, churn vs payoff);
+  may delegate to explore/bugbot/security-review when triggers match. Use when
+  the user asks for a code review, deep review, KISS/YAGNI pass,
   simplify/minimize/cleanup/dedup, to review a plan phase or prior transcript,
   or says auto-correct things you are sure about.
 ---
@@ -18,7 +18,8 @@ Default posture: **correctness first**, then **delete and collapse**, then **tes
 their keep**. Prefer a smaller design over a compatible one.
 
 Actively hunt **dedup and reuse** at every scope — local copy-paste, parallel types/views,
-shared policy in two layers, twin APIs, and test fixtures. Apply safe local wins in-pass;
+shared policy in two layers, twin APIs, and test fixtures. **Always apply** high-confidence
+local wins in-pass (do not wait for the user to say simplify / auto-correct);
 **always call out** stronger cross-file or structural dedups clearly in the report, ranked by
 **cost-to-value** (the user welcomes deeper refactors — do not bury or skip them because they
 are not auto-applied).
@@ -37,8 +38,9 @@ policy in `AGENTS.md` are already always-on — do not restate them.
 
 ## Apply vs propose
 
-**Apply in the same pass** when the prompt includes simplify, minimize, cleanup, kiss, yagni,
-auto-correct, refactor as needed, add coverage, or “review what’s done” after a phase:
+**Always apply** high-confidence fixes in the same pass (default for every review —
+including plain “review” / “see if” prompts). Do **not** require action words such as
+simplify, minimize, cleanup, kiss, yagni, or auto-correct:
 
 - Bugs and incorrect edge cases
 - Dead code, unused parameters/flags, leftover APIs, unused wrappers
@@ -49,8 +51,9 @@ auto-correct, refactor as needed, add coverage, or “review what’s done” af
 - XML `<summary>` on non-obvious private methods (not a `//` comment)
 - High-value tests and consolidation of overlapping tests
 
-**Findings first** (report + suggested order, offer to implement) when the prompt is only
-“review / see if / see where / can it be” with no action words.
+**Findings first** (report + suggested order, offer to implement — **no edits**) only when
+the user explicitly asks for findings-only / no changes (e.g. “review only”, “don’t edit”,
+“findings only”, “just report”).
 
 **Propose only** (do not silently do — but **must suggest clearly** in the report):
 
@@ -85,8 +88,8 @@ doc only when the user asks to handover, or when that phase already has one.
 ## Optional subagents
 
 **Default: one reviewer, one synthesized report.** Most reviews stay in-process — correctness,
-KISS, dedup, layering, naming, and tests overlap and the parent often applies fixes in the
-same pass.
+KISS, dedup, layering, naming, and tests overlap and the parent **always applies**
+high-confidence fixes in the same pass (unless findings-only).
 
 Delegate only for **discovery** or **specialized audits**. Subagent output is input; the parent
 merges, dedupes, prioritizes, and writes the final report. Subagents do **not** apply fixes.

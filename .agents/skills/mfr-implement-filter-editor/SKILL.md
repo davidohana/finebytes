@@ -88,6 +88,7 @@ Add a `switch` arm in `FilterOptionsEditorFactory.Create`. Until registered, sel
 | Multi checkbox + numeric                     | `Misc/FixLeadingZerosFilterEditor*`                                     |
 | Shared two-filter labels differ              | `Space/SpaceTriggerFilterEditor*` or `Case/CharacterListFilterEditor*`  |
 | Enum / radio case mode                       | `Case/LettersCaseFilterEditor*`                                         |
+| Find/replace + Literal/Wildcard/Regex mode   | `Replace/ReplacerFilterEditor*` (list pairs: `ReplaceListFilterEditor*`) |
 | Space char catalog                           | `Space/SpaceCharacterFilterEditor*`                                     |
 
 ## Tests
