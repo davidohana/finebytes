@@ -1,0 +1,108 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Audio"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="480"
+  d:DesignHeight="520"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Audio.AudioTagSetterFilterEditorView"
+  x:DataType="vm:AudioTagSetterFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <ToolTip.Tip>
+        <controls:RichToolTip>
+          <TextBlock Classes="rich-tip-title" Text="Per-field audio tag values." />
+          <TextBlock Classes="rich-tip-bullet" Text="• Checked: always set the field (overwrite)." />
+          <TextBlock
+            Classes="rich-tip-bullet"
+            Text="• Grayed (indeterminate): set only when the current value is empty."
+          />
+          <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: leave the field unchanged." />
+          <TextBlock
+            Classes="rich-tip-bullet"
+            Text="• Values may be plain text or formatter tokens (e.g. &lt;file-name&gt;)."
+          />
+        </controls:RichToolTip>
+      </ToolTip.Tip>
+      <StackPanel Spacing="6">
+        <ItemsControl x:Name="FieldRowsItemsControl" ItemsSource="{Binding FieldRows}">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <StackPanel Spacing="4" Grid.IsSharedSizeScope="True" />
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:AudioTagSetterFieldRowViewModel">
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" SharedSizeGroup="AudioTagSetterMode" />
+                  <ColumnDefinition Width="8" />
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <controls:CompactCheckBox
+                  Content="{Binding Label}"
+                  IsThreeState="True"
+                  IsChecked="{Binding IsActive}"
+                  ToolTip.Tip="{Binding Tip}"
+                  Tag="{Binding Kind}"
+                  VerticalAlignment="Top"
+                />
+                <Panel Grid.Column="2">
+                  <TextBox
+                    Classes="filter-editor-field"
+                    MinWidth="160"
+                    Watermark="{Binding Watermark}"
+                    Text="{Binding Text}"
+                    Tag="{Binding Kind}"
+                    IsVisible="{Binding !Multiline}"
+                    VerticalAlignment="Top"
+                  />
+                  <TextBox
+                    Classes="filter-editor-field-wrap"
+                    MinWidth="160"
+                    MinHeight="64"
+                    AcceptsReturn="True"
+                    Watermark="{Binding Watermark}"
+                    Text="{Binding Text}"
+                    Tag="{Binding Kind}"
+                    IsVisible="{Binding Multiline}"
+                    VerticalAlignment="Top"
+                  />
+                </Panel>
+                <controls:CompactCheckBox
+                  Grid.Column="3"
+                  Margin="8,0,0,0"
+                  Content="Auto-increment"
+                  IsVisible="{Binding ShowsAutoIncrement}"
+                  IsChecked="{Binding AutoIncrement}"
+                  Tag="{x:Static vm:AudioTagSetterFieldRowViewModel.AutoIncrementTag}"
+                  VerticalAlignment="Center"
+                >
+                  <ToolTip.Tip>
+                    <controls:RichToolTip>
+                      <TextBlock
+                        Classes="rich-tip-body"
+                        Text="Add each item’s Rename List index to the parsed track base, then clamp to 255."
+                      />
+                    </controls:RichToolTip>
+                  </ToolTip.Tip>
+                </controls:CompactCheckBox>
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock
+          Classes="filter-editor-label"
+          Opacity="0.75"
+          TextWrapping="Wrap"
+          Text="Use ';' to separate multiple performers, genres, or composers. Gray the checkbox to set a field only if empty."
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>
