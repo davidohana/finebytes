@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Filters.Case;
 
 namespace Mfr.Tests.Models.Filters.Case
@@ -15,10 +16,7 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void Apply_DoesNotChangeText_ButSetsSentenceEndChars()
         {
-            var filter = new SentenceEndCharactersFilter(
-                Target: _target,
-                Options: new SentenceEndCharactersOptions(Characters: ":;")
-            );
+            var filter = new SentenceEndCharactersFilter(Options: new SentenceEndCharactersOptions(Characters: ":;"));
 
             var item = FilterTestHelpers.ApplyReturnItem(filter, "hello: world");
 
@@ -33,7 +31,6 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SetsSentenceEndCharsForLaterSentenceCase()
         {
             var sentenceEndFilter = new SentenceEndCharactersFilter(
-                Target: _target,
                 Options: new SentenceEndCharactersOptions(Characters: "-.!")
             );
             var lettersCaseFilter = new LettersCaseFilter(
@@ -47,6 +44,17 @@ namespace Mfr.Tests.Models.Filters.Case
 
             Assert.Equal("-.!", item.SentenceEndChars);
             Assert.Equal("A - B. C", item.Preview.Prefix);
+        }
+
+        /// <summary>
+        /// Verifies the filter is state-only (not a string-target filter), matching MFR7.
+        /// </summary>
+        [Fact]
+        public void Filter_IsNotStringTargetFilter()
+        {
+            BaseFilter filter = new SentenceEndCharactersFilter();
+
+            Assert.False(filter is StringTargetFilter);
         }
     }
 }

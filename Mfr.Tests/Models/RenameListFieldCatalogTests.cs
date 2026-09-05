@@ -1,3 +1,4 @@
+using Mfr.Filters.Attributes;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
@@ -507,12 +508,27 @@ namespace Mfr.Tests.Models
             );
         }
 
+        [Theory]
+        [InlineData(ExtendedCreationDateField.CreationDateKey, true)]
+        [InlineData(ExtendedLastWriteDateField.LastWriteDateKey, true)]
+        [InlineData(ExtendedLastAccessDateField.LastAccessDateKey, true)]
+        [InlineData(ExtendedAttributesField.AttributesKey, true)]
+        [InlineData(ExtendedSizeField.SizeKey, false)]
+        [InlineData(ExtendedFileCountField.FileCountKey, false)]
+        public void Extended_fields_preview_flags_match_mfr7_read_write(string propertyKey, bool supportsPreview)
+        {
+            var field = RenameListFieldCatalog.GetField(ExtendedRenameListFields.Group, propertyKey);
+
+            Assert.Equal(supportsPreview, field.SupportsPreview);
+            Assert.True(field.IsSortable);
+            Assert.True(RenameListFieldCatalog.IsSortableKey(field.OriginalKey));
+        }
+
         [Fact]
         public void Phase7a_original_groups_are_sortable_without_preview()
         {
             string[] originalOnlyGroups =
             [
-                ExtendedRenameListFields.Group,
                 AudioTagRenameListFields.Group,
                 MediaRenameListFields.Group,
                 MpegRenameListFields.Group,
@@ -530,6 +546,93 @@ namespace Mfr.Tests.Models
                 Assert.True(field.IsSortable, field.PropertyKey);
                 Assert.True(RenameListFieldCatalog.IsSortableKey(field.OriginalKey), field.PropertyKey);
             }
+        }
+
+        [Fact]
+        public void Extended_date_preview_differs_after_DateTimeSetter()
+        {
+            var created = new DateTime(2023, 1, 2, 15, 4, 5, DateTimeKind.Unspecified);
+            var item = FilterTestHelpers.CreateRenameItem(
+                creationTime: created,
+                lastWriteTime: created.AddDays(1),
+                lastAccessTime: created.AddDays(2)
+            );
+            var creationPreview = RenameListFieldKey.Preview(
+                ExtendedRenameListFields.Group,
+                ExtendedCreationDateField.CreationDateKey
+            );
+            var lastWritePreview = RenameListFieldKey.Preview(
+                ExtendedRenameListFields.Group,
+                ExtendedLastWriteDateField.LastWriteDateKey
+            );
+            var lastAccessPreview = RenameListFieldKey.Preview(
+                ExtendedRenameListFields.Group,
+                ExtendedLastAccessDateField.LastAccessDateKey
+            );
+
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, creationPreview));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, lastWritePreview));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, lastAccessPreview));
+
+            var filter = new DateTimeSetterFilter(
+                Options: new DateTimeSetterOptions(
+                    TimestampField: TimestampField.Creation,
+                    SetDate: true,
+                    Date: new DateOnly(2020, 12, 25),
+                    SetTime: false,
+                    Time: new TimeOnly(0, 0, 0)
+                )
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            var expectedCreation = new DateTime(2020, 12, 25, 15, 4, 5, DateTimeKind.Unspecified);
+            Assert.Equal(
+                created.ToString("g"),
+                RenameListFieldCatalog.Resolve(
+                    item,
+                    RenameListFieldKey.Original(
+                        ExtendedRenameListFields.Group,
+                        ExtendedCreationDateField.CreationDateKey
+                    )
+                )
+            );
+            Assert.Equal(expectedCreation.ToString("g"), RenameListFieldCatalog.Resolve(item, creationPreview));
+            Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, creationPreview));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, lastWritePreview));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, lastAccessPreview));
+        }
+
+        [Fact]
+        public void Extended_attributes_preview_differs_after_AttributesSetter()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(attributes: FileAttributes.Archive);
+            var attrsOriginal = RenameListFieldKey.Original(
+                ExtendedRenameListFields.Group,
+                ExtendedAttributesField.AttributesKey
+            );
+            var attrsPreview = RenameListFieldKey.Preview(
+                ExtendedRenameListFields.Group,
+                ExtendedAttributesField.AttributesKey
+            );
+
+            Assert.Equal("-A--", RenameListFieldCatalog.Resolve(item, attrsOriginal));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, attrsPreview));
+
+            var filter = new AttributesSetterFilter(
+                Options: new AttributesSetterOptions(
+                    ReadOnly: AttributeTriState.Keep,
+                    Hidden: AttributeTriState.Set,
+                    Archive: AttributeTriState.Keep,
+                    System: AttributeTriState.Keep
+                )
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("-A--", RenameListFieldCatalog.Resolve(item, attrsOriginal));
+            Assert.Equal("-AH-", RenameListFieldCatalog.Resolve(item, attrsPreview));
+            Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, attrsPreview));
         }
 
         [Fact]

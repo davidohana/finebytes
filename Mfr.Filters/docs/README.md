@@ -74,6 +74,7 @@ Each filter in a preset has:
 - **`applyScope`** (optional; string-target filters only) — limits the filter to a **substring** or **token** of the resolved target string, then splices the result back (discriminator **`scopeType`**: **`Substring`** or **`Token`**). Omit for default “whole field” behavior. See [docs/magic-file-renamer-design.md](../../docs/magic-file-renamer-design.md) §6 (filter system).
 - For [DateTimeSetter](Attributes/DateTimeSetter.md) and [TimeShifter](Attributes/TimeShifter.md), `options` includes **`timestampField`**: which **filesystem timestamp field** to edit (not a clock value) — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings), together with the other filter-specific options.
 - **AttributesSetter** has no `target`; it always updates filesystem attributes ([AttributesSetter](Attributes/AttributesSetter.md)).
+- **SentenceEndCharacters** has no `target`; it only updates rename-item sentence-end characters for later filters ([SentenceEndCharacters](Case/SentenceEndCharacters.md)).
 - **AudioTagSetter** has no `target`; it updates multiple embedded audio tag fields from `options` ([AudioTagSetter](Audio/AudioTagSetter.md)).
 - **Id3v2FieldSetter** has no `target`; it sets one modeled ID3v2 frame from `options.frameId` / `text` / optional `onlyIfEmpty` ([Id3v2FieldSetter](Audio/Id3v2FieldSetter.md)).
 - **TagRemover** has no `target`; `options.all` is a nuclear TagLib wipe (including unmodeled types such as XMP), or `options.blocks` lists selected modeled types to delete ([TagRemover](Audio/TagRemover.md)).

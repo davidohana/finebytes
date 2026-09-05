@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
+using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
@@ -17,6 +18,7 @@ using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.App.Ui.Views.FilterEditors.Attributes;
+using Mfr.App.Ui.Views.FilterEditors.Audio;
 using Mfr.App.Ui.Views.FilterEditors.Case;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
 using Mfr.App.Ui.Views.FilterEditors.Misc;
@@ -25,12 +27,14 @@ using Mfr.App.Ui.Views.FilterEditors.Space;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.Filters;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
+using Mfr.Models.Tags;
 using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.FilterEditors
@@ -1125,6 +1129,117 @@ namespace Mfr.Tests.Ui.FilterEditors
                 dateBox.Text
             );
             Assert.NotEqual("2024-02-30", dateBox.Text);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Time Shifter option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Time_shifter_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TimeShifter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<TimeShifterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+            var editorVm = (TimeShifterFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor;
+
+            var editor = editorView.GetVisualDescendants().OfType<TimeShifterFilterEditorView>().Single();
+            var fieldCombo = editor.FindControl<ComboBox>("TimestampFieldCombo");
+            var amountSpinner = editor.FindControl<CompactNumericUpDown>("AmountSpinner");
+            var unitCombo = editor.FindControl<ComboBox>("UnitCombo");
+            Assert.NotNull(fieldCombo);
+            Assert.NotNull(amountSpinner);
+            Assert.NotNull(unitCombo);
+            Assert.Equal(1m, amountSpinner.Value);
+            Assert.Equal(TimeShiftUnit.Days, unitCombo.SelectedItem);
+
+            fieldCombo.SelectedItem = editorVm.TimestampFields.Single(c => c.Field == TimestampField.Creation);
+            amountSpinner.Value = -2;
+            unitCombo.SelectedItem = TimeShiftUnit.Hours;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (TimeShifterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(TimestampField.Creation, filter.Options.TimestampField);
+            Assert.Equal(-2, filter.Options.Amount);
+            Assert.Equal(TimeShiftUnit.Hours, filter.Options.Unit);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Audio Tag Remover option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Tag_remover_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<TagRemoverFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+            var editorVm = (TagRemoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!;
+
+            var editor = editorView.GetVisualDescendants().OfType<TagRemoverFilterEditorView>().Single();
+            var removeAll = editor.FindControl<CompactCheckBox>("RemoveAllCheckBox");
+            var id3v1 = editor.FindControl<CompactCheckBox>("Id3v1CheckBox");
+            var id3v2 = editor.FindControl<CompactCheckBox>("Id3v2CheckBox");
+            var xiph = editor.FindControl<CompactCheckBox>("XiphCheckBox");
+            var ape = editor.FindControl<CompactCheckBox>("ApeCheckBox");
+            var apple = editor.FindControl<CompactCheckBox>("AppleCheckBox");
+            var asf = editor.FindControl<CompactCheckBox>("AsfCheckBox");
+            var riff = editor.FindControl<CompactCheckBox>("RiffInfoCheckBox");
+            Assert.NotNull(removeAll);
+            Assert.NotNull(id3v1);
+            Assert.NotNull(id3v2);
+            Assert.NotNull(xiph);
+            Assert.NotNull(ape);
+            Assert.NotNull(apple);
+            Assert.NotNull(asf);
+            Assert.NotNull(riff);
+            Assert.True(removeAll.IsChecked);
+            Assert.False(editorVm.AreBlockTypesEnabled);
+            Assert.False(id3v1.IsEnabled);
+
+            removeAll.IsChecked = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(editorVm.AreBlockTypesEnabled);
+            Assert.True(id3v1.IsEnabled);
+            Assert.True(id3v1.IsChecked);
+            Assert.True(id3v2.IsChecked);
+
+            var filter = (TagRemoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.False(filter.Options.All);
+            Assert.Equal(7, filter.Options.Blocks!.Count);
+
+            id3v2.IsChecked = false;
+            xiph.IsChecked = false;
+            ape.IsChecked = false;
+            apple.IsChecked = false;
+            asf.IsChecked = false;
+            riff.IsChecked = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            filter = (TagRemoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.False(filter.Options.All);
+            Assert.Equal([AudioTagBlockKind.Id3v1], filter.Options.Blocks);
+
+            id3v1.IsChecked = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            filter = (TagRemoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.True(filter.Options.All);
+            Assert.True(removeAll.IsChecked);
+            Assert.False(editorVm.AreBlockTypesEnabled);
 
             window.Close();
         }

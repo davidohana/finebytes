@@ -1,5 +1,6 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
+using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
@@ -8,6 +9,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
@@ -52,7 +54,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 NameListFilter => new NameListFilterEditorViewModel(step),
                 TokenMoverFilter => new TokenMoverFilterEditorViewModel(step),
                 DateTimeSetterFilter => new DateTimeSetterFilterEditorViewModel(step),
+                TimeShifterFilter => new TimeShifterFilterEditorViewModel(step),
                 AttributesSetterFilter => new AttributesSetterFilterEditorViewModel(step),
+                TagRemoverFilter => new TagRemoverFilterEditorViewModel(step),
                 _ => null,
             };
         }

@@ -1,6 +1,8 @@
 # SentenceEndCharacters
 
-**Does not change the segment text.** It updates the rename item’s **sentence-end character set** for the rest of the filter chain. [LettersCase](LettersCase.md) in **sentence** mode and [CasingList](CasingList.md) with **uppercase sentence initial** read this set.
+**Does not change any target text.** It updates the rename item’s **sentence-end character set** for the rest of the filter chain. [LettersCase](LettersCase.md) in **sentence** mode and [CasingList](CasingList.md) with **uppercase sentence initial** read this set.
+
+This filter has **no `target`** and **no `applyScope`** (MFR7 state-only): when it runs, it always sets `SentenceEndChars`.
 
 ## Options
 
@@ -31,9 +33,6 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 ```json
 {
   "type": "SentenceEndCharacters",
-  "target": {
-    "targetType": "FilePrefix"
-  },
   "options": {
     "characters": ".!?"
   }

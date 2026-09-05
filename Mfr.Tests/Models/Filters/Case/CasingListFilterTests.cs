@@ -32,7 +32,6 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_WithUppercaseSentenceInitial_UppercasesAfterSentenceBoundaries()
         {
             var sentenceEndFilter = new SentenceEndCharactersFilter(
-                Target: _target,
                 Options: new SentenceEndCharactersOptions(Characters: "-.!")
             );
             var casingFilter = _CreateFilter(words: _sampleWords, uppercaseSentenceInitial: true);

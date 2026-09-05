@@ -1,6 +1,7 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
+using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
@@ -8,12 +9,14 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
+using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Ui.FilterEditors
 {
@@ -749,6 +752,85 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.False(options.SetTime);
             Assert.Equal(new TimeOnly(9, 0, 15), options.Time);
             Assert.Equal("25:19:01", editor.TimeText);
+        }
+
+        /// <summary>
+        /// Verifies Time Shifter option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Time_shifter_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Time Shifter", new TimeShifterFilter());
+            var editor = new TimeShifterFilterEditorViewModel(step);
+
+            Assert.Equal(TimestampField.LastWrite, editor.SelectedTimestampField.Field);
+            Assert.Equal(1m, editor.Amount);
+            Assert.Equal(TimeShiftUnit.Days, editor.SelectedUnit);
+
+            editor.SelectedTimestampField = editor.TimestampFields.Single(c => c.Field == TimestampField.Creation);
+            editor.Amount = -2;
+            editor.SelectedUnit = TimeShiftUnit.Hours;
+
+            var options = ((TimeShifterFilter)step.Filter).Options;
+            Assert.Equal(TimestampField.Creation, options.TimestampField);
+            Assert.Equal(-2, options.Amount);
+            Assert.Equal(TimeShiftUnit.Hours, options.Unit);
+        }
+
+        /// <summary>
+        /// Verifies Audio Tag Remover option edits replace the step filter options.
+        /// </summary>
+        [Fact]
+        public void Tag_remover_options_update_step_options()
+        {
+            var step = new AppliedFilterStepViewModel("Audio Tag Remover", new TagRemoverFilter());
+            var editor = new TagRemoverFilterEditorViewModel(step);
+
+            Assert.True(editor.RemoveAll);
+            Assert.False(editor.AreBlockTypesEnabled);
+            Assert.True(((TagRemoverFilter)step.Filter).Options.All);
+
+            editor.RemoveAll = false;
+            Assert.False(editor.RemoveAll);
+            Assert.True(editor.AreBlockTypesEnabled);
+            Assert.True(editor.RemoveId3v1);
+            Assert.True(editor.RemoveId3v2);
+            Assert.True(editor.RemoveXiph);
+            Assert.True(editor.RemoveApe);
+            Assert.True(editor.RemoveApple);
+            Assert.True(editor.RemoveAsf);
+            Assert.True(editor.RemoveRiffInfo);
+
+            var options = ((TagRemoverFilter)step.Filter).Options;
+            Assert.False(options.All);
+            Assert.Equal(
+                [
+                    AudioTagBlockKind.Id3v1,
+                    AudioTagBlockKind.Id3v2,
+                    AudioTagBlockKind.Xiph,
+                    AudioTagBlockKind.Ape,
+                    AudioTagBlockKind.Apple,
+                    AudioTagBlockKind.Asf,
+                    AudioTagBlockKind.RiffInfo,
+                ],
+                options.Blocks
+            );
+
+            editor.RemoveId3v2 = false;
+            editor.RemoveXiph = false;
+            editor.RemoveApe = false;
+            editor.RemoveApple = false;
+            editor.RemoveAsf = false;
+            editor.RemoveRiffInfo = false;
+
+            options = ((TagRemoverFilter)step.Filter).Options;
+            Assert.False(options.All);
+            Assert.Equal([AudioTagBlockKind.Id3v1], options.Blocks);
+
+            editor.RemoveId3v1 = false;
+            Assert.True(editor.RemoveAll);
+            Assert.False(editor.AreBlockTypesEnabled);
+            Assert.True(((TagRemoverFilter)step.Filter).Options.All);
         }
 
         /// <summary>
