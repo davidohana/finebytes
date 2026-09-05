@@ -62,15 +62,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         [ObservableProperty]
         private bool _wholeWord = true;
 
-        partial void OnEntriesTextChanged(string value) => _ApplyOptions();
+        partial void OnEntriesTextChanged(string value) => _ApplyOptions(parseEntries: true);
 
-        partial void OnModeChanged(ReplacerMode value) => _ApplyOptions();
+        partial void OnModeChanged(ReplacerMode value) => _ApplyOptions(parseEntries: false);
 
-        partial void OnCaseSensitiveChanged(bool value) => _ApplyOptions();
+        partial void OnCaseSensitiveChanged(bool value) => _ApplyOptions(parseEntries: false);
 
-        partial void OnReplaceAllChanged(bool value) => _ApplyOptions();
+        partial void OnReplaceAllChanged(bool value) => _ApplyOptions(parseEntries: false);
 
-        partial void OnWholeWordChanged(bool value) => _ApplyOptions();
+        partial void OnWholeWordChanged(bool value) => _ApplyOptions(parseEntries: false);
 
         private void _SyncFromFilter()
         {
@@ -89,15 +89,23 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
             });
         }
 
-        private void _ApplyOptions()
+        /// <summary>
+        /// Writes current editor state onto the applied step filter.
+        /// </summary>
+        /// <param name="parseEntries">
+        /// When true, rebuilds entries from <see cref="EntriesText"/>; when false, keeps the step's
+        /// structured entries (avoids re-parsing lossy text for searches that contain <c>=&gt;</c>).
+        /// </param>
+        private void _ApplyOptions(bool parseEntries)
         {
             if (IsLoading || Step.Filter is not ReplaceListFilter filter)
             {
                 return;
             }
 
+            var entries = parseEntries ? ReplaceListParser.ParseEditorText(EntriesText) : filter.Options.Entries;
             var options = new ReplaceListOptions(
-                Entries: ReplaceListParser.ParseEditorText(EntriesText),
+                Entries: entries,
                 Mode: Mode,
                 CaseSensitive: CaseSensitive,
                 ReplaceAll: ReplaceAll,
