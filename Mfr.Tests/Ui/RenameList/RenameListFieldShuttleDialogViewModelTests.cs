@@ -481,7 +481,10 @@ namespace Mfr.Tests.Ui.RenameList
                 ],
                 dialogVm.AvailablePreviewFields.Select(field => field.PropertyKey)
             );
-            Assert.DoesNotContain(dialogVm.AvailablePreviewFields, field => field.PropertyKey == ExtendedSizeField.SizeKey);
+            Assert.DoesNotContain(
+                dialogVm.AvailablePreviewFields,
+                field => field.PropertyKey == ExtendedSizeField.SizeKey
+            );
             Assert.DoesNotContain(
                 dialogVm.AvailablePreviewFields,
                 field => field.PropertyKey == ExtendedFileCountField.FileCountKey

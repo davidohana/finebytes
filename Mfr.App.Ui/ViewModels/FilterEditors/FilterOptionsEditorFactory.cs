@@ -54,6 +54,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 NameListFilter => new NameListFilterEditorViewModel(step),
                 TokenMoverFilter => new TokenMoverFilterEditorViewModel(step),
                 DateTimeSetterFilter => new DateTimeSetterFilterEditorViewModel(step),
+                TimeShifterFilter => new TimeShifterFilterEditorViewModel(step),
                 AttributesSetterFilter => new AttributesSetterFilterEditorViewModel(step),
                 TagRemoverFilter => new TagRemoverFilterEditorViewModel(step),
                 _ => null,

@@ -591,7 +591,10 @@ namespace Mfr.Tests.Models
                 created.ToString("g"),
                 RenameListFieldCatalog.Resolve(
                     item,
-                    RenameListFieldKey.Original(ExtendedRenameListFields.Group, ExtendedCreationDateField.CreationDateKey)
+                    RenameListFieldKey.Original(
+                        ExtendedRenameListFields.Group,
+                        ExtendedCreationDateField.CreationDateKey
+                    )
                 )
             );
             Assert.Equal(expectedCreation.ToString("g"), RenameListFieldCatalog.Resolve(item, creationPreview));
