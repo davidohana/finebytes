@@ -89,10 +89,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
                 return;
             }
 
-            var options = new MoverOptions(
-                RootFolder: RootFolder ?? string.Empty,
-                SubFolder: SubFolder ?? string.Empty
-            );
+            var options = new MoverOptions(RootFolder: RootFolder, SubFolder: SubFolder);
             ApplyIfChanged(filter, filter with { Options = options });
         }
     }

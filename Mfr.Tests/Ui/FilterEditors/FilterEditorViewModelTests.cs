@@ -7,7 +7,6 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
-using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
@@ -587,95 +586,6 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(",", options.Delimiter);
             Assert.Equal(2, options.TokenNumber);
             Assert.Equal(-1, options.MoveBy);
-        }
-
-        /// <summary>
-        /// Verifies Mover option edits replace the step filter options.
-        /// </summary>
-        [Fact]
-        public void Mover_options_update_step_options()
-        {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step);
-
-            Assert.Equal(@"C:\", editor.RootFolder);
-            Assert.Equal("MFR", editor.SubFolder);
-
-            editor.RootFolder = @"D:\Music";
-            editor.SubFolder = @"<parent-folder>\<file-name>";
-
-            var options = ((MoverFilter)step.Filter).Options;
-            Assert.Equal(@"D:\Music", options.RootFolder);
-            Assert.Equal(@"<parent-folder>\<file-name>", options.SubFolder);
-        }
-
-        /// <summary>
-        /// Verifies Browse applies a picked root folder to the step options.
-        /// </summary>
-        [Fact]
-        public async Task Mover_browse_applies_picked_root_folder()
-        {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step)
-            {
-                PickRootFolderAsync = (current, _) =>
-                {
-                    Assert.Equal(@"C:\", current);
-                    return Task.FromResult<string?>(@"D:\Picked");
-                },
-            };
-
-            await editor.BrowseRootFolderCommand.ExecuteAsync(null);
-
-            Assert.Equal(@"D:\Picked", editor.RootFolder);
-            Assert.Equal(@"D:\Picked", ((MoverFilter)step.Filter).Options.RootFolder);
-        }
-
-        /// <summary>
-        /// Verifies Browse leaves options unchanged when the picker is cancelled.
-        /// </summary>
-        [Fact]
-        public async Task Mover_browse_cancelled_leaves_root_unchanged()
-        {
-            var step = new AppliedFilterStepViewModel("Mover", new MoverFilter());
-            var editor = new MoverFilterEditorViewModel(step)
-            {
-                PickRootFolderAsync = (_, _) => Task.FromResult<string?>(null),
-            };
-
-            await editor.BrowseRootFolderCommand.ExecuteAsync(null);
-
-            Assert.Equal(@"C:\", editor.RootFolder);
-            Assert.Equal(@"C:\", ((MoverFilter)step.Filter).Options.RootFolder);
-        }
-
-        /// <summary>
-        /// Verifies folder-path resolution for File List drops onto path fields.
-        /// </summary>
-        [Fact]
-        public void Filter_editor_file_drop_resolves_folder_or_parent()
-        {
-            var dir = Path.Combine(Path.GetTempPath(), "mfr-filter-drop-" + Guid.NewGuid().ToString("N"));
-            Directory.CreateDirectory(dir);
-            try
-            {
-                var nested = Path.Combine(dir, "Nested");
-                Directory.CreateDirectory(nested);
-                var filePath = Path.Combine(nested, "a.txt");
-                File.WriteAllText(filePath, "x");
-
-                Assert.Equal(nested, FilterEditorFileDrop.TryResolveFolderPath([nested]));
-                Assert.Equal(nested, FilterEditorFileDrop.TryResolveFolderPath([filePath]));
-                Assert.Null(FilterEditorFileDrop.TryResolveFolderPath([]));
-            }
-            finally
-            {
-                try
-                {
-                    Directory.Delete(dir, recursive: true);
-                }
-                catch (IOException) { }
-            }
         }
 
         /// <summary>

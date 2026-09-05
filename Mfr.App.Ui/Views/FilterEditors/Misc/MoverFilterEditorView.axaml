@@ -44,7 +44,7 @@
             x:Name="RootFolderBox"
             Classes="filter-editor-field-wrap"
             MinWidth="240"
-            MaxLength="200"
+            MaxLength="520"
             Watermark="C:\"
             Text="{Binding RootFolder}"
           />
@@ -69,7 +69,7 @@
               />
             </controls:RichToolTip>
           </ToolTip.Tip>
-          <TextBlock Classes="filter-editor-label" Text="Sub-Folder:" />
+          <TextBlock Classes="filter-editor-label" Text="Sub-folder:" />
           <TextBox
             x:Name="SubFolderBox"
             Classes="filter-editor-field-wrap"

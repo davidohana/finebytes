@@ -145,6 +145,45 @@ namespace Mfr.Tests.Models.Filters.Misc
         }
 
         /// <summary>
+        /// Verifies that a drive-qualified SubFolder is rejected so Path.Combine cannot discard RootFolder.
+        /// </summary>
+        [Fact]
+        public void Apply_DriveAbsoluteSubFolder_Throws()
+        {
+            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: @"D:\OtherRoot"));
+            filter.Setup();
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", directory: Source);
+
+            Assert.Throws<ArgumentException>(() => filter.Apply(item));
+        }
+
+        /// <summary>
+        /// Verifies that a UNC SubFolder is rejected so Path.Combine cannot discard RootFolder.
+        /// </summary>
+        [Fact]
+        public void Apply_UncAbsoluteSubFolder_Throws()
+        {
+            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: @"\\server\share"));
+            filter.Setup();
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", directory: Source);
+
+            Assert.Throws<ArgumentException>(() => filter.Apply(item));
+        }
+
+        /// <summary>
+        /// Verifies that a drive-relative SubFolder (e.g. <c>C:foo</c>) is rejected.
+        /// </summary>
+        [Fact]
+        public void Apply_DriveRelativeSubFolder_Throws()
+        {
+            var filter = new MoverFilter(new MoverOptions(Dest, SubFolder: "C:foo"));
+            filter.Setup();
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", directory: Source);
+
+            Assert.Throws<ArgumentException>(() => filter.Apply(item));
+        }
+
+        /// <summary>
         /// Verifies that Setup throws when RootFolder is empty.
         /// </summary>
         [Fact]

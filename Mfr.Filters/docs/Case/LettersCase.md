@@ -38,6 +38,7 @@ Changes letter casing on the target segment. **Capitalize** and **sentence case*
 - `mode`: `SentenceCase`; (default [sentence-end characters](SentenceEndCharacters.md))
   - Before: `hello world. next line.`
   - After: `Hello world. Next line.`
+- `mode`: `SentenceCase` — `école. über next.` → `École. Über next.`
 - `mode`: `InvertCase` — `Hello` → `hELLO`
 - [SentenceEndCharacters](SentenceEndCharacters.md); `characters`: `":;"`; [LettersCase](LettersCase.md);
   `mode`: `SentenceCase`

@@ -4,10 +4,12 @@
 
 ## Options
 
-- **`characters`** (string, default `".!?"`)
+- **`characters`** (string, default `".!?"` on the options record / omitted JSON key)
   - Each character can end a sentence for sentence-style rules. Characters equal to the current [word
     separator](../Space/SpaceCharacter.md) are ignored when building the set. If empty, only the **start** of the
     segment gets a capital (for sentence case / sentence initials), not “after punctuation.”
+  - **Add-to-list** (parameterless filter) uses MFR7’s `"-.!"`. Until this filter runs, rename items use
+    `".!?"` (same as the options-record default).
 
 ## Examples
 
