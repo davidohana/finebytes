@@ -1,0 +1,130 @@
+---
+name: Filter editor review deeper refactors
+overview: Ranked follow-ups from the F5 filter-editor + filter code-review pass that were proposed but not applied. Prefer high cost-to-value first.
+---
+
+# Filter editor review — deeper refactors
+
+Synthesized from per-filter worktree reviews and [cross-editor dedup explore](https://github.com/davidohana/finebytes). Applied fixes landed via PRs #4, #6–#23 (and early local cherry-picks that were later opened as #12–#23). This doc lists **not done** work only.
+
+## Already shared (do not re-merge)
+
+- Count L/R ×4 → one VM + `ICountOptionsFilter`
+- Space After + Around → one SpaceTrigger editor
+- Capitalize After + Sentence End → one CharacterList editor
+- Date + Time Setter → one DateTimeSetter editor
+- Replacer mode/match UI fieldsets reused by Replace List
+- Replace List engine → `ReplacerFilter.ReplaceSegment`
+
+## Ranked follow-ups (best cost-to-value first)
+
+### 1. Shared timestamp ApplyCore mutator — **high**
+
+- **Sites:** `DateSetterFilter.ApplyCore`, `TimeSetterFilter.ApplyCore`, `TimeShifterFilter.ApplyCore`
+- **Target:** e.g. `TimestampFields.Update(preview, field, Func<DateTime, DateTime>)`
+- **Value:** delete three identical field switches; close drift before Time Shifter editor
+- **Cost:** low risk; Attributes-only; ~20–40 LOC
+
+### 2. Shared `ReplacerMatchOptions` record — **high**
+
+- **Sites:** `ReplacerOptions` / `ReplaceListOptions` (Mode + CaseSensitive + ReplaceAll + WholeWord); both editor VMs
+- **Target:** one nested match-options record; optional thin VM helper for the four props
+- **Value:** one owner for match policy; surfaces intentional WholeWord default split (Replacer `false`, Replace List `true`)
+- **Cost:** medium (option shapes, JSON nesting, tests)
+
+### 3. Sentence End side-effect outside scoped transform — **high**
+
+- **Sites:** `SentenceEndCharactersFilter._TransformValue` + `StringApplyScopeTransform` early return on out-of-range token
+- **Target:** always set `SentenceEndChars` in `ApplyCore` (or ignore ApplyScope / drop `StringTargetFilter`)
+- **Value:** matches MFR7 “state only” semantics; closes missed-token bug
+- **Cost:** medium (inheritance / sealed ApplyCore, tests)
+
+### 4. Isolate remaining editor tests like Mover — **high / medium**
+
+- **Sites:** shared `FilterEditorViewModelTests` / `FilterEditorViewTests` still hold many per-filter facts; Mover / Fix Leading Zeros / Name List / Token Mover already have dedicated suites
+- **Target:** move remaining `*_options_update_*` / headless gestures under `Ui/FilterEditors/<Group>/`; extract shared `_ShowFilterEditorPanes` helper once
+- **Value:** less mega-suite churn; one owner per editor
+- **Cost:** low risk per filter; shared-file touch
+
+### 5. Multiline list editor / line-iteration helper — **medium**
+
+- **Sites:** Name List + Replace List AXAML Entries fieldsets; parsers’ Format/Parse line loops (blank-preserving vs blank-skipping)
+- **Target:** shared multiline Entries control (DPs for tip/watermark); optional shared `EnumerateLines` only where semantics match — **do not** force Casing List into multiline
+- **Value:** less AXAML drift; one line-iteration owner where safe
+- **Cost:** medium (control + tip parameterization + headless name updates)
+
+### 6. CasingList Format/Parse ownership — **done in review**
+
+Editor now uses `CasingListParser.ParseEditorText` / `FormatEditorText`. Keep domain validation at `BuildMap` / Setup.
+
+### 7. Space Character MFR7 empty-Other validation — **medium**
+
+- **Sites:** `_ResolveSpaceCharacter` empty Other → `' '`
+- **Target:** don’t persist / don’t apply when Other + empty (or clear error)
+- **Value:** closes silent Space fallback drift vs MFR7
+- **Cost:** small UX decision + tests
+
+### 8. `CountFilterOptions.ClampToLength` helper — **medium**
+
+- **Sites:** identical clamp + slice in four Count filters
+- **Target:** one clamp API; filters keep one-line transforms
+- **Value:** one owner for clamp policy
+- **Cost:** low; four call sites
+
+### 9. Cache Setup HashSets (skip words / triggers) — **low–medium**
+
+- **Sites:** Letters Case capitalize skip-words; Space After/Around / Capitalize After trigger sets
+- **Target:** instance fields cleared/assigned in `_Setup` (BaseFilter cache rules)
+- **Value:** less alloc per file
+- **Cost:** low LOC; only worth if hot
+
+### 10. Cleaner → `FilterEditorLabeledRow` — **medium** (UI polish)
+
+- **Sites:** Cleaner AXAML hand-rolled Grid vs Replacer labeled rows
+- **Target:** one labeled-row for “Characters to clean”
+- **Value:** consistent filter-editor chrome
+- **Cost:** low; 1 AXAML + possible headless tweak
+
+### 11. Replace List Regex compile at Setup — **medium**
+
+- **Sites:** Replacer validates invalid Regex in `_Setup`; Replace List can fail later via `ReplaceSegment`
+- **Target:** validate/compile Regex entries in Replace List `_Setup`
+- **Value:** fail early; share compile helper with Replacer
+- **Cost:** medium; list of patterns
+
+## Explicit non-goals / skip
+
+| Idea | Why skip |
+|------|----------|
+| Merge Counter ↔ Inserter ↔ Token Mover “position” | Different models (placement enum vs char index vs token index) |
+| Merge Replacer + Replace List into one editor | Primary surfaces differ; mode/match already shared |
+| Unify Space After/Around option JSON schema | Editor already shared; persist key rename for little gain |
+| Merge four Count filters into one type + enum | High JSON/palette/docs churn |
+| Merge Date + Time Setter filter types | Product/schema pass — not a review cleanup |
+| Shared single-char editor VM | Only Shrink Dup today; weak until a second identical editor |
+| Force-merge list parsers (Name/Replace/Casing) | Intentional blank / `=>` / whitespace semantics differ |
+| Non-regex `CharacterRunHelpers` rewrite | Micro-gain; shared Shrink Spaces risk |
+
+## PR index (this review pass)
+
+| PR | Filter / area |
+|----|----------------|
+| #4 | Counter |
+| #6 | Replace List |
+| #7 | Name List |
+| #8 | Replacer |
+| #9 | Inserter |
+| #10 | Token Mover |
+| #11 | Date/Time Setter |
+| #12 | Space Character |
+| #13 | Trim Between |
+| #14 | Strip Parentheses |
+| #15 | Casing List |
+| #16 | Character List |
+| #17 | Space Trigger |
+| #18 | Letters Case |
+| #19 | Count L/R |
+| #20 | Shrink Duplicate |
+| #21 | Cleaner |
+| #22 | Fix Leading Zeros |
+| #23 | Mover |
