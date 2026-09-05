@@ -29,6 +29,7 @@
 - Dictionary/HashSet naming: use `keyToVal`-style names (for sets, use boolean-style values like `pathToIsIncluded`).
 - Access modifiers: prefer `private` over `internal` when members are not required outside the declaring type.
 - Warning suppressions: every suppression (`#pragma`, `[SuppressMessage]`, `.editorconfig` overrides, etc.) must include a brief nearby comment explaining why it is needed and why safer alternatives were not used.
+- Filter `_Setup` caches: always assign every instance cache field (including clear to null/default). Record `with` copies those fields while resetting setup-complete; conditional assign leaves stale values after an option is cleared (see `BaseFilter` remarks).
 
 ### Namespaces and folders
 

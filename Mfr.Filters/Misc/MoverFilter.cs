@@ -67,7 +67,7 @@ namespace Mfr.Filters.Misc
                 nameof(MoverOptions.RootFolder)
             );
 
-            // Always assign: `with` clones copy this field, so a prior non-empty SubFolder must not stick.
+            // Unconditional assign (BaseFilter._Setup): `with` copies this field; empty SubFolder must clear it.
             _compiledSubFolder = string.IsNullOrEmpty(Options.SubFolder)
                 ? null
                 : FormatStringCompiler.Compile(Options.SubFolder);

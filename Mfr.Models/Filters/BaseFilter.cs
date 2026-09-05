@@ -19,11 +19,13 @@ namespace Mfr.Models.Filters
         /// <summary>
         /// Copy constructor used by <c>with</c> expressions.
         /// </summary>
-        /// <param name="original">Source instance (setup state is not copied).</param>
+        /// <param name="original">Source instance (setup-complete flag is not copied).</param>
         /// <remarks>
         /// <para>
         /// Leaves <c>_isSetupComplete</c> false so option edits that produce a new instance via
-        /// <c>with</c> re-run <see cref="_Setup"/> on the next preview (cached setup data must not stick).
+        /// <c>with</c> re-run <see cref="_Setup"/> on the next preview. Derived private cache fields
+        /// are still copied by the record <c>with</c> clone — <see cref="_Setup"/> must overwrite
+        /// every one of them (see remarks on <see cref="_Setup"/>).
         /// </para>
         /// </remarks>
         protected BaseFilter(BaseFilter original)
@@ -78,6 +80,17 @@ namespace Mfr.Models.Filters
         /// <param name="item">The item whose preview is updated.</param>
         protected internal abstract void ApplyCore(RenameItem item);
 
+        /// <summary>
+        /// Prepares this instance once before the first <see cref="Apply"/> (compile templates, build maps, validate).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Record <c>with</c> clones copy derived private fields but reset the setup-complete flag, so this
+        /// method runs again on the clone. Assign every instance cache field unconditionally here —
+        /// including clearing to <see langword="null"/> / default when an option is empty. Do not assign
+        /// only inside an <c>if</c> for optional options; a prior non-empty cache will stick after clear.
+        /// </para>
+        /// </remarks>
         protected virtual void _Setup() { }
     }
 }

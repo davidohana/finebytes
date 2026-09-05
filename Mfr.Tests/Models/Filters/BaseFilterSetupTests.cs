@@ -82,6 +82,29 @@ namespace Mfr.Tests.Models.Filters
             Assert.Equal("name-2", item.Preview.Prefix);
         }
 
+        /// <summary>
+        /// Verifies clearing an optional setup cache via <c>with</c> does not keep the prior compiled value.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Record <c>with</c> copies private instance fields; <see cref="BaseFilter._Setup"/> must
+        /// assign every cache unconditionally (including null when the option is empty).
+        /// </para>
+        /// </remarks>
+        [Fact]
+        public void With_clearing_optional_setup_cache_drops_prior_value()
+        {
+            var filter = new OptionalCacheFilter(Template: "abc");
+            filter.Setup();
+
+            var cleared = filter with { Template = "" };
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "name");
+            cleared.Setup();
+            cleared.Apply(item);
+
+            Assert.Equal("none", item.Preview.Prefix);
+        }
+
         private sealed record SetupCountingFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)
             : StringTargetFilter(Target, ApplyScope)
         {
@@ -113,6 +136,27 @@ namespace Mfr.Tests.Models.Filters
             protected override string _TransformValue(string value, RenameItem item)
             {
                 return value;
+            }
+        }
+
+        /// <summary>
+        /// Stand-in for filters with an optional compiled field (same shape as Mover sub-folder).
+        /// </summary>
+        private sealed record OptionalCacheFilter(string Template) : BaseFilter
+        {
+            private string? _compiled;
+
+            public override string Type => "OptionalCache";
+
+            protected override void _Setup()
+            {
+                _compiled = string.IsNullOrEmpty(Template) ? null : Template.ToUpperInvariant();
+            }
+
+            protected internal override void ApplyCore(RenameItem item)
+            {
+                VerifySetupComplete();
+                item.Preview.Prefix = _compiled ?? "none";
             }
         }
     }

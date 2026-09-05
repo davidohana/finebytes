@@ -21,7 +21,7 @@ For Filter Configuration **option editors** (VM / AXAML / factory / tests), use 
 
 1. **`Type`.** `public override string Type => "YourFilterType";` — string must match the JSON `type` discriminator and `JsonDerivedType` registration **exactly**.
 
-1. **Transform (`StringTargetFilter`).** Implement `protected override string _TransformValue(string value, RenameItem item)`. Use `RenameItem` / `item.WordSeparator` when behavior depends on pipeline state (e.g. word separator set by an earlier `SpaceCharacter` filter). Override `protected virtual void _Setup()` only for one-time setup before transforms.
+1. **Transform (`StringTargetFilter`).** Implement `protected override string _TransformValue(string value, RenameItem item)`. Use `RenameItem` / `item.WordSeparator` when behavior depends on pipeline state (e.g. word separator set by an earlier `SpaceCharacter` filter). Override `protected virtual void _Setup()` only for one-time setup before transforms. If `_Setup` caches instance fields, **always assign every cache** (including clear to null/default) — record `with` copies those fields while resetting setup-complete (see `BaseFilter` remarks).
 
 1. **Options.** If the filter has settings, add a `YourOptions` `sealed record` in the same file or adjacent file, with camelCase JSON property names via record positional params / `[JsonPropertyName]` as needed.
 
