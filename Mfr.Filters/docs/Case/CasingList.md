@@ -1,6 +1,6 @@
 # CasingList
 
-Applies a **casing list** stored in the filter options as a **word array**. For each **word** in the target segment (split by the current [word separator](../Space/SpaceCharacter.md), default space), the filter looks up the word **case-insensitively**. If found, the word is replaced by the **exact spelling** from the list. Words not in the list are **unchanged**. An empty list is a no-op.
+Applies a **casing list** stored in the filter options as a **word array**. For each **word** in the target segment (split by the current [word separator](../Space/SpaceCharacter.md), default space), the filter looks up the word **case-insensitively**. If found, the word is replaced by the **exact spelling** from the list. Words not in the list are **unchanged**. An empty list skips word remapping (sentence-initial uppercasing still runs when enabled).
 
 Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceEndCharacters.md) and the word separator; place that filter **before** this one when you need custom sentence boundaries.
 
