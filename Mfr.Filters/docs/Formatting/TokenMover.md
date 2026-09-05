@@ -10,11 +10,11 @@ Can be applied to **any text field** (same `target` rules as other filters).
   - **Token separator string.** The target segment is split by this exact substring into ordered tokens. Example:
     separator `-` splits `Artist-Album-Title` into three tokens: `Artist`, `Album`, `Title`.
 - **`tokenNumber`** (int)
-  - **One-based** index of the token to move (first token is `1`). Must not exceed the number of tokens in the segment.
+  - **One-based** index of the token to move (first token is `1`). Values below `1` or past the token count leave the segment unchanged.
 - **`moveBy`** (int)
   - **Distance and direction** in token positions: positive = toward the **end** of the token list, negative = toward
     the **start**. Example: `-1` swaps the selected token with its **preceding** token (after removal and reinsertion,
-    equivalent to one step left).
+    equivalent to one step left). A value of `0` leaves the segment unchanged.
 
 ### Bounds
 
