@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -115,6 +117,35 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.Equal(VerticalAlignment.Center, lyricsCheck.VerticalAlignment);
             Assert.True(lyricsBox.Bounds.Width > performersBox.Bounds.Width);
 
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies clicking a field label toggles that row’s three-state checkbox.
+        /// </summary>
+        [AvaloniaFact]
+        public void Audio_tag_setter_label_click_toggles_field_checkbox()
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<AudioTagSetterFilterEditorView>().Single();
+            var titleCheck = _FindFieldCheckBox(editor, AudioTagSetterFieldKind.Title);
+            Assert.False(titleCheck.IsChecked);
+
+            var label = titleCheck.GetVisualDescendants().OfType<TextBlock>().Single(block => block.Text == "Set title:");
+            var local = new Point(Math.Max(2, label.Bounds.Width / 2), Math.Max(2, label.Bounds.Height / 2));
+            var windowPoint = label.TranslatePoint(local, window);
+            Assert.True(windowPoint.HasValue);
+
+            window.MouseMove(windowPoint.Value);
+            window.MouseDown(windowPoint.Value, MouseButton.Left);
+            window.MouseUp(windowPoint.Value, MouseButton.Left);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(titleCheck.IsChecked);
             window.Close();
         }
 

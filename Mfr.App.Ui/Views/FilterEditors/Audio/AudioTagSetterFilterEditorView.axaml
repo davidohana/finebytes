@@ -15,8 +15,6 @@
     <DataTemplate x:Key="AudioTagSetterFieldRowTemplate" x:DataType="vm:AudioTagSetterFieldRowViewModel">
       <Grid>
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" />
-          <ColumnDefinition Width="6" />
           <ColumnDefinition
             Width="Auto"
             SharedSizeGroup="{x:Static controls:FilterEditorLabeledRow.LabelSharedSizeGroup}"
@@ -31,15 +29,10 @@
           ToolTip.Tip="{Binding Tip}"
           Tag="{Binding Kind}"
           VerticalAlignment="Center"
-        />
-        <TextBlock
-          Grid.Column="2"
-          Classes="filter-editor-label"
-          Text="{Binding Label}"
-          ToolTip.Tip="{Binding Tip}"
-          VerticalAlignment="Center"
-        />
-        <Panel Grid.Column="4">
+        >
+          <TextBlock Classes="filter-editor-label" Text="{Binding Label}" />
+        </controls:CompactCheckBox>
+        <Panel Grid.Column="2">
           <TextBox
             Classes="filter-editor-field"
             MinWidth="100"
@@ -77,7 +70,7 @@
           />
         </Panel>
         <controls:CompactCheckBox
-          Grid.Column="5"
+          Grid.Column="3"
           Margin="8,0,0,0"
           Content="Auto-increment"
           IsVisible="{Binding ShowsAutoIncrement}"
