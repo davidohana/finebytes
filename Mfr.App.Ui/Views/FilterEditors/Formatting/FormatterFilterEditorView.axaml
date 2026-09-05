@@ -33,12 +33,9 @@
           Classes="filter-editor-field-wrap"
           MinWidth="240"
           MinHeight="64"
-          AcceptsReturn="True"
-          MaxLength="2000"
           Watermark="&lt;file-name&gt;"
           Text="{Binding Template}"
         />
-        <controls:FilterEditorHint Text="Literals plus formatting parameters such as &lt;file-name&gt;." />
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>

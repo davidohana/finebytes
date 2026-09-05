@@ -5,7 +5,7 @@ using Mfr.Filters.Formatting;
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
 {
     /// <summary>
-    /// Filter Configuration editor for <see cref="FormatterFilter"/> (format string only; token UI deferred).
+    /// Filter Configuration editor for <see cref="FormatterFilter"/>.
     /// </summary>
     internal sealed partial class FormatterFilterEditorViewModel : FilterOptionsEditorViewModel
     {
@@ -34,7 +34,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
                 return;
             }
 
-            LoadWithoutApplying(() => Template = filter.Options.Template);
+            LoadWithoutApplying(() => Template = filter.Options.Template ?? string.Empty);
         }
 
         private void _ApplyOptions()
@@ -44,7 +44,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
                 return;
             }
 
-            var options = new FormatterOptions(Template: Template);
+            var options = new FormatterOptions(Template: Template ?? string.Empty);
             ApplyIfChanged(filter, filter with { Options = options });
         }
     }
