@@ -86,9 +86,18 @@
     <Setter Property="AcceptsReturn" Value="False" />
     <Setter Property="VerticalContentAlignment" Value="Top" />
   </Style>
+  <Style Selector="ComboBox.filter-editor-field">
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
   <Style Selector="ComboBox.filter-editor-field /template/ ContentPresenter#ContentPresenter">
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Padding" Value="0" />
+  </Style>
+  <Style Selector="ComboBox.filter-editor-field /template/ TextBox#PART_EditableTextBox">
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="Padding" Value="4,0" />
   </Style>
 
   <Style Selector="TextBlock.rich-tip-title">
