@@ -1055,7 +1055,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Dispatcher.UIThread.RunJobs();
 
             Assert.IsType<DateTimeSetterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
-            var editorVm = (DateTimeSetterFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!;
+            var editorVm = (DateTimeSetterFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor;
 
             var editor = editorView.GetVisualDescendants().OfType<DateTimeSetterFilterEditorView>().Single();
             var fieldCombo = editor.FindControl<ComboBox>("TimestampFieldCombo");

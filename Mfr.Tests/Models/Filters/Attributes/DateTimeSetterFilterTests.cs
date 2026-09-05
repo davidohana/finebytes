@@ -7,36 +7,75 @@ namespace Mfr.Tests.Models.Filters.Attributes
     /// </summary>
     public sealed class DateTimeSetterFilterTests
     {
-        private static readonly DateTime s_Base = new(2024, 3, 15, 14, 5, 30, DateTimeKind.Unspecified);
+        private static readonly DateTime s_Base = new(2024, 3, 15, 14, 5, 30, 123, DateTimeKind.Unspecified);
+
+        public static TheoryData<TimestampField> TimestampFields { get; } =
+        [TimestampField.Creation, TimestampField.LastWrite, TimestampField.LastAccess];
+
+        [Theory]
+        [MemberData(nameof(TimestampFields))]
+        public void DateSetter_preserves_time_of_day_on_selected_field(TimestampField field)
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                creationTime: s_Base,
+                lastWriteTime: s_Base,
+                lastAccessTime: s_Base
+            );
+            var filter = new DateSetterFilter(
+                Options: new DateSetterOptions(TimestampField: field, Date: new DateOnly(2020, 12, 25))
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            var expected = new DateTime(2020, 12, 25, 14, 5, 30, 123, DateTimeKind.Unspecified);
+            Assert.Equal(expected, _Read(item.Preview, field));
+            _AssertOtherFieldsUnchanged(item.Preview, field);
+        }
+
+        [Theory]
+        [MemberData(nameof(TimestampFields))]
+        public void TimeSetter_preserves_calendar_date_on_selected_field(TimestampField field)
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                creationTime: s_Base,
+                lastWriteTime: s_Base,
+                lastAccessTime: s_Base
+            );
+            var filter = new TimeSetterFilter(
+                Options: new TimeSetterOptions(TimestampField: field, Time: new TimeOnly(9, 0, 15))
+            );
+            filter.Setup();
+            filter.Apply(item);
+
+            var expected = new DateTime(2024, 3, 15, 9, 0, 15, DateTimeKind.Unspecified);
+            Assert.Equal(expected, _Read(item.Preview, field));
+            _AssertOtherFieldsUnchanged(item.Preview, field);
+        }
 
         [Fact]
-        public void DateSetter_LastWrite_preserves_time_of_day()
+        public void DateSetter_and_TimeSetter_preserve_DateTimeKind()
         {
-            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: s_Base);
-            var filter = new DateSetterFilter(
+            var localBase = new DateTime(2024, 3, 15, 14, 5, 30, DateTimeKind.Local);
+            var item = FilterTestHelpers.CreateRenameItem(lastWriteTime: localBase);
+
+            var setDate = new DateSetterFilter(
                 Options: new DateSetterOptions(
                     TimestampField: TimestampField.LastWrite,
                     Date: new DateOnly(2020, 12, 25)
                 )
             );
-            filter.Setup();
-            filter.Apply(item);
+            setDate.Setup();
+            setDate.Apply(item);
+            Assert.Equal(DateTimeKind.Local, item.Preview.LastWriteTime.Kind);
 
-            Assert.Equal(new DateTime(2020, 12, 25, 14, 5, 30, DateTimeKind.Unspecified), item.Preview.LastWriteTime);
-            Assert.Equal(item.Original.CreationTime, item.Preview.CreationTime);
-        }
-
-        [Fact]
-        public void TimeSetter_Creation_preserves_calendar_date()
-        {
-            var item = FilterTestHelpers.CreateRenameItem(creationTime: s_Base);
-            var filter = new TimeSetterFilter(
-                Options: new TimeSetterOptions(TimestampField: TimestampField.Creation, Time: new TimeOnly(9, 0, 15))
+            var setTime = new TimeSetterFilter(
+                Options: new TimeSetterOptions(TimestampField: TimestampField.LastWrite, Time: new TimeOnly(9, 0, 15))
             );
-            filter.Setup();
-            filter.Apply(item);
+            setTime.Setup();
+            setTime.Apply(item);
 
-            Assert.Equal(new DateTime(2024, 3, 15, 9, 0, 15, DateTimeKind.Unspecified), item.Preview.CreationTime);
+            Assert.Equal(DateTimeKind.Local, item.Preview.LastWriteTime.Kind);
+            Assert.Equal(new DateTime(2020, 12, 25, 9, 0, 15, DateTimeKind.Local), item.Preview.LastWriteTime);
         }
 
         [Fact]
@@ -57,6 +96,30 @@ namespace Mfr.Tests.Models.Filters.Attributes
             chain.ApplyFilters(item);
 
             Assert.Equal(new DateTime(2019, 1, 1, 23, 59, 1, DateTimeKind.Unspecified), item.Preview.LastAccessTime);
+        }
+
+        private static void _AssertOtherFieldsUnchanged(FileMeta preview, TimestampField selected)
+        {
+            foreach (var field in Enum.GetValues<TimestampField>())
+            {
+                if (field == selected)
+                {
+                    continue;
+                }
+
+                Assert.Equal(s_Base, _Read(preview, field));
+            }
+        }
+
+        private static DateTime _Read(FileMeta preview, TimestampField field)
+        {
+            return field switch
+            {
+                TimestampField.Creation => preview.CreationTime,
+                TimestampField.LastWrite => preview.LastWriteTime,
+                TimestampField.LastAccess => preview.LastAccessTime,
+                _ => throw new ArgumentOutOfRangeException(nameof(field)),
+            };
         }
     }
 }

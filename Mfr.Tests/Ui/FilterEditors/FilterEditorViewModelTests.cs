@@ -615,6 +615,10 @@ namespace Mfr.Tests.Ui.FilterEditors
             editor.SetCurrentCommand.Execute(null);
             options = ((DateSetterFilter)step.Filter).Options;
             Assert.Equal(DateOnly.FromDateTime(DateTime.Today), options.Date);
+
+            var beforeInvalid = options;
+            editor.DateText = "2020-13-40";
+            Assert.Same(beforeInvalid, ((DateSetterFilter)step.Filter).Options);
         }
 
         /// <summary>
@@ -638,6 +642,11 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal(TimestampField.LastAccess, options.TimestampField);
             Assert.Equal(new TimeOnly(9, 0, 15), options.Time);
 
+            var beforeInvalid = options;
+            editor.TimeText = "25:61:99";
+            Assert.Same(beforeInvalid, ((TimeSetterFilter)step.Filter).Options);
+
+            editor.TimeText = "09:00:15";
             editor.SetCurrentCommand.Execute(null);
             options = ((TimeSetterFilter)step.Filter).Options;
             Assert.Equal(
