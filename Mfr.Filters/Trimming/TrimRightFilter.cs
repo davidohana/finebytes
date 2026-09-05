@@ -32,8 +32,7 @@ namespace Mfr.Filters.Trimming
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var count = Math.Clamp(Options.Count, 0, value.Length);
-            return value[..^count];
+            return value[..^Options.ClampToLength(value.Length)];
         }
     }
 }

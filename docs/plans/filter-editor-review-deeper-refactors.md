@@ -50,12 +50,9 @@ Editor now uses `CasingListParser.ParseEditorText` / `FormatEditorText`. Keep do
 
 Empty Other persists `\0`; filter `_Setup` throws `UserException` ("Space character not defined") so preview shows errors instead of silently keeping the last separator or falling back to `' '`.
 
-### 8. `CountFilterOptions.ClampToLength` helper — **medium**
+### 8. `CountFilterOptions.ClampToLength` helper — **done**
 
-- **Sites:** identical clamp + slice in four Count filters
-- **Target:** one clamp API; filters keep one-line transforms
-- **Value:** one owner for clamp policy
-- **Cost:** low; four call sites
+`CountFilterOptions.ClampToLength` owns `[0, length]` clamp policy; Trim/Extract Left/Right keep one-line range transforms.
 
 ### 9. Cache Setup HashSets (skip words / triggers) — **low–medium**
 
