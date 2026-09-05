@@ -21,7 +21,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
         }
 
         /// <summary>
-        /// Gets or sets the folder picker used by Browse (wired by the view from <c>StorageProvider</c>).
+        /// Gets or sets the folder picker used by Browse (wired by the view via <see cref="Services.FolderPicker"/>).
         /// </summary>
         /// <remarks>
         /// <para>
