@@ -59,6 +59,27 @@ namespace Mfr.Tests.Models.Filters.Space
         }
 
         /// <summary>
+        /// Verifies non-letter neighbors still get separators when the conditional is off.
+        /// </summary>
+        [Fact]
+        public void Apply_WhenNotConditional_InsertsBesideAnyNeighbor()
+        {
+            var f = _CreateFilter("-", onlyWhenNeighboringAreLettersOrDigits: false);
+            Assert.Equal("a - b", FilterTestHelpers.ApplyToPrefix(f, "a-b"));
+            Assert.Equal("( - )", FilterTestHelpers.ApplyToPrefix(f, "(-)"));
+        }
+
+        /// <summary>
+        /// Verifies consecutive triggers do not get a double separator between them.
+        /// </summary>
+        [Fact]
+        public void Apply_WhenNotConditional_ConsecutiveTriggers_SingleSeparatorBetween()
+        {
+            var f = _CreateFilter("-", onlyWhenNeighboringAreLettersOrDigits: false);
+            Assert.Equal("a - - b", FilterTestHelpers.ApplyToPrefix(f, "a--b"));
+        }
+
+        /// <summary>
         /// Verifies <see cref="SpaceCharacterFilter"/> sets the separator used for insertions.
         /// </summary>
         [Fact]
