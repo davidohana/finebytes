@@ -1,0 +1,78 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Attributes"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="520"
+  d:DesignHeight="120"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Attributes.TimeShifterFilterEditorView"
+  x:DataType="vm:TimeShifterFilterEditorViewModel"
+>
+  <StackPanel Spacing="8">
+    <controls:FieldsetGroup Header="Options">
+      <StackPanel Spacing="8">
+        <StackPanel Orientation="Horizontal" Spacing="6">
+          <TextBlock
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="Shift file's"
+            ToolTip.Tip="Which filesystem timestamp this filter shifts."
+          />
+          <ComboBox
+            x:Name="TimestampFieldCombo"
+            Classes="filter-editor-field"
+            Width="110"
+            ItemsSource="{Binding TimestampFields}"
+            SelectedItem="{Binding SelectedTimestampField}"
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-bullet" Text="• Creation: file/folder creation time." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Last Write: last modified time." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Last Access: last accessed time." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </ComboBox>
+          <TextBlock
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Text="date in:"
+            ToolTip.Tip="Signed amount and unit applied to the selected timestamp."
+          />
+          <controls:CompactNumericUpDown
+            x:Name="AmountSpinner"
+            Width="88"
+            Minimum="-10000000"
+            Maximum="10000000"
+            Increment="1"
+            FormatString="0"
+            ToolTip.Tip="Positive shifts forward; negative shifts backward."
+            Value="{Binding Amount}"
+          />
+          <ComboBox
+            x:Name="UnitCombo"
+            Classes="filter-editor-field"
+            Width="100"
+            ItemsSource="{Binding Units}"
+            SelectedItem="{Binding SelectedUnit}"
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-bullet" Text="• Days / Hours / Minutes / Seconds: fixed time spans." />
+                <TextBlock Classes="rich-tip-bullet" Text="• Months / Years: calendar months and years." />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </ComboBox>
+        </StackPanel>
+        <TextBlock
+          Classes="filter-editor-label"
+          Text="Hint: set a negative value to shift time backwards."
+          ToolTip.Tip="Negative amounts move the timestamp earlier; positive amounts move it later."
+        />
+      </StackPanel>
+    </controls:FieldsetGroup>
+  </StackPanel>
+</UserControl>
