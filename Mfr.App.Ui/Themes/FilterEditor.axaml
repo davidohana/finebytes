@@ -47,6 +47,21 @@
     <Setter Property="Height" Value="22" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
+  <Style Selector="Button.filter-editor-button">
+    <Setter Property="MinHeight" Value="22" />
+    <Setter Property="Height" Value="22" />
+    <Setter Property="Padding" Value="8,0" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
   <Style Selector="TextBox.filter-editor-field">
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>

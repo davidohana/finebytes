@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around + Capitalize After + Sentence End + Strip Parentheses + Cleaner + Counter + Inserter + Casing List + Replace List + Name List + Replacer + Token Mover + Mover done. Next: Date + Time Setter, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
+overview: "F1–F4 shipped. Reorg + Count L/R + Shrink Dup + Trim Between + Fix Leading 0's + Space After/Around + Capitalize After + Sentence End + Strip Parentheses + Cleaner + Counter + Inserter + Casing List + Replace List + Name List + Replacer + Token Mover + Mover + Date/Time Setter done. Next: Time Shifter, then remaining F5 option UIs — group only when options/UI are shared or near-identical; otherwise one filter per pass."
 todos:
   - id: f1-f4
     content: "F1–F4: ctors, Applied list, Filter Options/Apply To, Space Character + Letters Case"
@@ -61,7 +61,7 @@ todos:
     status: completed
   - id: f5-date-time-setter
     content: "F5 Date Setter + Time Setter — shared timestamp-field picker + date/time value editors"
-    status: pending
+    status: completed
   - id: f5-time-shifter
     content: "F5 Time Shifter"
     status: pending
@@ -87,7 +87,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for F5 onward.
 
-**Status (2026-09-05):** F5 Replacer + Token Mover + Mover done. **Next: F5 Date + Time Setter**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
+**Status (2026-09-05):** F5 Mover + Date Setter + Time Setter done. **Next: F5 Time Shifter**. Rename List Phase 10–11 already consume `ToChain()` → live preview when Auto-Preview is on.
 
 ## Already shipped (F1–F4)
 
@@ -227,8 +227,8 @@ When grouping: ship the shared editor once, wire every factory arm in that pass,
 | **15 (done)** | Replacer                        | Replace    | single                                             | find/replace / regex / scope                                                                        |
 | **16 (done)** | Token Mover                     | Formatting | single                                             | token indices / destination                                                                         |
 | **17 (done)** | **Mover**                       | Misc       | single                                             | root folder + optional sub-folder template (formatter tokens / `\`)                                 |
-| **18 (next)** | **Date + Time Setter**          | Attributes | Date Setter, Time Setter                           | Shared timestamp-field picker; date vs time value                                                   |
-| 19            | Time Shifter                    | Attributes | single                                             | field + amount + unit (not grouped with setters)                                                    |
+| **18 (done)** | **Date + Time Setter**          | Attributes | Date Setter, Time Setter                           | Shared timestamp-field picker; date vs time value                                                   |
+| **19 (next)** | Time Shifter                    | Attributes | single                                             | field + amount + unit (not grouped with setters)                                                    |
 | 20            | Attributes Setter               | Attributes | single                                             | attribute flags                                                                                     |
 | 21            | Audio Tag Remover               | Audio      | single                                             | all / block types                                                                                   |
 | 22            | Audio Tag Setter                | Audio      | single                                             | per-field format specs                                                                              |

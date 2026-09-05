@@ -39,13 +39,11 @@ Do **not** batch unrelated filters. File-list / audio / Formatter stay separate 
 
 ## Location and naming
 
-| Piece       | Path                                                                                    |
-| ----------- | --------------------------------------------------------------------------------------- |
-| VM          | `Mfr.App.Ui/ViewModels/FilterEditors/<FilterGroup>/YourFilterEditorViewModel.cs`        |
-| View        | `Mfr.App.Ui/Views/FilterEditors/<FilterGroup>/YourFilterEditorView.axaml` (+ `.cs`)     |
-| Factory     | `Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs` (root)              |
-| ViewLocator | `FilterEditorViewLocator` — prefix-replace; no edit if naming matches                   |
-| Tests       | `Mfr.Tests/Ui/FilterEditors/FilterEditorViewModelTests.cs` + `FilterEditorViewTests.cs` |
+- **VM** — `Mfr.App.Ui/ViewModels/FilterEditors/<FilterGroup>/YourFilterEditorViewModel.cs`
+- **View** — `Mfr.App.Ui/Views/FilterEditors/<FilterGroup>/YourFilterEditorView.axaml` (+ `.cs`)
+- **Factory** — `Mfr.App.Ui/ViewModels/FilterEditors/FilterOptionsEditorFactory.cs` (root)
+- **ViewLocator** — `FilterEditorViewLocator` — prefix-replace; no edit if naming matches
+- **Tests** — `Mfr.Tests/Ui/FilterEditors/FilterEditorViewModelTests.cs` + `FilterEditorViewTests.cs`
 
 - Namespace / `x:Class` must match folder (`…FilterEditors.Trimming`, etc.).
 - Shared editor for multiple filters: one VM/view name that describes the shared surface (e.g. `SpaceTrigger…`, `Count…`); factory maps each filter type to it.
@@ -53,7 +51,7 @@ Do **not** batch unrelated filters. File-list / audio / Formatter stay separate 
 
 ## ViewModel pattern
 
-Copy the closest shipped editor (see table below). Required shape:
+Copy the closest shipped editor (see list below). Required shape:
 
 1. `internal sealed partial class … : FilterOptionsEditorViewModel`
 1. `LoadWithoutApplying` around `_SyncFromFilter` so property setters do not re-apply during load
@@ -79,17 +77,16 @@ Add a `switch` arm in `FilterOptionsEditorFactory.Create`. Until registered, sel
 
 ## Reference editors by shape
 
-| Shape                                        | Copy from                                                               |
-| -------------------------------------------- | ----------------------------------------------------------------------- |
-| Shared numeric count                         | `Trimming/CountFilterEditor*`                                           |
-| Label+control form (aligned columns)         | `Formatting/CounterFilterEditor*` (`SharedSizeGroup=FilterEditorLabel`) |
-| Single char (`MaxLength=1`, empty semantics) | `Trimming/ShrinkDuplicateCharactersFilterEditor*`                       |
-| Position start/end                           | `Trimming/TrimBetweenFilterEditor*`                                     |
-| Multi checkbox + numeric                     | `Misc/FixLeadingZerosFilterEditor*`                                     |
-| Shared two-filter labels differ              | `Space/SpaceTriggerFilterEditor*` or `Case/CharacterListFilterEditor*`  |
-| Enum / radio case mode                       | `Case/LettersCaseFilterEditor*`                                         |
-| Find/replace + Literal/Wildcard/Regex mode   | `Replace/ReplacerFilterEditor*` (shared: `Controls/ReplacerModeFieldset`, `Controls/ReplacerMatchOptionsFieldset`; list pairs: `ReplaceListFilterEditor*`) |
-| Space char catalog                           | `Space/SpaceCharacterFilterEditor*`                                     |
+- **Shared numeric count** — `Trimming/CountFilterEditor*`
+- **Label+control form (aligned columns)** — `Formatting/CounterFilterEditor*` (`SharedSizeGroup=FilterEditorLabel`)
+- **Single char (`MaxLength=1`, empty semantics)** — `Trimming/ShrinkDuplicateCharactersFilterEditor*`
+- **Position start/end** — `Trimming/TrimBetweenFilterEditor*`
+- **Multi checkbox + numeric** — `Misc/FixLeadingZerosFilterEditor*`
+- **Shared two-filter labels differ** — `Space/SpaceTriggerFilterEditor*` or `Case/CharacterListFilterEditor*`
+- **Enum / radio case mode** — `Case/LettersCaseFilterEditor*`
+- **Find/replace + Literal/Wildcard/Regex mode** — `Replace/ReplacerFilterEditor*` (shared: `Controls/ReplacerModeFieldset`, `Controls/ReplacerMatchOptionsFieldset`; list pairs: `ReplaceListFilterEditor*`)
+- **Shared timestamp field + date/time value** — `Attributes/DateTimeSetterFilterEditor*` (Date Setter + Time Setter)
+- **Space char catalog** — `Space/SpaceCharacterFilterEditor*`
 
 ## Tests
 

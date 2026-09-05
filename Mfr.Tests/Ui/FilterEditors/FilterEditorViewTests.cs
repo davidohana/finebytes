@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
@@ -15,6 +16,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors;
+using Mfr.App.Ui.Views.FilterEditors.Attributes;
 using Mfr.App.Ui.Views.FilterEditors.Case;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
 using Mfr.App.Ui.Views.FilterEditors.Misc;
@@ -22,12 +24,14 @@ using Mfr.App.Ui.Views.FilterEditors.Replace;
 using Mfr.App.Ui.Views.FilterEditors.Space;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.Filters;
+using Mfr.Filters.Attributes;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
 using Mfr.Filters.Space;
 using Mfr.Filters.Trimming;
+using Mfr.Models.Media;
 using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.FilterEditors
@@ -1075,6 +1079,86 @@ namespace Mfr.Tests.Ui.FilterEditors
             var filter = (MoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(@"E:\Archive", filter.Options.RootFolder);
             Assert.Equal("<now:yyyy>", filter.Options.SubFolder);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Date Setter option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Date_setter_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("DateSetter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<DateTimeSetterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+            var editorVm = (DateTimeSetterFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!;
+
+            var editor = editorView.GetVisualDescendants().OfType<DateTimeSetterFilterEditorView>().Single();
+            var fieldCombo = editor.FindControl<ComboBox>("TimestampFieldCombo");
+            var dateBox = editor.FindControl<TextBox>("DateBox");
+            var currentButton = editor.FindControl<Button>("CurrentButton");
+            Assert.NotNull(fieldCombo);
+            Assert.NotNull(dateBox);
+            Assert.NotNull(currentButton);
+            Assert.True(dateBox.IsVisible);
+            Assert.Equal(
+                DateTime.Today.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
+                dateBox.Text
+            );
+
+            fieldCombo.SelectedItem = editorVm.TimestampFields.Single(c => c.Field == TimestampField.Creation);
+            dateBox.Text = "2020-12-25";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (DateSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(TimestampField.Creation, filter.Options.TimestampField);
+            Assert.Equal(new DateOnly(2020, 12, 25), filter.Options.Date);
+
+            currentButton.Command!.Execute(null);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            filter = (DateSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(DateOnly.FromDateTime(DateTime.Today), filter.Options.Date);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Time Setter option edits persist on the applied step.
+        /// </summary>
+        [AvaloniaFact]
+        public void Time_setter_controls_update_chain_options()
+        {
+            var (window, mainViewModel, editorView) = _ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TimeSetter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.IsType<DateTimeSetterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+            var editorVm = (DateTimeSetterFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor!;
+
+            var editor = editorView.GetVisualDescendants().OfType<DateTimeSetterFilterEditorView>().Single();
+            var fieldCombo = editor.FindControl<ComboBox>("TimestampFieldCombo");
+            var timeBox = editor.FindControl<TextBox>("TimeBox");
+            Assert.NotNull(fieldCombo);
+            Assert.NotNull(timeBox);
+            Assert.True(timeBox.IsVisible);
+            Assert.False(string.IsNullOrWhiteSpace(timeBox.Text));
+
+            fieldCombo.SelectedItem = editorVm.TimestampFields.Single(c => c.Field == TimestampField.LastAccess);
+            timeBox.Text = "09:00:15";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var filter = (TimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(TimestampField.LastAccess, filter.Options.TimestampField);
+            Assert.Equal(new TimeOnly(9, 0, 15), filter.Options.Time);
 
             window.Close();
         }
