@@ -391,7 +391,7 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
                 return;
             }
 
-            var dialog = new FormatEditorMessageDialog(title, message);
+            var dialog = new OkMessageDialog(title, message);
             await dialog.ShowDialog(owner);
         }
     }

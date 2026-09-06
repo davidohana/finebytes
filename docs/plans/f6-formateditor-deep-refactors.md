@@ -50,7 +50,6 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 | Nested `FormatEditor` in substr/token `source=` fields    | High engine+UI+gesture cost; not F6 exit       |
 | Nested token spans / caret hit-test in `TryValidate`      | Needed mainly for nested Edit; ride with above |
 | Inserter / Audio “likely-token” validation policy flag    | No second FormatEditor host yet                |
-| Shared OK-only message dialog across app hosts            | Wait for PathMover / Audio / second consumer   |
 | Replace `[FormatTokenInfo]` reflection with hand registry | Explicit non-goal (open catalog is correct)    |
 
 ## Ranked follow-ups (best cost-to-value first)
@@ -100,13 +99,11 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 - **Done:** `FormatEditorErrorLinkForegroundBrush` in FilterEditor Light (`#C42B1C`) / Dark (`#FF8080`, same family as RenameList/FileList error reds); error-link style uses `DynamicResource`
 - **Value (why it mattered):** Fixed `#C42B1C` was hard to read on dark chrome; theme brushes keep the error-link cue without fighting Dark mode.
 
-### 8. Shared OK-only message dialog — **low**
+### 8. Shared OK-only message dialog — **done**
 
-- **Sites:** `FormatEditorMessageDialog`; similar OK-only windows elsewhere
-- **Target:** one small shared dialog when a second FormatEditor host (or peer control) needs it
-- **Value:** Avoids a third copy of “title + message + OK” when PathMover / Audio Tag Setter adopt FormatEditor (or another control needs the same Edit-miss warning). Little payoff while FormatEditor has one host—extracting now is busywork.
-- **Cost:** low now, weak until reuse
-- **Rank:** low — wait for PathMover / Audio / second consumer
+- **Done:** `OkMessageDialog` under `Mfr.App.Ui.Views` (title + message + OK); FormatEditor uses it for Edit-miss / no-options / truncated error details; smoke headless test
+- **Value:** One copy for PathMover / Audio Tag Setter / any peer that needs the same OK-only warning
+- **Sites:** `OkMessageDialog` / `FormatEditor._ShowMessageAsync` / `OkMessageDialogTests`
 
 ### 9. Nested FormatEditor in `source=` + nested spans — **low for F6**
 

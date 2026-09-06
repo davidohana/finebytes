@@ -1,17 +1,17 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 
-namespace Mfr.App.Ui.Views.Controls.FormatEditor
+namespace Mfr.App.Ui.Views
 {
     /// <summary>
-    /// Simple OK-only message dialog used by FormatEditor warnings and error details.
+    /// Shared OK-only message dialog (title + body) for simple warnings and error details.
     /// </summary>
-    public partial class FormatEditorMessageDialog : Window
+    public partial class OkMessageDialog : Window
     {
         /// <summary>
         /// Initializes an empty dialog (designer / XAML loader).
         /// </summary>
-        public FormatEditorMessageDialog()
+        public OkMessageDialog()
         {
             InitializeComponent();
         }
@@ -21,7 +21,7 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
         /// </summary>
         /// <param name="title">Window title.</param>
         /// <param name="message">Message body.</param>
-        public FormatEditorMessageDialog(string title, string message)
+        public OkMessageDialog(string title, string message)
         {
             InitializeComponent();
             Title = title;
