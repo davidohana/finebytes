@@ -13,6 +13,12 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     /// Missing tags expand empty.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "Metadata Field",
+        "Image\\EXIF",
+        "A custom field from EXIF tag in Jpeg file",
+        "exif:ExifSub,36867"
+    )]
     internal sealed class ExifToken : IFormatToken
     {
         /// <summary>

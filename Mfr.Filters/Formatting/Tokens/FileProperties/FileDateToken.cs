@@ -14,6 +14,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// The comma before <c>date-kind</c> is the last comma in the argument so format patterns may contain commas.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "Date/Time",
+        "File Properties",
+        "Use the file's creation date and/or time",
+        "file-date:dd-MM-yyyy,creation"
+    )]
     internal sealed class FileDateToken : IFormatToken
     {
         /// <summary>

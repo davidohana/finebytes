@@ -11,6 +11,12 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     /// The pattern is not validated at compile time. Missing DateTaken expands empty.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "Date Picture Taken",
+        "Image\\EXIF",
+        "Date Picture Taken field from EXIF tag in Jpeg file",
+        "exif-date:dd-MM-yyyy"
+    )]
     internal sealed class ExifDateToken : IFormatToken
     {
         /// <inheritdoc />

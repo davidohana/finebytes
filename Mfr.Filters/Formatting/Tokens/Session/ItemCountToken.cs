@@ -11,6 +11,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
     /// that context observe <see cref="FileMeta.RenameListTotalCount"/> defaults (typically set via helpers).
     /// </para>
     /// </remarks>
+    [FormatTokenInfo("Item Count", "General", "Use the count of items in Rename List", "item-count")]
     internal sealed class ItemCountToken : IFormatToken
     {
         /// <inheritdoc />

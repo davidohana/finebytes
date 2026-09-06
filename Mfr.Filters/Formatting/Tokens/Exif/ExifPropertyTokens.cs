@@ -22,6 +22,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Make", "Image\\EXIF", "Camera manufacturer from EXIF", "exif-make")]
     internal sealed class ExifMakeToken : ExifPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;exif-make&gt;</c>.</summary>
@@ -30,6 +31,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Model", "Image\\EXIF", "Camera model from EXIF", "exif-model")]
     internal sealed class ExifModelToken : ExifPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;exif-model&gt;</c>.</summary>
@@ -38,6 +40,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Exposure", "Image\\EXIF", "Exposure time description from EXIF", "exif-exposure")]
     internal sealed class ExifExposureToken : ExifPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;exif-exposure&gt;</c>.</summary>
@@ -46,6 +49,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("F-Number", "Image\\EXIF", "F-number description from EXIF", "exif-fnumber")]
     internal sealed class ExifFNumberToken : ExifPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;exif-fnumber&gt;</c>.</summary>
@@ -54,6 +58,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("ISO", "Image\\EXIF", "ISO speed description from EXIF", "exif-iso")]
     internal sealed class ExifIsoToken : ExifPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;exif-iso&gt;</c>.</summary>
@@ -62,6 +67,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Focal Length", "Image\\EXIF", "Focal length description from EXIF", "exif-focal")]
     internal sealed class ExifFocalToken : ExifPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;exif-focal&gt;</c>.</summary>
@@ -70,6 +76,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
     }
 
     /// <inheritdoc />
+    [FormatTokenInfo("Focal Length 35mm", "Image\\EXIF", "35mm-equivalent focal length from EXIF", "exif-focal-35")]
     internal sealed class ExifFocal35Token : ExifPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;exif-focal-35&gt;</c>.</summary>

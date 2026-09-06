@@ -6,8 +6,8 @@ todos:
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
     status: completed
   - id: f6-formatter-format-editor
-    content: "F6 Formatter FormatEditor — token catalog, insert at caret, parse-error jump (box already shipped)"
-    status: pending
+    content: "F6 Formatter FormatEditor — see formatter-formateditor-ux.plan.md (PR A ready to push; next PR B)"
+    status: in_progress
   - id: f7-presets-ui
     content: "F7 Presets UI — enable Presets / Save Preset; load/save chain via PresetManager"
     status: pending
@@ -46,16 +46,16 @@ Editors live under `ViewModels/FilterEditors/<FilterGroup>/` ↔ `Views/FilterEd
 
 ### Option editors by group
 
-| Group        | Editors (shared where noted)                                                                                         |
-| ------------ | -------------------------------------------------------------------------------------------------------------------- |
-| **Space**    | Space Character; Space After + Around → shared `SpaceTrigger`                                                        |
-| **Case**     | Letters Case; Capitalize After + Sentence End → shared `CharacterList`; Casing List                                  |
-| **Trimming** | Count L/R (Trim/Extract Left/Right) → shared `Count`; Shrink Duplicate Characters; Trim Between                      |
-| **Replace**  | Cleaner; Replacer; Replace List                                                                                      |
-| **Formatting** | Counter; Inserter; Name List; Token Mover; **Formatter** (format-string box only)                                  |
-| **Attributes** | Date/Time Setter; Time Shifter; Attributes Setter                                                                  |
-| **Audio**    | Tag Remover; Audio Tag Setter; ID3v2 Field Setter                                                                    |
-| **Misc**     | Fix Leading 0's; Strip Parentheses; Mover (`PathMover`)                                                              |
+| Group          | Editors (shared where noted)                                                                    |
+| -------------- | ----------------------------------------------------------------------------------------------- |
+| **Space**      | Space Character; Space After + Around → shared `SpaceTrigger`                                   |
+| **Case**       | Letters Case; Capitalize After + Sentence End → shared `CharacterList`; Casing List             |
+| **Trimming**   | Count L/R (Trim/Extract Left/Right) → shared `Count`; Shrink Duplicate Characters; Trim Between |
+| **Replace**    | Cleaner; Replacer; Replace List                                                                 |
+| **Formatting** | Counter; Inserter; Name List; Token Mover; **Formatter** (format-string box only)               |
+| **Attributes** | Date/Time Setter; Time Shifter; Attributes Setter                                               |
+| **Audio**      | Tag Remover; Audio Tag Setter; ID3v2 Field Setter                                               |
+| **Misc**       | Fix Leading 0's; Strip Parentheses; Mover (`PathMover`)                                         |
 
 **Optionless (title only, intentional):** Shrink/Remove/Strip Spaces, Separate Capitalized Text, Uppercase Initials.
 
@@ -78,14 +78,19 @@ Ordered for product value. Do **not** mix these into a single “editor” pass 
 
 ### F6 — Formatter FormatEditor UX
 
+Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.plan.md).
+
 **Shipped today:** multiline format-string box + tip; edits update `FormatterFilter.Options.Template`.
+
+**PR A ready to push** (engine): public `FormatTokenCatalog` + `FormatStringSyntax.TryValidate`; reviewer gate passed. **Next:** PR B FormatEditor control.
 
 **Still needed (MFR7 `FormatEditor` parity):**
 
-1. **Token catalog** — browsable list of formatting parameters, grouped like MFR7 help (`filenamefp`, `filepropsfp`, `generalfp`, audio/image, …). Source of truth: finebytes `IFormatToken` types + [formatter-tokens.md](../../.agents/skills/mfr7-reference/formatter-tokens.md); UI reference `Help/formateditor.html` / `formateditor.gif`.
-1. **Insert at caret** — pick a token (optionally with a small options dialog for parameterized tokens) → insert `<token:…>` into the template at the caret / selection.
-1. **Parse-error feedback** — surface template parse failures; jump caret / highlight bad span when possible.
-1. **Reuse decision** — same control may later serve Mover sub-folder template, Audio Tag Setter field formats, and other format-string surfaces; design F6 so the editor is shareable, but ship Formatter first.
+1. **Token catalog** — searchable + grouped insert UI (engine catalog in PR A).
+1. **Insert at caret** — pick inserts default `<token…>` at caret (PR B control).
+1. **Parse-error feedback** — inline error + jump to bad span (PR B).
+1. **Param dialogs** — Edit/right-click for arg-bearing tokens (PR C).
+1. **Reuse decision** — shareable `FormatEditor`; only Formatter ships it in F6.
 
 Own sub-project; not a one-afternoon filter-editor pass. Skill note: Formatter rich builder is explicitly out of scope for `mfr-implement-filter-editor`.
 

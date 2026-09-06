@@ -8,6 +8,7 @@ namespace Mfr.Filters.Formatting.Tokens.Generators
     /// Returns the current UTC time as ISO 8601 by default, or with a .NET date/time format string supplied as the argument.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo("Now", "General", "Current UTC time (ISO-8601, or custom format)", "now")]
     internal sealed class NowToken : IFormatToken
     {
         /// <inheritdoc />

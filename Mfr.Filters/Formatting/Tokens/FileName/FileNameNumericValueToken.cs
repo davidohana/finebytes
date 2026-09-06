@@ -9,6 +9,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// digits, the token expands to <c>0</c>.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "File Name Numeric Value",
+        "File Name",
+        "First digit run in the full name (zeros stripped)",
+        "file-name-numeric-value"
+    )]
     internal sealed class FileNameNumericValueToken : IFormatToken
     {
         /// <inheritdoc />

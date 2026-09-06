@@ -26,6 +26,12 @@ namespace Mfr.Filters.Formatting.Tokens.Session
     /// <c>perFolder</c> uses per-folder index and sibling counts.
     /// </para>
     /// </remarks>
+    [FormatTokenInfo(
+        "Counter",
+        "General",
+        "Adds a serial number according to file's position in Rename List",
+        "counter:initial=1,step=1,padding=none,length=2,resetScope=global"
+    )]
     internal sealed class CounterToken : IFormatToken
     {
         /// <summary>
