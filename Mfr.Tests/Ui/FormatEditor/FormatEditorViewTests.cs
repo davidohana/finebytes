@@ -1,7 +1,10 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mfr.Filters.Formatting.FormatString;
 
 namespace Mfr.Tests.Ui.FormatEditor
@@ -150,10 +153,10 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies tapping a group folder does not insert text.
+        /// Verifies tapping a group folder expands/collapses it and does not insert text.
         /// </summary>
         [AvaloniaFact]
-        public void InsertList_Grouped_TappedGroup_DoesNotInsert()
+        public void InsertList_Grouped_TappedGroup_ExpandsAndDoesNotInsert()
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
@@ -167,12 +170,22 @@ namespace Mfr.Tests.Ui.FormatEditor
             Dispatcher.UIThread.RunJobs();
 
             var groupContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(fileNameGroup));
+            Assert.False(groupContainer.IsExpanded);
+
             groupContainer.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, null!));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
+            Assert.True(groupContainer.IsExpanded);
             Assert.Equal(string.Empty, editor.Text);
             Assert.True(editor.ViewModel.IsGrouped);
+
+            groupContainer.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, null!));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(groupContainer.IsExpanded);
+            Assert.Equal(string.Empty, editor.Text);
 
             window.Close();
         }
@@ -188,6 +201,25 @@ namespace Mfr.Tests.Ui.FormatEditor
             var search = editor.FindControl<TextBox>("InsertSearchBox");
             Assert.NotNull(search);
             Assert.True(search.IsFocused);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the insert picker uses compact app list chrome instead of Fluent TreeView defaults.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertList_UsesCompactAppChrome()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            Assert.Equal(new Thickness(0), list.BorderThickness);
+            Assert.Equal(
+                ScrollBarVisibility.Disabled,
+                list.GetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty)
+            );
 
             window.Close();
         }
@@ -325,10 +357,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         [AvaloniaFact]
         public void Construct_ShowsWithoutThrowing()
         {
-            var editor = new App.Ui.Views.FormatEditor.FormatEditor
-            {
-                Text = FormatTokenCatalog.Entries[0].InsertText,
-            };
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { Text = FormatTokenCatalog.Entries[0].InsertText };
             var window = new Window { Content = editor };
             window.Show();
             window.UpdateLayout();
@@ -341,16 +370,36 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies Insert and Edit are matching square glyph buttons.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertAndEditButtons_AreSameSize()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor();
+            var window = new Window { Content = editor };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var insert = editor.FindControl<Button>("InsertButton");
+            var edit = editor.FindControl<Button>("EditButton");
+            Assert.NotNull(insert);
+            Assert.NotNull(edit);
+            Assert.Equal(insert.Bounds.Size, edit.Bounds.Size);
+            Assert.Contains(insert.GetVisualDescendants().OfType<PathIcon>(), icon => icon.Width == 12);
+            Assert.Contains(edit.GetVisualDescendants().OfType<PathIcon>(), icon => icon.Width == 12);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Edit under caret for counter replaces the span with the editor result.
         /// </summary>
         [AvaloniaFact]
         public void EditUnderCaret_Counter_ReplacesSpan()
         {
             var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "counter");
-            var editor = new App.Ui.Views.FormatEditor.FormatEditor
-            {
-                Text = "pre" + entry.InsertText + "post",
-            };
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { Text = "pre" + entry.InsertText + "post" };
             var window = new Window
             {
                 Width = 480,

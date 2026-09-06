@@ -26,70 +26,59 @@
     <StackPanel DockPanel.Dock="Right" Spacing="4" Margin="6,0,0,0" VerticalAlignment="Top">
       <Button
         x:Name="InsertButton"
-        Classes="filter-editor-button"
-        Content="▶"
+        Classes="filter-editor-button format-editor-tool"
         ToolTip.Tip="Insert formatting parameter"
-        Width="28"
-        Padding="0"
       >
+        <PathIcon Width="12" Height="12" Data="{StaticResource FormatEditorInsertGeometry}" />
         <Button.Flyout>
           <Flyout Placement="BottomEdgeAlignedRight" Opened="_OnInsertFlyoutOpened">
-            <Border Width="280" MaxHeight="320" Padding="6">
-              <DockPanel>
-                <TextBox
-                  x:Name="InsertSearchBox"
-                  DockPanel.Dock="Top"
-                  Classes="filter-editor-field"
-                  Watermark="Search tokens…"
-                  Margin="0,0,0,6"
-                  Text="{Binding SearchText}"
-                />
-                <TreeView x:Name="InsertList" ItemsSource="{Binding VisibleItems}" MaxHeight="280">
-                  <TreeView.ItemTemplate>
-                    <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vm:FormatInsertPickerNode">
-                      <Panel>
-                        <TextBlock
-                          Text="{Binding Title}"
-                          FontWeight="SemiBold"
-                          IsVisible="{Binding IsGroup}"
-                          TextTrimming="CharacterEllipsis"
-                        />
-                        <StackPanel
-                          Spacing="0"
-                          IsVisible="{Binding !IsGroup}"
-                          ToolTip.Tip="{Binding Entry.ShortDescription}"
-                        >
-                          <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
-                          <TextBlock
-                            Text="{Binding Entry.GroupPath}"
-                            Opacity="0.7"
-                            FontSize="11"
-                            IsVisible="{Binding ShowGroupSubtitle}"
-                            TextTrimming="CharacterEllipsis"
-                          />
-                        </StackPanel>
-                      </Panel>
-                    </TreeDataTemplate>
-                  </TreeView.ItemTemplate>
-                  <TreeView.Styles>
-                    <Style Selector="TreeViewItem">
-                      <Setter Property="Padding" Value="2,2" />
-                      <Setter Property="IsExpanded" Value="False" />
-                    </Style>
-                  </TreeView.Styles>
-                </TreeView>
-              </DockPanel>
-            </Border>
+            <Flyout.FlyoutPresenterTheme>
+              <ControlTheme TargetType="FlyoutPresenter" BasedOn="{StaticResource {x:Type FlyoutPresenter}}">
+                <Setter Property="Padding" Value="6" />
+              </ControlTheme>
+            </Flyout.FlyoutPresenterTheme>
+            <DockPanel Width="280" MaxHeight="320">
+              <TextBox
+                x:Name="InsertSearchBox"
+                DockPanel.Dock="Top"
+                Classes="filter-editor-field format-insert-search"
+                Watermark="Search tokens…"
+                Margin="0,0,0,4"
+                Text="{Binding SearchText}"
+              />
+              <TreeView
+                x:Name="InsertList"
+                Classes="format-insert-picker"
+                ItemsSource="{Binding VisibleItems}"
+                MaxHeight="280"
+              >
+                <TreeView.ItemTemplate>
+                  <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vm:FormatInsertPickerNode">
+                    <StackPanel Spacing="0" ToolTip.Tip="{Binding Entry.ShortDescription}">
+                      <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock
+                        Text="{Binding Entry.GroupPath}"
+                        Opacity="0.7"
+                        FontSize="11"
+                        IsVisible="{Binding ShowGroupSubtitle}"
+                        TextTrimming="CharacterEllipsis"
+                      />
+                    </StackPanel>
+                  </TreeDataTemplate>
+                </TreeView.ItemTemplate>
+              </TreeView>
+            </DockPanel>
           </Flyout>
         </Button.Flyout>
       </Button>
       <Button
         x:Name="EditButton"
-        Classes="filter-editor-button"
-        Content="Edit"
+        Classes="filter-editor-button format-editor-tool"
         ToolTip.Tip="Edit formatting parameter under caret"
         Command="{Binding EditCommand}"
-      />
+      >
+        <PathIcon Width="12" Height="12" Data="{StaticResource FormatEditorEditGeometry}" />
+      </Button>
     </StackPanel>
 
     <TextBox

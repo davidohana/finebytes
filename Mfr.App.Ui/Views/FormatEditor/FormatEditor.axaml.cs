@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -235,7 +236,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Inserts the tapped catalog leaf (pointer/touch). Keyboard highlight alone must not insert.
+        /// Inserts the tapped catalog leaf, or expands/collapses a group folder (pointer/touch).
+        /// Keyboard highlight alone must not insert.
         /// </summary>
         private void _OnInsertItemTapped(object? sender, TappedEventArgs e)
         {
@@ -245,13 +247,49 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             var item = source as TreeViewItem ?? source.FindAncestorOfType<TreeViewItem>();
-            if (item?.DataContext is not FormatInsertPickerNode { Entry: { } entry })
+            if (item?.DataContext is not FormatInsertPickerNode node)
+            {
+                return;
+            }
+
+            if (node.IsGroup)
+            {
+                if (!_OriginatedFromExpandChevron(source, item))
+                {
+                    item.IsExpanded = !item.IsExpanded;
+                    e.Handled = true;
+                }
+
+                return;
+            }
+
+            if (node.Entry is not { } entry)
             {
                 return;
             }
 
             e.Handled = true;
             ViewModel.InsertEntryCommand.Execute(entry);
+        }
+
+        /// <summary>
+        /// True when the tap started on this item's expand/collapse chevron (already toggles
+        /// <see cref="TreeViewItem.IsExpanded"/>).
+        /// </summary>
+        private static bool _OriginatedFromExpandChevron(Visual source, TreeViewItem item)
+        {
+            Visual? current = source;
+            while (current is not null && !ReferenceEquals(current, item))
+            {
+                if (current is ToggleButton)
+                {
+                    return true;
+                }
+
+                current = current.GetVisualParent();
+            }
+
+            return false;
         }
 
         /// <summary>
