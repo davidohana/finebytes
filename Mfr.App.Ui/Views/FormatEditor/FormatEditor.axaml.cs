@@ -793,7 +793,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 _colorizer.ErrorLength = 0;
             }
 
-            _colorizer.TokenForeground = _ResolveBrush("FormatTokenForegroundBrush");
+            _colorizer.TokenDelimiterForeground = _ResolveBrush("FormatTokenDelimiterForegroundBrush");
+            _colorizer.TokenNameForeground = _ResolveBrush("FormatTokenNameForegroundBrush");
             _colorizer.ErrorBackground = _ResolveBrush("FormatTokenErrorBackgroundBrush");
             TemplateBox.TextArea.TextView.Redraw();
         }

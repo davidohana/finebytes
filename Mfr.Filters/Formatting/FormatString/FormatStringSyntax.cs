@@ -6,8 +6,15 @@ namespace Mfr.Filters.Formatting.FormatString
     /// <param name="Start">Zero-based start index of the <c>&lt;</c>.</param>
     /// <param name="Length">Length of the full <c>&lt;…&gt;</c> span.</param>
     /// <param name="CanonicalName">Resolved primary token name (not an alias).</param>
+    /// <param name="WrittenName">
+    /// Token name as written in the template (may be an alias such as <c>ext</c>).
+    /// </param>
     /// <param name="Args">Raw argument text after the first <c>:</c>, or empty.</param>
-    public sealed record FormatTokenSpan(int Start, int Length, string CanonicalName, string Args);
+    /// <remarks>
+    /// Syntax highlight must use <see cref="WrittenName"/> length for the name segment, never
+    /// <see cref="CanonicalName"/> — aliases resolve to a longer canonical name.
+    /// </remarks>
+    public sealed record FormatTokenSpan(int Start, int Length, string CanonicalName, string WrittenName, string Args);
 
     /// <summary>
     /// Result of <see cref="FormatStringSyntax.TryValidate(string)"/>.
@@ -117,6 +124,7 @@ namespace Mfr.Filters.Formatting.FormatString
                         Start: piece.Start,
                         Length: piece.Length,
                         CanonicalName: token.Names[0],
+                        WrittenName: piece.Name,
                         Args: piece.Args
                     )
                 );

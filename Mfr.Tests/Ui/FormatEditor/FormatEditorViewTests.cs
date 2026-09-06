@@ -806,8 +806,26 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(tokens);
             Assert.Single(tokens);
             Assert.Equal("file-name", tokens[0].CanonicalName);
+            Assert.Equal("file-name", tokens[0].WrittenName);
 
             window.Close();
+        }
+
+        /// <summary>
+        /// Verifies multi-color token brushes resolve under AppChrome themes (no leftover single accent key).
+        /// </summary>
+        [AvaloniaFact]
+        public void Theme_ResolvesDelimiterAndNameTokenBrushes()
+        {
+            var app = Application.Current;
+            Assert.NotNull(app);
+            Assert.True(
+                app.TryGetResource("FormatTokenDelimiterForegroundBrush", app.ActualThemeVariant, out var delim)
+            );
+            Assert.True(app.TryGetResource("FormatTokenNameForegroundBrush", app.ActualThemeVariant, out var name));
+            Assert.IsAssignableFrom<ISolidColorBrush>(delim);
+            Assert.IsAssignableFrom<ISolidColorBrush>(name);
+            Assert.False(app.TryGetResource("FormatTokenForegroundBrush", app.ActualThemeVariant, out _));
         }
 
         /// <summary>

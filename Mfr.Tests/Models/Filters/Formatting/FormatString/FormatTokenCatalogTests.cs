@@ -58,6 +58,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
                 Assert.True(result.Success, entry.CanonicalName);
                 var span = Assert.Single(result.Tokens);
                 Assert.Equal(entry.CanonicalName, span.CanonicalName);
+                Assert.Equal(entry.CanonicalName, span.WrittenName);
                 Assert.StartsWith("<" + entry.CanonicalName, entry.InsertText, StringComparison.Ordinal);
             }
         }

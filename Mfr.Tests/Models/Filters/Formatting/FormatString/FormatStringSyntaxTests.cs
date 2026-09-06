@@ -33,10 +33,58 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
             Assert.True(result.Success);
             Assert.Equal(2, result.Tokens.Count);
             Assert.Equal("file-name", result.Tokens[0].CanonicalName);
+            Assert.Equal("file-name", result.Tokens[0].WrittenName);
             Assert.Equal("file-extension", result.Tokens[1].CanonicalName);
+            Assert.Equal("ext", result.Tokens[1].WrittenName);
             Assert.Equal(template.IndexOf("<file-name>", StringComparison.Ordinal), result.Tokens[0].Start);
             Assert.Equal("<file-name>".Length, result.Tokens[0].Length);
             Assert.Equal(template.IndexOf("<ext>", StringComparison.Ordinal), result.Tokens[1].Start);
+            Assert.Equal("<ext>".Length, result.Tokens[1].Length);
+        }
+
+        /// <summary>
+        /// Verifies token args leave <see cref="FormatTokenSpan.WrittenName"/> as the name before the colon.
+        /// </summary>
+        [Fact]
+        public void TryValidate_TokenWithArgs_WrittenNameExcludesArgs()
+        {
+            var template = "<counter:initial=1,step=1>";
+            var result = FormatStringSyntax.TryValidate(template);
+
+            Assert.True(result.Success);
+            var span = Assert.Single(result.Tokens);
+            Assert.Equal("counter", span.CanonicalName);
+            Assert.Equal("counter", span.WrittenName);
+            Assert.Equal("initial=1,step=1", span.Args);
+            Assert.Equal(template.Length, span.Length);
+        }
+
+        /// <summary>
+        /// Verifies each validated span's length matches <c>&lt;</c> + written name + optional args + <c>&gt;</c>
+        /// (so highlight can slice name without overlapping delimiters).
+        /// </summary>
+        [Theory]
+        [InlineData("<ext>")]
+        [InlineData("<file-name>")]
+        [InlineData("<counter:initial=1,step=1>")]
+        [InlineData("<substr:start=1,end=-1,source=<file-name>>")]
+        public void TryValidate_TokenSpanGeometry_MatchesWrittenNameAndArgs(string template)
+        {
+            var result = FormatStringSyntax.TryValidate(template);
+
+            Assert.True(result.Success);
+            var span = Assert.Single(result.Tokens);
+            var argsWithColon = span.Args.Length == 0 ? 0 : 1 + span.Args.Length;
+            Assert.Equal(1 + span.WrittenName.Length + argsWithColon + 1, span.Length);
+            var nameStart = span.Start + 1;
+            var nameEnd = nameStart + span.WrittenName.Length;
+            Assert.Equal(template[nameStart..nameEnd], span.WrittenName);
+            if (span.Args.Length > 0)
+            {
+                Assert.Equal(':', template[nameEnd]);
+            }
+
+            Assert.Equal('>', template[span.Start + span.Length - 1]);
         }
 
         /// <summary>
@@ -208,6 +256,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
             Assert.True(result.Success);
             Assert.Single(result.Tokens);
             Assert.Equal("substr", result.Tokens[0].CanonicalName);
+            Assert.Equal("substr", result.Tokens[0].WrittenName);
+            Assert.Equal("start=1,end=-1,source=<file-name>", result.Tokens[0].Args);
         }
     }
 }

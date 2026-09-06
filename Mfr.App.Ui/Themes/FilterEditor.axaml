@@ -13,8 +13,9 @@
           <!-- Shown at TextControlPlaceholderOpacity (0.5); keep base color soft. -->
           <SolidColorBrush x:Key="FilterEditorWatermarkBrush" Color="#A8A8A8" />
           <SolidColorBrush x:Key="FormatEditorErrorLinkForegroundBrush" Color="#C42B1C" />
-          <!-- Valid format tokens (not error red). -->
-          <SolidColorBrush x:Key="FormatTokenForegroundBrush" Color="#2B6CB0" />
+          <!-- Format tokens: muted delimiters, stronger name (not error red); args use default fg. -->
+          <SolidColorBrush x:Key="FormatTokenDelimiterForegroundBrush" Color="#718096" />
+          <SolidColorBrush x:Key="FormatTokenNameForegroundBrush" Color="#2B6CB0" />
           <SolidColorBrush x:Key="FormatTokenErrorBackgroundBrush" Color="#40C42B1C" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
@@ -22,7 +23,8 @@
           <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#F0F0F0" />
           <SolidColorBrush x:Key="FilterEditorWatermarkBrush" Color="#8A8A8A" />
           <SolidColorBrush x:Key="FormatEditorErrorLinkForegroundBrush" Color="#FF8080" />
-          <SolidColorBrush x:Key="FormatTokenForegroundBrush" Color="#6CB6FF" />
+          <SolidColorBrush x:Key="FormatTokenDelimiterForegroundBrush" Color="#8B9CB3" />
+          <SolidColorBrush x:Key="FormatTokenNameForegroundBrush" Color="#6CB6FF" />
           <SolidColorBrush x:Key="FormatTokenErrorBackgroundBrush" Color="#66C42B1C" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
