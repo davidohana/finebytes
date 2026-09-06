@@ -95,13 +95,10 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 - **Value:** One policy everywhere — whitespace typos are unknown (Formatter) or not “likely” (Inserter/Audio), never “works in one place only”
 - **Sites:** `FormatStringCompiler` / `FormatStringScan.SplitNameAndArgs` / `Formatter.md`
 
-### 7. Theme-aware error link color — **low**
+### 7. Theme-aware error link color — **done**
 
-- **Sites:** `Themes/FilterEditor.axaml` hard-coded `#C42B1C`
-- **Target:** Light/Dark dictionary brushes
-- **Value:** On dark UI chrome the fixed red can be hard to read or clash with theme accents. Theme brushes keep the “this is an error link” cue without fighting Dark mode. Pure polish—no correctness impact.
-- **Cost:** tiny
-- **Rank:** low — polish when touching theme resources
+- **Done:** `FormatEditorErrorLinkForegroundBrush` in FilterEditor Light (`#C42B1C`) / Dark (`#FF8080`, same family as RenameList/FileList error reds); error-link style uses `DynamicResource`
+- **Value (why it mattered):** Fixed `#C42B1C` was hard to read on dark chrome; theme brushes keep the error-link cue without fighting Dark mode.
 
 ### 8. Shared OK-only message dialog — **low**
 

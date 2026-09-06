@@ -11,11 +11,13 @@
           <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#FFFFFF" />
           <!-- Shown at TextControlPlaceholderOpacity (0.5); keep base color soft. -->
           <SolidColorBrush x:Key="FilterEditorWatermarkBrush" Color="#A8A8A8" />
+          <SolidColorBrush x:Key="FormatEditorErrorLinkForegroundBrush" Color="#C42B1C" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="FilterEditorTitleBarBrush" Color="#264F78" />
           <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#F0F0F0" />
           <SolidColorBrush x:Key="FilterEditorWatermarkBrush" Color="#8A8A8A" />
+          <SolidColorBrush x:Key="FormatEditorErrorLinkForegroundBrush" Color="#FF8080" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
       <!-- x:Shared=False: each ComboBox needs its own tip visual (one parent). -->
@@ -141,7 +143,7 @@
     <Setter Property="HorizontalContentAlignment" Value="Left" />
     <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
     <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
-    <Setter Property="Foreground" Value="#C42B1C" />
+    <Setter Property="Foreground" Value="{DynamicResource FormatEditorErrorLinkForegroundBrush}" />
     <Setter Property="Cursor" Value="Hand" />
   </Style>
   <Style Selector="Button.format-editor-error-link:pointerover /template/ ContentPresenter#PART_ContentPresenter">
