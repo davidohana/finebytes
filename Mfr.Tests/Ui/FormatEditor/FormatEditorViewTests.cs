@@ -317,7 +317,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(presenter);
             var app = Application.Current;
             Assert.NotNull(app);
-            Assert.True(app.TryGetResource("FileListRowBrush", app.ActualThemeVariant, out var rowBrush));
+            Assert.True(app.TryGetResource("AppChromeSurfaceBrush", app.ActualThemeVariant, out var rowBrush));
             var panelBrush = Assert.IsAssignableFrom<ISolidColorBrush>(rowBrush);
             var presenterBrush = Assert.IsAssignableFrom<ISolidColorBrush>(presenter.Background);
             Assert.Equal(panelBrush.Color, presenterBrush.Color);
@@ -549,10 +549,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotEmpty(editor.ViewModel.VisibleItems);
             Assert.True(editor.ViewModel.IsGrouped);
             Assert.False(editor.ViewModel.HasError);
-            Assert.Same(
-                GridFonts.RenameListFixedWidthFamily,
-                editor.FindControl<TextEditor>("TemplateBox")?.FontFamily
-            );
+            Assert.Same(GridFonts.AppChromeFixedWidthFamily, editor.FindControl<TextEditor>("TemplateBox")?.FontFamily);
             Assert.Equal(
                 "Right-click a formatting parameter to customize it.",
                 editor.FindControl<FilterEditorHint>("RightClickHint")?.Text

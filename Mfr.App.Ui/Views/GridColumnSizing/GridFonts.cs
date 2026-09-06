@@ -4,19 +4,19 @@ using Avalonia.Media;
 namespace Mfr.App.Ui.Views.GridColumnSizing
 {
     /// <summary>
-    /// File List / Rename List grid font names and sizes shared by theme resources and column measurement.
+    /// Shared app chrome font names and sizes used by theme resources and grid column measurement.
     /// </summary>
     internal static class GridFonts
     {
         /// <summary>
-        /// Proportional File List / Rename List family list.
+        /// Proportional UI sans family list.
         /// </summary>
-        public const string FileListFamilyName = "Segoe UI, SegoeUI";
+        public const string AppChromeFamilyName = "Segoe UI, SegoeUI";
 
         /// <summary>
-        /// Fixed-width Rename List family list.
+        /// Fixed-width UI family list (Rename List, format-string fields).
         /// </summary>
-        public const string RenameListFixedWidthFamilyName = "Cascadia Mono, Consolas, monospace";
+        public const string AppChromeFixedWidthFamilyName = "Cascadia Mono, Consolas, monospace";
 
         /// <summary>
         /// Grid body and header size in device-independent pixels.
@@ -29,25 +29,25 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         public const double SortGlyphFontSize = 11;
 
         /// <summary>
-        /// Proportional File List / Rename List font family.
+        /// Proportional UI sans font family.
         /// </summary>
-        public static FontFamily FileListFamily { get; } = new(FileListFamilyName);
+        public static FontFamily AppChromeFamily { get; } = new(AppChromeFamilyName);
 
         /// <summary>
-        /// Fixed-width Rename List font family.
+        /// Fixed-width UI font family.
         /// </summary>
-        public static FontFamily RenameListFixedWidthFamily { get; } = new(RenameListFixedWidthFamilyName);
+        public static FontFamily AppChromeFixedWidthFamily { get; } = new(AppChromeFixedWidthFamilyName);
 
         /// <summary>
-        /// Registers theme keys used by File List / Rename List styles.
+        /// Registers theme keys used by app chrome and File List / Rename List styles.
         /// </summary>
         /// <param name="resources">Application resource dictionary.</param>
         public static void AddResources(IResourceDictionary resources)
         {
             ArgumentNullException.ThrowIfNull(resources);
-            resources["FileListFont"] = FileListFamily;
-            resources["RenameListFixedWidthFont"] = RenameListFixedWidthFamily;
-            resources["FileListFontSize"] = FontSize;
+            resources["AppChromeFont"] = AppChromeFamily;
+            resources["AppChromeFixedWidthFont"] = AppChromeFixedWidthFamily;
+            resources["AppChromeFontSize"] = FontSize;
             resources["FileListSortGlyphFontSize"] = SortGlyphFontSize;
         }
     }

@@ -10,9 +10,9 @@
   d:DesignHeight="280"
   x:Class="Mfr.App.Ui.Views.FilterEditors.FilterEditorView"
   x:DataType="editorVm:FilterEditorViewModel"
-  FontFamily="{StaticResource FileListFont}"
-  FontSize="{StaticResource FileListFontSize}"
-  Foreground="{DynamicResource FileListForegroundBrush}"
+  FontFamily="{StaticResource AppChromeFont}"
+  FontSize="{StaticResource AppChromeFontSize}"
+  Foreground="{DynamicResource AppChromeForegroundBrush}"
 >
   <Border Classes="pane">
     <DockPanel>

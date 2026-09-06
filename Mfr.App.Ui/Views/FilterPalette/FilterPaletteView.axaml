@@ -32,23 +32,23 @@
       <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
     <Style Selector="Button.filter-group:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="Button.filter-group.selected /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
     </Style>
     <Style Selector="Button.filter-group.selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
     </Style>
     <Style Selector="ListBox.filter-palette">
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Padding" Value="0" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
       <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     </Style>
@@ -57,24 +57,24 @@
       <Setter Property="Padding" Value="6,2" />
       <Setter Property="Margin" Value="0" />
       <Setter Property="CornerRadius" Value="0" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
     <Style Selector="ListBox.filter-palette ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="BorderBrush" Value="Transparent" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="ListBox.filter-palette ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="ListBox.filter-palette ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
     <Style Selector="ListBox.filter-palette ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
   </UserControl.Styles>
   <Border Classes="pane">

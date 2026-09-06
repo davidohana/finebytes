@@ -9,9 +9,9 @@
   WindowStartupLocation="CenterOwner"
   ShowInTaskbar="False"
   CanResize="False"
-  FontFamily="{StaticResource FileListFont}"
-  FontSize="{StaticResource FileListFontSize}"
-  Foreground="{DynamicResource FileListForegroundBrush}"
+  FontFamily="{StaticResource AppChromeFont}"
+  FontSize="{StaticResource AppChromeFontSize}"
+  Foreground="{DynamicResource AppChromeForegroundBrush}"
 >
   <Window.Styles>
     <Style Selector="Button.ok-message-footer">
@@ -19,17 +19,17 @@
       <Setter Property="MinWidth" Value="72" />
       <Setter Property="Padding" Value="12,2" />
       <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="Button.ok-message-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
   </Window.Styles>
   <DockPanel Margin="12">

@@ -16,7 +16,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// </summary>
         internal const int MaxAutoFitWidth = GridColumnTextWidths.MaxAutoFitWidth;
 
-        private static readonly FontFamily _GlyphFontFamily = GridFonts.FileListFamily;
+        private static readonly FontFamily _GlyphFontFamily = GridFonts.AppChromeFamily;
         private const double _SortGlyphFontSize = GridFonts.SortGlyphFontSize;
         private const double _SortGlyphMarginLeft = 6;
         private const double _SortGlyphBorderHorizontal = 2; // BorderThickness="1"

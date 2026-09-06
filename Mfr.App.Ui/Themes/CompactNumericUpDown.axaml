@@ -5,11 +5,11 @@
     <Setter Property="Height" Value="26" />
     <Setter Property="MinHeight" Value="26" />
     <Setter Property="Padding" Value="4,0,0,0" />
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-    <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="3" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -60,7 +60,7 @@
                   Width="8"
                   Height="4"
                   Data="M0,5 L4.5,.5 9,5 6,5 4.5,3.5 3,5 z"
-                  Fill="{DynamicResource FileListForegroundBrush}"
+                  Fill="{DynamicResource AppChromeForegroundBrush}"
                   Stretch="Uniform"
                 />
               </RepeatButton>
@@ -81,7 +81,7 @@
                   Width="8"
                   Height="4"
                   Data="M0,0 L3,0 4.5,1.5 6,0 9,0 4.5,4.5 z"
-                  Fill="{DynamicResource FileListForegroundBrush}"
+                  Fill="{DynamicResource AppChromeForegroundBrush}"
                   Stretch="Uniform"
                 />
               </RepeatButton>
@@ -100,7 +100,7 @@
     </Setter>
   </Style>
   <Style Selector="NumericUpDown.compact-numeric RepeatButton:pointerover:not(:disabled) /template/ ContentPresenter#PART_ContentPresenter">
-    <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
   </Style>
   <Style Selector="NumericUpDown.compact-numeric RepeatButton:disabled">
     <Setter Property="Opacity" Value="1" />

@@ -11,13 +11,14 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// <summary>
         /// Proportional File List / Rename List font.
         /// </summary>
-        internal static GridColumnTextFontContext FileList { get; } = new(GridFonts.FileListFamily, GridFonts.FontSize);
+        internal static GridColumnTextFontContext FileList { get; } =
+            new(GridFonts.AppChromeFamily, GridFonts.FontSize);
 
         /// <summary>
         /// Fixed-width Rename List font.
         /// </summary>
         internal static GridColumnTextFontContext RenameListFixedWidth { get; } =
-            new(GridFonts.RenameListFixedWidthFamily, GridFonts.FontSize);
+            new(GridFonts.AppChromeFixedWidthFamily, GridFonts.FontSize);
 
         /// <summary>
         /// Initializes a font context.

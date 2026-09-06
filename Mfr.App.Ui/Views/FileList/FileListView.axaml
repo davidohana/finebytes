@@ -35,12 +35,12 @@
   </UserControl.Resources>
   <UserControl.Styles>
     <Style Selector="ListBox.file-list">
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Padding" Value="2" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     </Style>
     <Style Selector="ListBox.file-icons">
@@ -51,15 +51,15 @@
       <Setter Property="Padding" Value="3,1" />
       <Setter Property="Margin" Value="0" />
       <Setter Property="CornerRadius" Value="0" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
     <Style Selector="ListBox.file-rows ListBoxItem">
       <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="Padding" Value="4,1" />
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
     </Style>
     <Style Selector="ListBox.file-rows ListBoxItem:nth-child(even)">
-      <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
     </Style>
     <Style Selector="ListBox.file-icons ListBoxItem">
       <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -82,53 +82,53 @@
       <Setter Property="VerticalAlignment" Value="Stretch" />
     </Style>
     <Style Selector="ListBox.file-list ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="ListBox.file-list ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
     <Style Selector="ListBox.file-list ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.file-report">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-      <Setter Property="RowBackground" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="RowBackground" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="ColumnHeaderHeight" Value="22" />
       <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
       <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridColumnHeader">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
       <Setter Property="FontWeight" Value="Normal" />
       <Setter Property="Foreground" Value="{DynamicResource FileListHeaderForegroundBrush}" />
       <Setter Property="Background" Value="{DynamicResource FileListHeaderBrush}" />
       <Setter Property="MinHeight" Value="22" />
       <Setter Property="Padding" Value="6,0,4,0" />
-      <Setter Property="SeparatorBrush" Value="{DynamicResource FileListSeparatorBrush}" />
+      <Setter Property="SeparatorBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
       <Setter Property="AreSeparatorsVisible" Value="True" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridRow">
       <Setter Property="MinHeight" Value="20" />
       <Setter Property="Height" Value="20" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridRow:nth-child(even)">
-      <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridCell">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="Padding" Value="4,0" />
       <Setter Property="MinHeight" Value="0" />
     </Style>
@@ -144,27 +144,27 @@
       <Setter Property="StrokeThickness" Value="1" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridRow:pointerover /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeHoverBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="ComboBox.mask-filter">
@@ -463,7 +463,7 @@
             TextAlignment="Center"
             TextWrapping="Wrap"
             Text="{Binding ListingError}"
-            Foreground="{DynamicResource FileListForegroundBrush}"
+            Foreground="{DynamicResource AppChromeForegroundBrush}"
             Opacity="0.85"
           />
           <Button

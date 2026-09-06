@@ -16,8 +16,8 @@ namespace Mfr.Tests.Ui.GridColumnSizing
             var proportional = GridColumnTextFontContext.ForRenameList(useFixedWidthFont: false);
             var fixedWidth = GridColumnTextFontContext.ForRenameList(useFixedWidthFont: true);
 
-            Assert.Same(GridFonts.FileListFamily, proportional.FontFamily);
-            Assert.Same(GridFonts.RenameListFixedWidthFamily, fixedWidth.FontFamily);
+            Assert.Same(GridFonts.AppChromeFamily, proportional.FontFamily);
+            Assert.Same(GridFonts.AppChromeFixedWidthFamily, fixedWidth.FontFamily);
             Assert.Equal(GridFonts.FontSize, proportional.FontSize);
             Assert.Equal(GridFonts.FontSize, fixedWidth.FontSize);
         }
@@ -32,13 +32,13 @@ namespace Mfr.Tests.Ui.GridColumnSizing
             Assert.NotNull(app);
             var theme = app.ActualThemeVariant;
 
-            Assert.True(app.TryGetResource("FileListFont", theme, out var fileListFont));
-            Assert.Same(GridFonts.FileListFamily, Assert.IsType<FontFamily>(fileListFont));
+            Assert.True(app.TryGetResource("AppChromeFont", theme, out var fileListFont));
+            Assert.Same(GridFonts.AppChromeFamily, Assert.IsType<FontFamily>(fileListFont));
 
-            Assert.True(app.TryGetResource("RenameListFixedWidthFont", theme, out var fixedWidthFont));
-            Assert.Same(GridFonts.RenameListFixedWidthFamily, Assert.IsType<FontFamily>(fixedWidthFont));
+            Assert.True(app.TryGetResource("AppChromeFixedWidthFont", theme, out var fixedWidthFont));
+            Assert.Same(GridFonts.AppChromeFixedWidthFamily, Assert.IsType<FontFamily>(fixedWidthFont));
 
-            Assert.True(app.TryGetResource("FileListFontSize", theme, out var fontSize));
+            Assert.True(app.TryGetResource("AppChromeFontSize", theme, out var fontSize));
             Assert.Equal(GridFonts.FontSize, Assert.IsType<double>(fontSize));
 
             Assert.True(app.TryGetResource("FileListSortGlyphFontSize", theme, out var glyphSize));

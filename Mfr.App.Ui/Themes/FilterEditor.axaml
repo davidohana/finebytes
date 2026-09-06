@@ -41,40 +41,40 @@
     <Setter Property="Padding" Value="6,0,4,0" />
   </Style>
   <Style Selector="TextBlock.filter-editor-title-bar">
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
     <Setter Property="FontWeight" Value="Bold" />
     <Setter Property="Foreground" Value="{DynamicResource FilterEditorTitleBarForegroundBrush}" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="TextTrimming" Value="CharacterEllipsis" />
   </Style>
   <Style Selector="TextBlock.filter-editor-label">
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
   </Style>
   <Style Selector="TextBlock.filter-editor-hint">
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     <Setter Property="Opacity" Value="0.85" />
   </Style>
   <Style Selector="HyperlinkButton.filter-editor-hint-link">
     <Setter Property="Padding" Value="0" />
     <Setter Property="MinHeight" Value="0" />
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
     <Setter Property="Opacity" Value="0.85" />
   </Style>
   <Style Selector="TextBox.filter-editor-field, ComboBox.filter-editor-field, TextBox.filter-editor-field-wrap">
     <Setter Property="MinHeight" Value="22" />
     <Setter Property="Padding" Value="4,2" />
     <Setter Property="CornerRadius" Value="3" />
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-    <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
   </Style>
   <Style Selector="TextBox.filter-editor-field, ComboBox.filter-editor-field">
@@ -82,8 +82,8 @@
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
   <Style Selector="TextBox.filter-editor-field[IsReadOnly=True], TextBox.filter-editor-field-wrap[IsReadOnly=True]">
-    <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
   </Style>
   <Style
     Selector="TextBox.filter-editor-field[IsReadOnly=True] /template/ Border#PART_BorderElement,
@@ -93,19 +93,19 @@
               TextBox.filter-editor-field-wrap[IsReadOnly=True]:pointerover /template/ Border#PART_BorderElement,
               TextBox.filter-editor-field-wrap[IsReadOnly=True]:focus /template/ Border#PART_BorderElement"
   >
-    <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
   </Style>
   <Style Selector="Button.filter-editor-button">
     <Setter Property="MinHeight" Value="22" />
     <Setter Property="Height" Value="22" />
     <Setter Property="Padding" Value="8,0" />
     <Setter Property="CornerRadius" Value="3" />
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-    <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -125,22 +125,22 @@
     <Setter Property="VerticalContentAlignment" Value="Top" />
   </Style>
   <Style Selector="TextBox.format-string-field">
-    <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFixedWidthFont}" />
   </Style>
   <Style Selector="AvaloniaEdit|TextEditor.format-string-field">
-    <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-    <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFixedWidthFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="4,2" />
     <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
     <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
   </Style>
   <Style Selector="TextBlock.format-editor-watermark">
-    <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFixedWidthFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
     <Setter Property="Foreground" Value="{DynamicResource FilterEditorWatermarkBrush}" />
     <Setter Property="IsHitTestVisible" Value="False" />
     <Setter Property="Margin" Value="8,6,8,0" />
@@ -148,10 +148,10 @@
     <Setter Property="TextTrimming" Value="CharacterEllipsis" />
   </Style>
   <Style Selector="ComboBox.format-string-field">
-    <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFixedWidthFont}" />
   </Style>
   <Style Selector="ComboBox.format-string-field /template/ TextBox#PART_EditableTextBox">
-    <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFixedWidthFont}" />
   </Style>
   <Style Selector="ComboBox.filter-editor-field">
     <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -203,8 +203,8 @@
     <Setter Property="MinHeight" Value="0" />
     <Setter Property="HorizontalAlignment" Value="Left" />
     <Setter Property="HorizontalContentAlignment" Value="Left" />
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
     <Setter Property="Foreground" Value="{DynamicResource FormatEditorErrorLinkForegroundBrush}" />
     <Setter Property="Cursor" Value="Hand" />
   </Style>
@@ -222,12 +222,12 @@
   </Style>
 
   <Style Selector="TreeView.format-insert-picker">
-    <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Padding" Value="0" />
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
     <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
   </Style>
@@ -236,7 +236,7 @@
     <Setter Property="Padding" Value="4,2" />
     <Setter Property="Margin" Value="0" />
     <Setter Property="CornerRadius" Value="3" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
   </Style>
   <Style Selector="TreeView.format-insert-picker TreeViewItem /template/ Panel#PART_ExpandCollapseChevronContainer">
     <Setter Property="Margin" Value="0,0,4,0" />
@@ -248,21 +248,21 @@
     <Setter Property="Padding" Value="6,0,0,0" />
   </Style>
   <Style Selector="TreeView.format-insert-picker TreeViewItem /template/ Border#PART_LayoutRoot:pointerover">
-    <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
   </Style>
   <Style Selector="TreeView.format-insert-picker TreeViewItem:selected /template/ Border#PART_LayoutRoot">
-    <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
   </Style>
   <Style
     Selector="TreeView.format-insert-picker TreeViewItem:selected /template/ Border#PART_LayoutRoot:pointerover,
               TreeView.format-insert-picker TreeViewItem:selected:pointerover /template/ Border#PART_LayoutRoot"
   >
-    <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
   </Style>
   <Style Selector="TreeView.format-insert-picker TreeViewItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
   </Style>
   <Style Selector="TreeView.format-insert-picker TreeViewItem:empty /template/ ToggleButton#PART_ExpandCollapseChevron">
     <Setter Property="IsVisible" Value="False" />
@@ -272,14 +272,14 @@
   </Style>
 
   <Style Selector="TextBlock.rich-tip-title">
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
     <Setter Property="FontWeight" Value="SemiBold" />
     <Setter Property="TextWrapping" Value="Wrap" />
   </Style>
   <Style Selector="TextBlock.rich-tip-body, TextBlock.rich-tip-bullet">
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
     <Setter Property="TextWrapping" Value="Wrap" />
   </Style>
 </Styles>

@@ -42,7 +42,7 @@
             <Flyout.FlyoutPresenterTheme>
               <ControlTheme TargetType="FlyoutPresenter" BasedOn="{StaticResource {x:Type FlyoutPresenter}}">
                 <Setter Property="Padding" Value="6" />
-                <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+                <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
               </ControlTheme>
             </Flyout.FlyoutPresenterTheme>
             <DockPanel Width="280" MaxHeight="320">

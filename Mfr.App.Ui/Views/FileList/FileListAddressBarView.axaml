@@ -17,7 +17,7 @@
   <UserControl.Styles>
     <Style Selector="Border.address-bar">
       <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="4" />
       <Setter Property="MinHeight" Value="30" />
@@ -33,9 +33,9 @@
       <Setter Property="MinHeight" Value="0" />
       <Setter Property="MinWidth" Value="0" />
       <Setter Property="CornerRadius" Value="4" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="HorizontalAlignment" Value="Left" />
@@ -45,7 +45,7 @@
       <Setter Property="Cursor" Value="Arrow" />
     </Style>
     <Style Selector="Button.breadcrumb:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
       <Setter Property="Cursor" Value="Arrow" />
     </Style>
     <Style Selector="Button.breadcrumb-overflow">
@@ -60,7 +60,7 @@
       <Setter Property="Cursor" Value="Arrow" />
     </Style>
     <Style Selector="Button.breadcrumb-overflow:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="Button.address-history">
       <Setter Property="Background" Value="Transparent" />
@@ -72,15 +72,15 @@
       <Setter Property="Cursor" Value="Arrow" />
     </Style>
     <Style Selector="Button.address-history:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="TextBox.address-edit">
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Background" Value="Transparent" />
       <Setter Property="MinHeight" Value="0" />
       <Setter Property="Padding" Value="8,0,4,0" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
       <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="VerticalAlignment" Value="Stretch" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
@@ -120,7 +120,7 @@
                   Width="16"
                   Height="16"
                   Stretch="Uniform"
-                  Fill="{DynamicResource FileListForegroundBrush}"
+                  Fill="{DynamicResource AppChromeForegroundBrush}"
                   Data="{StaticResource ComputerGeometry}"
                 />
               </Viewbox>
@@ -129,7 +129,7 @@
                   Width="16"
                   Height="16"
                   Stretch="Uniform"
-                  Fill="{DynamicResource FileListForegroundBrush}"
+                  Fill="{DynamicResource AppChromeForegroundBrush}"
                   Data="{StaticResource FolderGeometry}"
                 />
               </Viewbox>
@@ -157,7 +157,7 @@
                       VerticalAlignment="Center"
                       DockPanel.Dock="Left"
                       IsVisible="{Binding ShowLeadingChevron}"
-                      Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
+                      Stroke="{DynamicResource AppChromeMutedForegroundBrush}"
                       StrokeThickness="1.25"
                       StrokeLineCap="Round"
                       StrokeJoin="Round"
@@ -188,7 +188,7 @@
                 Width="10"
                 Height="10"
                 Stretch="Uniform"
-                Stroke="{DynamicResource FileListBreadcrumbMutedBrush}"
+                Stroke="{DynamicResource AppChromeMutedForegroundBrush}"
                 StrokeThickness="1.25"
                 StrokeLineCap="Round"
                 StrokeJoin="Round"
@@ -236,7 +236,7 @@
             Width="10"
             Height="6"
             Stretch="Uniform"
-            Fill="{DynamicResource FileListBreadcrumbMutedBrush}"
+            Fill="{DynamicResource AppChromeMutedForegroundBrush}"
             Data="M0,0 L10,0 L5,6 Z"
           />
           <Button.Flyout>
@@ -266,7 +266,7 @@
           Width="16"
           Height="16"
           Stretch="Uniform"
-          Fill="{DynamicResource FileListForegroundBrush}"
+          Fill="{DynamicResource AppChromeForegroundBrush}"
           Data="{StaticResource RefreshGeometry}"
         />
       </Viewbox>

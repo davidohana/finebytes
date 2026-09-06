@@ -4,14 +4,14 @@
   xmlns:controls="clr-namespace:Mfr.App.Ui.Views.Controls"
 >
   <ControlTheme x:Key="{x:Type controls:FieldsetGroup}" TargetType="controls:FieldsetGroup">
-    <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="0" />
     <Setter Property="Padding" Value="8,14,8,8" />
-    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     <Setter Property="Template">
       <ControlTemplate TargetType="controls:FieldsetGroup">
         <Grid>

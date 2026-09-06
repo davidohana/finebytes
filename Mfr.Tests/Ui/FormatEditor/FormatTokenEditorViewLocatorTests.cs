@@ -88,11 +88,11 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(box);
             Assert.True(box.IsReadOnly);
             Assert.Equal(editor.ResultingFormatString, box.Text);
-            Assert.Same(GridFonts.RenameListFixedWidthFamily, box.FontFamily);
+            Assert.Same(GridFonts.AppChromeFixedWidthFamily, box.FontFamily);
 
             var app = Application.Current;
             Assert.NotNull(app);
-            Assert.True(app.TryGetResource("FileListAltRowBrush", app.ActualThemeVariant, out var altRow));
+            Assert.True(app.TryGetResource("AppChromeAltSurfaceBrush", app.ActualThemeVariant, out var altRow));
             var expected = Assert.IsAssignableFrom<ISolidColorBrush>(altRow);
             var actual = Assert.IsAssignableFrom<ISolidColorBrush>(box.Background);
             Assert.Equal(expected.Color, actual.Color);

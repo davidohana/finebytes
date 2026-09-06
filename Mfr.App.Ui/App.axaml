@@ -7,6 +7,7 @@
   <Application.Resources>
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
+        <ResourceInclude Source="/Themes/AppChrome.axaml" />
         <ResourceInclude Source="/Themes/FileList.axaml" />
         <ResourceInclude Source="/Themes/FieldsetGroup.axaml" />
         <ResourceInclude Source="/Themes/FilterEditorLabeledRow.axaml" />
@@ -122,11 +123,11 @@
       <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
     <Style Selector="Button.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="Button.rename-list-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
     </Style>
     <Style Selector="Button.rename-list-action:disabled">
       <Setter Property="Opacity" Value="0.4" />

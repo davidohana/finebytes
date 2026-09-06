@@ -13,15 +13,15 @@
   WindowStartupLocation="CenterOwner"
   CanResize="False"
   ShowInTaskbar="False"
-  FontFamily="{StaticResource FileListFont}"
-  FontSize="{StaticResource FileListFontSize}"
-  Foreground="{DynamicResource FileListForegroundBrush}"
+  FontFamily="{StaticResource AppChromeFont}"
+  FontSize="{StaticResource AppChromeFontSize}"
+  Foreground="{DynamicResource AppChromeForegroundBrush}"
 >
   <Window.Styles>
     <Style Selector="TextBlock.filter-options-label">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="Margin" Value="0,0,10,0" />
       <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="TextAlignment" Value="Left" />
@@ -29,17 +29,17 @@
       <Setter Property="TextWrapping" Value="NoWrap" />
     </Style>
     <Style Selector="TextBlock.filter-options-suffix">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="Margin" Value="8,0,0,0" />
       <Setter Property="TextWrapping" Value="NoWrap" />
     </Style>
     <Style Selector="TextBlock.filter-options-from-the">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="Margin" Value="8,0" />
       <Setter Property="TextWrapping" Value="NoWrap" />
@@ -50,11 +50,11 @@
       <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="Padding" Value="6,2" />
       <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
@@ -84,17 +84,17 @@
       <Setter Property="MinWidth" Value="72" />
       <Setter Property="Padding" Value="12,2" />
       <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="Button.filter-options-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
   </Window.Styles>
   <DockPanel Margin="12">

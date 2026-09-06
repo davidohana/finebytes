@@ -92,11 +92,11 @@
   </UserControl.Resources>
   <UserControl.Styles>
     <Style Selector="DataGrid.rename-list">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-      <Setter Property="RowBackground" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="RowBackground" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="ColumnHeaderHeight" Value="22" />
       <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
@@ -108,21 +108,21 @@
       </Setter>
     </Style>
     <Style Selector="DataGrid.rename-list.fixed-width-font">
-      <Setter Property="FontFamily" Value="{StaticResource RenameListFixedWidthFont}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFixedWidthFont}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridColumnHeader">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
       <Setter Property="FontWeight" Value="Normal" />
       <Setter Property="Foreground" Value="{DynamicResource FileListHeaderForegroundBrush}" />
       <Setter Property="Background" Value="{DynamicResource FileListHeaderBrush}" />
       <Setter Property="MinHeight" Value="22" />
       <Setter Property="Padding" Value="6,0,4,0" />
-      <Setter Property="SeparatorBrush" Value="{DynamicResource FileListSeparatorBrush}" />
+      <Setter Property="SeparatorBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
       <Setter Property="AreSeparatorsVisible" Value="True" />
     </Style>
     <Style Selector="DataGrid.rename-list.fixed-width-font DataGridColumnHeader">
-      <Setter Property="FontFamily" Value="{StaticResource RenameListFixedWidthFont}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFixedWidthFont}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridColumnHeader /template/ Path#SortIcon">
       <Setter Property="IsVisible" Value="False" />
@@ -135,27 +135,27 @@
     <Style Selector="DataGrid.rename-list DataGridRow">
       <Setter Property="MinHeight" Value="20" />
       <Setter Property="Height" Value="20" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:nth-child(even)">
-      <Setter Property="Background" Value="{DynamicResource FileListAltRowBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="Padding" Value="4,0" />
       <Setter Property="MinHeight" Value="0" />
     </Style>
     <Style Selector="DataGrid.rename-list.fixed-width-font DataGridCell">
-      <Setter Property="FontFamily" Value="{StaticResource RenameListFixedWidthFont}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFixedWidthFont}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock">
       <Setter Property="Margin" Value="{StaticResource DataGridTextColumnCellTextBlockMargin}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-load-error">
-      <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
       <Setter Property="FontStyle" Value="Italic" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-preview-changed">
@@ -183,23 +183,23 @@
       <Setter Property="Stroke" Value="Transparent" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected:pointerover /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected:focus /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected:pointerover:focus /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <!-- MFR7 PreviewErrorBackColor (LavenderBlush) -->
@@ -212,8 +212,8 @@
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow.rename-list-preview-error:selected /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="Stroke" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <!-- MFR7 MarkedRow (Color.Salmon) while dragging over a row (files or internal reorder) -->
@@ -249,15 +249,15 @@
       <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
     <Style Selector="ToggleButton.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="ToggleButton.rename-list-action:checked /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
     </Style>
     <Style Selector="ToggleButton.rename-list-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
     </Style>
   </UserControl.Styles>
   <Border Classes="pane">

@@ -19,11 +19,11 @@
       <Setter Property="Padding" Value="8,2" />
       <Setter Property="Margin" Value="0,0,1,0" />
       <Setter Property="Background" Value="{DynamicResource PaneChromeBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="0" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
@@ -32,30 +32,30 @@
     </Style>
     <Style Selector="Border.applied-filter-shuttle-rail">
       <Setter Property="Background" Value="{DynamicResource FileListHeaderBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSeparatorBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
       <Setter Property="BorderThickness" Value="0,0,1,0" />
       <Setter Property="Padding" Value="4" />
       <Setter Property="VerticalAlignment" Value="Stretch" />
     </Style>
     <Style Selector="Border.applied-filter-shuttle-rail Button.rename-list-action">
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="Margin" Value="0,0,0,2" />
     </Style>
     <Style Selector="Border.applied-filter-shuttle-rail Button.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     </Style>
     <Style Selector="Border.applied-filter-shuttle-rail Button.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="ListBox.applied-filters">
-      <Setter Property="Background" Value="{DynamicResource FileListRowBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Padding" Value="0" />
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
       <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     </Style>
@@ -64,24 +64,24 @@
       <Setter Property="Padding" Value="4,2" />
       <Setter Property="Margin" Value="0" />
       <Setter Property="CornerRadius" Value="0" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
     <Style Selector="ListBox.applied-filters ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="BorderBrush" Value="Transparent" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
     <Style Selector="ListBox.applied-filters ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="ListBox.applied-filters ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
     <Style Selector="ListBox.applied-filters ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource FileListSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSelectionBorderBrush}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
     <Style Selector="ListBox.applied-filters ListBoxItem.drop-mark">
       <Setter Property="Background" Value="{DynamicResource RenameListDropIndicatorBrush}" />
@@ -94,7 +94,7 @@
     </Style>
     <Style Selector="TextBlock.applied-filter-apply-to">
       <Setter Property="FontSize" Value="11" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListBreadcrumbMutedBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
       <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
     <Style Selector="CheckBox.applied-filter-enabled">
