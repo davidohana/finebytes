@@ -8,39 +8,15 @@ namespace Mfr.App.Ui.ViewModels.Controls.FormatEditor.TokenEditors
     internal sealed partial class CounterFormatTokenEditorViewModel : FormatTokenEditorViewModelBase
     {
         /// <summary>
-        /// Padding mode choices for <c>padding=…</c>.
+        /// Gets padding mode rows for <c>padding=…</c>.
         /// </summary>
-        public sealed record PaddingChoice(string Value, string Label)
-        {
-            /// <inheritdoc />
-            public override string ToString()
-            {
-                return Label;
-            }
-        }
-
-        /// <summary>
-        /// Reset-scope choices for <c>resetScope=…</c>.
-        /// </summary>
-        public sealed record ResetScopeChoice(string Value, string Label)
-        {
-            /// <inheritdoc />
-            public override string ToString()
-            {
-                return Label;
-            }
-        }
-
-        /// <summary>
-        /// Gets padding mode rows.
-        /// </summary>
-        public static IReadOnlyList<PaddingChoice> PaddingChoices { get; } =
+        public static IReadOnlyList<FormatTokenChoice> PaddingChoices { get; } =
         [new("none", "None"), new("auto", "Auto"), new("fixed", "Fixed")];
 
         /// <summary>
-        /// Gets reset-scope rows.
+        /// Gets reset-scope rows for <c>resetScope=…</c>.
         /// </summary>
-        public static IReadOnlyList<ResetScopeChoice> ResetScopeChoices { get; } =
+        public static IReadOnlyList<FormatTokenChoice> ResetScopeChoices { get; } =
         [new("global", "Global"), new("perFolder", "Per folder")];
 
         /// <summary>
@@ -69,7 +45,7 @@ namespace Mfr.App.Ui.ViewModels.Controls.FormatEditor.TokenEditors
         /// Gets or sets the padding mode (<c>padding</c>).
         /// </summary>
         [ObservableProperty]
-        private PaddingChoice _padding = PaddingChoices[0];
+        private FormatTokenChoice _padding = PaddingChoices[0];
 
         /// <summary>
         /// Gets or sets the fixed pad width (<c>length</c>).
@@ -81,14 +57,14 @@ namespace Mfr.App.Ui.ViewModels.Controls.FormatEditor.TokenEditors
         /// Gets or sets the reset scope (<c>resetScope</c>).
         /// </summary>
         [ObservableProperty]
-        private ResetScopeChoice _resetScope = ResetScopeChoices[0];
+        private FormatTokenChoice _resetScope = ResetScopeChoices[0];
 
         /// <summary>
         /// Gets whether the length spinner applies (fixed padding).
         /// </summary>
         public bool IsLengthEnabled => string.Equals(Padding.Value, "fixed", StringComparison.OrdinalIgnoreCase);
 
-        partial void OnPaddingChanged(PaddingChoice value) => OnPropertyChanged(nameof(IsLengthEnabled));
+        partial void OnPaddingChanged(FormatTokenChoice value) => OnPropertyChanged(nameof(IsLengthEnabled));
 
         /// <inheritdoc />
         public override string BuildInnerText()

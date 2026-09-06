@@ -10,21 +10,9 @@ namespace Mfr.App.Ui.ViewModels.Controls.FormatEditor.TokenEditors
         private const string DefaultFormat = "dd-MM-yyyy";
 
         /// <summary>
-        /// Date-kind combo row aligned with <c>file-date</c> keywords.
-        /// </summary>
-        public sealed record KindChoice(string Value, string Label)
-        {
-            /// <inheritdoc />
-            public override string ToString()
-            {
-                return Label;
-            }
-        }
-
-        /// <summary>
         /// Gets date-kind rows (<c>creation</c>/<c>lastWrite</c>/<c>lastAccess</c>).
         /// </summary>
-        public static IReadOnlyList<KindChoice> KindChoices { get; } =
+        public static IReadOnlyList<FormatTokenChoice> KindChoices { get; } =
         [new("creation", "Creation"), new("lastWrite", "Last write"), new("lastAccess", "Last access")];
 
         /// <summary>
@@ -69,7 +57,7 @@ namespace Mfr.App.Ui.ViewModels.Controls.FormatEditor.TokenEditors
         /// Gets or sets the filesystem timestamp kind.
         /// </summary>
         [ObservableProperty]
-        private KindChoice _kind = KindChoices[0];
+        private FormatTokenChoice _kind = KindChoices[0];
 
         /// <inheritdoc />
         public override string BuildInnerText()

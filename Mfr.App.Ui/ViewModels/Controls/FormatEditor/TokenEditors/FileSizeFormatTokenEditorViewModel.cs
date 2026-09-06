@@ -9,21 +9,9 @@ namespace Mfr.App.Ui.ViewModels.Controls.FormatEditor.TokenEditors
     internal sealed partial class FileSizeFormatTokenEditorViewModel : FormatTokenEditorViewModelBase
     {
         /// <summary>
-        /// Unit combo row for the first <c>file-size</c> argument segment.
-        /// </summary>
-        public sealed record UnitChoice(string Value, string Label)
-        {
-            /// <inheritdoc />
-            public override string ToString()
-            {
-                return Label;
-            }
-        }
-
-        /// <summary>
         /// Gets unit rows (auto / bytes / KB / MB / GB).
         /// </summary>
-        public static IReadOnlyList<UnitChoice> UnitChoices { get; } =
+        public static IReadOnlyList<FormatTokenChoice> UnitChoices { get; } =
         [new("auto", "Auto"), new("b", "Bytes"), new("kb", "KB"), new("mb", "MB"), new("gb", "GB")];
 
         /// <summary>
@@ -55,7 +43,7 @@ namespace Mfr.App.Ui.ViewModels.Controls.FormatEditor.TokenEditors
         /// Gets or sets the size unit.
         /// </summary>
         [ObservableProperty]
-        private UnitChoice _unit = UnitChoices[0];
+        private FormatTokenChoice _unit = UnitChoices[0];
 
         /// <summary>
         /// Gets or sets fractional digit count.
@@ -84,7 +72,7 @@ namespace Mfr.App.Ui.ViewModels.Controls.FormatEditor.TokenEditors
         /// <summary>
         /// Maps a positional unit argument to a combo row (aliases <c>bytes</c> → <c>b</c>).
         /// </summary>
-        private static UnitChoice _ResolveUnit(string unitArg)
+        private static FormatTokenChoice _ResolveUnit(string unitArg)
         {
             if (unitArg.Length == 0 || string.Equals(unitArg, "auto", StringComparison.OrdinalIgnoreCase))
             {
