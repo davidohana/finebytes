@@ -48,65 +48,53 @@ namespace Mfr.Filters.Formatting.FormatString
         {
             ArgumentNullException.ThrowIfNull(template);
 
-            var tokens = new List<FormatTokenSpan>();
-            var i = 0;
-
-            while (i < template.Length)
+            var pieces = new List<FormatStringPiece>();
+            if (
+                !FormatStringScan.TryWalk(
+                    template,
+                    errorOnUnclosedLikelyToken: true,
+                    pieces,
+                    out var walkError
+                )
+            )
             {
-                if (template[i] != '<')
+                return _Fail(walkError.Message, walkError.Position, walkError.Length);
+            }
+
+            var tokens = new List<FormatTokenSpan>();
+            foreach (var piece in pieces)
+            {
+                if (!piece.IsToken)
                 {
-                    i++;
                     continue;
                 }
 
-                var tokenStart = i;
-                var tokenEnd = FormatStringScan.FindMatchingClose(template, tokenStart);
-                if (tokenEnd < 0)
-                {
-                    var candidate = FormatStringScan.ExtractUnclosedNameCandidate(template, tokenStart);
-                    if (FormatStringScan.LooksLikeFormatterTokenName(candidate))
-                    {
-                        return _Fail(
-                            $"Unclosed formatter token starting at '<{candidate}'.",
-                            tokenStart,
-                            template.Length - tokenStart
-                        );
-                    }
-
-                    i++;
-                    continue;
-                }
-
-                var tokenInner = template[(tokenStart + 1)..tokenEnd];
-                FormatStringScan.SplitNameAndArgs(tokenInner, out var name, out var args);
-                var spanLength = tokenEnd - tokenStart + 1;
-                if (!FormatTokenRegistry.NameToToken.TryGetValue(name, out var token))
+                if (!FormatTokenRegistry.NameToToken.TryGetValue(piece.Name, out var token))
                 {
                     return _Fail(
-                        $"Unknown formatter token '<{name}>'. See the Formatter docs for supported tokens.",
-                        tokenStart,
-                        spanLength
+                        FormatStringScan.UnknownTokenMessage(piece.Name),
+                        piece.Start,
+                        piece.Length
                     );
                 }
 
                 try
                 {
-                    _ = token.Compile(args);
+                    _ = token.Compile(piece.Args);
                 }
                 catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
                 {
-                    return _Fail(ex.Message, tokenStart, spanLength);
+                    return _Fail(ex.Message, piece.Start, piece.Length);
                 }
 
                 tokens.Add(
                     new FormatTokenSpan(
-                        Start: tokenStart,
-                        Length: spanLength,
+                        Start: piece.Start,
+                        Length: piece.Length,
                         CanonicalName: token.Names[0],
-                        Args: args
+                        Args: piece.Args
                     )
                 );
-                i = tokenEnd + 1;
             }
 
             return new FormatStringParseResult(

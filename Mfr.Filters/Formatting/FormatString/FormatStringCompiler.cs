@@ -43,42 +43,26 @@ namespace Mfr.Filters.Formatting.FormatString
         /// <returns>A <see cref="Formatter"/> that produces the fully expanded string for a <see cref="RenameItem"/>.</returns>
         internal static Formatter Compile(string template)
         {
-            var segments = new List<Formatter>();
-            var i = 0;
-            var literalStart = 0;
+            var pieces = new List<FormatStringPiece>();
+            // Compile treats unclosed likely tokens as literals (same as non-token angles).
+            _ = FormatStringScan.TryWalk(
+                template,
+                errorOnUnclosedLikelyToken: false,
+                pieces,
+                out _
+            );
 
-            while (i < template.Length)
+            var segments = new List<Formatter>(pieces.Count);
+            foreach (var piece in pieces)
             {
-                if (template[i] != '<')
+                if (!piece.IsToken)
                 {
-                    i++;
-                    continue;
-                }
-
-                var tokenStart = i;
-                var tokenEnd = FormatStringScan.FindMatchingClose(template, tokenStart);
-                if (tokenEnd < 0)
-                {
-                    i++;
-                    continue;
-                }
-
-                if (tokenStart > literalStart)
-                {
-                    var literal = template[literalStart..tokenStart];
+                    var literal = template.Substring(piece.Start, piece.Length);
                     segments.Add(_ => literal);
+                    continue;
                 }
 
-                var tokenInner = template[(tokenStart + 1)..tokenEnd];
-                segments.Add(_CompileToken(tokenInner));
-                i = tokenEnd + 1;
-                literalStart = i;
-            }
-
-            if (literalStart < template.Length)
-            {
-                var tail = template[literalStart..];
-                segments.Add(_ => tail);
+                segments.Add(_CompileToken(piece.Name, piece.Args));
             }
 
             if (segments.Count == 0)
@@ -146,14 +130,11 @@ namespace Mfr.Filters.Formatting.FormatString
             return false;
         }
 
-        private static Formatter _CompileToken(string tokenInner)
+        private static Formatter _CompileToken(string name, string tokenArgs)
         {
-            FormatStringScan.SplitNameAndArgs(tokenInner, out var name, out var tokenArgs);
             if (!FormatTokenRegistry.NameToToken.TryGetValue(name, out var token))
             {
-                throw new NotSupportedException(
-                    $"Unknown formatter token '<{name}>'. See the Formatter docs for supported tokens."
-                );
+                throw new NotSupportedException(FormatStringScan.UnknownTokenMessage(name));
             }
 
             return token.Compile(tokenArgs);

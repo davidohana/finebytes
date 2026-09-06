@@ -80,13 +80,10 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 
 
 
-### 2. One template-walk owner for Compile + TryValidate — **high**
+### 2. One template-walk owner for Compile + TryValidate — **done**
 
-- **Sites:** parallel `while` walks in `FormatStringCompiler.Compile` and `FormatStringSyntax.TryValidate` (already share `FormatStringScan.FindMatchingClose` / `SplitNameAndArgs` / LooksLike helpers only)
-- **Target:** shared internal scan yielding spans/errors; Compile builds segment formatters from the same walk (or validate-then-compile)
-- **Value:** closes future drift (trim / heuristic / error text / span list)
-- **Cost:** medium engine risk; ~50–100 LOC; compiler + syntax tests
-- **Rank:** high — engine hygiene before more FormatEditor consumers
+- **Done:** `FormatStringScan.TryWalk` yields ordered literal/token pieces (+ unclosed-likely error); `Compile` / `TryValidate` consume the same walk; shared `UnknownTokenMessage`
+- **Left as-is:** `ContainsLikelyFormatTokens` keeps its own trim-aware heuristic walk (see item 6 for name-trim product call)
 
 
 

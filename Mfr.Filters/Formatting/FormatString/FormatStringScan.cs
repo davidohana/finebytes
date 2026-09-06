@@ -1,10 +1,147 @@
 namespace Mfr.Filters.Formatting.FormatString
 {
     /// <summary>
+    /// One piece from a format-template walk: a literal run or a balanced <c>&lt;…&gt;</c> token.
+    /// </summary>
+    /// <param name="IsToken"><see langword="true"/> when this is a balanced token span.</param>
+    /// <param name="Start">Zero-based start index in the template.</param>
+    /// <param name="Length">Length of the piece in the template.</param>
+    /// <param name="Name">Token name when <see cref="IsToken"/>; otherwise empty.</param>
+    /// <param name="Args">Token args when <see cref="IsToken"/>; otherwise empty.</param>
+    internal readonly record struct FormatStringPiece(
+        bool IsToken,
+        int Start,
+        int Length,
+        string Name,
+        string Args
+    );
+
+    /// <summary>
+    /// Structural error from <see cref="FormatStringScan.TryWalk"/> (unclosed likely token).
+    /// </summary>
+    /// <param name="Message">Human-readable error text.</param>
+    /// <param name="Position">Start index of the failing span.</param>
+    /// <param name="Length">Length of the failing span.</param>
+    internal readonly record struct FormatStringWalkError(string Message, int Position, int Length);
+
+    /// <summary>
     /// Shared format-string span helpers used by <see cref="FormatStringCompiler"/> and <see cref="FormatStringSyntax"/>.
     /// </summary>
     internal static class FormatStringScan
     {
+        /// <summary>
+        /// Message for an unknown token name (shared by Compile and TryValidate).
+        /// </summary>
+        /// <param name="name">Token name as parsed (before registry lookup).</param>
+        /// <returns>Standard unknown-token error text.</returns>
+        internal static string UnknownTokenMessage(string name)
+        {
+            return $"Unknown formatter token '<{name}>'. See the Formatter docs for supported tokens.";
+        }
+
+        /// <summary>
+        /// Walks <paramref name="template"/> into ordered literal and balanced-token pieces.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Unclosed <c>&lt;</c> that does not look like a token name is left in the literal stream (same as
+        /// Compile). When <paramref name="errorOnUnclosedLikelyToken"/> is true, an unclosed angle whose
+        /// name candidate passes <see cref="LooksLikeFormatterTokenName"/> fails the walk.
+        /// </para>
+        /// </remarks>
+        /// <param name="template">Template text.</param>
+        /// <param name="errorOnUnclosedLikelyToken">Whether unclosed likely token names are errors.</param>
+        /// <param name="pieces">Receives ordered pieces on success (cleared first).</param>
+        /// <param name="error">Set when the walk fails; otherwise default.</param>
+        /// <returns><see langword="true"/> when the walk completed without structural error.</returns>
+        internal static bool TryWalk(
+            string template,
+            bool errorOnUnclosedLikelyToken,
+            List<FormatStringPiece> pieces,
+            out FormatStringWalkError error
+        )
+        {
+            pieces.Clear();
+            error = default;
+
+            var i = 0;
+            var literalStart = 0;
+
+            while (i < template.Length)
+            {
+                if (template[i] != '<')
+                {
+                    i++;
+                    continue;
+                }
+
+                var tokenStart = i;
+                var tokenEnd = FindMatchingClose(template, tokenStart);
+                if (tokenEnd < 0)
+                {
+                    if (errorOnUnclosedLikelyToken)
+                    {
+                        var candidate = ExtractUnclosedNameCandidate(template, tokenStart);
+                        if (LooksLikeFormatterTokenName(candidate))
+                        {
+                            error = new FormatStringWalkError(
+                                Message: $"Unclosed formatter token starting at '<{candidate}'.",
+                                Position: tokenStart,
+                                Length: template.Length - tokenStart
+                            );
+                            pieces.Clear();
+                            return false;
+                        }
+                    }
+
+                    i++;
+                    continue;
+                }
+
+                if (tokenStart > literalStart)
+                {
+                    pieces.Add(
+                        new FormatStringPiece(
+                            IsToken: false,
+                            Start: literalStart,
+                            Length: tokenStart - literalStart,
+                            Name: "",
+                            Args: ""
+                        )
+                    );
+                }
+
+                var tokenInner = template[(tokenStart + 1)..tokenEnd];
+                SplitNameAndArgs(tokenInner, out var name, out var args);
+                pieces.Add(
+                    new FormatStringPiece(
+                        IsToken: true,
+                        Start: tokenStart,
+                        Length: tokenEnd - tokenStart + 1,
+                        Name: name,
+                        Args: args
+                    )
+                );
+                i = tokenEnd + 1;
+                literalStart = i;
+            }
+
+            if (literalStart < template.Length)
+            {
+                pieces.Add(
+                    new FormatStringPiece(
+                        IsToken: false,
+                        Start: literalStart,
+                        Length: template.Length - literalStart,
+                        Name: "",
+                        Args: ""
+                    )
+                );
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Scans forward from the opening <c>&lt;</c> at <paramref name="openIndex"/> and returns the
         /// index of the matching closing <c>&gt;</c>, or <c>-1</c> when no balanced close is found.
