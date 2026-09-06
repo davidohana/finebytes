@@ -9,7 +9,7 @@ using Mfr.Filters.Formatting;
 namespace Mfr.App.Ui.Views.Controls.FormatEditor
 {
     /// <summary>
-    /// Shared format-string editor: text box, searchable insert picker, edit stub, inline parse errors.
+    /// Shared format-string editor: text box, searchable insert picker, token Edit, inline parse errors.
     /// </summary>
     public partial class FormatEditor : UserControl
     {
@@ -128,6 +128,55 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
             }
         }
 
+        /// <summary>
+        /// Replaces a validated token span with <paramref name="newInsertText"/> (typically <c>&lt;…&gt;</c>).
+        /// </summary>
+        /// <param name="span">Token span from the last successful parse.</param>
+        /// <param name="newInsertText">Replacement text including angle brackets.</param>
+        public void ReplaceTokenSpan(FormatTokenSpan span, string newInsertText)
+        {
+            ArgumentNullException.ThrowIfNull(span);
+            ArgumentNullException.ThrowIfNull(newInsertText);
+
+            var current = Text ?? string.Empty;
+            var start = Math.Clamp(span.Start, 0, current.Length);
+            var end = Math.Clamp(span.Start + span.Length, start, current.Length);
+            var next = current[..start] + newInsertText + current[end..];
+            var caret = start + newInsertText.Length;
+            _SetTextPreservingBinding(next);
+            TemplateBox.CaretIndex = caret;
+            TemplateBox.SelectionStart = caret;
+            TemplateBox.SelectionEnd = caret;
+            TemplateBox.Focus();
+        }
+
+        /// <summary>
+        /// Test hook for Edit under caret: creates the token editor and optionally replaces the span.
+        /// </summary>
+        /// <param name="accept">When <see langword="true"/>, replaces the span with the editor result.</param>
+        /// <param name="mutate">Optional mutation applied to the editor before building the result.</param>
+        /// <returns><see langword="true"/> when a registered editor was created for the caret token.</returns>
+        public bool EditUnderCaretForTests(bool accept, Action<IFormatTokenEditorViewModel>? mutate = null)
+        {
+            var span = _FindSpanAtCaret();
+            if (
+                span is null
+                || !FormatTokenEditorRegistry.TryCreate(span.CanonicalName, span.Args, out var editor)
+                || editor is null
+            )
+            {
+                return false;
+            }
+
+            mutate?.Invoke(editor);
+            if (accept)
+            {
+                ReplaceTokenSpan(span, editor.ResultingFormatString);
+            }
+
+            return true;
+        }
+
         /// <inheritdoc />
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
@@ -230,14 +279,19 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
         }
 
         /// <summary>
-        /// Opens the token editor (stub in PR B) or a warning when the caret is not on a token.
+        /// Opens the token parameter editor for the caret span, or a warning when unavailable.
         /// </summary>
         private void _EditUnderCaret()
+        {
+            _ = _EditUnderCaretAsync();
+        }
+
+        private async Task _EditUnderCaretAsync()
         {
             var span = _FindSpanAtCaret();
             if (span is null)
             {
-                _ = _ShowMessageAsync(
+                await _ShowMessageAsync(
                     "Formatting Parameter Editor",
                     "Cursor must be positioned on a formatting parameter in order to edit it.\n"
                         + "You can also right click on a formatting parameter to edit it."
@@ -245,11 +299,28 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
                 return;
             }
 
-            // Param editors land in F6 PR C; stub until the registry is wired.
-            _ = _ShowMessageAsync(
-                "Formatting Parameter Editor",
-                $"Editing '<{span.CanonicalName}>' options is not available yet."
-            );
+            if (!FormatTokenEditorRegistry.TryCreate(span.CanonicalName, span.Args, out var editor) || editor is null)
+            {
+                await _ShowMessageAsync(
+                    "Formatting Parameter Editor",
+                    "This formatting parameter has no editable options."
+                );
+                return;
+            }
+
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            var dialog = new FormatTokenEditorDialog(editor);
+            var accepted = await dialog.ShowDialog<bool>(owner);
+            if (!accepted)
+            {
+                return;
+            }
+
+            ReplaceTokenSpan(span, editor.ResultingFormatString);
         }
 
         /// <summary>

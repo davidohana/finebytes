@@ -16,16 +16,16 @@ todos:
     status: completed
   - id: f6-p3-param-editors
     content: "Phase 3: C1 shell+counter, then C2+ remaining param editors + tests"
-    status: in_progress
+    status: completed
   - id: f6-p3-review
     content: "PR C gate(s): separate reviewer after C1 and after C2+ (mfr-code-review); no push until pass"
-    status: pending
+    status: completed
   - id: f6-p4-docs
     content: "Docs: sync plan to docs/plans/; mark F6 done; debts.md highlight deferral"
-    status: pending
+    status: completed
   - id: f6-deep-refactors
     content: "Final reviewer pass: summarize all deferred deep refactors (cost-to-value) into docs/plans/"
-    status: pending
+    status: completed
 isProject: false
 ---
 

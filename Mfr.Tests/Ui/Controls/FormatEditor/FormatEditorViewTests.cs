@@ -175,5 +175,57 @@ namespace Mfr.Tests.Ui.Controls.FormatEditor
             Assert.False(editor.ViewModel.HasError);
             window.Close();
         }
+
+        /// <summary>
+        /// Verifies Edit under caret for counter replaces the span with the editor result.
+        /// </summary>
+        [AvaloniaFact]
+        public void EditUnderCaret_Counter_ReplacesSpan()
+        {
+            var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "counter");
+            var editor = new App.Ui.Views.Controls.FormatEditor.FormatEditor
+            {
+                Text = "pre" + entry.InsertText + "post",
+            };
+            var window = new Window
+            {
+                Width = 480,
+                Height = 200,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextBox>("TemplateBox");
+            Assert.NotNull(box);
+            var tokenStart = editor.Text.IndexOf('<');
+            box.CaretIndex = tokenStart + 2;
+            box.SelectionStart = tokenStart + 2;
+            box.SelectionEnd = tokenStart + 2;
+
+            Assert.True(
+                editor.EditUnderCaretForTests(
+                    accept: true,
+                    mutate: vm =>
+                    {
+                        var counter =
+                            Assert.IsType<App.Ui.ViewModels.Controls.FormatEditor.TokenEditors.CounterFormatTokenEditorViewModel>(
+                                vm
+                            );
+                        counter.Initial = 5;
+                    }
+                )
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.StartsWith("pre<", editor.Text);
+            Assert.Contains("initial=5", editor.Text);
+            Assert.EndsWith(">post", editor.Text);
+            Assert.False(editor.ViewModel.HasError);
+
+            window.Close();
+        }
     }
 }

@@ -2,9 +2,9 @@
 
 Deferred work. Short bullets only; grow this list when skipping a feature.
 
-## Rename List
+## Formatter / FormatEditor
 
-- Color-legend toolbar (MFR7) — Phase 16 after 14d blue + GO plum (15)
+- FormatEditor syntax highlight (MFR7 red/blue RichTextBox) — deferred; error jump covers failures. See `docs/plans/f6-formateditor-deep-refactors.md` for other F6 follow-ups.
 
 ## File List context menu
 
