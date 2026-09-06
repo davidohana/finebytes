@@ -1,10 +1,15 @@
+using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
+using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.App.Ui.Views.FormatEditor.TokenEditors;
+using Mfr.App.Ui.Views.GridColumnSizing;
 
 namespace Mfr.Tests.Ui.FormatEditor
 {
@@ -64,6 +69,62 @@ namespace Mfr.Tests.Ui.FormatEditor
             Dispatcher.UIThread.RunJobs();
 
             Assert.NotNull(dialog.FindDescendantOfType<CounterFormatTokenEditorView>());
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies the resulting format string is read-only and uses grayed field chrome.
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_ResultingFormatString_IsGrayedWhenReadOnly()
+        {
+            var editor = new CounterFormatTokenEditorViewModel(args: null);
+            var dialog = new FormatTokenEditorDialog(editor);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = dialog.FindControl<TextBox>("ResultingFormatStringBox");
+            Assert.NotNull(box);
+            Assert.True(box.IsReadOnly);
+            Assert.Equal(editor.ResultingFormatString, box.Text);
+            Assert.Same(GridFonts.RenameListFixedWidthFamily, box.FontFamily);
+
+            var app = Application.Current;
+            Assert.NotNull(app);
+            Assert.True(app.TryGetResource("FileListAltRowBrush", app.ActualThemeVariant, out var altRow));
+            var expected = Assert.IsAssignableFrom<ISolidColorBrush>(altRow);
+            var actual = Assert.IsAssignableFrom<ISolidColorBrush>(box.Background);
+            Assert.Equal(expected.Color, actual.Color);
+
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies token-editor fields and the resulting string share one label/control column.
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_LabeledFields_ShareColumnAlignment()
+        {
+            var editor = new NowFormatTokenEditorViewModel(null);
+            var dialog = new FormatTokenEditorDialog(editor) { Width = 480 };
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var rows = dialog.GetVisualDescendants().OfType<FilterEditorLabeledRow>().ToList();
+            var formatRow = Assert.Single(rows, row => row.Label == "Format:");
+            var resultingRow = Assert.Single(rows, row => row.Label == "Resulting format string:");
+            var formatBox = Assert.Single(formatRow.GetVisualDescendants().OfType<TextBox>());
+            var resultingBox = Assert.Single(resultingRow.GetVisualDescendants().OfType<TextBox>());
+
+            var formatOrigin = formatBox.TranslatePoint(default, dialog);
+            var resultingOrigin = resultingBox.TranslatePoint(default, dialog);
+            Assert.NotNull(formatOrigin);
+            Assert.NotNull(resultingOrigin);
+            Assert.Equal(formatOrigin.Value.X, resultingOrigin.Value.X, precision: 1);
+            Assert.Equal(formatBox.Bounds.Width, resultingBox.Bounds.Width, precision: 1);
+
             dialog.Close();
         }
 

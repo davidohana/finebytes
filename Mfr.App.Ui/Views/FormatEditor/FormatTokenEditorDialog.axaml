@@ -3,6 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:local="using:Mfr.App.Ui.Views.FormatEditor"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   x:Class="Mfr.App.Ui.Views.FormatEditor.FormatTokenEditorDialog"
   x:DataType="vm:IFormatTokenEditorViewModel"
   Title="{Binding Title}"
@@ -35,13 +36,6 @@
     <Style Selector="Button.format-token-editor-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
     </Style>
-    <Style Selector="TextBlock.format-token-editor-label">
-      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-      <Setter Property="Margin" Value="0,0,8,0" />
-    </Style>
   </Window.Styles>
   <DockPanel Margin="12">
     <StackPanel
@@ -55,16 +49,21 @@
       <Button Classes="format-token-editor-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
     </StackPanel>
 
-    <StackPanel Spacing="10">
-      <ContentControl Content="{Binding}">
+    <StackPanel Spacing="10" Grid.IsSharedSizeScope="True">
+      <ContentControl HorizontalAlignment="Stretch" Content="{Binding}">
         <ContentControl.ContentTemplate>
           <local:FormatTokenEditorViewLocator />
         </ContentControl.ContentTemplate>
       </ContentControl>
-      <StackPanel Spacing="4">
-        <TextBlock Classes="format-token-editor-label" Text="Resulting format string:" />
-        <TextBox Classes="filter-editor-field" IsReadOnly="True" Text="{Binding ResultingFormatString, Mode=OneWay}" />
-      </StackPanel>
+      <controls:FilterEditorLabeledRow Label="Resulting format string:">
+        <TextBox
+          x:Name="ResultingFormatStringBox"
+          Classes="filter-editor-field format-string-field"
+          IsReadOnly="True"
+          HorizontalAlignment="Stretch"
+          Text="{Binding ResultingFormatString, Mode=OneWay}"
+        />
+      </controls:FilterEditorLabeledRow>
     </StackPanel>
   </DockPanel>
 </Window>

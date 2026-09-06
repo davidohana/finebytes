@@ -4,6 +4,7 @@
   xmlns:controls="clr-namespace:Mfr.App.Ui.Views.Controls"
 >
   <ControlTheme x:Key="{x:Type controls:FilterEditorLabeledRow}" TargetType="controls:FilterEditorLabeledRow">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="Template">
       <ControlTemplate TargetType="controls:FilterEditorLabeledRow">
         <Grid>
@@ -19,6 +20,7 @@
           <ContentPresenter
             Name="PART_ContentPresenter"
             Grid.Column="2"
+            HorizontalAlignment="Stretch"
             VerticalAlignment="Center"
             Content="{TemplateBinding Content}"
             ContentTemplate="{TemplateBinding ContentTemplate}"

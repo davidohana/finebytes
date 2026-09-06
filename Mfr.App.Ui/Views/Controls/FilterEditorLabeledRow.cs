@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Layout;
 
 namespace Mfr.App.Ui.Views.Controls
 {
@@ -12,6 +13,13 @@ namespace Mfr.App.Ui.Views.Controls
     /// </summary>
     public sealed class FilterEditorLabeledRow : ContentControl
     {
+        static FilterEditorLabeledRow()
+        {
+            HorizontalContentAlignmentProperty.OverrideDefaultValue<FilterEditorLabeledRow>(
+                HorizontalAlignment.Stretch
+            );
+        }
+
         /// <summary>
         /// Shared size group name used by every labeled row's label column.
         /// </summary>

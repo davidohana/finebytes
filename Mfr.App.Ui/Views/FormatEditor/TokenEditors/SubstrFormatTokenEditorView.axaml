@@ -6,11 +6,9 @@
   x:Class="Mfr.App.Ui.Views.FormatEditor.TokenEditors.SubstrFormatTokenEditorView"
   x:DataType="vm:SubstrFormatTokenEditorViewModel"
 >
-  <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
+  <StackPanel Spacing="6">
     <controls:FilterEditorLabeledRow Label="Start:">
       <controls:CompactNumericUpDown
-        Width="80"
-        HorizontalAlignment="Left"
         Minimum="-9999"
         Maximum="9999"
         Increment="1"
@@ -20,8 +18,6 @@
     </controls:FilterEditorLabeledRow>
     <controls:FilterEditorLabeledRow Label="End:">
       <controls:CompactNumericUpDown
-        Width="80"
-        HorizontalAlignment="Left"
         Minimum="-9999"
         Maximum="9999"
         Increment="1"
@@ -30,7 +26,7 @@
       />
     </controls:FilterEditorLabeledRow>
     <controls:FilterEditorLabeledRow Label="Source:">
-      <TextBox Classes="filter-editor-field" MinWidth="240" HorizontalAlignment="Stretch" Text="{Binding Source}" />
+      <TextBox Classes="filter-editor-field" HorizontalAlignment="Stretch" Text="{Binding Source}" />
     </controls:FilterEditorLabeledRow>
   </StackPanel>
 </UserControl>

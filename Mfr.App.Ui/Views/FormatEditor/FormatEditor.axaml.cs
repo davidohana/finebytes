@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -52,6 +53,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
             TemplateBox.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
             InsertList.AddHandler(TappedEvent, _OnInsertItemTapped, RoutingStrategies.Bubble);
+            InsertList.AddHandler(TreeViewItem.ExpandedEvent, _OnInsertGroupExpanded);
             InsertList.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
             InsertSearchBox.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
         }
@@ -162,7 +164,20 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <returns><see langword="true"/> when a registered editor was created for the caret token.</returns>
         public bool EditUnderCaretForTests(bool accept, Action<IFormatTokenEditorViewModel>? mutate = null)
         {
-            var span = _FindSpanAtCaret();
+            return EditTokenAtIndexForTests(TemplateBox.CaretIndex, accept, mutate);
+        }
+
+        /// <summary>
+        /// Test hook for Edit at a character index: selects the token, creates its editor, and optionally replaces.
+        /// </summary>
+        /// <param name="index">Character index inside the token (click or caret).</param>
+        /// <param name="accept">When <see langword="true"/>, replaces the span with the editor result.</param>
+        /// <param name="mutate">Optional mutation applied to the editor before building the result.</param>
+        /// <returns><see langword="true"/> when a registered editor was created for the token at
+        /// <paramref name="index"/>.</returns>
+        public bool EditTokenAtIndexForTests(int index, bool accept, Action<IFormatTokenEditorViewModel>? mutate = null)
+        {
+            var span = _FindSpanAtIndex(index);
             if (
                 span is null
                 || !FormatTokenEditorRegistry.TryCreate(span.CanonicalName, span.Args, out var editor)
@@ -172,6 +187,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return false;
             }
 
+            _SelectSpan(span);
             mutate?.Invoke(editor);
             if (accept)
             {
@@ -293,6 +309,46 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
+        /// Accordion: opening a folder collapses sibling folders (tap, chevron, or keyboard).
+        /// </summary>
+        private void _OnInsertGroupExpanded(object? sender, RoutedEventArgs e)
+        {
+            if (e.Source is not TreeViewItem expanded)
+            {
+                return;
+            }
+
+            _CollapseSiblingGroups(expanded);
+        }
+
+        /// <summary>
+        /// Collapses other expanded folders that share <paramref name="expanded"/>'s parent.
+        /// </summary>
+        private static void _CollapseSiblingGroups(TreeViewItem expanded)
+        {
+            var parent = ItemsControl.ItemsControlFromItemContainer(expanded);
+            if (parent is null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < parent.ItemCount; i++)
+            {
+                if (parent.ContainerFromIndex(i) is not TreeViewItem sibling)
+                {
+                    continue;
+                }
+
+                if (ReferenceEquals(sibling, expanded) || !sibling.IsExpanded)
+                {
+                    continue;
+                }
+
+                sibling.IsExpanded = false;
+            }
+        }
+
+        /// <summary>
         /// Enter inserts the highlighted catalog leaf from search or list focus (not SelectionChanged).
         /// </summary>
         private void _OnInsertPickerKeyDown(object? sender, KeyEventArgs e)
@@ -334,14 +390,13 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         private void _OnTemplateDoubleTapped(object? sender, TappedEventArgs e)
         {
-            var span = _FindSpanAtCaret();
+            var span = _FindSpanAtIndex(TemplateBox.CaretIndex);
             if (span is null)
             {
                 return;
             }
 
-            TemplateBox.SelectionStart = span.Start;
-            TemplateBox.SelectionEnd = span.Start + span.Length;
+            _SelectSpan(span);
             e.Handled = true;
         }
 
@@ -352,8 +407,28 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
-            // Defer edit until after caret moves with the click.
-            Dispatcher.UIThread.Post(_EditUnderCaret);
+            if (_TryGetCharacterIndexAt(e.GetPosition(TemplateBox)) is not { } index)
+            {
+                return;
+            }
+
+            var span = _FindSpanAtIndex(index);
+            if (span is null)
+            {
+                return;
+            }
+
+            _SelectSpan(span);
+            e.Handled = true;
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (!IsLoaded)
+                {
+                    return;
+                }
+
+                _ = _EditSpanAsync(span);
+            });
         }
 
         /// <summary>
@@ -366,7 +441,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         private async Task _EditUnderCaretAsync()
         {
-            var span = _FindSpanAtCaret();
+            var span = _FindSpanAtIndex(TemplateBox.CaretIndex);
             if (span is null)
             {
                 await _ShowMessageAsync(
@@ -377,6 +452,15 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
+            await _EditSpanAsync(span);
+        }
+
+        /// <summary>
+        /// Selects <paramref name="span"/> and opens its parameter editor, or a warning when unavailable.
+        /// </summary>
+        private async Task _EditSpanAsync(FormatTokenSpan span)
+        {
+            _SelectSpan(span);
             if (!FormatTokenEditorRegistry.TryCreate(span.CanonicalName, span.Args, out var editor) || editor is null)
             {
                 await _ShowMessageAsync(
@@ -402,9 +486,56 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Resolves the validated token span under the caret, re-validating when the last parse failed.
+        /// Highlights the full token span (MFR7 <c>SelectFormattingParam</c>).
         /// </summary>
-        private FormatTokenSpan? _FindSpanAtCaret()
+        private void _SelectSpan(FormatTokenSpan span)
+        {
+            TemplateBox.Focus();
+            TemplateBox.SelectionStart = span.Start;
+            TemplateBox.SelectionEnd = span.Start + span.Length;
+        }
+
+        /// <summary>
+        /// Maps a point in <see cref="TemplateBox"/> coordinates to the glyph under the pointer
+        /// (<see cref="Avalonia.Media.CharacterHit.FirstCharacterIndex"/>), not the trailing-edge caret
+        /// (<c>TextHitTestResult.TextPosition</c>).
+        /// </summary>
+        private int? _TryGetCharacterIndexAt(Point boxPoint)
+        {
+            if (TemplateBox.GetVisualDescendants().OfType<TextPresenter>().FirstOrDefault() is not { } presenter)
+            {
+                return null;
+            }
+
+            if (TemplateBox.TranslatePoint(boxPoint, presenter) is not { } presenterPoint)
+            {
+                return null;
+            }
+
+            var hit = presenter.TextLayout.HitTestPoint(presenterPoint);
+            var length = (TemplateBox.Text ?? string.Empty).Length;
+            return Math.Clamp(hit.CharacterHit.FirstCharacterIndex, 0, length);
+        }
+
+        /// <summary>
+        /// Resolves the token whose half-open range <c>[Start, Start+Length)</c> contains
+        /// <paramref name="index"/> (caret or click). Re-validates when the last parse failed.
+        /// </summary>
+        private FormatTokenSpan? _FindSpanAtIndex(int index)
+        {
+            var tokens = _TryGetParsedTokens();
+            if (tokens is null)
+            {
+                return null;
+            }
+
+            return tokens.FirstOrDefault(t => index >= t.Start && index < t.Start + t.Length);
+        }
+
+        /// <summary>
+        /// Last successful parse tokens, re-validating when the previous parse failed.
+        /// </summary>
+        private IReadOnlyList<FormatTokenSpan>? _TryGetParsedTokens()
         {
             var result = ViewModel.LastParseResult;
             if (result is null || !result.Success)
@@ -418,8 +549,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return null;
             }
 
-            var caret = TemplateBox.CaretIndex;
-            return result.Tokens.FirstOrDefault(t => caret >= t.Start && caret <= t.Start + t.Length);
+            return result.Tokens;
         }
 
         private async Task _ShowMessageAsync(string title, string message)

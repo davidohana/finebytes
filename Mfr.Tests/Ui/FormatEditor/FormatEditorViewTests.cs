@@ -1,10 +1,16 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Layout;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.Views.Controls;
+using Mfr.App.Ui.Views.GridColumnSizing;
 using Mfr.Filters.Formatting.FormatString;
 
 namespace Mfr.Tests.Ui.FormatEditor
@@ -191,6 +197,91 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies expanding a group folder collapses other folders at the same level.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertList_Grouped_TappedGroup_CollapsesOtherGroups()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
+            var audioGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "Audio");
+
+            list.ScrollIntoView(fileNameGroup);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var fileNameContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(fileNameGroup));
+
+            fileNameContainer.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, null!));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            list.ScrollIntoView(audioGroup);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var audioContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(audioGroup));
+            fileNameContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(fileNameGroup));
+            Assert.True(fileNameContainer.IsExpanded);
+            Assert.False(audioContainer.IsExpanded);
+
+            audioContainer.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, null!));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            audioContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(audioGroup));
+            fileNameContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(fileNameGroup));
+            Assert.True(audioContainer.IsExpanded);
+            Assert.False(fileNameContainer.IsExpanded);
+            Assert.Equal(string.Empty, editor.Text);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies expanding a nested folder collapses sibling folders, not the parent.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertList_Grouped_ExpandingNested_CollapsesSiblingNotParent()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            var audioGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "Audio");
+            var tagGroup = Assert.Single(audioGroup.Children, n => n.Title == "Tag");
+            var mp3Group = Assert.Single(audioGroup.Children, n => n.Title == "MP3");
+
+            list.ScrollIntoView(audioGroup);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var audioContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(audioGroup));
+            audioContainer.IsExpanded = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var tagContainer = Assert.IsType<TreeViewItem>(audioContainer.ContainerFromItem(tagGroup));
+            tagContainer.IsExpanded = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var mp3Container = Assert.IsType<TreeViewItem>(audioContainer.ContainerFromItem(mp3Group));
+            mp3Container.IsExpanded = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            audioContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(audioGroup));
+            tagContainer = Assert.IsType<TreeViewItem>(audioContainer.ContainerFromItem(tagGroup));
+            mp3Container = Assert.IsType<TreeViewItem>(audioContainer.ContainerFromItem(mp3Group));
+            Assert.True(audioContainer.IsExpanded);
+            Assert.True(mp3Container.IsExpanded);
+            Assert.False(tagContainer.IsExpanded);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies opening the insert flyout focuses the search box.
         /// </summary>
         [AvaloniaFact]
@@ -206,7 +297,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies the insert picker uses compact app list chrome instead of Fluent TreeView defaults.
+        /// Verifies the insert picker uses compact app list chrome (white panel, not tooltip flyout chrome).
         /// </summary>
         [AvaloniaFact]
         public void InsertList_UsesCompactAppChrome()
@@ -220,6 +311,99 @@ namespace Mfr.Tests.Ui.FormatEditor
                 ScrollBarVisibility.Disabled,
                 list.GetValue(ScrollViewer.HorizontalScrollBarVisibilityProperty)
             );
+            Assert.False(list.GetValue(ScrollViewer.AllowAutoHideProperty));
+
+            var presenter = list.FindAncestorOfType<FlyoutPresenter>();
+            Assert.NotNull(presenter);
+            var app = Application.Current;
+            Assert.NotNull(app);
+            Assert.True(app.TryGetResource("FileListRowBrush", app.ActualThemeVariant, out var rowBrush));
+            var panelBrush = Assert.IsAssignableFrom<ISolidColorBrush>(rowBrush);
+            var presenterBrush = Assert.IsAssignableFrom<ISolidColorBrush>(presenter.Background);
+            Assert.Equal(panelBrush.Color, presenterBrush.Color);
+            var listBrush = Assert.IsAssignableFrom<ISolidColorBrush>(list.Background);
+            Assert.Equal(panelBrush.Color, listBrush.Color);
+
+            var group = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
+            list.ScrollIntoView(group);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var groupContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(group));
+            var layoutRoot = Assert.Single(
+                groupContainer.GetVisualDescendants().OfType<Border>(),
+                border => border.Name == "PART_LayoutRoot"
+            );
+            Assert.Equal(6, layoutRoot.Padding.Left);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies group folders are SemiBold so they read as categories, not insertable tokens.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertList_GroupTitle_IsSemiBoldDistinctFromLeaves()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
+            list.ScrollIntoView(fileNameGroup);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var groupContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(fileNameGroup));
+            var groupTitle = Assert.Single(
+                groupContainer.GetVisualDescendants().OfType<TextBlock>(),
+                text => text.Text == "File Name"
+            );
+            Assert.Equal(FontWeight.SemiBold, groupTitle.FontWeight);
+
+            groupContainer.IsExpanded = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var leaf = Assert.Single(fileNameGroup.Children, n => n.Entry?.CanonicalName == "file-name");
+            var leafContainer = Assert.IsType<TreeViewItem>(groupContainer.ContainerFromItem(leaf));
+            var leafTitle = Assert.Single(
+                leafContainer.GetVisualDescendants().OfType<TextBlock>(),
+                text => text.Text == leaf.Title
+            );
+            Assert.Equal(FontWeight.Normal, leafTitle.FontWeight);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the insert picker vertical scrollbar uses expanded Fluent chrome, not overlay thumbs.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertList_UsesExpandedVerticalScrollbar()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            list.MaxHeight = 80;
+            var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
+            list.ScrollIntoView(fileNameGroup);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var groupContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(fileNameGroup));
+            groupContainer.IsExpanded = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var root = Assert.IsAssignableFrom<Visual>(list.GetVisualRoot());
+            var scrollBar = root.GetVisualDescendants()
+                .OfType<ScrollBar>()
+                .First(bar => bar.Orientation == Orientation.Vertical && bar.IsVisible);
+            var scrollBarSize = (double)Application.Current!.FindResource("ScrollBarSize")!;
+            Assert.False(scrollBar.AllowAutoHide);
+            Assert.True(scrollBar.IsExpanded);
+            Assert.Equal(scrollBarSize, scrollBar.Bounds.Width, precision: 0);
 
             window.Close();
         }
@@ -366,6 +550,11 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotEmpty(editor.ViewModel.VisibleItems);
             Assert.True(editor.ViewModel.IsGrouped);
             Assert.False(editor.ViewModel.HasError);
+            Assert.Same(GridFonts.RenameListFixedWidthFamily, editor.FindControl<TextBox>("TemplateBox")?.FontFamily);
+            Assert.Equal(
+                "Right-click a formatting parameter to customize it.",
+                editor.FindControl<FilterEditorHint>("RightClickHint")?.Text
+            );
             window.Close();
         }
 
@@ -439,6 +628,181 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.False(editor.ViewModel.HasError);
 
             window.Close();
+        }
+
+        /// <summary>
+        /// Verifies right-click selects the token under the pointer, not the caret token.
+        /// </summary>
+        [AvaloniaFact]
+        public void RightClick_SelectsClickedTokenNotCaret()
+        {
+            var (_, box, window, fileName, counter) = _ShowTwoTokenEditor();
+            box.CaretIndex = fileName.Start + 2;
+            box.SelectionStart = fileName.Start + 2;
+            box.SelectionEnd = fileName.Start + 2;
+            box.Focus();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var clickIndex = counter.Start + 2;
+            var windowPoint = _CharacterWindowPoint(window, box, clickIndex);
+            window.MouseMove(windowPoint);
+            window.MouseDown(windowPoint, MouseButton.Right);
+
+            Assert.Equal(counter.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(counter.Start + counter.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        /// <summary>
+        /// Verifies Edit at a click index replaces that token while the caret sits on another.
+        /// </summary>
+        [AvaloniaFact]
+        public void EditTokenAtIndex_ReplacesClickedTokenNotCaret()
+        {
+            var (editor, box, window, fileName, counter) = _ShowTwoTokenEditor();
+            box.CaretIndex = fileName.Start + 2;
+            box.SelectionStart = fileName.Start + 2;
+            box.SelectionEnd = fileName.Start + 2;
+
+            Assert.True(
+                editor.EditTokenAtIndexForTests(
+                    counter.Start + 2,
+                    accept: true,
+                    mutate: vm =>
+                    {
+                        var counterVm =
+                            Assert.IsType<App.Ui.ViewModels.FormatEditor.TokenEditors.CounterFormatTokenEditorViewModel>(
+                                vm
+                            );
+                        counterVm.Initial = 9;
+                    }
+                )
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains("<file-name>", editor.Text);
+            Assert.Contains("initial=9", editor.Text);
+            Assert.DoesNotContain("initial=1", editor.Text);
+            Assert.False(editor.ViewModel.HasError);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies caret on the second of two adjacent tokens edits that token, not the previous <c>&gt;</c>.
+        /// </summary>
+        [AvaloniaFact]
+        public void EditUnderCaret_AdjacentTokens_CaretOnSecondSelectsSecond()
+        {
+            var (editor, box, window, fileName, counter) = _ShowTwoTokenEditor(
+                "pre<file-name><counter:initial=1,step=1>post"
+            );
+            box.CaretIndex = counter.Start;
+            box.SelectionStart = counter.Start;
+            box.SelectionEnd = counter.Start;
+
+            Assert.Equal(fileName.Start + fileName.Length, counter.Start);
+            Assert.True(
+                editor.EditUnderCaretForTests(
+                    accept: true,
+                    mutate: vm =>
+                    {
+                        var counterVm =
+                            Assert.IsType<App.Ui.ViewModels.FormatEditor.TokenEditors.CounterFormatTokenEditorViewModel>(
+                                vm
+                            );
+                        counterVm.Initial = 4;
+                    }
+                )
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains("<file-name>", editor.Text);
+            Assert.Contains("initial=4", editor.Text);
+            Assert.DoesNotContain("initial=1", editor.Text);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies right-click on adjacent tokens selects the glyph under the pointer (MFR7 exclusive end).
+        /// </summary>
+        [AvaloniaFact]
+        public void RightClick_AdjacentTokens_SelectsGlyphToken()
+        {
+            var (_, box, window, fileName, counter) = _ShowTwoTokenEditor(
+                "pre<file-name><counter:initial=1,step=1>post"
+            );
+            box.Focus();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var greaterThanPoint = _CharacterWindowPoint(window, box, fileName.Start + fileName.Length - 1);
+            window.MouseMove(greaterThanPoint);
+            window.MouseDown(greaterThanPoint, MouseButton.Right);
+            Assert.Equal(fileName.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(fileName.Start + fileName.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+
+            (_, box, window, fileName, counter) = _ShowTwoTokenEditor("pre<file-name><counter:initial=1,step=1>post");
+            box.Focus();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var lessThanPoint = _CharacterWindowPoint(window, box, counter.Start);
+            window.MouseMove(lessThanPoint);
+            window.MouseDown(lessThanPoint, MouseButton.Right);
+            Assert.Equal(counter.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(counter.Start + counter.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        private static (
+            App.Ui.Views.FormatEditor.FormatEditor Editor,
+            TextBox Box,
+            Window Window,
+            FormatTokenSpan FileName,
+            FormatTokenSpan Counter
+        ) _ShowTwoTokenEditor(string text = "pre<file-name>mid<counter:initial=1,step=1>post")
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { Text = text };
+            var window = new Window
+            {
+                Width = 640,
+                Height = 200,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextBox>("TemplateBox");
+            Assert.NotNull(box);
+            var tokens = editor.ViewModel.LastParseResult?.Tokens;
+            Assert.NotNull(tokens);
+            var fileName = Assert.Single(tokens, t => t.CanonicalName == "file-name");
+            var counter = Assert.Single(tokens, t => t.CanonicalName == "counter");
+            return (editor, box, window, fileName, counter);
+        }
+
+        private static Point _CharacterWindowPoint(Window window, TextBox box, int charIndex)
+        {
+            var presenter = box.GetVisualDescendants().OfType<TextPresenter>().FirstOrDefault();
+            Assert.NotNull(presenter);
+            var glyph = presenter.TextLayout.HitTestTextPosition(charIndex);
+            var local = new Point(glyph.X + Math.Max(glyph.Width / 2, 1), glyph.Y + Math.Max(glyph.Height / 2, 1));
+            var windowPoint = presenter.TranslatePoint(local, window);
+            Assert.True(windowPoint.HasValue);
+            return windowPoint.Value;
         }
 
         private static void _RaiseKeyDown(Control control, Key key)
