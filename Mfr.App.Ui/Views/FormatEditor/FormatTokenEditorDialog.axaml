@@ -1,0 +1,70 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:Mfr.App.Ui.Views.FormatEditor"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor"
+  x:Class="Mfr.App.Ui.Views.FormatEditor.FormatTokenEditorDialog"
+  x:DataType="vm:IFormatTokenEditorViewModel"
+  Title="{Binding Title}"
+  Icon="/Assets/mfr.ico"
+  Width="480"
+  MinWidth="400"
+  SizeToContent="Height"
+  WindowStartupLocation="CenterOwner"
+  CanResize="False"
+  ShowInTaskbar="False"
+  FontFamily="{StaticResource FileListFont}"
+  FontSize="{StaticResource FileListFontSize}"
+  Foreground="{DynamicResource FileListForegroundBrush}"
+>
+  <Window.Styles>
+    <Style Selector="Button.format-token-editor-footer">
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="MinWidth" Value="72" />
+      <Setter Property="Padding" Value="12,2" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.format-token-editor-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+    <Style Selector="TextBlock.format-token-editor-label">
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="0,0,8,0" />
+    </Style>
+  </Window.Styles>
+  <DockPanel Margin="12">
+    <StackPanel
+      DockPanel.Dock="Bottom"
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      Spacing="8"
+      Margin="0,14,0,0"
+    >
+      <Button Classes="format-token-editor-footer" Content="OK" IsDefault="True" Click="_OnOkClick" />
+      <Button Classes="format-token-editor-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
+    </StackPanel>
+
+    <StackPanel Spacing="10">
+      <ContentControl Content="{Binding}">
+        <ContentControl.ContentTemplate>
+          <local:FormatTokenEditorViewLocator />
+        </ContentControl.ContentTemplate>
+      </ContentControl>
+      <StackPanel Spacing="4">
+        <TextBlock Classes="format-token-editor-label" Text="Resulting format string:" />
+        <TextBox Classes="filter-editor-field" IsReadOnly="True" Text="{Binding ResultingFormatString, Mode=OneWay}" />
+      </StackPanel>
+    </StackPanel>
+  </DockPanel>
+</Window>

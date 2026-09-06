@@ -6,7 +6,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
 using Mfr.Tests.Ui.AppliedFilters;
-using FormatEditorControl = Mfr.App.Ui.Views.Controls.FormatEditor.FormatEditor;
+using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Formatting
 {

@@ -1,0 +1,23 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  x:Class="Mfr.App.Ui.Views.FormatEditor.TokenEditors.FileDateFormatTokenEditorView"
+  x:DataType="vm:FileDateFormatTokenEditorViewModel"
+>
+  <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
+    <controls:FilterEditorLabeledRow Label="Format:">
+      <TextBox Classes="filter-editor-field" MinWidth="200" HorizontalAlignment="Stretch" Text="{Binding Format}" />
+    </controls:FilterEditorLabeledRow>
+    <controls:FilterEditorLabeledRow Label="Kind:">
+      <ComboBox
+        Classes="filter-editor-field"
+        MinWidth="140"
+        HorizontalAlignment="Left"
+        ItemsSource="{x:Static vm:FileDateFormatTokenEditorViewModel.KindChoices}"
+        SelectedItem="{Binding Kind}"
+      />
+    </controls:FilterEditorLabeledRow>
+  </StackPanel>
+</UserControl>

@@ -1,0 +1,105 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="120"
+  x:Class="Mfr.App.Ui.Views.FormatEditor.FormatEditor"
+  x:Name="Root"
+>
+  <DockPanel x:Name="ChromeRoot" x:DataType="vm:FormatEditorViewModel" LastChildFill="True">
+    <StackPanel DockPanel.Dock="Bottom" Spacing="4" Margin="0,4,0,0">
+      <Button
+        x:Name="ErrorButton"
+        Classes="format-editor-error-link"
+        HorizontalAlignment="Left"
+        IsVisible="{Binding HasError}"
+        Content="{Binding ErrorMessage}"
+        Command="{Binding JumpToErrorCommand}"
+        ToolTip.Tip="{Binding FullErrorMessage}"
+      />
+    </StackPanel>
+
+    <StackPanel DockPanel.Dock="Right" Spacing="4" Margin="6,0,0,0" VerticalAlignment="Top">
+      <Button
+        x:Name="InsertButton"
+        Classes="filter-editor-button"
+        Content="▶"
+        ToolTip.Tip="Insert formatting parameter"
+        Width="28"
+        Padding="0"
+      >
+        <Button.Flyout>
+          <Flyout Placement="BottomEdgeAlignedRight" Opened="_OnInsertFlyoutOpened">
+            <Border Width="280" MaxHeight="320" Padding="6">
+              <DockPanel>
+                <TextBox
+                  x:Name="InsertSearchBox"
+                  DockPanel.Dock="Top"
+                  Classes="filter-editor-field"
+                  Watermark="Search tokens…"
+                  Margin="0,0,0,6"
+                  Text="{Binding SearchText}"
+                />
+                <TreeView x:Name="InsertList" ItemsSource="{Binding VisibleItems}" MaxHeight="280">
+                  <TreeView.ItemTemplate>
+                    <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vm:FormatInsertPickerNode">
+                      <Panel>
+                        <TextBlock
+                          Text="{Binding Title}"
+                          FontWeight="SemiBold"
+                          IsVisible="{Binding IsGroup}"
+                          TextTrimming="CharacterEllipsis"
+                        />
+                        <StackPanel
+                          Spacing="0"
+                          IsVisible="{Binding !IsGroup}"
+                          ToolTip.Tip="{Binding Entry.ShortDescription}"
+                        >
+                          <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                          <TextBlock
+                            Text="{Binding Entry.GroupPath}"
+                            Opacity="0.7"
+                            FontSize="11"
+                            IsVisible="{Binding ShowGroupSubtitle}"
+                            TextTrimming="CharacterEllipsis"
+                          />
+                        </StackPanel>
+                      </Panel>
+                    </TreeDataTemplate>
+                  </TreeView.ItemTemplate>
+                  <TreeView.Styles>
+                    <Style Selector="TreeViewItem">
+                      <Setter Property="Padding" Value="2,2" />
+                      <Setter Property="IsExpanded" Value="False" />
+                    </Style>
+                  </TreeView.Styles>
+                </TreeView>
+              </DockPanel>
+            </Border>
+          </Flyout>
+        </Button.Flyout>
+      </Button>
+      <Button
+        x:Name="EditButton"
+        Classes="filter-editor-button"
+        Content="Edit"
+        ToolTip.Tip="Edit formatting parameter under caret"
+        Command="{Binding EditCommand}"
+      />
+    </StackPanel>
+
+    <TextBox
+      x:Name="TemplateBox"
+      Classes="filter-editor-field-wrap"
+      MinHeight="64"
+      AcceptsReturn="True"
+      TextWrapping="Wrap"
+      Watermark="{Binding Watermark, ElementName=Root}"
+      TextChanged="_OnTemplateTextChanged"
+    />
+  </DockPanel>
+</UserControl>
