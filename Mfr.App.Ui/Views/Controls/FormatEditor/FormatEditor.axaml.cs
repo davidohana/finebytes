@@ -224,7 +224,7 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
         }
 
         /// <summary>
-        /// Inserts the tapped catalog row (pointer/touch). Keyboard highlight alone must not insert.
+        /// Inserts the tapped catalog leaf (pointer/touch). Keyboard highlight alone must not insert.
         /// </summary>
         private void _OnInsertItemTapped(object? sender, TappedEventArgs e)
         {
@@ -233,12 +233,13 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
                 return;
             }
 
-            var item = source as ListBoxItem ?? source.FindAncestorOfType<ListBoxItem>();
-            if (item?.DataContext is not FormatTokenCatalogEntry entry)
+            var item = source as TreeViewItem ?? source.FindAncestorOfType<TreeViewItem>();
+            if (item?.DataContext is not FormatInsertPickerNode { Entry: { } entry })
             {
                 return;
             }
 
+            e.Handled = true;
             ViewModel.InsertEntryCommand.Execute(entry);
         }
 

@@ -81,43 +81,98 @@ namespace Mfr.Tests.Ui.Controls.FormatEditor
         }
 
         /// <summary>
-        /// Verifies tapping a catalog row inserts its default text (keyboard highlight alone must not).
+        /// Verifies tapping a filtered catalog leaf inserts its default text (keyboard highlight alone must not).
         /// </summary>
         [AvaloniaFact]
         public void InsertList_Tapped_InsertsCatalogEntry()
         {
-            var editor = new App.Ui.Views.Controls.FormatEditor.FormatEditor();
-            var window = new Window
-            {
-                Width = 480,
-                Height = 320,
-                Content = editor,
-            };
-            window.Show();
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            editor.ViewModel.SearchText = "file-name";
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var insertButton = editor.FindControl<Button>("InsertButton");
-            Assert.NotNull(insertButton);
-            Assert.IsType<Flyout>(insertButton.Flyout);
-            ((Flyout)insertButton.Flyout!).ShowAt(insertButton);
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var list = editor.FindControl<ListBox>("InsertList");
+            var list = editor.FindControl<TreeView>("InsertList");
             Assert.NotNull(list);
+            Assert.False(editor.ViewModel.IsGrouped);
             var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "file-name");
-            list.ScrollIntoView(entry);
+            var leaf = Assert.Single(editor.ViewModel.VisibleItems, n => n.Entry?.CanonicalName == "file-name");
+            list.ScrollIntoView(leaf);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var container = Assert.IsType<ListBoxItem>(list.ContainerFromItem(entry));
+            var container = Assert.IsType<TreeViewItem>(list.ContainerFromItem(leaf));
             container.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, null!));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(entry.InsertText, editor.Text);
             Assert.False(editor.ViewModel.HasError);
+            Assert.True(editor.ViewModel.IsGrouped);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies empty-search picker shows nested group folders and leaf tap still inserts.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertList_Grouped_TappedLeaf_InsertsCatalogEntry()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            Assert.True(editor.ViewModel.IsGrouped);
+
+            var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
+            var leaf = Assert.Single(fileNameGroup.Children, n => n.Entry?.CanonicalName == "file-name");
+            var entry = leaf.Entry!;
+
+            list.ScrollIntoView(fileNameGroup);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var groupContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(fileNameGroup));
+            groupContainer.IsExpanded = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var leafContainer = Assert.IsType<TreeViewItem>(groupContainer.ContainerFromItem(leaf));
+            leafContainer.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, null!));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(entry.InsertText, editor.Text);
+            Assert.False(editor.ViewModel.HasError);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies tapping a group folder does not insert text.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertList_Grouped_TappedGroup_DoesNotInsert()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
+            Assert.True(fileNameGroup.IsGroup);
+
+            list.ScrollIntoView(fileNameGroup);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var groupContainer = Assert.IsType<TreeViewItem>(list.ContainerFromItem(fileNameGroup));
+            groupContainer.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, null!));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(string.Empty, editor.Text);
+            Assert.True(editor.ViewModel.IsGrouped);
 
             window.Close();
         }
@@ -171,7 +226,8 @@ namespace Mfr.Tests.Ui.Controls.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.NotEmpty(editor.ViewModel.VisibleEntries);
+            Assert.NotEmpty(editor.ViewModel.VisibleItems);
+            Assert.True(editor.ViewModel.IsGrouped);
             Assert.False(editor.ViewModel.HasError);
             window.Close();
         }
@@ -226,6 +282,29 @@ namespace Mfr.Tests.Ui.Controls.FormatEditor
             Assert.False(editor.ViewModel.HasError);
 
             window.Close();
+        }
+
+        private static (App.Ui.Views.Controls.FormatEditor.FormatEditor Editor, Window Window) _ShowWithInsertFlyout()
+        {
+            var editor = new App.Ui.Views.Controls.FormatEditor.FormatEditor();
+            var window = new Window
+            {
+                Width = 480,
+                Height = 320,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var insertButton = editor.FindControl<Button>("InsertButton");
+            Assert.NotNull(insertButton);
+            Assert.IsType<Flyout>(insertButton.Flyout);
+            ((Flyout)insertButton.Flyout).ShowAt(insertButton);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            return (editor, window);
         }
     }
 }

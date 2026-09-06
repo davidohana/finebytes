@@ -8,13 +8,7 @@ namespace Mfr.Filters.Formatting.FormatString
     /// <param name="Length">Length of the piece in the template.</param>
     /// <param name="Name">Token name when <see cref="IsToken"/>; otherwise empty.</param>
     /// <param name="Args">Token args when <see cref="IsToken"/>; otherwise empty.</param>
-    internal readonly record struct FormatStringPiece(
-        bool IsToken,
-        int Start,
-        int Length,
-        string Name,
-        string Args
-    );
+    internal readonly record struct FormatStringPiece(bool IsToken, int Start, int Length, string Name, string Args);
 
     /// <summary>
     /// Structural error from <see cref="FormatStringScan.TryWalk"/> (unclosed likely token).

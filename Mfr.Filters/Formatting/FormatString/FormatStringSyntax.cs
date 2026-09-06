@@ -49,14 +49,7 @@ namespace Mfr.Filters.Formatting.FormatString
             ArgumentNullException.ThrowIfNull(template);
 
             var pieces = new List<FormatStringPiece>();
-            if (
-                !FormatStringScan.TryWalk(
-                    template,
-                    errorOnUnclosedLikelyToken: true,
-                    pieces,
-                    out var walkError
-                )
-            )
+            if (!FormatStringScan.TryWalk(template, errorOnUnclosedLikelyToken: true, pieces, out var walkError))
             {
                 return _Fail(walkError.Message, walkError.Position, walkError.Length);
             }
@@ -71,11 +64,7 @@ namespace Mfr.Filters.Formatting.FormatString
 
                 if (!FormatTokenRegistry.NameToToken.TryGetValue(piece.Name, out var token))
                 {
-                    return _Fail(
-                        FormatStringScan.UnknownTokenMessage(piece.Name),
-                        piece.Start,
-                        piece.Length
-                    );
+                    return _Fail(FormatStringScan.UnknownTokenMessage(piece.Name), piece.Start, piece.Length);
                 }
 
                 try

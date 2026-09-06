@@ -4,7 +4,6 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.Controls.FormatEditor"
-  xmlns:filters="using:Mfr.Filters.Formatting.FormatString"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="120"
@@ -45,26 +44,40 @@
                   Margin="0,0,0,6"
                   Text="{Binding SearchText}"
                 />
-                <ListBox x:Name="InsertList" ItemsSource="{Binding VisibleEntries}" MaxHeight="280">
-                  <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="filters:FormatTokenCatalogEntry">
-                      <StackPanel Spacing="0" ToolTip.Tip="{Binding ShortDescription}">
-                        <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+                <TreeView x:Name="InsertList" ItemsSource="{Binding VisibleItems}" MaxHeight="280">
+                  <TreeView.ItemTemplate>
+                    <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vm:FormatInsertPickerNode">
+                      <Panel>
                         <TextBlock
-                          Text="{Binding GroupPath}"
-                          Opacity="0.7"
-                          FontSize="11"
+                          Text="{Binding Title}"
+                          FontWeight="SemiBold"
+                          IsVisible="{Binding IsGroup}"
                           TextTrimming="CharacterEllipsis"
                         />
-                      </StackPanel>
-                    </DataTemplate>
-                  </ListBox.ItemTemplate>
-                  <ListBox.Styles>
-                    <Style Selector="ListBoxItem">
-                      <Setter Property="Padding" Value="6,4" />
+                        <StackPanel
+                          Spacing="0"
+                          IsVisible="{Binding !IsGroup}"
+                          ToolTip.Tip="{Binding Entry.ShortDescription}"
+                        >
+                          <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                          <TextBlock
+                            Text="{Binding Entry.GroupPath}"
+                            Opacity="0.7"
+                            FontSize="11"
+                            IsVisible="{Binding ShowGroupSubtitle}"
+                            TextTrimming="CharacterEllipsis"
+                          />
+                        </StackPanel>
+                      </Panel>
+                    </TreeDataTemplate>
+                  </TreeView.ItemTemplate>
+                  <TreeView.Styles>
+                    <Style Selector="TreeViewItem">
+                      <Setter Property="Padding" Value="2,2" />
+                      <Setter Property="IsExpanded" Value="False" />
                     </Style>
-                  </ListBox.Styles>
-                </ListBox>
+                  </TreeView.Styles>
+                </TreeView>
               </DockPanel>
             </Border>
           </Flyout>

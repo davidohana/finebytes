@@ -90,7 +90,6 @@ Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.pla
 
 **PRs (do not merge yet):** [A #35](https://github.com/davidohana/finebytes/pull/35) · [B #36](https://github.com/davidohana/finebytes/pull/36) · [C #37](https://github.com/davidohana/finebytes/pull/37).
 
-
 ### F7 — Presets UI
 
 Engine already has `PresetManager` + JSON preset shape (`Mfr.Filters` docs). UI stubs exist (`Presets` / `Save Preset` menu items, disabled).

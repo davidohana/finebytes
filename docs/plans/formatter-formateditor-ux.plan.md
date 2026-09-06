@@ -493,7 +493,7 @@ Turn into [f6-formateditor-deep-refactors.md](f6-formateditor-deep-refactors.md)
 
 ### From PR B review
 
-1. **Grouped insert picker when search empty** (high) — nest by `GroupPath`; flat when filtering.
+1. **Grouped insert picker when search empty** (done) — nest by `GroupPath`; flat when filtering.
 1. **Flyout UX: focus search + Enter-to-insert** (medium).
 1. **Shared OK-only message dialog** (low until second host).
 1. **Theme-aware error link color** (low).

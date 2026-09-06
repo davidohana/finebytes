@@ -45,12 +45,7 @@ namespace Mfr.Filters.Formatting.FormatString
         {
             var pieces = new List<FormatStringPiece>();
             // Compile treats unclosed likely tokens as literals (same as non-token angles).
-            _ = FormatStringScan.TryWalk(
-                template,
-                errorOnUnclosedLikelyToken: false,
-                pieces,
-                out _
-            );
+            _ = FormatStringScan.TryWalk(template, errorOnUnclosedLikelyToken: false, pieces, out _);
 
             var segments = new List<Formatter>(pieces.Count);
             foreach (var piece in pieces)
