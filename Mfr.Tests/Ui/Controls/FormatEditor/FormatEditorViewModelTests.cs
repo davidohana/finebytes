@@ -1,5 +1,5 @@
 using Mfr.App.Ui.ViewModels.Controls.FormatEditor;
-using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 
 namespace Mfr.Tests.Ui.Controls.FormatEditor
 {

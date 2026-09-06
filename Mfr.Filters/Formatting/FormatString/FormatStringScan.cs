@@ -1,4 +1,4 @@
-namespace Mfr.Filters.Formatting
+namespace Mfr.Filters.Formatting.FormatString
 {
     /// <summary>
     /// Shared format-string span helpers used by <see cref="FormatStringCompiler"/> and <see cref="FormatStringSyntax"/>.

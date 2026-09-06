@@ -1,4 +1,6 @@
-namespace Mfr.Filters.Formatting
+using Mfr.Filters.Formatting.Tokens;
+
+namespace Mfr.Filters.Formatting.FormatString
 {
     /// <summary>
     /// One FormatEditor catalog row for a canonical formatter token.
@@ -7,7 +9,7 @@ namespace Mfr.Filters.Formatting
     /// <param name="GroupPath">Menu group path (<c>\</c>-separated).</param>
     /// <param name="ShortDescription">Tooltip / hint text.</param>
     /// <param name="InsertText">Default insert text including angle brackets.</param>
-    /// <param name="CanonicalName">Primary token name (<see cref="Tokens.IFormatToken.Names"/>[0]).</param>
+    /// <param name="CanonicalName">Primary token name (<see cref="IFormatToken.Names"/>[0]).</param>
     public sealed record FormatTokenCatalogEntry(
         string DisplayName,
         string GroupPath,

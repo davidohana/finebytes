@@ -1,7 +1,7 @@
 using System.Text;
 using Mfr.Filters.Formatting.Tokens;
 
-namespace Mfr.Filters.Formatting
+namespace Mfr.Filters.Formatting.FormatString
 {
     /// <summary>
     /// Compiles formatter template text into a per-item delegate.

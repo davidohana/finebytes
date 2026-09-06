@@ -1,13 +1,14 @@
 namespace Mfr.Filters.Formatting.Tokens
 {
     /// <summary>
-    /// Contract for a single formatter token (e.g. <c>&lt;file-name&gt;</c>) handled by <see cref="FormatStringCompiler"/>.
+    /// Contract for a single formatter token (e.g. <c>&lt;file-name&gt;</c>) handled by <see cref="FormatString.FormatStringCompiler"/>.
     /// </summary>
     /// <remarks>
     /// <para>
     /// Implementations are discovered automatically: any <c>internal sealed</c> class under
     /// <c>Mfr.Filters.Formatting.Tokens.*</c> with a parameterless constructor that implements this
     /// interface is registered at startup.
+    /// Each concrete token must carry <see cref="FormatTokenInfoAttribute"/> for FormatEditor catalog rows.
     /// </para>
     /// <para>
     /// Aliases are declared by listing multiple entries in <see cref="Names"/> on the same token

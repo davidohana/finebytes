@@ -1,7 +1,7 @@
 using System.Reflection;
 using Mfr.Filters.Formatting.Tokens;
 
-namespace Mfr.Filters.Formatting
+namespace Mfr.Filters.Formatting.FormatString
 {
     /// <summary>
     /// Discovers concrete <see cref="IFormatToken"/> types once for the compiler and catalog.

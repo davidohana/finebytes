@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 
 namespace Mfr.App.Ui.ViewModels.Controls.FormatEditor
 {

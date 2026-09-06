@@ -1,4 +1,4 @@
-using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 using Mfr.Filters.Formatting.Tokens.Meta;
 
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta

@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 
 namespace Mfr.Tests.Ui.Controls.FormatEditor
 {

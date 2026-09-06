@@ -1,7 +1,7 @@
-namespace Mfr.Filters.Formatting
+namespace Mfr.Filters.Formatting.Tokens
 {
     /// <summary>
-    /// Marks a concrete <see cref="Tokens.IFormatToken"/> with FormatEditor catalog metadata.
+    /// Marks a concrete <see cref="IFormatToken"/> with FormatEditor catalog metadata.
     /// </summary>
     /// <param name="displayName">Human-readable label shown in the insert picker.</param>
     /// <param name="group">Menu group path; use <c>\</c> for nesting (for example <c>Audio\Tag</c>).</param>

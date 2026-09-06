@@ -1,4 +1,4 @@
-namespace Mfr.Filters.Formatting
+namespace Mfr.Filters.Formatting.FormatString
 {
     /// <summary>
     /// One validated token span inside a format template.

@@ -4,7 +4,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.Controls.FormatEditor;
-using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 
 namespace Mfr.App.Ui.Views.Controls.FormatEditor
 {

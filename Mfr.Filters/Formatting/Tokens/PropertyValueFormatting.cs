@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Mfr.Filters.Formatting
+namespace Mfr.Filters.Formatting.Tokens
 {
     /// <summary>
     /// Shared token-value formatting for numeric, duration, and boolean properties.

@@ -1,6 +1,6 @@
-using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 
-namespace Mfr.Tests.Models.Filters.Formatting
+namespace Mfr.Tests.Models.Filters.Formatting.FormatString
 {
     /// <summary>
     /// Tests for <see cref="FormatTokenCatalog"/> discovery and metadata.
