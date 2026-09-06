@@ -71,13 +71,10 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 - **Done:** `FormatInsertPickerNode` tree by `GroupPath` when search empty; flat leaves (+ group subtitle) when filtering; `TreeView` insert flyout; tap inserts leaves only
 - **Sites:** `FormatEditor.axaml` / `FormatEditorViewModel` / headless `InsertList_*`
 
-### 4. Flyout UX: focus search + Enter-to-insert — **medium**
+### 4. Flyout UX: focus search + Enter-to-insert — **done**
 
-- **Sites:** Insert flyout open; insert list keyboard
-- **Target:** focus `InsertSearchBox` on open; Enter inserts highlighted row (without SelectionChanged insert regressions from B)
-- **Value:** a11y / muscle memory
-- **Cost:** low–medium; careful with B’s tap-vs-selection fix
-- **Rank:** medium — natural follow-on to grouped picker
+- **Done:** focus `InsertSearchBox` on flyout open; Enter on search/list inserts highlighted leaf only (tap still inserts; SelectionChanged does not)
+- **Sites:** `FormatEditor.axaml` / `FormatEditor.axaml.cs` / headless `InsertFlyout_*` / `InsertList_Enter_*` / `InsertSearchBox_Enter_*`
 
 ### 5. Convention ViewLocator for token bodies — **medium**
 

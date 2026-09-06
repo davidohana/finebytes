@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.Controls.FormatEditor;
 using Mfr.Filters.Formatting.FormatString;
@@ -50,6 +51,8 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
             TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
             TemplateBox.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
             InsertList.AddHandler(TappedEvent, _OnInsertItemTapped, RoutingStrategies.Bubble);
+            InsertList.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
+            InsertSearchBox.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
         }
 
         /// <summary>
@@ -205,6 +208,21 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
             }
         }
 
+        /// <summary>
+        /// Focuses the insert search box when the picker flyout opens (after Avalonia's default popup focus).
+        /// </summary>
+        private void _OnInsertFlyoutOpened(object? sender, EventArgs e)
+        {
+            Dispatcher.UIThread.Post(
+                () =>
+                {
+                    InsertSearchBox.Focus();
+                    InsertSearchBox.SelectAll();
+                },
+                DispatcherPriority.Input
+            );
+        }
+
         private void _OnTemplateTextChanged(object? sender, TextChangedEventArgs e)
         {
             if (_suppressTextSync)
@@ -244,6 +262,34 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
         }
 
         /// <summary>
+        /// Enter inserts the highlighted catalog leaf from search or list focus (not SelectionChanged).
+        /// </summary>
+        private void _OnInsertPickerKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Enter || !_TryInsertHighlighted())
+            {
+                return;
+            }
+
+            e.Handled = true;
+        }
+
+        /// <summary>
+        /// Inserts <see cref="TreeView.SelectedItem"/> when it is a catalog leaf.
+        /// </summary>
+        /// <returns><see langword="true"/> when a leaf was inserted.</returns>
+        private bool _TryInsertHighlighted()
+        {
+            if (InsertList.SelectedItem is not FormatInsertPickerNode { Entry: { } entry })
+            {
+                return false;
+            }
+
+            ViewModel.InsertEntryCommand.Execute(entry);
+            return true;
+        }
+
+        /// <summary>
         /// Writes text to the box and <see cref="Text"/> without re-entrant sync, then re-validates.
         /// </summary>
         private void _SetTextPreservingBinding(string next)
@@ -276,7 +322,7 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
             }
 
             // Defer edit until after caret moves with the click.
-            Avalonia.Threading.Dispatcher.UIThread.Post(_EditUnderCaret);
+            Dispatcher.UIThread.Post(_EditUnderCaret);
         }
 
         /// <summary>

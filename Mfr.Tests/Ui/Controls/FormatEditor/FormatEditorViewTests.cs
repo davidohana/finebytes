@@ -178,6 +178,114 @@ namespace Mfr.Tests.Ui.Controls.FormatEditor
         }
 
         /// <summary>
+        /// Verifies opening the insert flyout focuses the search box.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertFlyout_Opened_FocusesSearchBox()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var search = editor.FindControl<TextBox>("InsertSearchBox");
+            Assert.NotNull(search);
+            Assert.True(search.IsFocused);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Enter on the list inserts the highlighted leaf without relying on SelectionChanged.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertList_Enter_InsertsHighlightedLeaf()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            editor.ViewModel.SearchText = "file-name";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            var leaf = Assert.Single(editor.ViewModel.VisibleItems, n => n.Entry?.CanonicalName == "file-name");
+            var entry = leaf.Entry!;
+
+            list.SelectedItem = leaf;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(string.Empty, editor.Text);
+
+            _RaiseKeyDown(list, Key.Enter);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(entry.InsertText, editor.Text);
+            Assert.False(editor.ViewModel.HasError);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Enter on the search box inserts the highlighted leaf.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertSearchBox_Enter_InsertsHighlightedLeaf()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            editor.ViewModel.SearchText = "file-name";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            var search = editor.FindControl<TextBox>("InsertSearchBox");
+            Assert.NotNull(list);
+            Assert.NotNull(search);
+            var leaf = Assert.Single(editor.ViewModel.VisibleItems, n => n.Entry?.CanonicalName == "file-name");
+            var entry = leaf.Entry!;
+
+            list.SelectedItem = leaf;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(string.Empty, editor.Text);
+
+            _RaiseKeyDown(search, Key.Enter);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(entry.InsertText, editor.Text);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Enter on a highlighted group folder does not insert.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertList_Enter_OnGroup_DoesNotInsert()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var list = editor.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
+            Assert.True(fileNameGroup.IsGroup);
+
+            list.SelectedItem = fileNameGroup;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            _RaiseKeyDown(list, Key.Enter);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(string.Empty, editor.Text);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies double-tap on a validated token selects that span.
         /// </summary>
         [AvaloniaFact]
@@ -282,6 +390,18 @@ namespace Mfr.Tests.Ui.Controls.FormatEditor
             Assert.False(editor.ViewModel.HasError);
 
             window.Close();
+        }
+
+        private static void _RaiseKeyDown(Control control, Key key)
+        {
+            control.RaiseEvent(
+                new KeyEventArgs
+                {
+                    RoutedEvent = InputElement.KeyDownEvent,
+                    Key = key,
+                    Source = control,
+                }
+            );
         }
 
         private static (App.Ui.Views.Controls.FormatEditor.FormatEditor Editor, Window Window) _ShowWithInsertFlyout()

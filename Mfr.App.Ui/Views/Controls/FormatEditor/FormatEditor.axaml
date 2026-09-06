@@ -33,7 +33,7 @@
         Padding="0"
       >
         <Button.Flyout>
-          <Flyout Placement="BottomEdgeAlignedRight">
+          <Flyout Placement="BottomEdgeAlignedRight" Opened="_OnInsertFlyoutOpened">
             <Border Width="280" MaxHeight="320" Padding="6">
               <DockPanel>
                 <TextBox
