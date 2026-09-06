@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F5 shipped: Applied list + Filter Configuration host + every option-bearing filter has a live editor. Next: Formatter FormatEditor UX, presets, session chain, filter chrome (heart/reset/help), Filter Options polish."
+overview: "F1–F6 shipped (F6 PRs open, not merged): Applied list + Filter Configuration + FormatEditor. Next: presets, session chain, filter chrome, Filter Options polish."
 todos:
   - id: f1-f5-complete
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
@@ -88,7 +88,7 @@ Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.pla
 
 **Reuse later:** PathMover / Inserter / Audio Tag Setter format fields. Syntax highlight deferred (`docs/debts.md`).
 
-**PRs (do not merge yet):** [A #35](https://github.com/davidohana/finebytes/pull/35) · [B #36](https://github.com/davidohana/finebytes/pull/36) · C pending URL.
+**PRs (do not merge yet):** [A #35](https://github.com/davidohana/finebytes/pull/35) · [B #36](https://github.com/davidohana/finebytes/pull/36) · [C #37](https://github.com/davidohana/finebytes/pull/37).
 
 
 ### F7 — Presets UI
