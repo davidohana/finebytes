@@ -213,14 +213,7 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
         /// </summary>
         private void _OnInsertFlyoutOpened(object? sender, EventArgs e)
         {
-            Dispatcher.UIThread.Post(
-                () =>
-                {
-                    InsertSearchBox.Focus();
-                    InsertSearchBox.SelectAll();
-                },
-                DispatcherPriority.Input
-            );
+            Dispatcher.UIThread.Post(() => InsertSearchBox.Focus(), DispatcherPriority.Input);
         }
 
         private void _OnTemplateTextChanged(object? sender, TextChangedEventArgs e)
