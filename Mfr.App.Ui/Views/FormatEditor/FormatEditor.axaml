@@ -94,6 +94,8 @@
       MinHeight="64"
       AcceptsReturn="True"
       TextWrapping="Wrap"
+      ClearSelectionOnLostFocus="False"
+      IsInactiveSelectionHighlightEnabled="True"
       Watermark="{Binding Watermark, ElementName=Root}"
       TextChanged="_OnTemplateTextChanged"
     />

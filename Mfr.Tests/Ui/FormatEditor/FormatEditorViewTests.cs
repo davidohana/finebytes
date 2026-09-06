@@ -657,6 +657,33 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies token selection stays visible when focus moves to the parameter editor dialog.
+        /// </summary>
+        [AvaloniaFact]
+        public void TemplateBox_KeepsTokenSelectionAfterLostFocus()
+        {
+            var (editor, box, window, _, counter) = _ShowTwoTokenEditor();
+            Assert.False(box.ClearSelectionOnLostFocus);
+            Assert.True(box.IsInactiveSelectionHighlightEnabled);
+
+            Assert.True(editor.EditTokenAtIndexForTests(counter.Start + 2, accept: false));
+            Assert.Equal(counter.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(counter.Start + counter.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+
+            var editButton = editor.FindControl<Button>("EditButton");
+            Assert.NotNull(editButton);
+            editButton.Focus();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(box.IsFocused);
+            Assert.Equal(counter.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(counter.Start + counter.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Edit at a click index replaces that token while the caret sits on another.
         /// </summary>
         [AvaloniaFact]

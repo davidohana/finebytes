@@ -9,18 +9,46 @@
   WindowStartupLocation="CenterOwner"
   ShowInTaskbar="False"
   CanResize="False"
+  FontFamily="{StaticResource FileListFont}"
+  FontSize="{StaticResource FileListFontSize}"
+  Foreground="{DynamicResource FileListForegroundBrush}"
 >
-  <DockPanel Margin="16">
-    <Button
+  <Window.Styles>
+    <Style Selector="Button.ok-message-footer">
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="MinWidth" Value="72" />
+      <Setter Property="Padding" Value="12,2" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource FileListFont}" />
+      <Setter Property="FontSize" Value="{StaticResource FileListFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.ok-message-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource FileListHoverBrush}" />
+    </Style>
+  </Window.Styles>
+  <DockPanel Margin="12">
+    <StackPanel
+      x:Name="Footer"
       DockPanel.Dock="Bottom"
-      Content="OK"
-      MinWidth="88"
-      HorizontalAlignment="Right"
-      Margin="0,16,0,0"
-      IsDefault="True"
-      IsCancel="True"
-      Click="_OnOkClick"
-    />
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      Margin="0,14,0,0"
+    >
+      <Button
+        x:Name="OkButton"
+        Classes="ok-message-footer"
+        Content="OK"
+        IsDefault="True"
+        IsCancel="True"
+        Click="_OnOkClick"
+      />
+    </StackPanel>
     <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
   </DockPanel>
 </Window>

@@ -446,8 +446,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             {
                 await _ShowMessageAsync(
                     "Formatting Parameter Editor",
-                    "Cursor must be positioned on a formatting parameter in order to edit it.\n"
-                        + "You can also right click on a formatting parameter to edit it."
+                    "Place the cursor on a formatting parameter to edit it, or right-click one."
                 );
                 return;
             }
@@ -465,7 +464,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             {
                 await _ShowMessageAsync(
                     "Formatting Parameter Editor",
-                    "This formatting parameter has no editable options."
+                    $"The formatting parameter \"{_TokenDisplayName(span)}\" has no editable options."
                 );
                 return;
             }
@@ -550,6 +549,17 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             return result.Tokens;
+        }
+
+        /// <summary>
+        /// Catalog display name for <paramref name="span"/>, or the canonical token name.
+        /// </summary>
+        private static string _TokenDisplayName(FormatTokenSpan span)
+        {
+            var entry = FormatTokenCatalog.Entries.FirstOrDefault(e =>
+                string.Equals(e.CanonicalName, span.CanonicalName, StringComparison.OrdinalIgnoreCase)
+            );
+            return entry?.DisplayName ?? span.CanonicalName;
         }
 
         private async Task _ShowMessageAsync(string title, string message)
