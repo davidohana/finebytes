@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:AvaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="120"
@@ -29,13 +30,7 @@
       />
     </StackPanel>
 
-    <StackPanel
-      DockPanel.Dock="Right"
-      Orientation="Horizontal"
-      Spacing="4"
-      Margin="6,0,0,0"
-      VerticalAlignment="Center"
-    >
+    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4" Margin="6,0,0,0" VerticalAlignment="Center">
       <Button
         x:Name="InsertButton"
         Classes="filter-editor-button format-editor-tool"
@@ -98,17 +93,22 @@
       </Button>
     </StackPanel>
 
-    <TextBox
-      x:Name="TemplateBox"
-      Classes="filter-editor-field-wrap format-string-field"
-      MinHeight="64"
-      AcceptsReturn="{Binding AcceptsReturn, ElementName=Root}"
-      MaxLength="{Binding MaxLength, ElementName=Root}"
-      TextWrapping="Wrap"
-      ClearSelectionOnLostFocus="False"
-      IsInactiveSelectionHighlightEnabled="True"
-      Watermark="{Binding Watermark, ElementName=Root}"
-      TextChanged="_OnTemplateTextChanged"
-    />
+    <Panel>
+      <AvaloniaEdit:TextEditor
+        x:Name="TemplateBox"
+        Classes="format-string-field"
+        MinHeight="64"
+        WordWrap="True"
+        ShowLineNumbers="False"
+        GotFocus="_OnTemplateFocusChanged"
+        LostFocus="_OnTemplateFocusChanged"
+      />
+      <TextBlock
+        x:Name="TemplateWatermark"
+        Classes="format-editor-watermark"
+        Text="{Binding Watermark, ElementName=Root}"
+        IsVisible="False"
+      />
+    </Panel>
   </DockPanel>
 </UserControl>

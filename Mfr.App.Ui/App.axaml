@@ -31,6 +31,7 @@
   <Application.Styles>
     <FluentTheme />
     <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+    <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
     <StyleInclude Source="/Themes/CompactNumericUpDown.axaml" />
     <StyleInclude Source="/Themes/CompactToggle.axaml" />
     <StyleInclude Source="/Themes/FilterEditor.axaml" />

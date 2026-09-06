@@ -16,7 +16,9 @@ namespace Mfr.Filters.Formatting.FormatString
     /// <param name="ErrorMessage">Failure message when <see cref="Success"/> is false; otherwise null.</param>
     /// <param name="ErrorPosition">Start of the failing span, or <c>-1</c> when OK.</param>
     /// <param name="ErrorLength">Length of the failing span, or <c>0</c> when OK.</param>
-    /// <param name="Tokens">Successfully validated token spans (empty on failure).</param>
+    /// <param name="Tokens">
+    /// Validated token spans before any failure (empty when the walk fails or no tokens were accepted).
+    /// </param>
     public sealed record FormatStringParseResult(
         bool Success,
         string? ErrorMessage,
@@ -39,6 +41,11 @@ namespace Mfr.Filters.Formatting.FormatString
     /// In <see cref="FormatStringValidationMode.WhenLikelyTokens"/>, when
     /// <see cref="FormatStringCompiler.ContainsLikelyFormatTokens"/> is false the template is accepted as a
     /// literal (no spans). When it is true, validation matches <see cref="FormatStringValidationMode.Always"/>.
+    /// </para>
+    /// <para>
+    /// On unknown-token or <see cref="Tokens.IFormatToken.Compile"/> failure, <see cref="FormatStringParseResult.Tokens"/>
+    /// still lists spans validated before the failing piece (for live syntax highlight). Walk failures leave
+    /// <see cref="FormatStringParseResult.Tokens"/> empty.
     /// </para>
     /// </remarks>
     public static class FormatStringSyntax
@@ -93,7 +100,7 @@ namespace Mfr.Filters.Formatting.FormatString
 
                 if (!FormatTokenRegistry.NameToToken.TryGetValue(piece.Name, out var token))
                 {
-                    return _Fail(FormatStringScan.UnknownTokenMessage(piece.Name), piece.Start, piece.Length);
+                    return _Fail(FormatStringScan.UnknownTokenMessage(piece.Name), piece.Start, piece.Length, tokens);
                 }
 
                 try
@@ -102,7 +109,7 @@ namespace Mfr.Filters.Formatting.FormatString
                 }
                 catch (Exception ex) when (ex is ArgumentException or NotSupportedException)
                 {
-                    return _Fail(ex.Message, piece.Start, piece.Length);
+                    return _Fail(ex.Message, piece.Start, piece.Length, tokens);
                 }
 
                 tokens.Add(
@@ -125,11 +132,22 @@ namespace Mfr.Filters.Formatting.FormatString
         }
 
         /// <summary>
-        /// Builds a failed parse result with an empty token list.
+        /// Builds a failed parse result, optionally keeping spans validated before the failure.
         /// </summary>
-        private static FormatStringParseResult _Fail(string message, int position, int length)
+        private static FormatStringParseResult _Fail(
+            string message,
+            int position,
+            int length,
+            IReadOnlyList<FormatTokenSpan>? tokens = null
+        )
         {
-            return new(Success: false, ErrorMessage: message, ErrorPosition: position, ErrorLength: length, Tokens: []);
+            return new(
+                Success: false,
+                ErrorMessage: message,
+                ErrorPosition: position,
+                ErrorLength: length,
+                Tokens: tokens ?? []
+            );
         }
     }
 }

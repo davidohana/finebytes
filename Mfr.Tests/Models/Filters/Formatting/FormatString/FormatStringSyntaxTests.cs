@@ -56,6 +56,38 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         }
 
         /// <summary>
+        /// Verifies tokens before an unknown token remain in <see cref="FormatStringParseResult.Tokens"/>.
+        /// </summary>
+        [Fact]
+        public void TryValidate_GoodThenUnknown_KeepsPriorSpans()
+        {
+            var template = "Track: <file-name> <does-not-exist>";
+            var result = FormatStringSyntax.TryValidate(template);
+
+            Assert.False(result.Success);
+            Assert.Contains("Unknown formatter token", result.ErrorMessage);
+            Assert.Equal(template.IndexOf("<does-not-exist>", StringComparison.Ordinal), result.ErrorPosition);
+            Assert.Single(result.Tokens);
+            Assert.Equal("file-name", result.Tokens[0].CanonicalName);
+            Assert.Equal(template.IndexOf("<file-name>", StringComparison.Ordinal), result.Tokens[0].Start);
+        }
+
+        /// <summary>
+        /// Verifies tokens before a Compile failure remain in <see cref="FormatStringParseResult.Tokens"/>.
+        /// </summary>
+        [Fact]
+        public void TryValidate_GoodThenBadArgs_KeepsPriorSpans()
+        {
+            var template = "<file-name> <counter:padding=nope>";
+            var result = FormatStringSyntax.TryValidate(template);
+
+            Assert.False(result.Success);
+            Assert.Single(result.Tokens);
+            Assert.Equal("file-name", result.Tokens[0].CanonicalName);
+            Assert.Equal(template.IndexOf("<counter:", StringComparison.Ordinal), result.ErrorPosition);
+        }
+
+        /// <summary>
         /// Verifies bad counter arguments fail with the counter span.
         /// </summary>
         [Fact]
@@ -68,6 +100,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
             Assert.NotNull(result.ErrorMessage);
             Assert.Equal(0, result.ErrorPosition);
             Assert.Equal(template.Length, result.ErrorLength);
+            Assert.Empty(result.Tokens);
         }
 
         /// <summary>
@@ -97,6 +130,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
             Assert.Contains("Unclosed", result.ErrorMessage);
             Assert.Equal(template.IndexOf('<'), result.ErrorPosition);
             Assert.Equal(template.Length - result.ErrorPosition, result.ErrorLength);
+            Assert.Empty(result.Tokens);
         }
 
         /// <summary>

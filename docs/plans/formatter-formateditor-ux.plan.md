@@ -1,6 +1,6 @@
 ---
 name: Formatter FormatEditor UX
-overview: F6 builds a reusable Avalonia FormatEditor (MFR7 chrome + searchable picker, inline errors, param dialogs). Implementer PRs A/B/C each gated by a separate mfr-code-review agent before push; final pass writes a deep-refactors summary doc. Formatter first; no syntax highlight.
+overview: F6 builds a reusable Avalonia FormatEditor (MFR7 chrome + searchable picker, inline errors, param dialogs). Implementer PRs A/B/C each gated by a separate mfr-code-review agent before push; final pass writes a deep-refactors summary doc. Formatter first; syntax highlight deferred then shipped in formateditor-syntax-highlight.plan.md.
 todos:
   - id: f6-p1-engine
     content: "Phase 1/PR A: FormatTokenInfo + FormatTokenCatalog + FormatStringSyntax.TryValidate + engine tests"
@@ -56,7 +56,7 @@ Canonical backlog entry: [applied-filter-editors.plan.md](docs/plans/applied-fil
 | **Searchable token picker**     | Cascading-only menus are painful with 50+ tokens (deep Audio/Image trees). ▶ opens a flyout: filter box at top + grouped list (or filtered flat results). Nested groups remain for browse-without-search. |
 | **Inline error text**           | Show the parse message under the box immediately (truncated). Click still jumps/selects and can open full details. MFR7 hid everything behind a “details” link.                                           |
 | **Tooltips on catalog rows**    | Short description on the item itself; status-bar hint is optional secondary (MFR7 status-only was easy to miss).                                                                                          |
-| **No red/blue highlight in F6** | Expensive without AvaloniaEdit; error jump covers the failure case. Debt for later.                                                                                                                       |
+| **No red/blue highlight in F6** | Deferred; later shipped as single-accent AvaloniaEdit highlight — [`formateditor-syntax-highlight.plan.md`](formateditor-syntax-highlight.plan.md).                                                       |
 
 **Explicitly not doing** (overkill / low ROI for F6): `<`-triggered autocomplete chips, redesigning param dialogs into inline expanders, opening a param dialog on every parameterized insert.
 

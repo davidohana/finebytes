@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -9,6 +8,8 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using AvaloniaEdit;
+using AvaloniaEdit.Rendering;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.GridColumnSizing;
 using Mfr.Filters.Formatting.FormatString;
@@ -37,11 +38,10 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var box = editor.FindControl<TextBox>("TemplateBox");
+            var box = editor.FindControl<TextEditor>("TemplateBox");
             Assert.NotNull(box);
-            box.CaretIndex = 3;
-            box.SelectionStart = 3;
-            box.SelectionEnd = 5;
+            box.CaretOffset = 3;
+            box.Select(3, 2);
 
             editor.InsertTextAtCaret("<file-name>");
             window.UpdateLayout();
@@ -81,10 +81,10 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var box = editor.FindControl<TextBox>("TemplateBox");
+            var box = editor.FindControl<TextEditor>("TemplateBox");
             Assert.NotNull(box);
             Assert.Equal(editor.Text.IndexOf('<'), box.SelectionStart);
-            Assert.Equal(editor.Text.IndexOf('<') + "<does-not-exist>".Length, box.SelectionEnd);
+            Assert.Equal(editor.Text.IndexOf('<') + "<does-not-exist>".Length, _SelectionEnd(box));
 
             window.Close();
         }
@@ -518,19 +518,18 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var box = editor.FindControl<TextBox>("TemplateBox");
+            var box = editor.FindControl<TextEditor>("TemplateBox");
             Assert.NotNull(box);
             var tokenStart = editor.Text.IndexOf('<');
-            box.CaretIndex = tokenStart + 1;
-            box.SelectionStart = tokenStart + 1;
-            box.SelectionEnd = tokenStart + 1;
+            box.CaretOffset = tokenStart + 1;
+            box.Select(tokenStart + 1, 0);
 
             box.RaiseEvent(new TappedEventArgs(InputElement.DoubleTappedEvent, null!));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(tokenStart, box.SelectionStart);
-            Assert.Equal(tokenStart + "<file-name>".Length, box.SelectionEnd);
+            Assert.Equal(tokenStart + "<file-name>".Length, _SelectionEnd(box));
 
             window.Close();
         }
@@ -550,7 +549,10 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotEmpty(editor.ViewModel.VisibleItems);
             Assert.True(editor.ViewModel.IsGrouped);
             Assert.False(editor.ViewModel.HasError);
-            Assert.Same(GridFonts.RenameListFixedWidthFamily, editor.FindControl<TextBox>("TemplateBox")?.FontFamily);
+            Assert.Same(
+                GridFonts.RenameListFixedWidthFamily,
+                editor.FindControl<TextEditor>("TemplateBox")?.FontFamily
+            );
             Assert.Equal(
                 "Right-click a formatting parameter to customize it.",
                 editor.FindControl<FilterEditorHint>("RightClickHint")?.Text
@@ -601,12 +603,11 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var box = editor.FindControl<TextBox>("TemplateBox");
+            var box = editor.FindControl<TextEditor>("TemplateBox");
             Assert.NotNull(box);
             var tokenStart = editor.Text.IndexOf('<');
-            box.CaretIndex = tokenStart + 2;
-            box.SelectionStart = tokenStart + 2;
-            box.SelectionEnd = tokenStart + 2;
+            box.CaretOffset = tokenStart + 2;
+            box.Select(tokenStart + 2, 0);
 
             Assert.True(
                 editor.EditUnderCaretForTests(
@@ -639,9 +640,8 @@ namespace Mfr.Tests.Ui.FormatEditor
         public void RightClick_SelectsClickedTokenNotCaret()
         {
             var (_, box, window, fileName, counter) = _ShowTwoTokenEditor();
-            box.CaretIndex = fileName.Start + 2;
-            box.SelectionStart = fileName.Start + 2;
-            box.SelectionEnd = fileName.Start + 2;
+            box.CaretOffset = fileName.Start + 2;
+            box.Select(fileName.Start + 2, 0);
             box.Focus();
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -651,26 +651,24 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.MouseMove(windowPoint);
             window.MouseDown(windowPoint, MouseButton.Right);
 
-            Assert.Equal(counter.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
-            Assert.Equal(counter.Start + counter.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(counter.Start, box.SelectionStart);
+            Assert.Equal(counter.Start + counter.Length, _SelectionEnd(box));
 
             window.Close();
             Dispatcher.UIThread.RunJobs();
         }
 
         /// <summary>
-        /// Verifies token selection stays visible when focus moves to the parameter editor dialog.
+        /// Verifies token selection stays when focus moves to the Edit button.
         /// </summary>
         [AvaloniaFact]
         public void TemplateBox_KeepsTokenSelectionAfterLostFocus()
         {
             var (editor, box, window, _, counter) = _ShowTwoTokenEditor();
-            Assert.False(box.ClearSelectionOnLostFocus);
-            Assert.True(box.IsInactiveSelectionHighlightEnabled);
 
             Assert.True(editor.EditTokenAtIndexForTests(counter.Start + 2, accept: false));
-            Assert.Equal(counter.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
-            Assert.Equal(counter.Start + counter.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(counter.Start, box.SelectionStart);
+            Assert.Equal(counter.Start + counter.Length, _SelectionEnd(box));
 
             var editButton = editor.FindControl<Button>("EditButton");
             Assert.NotNull(editButton);
@@ -679,8 +677,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(box.IsFocused);
-            Assert.Equal(counter.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
-            Assert.Equal(counter.Start + counter.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(counter.Start, box.SelectionStart);
+            Assert.Equal(counter.Start + counter.Length, _SelectionEnd(box));
 
             window.Close();
         }
@@ -692,9 +690,8 @@ namespace Mfr.Tests.Ui.FormatEditor
         public void EditTokenAtIndex_ReplacesClickedTokenNotCaret()
         {
             var (editor, box, window, fileName, counter) = _ShowTwoTokenEditor();
-            box.CaretIndex = fileName.Start + 2;
-            box.SelectionStart = fileName.Start + 2;
-            box.SelectionEnd = fileName.Start + 2;
+            box.CaretOffset = fileName.Start + 2;
+            box.Select(fileName.Start + 2, 0);
 
             Assert.True(
                 editor.EditTokenAtIndexForTests(
@@ -730,9 +727,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             var (editor, box, window, fileName, counter) = _ShowTwoTokenEditor(
                 "pre<file-name><counter:initial=1,step=1>post"
             );
-            box.CaretIndex = counter.Start;
-            box.SelectionStart = counter.Start;
-            box.SelectionEnd = counter.Start;
+            box.CaretOffset = counter.Start;
+            box.Select(counter.Start, 0);
 
             Assert.Equal(fileName.Start + fileName.Length, counter.Start);
             Assert.True(
@@ -772,8 +768,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             var greaterThanPoint = _CharacterWindowPoint(window, box, fileName.Start + fileName.Length - 1);
             window.MouseMove(greaterThanPoint);
             window.MouseDown(greaterThanPoint, MouseButton.Right);
-            Assert.Equal(fileName.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
-            Assert.Equal(fileName.Start + fileName.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(fileName.Start, box.SelectionStart);
+            Assert.Equal(fileName.Start + fileName.Length, _SelectionEnd(box));
 
             window.Close();
             Dispatcher.UIThread.RunJobs();
@@ -786,16 +782,37 @@ namespace Mfr.Tests.Ui.FormatEditor
             var lessThanPoint = _CharacterWindowPoint(window, box, counter.Start);
             window.MouseMove(lessThanPoint);
             window.MouseDown(lessThanPoint, MouseButton.Right);
-            Assert.Equal(counter.Start, Math.Min(box.SelectionStart, box.SelectionEnd));
-            Assert.Equal(counter.Start + counter.Length, Math.Max(box.SelectionStart, box.SelectionEnd));
+            Assert.Equal(counter.Start, box.SelectionStart);
+            Assert.Equal(counter.Start + counter.Length, _SelectionEnd(box));
 
             window.Close();
             Dispatcher.UIThread.RunJobs();
         }
 
+        /// <summary>
+        /// Verifies valid tokens before an error remain available for highlight after validation fails.
+        /// </summary>
+        [AvaloniaFact]
+        public void Validate_GoodThenUnknown_KeepsPriorTokenSpans()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { Text = "Track: <file-name> <does-not-exist>" };
+            var window = new Window { Content = editor };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(editor.ViewModel.HasError);
+            var tokens = editor.ViewModel.LastParseResult?.Tokens;
+            Assert.NotNull(tokens);
+            Assert.Single(tokens);
+            Assert.Equal("file-name", tokens[0].CanonicalName);
+
+            window.Close();
+        }
+
         private static (
             App.Ui.Views.FormatEditor.FormatEditor Editor,
-            TextBox Box,
+            TextEditor Box,
             Window Window,
             FormatTokenSpan FileName,
             FormatTokenSpan Counter
@@ -812,7 +829,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var box = editor.FindControl<TextBox>("TemplateBox");
+            var box = editor.FindControl<TextEditor>("TemplateBox");
             Assert.NotNull(box);
             var tokens = editor.ViewModel.LastParseResult?.Tokens;
             Assert.NotNull(tokens);
@@ -821,13 +838,21 @@ namespace Mfr.Tests.Ui.FormatEditor
             return (editor, box, window, fileName, counter);
         }
 
-        private static Point _CharacterWindowPoint(Window window, TextBox box, int charIndex)
+        private static int _SelectionEnd(TextEditor box)
         {
-            var presenter = box.GetVisualDescendants().OfType<TextPresenter>().FirstOrDefault();
-            Assert.NotNull(presenter);
-            var glyph = presenter.TextLayout.HitTestTextPosition(charIndex);
-            var local = new Point(glyph.X + Math.Max(glyph.Width / 2, 1), glyph.Y + Math.Max(glyph.Height / 2, 1));
-            var windowPoint = presenter.TranslatePoint(local, window);
+            return box.SelectionStart + box.SelectionLength;
+        }
+
+        private static Point _CharacterWindowPoint(Window window, TextEditor box, int charIndex)
+        {
+            var textView = box.TextArea.TextView;
+            textView.EnsureVisualLines();
+            var document = box.Document;
+            Assert.NotNull(document);
+            var location = document.GetLocation(Math.Clamp(charIndex, 0, document.TextLength));
+            var visual = textView.GetVisualPosition(new TextViewPosition(location), VisualYPosition.TextMiddle);
+            visual -= textView.ScrollOffset;
+            var windowPoint = textView.TranslatePoint(visual, window);
             Assert.True(windowPoint.HasValue);
             return windowPoint.Value;
         }

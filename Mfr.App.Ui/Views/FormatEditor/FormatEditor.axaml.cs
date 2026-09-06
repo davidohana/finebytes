@@ -1,19 +1,20 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using AvaloniaEdit.Rendering;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 using Mfr.Filters.Formatting.FormatString;
 
 namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
-    /// Shared format-string editor: text box, searchable insert picker, token Edit, inline parse errors.
+    /// Shared format-string editor: AvaloniaEdit field with token highlight, searchable insert picker,
+    /// token Edit, and inline parse errors.
     /// </summary>
     public partial class FormatEditor : UserControl
     {
@@ -67,6 +68,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
             defaultValue: 0
         );
 
+        private readonly FormatTokenColorizingTransformer _colorizer = new();
+
+        private bool _suppressTextSync;
+        private bool _templateHooksAttached;
+
         /// <summary>
         /// Gets the control view-model (picker / error state).
         /// </summary>
@@ -84,14 +90,17 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 editUnderCaret: _EditUnderCaret
             );
             ChromeRoot.DataContext = ViewModel;
-            TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
-            TemplateBox.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
             InsertList.AddHandler(TappedEvent, _OnInsertItemTapped, RoutingStrategies.Bubble);
             InsertList.AddHandler(TreeViewItem.ExpandedEvent, _OnInsertGroupExpanded);
             InsertList.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
             InsertSearchBox.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
             ViewModel.ValidationMode = ValidationMode;
+            _ConfigureTemplateEditor();
             _ApplyAcceptsReturnLayout(AcceptsReturn);
+            _SyncTemplateFromTextProperty(Text ?? string.Empty);
+            ViewModel.Validate(Text ?? string.Empty);
+            _RefreshHighlight();
+            _UpdateWatermarkVisibility();
         }
 
         /// <summary>
@@ -148,8 +157,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
             set => SetValue(MaxLengthProperty, value);
         }
 
-        private bool _suppressTextSync;
-
         /// <summary>
         /// Inserts <paramref name="insertText"/> at the caret, replacing any selection.
         /// </summary>
@@ -159,22 +166,15 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ArgumentNullException.ThrowIfNull(insertText);
 
             _InsertFlyoutHide();
-            var box = TemplateBox;
-            var current = box.Text ?? string.Empty;
-            var start = Math.Clamp(box.SelectionStart, 0, current.Length);
-            var end = Math.Clamp(box.SelectionEnd, 0, current.Length);
-            if (end < start)
-            {
-                (start, end) = (end, start);
-            }
-
+            var current = TemplateBox.Text ?? string.Empty;
+            var start = Math.Clamp(TemplateBox.SelectionStart, 0, current.Length);
+            var end = Math.Clamp(start + TemplateBox.SelectionLength, start, current.Length);
             var next = current[..start] + insertText + current[end..];
-            var caret = start + insertText.Length;
+            next = _ClampToMaxLength(next);
+            var caret = Math.Min(start + insertText.Length, next.Length);
             _SetTextPreservingBinding(next);
-            box.CaretIndex = caret;
-            box.SelectionStart = caret;
-            box.SelectionEnd = caret;
-            box.Focus();
+            _SetCaret(caret);
+            TemplateBox.Focus();
         }
 
         /// <summary>
@@ -188,13 +188,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
-            var box = TemplateBox;
-            var length = (box.Text ?? string.Empty).Length;
+            var length = (TemplateBox.Text ?? string.Empty).Length;
             var start = Math.Clamp(result.ErrorPosition, 0, length);
             var end = Math.Clamp(start + Math.Max(result.ErrorLength, 0), start, length);
-            box.Focus();
-            box.SelectionStart = start;
-            box.SelectionEnd = end;
+            TemplateBox.Focus();
+            _SelectRange(start, end - start);
 
             // Details dialog only when the inline row is truncated.
             if (
@@ -219,12 +217,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
             var current = Text ?? string.Empty;
             var start = Math.Clamp(span.Start, 0, current.Length);
             var end = Math.Clamp(span.Start + span.Length, start, current.Length);
-            var next = current[..start] + newInsertText + current[end..];
-            var caret = start + newInsertText.Length;
+            var next = _ClampToMaxLength(current[..start] + newInsertText + current[end..]);
+            var caret = Math.Min(start + newInsertText.Length, next.Length);
             _SetTextPreservingBinding(next);
-            TemplateBox.CaretIndex = caret;
-            TemplateBox.SelectionStart = caret;
-            TemplateBox.SelectionEnd = caret;
+            _SetCaret(caret);
             TemplateBox.Focus();
         }
 
@@ -236,7 +232,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <returns><see langword="true"/> when a registered editor was created for the caret token.</returns>
         public bool EditUnderCaretForTests(bool accept, Action<IFormatTokenEditorViewModel>? mutate = null)
         {
-            return EditTokenAtIndexForTests(TemplateBox.CaretIndex, accept, mutate);
+            return EditTokenAtIndexForTests(TemplateBox.CaretOffset, accept, mutate);
         }
 
         /// <summary>
@@ -284,6 +280,13 @@ namespace Mfr.App.Ui.Views.FormatEditor
             {
                 ViewModel.ValidationMode = change.GetNewValue<FormatStringValidationMode>();
                 ViewModel.Validate(Text ?? string.Empty);
+                _RefreshHighlight();
+                return;
+            }
+
+            if (change.Property == WatermarkProperty || change.Property == MaxLengthProperty)
+            {
+                _UpdateWatermarkVisibility();
                 return;
             }
 
@@ -292,35 +295,63 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
-            var text = change.GetNewValue<string>() ?? string.Empty;
-            if (!string.Equals(TemplateBox.Text, text, StringComparison.Ordinal))
+            var text = _ClampToMaxLength(change.GetNewValue<string>() ?? string.Empty);
+            if (!string.Equals(text, change.GetNewValue<string>() ?? string.Empty, StringComparison.Ordinal))
             {
                 _suppressTextSync = true;
-                TemplateBox.Text = text;
+                Text = text;
                 _suppressTextSync = false;
             }
 
+            _SyncTemplateFromTextProperty(text);
             ViewModel.Validate(text);
+            _RefreshHighlight();
+            _UpdateWatermarkVisibility();
         }
 
         /// <summary>
-        /// Adjusts text-box height and wrapping for single-line vs multi-line hosts.
+        /// Configures AvaloniaEdit options, colorizer, and input hooks once.
+        /// </summary>
+        private void _ConfigureTemplateEditor()
+        {
+            TemplateBox.Options.AllowScrollBelowDocument = false;
+            TemplateBox.Options.EnableEmailHyperlinks = false;
+            TemplateBox.Options.EnableHyperlinks = false;
+            TemplateBox.Options.EnableImeSupport = true;
+            TemplateBox.TextArea.SelectionBrush = this.FindResource("TextSelectionBrush") as IBrush;
+            TemplateBox.TextArea.SelectionForeground = this.FindResource("TextSelectionForegroundBrush") as IBrush;
+            TemplateBox.TextArea.TextView.LineTransformers.Add(_colorizer);
+
+            if (_templateHooksAttached)
+            {
+                return;
+            }
+
+            _templateHooksAttached = true;
+            TemplateBox.TextChanged += _OnTemplateTextChanged;
+            TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
+            TemplateBox.TextArea.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
+            TemplateBox.TextArea.AddHandler(KeyDownEvent, _OnTemplateKeyDown, RoutingStrategies.Tunnel);
+        }
+
+        /// <summary>
+        /// Adjusts editor height and wrapping for single-line vs multi-line hosts.
         /// </summary>
         private void _ApplyAcceptsReturnLayout(bool acceptsReturn)
         {
             if (acceptsReturn)
             {
                 TemplateBox.MinHeight = 64;
-                TemplateBox.TextWrapping = TextWrapping.Wrap;
-                TemplateBox.Classes.Set("filter-editor-field-wrap", true);
-                TemplateBox.Classes.Set("filter-editor-field", false);
+                TemplateBox.WordWrap = true;
+                TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 return;
             }
 
             TemplateBox.MinHeight = 26;
-            TemplateBox.TextWrapping = TextWrapping.NoWrap;
-            TemplateBox.Classes.Set("filter-editor-field-wrap", false);
-            TemplateBox.Classes.Set("filter-editor-field", true);
+            TemplateBox.WordWrap = false;
+            TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
+            TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
         }
 
         private void _InsertFlyoutHide()
@@ -339,7 +370,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             Dispatcher.UIThread.Post(() => InsertSearchBox.Focus(), DispatcherPriority.Input);
         }
 
-        private void _OnTemplateTextChanged(object? sender, TextChangedEventArgs e)
+        private void _OnTemplateTextChanged(object? sender, EventArgs e)
         {
             if (_suppressTextSync)
             {
@@ -347,6 +378,14 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             var text = TemplateBox.Text ?? string.Empty;
+            if (MaxLength > 0 && text.Length > MaxLength)
+            {
+                text = text[..MaxLength];
+                _suppressTextSync = true;
+                TemplateBox.Text = text;
+                _suppressTextSync = false;
+            }
+
             if (!string.Equals(Text, text, StringComparison.Ordinal))
             {
                 _suppressTextSync = true;
@@ -355,6 +394,23 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             ViewModel.Validate(text);
+            _RefreshHighlight();
+            _UpdateWatermarkVisibility();
+        }
+
+        private void _OnTemplateKeyDown(object? sender, KeyEventArgs e)
+        {
+            if (AcceptsReturn || (e.Key != Key.Enter && e.Key != Key.Return))
+            {
+                return;
+            }
+
+            e.Handled = true;
+        }
+
+        private void _OnTemplateFocusChanged(object? sender, RoutedEventArgs e)
+        {
+            _UpdateWatermarkVisibility();
         }
 
         /// <summary>
@@ -483,7 +539,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Writes text to the box and <see cref="Text"/> without re-entrant sync, then re-validates.
+        /// Writes text to the editor and <see cref="Text"/> without re-entrant sync, then re-validates.
         /// </summary>
         private void _SetTextPreservingBinding(string next)
         {
@@ -492,11 +548,28 @@ namespace Mfr.App.Ui.Views.FormatEditor
             Text = next;
             _suppressTextSync = false;
             ViewModel.Validate(next);
+            _RefreshHighlight();
+            _UpdateWatermarkVisibility();
+        }
+
+        /// <summary>
+        /// Copies <see cref="Text"/> into the editor when the DP changed from outside.
+        /// </summary>
+        private void _SyncTemplateFromTextProperty(string text)
+        {
+            if (string.Equals(TemplateBox.Text, text, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            _suppressTextSync = true;
+            TemplateBox.Text = text;
+            _suppressTextSync = false;
         }
 
         private void _OnTemplateDoubleTapped(object? sender, TappedEventArgs e)
         {
-            var span = _FindSpanAtIndex(TemplateBox.CaretIndex);
+            var span = _FindSpanAtIndex(TemplateBox.CaretOffset);
             if (span is null)
             {
                 return;
@@ -547,7 +620,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         private async Task _EditUnderCaretAsync()
         {
-            var span = _FindSpanAtIndex(TemplateBox.CaretIndex);
+            var span = _FindSpanAtIndex(TemplateBox.CaretOffset);
             if (span is null)
             {
                 await _ShowMessageAsync(
@@ -596,30 +669,69 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private void _SelectSpan(FormatTokenSpan span)
         {
             TemplateBox.Focus();
-            TemplateBox.SelectionStart = span.Start;
-            TemplateBox.SelectionEnd = span.Start + span.Length;
+            _SelectRange(span.Start, span.Length);
         }
 
         /// <summary>
-        /// Maps a point in <see cref="TemplateBox"/> coordinates to the glyph under the pointer
-        /// (<see cref="CharacterHit.FirstCharacterIndex"/>), not the trailing-edge caret
-        /// (<c>TextHitTestResult.TextPosition</c>).
+        /// Sets caret and empty selection at <paramref name="offset"/>.
+        /// </summary>
+        private void _SetCaret(int offset)
+        {
+            var length = TemplateBox.Document?.TextLength ?? 0;
+            var caret = Math.Clamp(offset, 0, length);
+            TemplateBox.CaretOffset = caret;
+            TemplateBox.Select(caret, 0);
+        }
+
+        /// <summary>
+        /// Selects <paramref name="length"/> characters starting at <paramref name="start"/>.
+        /// </summary>
+        private void _SelectRange(int start, int length)
+        {
+            var documentLength = TemplateBox.Document?.TextLength ?? 0;
+            var clampedStart = Math.Clamp(start, 0, documentLength);
+            var clampedLength = Math.Clamp(length, 0, documentLength - clampedStart);
+            TemplateBox.Select(clampedStart, clampedLength);
+            TemplateBox.CaretOffset = clampedStart + clampedLength;
+        }
+
+        /// <summary>
+        /// Maps a point in <see cref="TemplateBox"/> coordinates to the glyph under the pointer.
         /// </summary>
         private int? _TryGetCharacterIndexAt(Point boxPoint)
         {
-            if (TemplateBox.GetVisualDescendants().OfType<TextPresenter>().FirstOrDefault() is not { } presenter)
+            var textView = TemplateBox.TextArea.TextView;
+            if (TemplateBox.TranslatePoint(boxPoint, textView) is not { } viewPoint)
             {
                 return null;
             }
 
-            if (TemplateBox.TranslatePoint(boxPoint, presenter) is not { } presenterPoint)
+            textView.EnsureVisualLines();
+            var position = textView.GetPosition(viewPoint + textView.ScrollOffset);
+            if (position is null)
             {
                 return null;
             }
 
-            var hit = presenter.TextLayout.HitTestPoint(presenterPoint);
-            var length = (TemplateBox.Text ?? string.Empty).Length;
-            return Math.Clamp(hit.CharacterHit.FirstCharacterIndex, 0, length);
+            var document = TemplateBox.Document;
+            if (document is null)
+            {
+                return null;
+            }
+
+            var offset = document.GetOffset(position.Value.Location);
+            // Prefer the glyph under the pointer (exclusive end at next token's '<').
+            if (offset > 0 && !position.Value.IsAtEndOfLine)
+            {
+                var visual = textView.GetVisualPosition(position.Value, VisualYPosition.LineMiddle);
+                visual -= textView.ScrollOffset;
+                if (viewPoint.X < visual.X)
+                {
+                    offset = Math.Max(0, offset - 1);
+                }
+            }
+
+            return Math.Clamp(offset, 0, document.TextLength);
         }
 
         /// <summary>
@@ -655,6 +767,73 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             return result.Tokens;
+        }
+
+        /// <summary>
+        /// Pushes the latest validation spans into the colorizer and redraws.
+        /// </summary>
+        private void _RefreshHighlight()
+        {
+            var result = ViewModel.LastParseResult;
+            _colorizer.Tokens = result?.Tokens ?? [];
+            if (result is { Success: false, ErrorPosition: >= 0, ErrorLength: > 0 })
+            {
+                _colorizer.ErrorPosition = result.ErrorPosition;
+                _colorizer.ErrorLength = result.ErrorLength;
+            }
+            else
+            {
+                _colorizer.ErrorPosition = -1;
+                _colorizer.ErrorLength = 0;
+            }
+
+            _colorizer.TokenForeground = _ResolveBrush("FormatTokenForegroundBrush");
+            _colorizer.ErrorBackground = _ResolveBrush("FormatTokenErrorBackgroundBrush");
+            TemplateBox.TextArea.TextView.Redraw();
+        }
+
+        /// <summary>
+        /// Resolves a themed brush from application or control resources.
+        /// </summary>
+        private IBrush? _ResolveBrush(string key)
+        {
+            if (TryGetResource(key, ActualThemeVariant, out var value) && value is IBrush brush)
+            {
+                return brush;
+            }
+
+            if (
+                Application.Current?.TryGetResource(key, ActualThemeVariant, out value) == true
+                && value is IBrush appBrush
+            )
+            {
+                return appBrush;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Shows the watermark only when the field is empty and focused (matches filter TextBox tips).
+        /// </summary>
+        private void _UpdateWatermarkVisibility()
+        {
+            var empty = string.IsNullOrEmpty(TemplateBox.Text);
+            var focused = TemplateBox.IsFocused || TemplateBox.TextArea.IsFocused;
+            TemplateWatermark.IsVisible = empty && focused && !string.IsNullOrEmpty(Watermark);
+        }
+
+        /// <summary>
+        /// Truncates <paramref name="text"/> when <see cref="MaxLength"/> is positive.
+        /// </summary>
+        private string _ClampToMaxLength(string text)
+        {
+            if (MaxLength <= 0 || text.Length <= MaxLength)
+            {
+                return text;
+            }
+
+            return text[..MaxLength];
         }
 
         /// <summary>

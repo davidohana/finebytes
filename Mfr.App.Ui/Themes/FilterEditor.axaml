@@ -1,6 +1,7 @@
 <Styles
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:AvaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
 >
   <Styles.Resources>
@@ -12,12 +13,17 @@
           <!-- Shown at TextControlPlaceholderOpacity (0.5); keep base color soft. -->
           <SolidColorBrush x:Key="FilterEditorWatermarkBrush" Color="#A8A8A8" />
           <SolidColorBrush x:Key="FormatEditorErrorLinkForegroundBrush" Color="#C42B1C" />
+          <!-- Valid format tokens (not error red). -->
+          <SolidColorBrush x:Key="FormatTokenForegroundBrush" Color="#2B6CB0" />
+          <SolidColorBrush x:Key="FormatTokenErrorBackgroundBrush" Color="#40C42B1C" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="FilterEditorTitleBarBrush" Color="#264F78" />
           <SolidColorBrush x:Key="FilterEditorTitleBarForegroundBrush" Color="#F0F0F0" />
           <SolidColorBrush x:Key="FilterEditorWatermarkBrush" Color="#8A8A8A" />
           <SolidColorBrush x:Key="FormatEditorErrorLinkForegroundBrush" Color="#FF8080" />
+          <SolidColorBrush x:Key="FormatTokenForegroundBrush" Color="#6CB6FF" />
+          <SolidColorBrush x:Key="FormatTokenErrorBackgroundBrush" Color="#66C42B1C" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
       <!-- x:Shared=False: each ComboBox needs its own tip visual (one parent). -->
@@ -120,6 +126,26 @@
   </Style>
   <Style Selector="TextBox.format-string-field">
     <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
+  </Style>
+  <Style Selector="AvaloniaEdit|TextEditor.format-string-field">
+    <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource FileListAddressBarBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="4,2" />
+    <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
+    <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+  </Style>
+  <Style Selector="TextBlock.format-editor-watermark">
+    <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource FilterEditorWatermarkBrush}" />
+    <Setter Property="IsHitTestVisible" Value="False" />
+    <Setter Property="Margin" Value="8,6,8,0" />
+    <Setter Property="TextWrapping" Value="NoWrap" />
+    <Setter Property="TextTrimming" Value="CharacterEllipsis" />
   </Style>
   <Style Selector="ComboBox.format-string-field">
     <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
