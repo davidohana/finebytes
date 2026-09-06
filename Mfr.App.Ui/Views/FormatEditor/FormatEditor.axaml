@@ -100,8 +100,6 @@
         MinHeight="64"
         WordWrap="True"
         ShowLineNumbers="False"
-        GotFocus="_OnTemplateFocusChanged"
-        LostFocus="_OnTemplateFocusChanged"
       />
       <TextBlock
         x:Name="TemplateWatermark"

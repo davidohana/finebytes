@@ -810,6 +810,155 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies Edit still targets a prior-good token when a later unknown token fails validation.
+        /// </summary>
+        [AvaloniaFact]
+        public void EditUnderCaret_GoodThenUnknown_EditsPriorToken()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor
+            {
+                Text = "pre<counter:initial=1,step=1> <does-not-exist>",
+            };
+            var window = new Window
+            {
+                Width = 480,
+                Height = 200,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(editor.ViewModel.HasError);
+            var counter = Assert.Single(editor.ViewModel.LastParseResult!.Tokens, t => t.CanonicalName == "counter");
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            box.CaretOffset = counter.Start + 2;
+            box.Select(counter.Start + 2, 0);
+
+            Assert.True(
+                editor.EditUnderCaretForTests(
+                    accept: true,
+                    mutate: vm =>
+                    {
+                        var counterVm =
+                            Assert.IsType<App.Ui.ViewModels.FormatEditor.TokenEditors.CounterFormatTokenEditorViewModel>(
+                                vm
+                            );
+                        counterVm.Initial = 7;
+                    }
+                )
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains("initial=7", editor.Text);
+            Assert.Contains("<does-not-exist>", editor.Text);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies empty-field watermark shows without requiring focus (prior TextBox Watermark behavior).
+        /// </summary>
+        [AvaloniaFact]
+        public void Watermark_EmptyUnfocused_IsVisible()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { Watermark = "<file-name>" };
+            var window = new Window { Content = editor };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var watermark = editor.FindControl<TextBlock>("TemplateWatermark");
+            Assert.NotNull(watermark);
+            Assert.True(watermark.IsVisible);
+            Assert.Equal("<file-name>", watermark.Text);
+
+            editor.Text = "x";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(watermark.IsVisible);
+
+            editor.Text = string.Empty;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(watermark.IsVisible);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies MaxLength truncates Text and insert results.
+        /// </summary>
+        [AvaloniaFact]
+        public void MaxLength_ClampsTextAndInsert()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { MaxLength = 8, Text = "abcdefghij" };
+            var window = new Window { Content = editor };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("abcdefgh", editor.Text);
+            Assert.Equal("abcdefgh", editor.FindControl<TextEditor>("TemplateBox")?.Text);
+
+            editor.Text = "ab";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            box.CaretOffset = 2;
+            box.Select(2, 0);
+            editor.InsertTextAtCaret("cdefghijkl");
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("abcdefgh", editor.Text);
+            Assert.Equal(8, editor.Text.Length);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies AcceptsReturn=false swallows Enter so single-line hosts do not insert a newline.
+        /// </summary>
+        [AvaloniaFact]
+        public void AcceptsReturnFalse_Enter_DoesNotInsertNewline()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { AcceptsReturn = false, Text = "ab" };
+            var window = new Window { Content = editor };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            box.CaretOffset = 1;
+            box.Focus();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var args = new KeyEventArgs
+            {
+                RoutedEvent = InputElement.KeyDownEvent,
+                Key = Key.Enter,
+                Source = box.TextArea,
+            };
+            box.TextArea.RaiseEvent(args);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(args.Handled);
+            Assert.Equal("ab", editor.Text);
+            Assert.DoesNotContain("\n", editor.Text);
+            Assert.DoesNotContain("\r", editor.Text);
+
+            window.Close();
+        }
+
         private static (
             App.Ui.Views.FormatEditor.FormatEditor Editor,
             TextEditor Box,

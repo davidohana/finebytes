@@ -284,9 +284,20 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
-            if (change.Property == WatermarkProperty || change.Property == MaxLengthProperty)
+            if (change.Property == WatermarkProperty)
             {
                 _UpdateWatermarkVisibility();
+                return;
+            }
+
+            if (change.Property == MaxLengthProperty)
+            {
+                var clamped = _ClampToMaxLength(Text ?? string.Empty);
+                if (!string.Equals(clamped, Text ?? string.Empty, StringComparison.Ordinal))
+                {
+                    Text = clamped;
+                }
+
                 return;
             }
 
@@ -318,9 +329,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
             TemplateBox.Options.EnableEmailHyperlinks = false;
             TemplateBox.Options.EnableHyperlinks = false;
             TemplateBox.Options.EnableImeSupport = true;
-            TemplateBox.TextArea.SelectionBrush = this.FindResource("TextSelectionBrush") as IBrush;
-            TemplateBox.TextArea.SelectionForeground = this.FindResource("TextSelectionForegroundBrush") as IBrush;
-            TemplateBox.TextArea.TextView.LineTransformers.Add(_colorizer);
+            TemplateBox.TextArea.SelectionBrush = _ResolveBrush("TextSelectionBrush");
+            TemplateBox.TextArea.SelectionForeground = _ResolveBrush("TextSelectionForegroundBrush");
 
             if (_templateHooksAttached)
             {
@@ -328,6 +338,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             _templateHooksAttached = true;
+            TemplateBox.TextArea.TextView.LineTransformers.Add(_colorizer);
             TemplateBox.TextChanged += _OnTemplateTextChanged;
             TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
             TemplateBox.TextArea.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
@@ -384,6 +395,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 _suppressTextSync = true;
                 TemplateBox.Text = text;
                 _suppressTextSync = false;
+                _SetCaret(Math.Min(TemplateBox.CaretOffset, text.Length));
             }
 
             if (!string.Equals(Text, text, StringComparison.Ordinal))
@@ -406,11 +418,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             e.Handled = true;
-        }
-
-        private void _OnTemplateFocusChanged(object? sender, RoutedEventArgs e)
-        {
-            _UpdateWatermarkVisibility();
         }
 
         /// <summary>
@@ -736,12 +743,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         /// <summary>
         /// Resolves the token whose half-open range <c>[Start, Start+Length)</c> contains
-        /// <paramref name="index"/> (caret or click). Re-validates when the last parse failed.
+        /// <paramref name="index"/> (caret or click), including prior-good spans when validation failed.
         /// </summary>
         private FormatTokenSpan? _FindSpanAtIndex(int index)
         {
             var tokens = _TryGetParsedTokens();
-            if (tokens is null)
+            if (tokens is null || tokens.Count == 0)
             {
                 return null;
             }
@@ -750,23 +757,18 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Last successful parse tokens, re-validating when the previous parse failed.
+        /// Token spans from the latest validation (partial list when validation failed after prior tokens).
         /// </summary>
         private IReadOnlyList<FormatTokenSpan>? _TryGetParsedTokens()
         {
             var result = ViewModel.LastParseResult;
-            if (result is null || !result.Success)
+            if (result is null)
             {
                 ViewModel.Validate(Text ?? string.Empty);
                 result = ViewModel.LastParseResult;
             }
 
-            if (result is null || !result.Success)
-            {
-                return null;
-            }
-
-            return result.Tokens;
+            return result?.Tokens;
         }
 
         /// <summary>
@@ -814,13 +816,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Shows the watermark only when the field is empty and focused (matches filter TextBox tips).
+        /// Shows the watermark when the field is empty (matches prior TextBox <c>Watermark</c> behavior).
         /// </summary>
         private void _UpdateWatermarkVisibility()
         {
             var empty = string.IsNullOrEmpty(TemplateBox.Text);
-            var focused = TemplateBox.IsFocused || TemplateBox.TextArea.IsFocused;
-            TemplateWatermark.IsVisible = empty && focused && !string.IsNullOrEmpty(Watermark);
+            TemplateWatermark.IsVisible = empty && !string.IsNullOrEmpty(Watermark);
         }
 
         /// <summary>
