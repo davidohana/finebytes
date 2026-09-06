@@ -1,6 +1,7 @@
 <Window
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:Mfr.App.Ui.Views.Controls.FormatEditor"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.Controls.FormatEditor"
   x:Class="Mfr.App.Ui.Views.Controls.FormatEditor.FormatTokenEditorDialog"
   x:DataType="vm:IFormatTokenEditorViewModel"
@@ -55,7 +56,11 @@
     </StackPanel>
 
     <StackPanel Spacing="10">
-      <ContentPresenter x:Name="EditorBodyHost" />
+      <ContentControl Content="{Binding}">
+        <ContentControl.ContentTemplate>
+          <local:FormatTokenEditorViewLocator />
+        </ContentControl.ContentTemplate>
+      </ContentControl>
       <StackPanel Spacing="4">
         <TextBlock Classes="format-token-editor-label" Text="Resulting format string:" />
         <TextBox Classes="filter-editor-field" IsReadOnly="True" Text="{Binding ResultingFormatString, Mode=OneWay}" />

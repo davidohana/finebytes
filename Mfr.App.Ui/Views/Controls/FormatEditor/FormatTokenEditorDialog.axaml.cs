@@ -26,7 +26,6 @@ namespace Mfr.App.Ui.Views.Controls.FormatEditor
         {
             ArgumentNullException.ThrowIfNull(editor);
             DataContext = editor;
-            EditorBodyHost.Content = FormatTokenEditorBodyFactory.Create(editor);
         }
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)
