@@ -82,7 +82,7 @@ Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.pla
 
 **Shipped today:** multiline format-string box + tip; edits update `FormatterFilter.Options.Template`.
 
-**PR A ready to push** (engine): public `FormatTokenCatalog` + `FormatStringSyntax.TryValidate`; reviewer gate passed. **Next:** PR B FormatEditor control.
+**PR A** opened (#35). **PR B in review:** shared FormatEditor + Formatter host.
 
 **Still needed (MFR7 `FormatEditor` parity):**
 

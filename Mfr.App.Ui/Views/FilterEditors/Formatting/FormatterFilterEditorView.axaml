@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Formatting"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:fe="using:Mfr.App.Ui.Views.Controls.FormatEditor"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="160"
@@ -28,11 +29,9 @@
           </controls:RichToolTip>
         </ToolTip.Tip>
         <TextBlock Classes="filter-editor-label" Text="Format string:" />
-        <TextBox
-          x:Name="TemplateBox"
-          Classes="filter-editor-field-wrap"
+        <fe:FormatEditor
+          x:Name="TemplateEditor"
           MinWidth="240"
-          MinHeight="64"
           Watermark="&lt;file-name&gt;"
           Text="{Binding Template}"
         />
