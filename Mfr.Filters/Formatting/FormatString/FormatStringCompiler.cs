@@ -87,6 +87,7 @@ namespace Mfr.Filters.Formatting.FormatString
         /// Returns whether <paramref name="text"/> likely contains formatter tokens: at least one balanced
         /// <c>&lt;...&gt;</c> span whose leading name matches the formatter token-name heuristic (ASCII letter, then
         /// letters/digits/<c>-</c>/<c>_</c>, at least two characters before an optional <c>:</c>).
+        /// Names are not trimmed (same exact-name policy as <see cref="Compile"/>).
         /// </summary>
         /// <param name="text">Candidate template text.</param>
         /// <returns><see langword="true"/> when a qualifying span exists.</returns>
@@ -107,15 +108,14 @@ namespace Mfr.Filters.Formatting.FormatString
                     continue;
                 }
 
-                var inner = text.AsSpan(i + 1, close - (i + 1)).Trim();
+                var inner = text[(i + 1)..close];
                 if (inner.Length == 0)
                 {
                     continue;
                 }
 
-                var innerStr = inner.ToString();
-                FormatStringScan.SplitNameAndArgs(innerStr, out var namePart, out _);
-                namePart = namePart.Trim();
+                FormatStringScan.SplitNameAndArgs(inner, out var namePart, out _);
+                // Exact name (no trim) — same policy as Compile / TryValidate.
                 if (FormatStringScan.LooksLikeFormatterTokenName(namePart))
                 {
                     return true;

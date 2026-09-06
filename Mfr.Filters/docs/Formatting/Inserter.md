@@ -1,6 +1,6 @@
 # Inserter
 
-Inserts **resolved text** at a fixed **one-based character position** in the target segment. The insert string is either **literal** or a **formatter template**: a template is used only when `text` contains at least one balanced `<…>` span whose name matches the formatter token-name heuristic (same auto-detection as [AudioTagSetter](../Audio/AudioTagSetter.md) `text`). Otherwise comparisons like `a < b` stay literal.
+Inserts **resolved text** at a fixed **one-based character position** in the target segment. The insert string is either **literal** or a **formatter template**: a template is used only when `text` contains at least one balanced `<…>` span whose name matches the formatter token-name heuristic (exact name, no surrounding whitespace; same auto-detection as [AudioTagSetter](../Audio/AudioTagSetter.md) `text`). Otherwise comparisons like `a < b` stay literal.
 
 ## Options
 

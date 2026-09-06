@@ -67,7 +67,7 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 
 - **Done:** `FormatStringScan.TryWalk` yields ordered literal/token pieces (+ unclosed-likely error); `Compile` / `TryValidate` consume the same walk; shared `UnknownTokenMessage`
 - **Value (why it mattered):** FormatEditor used to be able to show green while Formatter `_Setup` threw on the same string (or vice versa). One walk closed that “UI said OK, rename failed” class of bugs for balanced spans.
-- **Left as-is:** `ContainsLikelyFormatTokens` keeps its own trim-aware heuristic walk (see item 6 for name-trim product call)
+- **Also:** `ContainsLikelyFormatTokens` uses the same exact-name split (no trim); see item 6
 
 ### 3. Grouped insert picker when search empty — **done**
 
@@ -88,13 +88,12 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 - **Value (why it mattered):** Adding a new arg-bearing token no longer means editing a twin switch (VM factory *and* View factory). Less chance the dialog opens with a blank body after a rename.
 - **Sites:** `FormatTokenEditorViewLocator` / `FormatTokenEditorDialog` / `FormatTokenEditorViewLocatorTests`
 
-### 6. Consistent name trimming in Compile — **medium** (product call)
+### 6. Consistent name trimming in Compile — **done** (product call: neither)
 
-- **Sites:** `_CompileToken` (no trim) vs any residual trim expectations in UX / docs
-- **Target:** trim both or neither; document
-- **Value:** Rare edge: templates like `<file-name >` (space before `>`). Today engine and UI can disagree on whether that is a known token. Aligning trim policy removes “works in one place, unknown token in the other” for whitespace typos—but changing Compile may break templates that currently rely on exact spacing, so it needs an explicit product call, not a silent fix.
-- **Cost:** behavior change for edge templates; low LOC
-- **Rank:** medium — only with an explicit product decision
+- **Decision:** Do **not** trim token names. Compile / TryValidate / `ContainsLikelyFormatTokens` use exact names (MFR7 parity). Named arg `key=value` whitespace trim is unchanged and separate.
+- **Done:** Removed residual trim from `ContainsLikelyFormatTokens`; documented exact-name policy in `Formatter.md`; tests for `<file-name >` / `< file-name>` as not-likely
+- **Value:** One policy everywhere — whitespace typos are unknown (Formatter) or not “likely” (Inserter/Audio), never “works in one place only”
+- **Sites:** `FormatStringCompiler` / `FormatStringScan.SplitNameAndArgs` / `Formatter.md`
 
 ### 7. Theme-aware error link color — **low**
 

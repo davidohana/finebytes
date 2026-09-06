@@ -140,6 +140,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         [InlineData("a < b > c", false)]
         [InlineData("<3>", false)]
         [InlineData("<>", false)]
+        [InlineData("<file-name >", false)]
+        [InlineData("< file-name>", false)]
         public void ContainsLikelyFormatTokens_Classifies(string text, bool expected)
         {
             Assert.Equal(expected, FormatStringCompiler.ContainsLikelyFormatTokens(text));

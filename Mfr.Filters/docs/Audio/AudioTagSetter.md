@@ -10,7 +10,7 @@ Omit a property under **`options`** (or set it to JSON **`null`**) to leave that
 
 Each included field object uses:
 
-- **`text`** — plain text, **or** a formatter template when it contains at least one balanced `<...>` span that looks like a formatter token (ASCII letter, then letters/digits/`-`/`_`, at least two characters before an optional `:`), same token language as [Formatter](../Formatting/Formatter.md). Text without such a span is left **literal**.
+- **`text`** — plain text, **or** a formatter template when it contains at least one balanced `<...>` span that looks like a formatter token (ASCII letter, then letters/digits/`-`/`_`, at least two characters before an optional `:`; exact name, no surrounding whitespace), same token language as [Formatter](../Formatting/Formatter.md). Text without such a span is left **literal**.
 - **`onlyIfEmpty`** (optional, default **`false`**) — when **`true`**, set the value only when the field is empty in the preview overlay after tags are loaded (strings: null/whitespace; year/beatsPerMinute/track/trackCount/disc/discCount: unset). When **`false`** or omitted, always set (overwrite).
 
 **String fields** (`performers`, `albumArtists`, `title`, `album`, `genre`, `comment`, `composers`, `lyrics`, `grouping`, `copyright`, `conductor`, **`year`**, **`beatsPerMinute`**, **`track`**, **`trackCount`**, **`disc`**, **`discCount`**):
