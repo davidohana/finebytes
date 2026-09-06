@@ -78,12 +78,17 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         partial void OnSearchTextChanged(string value) => _RefreshVisibleItems();
 
         /// <summary>
+        /// Gets or sets how templates are validated (always vs only when likely tokens are present).
+        /// </summary>
+        public FormatStringValidationMode ValidationMode { get; set; } = FormatStringValidationMode.Always;
+
+        /// <summary>
         /// Re-validates <paramref name="template"/> and updates the error row.
         /// </summary>
         /// <param name="template">Current format string.</param>
         public void Validate(string template)
         {
-            var result = FormatStringSyntax.TryValidate(template ?? string.Empty);
+            var result = FormatStringSyntax.TryValidate(template ?? string.Empty, ValidationMode);
             LastParseResult = result;
             HasError = !result.Success;
             FullErrorMessage = result.ErrorMessage;

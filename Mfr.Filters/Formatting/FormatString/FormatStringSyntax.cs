@@ -10,7 +10,7 @@ namespace Mfr.Filters.Formatting.FormatString
     public sealed record FormatTokenSpan(int Start, int Length, string CanonicalName, string Args);
 
     /// <summary>
-    /// Result of <see cref="FormatStringSyntax.TryValidate"/>.
+    /// Result of <see cref="FormatStringSyntax.TryValidate(string)"/>.
     /// </summary>
     /// <param name="Success"><see langword="true"/> when the template has no validation errors.</param>
     /// <param name="ErrorMessage">Failure message when <see cref="Success"/> is false; otherwise null.</param>
@@ -30,23 +30,52 @@ namespace Mfr.Filters.Formatting.FormatString
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Closed <c>&lt;…&gt;</c> spans are validated with the same lookup and <see cref="Tokens.IFormatToken.Compile"/>
-    /// rules as <see cref="FormatStringCompiler.Compile"/> (including names that do not look like tokens).
-    /// Unclosed <c>&lt;</c> that looks like a token name is reported as an error; other unclosed angles remain
-    /// literals (matching compile skip). The name heuristic matches
-    /// <see cref="FormatStringCompiler.ContainsLikelyFormatTokens"/>.
+    /// In <see cref="FormatStringValidationMode.Always"/>, closed <c>&lt;…&gt;</c> spans are validated with the
+    /// same lookup and <see cref="Tokens.IFormatToken.Compile"/> rules as <see cref="FormatStringCompiler.Compile"/>
+    /// (including names that do not look like tokens). Unclosed <c>&lt;</c> that looks like a token name is
+    /// reported as an error; other unclosed angles remain literals (matching compile skip).
+    /// </para>
+    /// <para>
+    /// In <see cref="FormatStringValidationMode.WhenLikelyTokens"/>, when
+    /// <see cref="FormatStringCompiler.ContainsLikelyFormatTokens"/> is false the template is accepted as a
+    /// literal (no spans). When it is true, validation matches <see cref="FormatStringValidationMode.Always"/>.
     /// </para>
     /// </remarks>
     public static class FormatStringSyntax
     {
         /// <summary>
-        /// Validates <paramref name="template"/> and returns token spans or the first error location.
+        /// Validates <paramref name="template"/> with <see cref="FormatStringValidationMode.Always"/>.
         /// </summary>
         /// <param name="template">Template text that may contain formatter tokens.</param>
         /// <returns>Parse result with spans on success, or error position/length/message on failure.</returns>
         public static FormatStringParseResult TryValidate(string template)
         {
+            return TryValidate(template, FormatStringValidationMode.Always);
+        }
+
+        /// <summary>
+        /// Validates <paramref name="template"/> and returns token spans or the first error location.
+        /// </summary>
+        /// <param name="template">Template text that may contain formatter tokens.</param>
+        /// <param name="mode">Whether to always validate or only when likely tokens are present.</param>
+        /// <returns>Parse result with spans on success, or error position/length/message on failure.</returns>
+        public static FormatStringParseResult TryValidate(string template, FormatStringValidationMode mode)
+        {
             ArgumentNullException.ThrowIfNull(template);
+
+            if (
+                mode == FormatStringValidationMode.WhenLikelyTokens
+                && !FormatStringCompiler.ContainsLikelyFormatTokens(template)
+            )
+            {
+                return new FormatStringParseResult(
+                    Success: true,
+                    ErrorMessage: null,
+                    ErrorPosition: -1,
+                    ErrorLength: 0,
+                    Tokens: []
+                );
+            }
 
             var pieces = new List<FormatStringPiece>();
             if (!FormatStringScan.TryWalk(template, errorOnUnclosedLikelyToken: true, pieces, out var walkError))

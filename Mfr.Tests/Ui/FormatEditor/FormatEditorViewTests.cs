@@ -559,7 +559,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies Insert and Edit are matching square glyph buttons.
+        /// Verifies Insert and Edit are matching square glyph buttons on one horizontal row.
         /// </summary>
         [AvaloniaFact]
         public void InsertAndEditButtons_AreSameSize()
@@ -575,6 +575,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(insert);
             Assert.NotNull(edit);
             Assert.Equal(insert.Bounds.Size, edit.Bounds.Size);
+            Assert.Equal(insert.Bounds.Y, edit.Bounds.Y, precision: 0);
+            Assert.True(edit.Bounds.X > insert.Bounds.X);
             Assert.Contains(insert.GetVisualDescendants().OfType<PathIcon>(), icon => icon.Width == 12);
             Assert.Contains(edit.GetVisualDescendants().OfType<PathIcon>(), icon => icon.Width == 12);
 
@@ -762,9 +764,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         [AvaloniaFact]
         public void RightClick_AdjacentTokens_SelectsGlyphToken()
         {
-            var (_, box, window, fileName, counter) = _ShowTwoTokenEditor(
-                "pre<file-name><counter:initial=1,step=1>post"
-            );
+            var (_, box, window, fileName, _) = _ShowTwoTokenEditor("pre<file-name><counter:initial=1,step=1>post");
             box.Focus();
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -777,8 +777,8 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             window.Close();
             Dispatcher.UIThread.RunJobs();
-
-            (_, box, window, fileName, counter) = _ShowTwoTokenEditor("pre<file-name><counter:initial=1,step=1>post");
+            FormatTokenSpan? counter;
+            (_, box, window, _, counter) = _ShowTwoTokenEditor("pre<file-name><counter:initial=1,step=1>post");
             box.Focus();
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

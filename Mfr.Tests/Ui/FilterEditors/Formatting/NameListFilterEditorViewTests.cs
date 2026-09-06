@@ -6,6 +6,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
 using Mfr.Tests.Ui.AppliedFilters;
+using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Formatting
 {
@@ -29,12 +30,14 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
 
             var editor = editorView.GetVisualDescendants().OfType<NameListFilterEditorView>().Single();
             var entries = editor.FindControl<TextBox>("EntriesBox");
-            var prefix = editor.FindControl<TextBox>("PrefixBox");
-            var suffix = editor.FindControl<TextBox>("SuffixBox");
+            var prefix = editor.FindControl<FormatEditorControl>("PrefixEditor");
+            var suffix = editor.FindControl<FormatEditorControl>("SuffixEditor");
             Assert.NotNull(entries);
             Assert.NotNull(prefix);
             Assert.NotNull(suffix);
             Assert.True(entries.AcceptsReturn);
+            Assert.False(prefix.AcceptsReturn);
+            Assert.False(suffix.AcceptsReturn);
             Assert.Equal(string.Empty, entries.Text);
             Assert.Equal(string.Empty, prefix.Text);
             Assert.Equal(string.Empty, suffix.Text);

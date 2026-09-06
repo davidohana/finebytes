@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Formatting"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="240"
@@ -47,7 +48,13 @@
               <TextBlock Classes="rich-tip-body" Text="May include formatter tokens such as &lt;counter:…&gt;." />
             </controls:RichToolTip>
           </ToolTip.Tip>
-          <TextBox x:Name="PrefixBox" Classes="filter-editor-field" MinWidth="240" Text="{Binding Prefix}" />
+          <fe:FormatEditor
+            x:Name="PrefixEditor"
+            MinWidth="240"
+            AcceptsReturn="False"
+            ShowRightClickHint="False"
+            Text="{Binding Prefix}"
+          />
         </controls:FilterEditorLabeledRow>
         <controls:FilterEditorLabeledRow Label="Suffix:">
           <ToolTip.Tip>
@@ -56,8 +63,15 @@
               <TextBlock Classes="rich-tip-body" Text="May include formatter tokens such as &lt;counter:…&gt;." />
             </controls:RichToolTip>
           </ToolTip.Tip>
-          <TextBox x:Name="SuffixBox" Classes="filter-editor-field" MinWidth="240" Text="{Binding Suffix}" />
+          <fe:FormatEditor
+            x:Name="SuffixEditor"
+            MinWidth="240"
+            AcceptsReturn="False"
+            ShowRightClickHint="False"
+            Text="{Binding Suffix}"
+          />
         </controls:FilterEditorLabeledRow>
+        <controls:FilterEditorHint Text="Prefix and suffix may use formatter tokens; right-click a token to customize it." />
       </StackPanel>
     </controls:FieldsetGroup>
   </StackPanel>

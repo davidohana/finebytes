@@ -4,6 +4,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FormatEditor;
@@ -34,6 +35,39 @@ namespace Mfr.App.Ui.Views.FormatEditor
         >(nameof(Watermark));
 
         /// <summary>
+        /// Defines the <see cref="ValidationMode"/> property.
+        /// </summary>
+        public static readonly StyledProperty<FormatStringValidationMode> ValidationModeProperty =
+            AvaloniaProperty.Register<FormatEditor, FormatStringValidationMode>(
+                nameof(ValidationMode),
+                defaultValue: FormatStringValidationMode.Always
+            );
+
+        /// <summary>
+        /// Defines the <see cref="AcceptsReturn"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> AcceptsReturnProperty = AvaloniaProperty.Register<
+            FormatEditor,
+            bool
+        >(nameof(AcceptsReturn), defaultValue: true);
+
+        /// <summary>
+        /// Defines the <see cref="ShowRightClickHint"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> ShowRightClickHintProperty = AvaloniaProperty.Register<
+            FormatEditor,
+            bool
+        >(nameof(ShowRightClickHint), defaultValue: true);
+
+        /// <summary>
+        /// Defines the <see cref="MaxLength"/> property.
+        /// </summary>
+        public static readonly StyledProperty<int> MaxLengthProperty = AvaloniaProperty.Register<FormatEditor, int>(
+            nameof(MaxLength),
+            defaultValue: 0
+        );
+
+        /// <summary>
         /// Gets the control view-model (picker / error state).
         /// </summary>
         public FormatEditorViewModel ViewModel { get; }
@@ -56,6 +90,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
             InsertList.AddHandler(TreeViewItem.ExpandedEvent, _OnInsertGroupExpanded);
             InsertList.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
             InsertSearchBox.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
+            ViewModel.ValidationMode = ValidationMode;
+            _ApplyAcceptsReturnLayout(AcceptsReturn);
         }
 
         /// <summary>
@@ -74,6 +110,42 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             get => GetValue(WatermarkProperty);
             set => SetValue(WatermarkProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets whether validation always runs or only when likely tokens are present.
+        /// </summary>
+        public FormatStringValidationMode ValidationMode
+        {
+            get => GetValue(ValidationModeProperty);
+            set => SetValue(ValidationModeProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets whether the text box accepts multi-line input (Formatter default).
+        /// </summary>
+        public bool AcceptsReturn
+        {
+            get => GetValue(AcceptsReturnProperty);
+            set => SetValue(AcceptsReturnProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets whether the right-click hint under the field is shown.
+        /// </summary>
+        public bool ShowRightClickHint
+        {
+            get => GetValue(ShowRightClickHintProperty);
+            set => SetValue(ShowRightClickHintProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets the maximum character count for the text box (<c>0</c> = unlimited).
+        /// </summary>
+        public int MaxLength
+        {
+            get => GetValue(MaxLengthProperty);
+            set => SetValue(MaxLengthProperty, value);
         }
 
         private bool _suppressTextSync;
@@ -201,6 +273,20 @@ namespace Mfr.App.Ui.Views.FormatEditor
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
+
+            if (change.Property == AcceptsReturnProperty)
+            {
+                _ApplyAcceptsReturnLayout(change.GetNewValue<bool>());
+                return;
+            }
+
+            if (change.Property == ValidationModeProperty)
+            {
+                ViewModel.ValidationMode = change.GetNewValue<FormatStringValidationMode>();
+                ViewModel.Validate(Text ?? string.Empty);
+                return;
+            }
+
             if (change.Property != TextProperty || _suppressTextSync)
             {
                 return;
@@ -215,6 +301,26 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             ViewModel.Validate(text);
+        }
+
+        /// <summary>
+        /// Adjusts text-box height and wrapping for single-line vs multi-line hosts.
+        /// </summary>
+        private void _ApplyAcceptsReturnLayout(bool acceptsReturn)
+        {
+            if (acceptsReturn)
+            {
+                TemplateBox.MinHeight = 64;
+                TemplateBox.TextWrapping = TextWrapping.Wrap;
+                TemplateBox.Classes.Set("filter-editor-field-wrap", true);
+                TemplateBox.Classes.Set("filter-editor-field", false);
+                return;
+            }
+
+            TemplateBox.MinHeight = 26;
+            TemplateBox.TextWrapping = TextWrapping.NoWrap;
+            TemplateBox.Classes.Set("filter-editor-field-wrap", false);
+            TemplateBox.Classes.Set("filter-editor-field", true);
         }
 
         private void _InsertFlyoutHide()
@@ -294,7 +400,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// </summary>
         private static bool _OriginatedFromExpandChevron(Visual source, TreeViewItem item)
         {
-            Visual? current = source;
+            var current = source;
             while (current is not null && !ReferenceEquals(current, item))
             {
                 if (current is ToggleButton)
@@ -496,7 +602,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         /// <summary>
         /// Maps a point in <see cref="TemplateBox"/> coordinates to the glyph under the pointer
-        /// (<see cref="Avalonia.Media.CharacterHit.FirstCharacterIndex"/>), not the trailing-edge caret
+        /// (<see cref="CharacterHit.FirstCharacterIndex"/>), not the trailing-edge caret
         /// (<c>TextHitTestResult.TextPosition</c>).
         /// </summary>
         private int? _TryGetCharacterIndexAt(Point boxPoint)

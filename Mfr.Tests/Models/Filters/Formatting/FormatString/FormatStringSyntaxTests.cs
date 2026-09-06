@@ -134,6 +134,35 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         }
 
         /// <summary>
+        /// Verifies balanced non-token-looking spans are accepted under WhenLikelyTokens (literal path).
+        /// </summary>
+        [Theory]
+        [InlineData("a < b > c")]
+        [InlineData("<3>")]
+        [InlineData("<>")]
+        [InlineData("< file-name>")]
+        public void TryValidate_WhenLikelyTokens_NonLikelyBalanced_Succeeds(string template)
+        {
+            var result = FormatStringSyntax.TryValidate(template, FormatStringValidationMode.WhenLikelyTokens);
+
+            Assert.True(result.Success);
+            Assert.Empty(result.Tokens);
+        }
+
+        /// <summary>
+        /// Verifies WhenLikelyTokens still rejects bad real tokens.
+        /// </summary>
+        [Fact]
+        public void TryValidate_WhenLikelyTokens_UnknownLikelyToken_Fails()
+        {
+            var template = "x <does-not-exist> y";
+            var result = FormatStringSyntax.TryValidate(template, FormatStringValidationMode.WhenLikelyTokens);
+
+            Assert.False(result.Success);
+            Assert.Contains("Unknown formatter token", result.ErrorMessage);
+        }
+
+        /// <summary>
         /// Verifies nested tokens inside args are accepted when the outer token compiles.
         /// </summary>
         [Fact]

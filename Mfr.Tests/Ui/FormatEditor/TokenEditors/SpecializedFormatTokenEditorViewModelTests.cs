@@ -1,5 +1,5 @@
-using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
+using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
 using Mfr.Filters.Formatting.FormatString;
 
 namespace Mfr.Tests.Ui.FormatEditor.TokenEditors

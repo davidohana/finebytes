@@ -8,6 +8,7 @@ using Mfr.App.Ui.Views.FilterEditors.Misc;
 using Mfr.Filters.Misc;
 using Mfr.Tests.Ui.AppliedFilters;
 using Mfr.Tests.Ui.RenameList;
+using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Misc
 {
@@ -31,13 +32,14 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
 
             var editor = editorView.GetVisualDescendants().OfType<PathMoverFilterEditorView>().Single();
             var rootFolder = editor.FindControl<TextBox>("RootFolderBox");
-            var subFolder = editor.FindControl<TextBox>("SubFolderBox");
+            var subFolder = editor.FindControl<FormatEditorControl>("SubFolderEditor");
             var browse = editor.FindControl<HyperlinkButton>("BrowseRootButton");
             Assert.NotNull(rootFolder);
             Assert.NotNull(subFolder);
             Assert.NotNull(browse);
             Assert.Equal(@"C:\", rootFolder.Text);
             Assert.Equal("MFR", subFolder.Text);
+            Assert.False(subFolder.AcceptsReturn);
             Assert.Same(
                 (
                     (PathMoverFilterEditorViewModel)mainViewModel.FilterEditorViewModel.OptionsEditor

@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Misc"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="180"
@@ -70,11 +71,11 @@
             </controls:RichToolTip>
           </ToolTip.Tip>
           <TextBlock Classes="filter-editor-label" Text="Sub-folder:" />
-          <TextBox
-            x:Name="SubFolderBox"
-            Classes="filter-editor-field-wrap"
+          <fe:FormatEditor
+            x:Name="SubFolderEditor"
             MinWidth="240"
             MaxLength="500"
+            AcceptsReturn="False"
             Watermark="MFR"
             Text="{Binding SubFolder}"
           />

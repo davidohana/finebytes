@@ -22,10 +22,20 @@
         Command="{Binding JumpToErrorCommand}"
         ToolTip.Tip="{Binding FullErrorMessage}"
       />
-      <controls:FilterEditorHint x:Name="RightClickHint" Text="Right-click a formatting parameter to customize it." />
+      <controls:FilterEditorHint
+        x:Name="RightClickHint"
+        Text="Right-click a formatting parameter to customize it."
+        IsVisible="{Binding ShowRightClickHint, ElementName=Root}"
+      />
     </StackPanel>
 
-    <StackPanel DockPanel.Dock="Right" Spacing="4" Margin="6,0,0,0" VerticalAlignment="Top">
+    <StackPanel
+      DockPanel.Dock="Right"
+      Orientation="Horizontal"
+      Spacing="4"
+      Margin="6,0,0,0"
+      VerticalAlignment="Center"
+    >
       <Button
         x:Name="InsertButton"
         Classes="filter-editor-button format-editor-tool"
@@ -92,7 +102,8 @@
       x:Name="TemplateBox"
       Classes="filter-editor-field-wrap format-string-field"
       MinHeight="64"
-      AcceptsReturn="True"
+      AcceptsReturn="{Binding AcceptsReturn, ElementName=Root}"
+      MaxLength="{Binding MaxLength, ElementName=Root}"
       TextWrapping="Wrap"
       ClearSelectionOnLostFocus="False"
       IsInactiveSelectionHighlightEnabled="True"

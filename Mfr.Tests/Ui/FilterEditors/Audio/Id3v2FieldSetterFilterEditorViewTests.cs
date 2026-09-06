@@ -6,7 +6,9 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Audio;
 using Mfr.Filters.Audio;
+using Mfr.Filters.Formatting.FormatString;
 using Mfr.Tests.Ui.AppliedFilters;
+using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Audio
 {
@@ -31,27 +33,28 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
 
             var editor = editorView.GetVisualDescendants().OfType<Id3v2FieldSetterFilterEditorView>().Single();
             var frameCombo = editor.FindControl<ComboBox>("FrameCombo");
-            var textBox = editor.FindControl<TextBox>("TextBox");
+            var textEditor = editor.FindControl<FormatEditorControl>("TextEditor");
             var onlyIfEmpty = editor.FindControl<CompactCheckBox>("OnlyIfEmptyCheckBox");
             var languageRow = editor.FindControl<FilterEditorLabeledRow>("LanguageRow");
             var descriptionRow = editor.FindControl<FilterEditorLabeledRow>("DescriptionRow");
             var languageBox = editor.FindControl<TextBox>("LanguageBox");
             var descriptionBox = editor.FindControl<TextBox>("DescriptionBox");
             Assert.NotNull(frameCombo);
-            Assert.NotNull(textBox);
+            Assert.NotNull(textEditor);
             Assert.NotNull(onlyIfEmpty);
             Assert.NotNull(languageRow);
             Assert.NotNull(descriptionRow);
             Assert.NotNull(languageBox);
             Assert.NotNull(descriptionBox);
             Assert.Equal("TIT2", editorVm.SelectedFrame.FrameId);
-            Assert.Equal(string.Empty, textBox.Text);
+            Assert.Equal(FormatStringValidationMode.WhenLikelyTokens, textEditor.ValidationMode);
+            Assert.Equal(string.Empty, textEditor.Text);
             Assert.False(onlyIfEmpty.IsChecked);
             Assert.False(languageRow.IsVisible);
             Assert.False(descriptionRow.IsVisible);
 
             frameCombo.SelectedItem = editorVm.Frames.Single(c => c.FrameId == "COMM");
-            textBox.Text = "Hi";
+            textEditor.Text = "Hi";
             onlyIfEmpty.IsChecked = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

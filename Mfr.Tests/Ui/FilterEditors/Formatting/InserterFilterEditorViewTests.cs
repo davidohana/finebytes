@@ -6,7 +6,9 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 using Mfr.Tests.Ui.AppliedFilters;
+using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Formatting
 {
@@ -29,7 +31,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             Assert.IsType<InserterFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<InserterFilterEditorView>().Single();
-            var insertText = editor.FindControl<TextBox>("InsertTextBox");
+            var insertText = editor.FindControl<FormatEditorControl>("InsertTextEditor");
             var position = editor.FindControl<CompactNumericUpDown>("PositionSpinner");
             var endRadio = editor.FindControl<RadioButton>("EndRadio");
             var overwrite = editor.FindControl<CompactCheckBox>("OverwriteCheckBox");
@@ -37,6 +39,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             Assert.NotNull(position);
             Assert.NotNull(endRadio);
             Assert.NotNull(overwrite);
+            Assert.Equal(FormatStringValidationMode.WhenLikelyTokens, insertText.ValidationMode);
+            Assert.False(insertText.AcceptsReturn);
             Assert.Equal(string.Empty, insertText.Text);
             Assert.Equal(1, position.Value);
             Assert.False(overwrite.IsChecked);

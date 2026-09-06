@@ -11,6 +11,7 @@ using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Audio;
 using Mfr.Filters.Audio;
 using Mfr.Tests.Ui.AppliedFilters;
+using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Audio
 {
@@ -34,11 +35,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             var editor = editorView.GetVisualDescendants().OfType<AudioTagSetterFilterEditorView>().Single();
 
             var titleCheck = _FindFieldCheckBox(editor, AudioTagSetterFieldKind.Title);
-            var titleBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.Title);
+            var titleEditor = _FindVisibleFieldFormatEditor(editor, AudioTagSetterFieldKind.Title);
             Assert.False(titleCheck.IsChecked);
-            Assert.Equal(string.Empty, titleBox.Text);
+            Assert.Equal(string.Empty, titleEditor.Text);
 
-            titleBox.Text = "<file-name>";
+            titleEditor.Text = "<file-name>";
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -57,7 +58,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.True(filter.Options.Title.OnlyIfEmpty);
 
             var trackCheck = _FindFieldCheckBox(editor, AudioTagSetterFieldKind.Track);
-            var trackBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.Track);
+            var trackEditor = _FindVisibleFieldFormatEditor(editor, AudioTagSetterFieldKind.Track);
             var autoInc = editor
                 .GetVisualDescendants()
                 .OfType<CompactCheckBox>()
@@ -66,7 +67,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
                 );
             Assert.True(autoInc.IsChecked);
 
-            trackBox.Text = "1";
+            trackEditor.Text = "1";
             autoInc.IsChecked = false;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -103,19 +104,19 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Dispatcher.UIThread.RunJobs();
 
             var editor = editorView.GetVisualDescendants().OfType<AudioTagSetterFilterEditorView>().Single();
-            var performersBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.Performers);
-            var titleBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.Title);
-            var albumArtistsBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.AlbumArtists);
+            var performersEditor = _FindVisibleFieldFormatEditor(editor, AudioTagSetterFieldKind.Performers);
+            var titleEditor = _FindVisibleFieldFormatEditor(editor, AudioTagSetterFieldKind.Title);
+            var albumArtistsEditor = _FindVisibleFieldFormatEditor(editor, AudioTagSetterFieldKind.AlbumArtists);
             var genreCombo = _FindVisibleFieldComboBox(editor, AudioTagSetterFieldKind.Genre);
             var lyricsCheck = _FindFieldCheckBox(editor, AudioTagSetterFieldKind.Lyrics);
-            var lyricsBox = _FindVisibleFieldTextBox(editor, AudioTagSetterFieldKind.Lyrics);
+            var lyricsEditor = _FindVisibleFieldFormatEditor(editor, AudioTagSetterFieldKind.Lyrics);
 
-            Assert.True(performersBox.Bounds.Width > 1 && titleBox.Bounds.Width > 1);
-            Assert.Equal(_LeftInEditor(editor, performersBox), _LeftInEditor(editor, titleBox), precision: 0);
-            Assert.Equal(_LeftInEditor(editor, albumArtistsBox), _LeftInEditor(editor, genreCombo), precision: 0);
-            Assert.True(_LeftInEditor(editor, albumArtistsBox) > _LeftInEditor(editor, performersBox));
+            Assert.True(performersEditor.Bounds.Width > 1 && titleEditor.Bounds.Width > 1);
+            Assert.Equal(_LeftInEditor(editor, performersEditor), _LeftInEditor(editor, titleEditor), precision: 0);
+            Assert.Equal(_LeftInEditor(editor, albumArtistsEditor), _LeftInEditor(editor, genreCombo), precision: 0);
+            Assert.True(_LeftInEditor(editor, albumArtistsEditor) > _LeftInEditor(editor, performersEditor));
             Assert.Equal(VerticalAlignment.Center, lyricsCheck.VerticalAlignment);
-            Assert.True(lyricsBox.Bounds.Width > performersBox.Bounds.Width);
+            Assert.True(lyricsEditor.Bounds.Width > performersEditor.Bounds.Width);
 
             window.Close();
         }
@@ -170,14 +171,14 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
                 .Single(box => box.Tag is AudioTagSetterFieldKind tagged && tagged == kind);
         }
 
-        private static TextBox _FindVisibleFieldTextBox(
+        private static FormatEditorControl _FindVisibleFieldFormatEditor(
             AudioTagSetterFilterEditorView editor,
             AudioTagSetterFieldKind kind
         )
         {
             return editor
                 .GetVisualDescendants()
-                .OfType<TextBox>()
+                .OfType<FormatEditorControl>()
                 .Single(box => box.IsVisible && box.Tag is AudioTagSetterFieldKind tagged && tagged == kind);
         }
 

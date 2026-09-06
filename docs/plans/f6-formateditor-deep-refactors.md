@@ -49,7 +49,7 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 | --------------------------------------------------------- | ---------------------------------------------- |
 | Nested `FormatEditor` in substr/token `source=` fields    | High engine+UI+gesture cost; not F6 exit       |
 | Nested token spans / caret hit-test in `TryValidate`      | Needed mainly for nested Edit; ride with above |
-| Inserter / Audio “likely-token” validation policy flag    | No second FormatEditor host yet                |
+| Inserter / Audio “likely-token” validation policy flag    | Done — `FormatStringValidationMode`            |
 | Replace `[FormatTokenInfo]` reflection with hand registry | Explicit non-goal (open catalog is correct)    |
 
 ## Ranked follow-ups (best cost-to-value first)
@@ -113,13 +113,11 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 - **Cost:** high (engine + UI + gestures + tests)
 - **Rank:** low for F6 — post-F6 feature; pair engine nested spans with UI
 
-### 10. Inserter/Audio “likely-token” validation mode — **low**
+### 10. Inserter/Audio “likely-token” validation mode — **done**
 
-- **Sites:** `FormatStringCompiler.ContainsLikelyFormatTokens` gate vs Formatter always-Compile; FormatEditor always validates
-- **Target:** FormatEditor validation policy flag when hosts do not always-Compile
-- **Value:** Formatter always treats balanced `<…>` as tokens. Inserter / some Audio fields only compile when text “looks like” tokens, so literal `<3>` or comparison text can stay literal. If those hosts reuse FormatEditor without a policy flag, the error row will red-flag strings that currently rename fine. The flag preserves host semantics when FormatEditor is adopted outside Formatter.
-- **Cost:** UI API; not needed until those hosts adopt FormatEditor
-- **Rank:** low — defer until reuse
+- **Sites:** `FormatStringCompiler.ContainsLikelyFormatTokens` gate vs Formatter always-Compile; FormatEditor hosts outside Formatter
+- **Done:** `FormatStringValidationMode` + `FormatStringSyntax.TryValidate(…, mode)`; FormatEditor `ValidationMode` DP; Inserter / Audio Tag Setter / ID3v2 use `WhenLikelyTokens`
+- **Value:** Literal `<3>` / comparison text stay green in those hosts while real tokens still validate
 
 ## Explicit non-goals / skip
 

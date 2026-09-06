@@ -129,6 +129,21 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies WhenLikelyTokens skips errors for non-token angle brackets.
+        /// </summary>
+        [Fact]
+        public void Validate_WhenLikelyTokens_NonLikelyLiteral_ClearsError()
+        {
+            var vm = _CreateVm();
+            vm.ValidationMode = FormatStringValidationMode.WhenLikelyTokens;
+
+            vm.Validate("<3>");
+            Assert.False(vm.HasError);
+            Assert.NotNull(vm.LastParseResult);
+            Assert.True(vm.LastParseResult.Success);
+        }
+
+        /// <summary>
         /// Verifies long parse errors are truncated inline while FullErrorMessage stays complete.
         /// </summary>
         [Fact]

@@ -5,6 +5,8 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Audio"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
+  xmlns:formatString="using:Mfr.Filters.Formatting.FormatString"
   mc:Ignorable="d"
   d:DesignWidth="560"
   d:DesignHeight="480"
@@ -33,9 +35,11 @@
           <TextBlock Classes="filter-editor-label" Text="{Binding Label}" />
         </controls:CompactCheckBox>
         <Panel Grid.Column="2">
-          <TextBox
-            Classes="filter-editor-field"
+          <fe:FormatEditor
             MinWidth="100"
+            AcceptsReturn="False"
+            ShowRightClickHint="False"
+            ValidationMode="{x:Static formatString:FormatStringValidationMode.WhenLikelyTokens}"
             Watermark="{Binding Watermark}"
             Text="{Binding Text}"
             Tag="{Binding Kind}"
@@ -56,11 +60,11 @@
             IsVisible="{Binding UsesGenreCombo}"
             VerticalAlignment="Center"
           />
-          <TextBox
-            Classes="filter-editor-field-wrap"
+          <fe:FormatEditor
             MinWidth="160"
-            MinHeight="64"
             AcceptsReturn="True"
+            ShowRightClickHint="False"
+            ValidationMode="{x:Static formatString:FormatStringValidationMode.WhenLikelyTokens}"
             Watermark="{Binding Watermark}"
             Text="{Binding Text}"
             Tag="{Binding Kind}"
