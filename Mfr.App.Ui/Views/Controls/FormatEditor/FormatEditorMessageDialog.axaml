@@ -1,0 +1,26 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  x:Class="Mfr.App.Ui.Views.Controls.FormatEditor.FormatEditorMessageDialog"
+  Icon="/Assets/mfr.ico"
+  Width="420"
+  MinWidth="360"
+  SizeToContent="Height"
+  WindowStartupLocation="CenterOwner"
+  ShowInTaskbar="False"
+  CanResize="False"
+>
+  <DockPanel Margin="16">
+    <Button
+      DockPanel.Dock="Bottom"
+      Content="OK"
+      MinWidth="88"
+      HorizontalAlignment="Right"
+      Margin="0,16,0,0"
+      IsDefault="True"
+      IsCancel="True"
+      Click="_OnOkClick"
+    />
+    <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
+  </DockPanel>
+</Window>

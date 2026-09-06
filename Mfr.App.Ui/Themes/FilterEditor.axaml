@@ -132,6 +132,22 @@
     <Setter Property="Foreground" Value="{DynamicResource FilterEditorWatermarkBrush}" />
   </Style>
 
+  <Style Selector="Button.format-editor-error-link">
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="HorizontalAlignment" Value="Left" />
+    <Setter Property="HorizontalContentAlignment" Value="Left" />
+    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="Foreground" Value="#C42B1C" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.format-editor-error-link:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="Transparent" />
+  </Style>
+
   <Style Selector="TextBlock.rich-tip-title">
     <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
     <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />

@@ -10,22 +10,22 @@ todos:
     status: completed
   - id: f6-p2-control
     content: "Phase 2/PR B: Shared FormatEditor + wire Formatter + UI tests"
-    status: pending
+    status: completed
   - id: f6-p2-review
     content: "PR B gate: separate reviewer agent (mfr-code-review); fix high-confidence; no push until pass"
-    status: pending
+    status: completed
   - id: f6-p3-param-editors
     content: "Phase 3: C1 shell+counter, then C2+ remaining param editors + tests"
-    status: pending
+    status: completed
   - id: f6-p3-review
     content: "PR C gate(s): separate reviewer after C1 and after C2+ (mfr-code-review); no push until pass"
-    status: pending
+    status: completed
   - id: f6-p4-docs
     content: "Docs: sync plan to docs/plans/; mark F6 done; debts.md highlight deferral"
-    status: pending
+    status: completed
   - id: f6-deep-refactors
     content: "Final reviewer pass: summarize all deferred deep refactors (cost-to-value) into docs/plans/"
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -490,3 +490,10 @@ Turn into [f6-formateditor-deep-refactors.md](f6-formateditor-deep-refactors.md)
 1. **Consistent name trimming in Compile** (medium) — trim both or neither; product call.
 1. **Inserter/Audio “likely-token” validation mode** (low until reuse) — FormatEditor policy flag when hosts don’t always-Compile.
 1. Keep attribute-per-token reflection catalog (do not replace with hand registry).
+
+### From PR B review
+
+1. **Grouped insert picker when search empty** (high) — nest by `GroupPath`; flat when filtering.
+1. **Flyout UX: focus search + Enter-to-insert** (medium).
+1. **Shared OK-only message dialog** (low until second host).
+1. **Theme-aware error link color** (low).

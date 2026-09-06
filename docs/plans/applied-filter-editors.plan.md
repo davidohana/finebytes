@@ -1,13 +1,13 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F5 shipped: Applied list + Filter Configuration host + every option-bearing filter has a live editor. Next: Formatter FormatEditor UX, presets, session chain, filter chrome (heart/reset/help), Filter Options polish."
+overview: "F1–F6 shipped (F6 PRs open, not merged): Applied list + Filter Configuration + FormatEditor. Next: presets, session chain, filter chrome, Filter Options polish."
 todos:
   - id: f1-f5-complete
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
     status: completed
   - id: f6-formatter-format-editor
-    content: "F6 Formatter FormatEditor — see formatter-formateditor-ux.plan.md (PR A ready to push; next PR B)"
-    status: in_progress
+    content: "F6 Formatter FormatEditor — shipped (PRs A/B/C); see formatter-formateditor-ux.plan.md"
+    status: completed
   - id: f7-presets-ui
     content: "F7 Presets UI — enable Presets / Save Preset; load/save chain via PresetManager"
     status: pending
@@ -78,21 +78,18 @@ Ordered for product value. Do **not** mix these into a single “editor” pass 
 
 ### F6 — Formatter FormatEditor UX
 
-Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.plan.md).
+Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.plan.md). Deep follow-ups: [f6-formateditor-deep-refactors.md](f6-formateditor-deep-refactors.md).
 
-**Shipped today:** multiline format-string box + tip; edits update `FormatterFilter.Options.Template`.
+**Shipped (PRs A–C, not merged yet):**
 
-**PR A ready to push** (engine): public `FormatTokenCatalog` + `FormatStringSyntax.TryValidate`; reviewer gate passed. **Next:** PR B FormatEditor control.
+1. Public `FormatTokenCatalog` + `FormatStringSyntax.TryValidate` (engine).
+1. Shared `FormatEditor` (searchable insert, caret insert, inline error + jump) wired to Formatter.
+1. Param dialogs for all arg-bearing tokens (`FormatTokenEditorRegistry` + Edit/right-click).
 
-**Still needed (MFR7 `FormatEditor` parity):**
+**Reuse later:** PathMover / Inserter / Audio Tag Setter format fields. Syntax highlight deferred (`docs/debts.md`).
 
-1. **Token catalog** — searchable + grouped insert UI (engine catalog in PR A).
-1. **Insert at caret** — pick inserts default `<token…>` at caret (PR B control).
-1. **Parse-error feedback** — inline error + jump to bad span (PR B).
-1. **Param dialogs** — Edit/right-click for arg-bearing tokens (PR C).
-1. **Reuse decision** — shareable `FormatEditor`; only Formatter ships it in F6.
+**PRs (do not merge yet):** [A #35](https://github.com/davidohana/finebytes/pull/35) · [B #36](https://github.com/davidohana/finebytes/pull/36) · [C #37](https://github.com/davidohana/finebytes/pull/37).
 
-Own sub-project; not a one-afternoon filter-editor pass. Skill note: Formatter rich builder is explicitly out of scope for `mfr-implement-filter-editor`.
 
 ### F7 — Presets UI
 
