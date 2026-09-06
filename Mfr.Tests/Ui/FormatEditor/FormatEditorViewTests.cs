@@ -860,10 +860,10 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies empty-field watermark shows without requiring focus (prior TextBox Watermark behavior).
+        /// Verifies empty-field watermark shows only while focused (matches filter TextBox tips).
         /// </summary>
         [AvaloniaFact]
-        public void Watermark_EmptyUnfocused_IsVisible()
+        public void Watermark_EmptyFocused_IsVisible()
         {
             var editor = new App.Ui.Views.FormatEditor.FormatEditor { Watermark = "<file-name>" };
             var window = new Window { Content = editor };
@@ -872,9 +872,17 @@ namespace Mfr.Tests.Ui.FormatEditor
             Dispatcher.UIThread.RunJobs();
 
             var watermark = editor.FindControl<TextBlock>("TemplateWatermark");
+            var box = editor.FindControl<TextEditor>("TemplateBox");
             Assert.NotNull(watermark);
-            Assert.True(watermark.IsVisible);
+            Assert.NotNull(box);
+            Assert.False(watermark.IsVisible);
             Assert.Equal("<file-name>", watermark.Text);
+
+            // AvaloniaEdit focuses TextArea (TemplateBox itself is not Focusable).
+            Assert.True(box.TextArea.Focus());
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(watermark.IsVisible);
 
             editor.Text = "x";
             window.UpdateLayout();

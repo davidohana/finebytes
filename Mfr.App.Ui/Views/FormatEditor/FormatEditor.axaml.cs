@@ -340,6 +340,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
             _templateHooksAttached = true;
             TemplateBox.TextArea.TextView.LineTransformers.Add(_colorizer);
             TemplateBox.TextChanged += _OnTemplateTextChanged;
+            // AvaloniaEdit focuses TextArea (TemplateBox.Focusable is false), so tip visibility
+            // must listen here as well as GotFocus/LostFocus on TemplateBox in AXAML.
+            TemplateBox.TextArea.GotFocus += _OnTemplateFocusChanged;
+            TemplateBox.TextArea.LostFocus += _OnTemplateFocusChanged;
             TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
             TemplateBox.TextArea.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
             TemplateBox.TextArea.AddHandler(KeyDownEvent, _OnTemplateKeyDown, RoutingStrategies.Tunnel);
@@ -815,13 +819,19 @@ namespace Mfr.App.Ui.Views.FormatEditor
             return null;
         }
 
+        private void _OnTemplateFocusChanged(object? sender, RoutedEventArgs e)
+        {
+            _UpdateWatermarkVisibility();
+        }
+
         /// <summary>
-        /// Shows the watermark when the field is empty (matches prior TextBox <c>Watermark</c> behavior).
+        /// Shows the watermark only when the field is empty and focused (matches filter TextBox tips).
         /// </summary>
         private void _UpdateWatermarkVisibility()
         {
             var empty = string.IsNullOrEmpty(TemplateBox.Text);
-            TemplateWatermark.IsVisible = empty && !string.IsNullOrEmpty(Watermark);
+            var focused = TemplateBox.IsFocused || TemplateBox.TextArea.IsFocused;
+            TemplateWatermark.IsVisible = empty && focused && !string.IsNullOrEmpty(Watermark);
         }
 
         /// <summary>
