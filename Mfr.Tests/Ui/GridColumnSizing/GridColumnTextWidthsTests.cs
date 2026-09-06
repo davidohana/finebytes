@@ -32,8 +32,8 @@ namespace Mfr.Tests.Ui.GridColumnSizing
             Assert.NotNull(app);
             var theme = app.ActualThemeVariant;
 
-            Assert.True(app.TryGetResource("AppChromeFont", theme, out var fileListFont));
-            Assert.Same(GridFonts.AppChromeFamily, Assert.IsType<FontFamily>(fileListFont));
+            Assert.True(app.TryGetResource("AppChromeFont", theme, out var appChromeFont));
+            Assert.Same(GridFonts.AppChromeFamily, Assert.IsType<FontFamily>(appChromeFont));
 
             Assert.True(app.TryGetResource("AppChromeFixedWidthFont", theme, out var fixedWidthFont));
             Assert.Same(GridFonts.AppChromeFixedWidthFamily, Assert.IsType<FontFamily>(fixedWidthFont));

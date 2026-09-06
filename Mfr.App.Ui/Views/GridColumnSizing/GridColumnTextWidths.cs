@@ -9,15 +9,15 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
     internal readonly struct GridColumnTextFontContext
     {
         /// <summary>
-        /// Proportional File List / Rename List font.
+        /// Proportional app chrome font.
         /// </summary>
-        internal static GridColumnTextFontContext FileList { get; } =
+        internal static GridColumnTextFontContext AppChrome { get; } =
             new(GridFonts.AppChromeFamily, GridFonts.FontSize);
 
         /// <summary>
-        /// Fixed-width Rename List font.
+        /// Fixed-width app chrome font.
         /// </summary>
-        internal static GridColumnTextFontContext RenameListFixedWidth { get; } =
+        internal static GridColumnTextFontContext AppChromeFixedWidth { get; } =
             new(GridFonts.AppChromeFixedWidthFamily, GridFonts.FontSize);
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// <returns>Measurement font context.</returns>
         internal static GridColumnTextFontContext ForRenameList(bool useFixedWidthFont)
         {
-            return useFixedWidthFont ? RenameListFixedWidth : FileList;
+            return useFixedWidthFont ? AppChromeFixedWidth : AppChrome;
         }
     }
 
@@ -89,7 +89,7 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// Measures unwrapped text width in the File List / Rename List grid font.
         /// </summary>
         /// <param name="text">Text to measure.</param>
-        /// <param name="fontContext">Font context; defaults to <see cref="GridColumnTextFontContext.FileList"/>.</param>
+        /// <param name="fontContext">Font context; defaults to <see cref="GridColumnTextFontContext.AppChrome"/>.</param>
         /// <returns>Layout width in device-independent pixels.</returns>
         internal static double MeasureText(string text, GridColumnTextFontContext? fontContext = null)
         {
@@ -98,7 +98,7 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
                 return 0;
             }
 
-            var context = fontContext ?? GridColumnTextFontContext.FileList;
+            var context = fontContext ?? GridColumnTextFontContext.AppChrome;
             var typeface = new Typeface(context.FontFamily, FontStyle.Normal, FontWeight.Normal);
             using var layout = new TextLayout(
                 text,
@@ -114,7 +114,7 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// Gets the minimum pixel width needed to display a column header without truncation.
         /// </summary>
         /// <param name="headerText">Grid column header text.</param>
-        /// <param name="fontContext">Font context; defaults to <see cref="GridColumnTextFontContext.FileList"/>.</param>
+        /// <param name="fontContext">Font context; defaults to <see cref="GridColumnTextFontContext.AppChrome"/>.</param>
         /// <returns>Minimum column width in pixels.</returns>
         internal static int GetMinimumHeaderWidth(string headerText, GridColumnTextFontContext? fontContext = null)
         {
@@ -129,7 +129,7 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// </summary>
         /// <param name="text">Cell display text.</param>
         /// <param name="extraChrome">Additional horizontal content such as icon width or extra padding.</param>
-        /// <param name="fontContext">Font context; defaults to <see cref="GridColumnTextFontContext.FileList"/>.</param>
+        /// <param name="fontContext">Font context; defaults to <see cref="GridColumnTextFontContext.AppChrome"/>.</param>
         /// <returns>Cell width in pixels.</returns>
         internal static int MeasureCellWidth(
             string text,
