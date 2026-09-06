@@ -53,6 +53,13 @@
     <Setter Property="Foreground" Value="{DynamicResource FileListForegroundBrush}" />
     <Setter Property="Opacity" Value="0.85" />
   </Style>
+  <Style Selector="HyperlinkButton.filter-editor-hint-link">
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="MinHeight" Value="0" />
+    <Setter Property="FontFamily" Value="{DynamicResource FileListFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource FileListFontSize}" />
+    <Setter Property="Opacity" Value="0.85" />
+  </Style>
   <Style Selector="TextBox.filter-editor-field, ComboBox.filter-editor-field, TextBox.filter-editor-field-wrap">
     <Setter Property="MinHeight" Value="22" />
     <Setter Property="Padding" Value="4,2" />
@@ -112,6 +119,12 @@
     <Setter Property="VerticalContentAlignment" Value="Top" />
   </Style>
   <Style Selector="TextBox.format-string-field">
+    <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
+  </Style>
+  <Style Selector="ComboBox.format-string-field">
+    <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
+  </Style>
+  <Style Selector="ComboBox.format-string-field /template/ TextBox#PART_EditableTextBox">
     <Setter Property="FontFamily" Value="{DynamicResource RenameListFixedWidthFont}" />
   </Style>
   <Style Selector="ComboBox.filter-editor-field">

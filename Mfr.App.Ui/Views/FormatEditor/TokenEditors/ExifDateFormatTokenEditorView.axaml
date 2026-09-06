@@ -8,11 +8,18 @@
 >
   <StackPanel Spacing="6">
     <controls:FilterEditorLabeledRow Label="Format:">
-      <TextBox
+      <ComboBox
         Classes="filter-editor-field format-string-field"
         HorizontalAlignment="Stretch"
+        IsEditable="True"
+        ItemsSource="{x:Static vm:DateFormatExamples.All}"
         Text="{Binding Format}"
       />
     </controls:FilterEditorLabeledRow>
+    <controls:FilterEditorHint
+      x:Name="FormatDocsHint"
+      LinkText="{x:Static vm:DateFormatExamples.DocsLinkText}"
+      NavigateUri="{x:Static vm:DateFormatExamples.DocsUri}"
+    />
   </StackPanel>
 </UserControl>

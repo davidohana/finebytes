@@ -7,10 +7,10 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
     /// </summary>
     internal sealed partial class ExifDateFormatTokenEditorViewModel : FormatTokenEditorViewModelBase
     {
-        private const string DefaultFormat = "dd-MM-yyyy";
+        private const string DefaultFormat = "yyyy-MM-dd";
 
         /// <summary>
-        /// Initializes the editor from existing arguments (empty → <c>dd-MM-yyyy</c>).
+        /// Initializes the editor from existing arguments (empty → <c>yyyy-MM-dd</c>).
         /// </summary>
         /// <param name="args">Required .NET date format string.</param>
         public ExifDateFormatTokenEditorViewModel(string? args)

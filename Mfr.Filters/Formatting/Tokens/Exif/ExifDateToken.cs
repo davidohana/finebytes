@@ -15,7 +15,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         "Date Picture Taken",
         "Image\\EXIF",
         "Date Picture Taken field from EXIF tag in Jpeg file",
-        "exif-date:dd-MM-yyyy"
+        "exif-date:yyyy-MM-dd"
     )]
     internal sealed class ExifDateToken : IFormatToken
     {

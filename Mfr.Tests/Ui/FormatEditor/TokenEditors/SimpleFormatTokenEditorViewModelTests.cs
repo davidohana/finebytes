@@ -43,13 +43,37 @@ namespace Mfr.Tests.Ui.FormatEditor.TokenEditors
         }
 
         /// <summary>
-        /// Verifies exif-date requires a format and defaults to <c>dd-MM-yyyy</c>.
+        /// Verifies shared date-format suggestions include the common MFR7 presets.
+        /// </summary>
+        [Fact]
+        public void DateFormatExamples_IncludesCommonPresets()
+        {
+            Assert.Contains("dd-MM-yyyy", DateFormatExamples.All);
+            Assert.Contains("hh_mm_ss", DateFormatExamples.All);
+            Assert.Contains("dd-MM-yyyy hh_mm_ss", DateFormatExamples.All);
+            Assert.Contains("yyyy-MM-dd", DateFormatExamples.All);
+        }
+
+        /// <summary>
+        /// Verifies the public docs URI is an absolute https Microsoft Learn link.
+        /// </summary>
+        [Fact]
+        public void DateFormatExamples_DocsUri_IsPublicHttps()
+        {
+            Assert.True(DateFormatExamples.DocsUri.IsAbsoluteUri);
+            Assert.Equal(Uri.UriSchemeHttps, DateFormatExamples.DocsUri.Scheme);
+            Assert.Equal("learn.microsoft.com", DateFormatExamples.DocsUri.Host);
+            Assert.False(string.IsNullOrWhiteSpace(DateFormatExamples.DocsLinkText));
+        }
+
+        /// <summary>
+        /// Verifies exif-date requires a format and defaults to <c>yyyy-MM-dd</c>.
         /// </summary>
         [Fact]
         public void ExifDate_DefaultFormat()
         {
             var vm = new ExifDateFormatTokenEditorViewModel(null);
-            Assert.Equal("exif-date:dd-MM-yyyy", vm.BuildInnerText());
+            Assert.Equal("exif-date:yyyy-MM-dd", vm.BuildInnerText());
             Assert.Equal(
                 FormatTokenCatalog.Entries.First(e => e.CanonicalName == "exif-date").InsertText,
                 vm.ResultingFormatString

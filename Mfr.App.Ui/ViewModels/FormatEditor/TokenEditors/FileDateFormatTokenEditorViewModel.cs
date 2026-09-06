@@ -7,7 +7,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
     /// </summary>
     internal sealed partial class FileDateFormatTokenEditorViewModel : FormatTokenEditorViewModelBase
     {
-        private const string DefaultFormat = "dd-MM-yyyy";
+        private const string DefaultFormat = "yyyy-MM-dd";
 
         /// <summary>
         /// Gets date-kind rows (<c>creation</c>/<c>lastWrite</c>/<c>lastAccess</c>).

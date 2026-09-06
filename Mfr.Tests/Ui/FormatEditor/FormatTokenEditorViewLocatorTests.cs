@@ -115,15 +115,26 @@ namespace Mfr.Tests.Ui.FormatEditor
             var rows = dialog.GetVisualDescendants().OfType<FilterEditorLabeledRow>().ToList();
             var formatRow = Assert.Single(rows, row => row.Label == "Format:");
             var resultingRow = Assert.Single(rows, row => row.Label == "Resulting format string:");
-            var formatBox = Assert.Single(formatRow.GetVisualDescendants().OfType<TextBox>());
+            var formatCombo = Assert.Single(formatRow.GetVisualDescendants().OfType<ComboBox>());
             var resultingBox = Assert.Single(resultingRow.GetVisualDescendants().OfType<TextBox>());
 
-            var formatOrigin = formatBox.TranslatePoint(default, dialog);
+            Assert.True(formatCombo.IsEditable);
+            Assert.Same(DateFormatExamples.All, formatCombo.ItemsSource);
+            Assert.Equal(editor.Format, formatCombo.Text);
+
+            var formatDocsHint = Assert.Single(
+                dialog.GetVisualDescendants().OfType<FilterEditorHint>(),
+                hint => hint.Name == "FormatDocsHint"
+            );
+            Assert.Equal(DateFormatExamples.DocsLinkText, formatDocsHint.LinkText);
+            Assert.Equal(DateFormatExamples.DocsUri, formatDocsHint.NavigateUri);
+
+            var formatOrigin = formatCombo.TranslatePoint(default, dialog);
             var resultingOrigin = resultingBox.TranslatePoint(default, dialog);
             Assert.NotNull(formatOrigin);
             Assert.NotNull(resultingOrigin);
             Assert.Equal(formatOrigin.Value.X, resultingOrigin.Value.X, precision: 1);
-            Assert.Equal(formatBox.Bounds.Width, resultingBox.Bounds.Width, precision: 1);
+            Assert.Equal(formatCombo.Bounds.Width, resultingBox.Bounds.Width, precision: 1);
 
             dialog.Close();
         }

@@ -18,7 +18,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         "Date/Time",
         "File Properties",
         "Use the file's creation date and/or time",
-        "file-date:dd-MM-yyyy,creation"
+        "file-date:yyyy-MM-dd,creation"
     )]
     internal sealed class FileDateToken : IFormatToken
     {
@@ -68,7 +68,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             Require.That(
                 !string.IsNullOrWhiteSpace(tokenArgs),
                 $"{tokenDisplayName} requires arguments: a .NET format string and date-kind separated by a comma "
-                    + "(for example 'dd-MM-yyyy,creation').",
+                    + "(for example 'yyyy-MM-dd,creation').",
                 nameof(tokenArgs)
             );
 
@@ -78,7 +78,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             Require.That(
                 lastComma >= 0,
                 $"{tokenDisplayName} requires a .NET format string and date-kind separated by a comma "
-                    + "(for example 'dd-MM-yyyy,creation').",
+                    + "(for example 'yyyy-MM-dd,creation').",
                 nameof(tokenArgs)
             );
 
