@@ -16,13 +16,13 @@ namespace Mfr.App.Ui.Views.RenameList
         /// </summary>
         internal const int MaxAutoFitWidth = GridColumnTextWidths.MaxAutoFitWidth;
 
-        private static readonly FontFamily _GlyphFontFamily = GridFonts.AppChromeFamily;
-        private const double _SortGlyphFontSize = GridFonts.SortGlyphFontSize;
+        private static readonly FontFamily _GlyphFontFamily = AppChromeFonts.AppChromeFamily;
+        private const double _SortGlyphFontSize = AppChromeFonts.SortGlyphFontSize;
         private const double _SortGlyphMarginLeft = 6;
         private const double _SortGlyphBorderHorizontal = 2; // BorderThickness="1"
         private const double _SortGlyphPaddingHorizontal = 8; // Padding="4,0"
         private const double _SortGlyphStackSpacing = 1;
-        private const double _PreviewGlyphFontSize = GridFonts.SortGlyphFontSize;
+        private const double _PreviewGlyphFontSize = AppChromeFonts.SortGlyphFontSize;
         private const double _PreviewGlyphSpacing = 4;
         private const double _PreviewGlyphMarginLeft = 0;
         private const double _PreviewGlyphBorderHorizontal = 2;

@@ -109,8 +109,8 @@
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
       <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
       <Setter Property="FontWeight" Value="Normal" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListHeaderForegroundBrush}" />
-      <Setter Property="Background" Value="{DynamicResource FileListHeaderBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeHeaderForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHeaderBrush}" />
       <Setter Property="MinHeight" Value="22" />
       <Setter Property="Padding" Value="6,0,4,0" />
       <Setter Property="SeparatorBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />

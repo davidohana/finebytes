@@ -23,7 +23,7 @@
 >
   <Window.Styles>
     <Style Selector="Border.field-shuttle-panel">
-      <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromePanelBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="4" />
@@ -144,8 +144,8 @@
       <Setter Property="Opacity" Value="0.45" />
     </Style>
     <Style Selector="Border.field-shuttle-priority">
-      <Setter Property="Background" Value="{DynamicResource FileListSortGlyphBackgroundBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSortGlyphBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSortGlyphBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSortGlyphBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="3" />
       <Setter Property="MinWidth" Value="22" />
@@ -156,8 +156,8 @@
     </Style>
     <Style Selector="Border.field-shuttle-priority TextBlock">
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListSortGlyphForegroundBrush}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeSortGlyphFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeSortGlyphForegroundBrush}" />
       <Setter Property="HorizontalAlignment" Value="Center" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
@@ -166,13 +166,13 @@
       <Setter Property="MinHeight" Value="22" />
       <Setter Property="Padding" Value="6,0" />
       <Setter Property="Margin" Value="4,0,0,0" />
-      <Setter Property="Background" Value="{DynamicResource FileListSortGlyphBackgroundBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource FileListSortGlyphBorderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSortGlyphBackgroundBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSortGlyphBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="3" />
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
-      <Setter Property="FontSize" Value="{StaticResource FileListSortGlyphFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource FileListSortGlyphForegroundBrush}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeSortGlyphFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeSortGlyphForegroundBrush}" />
     </Style>
     <Style Selector="Button.field-shuttle-direction:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />

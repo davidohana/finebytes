@@ -16,7 +16,7 @@
 >
   <UserControl.Styles>
     <Style Selector="Border.address-bar">
-      <Setter Property="Background" Value="{DynamicResource FileListAddressBarBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromePanelBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="4" />

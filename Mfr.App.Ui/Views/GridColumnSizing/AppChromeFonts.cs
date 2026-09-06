@@ -6,7 +6,7 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
     /// <summary>
     /// Shared app chrome font names and sizes used by theme resources and grid column measurement.
     /// </summary>
-    internal static class GridFonts
+    internal static class AppChromeFonts
     {
         /// <summary>
         /// Proportional UI sans family list.
@@ -39,7 +39,7 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         public static FontFamily AppChromeFixedWidthFamily { get; } = new(AppChromeFixedWidthFamilyName);
 
         /// <summary>
-        /// Registers theme keys used by app chrome and File List / Rename List styles.
+        /// Registers theme keys used by app chrome styles.
         /// </summary>
         /// <param name="resources">Application resource dictionary.</param>
         public static void AddResources(IResourceDictionary resources)
@@ -48,7 +48,7 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
             resources["AppChromeFont"] = AppChromeFamily;
             resources["AppChromeFixedWidthFont"] = AppChromeFixedWidthFamily;
             resources["AppChromeFontSize"] = FontSize;
-            resources["FileListSortGlyphFontSize"] = SortGlyphFontSize;
+            resources["AppChromeSortGlyphFontSize"] = SortGlyphFontSize;
         }
     }
 }

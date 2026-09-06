@@ -12,13 +12,13 @@ namespace Mfr.App.Ui.Views.GridColumnSizing
         /// Proportional app chrome font.
         /// </summary>
         internal static GridColumnTextFontContext AppChrome { get; } =
-            new(GridFonts.AppChromeFamily, GridFonts.FontSize);
+            new(AppChromeFonts.AppChromeFamily, AppChromeFonts.FontSize);
 
         /// <summary>
         /// Fixed-width app chrome font.
         /// </summary>
         internal static GridColumnTextFontContext AppChromeFixedWidth { get; } =
-            new(GridFonts.AppChromeFixedWidthFamily, GridFonts.FontSize);
+            new(AppChromeFonts.AppChromeFixedWidthFamily, AppChromeFonts.FontSize);
 
         /// <summary>
         /// Initializes a font context.

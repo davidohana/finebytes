@@ -31,7 +31,7 @@
       <Setter Property="Opacity" Value="0.55" />
     </Style>
     <Style Selector="Border.applied-filter-shuttle-rail">
-      <Setter Property="Background" Value="{DynamicResource FileListHeaderBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeHeaderBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
       <Setter Property="BorderThickness" Value="0,0,1,0" />
       <Setter Property="Padding" Value="4" />

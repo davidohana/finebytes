@@ -18,7 +18,7 @@ namespace Mfr.App.Ui
         public override void Initialize()
         {
             AvaloniaXamlLoader.Load(this);
-            GridFonts.AddResources(Resources);
+            AppChromeFonts.AddResources(Resources);
         }
 
         /// <inheritdoc />

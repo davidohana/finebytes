@@ -21,8 +21,8 @@
   </Styles.Resources>
 
   <Style Selector="Border.rename-list-preview-glyph">
-    <Setter Property="Background" Value="{DynamicResource FileListPreviewGlyphBackgroundBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListPreviewGlyphBorderBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromePreviewGlyphBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromePreviewGlyphBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="3" />
     <Setter Property="Padding" Value="4,0" />
@@ -30,13 +30,13 @@
   </Style>
   <Style Selector="Border.rename-list-preview-glyph TextBlock">
     <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListSortGlyphFontSize}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeSortGlyphFontSize}" />
     <Setter Property="FontWeight" Value="SemiBold" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListPreviewGlyphForegroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromePreviewGlyphForegroundBrush}" />
   </Style>
   <Style Selector="Border.rename-list-sort-glyph">
-    <Setter Property="Background" Value="{DynamicResource FileListSortGlyphBackgroundBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource FileListSortGlyphBorderBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSortGlyphBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSortGlyphBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="3" />
     <Setter Property="Padding" Value="4,0" />
@@ -45,7 +45,7 @@
   </Style>
   <Style Selector="Border.rename-list-sort-glyph TextBlock">
     <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
-    <Setter Property="FontSize" Value="{DynamicResource FileListSortGlyphFontSize}" />
-    <Setter Property="Foreground" Value="{DynamicResource FileListSortGlyphForegroundBrush}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeSortGlyphFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeSortGlyphForegroundBrush}" />
   </Style>
 </Styles>

@@ -8,7 +8,6 @@
     <ResourceDictionary>
       <ResourceDictionary.MergedDictionaries>
         <ResourceInclude Source="/Themes/AppChrome.axaml" />
-        <ResourceInclude Source="/Themes/FileList.axaml" />
         <ResourceInclude Source="/Themes/FieldsetGroup.axaml" />
         <ResourceInclude Source="/Themes/FilterEditorLabeledRow.axaml" />
         <ResourceInclude Source="/Themes/FilterEditorHint.axaml" />

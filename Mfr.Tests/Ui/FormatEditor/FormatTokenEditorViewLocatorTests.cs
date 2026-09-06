@@ -88,7 +88,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(box);
             Assert.True(box.IsReadOnly);
             Assert.Equal(editor.ResultingFormatString, box.Text);
-            Assert.Same(GridFonts.AppChromeFixedWidthFamily, box.FontFamily);
+            Assert.Same(AppChromeFonts.AppChromeFixedWidthFamily, box.FontFamily);
 
             var app = Application.Current;
             Assert.NotNull(app);

@@ -549,7 +549,10 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotEmpty(editor.ViewModel.VisibleItems);
             Assert.True(editor.ViewModel.IsGrouped);
             Assert.False(editor.ViewModel.HasError);
-            Assert.Same(GridFonts.AppChromeFixedWidthFamily, editor.FindControl<TextEditor>("TemplateBox")?.FontFamily);
+            Assert.Same(
+                AppChromeFonts.AppChromeFixedWidthFamily,
+                editor.FindControl<TextEditor>("TemplateBox")?.FontFamily
+            );
             Assert.Equal(
                 "Right-click a formatting parameter to customize it.",
                 editor.FindControl<FilterEditorHint>("RightClickHint")?.Text
