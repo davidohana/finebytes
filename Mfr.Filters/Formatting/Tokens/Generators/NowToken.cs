@@ -22,12 +22,7 @@ namespace Mfr.Filters.Formatting.Tokens.Generators
     /// date/time format string supplied as the argument.
     /// </para>
     /// </remarks>
-    [FormatTokenInfo(
-        "Now",
-        "General",
-        "Current UTC time (" + NowTokenDefaults.Format + ", or custom format)",
-        "now"
-    )]
+    [FormatTokenInfo("Now", "General", "Current UTC time (" + NowTokenDefaults.Format + ", or custom format)", "now")]
     internal sealed class NowToken : IFormatToken
     {
         /// <inheritdoc />

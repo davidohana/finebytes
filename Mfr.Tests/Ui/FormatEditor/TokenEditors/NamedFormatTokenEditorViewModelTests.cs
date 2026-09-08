@@ -1,7 +1,6 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Models.Filters;
 
 namespace Mfr.Tests.Ui.FormatEditor.TokenEditors
 {

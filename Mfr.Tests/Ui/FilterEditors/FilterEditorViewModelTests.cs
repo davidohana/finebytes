@@ -3,7 +3,6 @@ using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
-using Mfr.Models.Config;
 
 namespace Mfr.Tests.Ui.FilterEditors
 {
@@ -98,8 +97,10 @@ namespace Mfr.Tests.Ui.FilterEditors
         [Fact]
         public void SyncSelection_copies_format_token_picker_expanded_onto_options_editor()
         {
-            var editor = new FilterEditorViewModel();
-            editor.FormatTokenPickerExpanded = false;
+            var editor = new FilterEditorViewModel
+            {
+                FormatTokenPickerExpanded = false
+            };
             var step = new AppliedFilterStepViewModel("Formatter", new FormatterFilter());
 
             editor.SyncSelection([step]);

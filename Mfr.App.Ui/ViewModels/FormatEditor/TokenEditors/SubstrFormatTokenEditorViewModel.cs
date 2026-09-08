@@ -102,9 +102,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
         {
             var value = signed == 0 ? defaultWhenZero : signed;
             position = Math.Max(1, Math.Abs(value));
-            anchor = StringScopeAnchorOption.FromAnchor(
-                value < 0 ? StringScopeAnchor.Right : StringScopeAnchor.Left
-            );
+            anchor = StringScopeAnchorOption.FromAnchor(value < 0 ? StringScopeAnchor.Right : StringScopeAnchor.Left);
         }
 
         private static int _EncodeSignedPosition(decimal position, StringScopeAnchorOption anchor)

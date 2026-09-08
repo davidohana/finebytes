@@ -1026,7 +1026,9 @@ namespace Mfr.Tests.Ui.FormatEditor
             var app = Application.Current;
             Assert.NotNull(app);
             Assert.True(app.TryGetResource("FormatTokenBackgroundBrush", app.ActualThemeVariant, out var tokenBg));
-            Assert.True(app.TryGetResource("FormatTokenAltBackgroundBrush", app.ActualThemeVariant, out var tokenAltBg));
+            Assert.True(
+                app.TryGetResource("FormatTokenAltBackgroundBrush", app.ActualThemeVariant, out var tokenAltBg)
+            );
             Assert.True(app.TryGetResource("FormatTokenNameForegroundBrush", app.ActualThemeVariant, out var nameFg));
             Assert.True(app.TryGetResource("FormatTokenErrorBackgroundBrush", app.ActualThemeVariant, out var errorBg));
             Assert.IsAssignableFrom<ISolidColorBrush>(tokenBg);

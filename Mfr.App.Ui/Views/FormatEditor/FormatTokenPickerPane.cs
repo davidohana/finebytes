@@ -4,9 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FormatEditor;
-using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.Views.FormatEditor
 {
@@ -21,10 +19,9 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// hosted here.
     /// </para>
     /// <para>
-    /// Collapse state is shared via <see cref="SessionStateFilterEditor.FormatTokenPickerExpanded"/>
-    /// when the pane lives under a <see cref="MainWindowViewModel"/> with a loaded session (written
-    /// when <see cref="IsExpanded"/> changes, flushed with <c>session.json</c> on main-window close).
-    /// Missing session section defaults to expanded.
+    /// Collapse state is driven by bound <see cref="IsExpanded"/> (Filter Configuration option editors
+    /// two-way bind <see cref="ViewModels.FilterEditors.FilterOptionsEditorViewModel.FormatTokenPickerExpanded"/>).
+    /// Persistence lives on <see cref="ViewModels.FilterEditors.FilterEditorViewModel"/>, not this control.
     /// </para>
     /// </remarks>
     public sealed class FormatTokenPickerPane : ContentControl
@@ -66,10 +63,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// Defines the <see cref="PaneWidth"/> property.
         /// </summary>
         public static readonly DirectProperty<FormatTokenPickerPane, double> PaneWidthProperty =
-            AvaloniaProperty.RegisterDirect<FormatTokenPickerPane, double>(
-                nameof(PaneWidth),
-                o => o.PaneWidth
-            );
+            AvaloniaProperty.RegisterDirect<FormatTokenPickerPane, double>(nameof(PaneWidth), o => o.PaneWidth);
 
         /// <summary>
         /// Defines the <see cref="CollapseToolTip"/> property.
@@ -84,11 +78,13 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// Defines the <see cref="CollapseIcon"/> property.
         /// </summary>
         public static readonly DirectProperty<FormatTokenPickerPane, Geometry?> CollapseIconProperty =
-            AvaloniaProperty.RegisterDirect<FormatTokenPickerPane, Geometry?>(nameof(CollapseIcon), o => o.CollapseIcon);
+            AvaloniaProperty.RegisterDirect<FormatTokenPickerPane, Geometry?>(
+                nameof(CollapseIcon),
+                o => o.CollapseIcon
+            );
 
         private readonly List<FormatEditor> _editors = [];
         private readonly FormatTokenPickerViewModel _pickerViewModel;
-        private bool _isApplyingSessionExpanded;
 
         private Button? _editButton;
         private Button? _collapseButton;
@@ -239,84 +235,19 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <inheritdoc />
-        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
-        {
-            base.OnAttachedToVisualTree(e);
-            _ApplyExpandedFromSession();
-        }
-
-        /// <inheritdoc />
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property != IsExpandedProperty)
+            if (change.Property == IsExpandedProperty)
             {
-                return;
-            }
-
-            _RefreshChrome();
-            if (!_isApplyingSessionExpanded)
-            {
-                _PersistExpandedToSession();
+                _RefreshChrome();
             }
         }
 
         private void _OnCollapseClick(object? sender, RoutedEventArgs e)
         {
             IsExpanded = !IsExpanded;
-        }
-
-        /// <summary>
-        /// Restores <see cref="IsExpanded"/> from the shared Filter Configuration session section.
-        /// <para>No-op when there is no session document or the section is missing (stay expanded).</para>
-        /// </summary>
-        private void _ApplyExpandedFromSession()
-        {
-            var session = _TryFindSession();
-            if (session?.FilterEditor is null)
-            {
-                return;
-            }
-
-            _isApplyingSessionExpanded = true;
-            try
-            {
-                IsExpanded = session.FilterEditor.FormatTokenPickerExpanded;
-            }
-            finally
-            {
-                _isApplyingSessionExpanded = false;
-            }
-        }
-
-        /// <summary>
-        /// Writes <see cref="IsExpanded"/> into <see cref="SessionState.FilterEditor"/> for later panes.
-        /// <para>Flush to disk still happens on main-window close via <c>session.json</c>.</para>
-        /// </summary>
-        private void _PersistExpandedToSession()
-        {
-            var session = _TryFindSession();
-            if (session is null)
-            {
-                return;
-            }
-
-            session.EnsureFilterEditor().FormatTokenPickerExpanded = IsExpanded;
-        }
-
-        /// <summary>
-        /// Finds the live main-window <see cref="SessionState"/> when this pane is under a session-backed shell.
-        /// </summary>
-        /// <returns>The session document, or <see langword="null"/> when absent.</returns>
-        private SessionState? _TryFindSession()
-        {
-            if (VisualRoot is TopLevel { DataContext: MainWindowViewModel { Session: { } session } })
-            {
-                return session;
-            }
-
-            return null;
         }
 
         private void _OnEditClick(object? sender, RoutedEventArgs e)

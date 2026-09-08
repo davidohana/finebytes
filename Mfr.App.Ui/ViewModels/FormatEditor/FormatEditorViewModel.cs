@@ -14,24 +14,18 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
     /// <see cref="FormatTokenPickerViewModel"/>.
     /// </para>
     /// </remarks>
-    public sealed partial class FormatEditorViewModel : ViewModelBase
+    /// <remarks>
+    /// Initializes error and Edit state for a FormatEditor instance.
+    /// </remarks>
+    /// <param name="jumpToError">Selects the last validation error span.</param>
+    /// <param name="editUnderCaret">Opens the token editor (or warning) for the caret token.</param>
+    public sealed partial class FormatEditorViewModel(Action jumpToError, Action editUnderCaret) : ViewModelBase
     {
         /// <summary>Max characters shown on the inline error link before truncation.</summary>
         private const int MaxInlineErrorLength = 120;
 
-        private readonly Action _jumpToError;
-        private readonly Action _editUnderCaret;
-
-        /// <summary>
-        /// Initializes error and Edit state for a FormatEditor instance.
-        /// </summary>
-        /// <param name="jumpToError">Selects the last validation error span.</param>
-        /// <param name="editUnderCaret">Opens the token editor (or warning) for the caret token.</param>
-        public FormatEditorViewModel(Action jumpToError, Action editUnderCaret)
-        {
-            _jumpToError = jumpToError;
-            _editUnderCaret = editUnderCaret;
-        }
+        private readonly Action _jumpToError = jumpToError;
+        private readonly Action _editUnderCaret = editUnderCaret;
 
         /// <summary>
         /// Gets whether the last validation failed.

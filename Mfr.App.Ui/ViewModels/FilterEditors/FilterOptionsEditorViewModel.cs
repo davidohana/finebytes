@@ -27,7 +27,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// <summary>
         /// Gets or sets whether the format-token picker catalog is expanded.
         /// <para>
-        /// Shared Filter Configuration chrome; bound by <see cref="Mfr.App.Ui.Views.FormatEditor.FormatTokenPickerPane"/>
+        /// Shared Filter Configuration chrome; bound by <see cref="Views.FormatEditor.FormatTokenPickerPane"/>
         /// and kept in sync with <see cref="FilterEditorViewModel.FormatTokenPickerExpanded"/>.
         /// </para>
         /// </summary>

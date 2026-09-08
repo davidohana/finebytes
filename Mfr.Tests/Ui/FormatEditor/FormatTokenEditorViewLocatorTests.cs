@@ -94,7 +94,7 @@ namespace Mfr.Tests.Ui.FormatEditor
                 row => row.Label == "Source format string:"
             );
             var sourceEditor = Assert.Single(
-                sourceRow.GetVisualDescendants().OfType<global::Mfr.App.Ui.Views.FormatEditor.FormatEditor>()
+                sourceRow.GetVisualDescendants().OfType<App.Ui.Views.FormatEditor.FormatEditor>()
             );
             Assert.True(sourceEditor.ShowsToolButtons);
             Assert.True(sourceEditor.ShowInsertButton);

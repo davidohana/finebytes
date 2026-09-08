@@ -72,14 +72,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                     continue;
                 }
 
-                _DrawSegmentMinusSelection(
-                    textView,
-                    drawingContext,
-                    token.Start,
-                    token.Length,
-                    brush,
-                    selection
-                );
+                _DrawSegmentMinusSelection(textView, drawingContext, token.Start, token.Length, brush, selection);
             }
 
             if (ErrorBackground is null || ErrorPosition < 0 || ErrorLength <= 0)

@@ -3,7 +3,6 @@ using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.FilterEditors;
-using Mfr.Models.Config;
 
 namespace Mfr.Tests.Ui.FilterEditors
 {

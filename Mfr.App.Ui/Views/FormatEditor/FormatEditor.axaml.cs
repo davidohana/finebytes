@@ -357,11 +357,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <summary>
         /// Shared test path for selecting a span and optionally applying an editor mutation.
         /// </summary>
-        private bool _EditSpanForTests(
-            FormatTokenSpan? span,
-            bool accept,
-            Action<IFormatTokenEditorViewModel>? mutate
-        )
+        private bool _EditSpanForTests(FormatTokenSpan? span, bool accept, Action<IFormatTokenEditorViewModel>? mutate)
         {
             if (
                 span is null

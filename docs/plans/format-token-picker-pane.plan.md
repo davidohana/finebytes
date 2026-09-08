@@ -31,7 +31,7 @@ Replaces duplicated per-field Insert flyouts with a shared collapsible picker st
 - Insert + Edit on the pane target the **last-focused** descendant [`FormatEditor`](../../Mfr.App.Ui/Views/FormatEditor/FormatEditor.axaml) (defaults to the **first** registered field); active field gets `format-editor-active-target` cue. Pane Edit is a click handler on the active field (not the picker VM).
 - Under a pane, `ShowInsertButton` / `ShowEditButton` are cleared on register; **Edit stays on the collapse rail** when the catalog is hidden.
 - Standalone / nested `FormatEditor` (no pane) keeps local Insert+Edit.
-- Collapse state is **shared** across format-capable editors via [`FilterEditorViewModel.FormatTokenPickerExpanded`](../../Mfr.App.Ui/ViewModels/FilterEditors/FilterEditorViewModel.cs) (persisted as `filterEditor.formatTokenPickerExpanded` in `session.json`). Option editors two-way bind [`FormatTokenPickerPane.IsExpanded`](../../Mfr.App.Ui/Views/FormatEditor/FormatTokenPickerPane.cs); the pane VM writes through on change. Missing section → expanded.
+- Collapse state is **shared** across format-capable editors via [`FilterEditorViewModel.FormatTokenPickerExpanded`](../../Mfr.App.Ui/ViewModels/FilterEditors/FilterEditorViewModel.cs) (persisted as `filterEditor.formatTokenPickerExpanded` in `session.json`). Option editors two-way bind [`FormatTokenPickerPane.IsExpanded`](../../Mfr.App.Ui/Views/FormatEditor/FormatTokenPickerPane.cs); the Filter Configuration VM writes through on change. The pane itself does not read or write session. Missing section → expanded.
 
 ## Wired editors
 

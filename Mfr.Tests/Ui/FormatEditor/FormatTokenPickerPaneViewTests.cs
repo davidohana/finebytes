@@ -6,7 +6,6 @@ using Avalonia.VisualTree;
 using AvaloniaEdit;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Models.Config;
 using Mfr.Tests.Ui.AppliedFilters;
 using Mfr.Tests.Ui.FilterEditors;
 
@@ -175,7 +174,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies a format-capable filter editor restores collapsed picker from session via the pane VM.
+        /// Verifies a format-capable filter editor restores collapsed picker from session via FilterEditorViewModel.
         /// </summary>
         [AvaloniaFact]
         public void FilterEditor_RestoresCollapsedTokenPickerFromSession()
@@ -201,7 +200,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(mainViewModel.FilterEditorViewModel.FormatTokenPickerExpanded);
-            Assert.True(session.FilterEditor!.FormatTokenPickerExpanded);
+            Assert.True(session.FilterEditor.FormatTokenPickerExpanded);
 
             window.Close();
         }
