@@ -36,6 +36,29 @@
     <Style Selector="Button.format-token-editor-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
+    <Style Selector="Button.format-token-preview-nav">
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="MinWidth" Value="28" />
+      <Setter Property="Padding" Value="4,2" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.format-token-preview-nav:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
+    </Style>
+    <Style Selector="TextBox.format-token-preview-field">
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="Padding" Value="4,2" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+    </Style>
   </Window.Styles>
   <DockPanel Margin="12">
     <StackPanel
@@ -45,13 +68,7 @@
       Spacing="8"
       Margin="0,14,0,0"
     >
-      <Button
-        x:Name="OkButton"
-        Classes="format-token-editor-footer"
-        Content="OK"
-        IsDefault="True"
-        Click="_OnOkClick"
-      />
+      <Button x:Name="OkButton" Classes="format-token-editor-footer" Content="OK" IsDefault="True" Click="_OnOkClick" />
       <Button Classes="format-token-editor-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
     </StackPanel>
 
@@ -61,6 +78,57 @@
           <local:FormatTokenEditorViewLocator />
         </ContentControl.ContentTemplate>
       </ContentControl>
+
+      <controls:FilterEditorLabeledRow x:Name="PreviewRow" Label="Preview:">
+        <StackPanel x:Name="PreviewPanel" x:DataType="vm:FormatTokenPreviewViewModel" Spacing="6">
+          <DockPanel>
+            <StackPanel
+              DockPanel.Dock="Right"
+              Orientation="Horizontal"
+              Spacing="4"
+              Margin="6,0,0,0"
+              VerticalAlignment="Center"
+            >
+              <Button
+                x:Name="PreviewPreviousButton"
+                Classes="format-token-preview-nav"
+                Content="▲"
+                Command="{Binding GoPreviousCommand}"
+                IsEnabled="{Binding CanGoPrevious}"
+              />
+              <TextBlock
+                x:Name="PreviewItemIndexLabel"
+                Text="{Binding ItemIndexLabel}"
+                VerticalAlignment="Center"
+                MinWidth="16"
+                TextAlignment="Center"
+              />
+              <Button
+                x:Name="PreviewNextButton"
+                Classes="format-token-preview-nav"
+                Content="▼"
+                Command="{Binding GoNextCommand}"
+                IsEnabled="{Binding CanGoNext}"
+              />
+            </StackPanel>
+            <TextBox
+              x:Name="PreviewSampleBox"
+              Classes="format-token-preview-field"
+              IsReadOnly="True"
+              Text="{Binding SampleText}"
+              HorizontalAlignment="Stretch"
+            />
+          </DockPanel>
+          <TextBox
+            x:Name="PreviewResultBox"
+            Classes="format-token-preview-field"
+            IsReadOnly="True"
+            Text="{Binding PreviewResult}"
+            HorizontalAlignment="Stretch"
+          />
+        </StackPanel>
+      </controls:FilterEditorLabeledRow>
+
       <controls:FilterEditorLabeledRow Label="Resulting format string:">
         <local:FormatEditor
           x:Name="ResultingFormatStringBox"

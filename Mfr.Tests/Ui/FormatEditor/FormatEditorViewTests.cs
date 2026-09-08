@@ -695,11 +695,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         [AvaloniaFact]
         public void AcceptsReturnFalse_CentersShortTextVertically()
         {
-            var editor = new App.Ui.Views.FormatEditor.FormatEditor
-            {
-                AcceptsReturn = false,
-                Text = "<file-name>",
-            };
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { AcceptsReturn = false, Text = "<file-name>" };
             var window = new Window
             {
                 Width = 320,
@@ -715,11 +711,7 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             var box = editor.FindControl<TextEditor>("TemplateBox");
             Assert.NotNull(box);
-            Assert.Equal(
-                App.Ui.Views.FormatEditor.FormatEditor.SingleLineMinHeight,
-                box.Height,
-                precision: 0
-            );
+            Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.SingleLineMinHeight, box.Height, precision: 0);
             Assert.Equal(box.Padding.Top, box.Padding.Bottom, precision: 0);
             Assert.True(box.Padding.Top >= App.Ui.Views.FormatEditor.FormatEditor.TemplateMinVerticalPadding);
             Assert.Equal(ScrollBarVisibility.Disabled, box.VerticalScrollBarVisibility);

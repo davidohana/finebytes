@@ -140,6 +140,34 @@ namespace Mfr.Filters.Formatting.FormatString
         }
 
         /// <summary>
+        /// Compiles <paramref name="template"/> and evaluates it once against <paramref name="item"/>.
+        /// </summary>
+        /// <param name="template">Format template (e.g. a single <c>&lt;token…&gt;</c> span).</param>
+        /// <param name="item">Rename list item to evaluate against.</param>
+        /// <param name="result">Expanded text on success; empty when evaluation fails.</param>
+        /// <param name="error">Failure message when evaluation fails; otherwise null.</param>
+        /// <returns><see langword="true"/> when evaluation succeeded.</returns>
+        public static bool TryEvaluate(string template, RenameItem item, out string result, out string? error)
+        {
+            ArgumentNullException.ThrowIfNull(template);
+            ArgumentNullException.ThrowIfNull(item);
+
+            try
+            {
+                var formatter = FormatStringCompiler.Compile(template);
+                result = formatter(item);
+                error = null;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                result = string.Empty;
+                error = ex.Message;
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Builds a failed parse result, optionally keeping spans validated before the failure.
         /// </summary>
         private static FormatStringParseResult _Fail(

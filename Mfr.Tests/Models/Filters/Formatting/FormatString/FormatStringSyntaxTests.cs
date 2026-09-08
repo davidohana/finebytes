@@ -259,5 +259,73 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
             Assert.Equal("substr", result.Tokens[0].WrittenName);
             Assert.Equal("start=1,end=-1,source=<file-name>", result.Tokens[0].Args);
         }
+
+        /// <summary>
+        /// Verifies evaluation expands a token against a rename item.
+        /// </summary>
+        [Fact]
+        public void TryEvaluate_FileNameToken_ReturnsPreviewPrefix()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                prefix: "Sound Effects - Bats In The Belfry",
+                extension: ".mp3"
+            );
+
+            var ok = FormatStringSyntax.TryEvaluate("<file-name>", item, out var result, out var error);
+
+            Assert.True(ok);
+            Assert.Null(error);
+            Assert.Equal("Sound Effects - Bats In The Belfry", result);
+        }
+
+        /// <summary>
+        /// Verifies nested substr evaluation matches MFR7-style token preview.
+        /// </summary>
+        [Fact]
+        public void TryEvaluate_SubstrOfFileName_ReturnsExpandedText()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                prefix: "Sound Effects - Bats In The Belfry",
+                extension: ".mp3"
+            );
+            var template = "<substr:start=1,end=-1,source=<file-name>>";
+
+            var ok = FormatStringSyntax.TryEvaluate(template, item, out var result, out var error);
+
+            Assert.True(ok);
+            Assert.Null(error);
+            Assert.Equal("Sound Effects - Bats In The Belfry", result);
+        }
+
+        /// <summary>
+        /// Verifies unknown tokens fail evaluation with an error message.
+        /// </summary>
+        [Fact]
+        public void TryEvaluate_UnknownToken_ReturnsError()
+        {
+            var item = FilterTestHelpers.CreateRenameItem();
+
+            var ok = FormatStringSyntax.TryEvaluate("<does-not-exist>", item, out var result, out var error);
+
+            Assert.False(ok);
+            Assert.Equal(string.Empty, result);
+            Assert.Contains("Unknown formatter token", error);
+        }
+
+        /// <summary>
+        /// Verifies counter auto-padding fails when rename-list counts are zero.
+        /// </summary>
+        [Fact]
+        public void TryEvaluate_CounterAutoWithZeroCounts_ReturnsError()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(renameListTotalCount: 0, renameListFolderSiblingCount: 0);
+            var template = "<counter:initial=1,step=1,padding=auto,length=1,resetScope=never>";
+
+            var ok = FormatStringSyntax.TryEvaluate(template, item, out var result, out var error);
+
+            Assert.False(ok);
+            Assert.Equal(string.Empty, result);
+            Assert.False(string.IsNullOrEmpty(error));
+        }
     }
 }
