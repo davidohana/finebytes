@@ -5,6 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.ViewModels.FormatEditor;
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Tests.Models.Filters;
@@ -33,7 +34,10 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(dialog.FindControl<Button>("PreviewPreviousButton"));
             Assert.NotNull(dialog.FindControl<Button>("PreviewNextButton"));
             Assert.NotNull(dialog.FindControl<Grid>("PreviewRow"));
-            Assert.Equal("<Rename list is empty>", dialog.FindControl<TextBox>("PreviewSampleBox")!.Text);
+            Assert.Equal(
+                FormatTokenPreviewViewModel.EmptyListSampleText,
+                dialog.FindControl<TextBox>("PreviewSampleBox")!.Text
+            );
 
             // Sample and result share the content column so their left edges align.
             var sample = dialog.FindControl<TextBox>("PreviewSampleBox")!;
@@ -119,7 +123,10 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.Equal("alpha.mp3", nested.FindControl<TextBox>("PreviewSampleBox")!.Text);
             Assert.Equal("1", nested.FindControl<TextBlock>("PreviewItemIndexLabel")!.Text);
-            Assert.NotEqual("<Preview N/A>", nested.FindControl<TextBox>("PreviewResultBox")!.Text);
+            Assert.NotEqual(
+                FormatTokenPreviewViewModel.PreviewUnavailableText,
+                nested.FindControl<TextBox>("PreviewResultBox")!.Text
+            );
 
             nested.Close();
             parent.Close();

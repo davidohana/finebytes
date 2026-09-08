@@ -11,8 +11,20 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
     /// </summary>
     public sealed partial class FormatTokenPreviewViewModel : ViewModelBase
     {
-        private const string EmptyListSample = "<Rename list is empty>";
-        private const string PreviewUnavailable = "<Preview N/A>";
+        /// <summary>
+        /// Sample text when the Rename List snapshot is empty (MFR7 parity).
+        /// </summary>
+        public const string EmptyListSampleText = "<Rename list is empty>";
+
+        /// <summary>
+        /// Preview result when the Rename List snapshot is empty (MFR7 parity).
+        /// </summary>
+        public const string PreviewUnavailableText = "<Preview N/A>";
+
+        /// <summary>
+        /// Prefix for evaluation failures (MFR7 parity).
+        /// </summary>
+        public const string ErrorPrefix = "ERROR: ";
 
         private readonly IReadOnlyList<RenameItem> _renameItems;
         private string _resultingFormatString = string.Empty;
@@ -32,13 +44,13 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         /// Gets the read-only sample file name for the current Rename List item.
         /// </summary>
         [ObservableProperty]
-        private string _sampleText = EmptyListSample;
+        private string _sampleText = EmptyListSampleText;
 
         /// <summary>
         /// Gets the evaluated preview result for the current item and format string.
         /// </summary>
         [ObservableProperty]
-        private string _previewResult = PreviewUnavailable;
+        private string _previewResult = PreviewUnavailableText;
 
         /// <summary>
         /// Gets the 1-based item index label, or empty when the Rename List is empty.
@@ -103,9 +115,9 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         {
             if (_renameItems.Count == 0)
             {
-                SampleText = EmptyListSample;
+                SampleText = EmptyListSampleText;
                 ItemIndexLabel = string.Empty;
-                PreviewResult = PreviewUnavailable;
+                PreviewResult = PreviewUnavailableText;
                 _NotifyNavigationChanged();
                 return;
             }
@@ -124,7 +136,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         {
             if (_renameItems.Count == 0)
             {
-                PreviewResult = PreviewUnavailable;
+                PreviewResult = PreviewUnavailableText;
                 return;
             }
 
@@ -135,7 +147,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
                 return;
             }
 
-            PreviewResult = "ERROR: " + error;
+            PreviewResult = ErrorPrefix + error;
         }
 
         /// <summary>

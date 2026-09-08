@@ -17,8 +17,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             var preview = new FormatTokenPreviewViewModel([]);
             preview.Refresh("<file-name>");
 
-            Assert.Equal("<Rename list is empty>", preview.SampleText);
-            Assert.Equal("<Preview N/A>", preview.PreviewResult);
+            Assert.Equal(FormatTokenPreviewViewModel.EmptyListSampleText, preview.SampleText);
+            Assert.Equal(FormatTokenPreviewViewModel.PreviewUnavailableText, preview.PreviewResult);
             Assert.Equal(string.Empty, preview.ItemIndexLabel);
             Assert.False(preview.CanGoPrevious);
             Assert.False(preview.CanGoNext);
@@ -83,7 +83,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             var preview = new FormatTokenPreviewViewModel([item]);
             preview.Refresh("<does-not-exist>");
 
-            Assert.StartsWith("ERROR: ", preview.PreviewResult, StringComparison.Ordinal);
+            Assert.StartsWith(FormatTokenPreviewViewModel.ErrorPrefix, preview.PreviewResult, StringComparison.Ordinal);
             Assert.Contains("Unknown formatter token", preview.PreviewResult);
         }
     }
