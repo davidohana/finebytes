@@ -1,4 +1,5 @@
 using Mfr.Filters;
+using Mfr.Filters.Case;
 
 namespace Mfr.Tests.Models.Filters
 {
@@ -80,6 +81,35 @@ namespace Mfr.Tests.Models.Filters
             var item = FilterTestHelpers.CreateRenameItem(prefix: "name");
             clone.Apply(item);
             Assert.Equal("name-2", item.Preview.Prefix);
+        }
+
+        /// <summary>
+        /// Verifies setup-complete does not participate in value equality (editors / reset compare options).
+        /// </summary>
+        [Fact]
+        public void Equals_ignores_setup_complete()
+        {
+            var unset = new LettersCaseFilter();
+            var setUp = new LettersCaseFilter();
+            setUp.Setup();
+
+            Assert.Equal(unset, setUp);
+
+            var edited = setUp with { Options = setUp.Options with { Mode = LettersCaseMode.UpperCase } };
+            Assert.NotEqual(setUp, edited);
+        }
+
+        /// <summary>
+        /// Verifies a same-options <c>with</c> clone equals the source after setup (ApplyIfChanged noop).
+        /// </summary>
+        [Fact]
+        public void Equals_with_same_options_after_setup()
+        {
+            var filter = new LettersCaseFilter();
+            filter.Setup();
+            var clone = filter with { Options = filter.Options };
+
+            Assert.Equal(filter, clone);
         }
 
         /// <summary>

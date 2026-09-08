@@ -34,6 +34,40 @@ namespace Mfr.Models.Filters
         }
 
         /// <summary>
+        /// Value equality ignores setup lifecycle state.
+        /// <para>
+        /// Preview mutates <c>_isSetupComplete</c> in place; option editors and reset compare configuration
+        /// via <see cref="Equals(BaseFilter?)"/> and must not treat a set-up instance as different from an
+        /// otherwise identical fresh one.
+        /// </para>
+        /// </summary>
+        /// <param name="other">Other filter, or <see langword="null"/>.</param>
+        /// <returns>
+        /// <see langword="true"/> when <paramref name="other"/> is the same runtime filter type; derived
+        /// records still compare their own option fields.
+        /// </returns>
+        public virtual bool Equals(BaseFilter? other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(this, other))
+            {
+                return true;
+            }
+
+            return EqualityContract == other.EqualityContract;
+        }
+
+        /// <inheritdoc />
+        public override int GetHashCode()
+        {
+            return EqualityContract.GetHashCode();
+        }
+
+        /// <summary>
         /// Gets the filter type discriminator.
         /// </summary>
         [JsonIgnore]

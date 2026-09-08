@@ -148,9 +148,9 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Gets whether exactly one step is selected for Filter Options.
+        /// Gets whether exactly one step is selected for Filter Options / reset.
         /// </summary>
-        public bool CanShowFilterOptions => _selectedSteps.Count == 1;
+        public bool CanShowFilterOptions => _HasSingleSelection();
 
         /// <summary>
         /// Applies Filter Options dialog edits to the selected step.
@@ -184,44 +184,32 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Restores selected steps to catalog defaults without removing them from the list.
+        /// Restores the sole selected step to catalog defaults without removing it from the list.
         /// <para>
-        /// Replaces each step's filter via <see cref="FilterCatalog.CreateDefault"/> (options, Apply To,
-        /// and scope). Keeps <see cref="AppliedFilterStepViewModel.DisplayName"/> and
-        /// <see cref="AppliedFilterStepViewModel.Enabled"/>.
+        /// Replaces the filter via <see cref="FilterCatalog.CreateDefault"/> (options, Apply To, and
+        /// scope). Keeps <see cref="AppliedFilterStepViewModel.DisplayName"/> and
+        /// <see cref="AppliedFilterStepViewModel.Enabled"/>. Requires exactly one selected step (same as
+        /// Filter Options / the Filter Configuration pane).
         /// </para>
         /// </summary>
-        [RelayCommand(CanExecute = nameof(_HasSelection))]
+        [RelayCommand(CanExecute = nameof(_HasSingleSelection))]
         public void ResetSelectedToDefaults()
         {
-            if (_selectedSteps.Count == 0)
+            if (_selectedSteps.Count != 1)
             {
                 return;
             }
 
-            var anyChanged = false;
-            _WithSingleChainChanged(() =>
+            var step = _selectedSteps[0];
+            var entry = FilterCatalog.Entries.Single(catalogEntry => catalogEntry.FilterType == step.Filter.GetType());
+            var defaults = FilterCatalog.CreateDefault(entry);
+            if (Equals(step.Filter, defaults))
             {
-                foreach (var step in _selectedSteps)
-                {
-                    var entry = FilterCatalog.Entries.Single(catalogEntry =>
-                        catalogEntry.FilterType == step.Filter.GetType()
-                    );
-                    var defaults = FilterCatalog.CreateDefault(entry);
-                    if (Equals(step.Filter, defaults))
-                    {
-                        continue;
-                    }
-
-                    step.SetFilter(defaults);
-                    anyChanged = true;
-                }
-            });
-
-            if (anyChanged)
-            {
-                FilterOptionsApplied?.Invoke(this, EventArgs.Empty);
+                return;
             }
+
+            _WithSingleChainChanged(() => step.SetFilter(defaults));
+            FilterOptionsApplied?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -417,6 +405,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private bool _HasSelection()
         {
             return _selectedSteps.Count > 0;
+        }
+
+        private bool _HasSingleSelection()
+        {
+            return _selectedSteps.Count == 1;
         }
 
         private bool _HasSteps()

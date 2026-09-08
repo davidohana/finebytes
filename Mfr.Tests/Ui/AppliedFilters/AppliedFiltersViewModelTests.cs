@@ -212,15 +212,15 @@ namespace Mfr.Tests.Ui.AppliedFilters
             step.SetDisplayName("My Letters");
             step.Enabled = false;
             step.SetFilter(
-                new LettersCaseFilter(
-                    new FileExtensionTarget(),
-                    new LettersCaseOptions(LettersCaseMode.UpperCase, [])
-                )
+                new LettersCaseFilter(new FileExtensionTarget(), new LettersCaseOptions(LettersCaseMode.UpperCase, []))
             );
 
             var optionsApplied = 0;
             viewModel.FilterOptionsApplied += (_, _) => optionsApplied++;
-            var chainChanged = _CountChainChanged(viewModel, () => viewModel.ResetSelectedToDefaultsCommand.Execute(null));
+            var chainChanged = _CountChainChanged(
+                viewModel,
+                () => viewModel.ResetSelectedToDefaultsCommand.Execute(null)
+            );
 
             Assert.Same(step, viewModel.Steps[0]);
             Assert.Equal("My Letters", step.DisplayName);
@@ -243,11 +243,53 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             var optionsApplied = 0;
             viewModel.FilterOptionsApplied += (_, _) => optionsApplied++;
-            var chainChanged = _CountChainChanged(viewModel, () => viewModel.ResetSelectedToDefaultsCommand.Execute(null));
+            var chainChanged = _CountChainChanged(
+                viewModel,
+                () => viewModel.ResetSelectedToDefaultsCommand.Execute(null)
+            );
 
             Assert.Same(filterBefore, viewModel.Steps[0].Filter);
             Assert.Equal(0, chainChanged);
             Assert.Equal(0, optionsApplied);
+        }
+
+        /// <summary>
+        /// Verifies reset stays a no-op after preview setup when options are already catalog defaults.
+        /// </summary>
+        [Fact]
+        public void ResetSelectedToDefaults_noop_after_setup_when_already_default()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            var filterBefore = viewModel.Steps[0].Filter;
+            filterBefore.Setup();
+
+            var optionsApplied = 0;
+            viewModel.FilterOptionsApplied += (_, _) => optionsApplied++;
+            var chainChanged = _CountChainChanged(
+                viewModel,
+                () => viewModel.ResetSelectedToDefaultsCommand.Execute(null)
+            );
+
+            Assert.Same(filterBefore, viewModel.Steps[0].Filter);
+            Assert.Equal(0, chainChanged);
+            Assert.Equal(0, optionsApplied);
+        }
+
+        /// <summary>
+        /// Verifies reset requires exactly one selected step (Filter Configuration / Filter Options parity).
+        /// </summary>
+        [Fact]
+        public void ResetSelectedToDefaults_disabled_for_multi_select()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([viewModel.Steps[0], viewModel.Steps[1]]);
+
+            Assert.False(viewModel.ResetSelectedToDefaultsCommand.CanExecute(null));
+            Assert.False(viewModel.CanShowFilterOptions);
         }
 
         /// <summary>
