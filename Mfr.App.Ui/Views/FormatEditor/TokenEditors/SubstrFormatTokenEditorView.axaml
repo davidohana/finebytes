@@ -2,30 +2,78 @@
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors"
+  xmlns:anchors="using:Mfr.App.Ui.ViewModels.AppliedFilters"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   x:Class="Mfr.App.Ui.Views.FormatEditor.TokenEditors.SubstrFormatTokenEditorView"
   x:DataType="vm:SubstrFormatTokenEditorViewModel"
 >
+  <UserControl.Styles>
+    <Style Selector="TextBlock.substr-from-the">
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="8,0" />
+      <Setter Property="TextWrapping" Value="NoWrap" />
+    </Style>
+    <Style Selector="TextBlock.substr-side-suffix">
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="8,0,0,0" />
+      <Setter Property="TextWrapping" Value="NoWrap" />
+    </Style>
+    <Style Selector="ComboBox.substr-anchor">
+      <Setter Property="Width" Value="80" />
+      <Setter Property="MinWidth" Value="80" />
+      <Setter Property="HorizontalAlignment" Value="Left" />
+    </Style>
+  </UserControl.Styles>
   <StackPanel Spacing="6">
-    <controls:FilterEditorLabeledRow Label="Start:">
-      <controls:CompactNumericUpDown
-        Minimum="-9999"
-        Maximum="9999"
-        Increment="1"
-        FormatString="0"
-        Value="{Binding Start}"
-      />
+    <controls:FilterEditorLabeledRow Label="From position:">
+      <StackPanel Orientation="Horizontal" Spacing="0">
+        <controls:CompactNumericUpDown
+          Minimum="1"
+          Maximum="9999"
+          Increment="1"
+          FormatString="0"
+          Value="{Binding FromPosition}"
+        />
+        <TextBlock Classes="substr-from-the" Text="from the" />
+        <ComboBox
+          Classes="filter-editor-field substr-anchor"
+          ItemsSource="{Binding AnchorOptions}"
+          SelectedItem="{Binding FromAnchorOption}"
+        >
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="anchors:StringScopeAnchorOption">
+              <TextBlock Text="{Binding Label}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Classes="substr-side-suffix" Text="side (incl.)" />
+      </StackPanel>
     </controls:FilterEditorLabeledRow>
-    <controls:FilterEditorLabeledRow Label="End:">
-      <controls:CompactNumericUpDown
-        Minimum="-9999"
-        Maximum="9999"
-        Increment="1"
-        FormatString="0"
-        Value="{Binding End}"
-      />
+    <controls:FilterEditorLabeledRow Label="To position:">
+      <StackPanel Orientation="Horizontal" Spacing="0">
+        <controls:CompactNumericUpDown
+          Minimum="1"
+          Maximum="9999"
+          Increment="1"
+          FormatString="0"
+          Value="{Binding ToPosition}"
+        />
+        <TextBlock Classes="substr-from-the" Text="from the" />
+        <ComboBox
+          Classes="filter-editor-field substr-anchor"
+          ItemsSource="{Binding AnchorOptions}"
+          SelectedItem="{Binding ToAnchorOption}"
+        >
+          <ComboBox.ItemTemplate>
+            <DataTemplate x:DataType="anchors:StringScopeAnchorOption">
+              <TextBlock Text="{Binding Label}" />
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBlock Classes="substr-side-suffix" Text="side (incl.)" />
+      </StackPanel>
     </controls:FilterEditorLabeledRow>
-    <controls:FilterEditorLabeledRow Label="Source:">
+    <controls:FilterEditorLabeledRow Label="Source format string:">
       <TextBox Classes="filter-editor-field" HorizontalAlignment="Stretch" Text="{Binding Source}" />
     </controls:FilterEditorLabeledRow>
   </StackPanel>

@@ -1,5 +1,7 @@
+using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
 using Mfr.Filters.Formatting.FormatString;
+using Mfr.Models.Filters;
 
 namespace Mfr.Tests.Ui.FormatEditor.TokenEditors
 {
@@ -9,7 +11,7 @@ namespace Mfr.Tests.Ui.FormatEditor.TokenEditors
     public sealed class NamedFormatTokenEditorViewModelTests
     {
         /// <summary>
-        /// Verifies substr defaults and named-arg round-trip.
+        /// Verifies substr defaults and named-arg round-trip (MFR7 from/to + side UI).
         /// </summary>
         [Fact]
         public void Substr_DefaultsAndRoundTrip()
@@ -19,13 +21,41 @@ namespace Mfr.Tests.Ui.FormatEditor.TokenEditors
                 FormatTokenCatalog.Entries.First(e => e.CanonicalName == "substr").InsertText,
                 defaults.ResultingFormatString
             );
+            Assert.Equal(1, defaults.FromPosition);
+            Assert.Equal(StringScopeAnchor.Left, defaults.FromAnchorOption.Anchor);
+            Assert.Equal(1, defaults.ToPosition);
+            Assert.Equal(StringScopeAnchor.Right, defaults.ToAnchorOption.Anchor);
 
             const string args = "start=2,end=5,source=<full-name>";
             var vm = new SubstrFormatTokenEditorViewModel(args);
-            Assert.Equal(2, vm.Start);
-            Assert.Equal(5, vm.End);
+            Assert.Equal(2, vm.FromPosition);
+            Assert.Equal(StringScopeAnchor.Left, vm.FromAnchorOption.Anchor);
+            Assert.Equal(5, vm.ToPosition);
+            Assert.Equal(StringScopeAnchor.Left, vm.ToAnchorOption.Anchor);
             Assert.Equal("<full-name>", vm.Source);
             Assert.Equal("substr:" + args, vm.BuildInnerText());
+            Assert.True(FormatStringSyntax.TryValidate(vm.ResultingFormatString).Success);
+        }
+
+        /// <summary>
+        /// Verifies substr right-side signed ends decode to position + right anchor.
+        /// </summary>
+        [Fact]
+        public void Substr_RightAnchors_RoundTrip()
+        {
+            const string args = "start=1,end=-1,source=<file-name>";
+            var vm = new SubstrFormatTokenEditorViewModel(args);
+            Assert.Equal(1, vm.FromPosition);
+            Assert.Equal(StringScopeAnchor.Left, vm.FromAnchorOption.Anchor);
+            Assert.Equal(1, vm.ToPosition);
+            Assert.Equal(StringScopeAnchor.Right, vm.ToAnchorOption.Anchor);
+            Assert.Equal("substr:" + args, vm.BuildInnerText());
+
+            vm.FromAnchorOption = StringScopeAnchorOption.FromAnchor(StringScopeAnchor.Right);
+            vm.FromPosition = 3;
+            vm.ToAnchorOption = StringScopeAnchorOption.FromAnchor(StringScopeAnchor.Right);
+            vm.ToPosition = 2;
+            Assert.Equal("substr:start=-3,end=-2,source=<file-name>", vm.BuildInnerText());
             Assert.True(FormatStringSyntax.TryValidate(vm.ResultingFormatString).Success);
         }
 

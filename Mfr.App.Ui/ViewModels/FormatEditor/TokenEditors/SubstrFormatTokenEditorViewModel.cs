@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
 {
@@ -21,22 +23,55 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
                 return;
             }
 
-            Start = NamedFormatOptionsBuilder.GetInt(keyToValue, "start", 1);
-            End = NamedFormatOptionsBuilder.GetInt(keyToValue, "end", -1);
+            _DecodeSignedPosition(
+                NamedFormatOptionsBuilder.GetInt(keyToValue, "start", 1),
+                defaultWhenZero: 1,
+                out var fromPosition,
+                out var fromAnchor
+            );
+            FromPosition = fromPosition;
+            FromAnchorOption = fromAnchor;
+
+            _DecodeSignedPosition(
+                NamedFormatOptionsBuilder.GetInt(keyToValue, "end", -1),
+                defaultWhenZero: -1,
+                out var toPosition,
+                out var toAnchor
+            );
+            ToPosition = toPosition;
+            ToAnchorOption = toAnchor;
+
             Source = NamedFormatOptionsBuilder.GetString(keyToValue, "source", DefaultSource);
         }
 
         /// <summary>
-        /// Gets or sets the 1-based start position (<c>start</c>; negative = from right).
+        /// Gets left/right choices for from/to position anchors.
         /// </summary>
-        [ObservableProperty]
-        private decimal _start = 1;
+        public IReadOnlyList<StringScopeAnchorOption> AnchorOptions => StringScopeAnchorOption.All;
 
         /// <summary>
-        /// Gets or sets the 1-based end position (<c>end</c>; negative = from right).
+        /// Gets or sets the inclusive 1-based from position (positive magnitude).
         /// </summary>
         [ObservableProperty]
-        private decimal _end = -1;
+        private decimal _fromPosition = 1;
+
+        /// <summary>
+        /// Gets or sets whether <see cref="FromPosition"/> counts from the left or right.
+        /// </summary>
+        [ObservableProperty]
+        private StringScopeAnchorOption _fromAnchorOption = StringScopeAnchorOption.All[0];
+
+        /// <summary>
+        /// Gets or sets the inclusive 1-based to position (positive magnitude).
+        /// </summary>
+        [ObservableProperty]
+        private decimal _toPosition = 1;
+
+        /// <summary>
+        /// Gets or sets whether <see cref="ToPosition"/> counts from the left or right.
+        /// </summary>
+        [ObservableProperty]
+        private StringScopeAnchorOption _toAnchorOption = StringScopeAnchorOption.All[1];
 
         /// <summary>
         /// Gets or sets the nested source format string (<c>source</c>).
@@ -47,18 +82,8 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
         /// <inheritdoc />
         public override string BuildInnerText()
         {
-            var start = (int)Start;
-            var end = (int)End;
-            if (start == 0)
-            {
-                start = 1;
-            }
-
-            if (end == 0)
-            {
-                end = -1;
-            }
-
+            var start = _EncodeSignedPosition(FromPosition, FromAnchorOption);
+            var end = _EncodeSignedPosition(ToPosition, ToAnchorOption);
             var source = string.IsNullOrWhiteSpace(Source) ? DefaultSource : Source.Trim();
             var args = NamedFormatOptionsBuilder.Join(
                 ("start", NamedFormatOptionsBuilder.FormatInt(start)),
@@ -66,6 +91,26 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
                 ("source", source)
             );
             return CanonicalName + ":" + args;
+        }
+
+        private static void _DecodeSignedPosition(
+            int signed,
+            int defaultWhenZero,
+            out decimal position,
+            out StringScopeAnchorOption anchor
+        )
+        {
+            var value = signed == 0 ? defaultWhenZero : signed;
+            position = Math.Max(1, Math.Abs(value));
+            anchor = StringScopeAnchorOption.FromAnchor(
+                value < 0 ? StringScopeAnchor.Right : StringScopeAnchor.Left
+            );
+        }
+
+        private static int _EncodeSignedPosition(decimal position, StringScopeAnchorOption anchor)
+        {
+            var n = Math.Max(1, (int)position);
+            return anchor.Anchor == StringScopeAnchor.Right ? -n : n;
         }
     }
 }
