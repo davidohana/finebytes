@@ -35,7 +35,7 @@ namespace Mfr.Engine.Presets
         }
 
         /// <summary>
-        /// Opens the AppData store, loading when the file exists (missing file → empty).
+        /// Opens the AppData store, loading when the file exists (missing or unreadable → empty).
         /// </summary>
         /// <returns>A store ready for get/set.</returns>
         public static FilterDefaultsStore OpenDefault()
@@ -46,8 +46,20 @@ namespace Mfr.Engine.Presets
         }
 
         /// <summary>
-        /// Loads defaults from disk when the file exists; otherwise leaves the cache empty.
+        /// Creates an empty store that does not read AppData (tests and isolated UI hosts).
+        /// </summary>
+        /// <returns>A store with no type defaults loaded.</returns>
+        public static FilterDefaultsStore CreateEmpty()
+        {
+            return new FilterDefaultsStore(
+                Path.Combine(Path.GetTempPath(), $"mfr-empty-filter-defaults-{Guid.NewGuid():N}.json")
+            );
+        }
+
+        /// <summary>
+        /// Loads defaults from disk when the file exists and is readable; otherwise leaves the cache empty.
         /// <para>
+        /// Missing, corrupt, or wrong-shaped files leave the cache empty (same soft load as session).
         /// Unknown or invalid entries are skipped (factory defaults remain for those types).
         /// </para>
         /// </summary>
@@ -64,9 +76,10 @@ namespace Mfr.Engine.Presets
             {
                 doc = JsonDocument.Parse(File.ReadAllText(DefaultsFilePath));
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
             {
-                throw new UserException($"Failed to read filter defaults file '{DefaultsFilePath}': {ex.Message}", ex);
+                // Preference file — do not fail app startup or hosts; add uses factory.
+                return;
             }
 
             using (doc)

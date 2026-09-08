@@ -40,7 +40,8 @@ namespace Mfr.App.Ui.ViewModels
         /// first-launch defaults and this window does not write <c>session.json</c>.
         /// </param>
         /// <param name="filterDefaults">
-        /// Per-type filter add defaults. When null, opens the AppData <c>filter-defaults.json</c> store.
+        /// Per-type filter add defaults. When null, uses an empty store that does not read AppData
+        /// (production passes <see cref="FilterDefaultsStore.OpenDefault"/>).
         /// </param>
         public MainWindowViewModel(
             string? initialFileListPath = null,
@@ -49,12 +50,7 @@ namespace Mfr.App.Ui.ViewModels
         )
         {
             Session = session;
-            AppliedFiltersViewModel = new AppliedFiltersViewModel(
-                filterDefaults
-                    ?? new FilterDefaultsStore(
-                        Path.Combine(Path.GetTempPath(), $"mfr-ui-filter-defaults-{Guid.NewGuid():N}.json")
-                    )
-            );
+            AppliedFiltersViewModel = new AppliedFiltersViewModel(filterDefaults ?? FilterDefaultsStore.CreateEmpty());
             FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
             RenameListViewModel = new RenameListViewModel(FileListViewModel);
             FilterEditorViewModel = new FilterEditorViewModel();

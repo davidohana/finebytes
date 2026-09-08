@@ -122,6 +122,19 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies a corrupt file leaves the store empty (soft load; does not throw).
+        /// </summary>
+        [Fact]
+        public void TryLoad_corrupt_file_is_empty()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("filter-defaults.json");
+            File.WriteAllText(path, "{ not json");
+            var store = new FilterDefaultsStore(path);
+            store.TryLoad();
+            Assert.False(store.TryGetDefault("LettersCase", out _));
+        }
+
+        /// <summary>
         /// Verifies serialized shape uses a <c>defaults</c> map keyed by type.
         /// </summary>
         [Fact]

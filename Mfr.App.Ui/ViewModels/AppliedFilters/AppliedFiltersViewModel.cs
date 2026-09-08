@@ -28,11 +28,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// </param>
         public AppliedFiltersViewModel(FilterDefaultsStore? filterDefaults = null)
         {
-            _filterDefaults =
-                filterDefaults
-                ?? new FilterDefaultsStore(
-                    Path.Combine(Path.GetTempPath(), $"mfr-empty-filter-defaults-{Guid.NewGuid():N}.json")
-                );
+            _filterDefaults = filterDefaults ?? FilterDefaultsStore.CreateEmpty();
             Steps = [];
             Steps.CollectionChanged += _OnStepsCollectionChanged;
         }
