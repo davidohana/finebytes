@@ -12,7 +12,7 @@
   MinWidth="440"
   SizeToContent="Height"
   WindowStartupLocation="CenterOwner"
-  CanResize="False"
+  CanResize="True"
   ShowInTaskbar="False"
   FontFamily="{StaticResource AppChromeFont}"
   FontSize="{StaticResource AppChromeFontSize}"
@@ -45,7 +45,13 @@
       Spacing="8"
       Margin="0,14,0,0"
     >
-      <Button Classes="format-token-editor-footer" Content="OK" IsDefault="True" Click="_OnOkClick" />
+      <Button
+        x:Name="OkButton"
+        Classes="format-token-editor-footer"
+        Content="OK"
+        IsDefault="True"
+        Click="_OnOkClick"
+      />
       <Button Classes="format-token-editor-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
     </StackPanel>
 

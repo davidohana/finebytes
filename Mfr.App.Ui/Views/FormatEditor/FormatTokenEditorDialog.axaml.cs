@@ -1,13 +1,15 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.FormatEditor;
-using Mfr.App.Ui.Views;
 
 namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
     /// Modal host for a format-token parameter editor (title, body, live resulting string, OK/Cancel).
     /// </summary>
+    /// <remarks>
+    /// Opens height-to-content, then locks height so only width remains resizable.
+    /// </remarks>
     public partial class FormatTokenEditorDialog : Window
     {
         /// <summary>
@@ -17,6 +19,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
+            ModalDialogHorizontalResize.Attach(this);
         }
 
         /// <summary>

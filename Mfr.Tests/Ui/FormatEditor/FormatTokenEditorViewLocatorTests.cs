@@ -244,6 +244,70 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies the docked footer stays fully inside the client area for a tall body (substr),
+        /// and height is locked to content (horizontal-only resize).
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_FooterButtons_FullyVisible_ForSubstr()
+        {
+            Assert.True(FormatTokenEditorRegistry.TryCreate("substr", string.Empty, out var editor));
+            Assert.NotNull(editor);
+            var dialog = new FormatTokenEditorDialog(editor);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(dialog.MinHeight, dialog.MaxHeight);
+            Assert.True(dialog.MinHeight > 0);
+
+            var ok = dialog.FindControl<Button>("OkButton");
+            Assert.NotNull(ok);
+            var topLeft = ok.TranslatePoint(default, dialog);
+            Assert.NotNull(topLeft);
+            var bottom = topLeft.Value.Y + ok.Bounds.Height;
+            Assert.True(
+                bottom <= dialog.Bounds.Height + 0.5,
+                $"OK button bottom {bottom} exceeds dialog height {dialog.Bounds.Height}."
+            );
+            Assert.True(ok.IsVisible);
+            Assert.True(ok.Bounds.Height > 1);
+
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies a short token body opens shorter than substr (content-sized default height).
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_DefaultHeight_IsContentSized()
+        {
+            var now = new FormatTokenEditorDialog(new NowFormatTokenEditorViewModel(null));
+            now.Show();
+            now.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            now.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var nowHeight = now.Bounds.Height;
+            now.Close();
+
+            Assert.True(FormatTokenEditorRegistry.TryCreate("substr", string.Empty, out var substrEditor));
+            Assert.NotNull(substrEditor);
+            var substr = new FormatTokenEditorDialog(substrEditor);
+            substr.Show();
+            substr.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            substr.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var substrHeight = substr.Bounds.Height;
+            substr.Close();
+
+            Assert.True(nowHeight > 0);
+            Assert.True(substrHeight > nowHeight, $"Expected substr {substrHeight} > now {nowHeight}.");
+        }
+
+        /// <summary>
         /// Verifies Build fails loudly when the view-model is outside the TokenEditors namespace.
         /// </summary>
         [Fact]

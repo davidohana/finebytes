@@ -309,7 +309,52 @@ namespace Mfr.Tests.Ui.AppliedFilters
             dialog.Show();
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
             return dialog;
+        }
+
+        /// <summary>
+        /// Verifies height is content-sized and locked (horizontal-only resize), and grows when
+        /// Apply-on switches to Substring.
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_HorizontalResizeOnly_RelocksWhenScopeGrows()
+        {
+            var dialog = _Show(FilterApplyScopeMode.Whole);
+            try
+            {
+                Assert.Equal(dialog.MinHeight, dialog.MaxHeight);
+                Assert.True(dialog.MinHeight > 0);
+                var wholeHeight = dialog.Bounds.Height;
+
+                var ok = dialog.FindControl<Button>("OkButton");
+                Assert.NotNull(ok);
+                var topLeft = ok.TranslatePoint(default, dialog);
+                Assert.NotNull(topLeft);
+                Assert.True(
+                    topLeft.Value.Y + ok.Bounds.Height <= dialog.Bounds.Height + 0.5,
+                    "OK button should stay fully visible."
+                );
+
+                var substringRadio = dialog.FindControl<RadioButton>("SubstringScopeRadio");
+                Assert.NotNull(substringRadio);
+                substringRadio.IsChecked = true;
+                dialog.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+                dialog.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.Equal(dialog.MinHeight, dialog.MaxHeight);
+                Assert.True(
+                    dialog.Bounds.Height > wholeHeight,
+                    $"Expected substring height {dialog.Bounds.Height} > whole {wholeHeight}."
+                );
+            }
+            finally
+            {
+                dialog.Close();
+            }
         }
     }
 }
