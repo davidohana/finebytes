@@ -176,7 +176,7 @@
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="Padding" Value="4,2" />
     <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
-    <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+    <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />
   </Style>
   <Style Selector="fe|FormatEditor[IsReadOnly=True] AvaloniaEdit|TextEditor.format-string-field">
     <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />

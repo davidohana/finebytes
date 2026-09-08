@@ -722,6 +722,35 @@ namespace Mfr.Tests.Ui.FormatEditor
             );
             Assert.Equal(box.Padding.Top, box.Padding.Bottom, precision: 0);
             Assert.True(box.Padding.Top >= App.Ui.Views.FormatEditor.FormatEditor.TemplateMinVerticalPadding);
+            Assert.Equal(ScrollBarVisibility.Disabled, box.VerticalScrollBarVisibility);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies empty single-line FormatEditor does not show a vertical scrollbar.
+        /// </summary>
+        [AvaloniaFact]
+        public void AcceptsReturnFalse_Empty_HidesVerticalScrollbar()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { AcceptsReturn = false, Text = string.Empty };
+            var window = new Window
+            {
+                Width = 320,
+                Height = 200,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            editor.UpdateAutoGrowHeightForTests();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            Assert.Equal(ScrollBarVisibility.Disabled, box.VerticalScrollBarVisibility);
+            Assert.True(box.Height < App.Ui.Views.FormatEditor.FormatEditor.MultilineMaxHeight);
 
             window.Close();
         }

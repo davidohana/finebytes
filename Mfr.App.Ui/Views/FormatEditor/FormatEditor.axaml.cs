@@ -582,7 +582,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
             TemplateBox.MaxHeight = MultilineMaxHeight;
             TemplateBox.WordWrap = true;
             TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
-            TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            // Auto only after the grow cap; otherwise AvaloniaEdit shows a thumb for tiny extent/viewport mismatch.
+            TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
             TemplateBox.MinHeight = acceptsReturn ? MultilineMinHeight : SingleLineMinHeight;
             if (acceptsReturn)
             {
@@ -606,6 +607,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private void _ApplyReadOnly(bool isReadOnly)
         {
             TemplateBox.IsReadOnly = isReadOnly;
+            _RefreshHighlight();
         }
 
         /// <summary>
@@ -653,12 +655,54 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 }
             }
 
+            _ScheduleVerticalScrollBarVisibility();
+
             if (!double.IsNaN(TemplateBox.Height) && Math.Abs(TemplateBox.Height - height) < 0.5)
             {
                 return;
             }
 
             TemplateBox.Height = height;
+        }
+
+        /// <summary>
+        /// Defers scrollbar visibility so toggling it cannot invalidate visual lines mid-EnsureVisualLines.
+        /// </summary>
+        private void _ScheduleVerticalScrollBarVisibility()
+        {
+            Dispatcher.UIThread.Post(_ApplyVerticalScrollBarVisibility, DispatcherPriority.Render);
+        }
+
+        /// <summary>
+        /// Shows a vertical scrollbar only when height is capped and document content overflows the viewport.
+        /// </summary>
+        private void _ApplyVerticalScrollBarVisibility()
+        {
+            var textView = TemplateBox.TextArea.TextView;
+            var contentHeight = textView.DocumentHeight;
+            if (double.IsNaN(contentHeight) || contentHeight <= 0)
+            {
+                contentHeight = Math.Max(textView.DefaultLineHeight, 1);
+            }
+
+            var height = TemplateBox.Height;
+            if (double.IsNaN(height) || height <= 0)
+            {
+                height = TemplateBox.MinHeight;
+            }
+
+            var border = TemplateBox.BorderThickness.Top + TemplateBox.BorderThickness.Bottom;
+            var verticalPadding = TemplateBox.Padding.Top + TemplateBox.Padding.Bottom;
+            var viewport = Math.Max(0, height - border - verticalPadding);
+            var atCap = height >= MultilineMaxHeight - 0.5;
+            var overflows = contentHeight > viewport + 0.5;
+            var visibility = atCap && overflows ? ScrollBarVisibility.Auto : ScrollBarVisibility.Disabled;
+            if (TemplateBox.VerticalScrollBarVisibility == visibility)
+            {
+                return;
+            }
+
+            TemplateBox.VerticalScrollBarVisibility = visibility;
         }
 
         /// <summary>
@@ -1061,11 +1105,17 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 _backgroundRenderer.ErrorLength = 0;
             }
 
-            _backgroundRenderer.TokenBackground = _ResolveBrush("FormatTokenBackgroundBrush");
-            _backgroundRenderer.TokenAltBackground = _ResolveBrush("FormatTokenAltBackgroundBrush");
+            _backgroundRenderer.TokenBackground = IsReadOnly
+                ? null
+                : _ResolveBrush("FormatTokenBackgroundBrush");
+            _backgroundRenderer.TokenAltBackground = IsReadOnly
+                ? null
+                : _ResolveBrush("FormatTokenAltBackgroundBrush");
             _colorizer.TokenNameForeground = _ResolveBrush("FormatTokenNameForegroundBrush");
             _colorizer.TokenNumberForeground = _ResolveBrush("FormatTokenNumberForegroundBrush");
-            _backgroundRenderer.ErrorBackground = _ResolveBrush("FormatTokenErrorBackgroundBrush");
+            _backgroundRenderer.ErrorBackground = IsReadOnly
+                ? null
+                : _ResolveBrush("FormatTokenErrorBackgroundBrush");
             TemplateBox.TextArea.TextView.Redraw();
         }
 

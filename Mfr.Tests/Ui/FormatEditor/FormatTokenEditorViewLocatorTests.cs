@@ -163,6 +163,13 @@ namespace Mfr.Tests.Ui.FormatEditor
             );
             Assert.NotEmpty(colorizer.Tokens);
             Assert.Equal("counter", colorizer.Tokens[0].CanonicalName);
+            Assert.NotNull(colorizer.TokenNameForeground);
+
+            var background = Assert.Single(
+                templateBox.TextArea.TextView.BackgroundRenderers.OfType<FormatTokenBackgroundRenderer>()
+            );
+            Assert.Null(background.TokenBackground);
+            Assert.Null(background.TokenAltBackground);
 
             dialog.Close();
         }
