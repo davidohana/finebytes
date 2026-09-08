@@ -488,9 +488,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
         protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
         {
             base.OnAttachedToVisualTree(e);
-            // Ctor may run before app theme resources resolve; never leave SelectionBrush null
-            // (that clears AvaloniaEdit's themed TextAreaSelectionBrush and hides selection).
+            // Ctor / early Text binding may run before theme dictionaries resolve (token dialogs
+            // bind Source before attach). Never leave SelectionBrush or token highlight brushes null.
             _ApplySelectionChrome();
+            _RefreshHighlight();
             _pickerPane = this.FindAncestorOfType<FormatTokenPickerPane>();
             _pickerPane?.RegisterEditor(this);
         }

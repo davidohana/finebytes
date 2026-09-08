@@ -4,6 +4,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using AvaloniaEdit;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
 using Mfr.App.Ui.Views.Controls;
@@ -105,6 +106,21 @@ namespace Mfr.Tests.Ui.FormatEditor
                     : ((TokenFormatTokenEditorViewModel)editor).Source,
                 sourceEditor.Text
             );
+
+            // Bound default Source must highlight on open (attach re-resolves theme brushes).
+            var templateBox = sourceEditor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(templateBox);
+            var colorizer = Assert.Single(
+                templateBox.TextArea.TextView.LineTransformers.OfType<FormatTokenColorizingTransformer>()
+            );
+            Assert.NotNull(colorizer.TokenNameForeground);
+            Assert.NotEmpty(colorizer.Tokens);
+            Assert.Equal("file-name", colorizer.Tokens[0].CanonicalName);
+            var background = Assert.Single(
+                templateBox.TextArea.TextView.BackgroundRenderers.OfType<FormatTokenBackgroundRenderer>()
+            );
+            Assert.NotNull(background.TokenBackground);
+            Assert.NotEmpty(background.Tokens);
 
             dialog.Close();
         }
