@@ -607,8 +607,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
             if (MaxLength > 0 && text.Length > MaxLength)
             {
                 text = text[..MaxLength];
+                // Do not assign TemplateBox.Text here: TextEditor.Text clears the undo stack and
+                // throws while an undo group is still open (paste / BeginUpdate→EndUpdate).
                 _suppressTextSync = true;
-                TemplateBox.Text = text;
+                _TruncateTemplateDocumentToMaxLength();
                 _suppressTextSync = false;
                 _SetCaret(Math.Min(TemplateBox.CaretOffset, text.Length));
             }
@@ -943,6 +945,30 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             return text[..MaxLength];
+        }
+
+        /// <summary>
+        /// Removes characters past <see cref="MaxLength"/> from the editor document.
+        /// </summary>
+        /// <remarks>
+        /// Prefer this over assigning <c>TemplateBox.Text</c> from <see cref="_OnTemplateTextChanged"/>:
+        /// AvaloniaEdit's Text setter calls <c>UndoStack.ClearAll()</c>, which throws when an undo group
+        /// is open (for example during paste).
+        /// </remarks>
+        private void _TruncateTemplateDocumentToMaxLength()
+        {
+            if (MaxLength <= 0)
+            {
+                return;
+            }
+
+            var document = TemplateBox.Document;
+            if (document is null || document.TextLength <= MaxLength)
+            {
+                return;
+            }
+
+            document.Remove(MaxLength, document.TextLength - MaxLength);
         }
 
         /// <summary>

@@ -1021,6 +1021,37 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies MaxLength clamp during an open document update (paste-style) does not throw.
+        /// </summary>
+        [AvaloniaFact]
+        public void MaxLength_ClampsDuringOpenUndoGroup_DoesNotThrow()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { MaxLength = 8, Text = "ab" };
+            var window = new Window { Content = editor };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            var document = box.Document;
+            Assert.NotNull(document);
+
+            // Mimic paste: insert while BeginUpdate keeps an undo group open through TextChanged.
+            document.BeginUpdate();
+            document.Insert(2, "cdefghijkl");
+            document.EndUpdate();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("abcdefgh", editor.Text);
+            Assert.Equal("abcdefgh", box.Text);
+            Assert.Equal(8, editor.Text.Length);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies AcceptsReturn=false swallows Enter so single-line hosts do not insert a newline.
         /// </summary>
         [AvaloniaFact]
