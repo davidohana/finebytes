@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Mfr.Utils;
+using Serilog;
 
 namespace Mfr.Engine.Presets
 {
@@ -79,6 +80,7 @@ namespace Mfr.Engine.Presets
             catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
             {
                 // Preference file — do not fail app startup or hosts; add uses factory.
+                Log.Warning(ex, "Failed to read filter defaults file '{DefaultsFilePath}'.", DefaultsFilePath);
                 return;
             }
 
