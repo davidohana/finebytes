@@ -83,10 +83,10 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             right.FindControl<TextEditor>("TemplateBox")!.CaretOffset = 1;
             var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "file-name");
-            var picker = _NamedDescendant<FormatTokenInsertPicker>(host, "PART_InsertPicker");
-            Assert.IsType<App.Ui.ViewModels.FormatEditor.FormatTokenInsertPickerViewModel>(picker.DataContext);
+            var picker = _NamedDescendant<FormatTokenPicker>(host, "PART_TokenPicker");
+            Assert.IsType<App.Ui.ViewModels.FormatEditor.FormatTokenPickerViewModel>(picker.DataContext);
             (
-                (App.Ui.ViewModels.FormatEditor.FormatTokenInsertPickerViewModel)picker.DataContext
+                (App.Ui.ViewModels.FormatEditor.FormatTokenPickerViewModel)picker.DataContext
             ).InsertEntryCommand.Execute(entry);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

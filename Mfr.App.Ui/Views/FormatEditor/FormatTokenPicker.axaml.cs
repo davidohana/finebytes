@@ -13,22 +13,22 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Expects a <see cref="FormatTokenInsertPickerViewModel"/> as <see cref="StyledElement.DataContext"/>.
+    /// Expects a <see cref="FormatTokenPickerViewModel"/> as <see cref="StyledElement.DataContext"/>.
     /// Used by the per-field Insert flyout and by <see cref="FormatTokenToolsHost"/>.
     /// </para>
     /// </remarks>
-    public partial class FormatTokenInsertPicker : UserControl
+    public partial class FormatTokenPicker : UserControl
     {
         /// <summary>
-        /// Initializes insert-picker interaction handlers.
+        /// Initializes token-picker interaction handlers.
         /// </summary>
-        public FormatTokenInsertPicker()
+        public FormatTokenPicker()
         {
             InitializeComponent();
-            InsertList.AddHandler(TappedEvent, _OnInsertItemTapped, RoutingStrategies.Bubble);
-            InsertList.AddHandler(TreeViewItem.ExpandedEvent, _OnInsertGroupExpanded);
-            InsertList.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
-            InsertSearchBox.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
+            TokenList.AddHandler(TappedEvent, _OnTokenItemTapped, RoutingStrategies.Bubble);
+            TokenList.AddHandler(TreeViewItem.ExpandedEvent, _OnTokenGroupExpanded);
+            TokenList.AddHandler(KeyDownEvent, _OnTokenPickerKeyDown, RoutingStrategies.Tunnel);
+            TokenSearchBox.AddHandler(KeyDownEvent, _OnTokenPickerKeyDown, RoutingStrategies.Tunnel);
         }
 
         /// <summary>
@@ -36,14 +36,14 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// </summary>
         public void FocusSearch()
         {
-            InsertSearchBox.Focus();
+            TokenSearchBox.Focus();
         }
 
         /// <summary>
         /// Inserts the tapped catalog leaf, or expands/collapses a group folder (pointer/touch).
         /// Keyboard highlight alone must not insert.
         /// </summary>
-        private void _OnInsertItemTapped(object? sender, TappedEventArgs e)
+        private void _OnTokenItemTapped(object? sender, TappedEventArgs e)
         {
             if (e.Source is not Visual source)
             {
@@ -51,7 +51,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             var item = source as TreeViewItem ?? source.FindAncestorOfType<TreeViewItem>();
-            if (item?.DataContext is not FormatInsertPickerNode node)
+            if (item?.DataContext is not FormatTokenPickerNode node)
             {
                 return;
             }
@@ -73,7 +73,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             e.Handled = true;
-            if (DataContext is FormatTokenInsertPickerViewModel vm)
+            if (DataContext is FormatTokenPickerViewModel vm)
             {
                 vm.InsertEntryCommand.Execute(entry);
             }
@@ -102,7 +102,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <summary>
         /// Accordion: opening a folder collapses sibling folders (tap, chevron, or keyboard).
         /// </summary>
-        private void _OnInsertGroupExpanded(object? sender, RoutedEventArgs e)
+        private void _OnTokenGroupExpanded(object? sender, RoutedEventArgs e)
         {
             if (e.Source is not TreeViewItem expanded)
             {
@@ -142,7 +142,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <summary>
         /// Enter inserts the highlighted catalog leaf from search or list focus (not SelectionChanged).
         /// </summary>
-        private void _OnInsertPickerKeyDown(object? sender, KeyEventArgs e)
+        private void _OnTokenPickerKeyDown(object? sender, KeyEventArgs e)
         {
             if (e.Key != Key.Enter || !_TryInsertHighlighted())
             {
@@ -159,8 +159,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private bool _TryInsertHighlighted()
         {
             if (
-                InsertList.SelectedItem is not FormatInsertPickerNode { Entry: { } entry }
-                || DataContext is not FormatTokenInsertPickerViewModel vm
+                TokenList.SelectedItem is not FormatTokenPickerNode { Entry: { } entry }
+                || DataContext is not FormatTokenPickerViewModel vm
             )
             {
                 return false;

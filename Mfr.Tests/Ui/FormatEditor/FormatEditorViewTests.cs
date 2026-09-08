@@ -97,15 +97,15 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            editor.InsertPickerViewModel.SearchText = "file-name";
+            editor.TokenPickerViewModel.SearchText = "file-name";
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             var list = _RequireInsertList(editor);
-            Assert.False(editor.InsertPickerViewModel.IsGrouped);
+            Assert.False(editor.TokenPickerViewModel.IsGrouped);
             var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "file-name");
             var leaf = Assert.Single(
-                editor.InsertPickerViewModel.VisibleItems,
+                editor.TokenPickerViewModel.VisibleItems,
                 n => n.Entry?.CanonicalName == "file-name"
             );
             list.ScrollIntoView(leaf);
@@ -119,7 +119,7 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.Equal(entry.InsertText, editor.Text);
             Assert.False(editor.ViewModel.HasError);
-            Assert.True(editor.InsertPickerViewModel.IsGrouped);
+            Assert.True(editor.TokenPickerViewModel.IsGrouped);
 
             window.Close();
         }
@@ -133,9 +133,9 @@ namespace Mfr.Tests.Ui.FormatEditor
             var (editor, window) = _ShowWithInsertFlyout();
 
             var list = _RequireInsertList(editor);
-            Assert.True(editor.InsertPickerViewModel.IsGrouped);
+            Assert.True(editor.TokenPickerViewModel.IsGrouped);
 
-            var fileNameGroup = Assert.Single(editor.InsertPickerViewModel.VisibleItems, n => n.Title == "File Name");
+            var fileNameGroup = Assert.Single(editor.TokenPickerViewModel.VisibleItems, n => n.Title == "File Name");
             var leaf = Assert.Single(fileNameGroup.Children, n => n.Entry?.CanonicalName == "file-name");
             var entry = leaf.Entry!;
 
@@ -168,7 +168,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             var (editor, window) = _ShowWithInsertFlyout();
 
             var list = _RequireInsertList(editor);
-            var fileNameGroup = Assert.Single(editor.InsertPickerViewModel.VisibleItems, n => n.Title == "File Name");
+            var fileNameGroup = Assert.Single(editor.TokenPickerViewModel.VisibleItems, n => n.Title == "File Name");
             Assert.True(fileNameGroup.IsGroup);
 
             list.ScrollIntoView(fileNameGroup);
@@ -184,7 +184,7 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.True(groupContainer.IsExpanded);
             Assert.Equal(string.Empty, editor.Text);
-            Assert.True(editor.InsertPickerViewModel.IsGrouped);
+            Assert.True(editor.TokenPickerViewModel.IsGrouped);
 
             groupContainer.RaiseEvent(new TappedEventArgs(InputElement.TappedEvent, null!));
             window.UpdateLayout();
@@ -205,8 +205,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             var (editor, window) = _ShowWithInsertFlyout();
 
             var list = _RequireInsertList(editor);
-            var fileNameGroup = Assert.Single(editor.InsertPickerViewModel.VisibleItems, n => n.Title == "File Name");
-            var audioGroup = Assert.Single(editor.InsertPickerViewModel.VisibleItems, n => n.Title == "Audio");
+            var fileNameGroup = Assert.Single(editor.TokenPickerViewModel.VisibleItems, n => n.Title == "File Name");
+            var audioGroup = Assert.Single(editor.TokenPickerViewModel.VisibleItems, n => n.Title == "Audio");
 
             list.ScrollIntoView(fileNameGroup);
             window.UpdateLayout();
@@ -247,7 +247,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             var (editor, window) = _ShowWithInsertFlyout();
 
             var list = _RequireInsertList(editor);
-            var audioGroup = Assert.Single(editor.InsertPickerViewModel.VisibleItems, n => n.Title == "Audio");
+            var audioGroup = Assert.Single(editor.TokenPickerViewModel.VisibleItems, n => n.Title == "Audio");
             var tagGroup = Assert.Single(audioGroup.Children, n => n.Title == "Tag");
             var mp3Group = Assert.Single(audioGroup.Children, n => n.Title == "MP3");
 
@@ -320,7 +320,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             var listBrush = Assert.IsAssignableFrom<ISolidColorBrush>(list.Background);
             Assert.Equal(panelBrush.Color, listBrush.Color);
 
-            var group = Assert.Single(editor.InsertPickerViewModel.VisibleItems, n => n.Title == "File Name");
+            var group = Assert.Single(editor.TokenPickerViewModel.VisibleItems, n => n.Title == "File Name");
             list.ScrollIntoView(group);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -343,7 +343,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             var (editor, window) = _ShowWithInsertFlyout();
 
             var list = _RequireInsertList(editor);
-            var fileNameGroup = Assert.Single(editor.InsertPickerViewModel.VisibleItems, n => n.Title == "File Name");
+            var fileNameGroup = Assert.Single(editor.TokenPickerViewModel.VisibleItems, n => n.Title == "File Name");
             list.ScrollIntoView(fileNameGroup);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -380,7 +380,7 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             var list = _RequireInsertList(editor);
             list.MaxHeight = 80;
-            var fileNameGroup = Assert.Single(editor.InsertPickerViewModel.VisibleItems, n => n.Title == "File Name");
+            var fileNameGroup = Assert.Single(editor.TokenPickerViewModel.VisibleItems, n => n.Title == "File Name");
             list.ScrollIntoView(fileNameGroup);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -410,13 +410,13 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            editor.InsertPickerViewModel.SearchText = "file-name";
+            editor.TokenPickerViewModel.SearchText = "file-name";
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             var list = _RequireInsertList(editor);
             var leaf = Assert.Single(
-                editor.InsertPickerViewModel.VisibleItems,
+                editor.TokenPickerViewModel.VisibleItems,
                 n => n.Entry?.CanonicalName == "file-name"
             );
             var entry = leaf.Entry!;
@@ -445,14 +445,14 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            editor.InsertPickerViewModel.SearchText = "file-name";
+            editor.TokenPickerViewModel.SearchText = "file-name";
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             var list = _RequireInsertList(editor);
             var search = _RequireInsertSearchBox(editor);
             var leaf = Assert.Single(
-                editor.InsertPickerViewModel.VisibleItems,
+                editor.TokenPickerViewModel.VisibleItems,
                 n => n.Entry?.CanonicalName == "file-name"
             );
             var entry = leaf.Entry!;
@@ -481,7 +481,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             var (editor, window) = _ShowWithInsertFlyout();
 
             var list = _RequireInsertList(editor);
-            var fileNameGroup = Assert.Single(editor.InsertPickerViewModel.VisibleItems, n => n.Title == "File Name");
+            var fileNameGroup = Assert.Single(editor.TokenPickerViewModel.VisibleItems, n => n.Title == "File Name");
             Assert.True(fileNameGroup.IsGroup);
 
             list.SelectedItem = fileNameGroup;
@@ -542,8 +542,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.NotEmpty(editor.InsertPickerViewModel.VisibleItems);
-            Assert.True(editor.InsertPickerViewModel.IsGrouped);
+            Assert.NotEmpty(editor.TokenPickerViewModel.VisibleItems);
+            Assert.True(editor.TokenPickerViewModel.IsGrouped);
             Assert.False(editor.ViewModel.HasError);
             Assert.Same(
                 AppChromeFonts.AppChromeFixedWidthFamily,
@@ -1065,11 +1065,11 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Resolves the insert catalog tree (lives in <see cref="FormatTokenInsertPicker"/>'s name scope).
+        /// Resolves the insert catalog tree (lives in <see cref="FormatTokenPicker"/>'s name scope).
         /// </summary>
         private static TreeView _RequireInsertList(App.Ui.Views.FormatEditor.FormatEditor editor)
         {
-            var list = editor.InsertPickerControl.FindControl<TreeView>("InsertList");
+            var list = editor.TokenPickerControl.FindControl<TreeView>("TokenList");
             Assert.NotNull(list);
             return list;
         }
@@ -1079,7 +1079,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         /// </summary>
         private static TextBox _RequireInsertSearchBox(App.Ui.Views.FormatEditor.FormatEditor editor)
         {
-            var search = editor.InsertPickerControl.FindControl<TextBox>("InsertSearchBox");
+            var search = editor.TokenPickerControl.FindControl<TextBox>("TokenSearchBox");
             Assert.NotNull(search);
             return search;
         }

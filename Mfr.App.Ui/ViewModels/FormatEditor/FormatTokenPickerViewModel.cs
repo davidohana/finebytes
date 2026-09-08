@@ -5,33 +5,34 @@ using Mfr.Filters.Formatting.FormatString;
 namespace Mfr.App.Ui.ViewModels.FormatEditor
 {
     /// <summary>
-    /// Searchable format-token catalog for Insert (flyout or <see cref="Views.FormatEditor.FormatTokenToolsHost"/>).
+    /// Searchable format-token catalog for the Insert flyout or
+    /// <see cref="Views.FormatEditor.FormatTokenToolsHost"/>.
     /// </summary>
-    public sealed partial class FormatTokenInsertPickerViewModel : ViewModelBase
+    public sealed partial class FormatTokenPickerViewModel : ViewModelBase
     {
         private readonly Action<string> _insertText;
 
         /// <summary>
-        /// Initializes catalog state for an insert picker.
+        /// Initializes catalog state for a format-token picker.
         /// </summary>
         /// <param name="insertText">Inserts catalog text at the caret / selection.</param>
-        public FormatTokenInsertPickerViewModel(Action<string> insertText)
+        public FormatTokenPickerViewModel(Action<string> insertText)
         {
             _insertText = insertText;
             _RefreshVisibleItems();
         }
 
         /// <summary>
-        /// Gets or sets the insert-picker search filter.
+        /// Gets or sets the token-picker search filter.
         /// </summary>
         [ObservableProperty]
         private string _searchText = string.Empty;
 
         /// <summary>
-        /// Gets insert-picker roots: nested <see cref="FormatTokenCatalogEntry.GroupPath"/> folders when
+        /// Gets token-picker roots: nested <see cref="FormatTokenCatalogEntry.GroupPath"/> folders when
         /// search is empty; flat catalog leaves when filtering.
         /// </summary>
-        public IReadOnlyList<FormatInsertPickerNode> VisibleItems { get; private set; } = [];
+        public IReadOnlyList<FormatTokenPickerNode> VisibleItems { get; private set; } = [];
 
         /// <summary>
         /// Gets whether the picker is nested by group (search empty / whitespace) rather than a flat filter result.
@@ -72,7 +73,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         /// <summary>
         /// Flat catalog leaves matching <paramref name="query"/> (group subtitle shown).
         /// </summary>
-        private static List<FormatInsertPickerNode> _BuildFlatFilteredItems(string query)
+        private static List<FormatTokenPickerNode> _BuildFlatFilteredItems(string query)
         {
             return
             [
@@ -83,14 +84,14 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
                         || e.ShortDescription.Contains(query, StringComparison.OrdinalIgnoreCase)
                         || e.GroupPath.Contains(query, StringComparison.OrdinalIgnoreCase)
                     )
-                    .Select(e => FormatInsertPickerNode.Leaf(e, showGroupSubtitle: true)),
+                    .Select(e => FormatTokenPickerNode.Leaf(e, showGroupSubtitle: true)),
             ];
         }
 
         /// <summary>
         /// Nests catalog rows under <see cref="FormatTokenCatalogEntry.GroupPath"/> segments (<c>\</c>-separated).
         /// </summary>
-        private static List<FormatInsertPickerNode> _BuildGroupedItems(IReadOnlyList<FormatTokenCatalogEntry> entries)
+        private static List<FormatTokenPickerNode> _BuildGroupedItems(IReadOnlyList<FormatTokenCatalogEntry> entries)
         {
             var root = new GroupBuilder(title: string.Empty);
             foreach (var entry in entries)
@@ -112,7 +113,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         }
 
         /// <summary>
-        /// Mutable folder used while folding catalog rows into a <see cref="FormatInsertPickerNode"/> tree.
+        /// Mutable folder used while folding catalog rows into a <see cref="FormatTokenPickerNode"/> tree.
         /// </summary>
         private sealed class GroupBuilder(string title)
         {
@@ -147,17 +148,17 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
             /// Materializes child groups then leaves (group-first, matching browse menus).
             /// </summary>
             /// <returns>Nodes for this folder's children and catalog leaves.</returns>
-            public List<FormatInsertPickerNode> ToNodes()
+            public List<FormatTokenPickerNode> ToNodes()
             {
-                var nodes = new List<FormatInsertPickerNode>(_childOrder.Count + Entries.Count);
+                var nodes = new List<FormatTokenPickerNode>(_childOrder.Count + Entries.Count);
                 foreach (var child in _childOrder)
                 {
-                    nodes.Add(FormatInsertPickerNode.Group(child.Title, child.ToNodes()));
+                    nodes.Add(FormatTokenPickerNode.Group(child.Title, child.ToNodes()));
                 }
 
                 foreach (var entry in Entries)
                 {
-                    nodes.Add(FormatInsertPickerNode.Leaf(entry, showGroupSubtitle: false));
+                    nodes.Add(FormatTokenPickerNode.Leaf(entry, showGroupSubtitle: false));
                 }
 
                 return nodes;

@@ -3,14 +3,14 @@ using Mfr.Filters.Formatting.FormatString;
 namespace Mfr.App.Ui.ViewModels.FormatEditor
 {
     /// <summary>
-    /// One insert-picker row: a <see cref="FormatTokenCatalogEntry.GroupPath"/> folder or a catalog leaf.
+    /// One format-token picker row: a <see cref="FormatTokenCatalogEntry.GroupPath"/> folder or a catalog leaf.
     /// </summary>
-    public sealed class FormatInsertPickerNode
+    public sealed class FormatTokenPickerNode
     {
-        private FormatInsertPickerNode(
+        private FormatTokenPickerNode(
             string title,
             FormatTokenCatalogEntry? entry,
-            IReadOnlyList<FormatInsertPickerNode> children,
+            IReadOnlyList<FormatTokenPickerNode> children,
             bool showGroupSubtitle
         )
         {
@@ -33,7 +33,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         /// <summary>
         /// Gets nested group / leaf children (empty for leaves).
         /// </summary>
-        public IReadOnlyList<FormatInsertPickerNode> Children { get; }
+        public IReadOnlyList<FormatTokenPickerNode> Children { get; }
 
         /// <summary>
         /// Gets whether the leaf should show <see cref="FormatTokenCatalogEntry.GroupPath"/> under the title
@@ -52,9 +52,9 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         /// <param name="title">Single path segment (for example <c>Audio</c> or <c>Tag</c>).</param>
         /// <param name="children">Child groups and/or leaves.</param>
         /// <returns>Group node.</returns>
-        public static FormatInsertPickerNode Group(string title, IReadOnlyList<FormatInsertPickerNode> children)
+        public static FormatTokenPickerNode Group(string title, IReadOnlyList<FormatTokenPickerNode> children)
         {
-            return new FormatInsertPickerNode(title, entry: null, children, showGroupSubtitle: false);
+            return new FormatTokenPickerNode(title, entry: null, children, showGroupSubtitle: false);
         }
 
         /// <summary>
@@ -63,9 +63,9 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         /// <param name="entry">Catalog row.</param>
         /// <param name="showGroupSubtitle">When <see langword="true"/>, show <see cref="FormatTokenCatalogEntry.GroupPath"/>.</param>
         /// <returns>Leaf node.</returns>
-        public static FormatInsertPickerNode Leaf(FormatTokenCatalogEntry entry, bool showGroupSubtitle)
+        public static FormatTokenPickerNode Leaf(FormatTokenCatalogEntry entry, bool showGroupSubtitle)
         {
-            return new FormatInsertPickerNode(entry.DisplayName, entry, children: [], showGroupSubtitle);
+            return new FormatTokenPickerNode(entry.DisplayName, entry, children: [], showGroupSubtitle);
         }
     }
 }

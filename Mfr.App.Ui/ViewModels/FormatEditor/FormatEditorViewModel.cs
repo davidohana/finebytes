@@ -10,8 +10,8 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
     /// <remarks>
     /// <para>
     /// The bound format string lives on the control's <c>Text</c> property; this VM owns the last validation
-    /// result for the error row and Edit-under-caret. Insert catalog state lives on
-    /// <see cref="FormatTokenInsertPickerViewModel"/>.
+    /// result for the error row and Edit-under-caret. Token catalog state lives on
+    /// <see cref="FormatTokenPickerViewModel"/>.
     /// </para>
     /// </remarks>
     public sealed partial class FormatEditorViewModel : ViewModelBase

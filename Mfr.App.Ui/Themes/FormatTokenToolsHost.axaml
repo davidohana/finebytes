@@ -62,7 +62,7 @@
                   Text="Tokens"
                   TextTrimming="CharacterEllipsis"
                 />
-                <fe:FormatTokenInsertPicker Name="PART_InsertPicker" MinHeight="160" MaxHeight="320" />
+                <fe:FormatTokenPicker Name="PART_TokenPicker" MinHeight="160" MaxHeight="320" />
               </DockPanel>
             </Border>
           </DockPanel>

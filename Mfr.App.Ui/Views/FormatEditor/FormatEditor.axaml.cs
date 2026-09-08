@@ -111,9 +111,9 @@ namespace Mfr.App.Ui.Views.FormatEditor
         public FormatEditorViewModel ViewModel { get; }
 
         /// <summary>
-        /// Gets the insert-picker view-model (search + catalog).
+        /// Gets the format-token picker view-model (search + catalog).
         /// </summary>
-        public FormatTokenInsertPickerViewModel InsertPickerViewModel { get; }
+        public FormatTokenPickerViewModel TokenPickerViewModel { get; }
 
         /// <summary>
         /// Initializes the FormatEditor control.
@@ -122,9 +122,9 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             InitializeComponent();
             ViewModel = new FormatEditorViewModel(jumpToError: JumpToError, editUnderCaret: _EditUnderCaret);
-            InsertPickerViewModel = new FormatTokenInsertPickerViewModel(InsertTextAtCaret);
+            TokenPickerViewModel = new FormatTokenPickerViewModel(InsertTextAtCaret);
             ChromeRoot.DataContext = ViewModel;
-            InsertPicker.DataContext = InsertPickerViewModel;
+            TokenPicker.DataContext = TokenPickerViewModel;
             ViewModel.ValidationMode = ValidationMode;
             _ConfigureTemplateEditor();
             _ApplyAcceptsReturnLayout(AcceptsReturn);
@@ -136,9 +136,9 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets the insert-picker control hosted in the Insert flyout (for tests).
+        /// Gets the format-token picker control hosted in the Insert flyout (for tests).
         /// </summary>
-        public FormatTokenInsertPicker InsertPickerControl => InsertPicker;
+        public FormatTokenPicker TokenPickerControl => TokenPicker;
 
         /// <summary>
         /// Gets or sets the format string.
@@ -515,7 +515,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// </summary>
         private void _OnInsertFlyoutOpened(object? sender, EventArgs e)
         {
-            Dispatcher.UIThread.Post(InsertPicker.FocusSearch, DispatcherPriority.Input);
+            Dispatcher.UIThread.Post(TokenPicker.FocusSearch, DispatcherPriority.Input);
         }
 
         /// <summary>

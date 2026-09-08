@@ -79,7 +79,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, Geometry?>(nameof(CollapseIcon), o => o.CollapseIcon);
 
         private readonly List<FormatEditor> _editors = [];
-        private readonly FormatTokenInsertPickerViewModel _pickerViewModel;
+        private readonly FormatTokenPickerViewModel _pickerViewModel;
 
         private Button? _editButton;
         private Button? _collapseButton;
@@ -97,7 +97,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             CollapseToolTip = "Collapse token tools";
             ToolsPaneWidth = ExpandedPaneWidth;
-            _pickerViewModel = new FormatTokenInsertPickerViewModel(_InsertIntoActive);
+            _pickerViewModel = new FormatTokenPickerViewModel(_InsertIntoActive);
             _RefreshChrome();
         }
 
@@ -220,9 +220,9 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
             _editButton = e.NameScope.Find<Button>("PART_EditButton");
             _collapseButton = e.NameScope.Find<Button>("PART_CollapseButton");
-            if (e.NameScope.Find<FormatTokenInsertPicker>("PART_InsertPicker") is { } insertPicker)
+            if (e.NameScope.Find<FormatTokenPicker>("PART_TokenPicker") is { } tokenPicker)
             {
-                insertPicker.DataContext = _pickerViewModel;
+                tokenPicker.DataContext = _pickerViewModel;
             }
 
             _editButton?.Click += _OnEditClick;

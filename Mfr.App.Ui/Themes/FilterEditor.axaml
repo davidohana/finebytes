@@ -249,14 +249,14 @@
 
   <!-- Insert-picker search should keep its hint; option fields hide watermarks until focus. -->
   <Style
-    Selector="TextBox.format-insert-search /template/ TextBlock#PART_Watermark,
-              TextBox.format-insert-search:pointerover /template/ TextBlock#PART_Watermark,
-              TextBox.format-insert-search:focus /template/ TextBlock#PART_Watermark"
+    Selector="TextBox.format-token-search /template/ TextBlock#PART_Watermark,
+              TextBox.format-token-search:pointerover /template/ TextBlock#PART_Watermark,
+              TextBox.format-token-search:focus /template/ TextBlock#PART_Watermark"
   >
     <Setter Property="Foreground" Value="{DynamicResource FilterEditorWatermarkBrush}" />
   </Style>
 
-  <Style Selector="TreeView.format-insert-picker">
+  <Style Selector="TreeView.format-token-picker">
     <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
     <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Padding" Value="0" />
@@ -266,43 +266,43 @@
     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
     <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
   </Style>
-  <Style Selector="TreeView.format-insert-picker TreeViewItem">
+  <Style Selector="TreeView.format-token-picker TreeViewItem">
     <Setter Property="MinHeight" Value="0" />
     <Setter Property="Padding" Value="4,2" />
     <Setter Property="Margin" Value="0" />
     <Setter Property="CornerRadius" Value="3" />
     <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
   </Style>
-  <Style Selector="TreeView.format-insert-picker TreeViewItem /template/ Panel#PART_ExpandCollapseChevronContainer">
+  <Style Selector="TreeView.format-token-picker TreeViewItem /template/ Panel#PART_ExpandCollapseChevronContainer">
     <Setter Property="Margin" Value="0,0,4,0" />
   </Style>
-  <Style Selector="TreeView.format-insert-picker TreeViewItem /template/ Border#PART_LayoutRoot">
+  <Style Selector="TreeView.format-token-picker TreeViewItem /template/ Border#PART_LayoutRoot">
     <Setter Property="BorderBrush" Value="Transparent" />
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="CornerRadius" Value="3" />
     <Setter Property="Padding" Value="6,0,0,0" />
   </Style>
-  <Style Selector="TreeView.format-insert-picker TreeViewItem /template/ Border#PART_LayoutRoot:pointerover">
+  <Style Selector="TreeView.format-token-picker TreeViewItem /template/ Border#PART_LayoutRoot:pointerover">
     <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
   </Style>
-  <Style Selector="TreeView.format-insert-picker TreeViewItem:selected /template/ Border#PART_LayoutRoot">
+  <Style Selector="TreeView.format-token-picker TreeViewItem:selected /template/ Border#PART_LayoutRoot">
     <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
   </Style>
   <Style
-    Selector="TreeView.format-insert-picker TreeViewItem:selected /template/ Border#PART_LayoutRoot:pointerover,
-              TreeView.format-insert-picker TreeViewItem:selected:pointerover /template/ Border#PART_LayoutRoot"
+    Selector="TreeView.format-token-picker TreeViewItem:selected /template/ Border#PART_LayoutRoot:pointerover,
+              TreeView.format-token-picker TreeViewItem:selected:pointerover /template/ Border#PART_LayoutRoot"
   >
     <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
   </Style>
-  <Style Selector="TreeView.format-insert-picker TreeViewItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
+  <Style Selector="TreeView.format-token-picker TreeViewItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
     <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
   </Style>
-  <Style Selector="TreeView.format-insert-picker TreeViewItem:empty /template/ ToggleButton#PART_ExpandCollapseChevron">
+  <Style Selector="TreeView.format-token-picker TreeViewItem:empty /template/ ToggleButton#PART_ExpandCollapseChevron">
     <Setter Property="IsVisible" Value="False" />
   </Style>
-  <Style Selector="TreeView.format-insert-picker TextBlock.format-insert-group">
+  <Style Selector="TreeView.format-token-picker TextBlock.format-token-group">
     <Setter Property="FontWeight" Value="SemiBold" />
   </Style>
 

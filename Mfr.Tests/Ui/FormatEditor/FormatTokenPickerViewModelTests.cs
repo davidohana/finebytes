@@ -4,9 +4,9 @@ using Mfr.Filters.Formatting.FormatString;
 namespace Mfr.Tests.Ui.FormatEditor
 {
     /// <summary>
-    /// Unit tests for <see cref="FormatTokenInsertPickerViewModel"/>.
+    /// Unit tests for <see cref="FormatTokenPickerViewModel"/>.
     /// </summary>
-    public sealed class FormatTokenInsertPickerViewModelTests
+    public sealed class FormatTokenPickerViewModelTests
     {
         /// <summary>
         /// Verifies an empty search nests catalog rows under <see cref="FormatTokenCatalogEntry.GroupPath"/>.
@@ -97,7 +97,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         public void InsertEntryCommand_InsertsCatalogText()
         {
             var inserted = new List<string>();
-            var vm = new FormatTokenInsertPickerViewModel(inserted.Add);
+            var vm = new FormatTokenPickerViewModel(inserted.Add);
 
             var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "file-name");
             vm.SearchText = "file";
@@ -109,12 +109,12 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.True(vm.IsGrouped);
         }
 
-        private static FormatTokenInsertPickerViewModel _CreateVm()
+        private static FormatTokenPickerViewModel _CreateVm()
         {
             return new(static _ => { });
         }
 
-        private static int _CountLeaves(IEnumerable<FormatInsertPickerNode> nodes)
+        private static int _CountLeaves(IEnumerable<FormatTokenPickerNode> nodes)
         {
             return nodes.Sum(n => n.IsGroup ? _CountLeaves(n.Children) : 1);
         }

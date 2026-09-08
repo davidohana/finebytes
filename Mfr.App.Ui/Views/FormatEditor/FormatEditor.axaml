@@ -55,7 +55,7 @@
                 <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
               </ControlTheme>
             </Flyout.FlyoutPresenterTheme>
-            <fe:FormatTokenInsertPicker x:Name="InsertPicker" Width="280" MaxHeight="320" />
+            <fe:FormatTokenPicker x:Name="TokenPicker" Width="280" MaxHeight="320" />
           </Flyout>
         </Button.Flyout>
       </Button>
