@@ -15,19 +15,6 @@ namespace Mfr.Tests.Ui.FilterEditors
         /// <summary>
         /// Shows Applied Filters above Filter Configuration for headless editor tests.
         /// </summary>
-        /// <returns>Host window, main view model, and filter editor view.</returns>
-        public static (
-            Window Window,
-            MainWindowViewModel MainViewModel,
-            FilterEditorView EditorView
-        ) ShowFilterEditorPanes()
-        {
-            return ShowFilterEditorPanes(session: null);
-        }
-
-        /// <summary>
-        /// Shows Applied Filters above Filter Configuration with an optional session document.
-        /// </summary>
         /// <param name="session">
         /// Session restored onto the main view model, or <see langword="null"/> for first-launch defaults.
         /// </param>
@@ -36,7 +23,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Window Window,
             MainWindowViewModel MainViewModel,
             FilterEditorView EditorView
-        ) ShowFilterEditorPanes(SessionState? session)
+        ) ShowFilterEditorPanes(SessionState? session = null)
         {
             var mainViewModel = new MainWindowViewModel(session: session);
             var appliedView = new AppliedFiltersView

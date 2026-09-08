@@ -176,26 +176,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies collapse is restored from <c>session.json</c> when the host attaches under a session.
-        /// </summary>
-        [AvaloniaFact]
-        public void Collapse_RestoresFromSession_WhenExpandedFalse()
-        {
-            var session = new SessionState
-            {
-                FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
-            };
-            var (host, window) = _ShowHostWithSession(session);
-
-            Assert.False(host.IsExpanded);
-            Assert.Equal(26, host.ToolsPaneWidth);
-            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
-
-            window.Close();
-        }
-
-        /// <summary>
-        /// Verifies toggling collapse writes the shared session preference for later hosts.
+        /// Verifies toggling collapse writes the shared session preference and the next host restores it.
         /// </summary>
         [AvaloniaFact]
         public void Collapse_PersistsToSession_AndAppliesToNextHost()
@@ -212,11 +193,14 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.NotNull(session.FilterEditor);
             Assert.False(session.FilterEditor.FormatTokenPickerExpanded);
+            Assert.Equal(26, host.ToolsPaneWidth);
+            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
 
             window.Close();
 
             var (nextHost, nextWindow) = _ShowHostWithSession(session);
             Assert.False(nextHost.IsExpanded);
+            Assert.Equal(26, nextHost.ToolsPaneWidth);
             Assert.False(_NamedDescendant<Border>(nextHost, "PART_ToolsPane").IsVisible);
             nextWindow.Close();
         }

@@ -21,9 +21,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// hosted here.
     /// </para>
     /// <para>
-    /// Collapse state is shared via <see cref="SessionState.FilterEditor"/> when the host lives
-    /// under a <see cref="MainWindowViewModel"/> with a loaded session (written on toggle, flushed
-    /// with <c>session.json</c> on main-window close). Missing session section defaults to expanded.
+    /// Collapse state is shared via <see cref="SessionStateFilterEditor.FormatTokenPickerExpanded"/>
+    /// when the host lives under a <see cref="MainWindowViewModel"/> with a loaded session (written
+    /// when <see cref="IsExpanded"/> changes, flushed with <c>session.json</c> on main-window close).
+    /// Missing session section defaults to expanded.
     /// </para>
     /// </remarks>
     public sealed class FormatTokenToolsHost : ContentControl
@@ -266,6 +267,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
             IsExpanded = !IsExpanded;
         }
 
+        /// <summary>
+        /// Restores <see cref="IsExpanded"/> from the shared Filter Configuration session section.
+        /// <para>No-op when there is no session document or the section is missing (stay expanded).</para>
+        /// </summary>
         private void _ApplyExpandedFromSession()
         {
             var session = _TryFindSession();
@@ -285,6 +290,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
         }
 
+        /// <summary>
+        /// Writes <see cref="IsExpanded"/> into <see cref="SessionState.FilterEditor"/> for later hosts.
+        /// <para>Flush to disk still happens on main-window close via <c>session.json</c>.</para>
+        /// </summary>
         private void _PersistExpandedToSession()
         {
             var session = _TryFindSession();
@@ -296,6 +305,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
             session.EnsureFilterEditor().FormatTokenPickerExpanded = IsExpanded;
         }
 
+        /// <summary>
+        /// Finds the live main-window <see cref="SessionState"/> when this host is under a session-backed shell.
+        /// </summary>
+        /// <returns>The session document, or <see langword="null"/> when absent.</returns>
         private SessionState? _TryFindSession()
         {
             if (VisualRoot is TopLevel { DataContext: MainWindowViewModel { Session: { } session } })
