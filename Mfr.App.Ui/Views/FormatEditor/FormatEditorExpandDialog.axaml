@@ -1,0 +1,58 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:local="using:Mfr.App.Ui.Views.FormatEditor"
+  x:Class="Mfr.App.Ui.Views.FormatEditor.FormatEditorExpandDialog"
+  Title="Edit format string"
+  Icon="/Assets/mfr.ico"
+  Width="560"
+  Height="360"
+  MinWidth="420"
+  MinHeight="280"
+  WindowStartupLocation="CenterOwner"
+  CanResize="True"
+  ShowInTaskbar="False"
+  FontFamily="{StaticResource AppChromeFont}"
+  FontSize="{StaticResource AppChromeFontSize}"
+  Foreground="{DynamicResource AppChromeForegroundBrush}"
+>
+  <Window.Styles>
+    <Style Selector="Button.format-editor-expand-footer">
+      <Setter Property="MinHeight" Value="24" />
+      <Setter Property="MinWidth" Value="72" />
+      <Setter Property="Padding" Value="12,2" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.format-editor-expand-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
+    </Style>
+  </Window.Styles>
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,14,0,0">
+      <Button
+        x:Name="OkButton"
+        Classes="format-editor-expand-footer"
+        Content="OK"
+        IsDefault="True"
+        IsCancel="True"
+        Click="_OnOkClick"
+      />
+    </StackPanel>
+
+    <local:FormatEditor
+      x:Name="Editor"
+      ShowExpandButton="False"
+      ShowRightClickHint="False"
+      VerticalAlignment="Stretch"
+      HorizontalAlignment="Stretch"
+    />
+  </DockPanel>
+</Window>

@@ -14,10 +14,25 @@ namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
     /// Shared format-string editor: AvaloniaEdit field with token highlight, searchable insert picker,
-    /// token Edit, and inline parse errors.
+    /// token Edit, capped auto-grow, expand dialog, and inline parse errors.
     /// </summary>
     public partial class FormatEditor : UserControl
     {
+        /// <summary>
+        /// Multiline field floor height before auto-grow.
+        /// </summary>
+        public const double MultilineMinHeight = 64;
+
+        /// <summary>
+        /// Multiline field ceiling; content scrolls after this (~5–6 wrapped lines).
+        /// </summary>
+        public const double MultilineMaxHeight = 168;
+
+        /// <summary>
+        /// Single-line field height (no auto-grow).
+        /// </summary>
+        public const double SingleLineMinHeight = 26;
+
         /// <summary>
         /// Defines the <see cref="Text"/> property.
         /// </summary>
@@ -61,6 +76,14 @@ namespace Mfr.App.Ui.Views.FormatEditor
         >(nameof(ShowRightClickHint), defaultValue: true);
 
         /// <summary>
+        /// Defines the <see cref="ShowExpandButton"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> ShowExpandButtonProperty = AvaloniaProperty.Register<
+            FormatEditor,
+            bool
+        >(nameof(ShowExpandButton), defaultValue: true);
+
+        /// <summary>
         /// Defines the <see cref="MaxLength"/> property.
         /// </summary>
         public static readonly StyledProperty<int> MaxLengthProperty = AvaloniaProperty.Register<FormatEditor, int>(
@@ -73,6 +96,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         private bool _suppressTextSync;
         private bool _templateHooksAttached;
+        private double? _fixedEditorHeight;
 
         /// <summary>
         /// Gets the control view-model (picker / error state).
@@ -150,12 +174,48 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
+        /// Gets or sets whether the expand (larger editor dialog) tool button is shown.
+        /// </summary>
+        public bool ShowExpandButton
+        {
+            get => GetValue(ShowExpandButtonProperty);
+            set => SetValue(ShowExpandButtonProperty, value);
+        }
+
+        /// <summary>
         /// Gets or sets the maximum character count for the text box (<c>0</c> = unlimited).
         /// </summary>
         public int MaxLength
         {
             get => GetValue(MaxLengthProperty);
             set => SetValue(MaxLengthProperty, value);
+        }
+
+        /// <summary>
+        /// Disables capped auto-grow and forces a fixed editor height (expand dialog).
+        /// </summary>
+        /// <param name="height">Target editor height in device-independent pixels.</param>
+        public void UseFixedEditorHeight(double height)
+        {
+            _fixedEditorHeight = height;
+            _ApplyAcceptsReturnLayout(AcceptsReturn);
+        }
+
+        /// <summary>
+        /// Test hook: builds the expand dialog without showing it.
+        /// </summary>
+        /// <returns>A dialog bound to this editor's <see cref="Text"/>.</returns>
+        public FormatEditorExpandDialog CreateExpandDialogForTests()
+        {
+            return new FormatEditorExpandDialog(this);
+        }
+
+        /// <summary>
+        /// Test hook: remeasures capped auto-grow height from the current document.
+        /// </summary>
+        public void UpdateAutoGrowHeightForTests()
+        {
+            _UpdateAutoGrowHeight();
         }
 
         /// <summary>
@@ -319,6 +379,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ViewModel.Validate(text);
             _RefreshHighlight();
             _UpdateWatermarkVisibility();
+            _UpdateAutoGrowHeight();
         }
 
         /// <summary>
@@ -348,9 +409,17 @@ namespace Mfr.App.Ui.Views.FormatEditor
             // Selection changes often only invalidate the Selection layer; refresh Background so
             // yellow wash holes under the selection stay in sync while dragging.
             TemplateBox.TextArea.Caret.PositionChanged += _OnTemplateCaretPositionChanged;
+            TemplateBox.TextArea.TextView.VisualLinesChanged += _OnTemplateVisualLinesChanged;
             TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
             TemplateBox.TextArea.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
             TemplateBox.TextArea.AddHandler(KeyDownEvent, _OnTemplateKeyDown, RoutingStrategies.Tunnel);
+        }
+
+        /// <inheritdoc />
+        protected override void OnSizeChanged(SizeChangedEventArgs e)
+        {
+            base.OnSizeChanged(e);
+            _UpdateAutoGrowHeight();
         }
 
         /// <inheritdoc />
@@ -387,23 +456,106 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Adjusts editor height and wrapping for single-line vs multi-line hosts.
+        /// Adjusts editor height and wrapping for single-line vs multi-line hosts (or a fixed expand height).
         /// </summary>
         private void _ApplyAcceptsReturnLayout(bool acceptsReturn)
         {
-            if (acceptsReturn)
+            if (_fixedEditorHeight is { } fixedHeight)
             {
-                TemplateBox.MinHeight = 64;
+                TemplateBox.MinHeight = fixedHeight;
+                TemplateBox.MaxHeight = fixedHeight;
+                TemplateBox.Height = fixedHeight;
+                // Wrap in the expand dialog even for single-line hosts; Enter still rejected when
+                // AcceptsReturn is false.
                 TemplateBox.WordWrap = true;
                 TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
                 TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 return;
             }
 
-            TemplateBox.MinHeight = 26;
+            if (acceptsReturn)
+            {
+                TemplateBox.ClearValue(HeightProperty);
+                TemplateBox.MinHeight = MultilineMinHeight;
+                TemplateBox.MaxHeight = MultilineMaxHeight;
+                TemplateBox.WordWrap = true;
+                TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+                _UpdateAutoGrowHeight();
+                return;
+            }
+
+            TemplateBox.ClearValue(HeightProperty);
+            TemplateBox.ClearValue(MaxHeightProperty);
+            TemplateBox.MinHeight = SingleLineMinHeight;
             TemplateBox.WordWrap = false;
             TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
             TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+        }
+
+        /// <summary>
+        /// Grows the multiline editor with wrapped content up to <see cref="MultilineMaxHeight"/>.
+        /// </summary>
+        private void _UpdateAutoGrowHeight()
+        {
+            if (!AcceptsReturn || _fixedEditorHeight is not null)
+            {
+                return;
+            }
+
+            var textView = TemplateBox.TextArea.TextView;
+            if (textView.Bounds.Width <= 0)
+            {
+                return;
+            }
+
+            textView.EnsureVisualLines();
+            var contentHeight = textView.DocumentHeight;
+            if (double.IsNaN(contentHeight) || contentHeight <= 0)
+            {
+                contentHeight = Math.Max(textView.DefaultLineHeight, 1);
+            }
+
+            var chrome =
+                TemplateBox.Padding.Top
+                + TemplateBox.Padding.Bottom
+                + TemplateBox.BorderThickness.Top
+                + TemplateBox.BorderThickness.Bottom;
+            var desired = contentHeight + chrome;
+            var height = Math.Clamp(desired, MultilineMinHeight, MultilineMaxHeight);
+            if (!double.IsNaN(TemplateBox.Height) && Math.Abs(TemplateBox.Height - height) < 0.5)
+            {
+                return;
+            }
+
+            TemplateBox.Height = height;
+        }
+
+        /// <summary>
+        /// Remeasures auto-grow when wrap layout rebuilds visual lines.
+        /// </summary>
+        private void _OnTemplateVisualLinesChanged(object? sender, EventArgs e)
+        {
+            _UpdateAutoGrowHeight();
+        }
+
+        /// <summary>
+        /// Opens the expand dialog for a larger editing surface.
+        /// </summary>
+        private void _OnExpandClick(object? sender, RoutedEventArgs e)
+        {
+            _ = _ShowExpandDialogAsync();
+        }
+
+        private async Task _ShowExpandDialogAsync()
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            var dialog = new FormatEditorExpandDialog(this);
+            await dialog.ShowDialog(owner);
         }
 
         private void _InsertFlyoutHide()
@@ -449,6 +601,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ViewModel.Validate(text);
             _RefreshHighlight();
             _UpdateWatermarkVisibility();
+            _UpdateAutoGrowHeight();
         }
 
         private void _OnTemplateKeyDown(object? sender, KeyEventArgs e)
@@ -598,6 +751,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ViewModel.Validate(next);
             _RefreshHighlight();
             _UpdateWatermarkVisibility();
+            _UpdateAutoGrowHeight();
         }
 
         /// <summary>

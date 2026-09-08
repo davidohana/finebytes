@@ -146,11 +146,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
-            var builder = new BackgroundGeometryBuilder
-            {
-                AlignToWholePixels = true,
-                CornerRadius = 1,
-            };
+            var builder = new BackgroundGeometryBuilder { AlignToWholePixels = true, CornerRadius = 1 };
             builder.AddSegment(textView, new SimpleSegment(start, length));
             var geometry = builder.CreateGeometry();
             if (geometry is null)
