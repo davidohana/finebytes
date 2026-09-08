@@ -29,6 +29,15 @@
             IsVisible="{Binding HasSelectedStep}"
             Command="{Binding ResetSelectedToDefaultsCommand, ElementName=FilterEditorRoot}"
           />
+          <Button
+            x:Name="SaveFilterAsDefaultButton"
+            DockPanel.Dock="Right"
+            Classes="filter-editor-title-bar-button"
+            Content="📌"
+            ToolTip.Tip="{x:Static resources:AppTips.SaveFilterAsDefault}"
+            IsVisible="{Binding HasSelectedStep}"
+            Command="{Binding SaveSelectedAsDefaultCommand, ElementName=FilterEditorRoot}"
+          />
           <TextBlock x:Name="AppliedFilterTitle" Classes="filter-editor-title-bar" Text="{Binding TitleText}" />
         </DockPanel>
       </Border>

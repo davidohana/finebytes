@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mfr.Engine.Presets;
 using Mfr.Filters;
 using Mfr.Models.Filters;
 using Mfr.Utils;
@@ -13,6 +14,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
     /// </summary>
     public sealed partial class AppliedFiltersViewModel : ViewModelBase
     {
+        private readonly FilterDefaultsStore _filterDefaults;
         private readonly List<AppliedFilterStepViewModel> _selectedSteps = [];
         private int _chainChangedBatchDepth;
         private bool _chainChangedQueued;
@@ -20,8 +22,17 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Initializes an empty applied-filter list.
         /// </summary>
-        public AppliedFiltersViewModel()
+        /// <param name="filterDefaults">
+        /// Per-type add defaults store. When null, uses an empty store that does not read AppData
+        /// (production passes <see cref="FilterDefaultsStore.OpenDefault"/>).
+        /// </param>
+        public AppliedFiltersViewModel(FilterDefaultsStore? filterDefaults = null)
         {
+            _filterDefaults =
+                filterDefaults
+                ?? new FilterDefaultsStore(
+                    Path.Combine(Path.GetTempPath(), $"mfr-empty-filter-defaults-{Guid.NewGuid():N}.json")
+                );
             Steps = [];
             Steps.CollectionChanged += _OnStepsCollectionChanged;
         }
@@ -50,6 +61,12 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Raised after Filter Options are accepted so hosts can refresh dependent panes.
         /// </summary>
         public event EventHandler? FilterOptionsApplied;
+
+        /// <summary>
+        /// Raised after the selected step’s options are saved as the per-type add default.
+        /// <para>Payload is the catalog display name (for the confirmation dialog).</para>
+        /// </summary>
+        public event EventHandler<string>? FilterDefaultSaved;
 
         /// <summary>
         /// Replaces the current multi-selection.
@@ -213,6 +230,27 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
+        /// Saves the sole selected step’s filter options as the add default for that filter type.
+        /// <para>
+        /// Persists via <see cref="FilterDefaultsStore"/> (options, Apply To, scope). Does not change
+        /// the current step. Requires exactly one selected step.
+        /// </para>
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_HasSingleSelection))]
+        public void SaveSelectedAsDefault()
+        {
+            if (_selectedSteps.Count != 1)
+            {
+                return;
+            }
+
+            var step = _selectedSteps[0];
+            var entry = FilterCatalog.Entries.Single(catalogEntry => catalogEntry.FilterType == step.Filter.GetType());
+            _filterDefaults.SetDefault(step.Filter);
+            FilterDefaultSaved?.Invoke(this, entry.DisplayName);
+        }
+
+        /// <summary>
         /// Builds a <see cref="FilterChain"/> matching the current stack.
         /// </summary>
         /// <returns>Enabled flags and filters in list order.</returns>
@@ -327,9 +365,25 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
         private AppliedFilterStepViewModel _CreateStep(FilterCatalogEntry entry)
         {
-            var filter = FilterCatalog.CreateDefault(entry);
+            var filter = _ResolveAddDefault(entry);
             var displayName = _GenerateDisplayName(entry);
             return new AppliedFilterStepViewModel(displayName, filter);
+        }
+
+        /// <summary>
+        /// Resolves the filter instance used when adding from the palette (user default, else factory).
+        /// </summary>
+        private BaseFilter _ResolveAddDefault(FilterCatalogEntry entry)
+        {
+            if (
+                _filterDefaults.TryGetDefault(entry.Type, out var userDefault)
+                && userDefault.GetType() == entry.FilterType
+            )
+            {
+                return userDefault;
+            }
+
+            return FilterCatalog.CreateDefault(entry);
         }
 
         private int _GetInsertIndex()
@@ -504,6 +558,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             ResetSelectedToDefaultsCommand.NotifyCanExecuteChanged();
+            SaveSelectedAsDefaultCommand.NotifyCanExecuteChanged();
             OnPropertyChanged(nameof(CanShowFilterOptions));
         }
     }

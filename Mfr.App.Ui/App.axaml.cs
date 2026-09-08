@@ -5,6 +5,7 @@ using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.GridColumnSizing;
+using Mfr.Engine.Presets;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui
@@ -32,7 +33,11 @@ namespace Mfr.App.Ui
 
                 var mainWindow = new MainWindow
                 {
-                    DataContext = new MainWindowViewModel(initialFileListPath: initialFolder, session: session),
+                    DataContext = new MainWindowViewModel(
+                        initialFileListPath: initialFolder,
+                        session: session,
+                        filterDefaults: FilterDefaultsStore.OpenDefault()
+                    ),
                 };
 
                 UiSessionPersistence.TryRestore(mainWindow, session);

@@ -15,7 +15,7 @@ todos:
     content: "F8 Session — persist + restore working Applied Filters chain (current schema only)"
     status: pending
   - id: f9-filter-chrome
-    content: "F9 Filter chrome — instance heart/favorite, reset-to-defaults, per-filter help ?"
+    content: "F9 Filter chrome — save-as-default (pin), reset-to-defaults (done), per-filter help ?"
     status: pending
   - id: f10-filter-options-polish
     content: "F10 Filter Options dialog — XAML/layout polish vs MFR7 (dialog already functional)"
@@ -27,7 +27,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-08):** **F1–F6 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` (catalog, param dialogs, syntax highlight, token picker pane) is wired across format-capable filters. **Next:** F7 presets → F8 session chain → F9 chrome → F10 Filter Options polish.
+**Status (2026-09-08):** **F1–F6 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` (catalog, param dialogs, syntax highlight, token picker pane) is wired across format-capable filters. **F9a save-as-default (pin)** landed — see [filter-save-as-default.plan.md](filter-save-as-default.plan.md). **Next:** F7 presets → F8 session chain → F9 help `?` → F10 Filter Options polish.
 
 ______________________________________________________________________
 
@@ -108,11 +108,11 @@ Rename List / other session fields already persist; Applied Filters chain does n
 1. Missing/unrecognized → defaults (first launch), **no** legacy converters (`AGENTS.md` persistence policy).
 1. Tests: serialize/deserialize round-trip; unknown type drops to empty or skips that step with documented behavior.
 
-### F9 — Filter chrome (heart / reset / help)
+### F9 — Filter chrome (save-as-default / reset / help)
 
-MFR7 Applied / Filter Configuration chrome still missing:
+MFR7 Applied / Filter Configuration chrome:
 
-1. **Instance heart / favorite** — mark an applied-step instance name (or options snapshot) as favorite; clarify product meaning vs presets before coding (MFR7 heart vs preset overlap).
+1. **Save as default (pin)** — **done** (title-bar **📌**; `FilterDefaultsStore` / `filter-defaults.json`; applies on palette add only; reset stays factory). See [filter-save-as-default.plan.md](filter-save-as-default.plan.md).
 1. **Reset to defaults** — **done** (single selection; options / Apply To / scope via `FilterCatalog.CreateDefault`; keeps display name + enabled; title-bar `↺`).
 1. **Help `?`** — open per-filter help (ported help pages or MFR7 `Help/*.html` mapping). Wire from Filter Configuration title bar and/or Filter Options.
 

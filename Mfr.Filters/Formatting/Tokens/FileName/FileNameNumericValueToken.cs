@@ -5,7 +5,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Full name is <see cref="Mfr.Models.Rename.FileMeta.FullFileName"/> on the preview snapshot.
+    /// Full name is <see cref="FileMeta.FullFileName"/> on the preview snapshot.
     /// Leading zeros are stripped. When the full name has no digits, the token expands to <c>0</c>.
     /// </para>
     /// </remarks>

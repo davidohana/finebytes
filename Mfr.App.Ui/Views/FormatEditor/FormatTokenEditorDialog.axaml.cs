@@ -76,7 +76,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <returns>Rename items for Preview, or empty when none are available.</returns>
         internal static IReadOnlyList<RenameItem> ResolvePreviewRenameItems(Window? start)
         {
-            for (Window? window = start; window is not null; window = window.Owner as Window)
+            for (var window = start; window is not null; window = window.Owner as Window)
             {
                 // Prefer the nearest token dialog snapshot, including empty — do not fall through to a
                 // live MainWindow list or nested preview can disagree with its parent.

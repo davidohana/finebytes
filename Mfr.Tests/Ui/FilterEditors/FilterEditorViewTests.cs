@@ -142,6 +142,53 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies the title-bar save-as-default button persists options for the next palette add.
+        /// </summary>
+        [AvaloniaFact]
+        public void Save_as_default_button_persists_options_for_next_add()
+        {
+            var defaultsPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-ui-{Guid.NewGuid():N}.json");
+            try
+            {
+                var store = new FilterDefaultsStore(defaultsPath);
+                var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(
+                    filterDefaults: store
+                );
+                var applied = mainViewModel.AppliedFiltersViewModel;
+                applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+                window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                var editor = editorView.GetVisualDescendants().OfType<LettersCaseFilterEditorView>().Single();
+                var upperCaseRadio = editor.FindControl<RadioButton>("UpperCaseRadio");
+                Assert.NotNull(upperCaseRadio);
+                upperCaseRadio.IsChecked = true;
+                window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+
+                var saveButton = editorView.FindControl<Button>("SaveFilterAsDefaultButton");
+                Assert.NotNull(saveButton);
+                Assert.True(saveButton.IsVisible);
+                Assert.Equal("📌", saveButton.Content);
+                Assert.True(saveButton.Command!.CanExecute(null));
+                saveButton.Command.Execute(null);
+
+                applied.Clear();
+                applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+                Assert.Equal(LettersCaseMode.UpperCase, ((LettersCaseFilter)applied.Steps[0].Filter).Options.Mode);
+
+                window.Close();
+            }
+            finally
+            {
+                if (File.Exists(defaultsPath))
+                {
+                    File.Delete(defaultsPath);
+                }
+            }
+        }
+
+        /// <summary>
         /// Verifies the fieldset header is left-aligned on the top border instead of covering it.
         /// </summary>
         [AvaloniaFact]

@@ -481,6 +481,7 @@
             Grid.Row="2"
             DataContext="{Binding FilterEditorViewModel}"
             ResetSelectedToDefaultsCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel.ResetSelectedToDefaultsCommand}"
+            SaveSelectedAsDefaultCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel.SaveSelectedAsDefaultCommand}"
           />
         </Grid>
       </Grid>

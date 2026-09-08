@@ -4,7 +4,6 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
 using Mfr.App.Ui.Views.FormatEditor;

@@ -95,5 +95,8 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Filter Configuration title-bar reset tip (MFR7 Reset settings for this filter).</summary>
         public const string ResetFilterDefaults = "Reset settings for this filter";
+
+        /// <summary>Filter Configuration title-bar save-as-default tip (MFR7 save current settings as default).</summary>
+        public const string SaveFilterAsDefault = "Save current settings for this filter as default";
     }
 }

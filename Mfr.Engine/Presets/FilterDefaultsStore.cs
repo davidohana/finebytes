@@ -1,0 +1,173 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Mfr.Utils;
+
+namespace Mfr.Engine.Presets
+{
+    /// <summary>
+    /// Loads and saves per-filter-type add defaults (Filter Configuration “save as default”).
+    /// <para>
+    /// One snapshot per <see cref="BaseFilter.Type"/> discriminator in <c>filter-defaults.json</c>.
+    /// Used when adding from the palette; not used by reset, presets, or session restore.
+    /// </para>
+    /// </summary>
+    /// <param name="defaultsFilePath">Path to the JSON file of type defaults.</param>
+    public sealed class FilterDefaultsStore(string defaultsFilePath)
+    {
+        private readonly Dictionary<string, BaseFilter> _typeToDefault = new(StringComparer.Ordinal);
+
+        /// <summary>
+        /// Gets the JSON file path for type defaults.
+        /// </summary>
+        public string DefaultsFilePath { get; } =
+            string.IsNullOrWhiteSpace(defaultsFilePath)
+                ? throw new ArgumentException("Defaults file path must not be blank.", nameof(defaultsFilePath))
+                : defaultsFilePath;
+
+        /// <summary>
+        /// Gets the default AppData path for filter type defaults.
+        /// </summary>
+        /// <returns>Absolute path to <c>filter-defaults.json</c>.</returns>
+        public static string DefaultFilePath()
+        {
+            return AppDataPaths.RoamingRoot().CombinePath("filter-defaults.json");
+        }
+
+        /// <summary>
+        /// Opens the AppData store, loading when the file exists (missing file → empty).
+        /// </summary>
+        /// <returns>A store ready for get/set.</returns>
+        public static FilterDefaultsStore OpenDefault()
+        {
+            var store = new FilterDefaultsStore(DefaultFilePath());
+            store.TryLoad();
+            return store;
+        }
+
+        /// <summary>
+        /// Loads defaults from disk when the file exists; otherwise leaves the cache empty.
+        /// <para>
+        /// Unknown or invalid entries are skipped (factory defaults remain for those types).
+        /// </para>
+        /// </summary>
+        public void TryLoad()
+        {
+            _typeToDefault.Clear();
+            if (!File.Exists(DefaultsFilePath))
+            {
+                return;
+            }
+
+            JsonDocument doc;
+            try
+            {
+                doc = JsonDocument.Parse(File.ReadAllText(DefaultsFilePath));
+            }
+            catch (Exception ex)
+            {
+                throw new UserException($"Failed to read filter defaults file '{DefaultsFilePath}': {ex.Message}", ex);
+            }
+
+            using (doc)
+            {
+                if (
+                    !doc.RootElement.TryGetProperty("defaults", out var defaultsElement)
+                    || defaultsElement.ValueKind != JsonValueKind.Object
+                )
+                {
+                    return;
+                }
+
+                foreach (var property in defaultsElement.EnumerateObject())
+                {
+                    try
+                    {
+                        var filter = JsonSerializer.Deserialize<BaseFilter>(
+                            property.Value.GetRawText(),
+                            PresetJsonOptions.Default
+                        );
+                        if (filter is null)
+                        {
+                            continue;
+                        }
+
+                        _typeToDefault[filter.Type] = filter;
+                    }
+                    catch (Exception ex) when (ex is JsonException or NotSupportedException)
+                    {
+                        // Unknown type discriminator or bad payload — skip; add uses factory.
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Saves the current type defaults to disk.
+        /// </summary>
+        public void Save()
+        {
+            try
+            {
+                var directory = Path.GetDirectoryName(DefaultsFilePath);
+                if (!string.IsNullOrWhiteSpace(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
+                var sorted = _typeToDefault
+                    .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                    .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
+                var container = new FilterDefaultsContainer(sorted);
+                var json = JsonSerializer.Serialize(container, PresetJsonOptions.Default);
+                File.WriteAllText(DefaultsFilePath, json);
+            }
+            catch (Exception ex)
+            {
+                throw new UserException($"Failed to save filter defaults file '{DefaultsFilePath}': {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Tries to get a cloned default for <paramref name="type"/> (JSON discriminator).
+        /// </summary>
+        /// <param name="type">Filter type discriminator (e.g. <c>LettersCase</c>).</param>
+        /// <param name="filter">Cloned default when found.</param>
+        /// <returns><see langword="true"/> when a saved default exists.</returns>
+        public bool TryGetDefault(string type, [NotNullWhen(true)] out BaseFilter? filter)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(type);
+
+            if (!_typeToDefault.TryGetValue(type, out var stored))
+            {
+                filter = null;
+                return false;
+            }
+
+            filter = _Clone(stored);
+            return true;
+        }
+
+        /// <summary>
+        /// Stores a clone of <paramref name="filter"/> as the add default for its type and writes disk.
+        /// </summary>
+        /// <param name="filter">Current applied filter configuration to remember.</param>
+        public void SetDefault(BaseFilter filter)
+        {
+            ArgumentNullException.ThrowIfNull(filter);
+            _typeToDefault[filter.Type] = _Clone(filter);
+            Save();
+        }
+
+        private static BaseFilter _Clone(BaseFilter filter)
+        {
+            var json = JsonSerializer.Serialize(filter, PresetJsonOptions.Default);
+            return JsonSerializer.Deserialize<BaseFilter>(json, PresetJsonOptions.Default)
+                ?? throw new InvalidOperationException($"Failed to clone filter type '{filter.Type}'.");
+        }
+    }
+
+    internal sealed record FilterDefaultsContainer(
+        [property: JsonPropertyName("defaults")] Dictionary<string, BaseFilter> Defaults
+    );
+}

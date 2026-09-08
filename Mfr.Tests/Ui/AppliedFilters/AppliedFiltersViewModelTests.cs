@@ -1,7 +1,6 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
-using Mfr.Models.Filters;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -290,6 +289,79 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.False(viewModel.ResetSelectedToDefaultsCommand.CanExecute(null));
             Assert.False(viewModel.CanShowFilterOptions);
+        }
+
+        /// <summary>
+        /// Verifies save-as-default persists options used on the next palette add.
+        /// </summary>
+        [Fact]
+        public void SaveSelectedAsDefault_applies_on_next_add()
+        {
+            var defaultsPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-test-{Guid.NewGuid():N}.json");
+            try
+            {
+                var store = new FilterDefaultsStore(defaultsPath);
+                var viewModel = new AppliedFiltersViewModel(store);
+                viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+                var customized = new LettersCaseFilter(
+                    new FileExtensionTarget(),
+                    new LettersCaseOptions(LettersCaseMode.UpperCase, [])
+                );
+                viewModel.Steps[0].SetFilter(customized);
+
+                string? savedName = null;
+                viewModel.FilterDefaultSaved += (_, name) => savedName = name;
+                viewModel.SaveSelectedAsDefaultCommand.Execute(null);
+
+                Assert.Equal("Letters Case", savedName);
+
+                viewModel.Clear();
+                viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+                var added = Assert.IsType<LettersCaseFilter>(viewModel.Steps[0].Filter);
+                Assert.IsType<FileExtensionTarget>(added.Target);
+                Assert.Equal(LettersCaseMode.UpperCase, added.Options.Mode);
+                Assert.True(viewModel.Steps[0].Enabled);
+            }
+            finally
+            {
+                if (File.Exists(defaultsPath))
+                {
+                    File.Delete(defaultsPath);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verifies reset restores factory defaults even when a saved type default exists.
+        /// </summary>
+        [Fact]
+        public void ResetSelectedToDefaults_ignores_saved_type_default()
+        {
+            var defaultsPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-test-{Guid.NewGuid():N}.json");
+            try
+            {
+                var store = new FilterDefaultsStore(defaultsPath);
+                store.SetDefault(
+                    new LettersCaseFilter(
+                        new FileExtensionTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, [])
+                    )
+                );
+
+                var viewModel = new AppliedFiltersViewModel(store);
+                viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+                Assert.Equal(LettersCaseMode.UpperCase, ((LettersCaseFilter)viewModel.Steps[0].Filter).Options.Mode);
+
+                viewModel.ResetSelectedToDefaultsCommand.Execute(null);
+                Assert.Equal(new LettersCaseFilter(), viewModel.Steps[0].Filter);
+            }
+            finally
+            {
+                if (File.Exists(defaultsPath))
+                {
+                    File.Delete(defaultsPath);
+                }
+            }
         }
 
         /// <summary>

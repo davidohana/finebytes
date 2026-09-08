@@ -10,6 +10,7 @@ using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Engine.Presets;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.ViewModels
@@ -38,9 +39,22 @@ namespace Mfr.App.Ui.ViewModels
         /// Loaded session to restore onto child panes and persist from this window. When null, panes keep
         /// first-launch defaults and this window does not write <c>session.json</c>.
         /// </param>
-        public MainWindowViewModel(string? initialFileListPath = null, SessionState? session = null)
+        /// <param name="filterDefaults">
+        /// Per-type filter add defaults. When null, opens the AppData <c>filter-defaults.json</c> store.
+        /// </param>
+        public MainWindowViewModel(
+            string? initialFileListPath = null,
+            SessionState? session = null,
+            FilterDefaultsStore? filterDefaults = null
+        )
         {
             Session = session;
+            AppliedFiltersViewModel = new AppliedFiltersViewModel(
+                filterDefaults
+                    ?? new FilterDefaultsStore(
+                        Path.Combine(Path.GetTempPath(), $"mfr-ui-filter-defaults-{Guid.NewGuid():N}.json")
+                    )
+            );
             FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
             RenameListViewModel = new RenameListViewModel(FileListViewModel);
             FilterEditorViewModel = new FilterEditorViewModel();
@@ -88,7 +102,7 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Gets the Applied Filters pane.
         /// </summary>
-        public AppliedFiltersViewModel AppliedFiltersViewModel { get; } = new AppliedFiltersViewModel();
+        public AppliedFiltersViewModel AppliedFiltersViewModel { get; }
 
         /// <summary>
         /// Gets the Filter Configuration pane.

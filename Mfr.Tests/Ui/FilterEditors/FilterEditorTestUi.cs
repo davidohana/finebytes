@@ -17,14 +17,17 @@ namespace Mfr.Tests.Ui.FilterEditors
         /// <param name="session">
         /// Session restored onto the main view model, or <see langword="null"/> for first-launch defaults.
         /// </param>
+        /// <param name="filterDefaults">
+        /// Optional per-type add defaults store (isolated temp store when null).
+        /// </param>
         /// <returns>Host window, main view model, and filter editor view.</returns>
         public static (
             Window Window,
             MainWindowViewModel MainViewModel,
             FilterEditorView EditorView
-        ) ShowFilterEditorPanes(SessionState? session = null)
+        ) ShowFilterEditorPanes(SessionState? session = null, FilterDefaultsStore? filterDefaults = null)
         {
-            var mainViewModel = new MainWindowViewModel(session: session);
+            var mainViewModel = new MainWindowViewModel(session: session, filterDefaults: filterDefaults);
             var appliedView = new AppliedFiltersView
             {
                 DataContext = mainViewModel.AppliedFiltersViewModel,
@@ -33,9 +36,8 @@ namespace Mfr.Tests.Ui.FilterEditors
             var editorView = new FilterEditorView
             {
                 DataContext = mainViewModel.FilterEditorViewModel,
-                ResetSelectedToDefaultsCommand = mainViewModel
-                    .AppliedFiltersViewModel
-                    .ResetSelectedToDefaultsCommand,
+                ResetSelectedToDefaultsCommand = mainViewModel.AppliedFiltersViewModel.ResetSelectedToDefaultsCommand,
+                SaveSelectedAsDefaultCommand = mainViewModel.AppliedFiltersViewModel.SaveSelectedAsDefaultCommand,
             };
 
             var grid = new Grid { RowDefinitions = new RowDefinitions("*,*"), Children = { appliedView, editorView } };

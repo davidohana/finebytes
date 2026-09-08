@@ -1,7 +1,7 @@
 namespace Mfr.Filters.Formatting.Tokens.FileName
 {
     /// <summary>
-    /// Resolves the <c>&lt;full-name&gt;</c> token to the preview <see cref="Mfr.Models.Rename.FileMeta.FullFileName"/>.
+    /// Resolves the <c>&lt;full-name&gt;</c> token to the preview <see cref="FileMeta.FullFileName"/>.
     /// </summary>
     [FormatTokenInfo("Full Name", "File Name", "Use full filename name including extension", "full-name")]
     internal sealed class FullNameToken : IFormatToken

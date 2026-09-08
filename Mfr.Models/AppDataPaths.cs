@@ -5,7 +5,7 @@ namespace Mfr.Models
     /// <summary>
     /// Shared user-profile roots for MFR files under <c>finebytes/mfr</c>.
     /// <para>
-    /// Roaming holds config, session, and presets; local holds diagnostic logs.
+    /// Roaming holds config, session, presets, and filter type defaults; local holds diagnostic logs.
     /// </para>
     /// </summary>
     public static class AppDataPaths
