@@ -13,7 +13,7 @@
   x:Class="Mfr.App.Ui.Views.FilterEditors.Audio.Id3v2FieldSetterFilterEditorView"
   x:DataType="vm:Id3v2FieldSetterFilterEditorViewModel"
 >
-  <fe:FormatTokenToolsHost>
+  <fe:FormatTokenToolsHost IsExpanded="{Binding FormatTokenPickerExpanded, Mode=TwoWay}">
     <StackPanel Spacing="8">
       <controls:FieldsetGroup Header="Options">
         <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">

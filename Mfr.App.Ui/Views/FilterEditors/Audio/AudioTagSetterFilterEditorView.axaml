@@ -95,7 +95,7 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <fe:FormatTokenToolsHost>
+  <fe:FormatTokenToolsHost IsExpanded="{Binding FormatTokenPickerExpanded, Mode=TwoWay}">
     <StackPanel Spacing="8">
       <ItemsControl x:Name="SectionsItemsControl" ItemsSource="{Binding Sections}">
         <ItemsControl.ItemsPanel>

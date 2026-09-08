@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Models.Filters;
 
@@ -6,7 +7,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
     /// <summary>
     /// Base type for type-specific Filter Configuration option editors.
     /// </summary>
-    public abstract class FilterOptionsEditorViewModel : ViewModelBase
+    public abstract partial class FilterOptionsEditorViewModel : ViewModelBase
     {
         /// <summary>
         /// Initializes an options editor for one applied-filter step.
@@ -22,6 +23,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// Gets the applied list row being edited.
         /// </summary>
         protected AppliedFilterStepViewModel Step { get; }
+
+        /// <summary>
+        /// Gets or sets whether the format-token picker catalog is expanded.
+        /// <para>
+        /// Shared Filter Configuration chrome; bound by <see cref="Mfr.App.Ui.Views.FormatEditor.FormatTokenToolsHost"/>
+        /// and kept in sync with <see cref="FilterEditorViewModel.FormatTokenPickerExpanded"/>.
+        /// </para>
+        /// </summary>
+        [ObservableProperty]
+        private bool _formatTokenPickerExpanded = true;
 
         /// <summary>
         /// Gets whether property setters should skip live option replace (sync-from-filter in progress).

@@ -1,7 +1,9 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.Filters.Case;
+using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
+using Mfr.Models.Config;
 
 namespace Mfr.Tests.Ui.FilterEditors
 {
@@ -53,6 +55,75 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             Assert.True(editor.HasSelectedStep);
             Assert.Equal("Applied Filter: Shrink Spaces", editor.TitleText);
+        }
+
+        /// <summary>
+        /// Verifies ApplySession restores the format-token picker collapse preference.
+        /// </summary>
+        [Fact]
+        public void ApplySession_restores_format_token_picker_expanded()
+        {
+            var session = new SessionState
+            {
+                FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
+            };
+            var editor = new FilterEditorViewModel();
+
+            editor.ApplySession(session);
+
+            Assert.False(editor.FormatTokenPickerExpanded);
+        }
+
+        /// <summary>
+        /// Verifies toggling the shared chrome writes through to the attached session document.
+        /// </summary>
+        [Fact]
+        public void FormatTokenPickerExpanded_writes_through_to_session()
+        {
+            var session = new SessionState();
+            var editor = new FilterEditorViewModel();
+            editor.ApplySession(session);
+
+            Assert.Null(session.FilterEditor);
+
+            editor.FormatTokenPickerExpanded = false;
+
+            Assert.NotNull(session.FilterEditor);
+            Assert.False(session.FilterEditor.FormatTokenPickerExpanded);
+        }
+
+        /// <summary>
+        /// Verifies a new format options editor inherits the shared collapse preference.
+        /// </summary>
+        [Fact]
+        public void SyncSelection_copies_format_token_picker_expanded_onto_options_editor()
+        {
+            var editor = new FilterEditorViewModel();
+            editor.FormatTokenPickerExpanded = false;
+            var step = new AppliedFilterStepViewModel("Formatter", new FormatterFilter());
+
+            editor.SyncSelection([step]);
+
+            Assert.NotNull(editor.OptionsEditor);
+            Assert.False(editor.OptionsEditor.FormatTokenPickerExpanded);
+        }
+
+        /// <summary>
+        /// Verifies options-editor collapse changes update the pane preference and session.
+        /// </summary>
+        [Fact]
+        public void OptionsEditor_format_token_picker_expanded_updates_pane_and_session()
+        {
+            var session = new SessionState();
+            var editor = new FilterEditorViewModel();
+            editor.ApplySession(session);
+            var step = new AppliedFilterStepViewModel("Formatter", new FormatterFilter());
+            editor.SyncSelection([step]);
+
+            editor.OptionsEditor!.FormatTokenPickerExpanded = false;
+
+            Assert.False(editor.FormatTokenPickerExpanded);
+            Assert.False(session.FilterEditor!.FormatTokenPickerExpanded);
         }
     }
 }

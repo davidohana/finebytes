@@ -4,7 +4,6 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaEdit;
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Filters.Formatting.FormatString;
 using Mfr.Models.Config;
@@ -176,37 +175,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies toggling collapse writes the shared session preference and the next host restores it.
-        /// </summary>
-        [AvaloniaFact]
-        public void Collapse_PersistsToSession_AndAppliesToNextHost()
-        {
-            var session = new SessionState();
-            var (host, window) = _ShowHostWithSession(session);
-
-            Assert.True(host.IsExpanded);
-            Assert.Null(session.FilterEditor);
-
-            host.IsExpanded = false;
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            Assert.NotNull(session.FilterEditor);
-            Assert.False(session.FilterEditor.FormatTokenPickerExpanded);
-            Assert.Equal(26, host.ToolsPaneWidth);
-            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
-
-            window.Close();
-
-            var (nextHost, nextWindow) = _ShowHostWithSession(session);
-            Assert.False(nextHost.IsExpanded);
-            Assert.Equal(26, nextHost.ToolsPaneWidth);
-            Assert.False(_NamedDescendant<Border>(nextHost, "PART_ToolsPane").IsVisible);
-            nextWindow.Close();
-        }
-
-        /// <summary>
-        /// Verifies a format-capable filter editor restores collapsed tools from session.
+        /// Verifies a format-capable filter editor restores collapsed tools from session via the pane VM.
         /// </summary>
         [AvaloniaFact]
         public void FilterEditor_RestoresCollapsedTokenToolsFromSession()
@@ -216,6 +185,9 @@ namespace Mfr.Tests.Ui.FormatEditor
                 FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
             };
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(session);
+
+            Assert.False(mainViewModel.FilterEditorViewModel.FormatTokenPickerExpanded);
+
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -228,7 +200,43 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
+            Assert.True(mainViewModel.FilterEditorViewModel.FormatTokenPickerExpanded);
             Assert.True(session.FilterEditor!.FormatTokenPickerExpanded);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies collapse preference is shared when switching between format-capable filters.
+        /// </summary>
+        [AvaloniaFact]
+        public void FilterEditor_SharesCollapsedPreferenceAcrossFormatEditors()
+        {
+            var session = new SessionState();
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(session);
+            var applied = mainViewModel.AppliedFiltersViewModel;
+
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var host = editorView.GetVisualDescendants().OfType<FormatTokenToolsHost>().Single();
+            Assert.True(host.IsExpanded);
+
+            host.IsExpanded = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(session.FilterEditor!.FormatTokenPickerExpanded);
+
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Inserter"));
+            applied.SetSelectedSteps([applied.Steps[^1]]);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            host = editorView.GetVisualDescendants().OfType<FormatTokenToolsHost>().Single();
+            Assert.False(host.IsExpanded);
+            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
 
             window.Close();
         }
@@ -245,28 +253,6 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(box);
             box.Focus();
             box.TextArea.Focus();
-        }
-
-        private static (FormatTokenToolsHost Host, Window Window) _ShowHostWithSession(SessionState session)
-        {
-            var left = new App.Ui.Views.FormatEditor.FormatEditor
-            {
-                Name = "LeftEditor",
-                AcceptsReturn = false,
-                ShowRightClickHint = false,
-            };
-            var host = new FormatTokenToolsHost { Content = left };
-            var window = new Window
-            {
-                Width = 720,
-                Height = 360,
-                Content = host,
-                DataContext = new MainWindowViewModel(session: session),
-            };
-            window.Show();
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-            return (host, window);
         }
 
         private static (

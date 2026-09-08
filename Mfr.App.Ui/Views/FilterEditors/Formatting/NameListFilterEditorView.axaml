@@ -12,7 +12,7 @@
   x:Class="Mfr.App.Ui.Views.FilterEditors.Formatting.NameListFilterEditorView"
   x:DataType="vm:NameListFilterEditorViewModel"
 >
-  <fe:FormatTokenToolsHost>
+  <fe:FormatTokenToolsHost IsExpanded="{Binding FormatTokenPickerExpanded, Mode=TwoWay}">
     <StackPanel Spacing="8">
       <controls:FieldsetGroup Header="Name List">
         <StackPanel Spacing="4">

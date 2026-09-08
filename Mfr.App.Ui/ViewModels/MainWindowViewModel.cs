@@ -43,6 +43,8 @@ namespace Mfr.App.Ui.ViewModels
             Session = session;
             FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
             RenameListViewModel = new RenameListViewModel(FileListViewModel);
+            FilterEditorViewModel = new FilterEditorViewModel();
+            FilterEditorViewModel.ApplySession(session);
             if (session is not null)
             {
                 FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
@@ -91,7 +93,7 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Gets the Filter Configuration pane.
         /// </summary>
-        public FilterEditorViewModel FilterEditorViewModel { get; } = new FilterEditorViewModel();
+        public FilterEditorViewModel FilterEditorViewModel { get; }
 
         /// <summary>
         /// Gets the Rename List pane.

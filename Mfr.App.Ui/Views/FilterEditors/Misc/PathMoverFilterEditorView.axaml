@@ -12,7 +12,7 @@
   x:Class="Mfr.App.Ui.Views.FilterEditors.Misc.PathMoverFilterEditorView"
   x:DataType="vm:PathMoverFilterEditorViewModel"
 >
-  <fe:FormatTokenToolsHost>
+  <fe:FormatTokenToolsHost IsExpanded="{Binding FormatTokenPickerExpanded, Mode=TwoWay}">
     <StackPanel Spacing="8">
       <controls:FieldsetGroup Header="Options">
         <StackPanel Spacing="6">

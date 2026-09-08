@@ -31,7 +31,7 @@ Replaces duplicated per-field Insert flyouts with a shared collapsible tools str
 - Insert + Edit on the pane target the **last-focused** descendant [`FormatEditor`](../../Mfr.App.Ui/Views/FormatEditor/FormatEditor.axaml) (defaults to the **first** registered field); active field gets `format-editor-active-target` cue. Host Edit is a click handler on the active field (not the picker VM).
 - Under a host, `ShowInsertButton` / `ShowEditButton` are cleared on register; **Edit stays on the collapse rail** when the catalog is hidden.
 - Standalone / nested `FormatEditor` (no host) keeps local Insert+Edit.
-- Collapse state is **shared** across format-capable editors via [`SessionState.FilterEditor`](../../Mfr.Models/Config/SessionState.cs) (`filterEditor.formatTokenPickerExpanded` in `session.json`). Hosts restore on attach and write on toggle; flush is the existing main-window close path. Missing section → expanded.
+- Collapse state is **shared** across format-capable editors via [`FilterEditorViewModel.FormatTokenPickerExpanded`](../../Mfr.App.Ui/ViewModels/FilterEditors/FilterEditorViewModel.cs) (persisted as `filterEditor.formatTokenPickerExpanded` in `session.json`). Option editors two-way bind [`FormatTokenToolsHost.IsExpanded`](../../Mfr.App.Ui/Views/FormatEditor/FormatTokenToolsHost.cs); the pane VM writes through on change. Missing section → expanded.
 
 ## Wired editors
 
@@ -39,4 +39,5 @@ Formatter, Inserter, Name List, PathMover, Audio Tag Setter, ID3v2 Field Setter.
 
 ## Tests
 
-[`FormatTokenToolsHostViewTests`](../../Mfr.Tests/Ui/FormatEditor/FormatTokenToolsHostViewTests.cs) — hide chrome, last-focus insert, collapsed Edit affordance, standalone chrome, session restore/persist.
+[`FormatTokenToolsHostViewTests`](../../Mfr.Tests/Ui/FormatEditor/FormatTokenToolsHostViewTests.cs) — hide chrome, last-focus insert, collapsed Edit affordance, standalone chrome, session restore/share via Filter Configuration.
+[`FilterEditorViewModelTests`](../../Mfr.Tests/Ui/FilterEditors/FilterEditorViewModelTests.cs) — ApplySession / write-through / options-editor sync for `FormatTokenPickerExpanded`.
