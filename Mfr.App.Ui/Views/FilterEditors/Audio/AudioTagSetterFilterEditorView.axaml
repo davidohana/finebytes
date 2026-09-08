@@ -96,54 +96,31 @@
   </UserControl.Resources>
 
   <fe:FormatTokenToolsHost>
-    <fe:FormatTokenToolsHost.Body>
-      <StackPanel Spacing="8">
-        <ItemsControl x:Name="SectionsItemsControl" ItemsSource="{Binding Sections}">
-          <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-              <StackPanel Spacing="8" />
-            </ItemsPanelTemplate>
-          </ItemsControl.ItemsPanel>
-          <ItemsControl.ItemTemplate>
-            <DataTemplate x:DataType="vm:AudioTagSetterFieldSectionViewModel">
-              <controls:FieldsetGroup Header="{Binding Header}">
-                <ToolTip.Tip>
-                  <controls:RichToolTip>
-                    <TextBlock Classes="rich-tip-title" Text="Per-field audio tag values." />
-                    <TextBlock Classes="rich-tip-bullet" Text="• Checked: always set the field (overwrite)." />
-                    <TextBlock
-                      Classes="rich-tip-bullet"
-                      Text="• Grayed (indeterminate): set only when the current value is empty."
-                    />
-                    <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: leave the field unchanged." />
-                  </controls:RichToolTip>
-                </ToolTip.Tip>
-                <StackPanel Spacing="4" Grid.IsSharedSizeScope="True">
-                  <Grid ColumnDefinitions="*,24,*">
-                    <ItemsControl
-                      ItemsSource="{Binding LeftCompactRows}"
-                      ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
-                    >
-                      <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                          <StackPanel Spacing="4" />
-                        </ItemsPanelTemplate>
-                      </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                    <ItemsControl
-                      Grid.Column="2"
-                      ItemsSource="{Binding RightCompactRows}"
-                      ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
-                    >
-                      <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                          <StackPanel Spacing="4" />
-                        </ItemsPanelTemplate>
-                      </ItemsControl.ItemsPanel>
-                    </ItemsControl>
-                  </Grid>
+    <StackPanel Spacing="8">
+      <ItemsControl x:Name="SectionsItemsControl" ItemsSource="{Binding Sections}">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <StackPanel Spacing="8" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:AudioTagSetterFieldSectionViewModel">
+            <controls:FieldsetGroup Header="{Binding Header}">
+              <ToolTip.Tip>
+                <controls:RichToolTip>
+                  <TextBlock Classes="rich-tip-title" Text="Per-field audio tag values." />
+                  <TextBlock Classes="rich-tip-bullet" Text="• Checked: always set the field (overwrite)." />
+                  <TextBlock
+                    Classes="rich-tip-bullet"
+                    Text="• Grayed (indeterminate): set only when the current value is empty."
+                  />
+                  <TextBlock Classes="rich-tip-bullet" Text="• Unchecked: leave the field unchanged." />
+                </controls:RichToolTip>
+              </ToolTip.Tip>
+              <StackPanel Spacing="4" Grid.IsSharedSizeScope="True">
+                <Grid ColumnDefinitions="*,24,*">
                   <ItemsControl
-                    ItemsSource="{Binding FullWidthRows}"
+                    ItemsSource="{Binding LeftCompactRows}"
                     ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
                   >
                     <ItemsControl.ItemsPanel>
@@ -152,13 +129,34 @@
                       </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                   </ItemsControl>
-                </StackPanel>
-              </controls:FieldsetGroup>
-            </DataTemplate>
-          </ItemsControl.ItemTemplate>
-        </ItemsControl>
-        <controls:FilterEditorHint Text="Gray a checkbox (indeterminate) to set that field only when it is currently empty." />
-      </StackPanel>
-    </fe:FormatTokenToolsHost.Body>
+                  <ItemsControl
+                    Grid.Column="2"
+                    ItemsSource="{Binding RightCompactRows}"
+                    ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
+                  >
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <StackPanel Spacing="4" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                  </ItemsControl>
+                </Grid>
+                <ItemsControl
+                  ItemsSource="{Binding FullWidthRows}"
+                  ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
+                >
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Spacing="4" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                </ItemsControl>
+              </StackPanel>
+            </controls:FieldsetGroup>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <controls:FilterEditorHint Text="Gray a checkbox (indeterminate) to set that field only when it is currently empty." />
+    </StackPanel>
   </fe:FormatTokenToolsHost>
 </UserControl>

@@ -34,8 +34,8 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             var window = new Window
             {
-                Width = 320,
-                Height = 280,
+                Width = 960,
+                Height = 480,
                 Content = grid,
             };
             window.Show();

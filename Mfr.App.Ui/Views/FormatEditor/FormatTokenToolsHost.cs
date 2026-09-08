@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 
@@ -11,12 +13,13 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Descendant <see cref="FormatEditor"/> controls register on attach; Insert/Edit target the
-    /// last-focused editor (defaults to the first registered field). Per-field Insert/Edit chrome is
-    /// hidden while hosted here.
+    /// Child content is the options body (<see cref="ContentControl.Content"/>). Descendant
+    /// <see cref="FormatEditor"/> controls register on attach; Insert/Edit target the last-focused
+    /// editor (defaults to the first registered field). Per-field Insert/Edit chrome is hidden while
+    /// hosted here.
     /// </para>
     /// </remarks>
-    public partial class FormatTokenToolsHost : UserControl
+    public sealed class FormatTokenToolsHost : ContentControl
     {
         /// <summary>
         /// Expanded tools column: grip rail (22) + gap (4) + catalog card (~280).
@@ -33,14 +36,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// taller; the rail does not, so the expand button does not jump.
         /// </summary>
         public const double ToolsPaneMinHeight = 200;
-
-        /// <summary>
-        /// Defines the <see cref="Body"/> property.
-        /// </summary>
-        public static readonly StyledProperty<object?> BodyProperty = AvaloniaProperty.Register<
-            FormatTokenToolsHost,
-            object?
-        >(nameof(Body));
 
         /// <summary>
         /// Defines the <see cref="IsExpanded"/> property.
@@ -84,7 +79,16 @@ namespace Mfr.App.Ui.Views.FormatEditor
             AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, Geometry?>(nameof(CollapseIcon), o => o.CollapseIcon);
 
         private readonly List<FormatEditor> _editors = [];
-        private readonly FormatEditorViewModel _pickerViewModel;
+        private readonly FormatTokenInsertPickerViewModel _pickerViewModel;
+
+        private Button? _editButton;
+        private Button? _collapseButton;
+
+        static FormatTokenToolsHost()
+        {
+            HorizontalContentAlignmentProperty.OverrideDefaultValue<FormatTokenToolsHost>(HorizontalAlignment.Stretch);
+            VerticalContentAlignmentProperty.OverrideDefaultValue<FormatTokenToolsHost>(VerticalAlignment.Stretch);
+        }
 
         /// <summary>
         /// Initializes the tools host and shared insert-picker view-model.
@@ -93,25 +97,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             CollapseToolTip = "Collapse token tools";
             ToolsPaneWidth = ExpandedPaneWidth;
-            _pickerViewModel = new FormatEditorViewModel(
-                insertText: _InsertIntoActive,
-                jumpToError: static () => { },
-                editUnderCaret: _EditActive
-            );
-            InitializeComponent();
-            InsertPicker.DataContext = _pickerViewModel;
-            EditButton.Command = _pickerViewModel.EditCommand;
+            _pickerViewModel = new FormatTokenInsertPickerViewModel(_InsertIntoActive);
             _RefreshChrome();
         }
 
-        /// <summary>
-        /// Gets or sets the filter options content shown to the left of the tools pane.
-        /// </summary>
-        public object? Body
-        {
-            get => GetValue(BodyProperty);
-            set => SetValue(BodyProperty, value);
-        }
+        /// <inheritdoc />
+        protected override Type StyleKeyOverride => typeof(FormatTokenToolsHost);
 
         /// <summary>
         /// Gets or sets whether the Insert catalog body is visible (default open).
@@ -220,6 +211,25 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <inheritdoc />
+        protected override void OnApplyTemplate(TemplateAppliedEventArgs e)
+        {
+            base.OnApplyTemplate(e);
+
+            _editButton?.Click -= _OnEditClick;
+            _collapseButton?.Click -= _OnCollapseClick;
+
+            _editButton = e.NameScope.Find<Button>("PART_EditButton");
+            _collapseButton = e.NameScope.Find<Button>("PART_CollapseButton");
+            if (e.NameScope.Find<FormatTokenInsertPicker>("PART_InsertPicker") is { } insertPicker)
+            {
+                insertPicker.DataContext = _pickerViewModel;
+            }
+
+            _editButton?.Click += _OnEditClick;
+            _collapseButton?.Click += _OnCollapseClick;
+        }
+
+        /// <inheritdoc />
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
@@ -233,6 +243,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private void _OnCollapseClick(object? sender, RoutedEventArgs e)
         {
             IsExpanded = !IsExpanded;
+        }
+
+        private void _OnEditClick(object? sender, RoutedEventArgs e)
+        {
+            _EditActive();
         }
 
         private void _InsertIntoActive(string insertText)

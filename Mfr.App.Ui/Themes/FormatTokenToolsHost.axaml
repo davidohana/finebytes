@@ -1,0 +1,81 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:fe="clr-namespace:Mfr.App.Ui.Views.FormatEditor"
+>
+  <ControlTheme x:Key="{x:Type fe:FormatTokenToolsHost}" TargetType="fe:FormatTokenToolsHost">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="VerticalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="fe:FormatTokenToolsHost">
+        <DockPanel LastChildFill="True">
+          <DockPanel
+            DockPanel.Dock="Right"
+            Margin="8,0,0,0"
+            Width="{TemplateBinding ToolsPaneWidth}"
+            VerticalAlignment="Top"
+            MinHeight="{x:Static fe:FormatTokenToolsHost.ToolsPaneMinHeight}"
+          >
+            <!-- Fixed-height rail: Edit on top, collapse grip centered — does not grow with the token list. -->
+            <DockPanel
+              Name="PART_GripRail"
+              DockPanel.Dock="Left"
+              Width="22"
+              Height="{x:Static fe:FormatTokenToolsHost.ToolsPaneMinHeight}"
+              Margin="0,0,4,0"
+              VerticalAlignment="Top"
+            >
+              <Button
+                Name="PART_EditButton"
+                Classes="filter-editor-button format-editor-tool"
+                DockPanel.Dock="Top"
+                HorizontalAlignment="Center"
+                ToolTip.Tip="Edit formatting parameter under caret in the active format field"
+                IsEnabled="{TemplateBinding HasActiveEditor}"
+              >
+                <PathIcon Width="12" Height="12" Data="{StaticResource FormatEditorEditGeometry}" />
+              </Button>
+              <Button
+                Name="PART_CollapseButton"
+                Classes="format-token-collapse-grip"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"
+                ToolTip.Tip="{TemplateBinding CollapseToolTip}"
+              >
+                <PathIcon Width="10" Height="10" Data="{TemplateBinding CollapseIcon}" />
+              </Button>
+            </DockPanel>
+
+            <Border
+              Name="PART_ToolsPane"
+              Classes="format-token-tools-pane"
+              VerticalAlignment="Top"
+              MinHeight="{x:Static fe:FormatTokenToolsHost.ToolsPaneMinHeight}"
+              IsVisible="{TemplateBinding IsExpanded}"
+            >
+              <DockPanel LastChildFill="True">
+                <TextBlock
+                  DockPanel.Dock="Top"
+                  Classes="filter-editor-label"
+                  Margin="0,0,0,4"
+                  VerticalAlignment="Center"
+                  Text="Tokens"
+                  TextTrimming="CharacterEllipsis"
+                />
+                <fe:FormatTokenInsertPicker Name="PART_InsertPicker" MinHeight="160" MaxHeight="320" />
+              </DockPanel>
+            </Border>
+          </DockPanel>
+
+          <ContentPresenter
+            Name="PART_ContentPresenter"
+            HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+            VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+            Content="{TemplateBinding Content}"
+            ContentTemplate="{TemplateBinding ContentTemplate}"
+          />
+        </DockPanel>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

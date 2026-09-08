@@ -106,9 +106,14 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private FormatTokenToolsHost? _toolsHost;
 
         /// <summary>
-        /// Gets the control view-model (picker / error state).
+        /// Gets the control view-model (validation / Edit chrome).
         /// </summary>
         public FormatEditorViewModel ViewModel { get; }
+
+        /// <summary>
+        /// Gets the insert-picker view-model (search + catalog).
+        /// </summary>
+        public FormatTokenInsertPickerViewModel InsertPickerViewModel { get; }
 
         /// <summary>
         /// Initializes the FormatEditor control.
@@ -116,13 +121,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
         public FormatEditor()
         {
             InitializeComponent();
-            ViewModel = new FormatEditorViewModel(
-                insertText: InsertTextAtCaret,
-                jumpToError: JumpToError,
-                editUnderCaret: _EditUnderCaret
-            );
+            ViewModel = new FormatEditorViewModel(jumpToError: JumpToError, editUnderCaret: _EditUnderCaret);
+            InsertPickerViewModel = new FormatTokenInsertPickerViewModel(InsertTextAtCaret);
             ChromeRoot.DataContext = ViewModel;
-            InsertPicker.DataContext = ViewModel;
+            InsertPicker.DataContext = InsertPickerViewModel;
             ViewModel.ValidationMode = ValidationMode;
             _ConfigureTemplateEditor();
             _ApplyAcceptsReturnLayout(AcceptsReturn);

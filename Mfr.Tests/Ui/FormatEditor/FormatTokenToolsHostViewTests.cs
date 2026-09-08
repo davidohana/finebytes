@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using AvaloniaEdit;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Filters.Formatting.FormatString;
@@ -25,22 +26,24 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.False(left.ShowEditButton);
             Assert.False(left.ShowsToolButtons);
             Assert.True(host.IsExpanded);
-            Assert.True(host.FindControl<Button>("EditButton")!.IsVisible);
+            Assert.True(_NamedDescendant<Button>(host, "PART_EditButton").IsVisible);
             Assert.Same(left, host.ActiveEditor);
             Assert.True(left.IsActiveTarget);
 
-            var collapse = host.FindControl<Button>("CollapseButton");
-            Assert.NotNull(collapse);
+            var collapse = _NamedDescendant<Button>(host, "PART_CollapseButton");
             collapse.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(host.IsExpanded);
             Assert.Equal(26, host.ToolsPaneWidth);
-            Assert.Equal(FormatTokenToolsHost.ToolsPaneMinHeight, host.FindControl<DockPanel>("GripRail")!.Height);
-            Assert.True(host.FindControl<Button>("EditButton")!.IsVisible);
+            Assert.Equal(
+                FormatTokenToolsHost.ToolsPaneMinHeight,
+                _NamedDescendant<DockPanel>(host, "PART_GripRail").Height
+            );
+            Assert.True(_NamedDescendant<Button>(host, "PART_EditButton").IsVisible);
             Assert.True(collapse.IsVisible);
-            Assert.False(host.FindControl<Border>("ToolsPane")!.IsVisible);
+            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
 
             window.Close();
         }
@@ -80,12 +83,11 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             right.FindControl<TextEditor>("TemplateBox")!.CaretOffset = 1;
             var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "file-name");
-            var picker = host.FindControl<FormatTokenInsertPicker>("InsertPicker");
-            Assert.NotNull(picker);
-            Assert.IsType<App.Ui.ViewModels.FormatEditor.FormatEditorViewModel>(picker.DataContext);
-            ((App.Ui.ViewModels.FormatEditor.FormatEditorViewModel)picker.DataContext).InsertEntryCommand.Execute(
-                entry
-            );
+            var picker = _NamedDescendant<FormatTokenInsertPicker>(host, "PART_InsertPicker");
+            Assert.IsType<App.Ui.ViewModels.FormatEditor.FormatTokenInsertPickerViewModel>(picker.DataContext);
+            (
+                (App.Ui.ViewModels.FormatEditor.FormatTokenInsertPickerViewModel)picker.DataContext
+            ).InsertEntryCommand.Execute(entry);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -113,13 +115,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(box);
             box.CaretOffset = 2;
 
-            var edit = host.FindControl<Button>("EditButton");
-            var picker = host.FindControl<FormatTokenInsertPicker>("InsertPicker");
-            Assert.NotNull(edit);
-            Assert.NotNull(picker);
+            var edit = _NamedDescendant<Button>(host, "PART_EditButton");
             Assert.True(edit.IsEnabled);
-            var pickerVm = Assert.IsType<App.Ui.ViewModels.FormatEditor.FormatEditorViewModel>(picker.DataContext);
-            Assert.Same(pickerVm.EditCommand, edit.Command);
 
             Assert.True(
                 left.EditUnderCaretForTests(
@@ -174,6 +171,12 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.Close();
         }
 
+        private static T _NamedDescendant<T>(Control root, string name)
+            where T : Control
+        {
+            return Assert.Single(root.GetVisualDescendants().OfType<T>(), c => c.Name == name);
+        }
+
         private static void _FocusEditor(App.Ui.Views.FormatEditor.FormatEditor editor)
         {
             var box = editor.FindControl<TextEditor>("TemplateBox");
@@ -203,7 +206,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             };
             var host = new FormatTokenToolsHost
             {
-                Body = new StackPanel { Spacing = 8, Children = { left, right } },
+                Content = new StackPanel { Spacing = 8, Children = { left, right } },
             };
             var window = new Window
             {

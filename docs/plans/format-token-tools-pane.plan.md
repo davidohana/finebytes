@@ -23,9 +23,9 @@ Replaces duplicated per-field Insert flyouts with a shared collapsible tools str
 
 ## Shape
 
-- [`FormatTokenToolsHost`](../../Mfr.App.Ui/Views/FormatEditor/FormatTokenToolsHost.axaml) — options via `Body`, tools on the right (default **open**).
-- [`FormatTokenInsertPicker`](../../Mfr.App.Ui/Views/FormatEditor/FormatTokenInsertPicker.axaml) — shared search + catalog tree (also used by the standalone Insert flyout).
-- Insert + Edit on the pane target the **last-focused** descendant [`FormatEditor`](../../Mfr.App.Ui/Views/FormatEditor/FormatEditor.axaml) (defaults to the **first** registered field); active field gets `format-editor-active-target` cue.
+- [`FormatTokenToolsHost`](../../Mfr.App.Ui/Views/FormatEditor/FormatTokenToolsHost.cs) — options via child `Content`, tools on the right (default **open**); ControlTheme in [`Themes/FormatTokenToolsHost.axaml`](../../Mfr.App.Ui/Themes/FormatTokenToolsHost.axaml).
+- [`FormatTokenInsertPicker`](../../Mfr.App.Ui/Views/FormatEditor/FormatTokenInsertPicker.axaml) — shared search + catalog tree (also used by the standalone Insert flyout); data context is [`FormatTokenInsertPickerViewModel`](../../Mfr.App.Ui/ViewModels/FormatEditor/FormatTokenInsertPickerViewModel.cs).
+- Insert + Edit on the pane target the **last-focused** descendant [`FormatEditor`](../../Mfr.App.Ui/Views/FormatEditor/FormatEditor.axaml) (defaults to the **first** registered field); active field gets `format-editor-active-target` cue. Host Edit is a click handler on the active field (not the picker VM).
 - Under a host, `ShowInsertButton` / `ShowEditButton` are cleared on register; **Edit stays on the collapse rail** when the catalog is hidden.
 - Standalone / nested `FormatEditor` (no host) keeps local Insert+Edit.
 - Collapse state is **not** persisted in session (v1).

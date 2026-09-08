@@ -13,8 +13,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Expects a <see cref="FormatEditorViewModel"/> as <see cref="StyledElement.DataContext"/>. Used by the
-    /// per-field Insert flyout and by <see cref="FormatTokenToolsHost"/>.
+    /// Expects a <see cref="FormatTokenInsertPickerViewModel"/> as <see cref="StyledElement.DataContext"/>.
+    /// Used by the per-field Insert flyout and by <see cref="FormatTokenToolsHost"/>.
     /// </para>
     /// </remarks>
     public partial class FormatTokenInsertPicker : UserControl
@@ -73,7 +73,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             e.Handled = true;
-            if (DataContext is FormatEditorViewModel vm)
+            if (DataContext is FormatTokenInsertPickerViewModel vm)
             {
                 vm.InsertEntryCommand.Execute(entry);
             }
@@ -160,7 +160,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             if (
                 InsertList.SelectedItem is not FormatInsertPickerNode { Entry: { } entry }
-                || DataContext is not FormatEditorViewModel vm
+                || DataContext is not FormatTokenInsertPickerViewModel vm
             )
             {
                 return false;

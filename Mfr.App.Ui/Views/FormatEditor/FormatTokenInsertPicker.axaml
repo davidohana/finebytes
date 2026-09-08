@@ -8,7 +8,7 @@
   d:DesignWidth="280"
   d:DesignHeight="320"
   x:Class="Mfr.App.Ui.Views.FormatEditor.FormatTokenInsertPicker"
-  x:DataType="vm:FormatEditorViewModel"
+  x:DataType="vm:FormatTokenInsertPickerViewModel"
 >
   <DockPanel>
     <TextBox
