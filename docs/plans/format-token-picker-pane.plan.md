@@ -37,6 +37,14 @@ Replaces duplicated per-field Insert flyouts with a shared collapsible picker st
 
 Formatter, Inserter, Name List, PathMover, Audio Tag Setter, ID3v2 Field Setter.
 
+## Out of scope for a first cut
+
+These stay deferred so the pane stays an explicit per-editor wrap, not a new Filter Configuration shell or a second inventing of format UX.
+
+- **Main-window global dock / `FilterEditorView` auto-injection.** Do not put one shared token dock on the main window, and do not teach `FilterEditorView` to scan option content for `FormatEditor` children and inject the pane. Each format-capable options view wraps itself in `FormatTokenPickerPane` explicitly. A shell-level dock would need global layout modes, cross-editor focus rules when Applied selection swaps content, and “does this editor need tokens?” heuristics — all avoided by opt-in wrapping.
+- **Autocomplete-on-`<` or inline expanders.** Typing `<` must not open chip/autocomplete UI, and token param editors stay modal dialogs (not inline expanders under the caret). Both were already cut in F6 as overkill / low ROI ([`formatter-formateditor-ux.plan.md`](formatter-formateditor-ux.plan.md)); the picker pane does not reopen that design. Insert remains catalog browse/search; customize remains Edit / right-click afterward.
+- **Migrating Genre / plain-language fields into `FormatEditor`.** Audio Tag Setter **Genre** stays an editable ComboBox (ID3v1 suggestions); other non-template fields stay plain `TextBox` / combo controls. The pane only targets registered `FormatEditor`s — when focus is on Genre or plain language, Insert/Edit stay disabled (“Click a format field”). Converting those rows to `FormatEditor` just to share Insert would drop genre suggestions and blur free-text vs format-string UX; that is a separate product call, not part of this pane.
+
 ## Tests
 
 [`FormatTokenPickerPaneViewTests`](../../Mfr.Tests/Ui/FormatEditor/FormatTokenPickerPaneViewTests.cs) — hide chrome, last-focus insert, collapsed Edit affordance, standalone chrome, session restore/share via Filter Configuration.

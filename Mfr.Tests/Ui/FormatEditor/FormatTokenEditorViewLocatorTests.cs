@@ -73,6 +73,43 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies substr/token source fields host FormatEditor with Insert/Edit chrome (MFR7).
+        /// </summary>
+        /// <param name="canonicalName">Editable token with a nested source format string.</param>
+        [AvaloniaTheory]
+        [InlineData("substr")]
+        [InlineData("token")]
+        public void Dialog_SourceFormatString_UsesFormatEditorWithToolButtons(string canonicalName)
+        {
+            Assert.True(FormatTokenEditorRegistry.TryCreate(canonicalName, string.Empty, out var editor));
+            Assert.NotNull(editor);
+            var dialog = new FormatTokenEditorDialog(editor);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var sourceRow = Assert.Single(
+                dialog.GetVisualDescendants().OfType<FilterEditorLabeledRow>(),
+                row => row.Label == "Source format string:"
+            );
+            var sourceEditor = Assert.Single(
+                sourceRow.GetVisualDescendants().OfType<global::Mfr.App.Ui.Views.FormatEditor.FormatEditor>()
+            );
+            Assert.True(sourceEditor.ShowsToolButtons);
+            Assert.True(sourceEditor.ShowInsertButton);
+            Assert.True(sourceEditor.ShowEditButton);
+            Assert.False(sourceEditor.ShowRightClickHint);
+            Assert.Equal(
+                canonicalName == "substr"
+                    ? ((SubstrFormatTokenEditorViewModel)editor).Source
+                    : ((TokenFormatTokenEditorViewModel)editor).Source,
+                sourceEditor.Text
+            );
+
+            dialog.Close();
+        }
+
+        /// <summary>
         /// Verifies the resulting format string is read-only and uses grayed field chrome.
         /// </summary>
         [AvaloniaFact]

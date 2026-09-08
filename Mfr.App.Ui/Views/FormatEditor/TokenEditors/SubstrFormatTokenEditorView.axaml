@@ -4,6 +4,7 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors"
   xmlns:anchors="using:Mfr.App.Ui.ViewModels.AppliedFilters"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
   x:Class="Mfr.App.Ui.Views.FormatEditor.TokenEditors.SubstrFormatTokenEditorView"
   x:DataType="vm:SubstrFormatTokenEditorViewModel"
 >
@@ -74,7 +75,13 @@
       </StackPanel>
     </controls:FilterEditorLabeledRow>
     <controls:FilterEditorLabeledRow Label="Source format string:">
-      <TextBox Classes="filter-editor-field" HorizontalAlignment="Stretch" Text="{Binding Source}" />
+      <fe:FormatEditor
+        x:Name="SourceEditor"
+        MinWidth="200"
+        AcceptsReturn="False"
+        ShowRightClickHint="False"
+        Text="{Binding Source}"
+      />
     </controls:FilterEditorLabeledRow>
   </StackPanel>
 </UserControl>

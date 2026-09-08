@@ -3,6 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
   x:Class="Mfr.App.Ui.Views.FormatEditor.TokenEditors.TokenFormatTokenEditorView"
   x:DataType="vm:TokenFormatTokenEditorViewModel"
 >
@@ -25,8 +26,14 @@
     <controls:FilterEditorLabeledRow Label="">
       <controls:CompactCheckBox Content="Include previous" IsChecked="{Binding IncludePrev}" />
     </controls:FilterEditorLabeledRow>
-    <controls:FilterEditorLabeledRow Label="Source:">
-      <TextBox Classes="filter-editor-field" HorizontalAlignment="Stretch" Text="{Binding Source}" />
+    <controls:FilterEditorLabeledRow Label="Source format string:">
+      <fe:FormatEditor
+        x:Name="SourceEditor"
+        MinWidth="200"
+        AcceptsReturn="False"
+        ShowRightClickHint="False"
+        Text="{Binding Source}"
+      />
     </controls:FilterEditorLabeledRow>
   </StackPanel>
 </UserControl>
