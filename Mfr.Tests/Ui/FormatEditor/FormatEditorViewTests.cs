@@ -101,8 +101,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             Assert.False(editor.ViewModel.IsGrouped);
             var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "file-name");
             var leaf = Assert.Single(editor.ViewModel.VisibleItems, n => n.Entry?.CanonicalName == "file-name");
@@ -130,8 +129,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             Assert.True(editor.ViewModel.IsGrouped);
 
             var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
@@ -166,8 +164,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
             Assert.True(fileNameGroup.IsGroup);
 
@@ -204,8 +201,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
             var audioGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "Audio");
 
@@ -247,8 +243,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             var audioGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "Audio");
             var tagGroup = Assert.Single(audioGroup.Children, n => n.Title == "Tag");
             var mp3Group = Assert.Single(audioGroup.Children, n => n.Title == "MP3");
@@ -289,8 +284,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            var search = editor.FindControl<TextBox>("InsertSearchBox");
-            Assert.NotNull(search);
+            var search = _RequireInsertSearchBox(editor);
             Assert.True(search.IsFocused);
 
             window.Close();
@@ -304,8 +298,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             Assert.Equal(new Thickness(0), list.BorderThickness);
             Assert.Equal(
                 ScrollBarVisibility.Disabled,
@@ -346,8 +339,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
             list.ScrollIntoView(fileNameGroup);
             window.UpdateLayout();
@@ -383,8 +375,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             list.MaxHeight = 80;
             var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
             list.ScrollIntoView(fileNameGroup);
@@ -420,8 +411,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             var leaf = Assert.Single(editor.ViewModel.VisibleItems, n => n.Entry?.CanonicalName == "file-name");
             var entry = leaf.Entry!;
 
@@ -453,10 +443,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            var search = editor.FindControl<TextBox>("InsertSearchBox");
-            Assert.NotNull(list);
-            Assert.NotNull(search);
+            var list = _RequireInsertList(editor);
+            var search = _RequireInsertSearchBox(editor);
             var leaf = Assert.Single(editor.ViewModel.VisibleItems, n => n.Entry?.CanonicalName == "file-name");
             var entry = leaf.Entry!;
 
@@ -483,8 +471,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var (editor, window) = _ShowWithInsertFlyout();
 
-            var list = editor.FindControl<TreeView>("InsertList");
-            Assert.NotNull(list);
+            var list = _RequireInsertList(editor);
             var fileNameGroup = Assert.Single(editor.ViewModel.VisibleItems, n => n.Title == "File Name");
             Assert.True(fileNameGroup.IsGroup);
 
@@ -1066,6 +1053,26 @@ namespace Mfr.Tests.Ui.FormatEditor
             Dispatcher.UIThread.RunJobs();
 
             return (editor, window);
+        }
+
+        /// <summary>
+        /// Resolves the insert catalog tree (lives in <see cref="FormatTokenInsertPicker"/>'s name scope).
+        /// </summary>
+        private static TreeView _RequireInsertList(App.Ui.Views.FormatEditor.FormatEditor editor)
+        {
+            var list = editor.InsertPickerControl.FindControl<TreeView>("InsertList");
+            Assert.NotNull(list);
+            return list;
+        }
+
+        /// <summary>
+        /// Resolves the insert search box inside the shared picker.
+        /// </summary>
+        private static TextBox _RequireInsertSearchBox(App.Ui.Views.FormatEditor.FormatEditor editor)
+        {
+            var search = editor.InsertPickerControl.FindControl<TextBox>("InsertSearchBox");
+            Assert.NotNull(search);
+            return search;
         }
     }
 }

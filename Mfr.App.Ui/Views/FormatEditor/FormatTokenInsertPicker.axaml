@@ -1,0 +1,43 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor"
+  mc:Ignorable="d"
+  d:DesignWidth="280"
+  d:DesignHeight="320"
+  x:Class="Mfr.App.Ui.Views.FormatEditor.FormatTokenInsertPicker"
+  x:DataType="vm:FormatEditorViewModel"
+>
+  <DockPanel>
+    <TextBox
+      x:Name="InsertSearchBox"
+      DockPanel.Dock="Top"
+      Classes="filter-editor-field format-insert-search"
+      Watermark="Search tokens…"
+      Margin="0,0,0,4"
+      Text="{Binding SearchText}"
+    />
+    <TreeView x:Name="InsertList" Classes="format-insert-picker" ItemsSource="{Binding VisibleItems}">
+      <TreeView.ItemTemplate>
+        <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vm:FormatInsertPickerNode">
+          <StackPanel Spacing="0" ToolTip.Tip="{Binding Entry.ShortDescription}">
+            <TextBlock
+              Text="{Binding Title}"
+              TextTrimming="CharacterEllipsis"
+              Classes.format-insert-group="{Binding IsGroup}"
+            />
+            <TextBlock
+              Text="{Binding Entry.GroupPath}"
+              Opacity="0.7"
+              FontSize="11"
+              IsVisible="{Binding ShowGroupSubtitle}"
+              TextTrimming="CharacterEllipsis"
+            />
+          </StackPanel>
+        </TreeDataTemplate>
+      </TreeView.ItemTemplate>
+    </TreeView>
+  </DockPanel>
+</UserControl>

@@ -118,6 +118,22 @@
     <Setter Property="MinWidth" Value="22" />
     <Setter Property="Padding" Value="0" />
   </Style>
+  <Style Selector="Border.format-editor-field-frame">
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Padding" Value="0" />
+  </Style>
+  <Style Selector="Border.format-editor-field-frame.format-editor-active-target">
+    <Setter Property="BorderBrush" Value="{DynamicResource FilterEditorTitleBarBrush}" />
+  </Style>
+  <Style Selector="Border.format-token-tools-pane">
+    <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Padding" Value="6" />
+  </Style>
   <Style Selector="TextBox.filter-editor-field">
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>

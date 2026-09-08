@@ -8,14 +8,14 @@ Mark recognized format tokens in the shared FormatEditor (not MFR7 red/blue zebr
 
 ## UX
 
-| State                        | Treatment                                                              |
-| ---------------------------- | ---------------------------------------------------------------------- |
-| Literal text                 | Default editor colors                                                  |
+| State                        | Treatment                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| Literal text                 | Default editor colors                                                     |
 | Valid token span (`<…>`)     | Pale yellow chip (`FormatTokenBackgroundBrush`) — keeps selection visible |
-| Written token name           | Accent foreground (`FormatTokenNameForegroundBrush`)                   |
-| Delimiters / args            | Default foreground                                                     |
-| Failing span                 | Soft error background (`FormatTokenErrorBackgroundBrush`)              |
-| Valid tokens before an error | Still washed + name accent                                             |
+| Written token name           | Accent foreground (`FormatTokenNameForegroundBrush`)                      |
+| Delimiters / args            | Default foreground                                                        |
+| Failing span                 | Soft error background (`FormatTokenErrorBackgroundBrush`)                 |
+| Valid tokens before an error | Still washed + name accent                                                |
 
 ## Implementation
 

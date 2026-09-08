@@ -1,0 +1,74 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
+  mc:Ignorable="d"
+  d:DesignWidth="640"
+  d:DesignHeight="280"
+  x:Class="Mfr.App.Ui.Views.FormatEditor.FormatTokenToolsHost"
+  x:Name="Root"
+>
+  <DockPanel LastChildFill="True">
+    <Border
+      x:Name="ToolsPane"
+      Classes="format-token-tools-pane"
+      DockPanel.Dock="Right"
+      Margin="8,0,0,0"
+      Width="{Binding ToolsPaneWidth, ElementName=Root}"
+      VerticalAlignment="Top"
+    >
+      <DockPanel LastChildFill="True">
+        <DockPanel
+          DockPanel.Dock="Top"
+          Margin="{Binding HeaderMargin, ElementName=Root}"
+          LastChildFill="True"
+        >
+          <Button
+            x:Name="CollapseButton"
+            Classes="filter-editor-button format-editor-tool"
+            DockPanel.Dock="Left"
+            ToolTip.Tip="{Binding CollapseToolTip, ElementName=Root}"
+            Click="_OnCollapseClick"
+          >
+            <PathIcon Width="12" Height="12" Data="{Binding CollapseIcon, ElementName=Root}" />
+          </Button>
+          <Button
+            x:Name="EditButton"
+            Classes="filter-editor-button format-editor-tool"
+            DockPanel.Dock="Right"
+            Margin="4,0,0,0"
+            ToolTip.Tip="Edit formatting parameter under caret in the active format field"
+            IsEnabled="{Binding HasActiveEditor, ElementName=Root}"
+            Click="_OnEditClick"
+          >
+            <PathIcon Width="12" Height="12" Data="{StaticResource FormatEditorEditGeometry}" />
+          </Button>
+          <TextBlock
+            Classes="filter-editor-label"
+            VerticalAlignment="Center"
+            Margin="6,0,0,0"
+            Text="Tokens"
+            IsVisible="{Binding IsExpanded, ElementName=Root}"
+            TextTrimming="CharacterEllipsis"
+          />
+        </DockPanel>
+
+        <fe:FormatTokenInsertPicker
+          x:Name="InsertPicker"
+          MinHeight="160"
+          MaxHeight="320"
+          IsVisible="{Binding ShowsInsertPicker, ElementName=Root}"
+        />
+      </DockPanel>
+    </Border>
+
+    <ContentControl
+      x:Name="BodyHost"
+      HorizontalContentAlignment="Stretch"
+      VerticalContentAlignment="Stretch"
+      Content="{Binding Body, ElementName=Root}"
+    />
+  </DockPanel>
+</UserControl>

@@ -13,8 +13,8 @@ using Mfr.Filters.Formatting.FormatString;
 namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
-    /// Shared format-string editor: AvaloniaEdit field with token highlight, searchable insert picker,
-    /// token Edit, and inline parse errors.
+    /// Shared format-string editor: AvaloniaEdit field with token highlight, optional Insert/Edit chrome,
+    /// and inline parse errors. Under <see cref="FormatTokenToolsHost"/>, Insert/Edit move to the tools pane.
     /// </summary>
     public partial class FormatEditor : UserControl
     {
@@ -61,6 +61,30 @@ namespace Mfr.App.Ui.Views.FormatEditor
         >(nameof(ShowRightClickHint), defaultValue: true);
 
         /// <summary>
+        /// Defines the <see cref="ShowInsertButton"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> ShowInsertButtonProperty = AvaloniaProperty.Register<
+            FormatEditor,
+            bool
+        >(nameof(ShowInsertButton), defaultValue: true);
+
+        /// <summary>
+        /// Defines the <see cref="ShowEditButton"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> ShowEditButtonProperty = AvaloniaProperty.Register<
+            FormatEditor,
+            bool
+        >(nameof(ShowEditButton), defaultValue: true);
+
+        /// <summary>
+        /// Defines the <see cref="IsActiveTarget"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> IsActiveTargetProperty = AvaloniaProperty.Register<
+            FormatEditor,
+            bool
+        >(nameof(IsActiveTarget));
+
+        /// <summary>
         /// Defines the <see cref="MaxLength"/> property.
         /// </summary>
         public static readonly StyledProperty<int> MaxLengthProperty = AvaloniaProperty.Register<FormatEditor, int>(
@@ -68,11 +92,18 @@ namespace Mfr.App.Ui.Views.FormatEditor
             defaultValue: 0
         );
 
+        /// <summary>
+        /// Defines the <see cref="ShowsToolButtons"/> property.
+        /// </summary>
+        public static readonly DirectProperty<FormatEditor, bool> ShowsToolButtonsProperty =
+            AvaloniaProperty.RegisterDirect<FormatEditor, bool>(nameof(ShowsToolButtons), o => o.ShowsToolButtons);
+
         private readonly FormatTokenColorizingTransformer _colorizer = new();
         private readonly FormatTokenBackgroundRenderer _backgroundRenderer = new();
 
         private bool _suppressTextSync;
         private bool _templateHooksAttached;
+        private FormatTokenToolsHost? _toolsHost;
 
         /// <summary>
         /// Gets the control view-model (picker / error state).
@@ -91,10 +122,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 editUnderCaret: _EditUnderCaret
             );
             ChromeRoot.DataContext = ViewModel;
-            InsertList.AddHandler(TappedEvent, _OnInsertItemTapped, RoutingStrategies.Bubble);
-            InsertList.AddHandler(TreeViewItem.ExpandedEvent, _OnInsertGroupExpanded);
-            InsertList.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
-            InsertSearchBox.AddHandler(KeyDownEvent, _OnInsertPickerKeyDown, RoutingStrategies.Tunnel);
+            InsertPicker.DataContext = ViewModel;
             ViewModel.ValidationMode = ValidationMode;
             _ConfigureTemplateEditor();
             _ApplyAcceptsReturnLayout(AcceptsReturn);
@@ -102,7 +130,13 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ViewModel.Validate(Text ?? string.Empty);
             _RefreshHighlight();
             _UpdateWatermarkVisibility();
+            _RefreshToolButtonsVisibility();
         }
+
+        /// <summary>
+        /// Gets the insert-picker control hosted in the Insert flyout (for tests and host reuse).
+        /// </summary>
+        public FormatTokenInsertPicker InsertPickerControl => InsertPicker;
 
         /// <summary>
         /// Gets or sets the format string.
@@ -150,12 +184,56 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
+        /// Gets or sets whether the per-field Insert button is shown (hidden under a tools host).
+        /// </summary>
+        public bool ShowInsertButton
+        {
+            get => GetValue(ShowInsertButtonProperty);
+            set => SetValue(ShowInsertButtonProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets whether the per-field Edit button is shown (hidden under a tools host).
+        /// </summary>
+        public bool ShowEditButton
+        {
+            get => GetValue(ShowEditButtonProperty);
+            set => SetValue(ShowEditButtonProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets whether this field is the Insert/Edit target of a hosting tools pane.
+        /// </summary>
+        public bool IsActiveTarget
+        {
+            get => GetValue(IsActiveTargetProperty);
+            set => SetValue(IsActiveTargetProperty, value);
+        }
+
+        /// <summary>
+        /// Gets whether any per-field tool button is visible.
+        /// </summary>
+        public bool ShowsToolButtons
+        {
+            get;
+            private set => SetAndRaise(ShowsToolButtonsProperty, ref field, value);
+        }
+
+        /// <summary>
         /// Gets or sets the maximum character count for the text box (<c>0</c> = unlimited).
         /// </summary>
         public int MaxLength
         {
             get => GetValue(MaxLengthProperty);
             set => SetValue(MaxLengthProperty, value);
+        }
+
+        /// <summary>
+        /// Opens the token parameter editor for the caret span, or a warning when unavailable.
+        /// </summary>
+        public void EditUnderCaret()
+        {
+            _EditUnderCaret();
         }
 
         /// <summary>
@@ -277,6 +355,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
+            if (change.Property == ShowInsertButtonProperty || change.Property == ShowEditButtonProperty)
+            {
+                _RefreshToolButtonsVisibility();
+                return;
+            }
+
             if (change.Property == ValidationModeProperty)
             {
                 ViewModel.ValidationMode = change.GetNewValue<FormatStringValidationMode>();
@@ -360,6 +444,16 @@ namespace Mfr.App.Ui.Views.FormatEditor
             // Ctor may run before app theme resources resolve; never leave SelectionBrush null
             // (that clears AvaloniaEdit's themed TextAreaSelectionBrush and hides selection).
             _ApplySelectionChrome();
+            _toolsHost = this.FindAncestorOfType<FormatTokenToolsHost>();
+            _toolsHost?.RegisterEditor(this);
+        }
+
+        /// <inheritdoc />
+        protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            _toolsHost?.UnregisterEditor(this);
+            _toolsHost = null;
+            base.OnDetachedFromVisualTree(e);
         }
 
         /// <summary>
@@ -419,7 +513,15 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// </summary>
         private void _OnInsertFlyoutOpened(object? sender, EventArgs e)
         {
-            Dispatcher.UIThread.Post(() => InsertSearchBox.Focus(), DispatcherPriority.Input);
+            Dispatcher.UIThread.Post(InsertPicker.FocusSearch, DispatcherPriority.Input);
+        }
+
+        /// <summary>
+        /// Updates whether the Insert/Edit button strip is shown.
+        /// </summary>
+        private void _RefreshToolButtonsVisibility()
+        {
+            ShowsToolButtons = ShowInsertButton || ShowEditButton;
         }
 
         private void _OnTemplateTextChanged(object? sender, EventArgs e)
@@ -459,131 +561,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             e.Handled = true;
-        }
-
-        /// <summary>
-        /// Inserts the tapped catalog leaf, or expands/collapses a group folder (pointer/touch).
-        /// Keyboard highlight alone must not insert.
-        /// </summary>
-        private void _OnInsertItemTapped(object? sender, TappedEventArgs e)
-        {
-            if (e.Source is not Visual source)
-            {
-                return;
-            }
-
-            var item = source as TreeViewItem ?? source.FindAncestorOfType<TreeViewItem>();
-            if (item?.DataContext is not FormatInsertPickerNode node)
-            {
-                return;
-            }
-
-            if (node.IsGroup)
-            {
-                if (!_OriginatedFromExpandChevron(source, item))
-                {
-                    item.IsExpanded = !item.IsExpanded;
-                    e.Handled = true;
-                }
-
-                return;
-            }
-
-            if (node.Entry is not { } entry)
-            {
-                return;
-            }
-
-            e.Handled = true;
-            ViewModel.InsertEntryCommand.Execute(entry);
-        }
-
-        /// <summary>
-        /// True when the tap started on this item's expand/collapse chevron (already toggles
-        /// <see cref="TreeViewItem.IsExpanded"/>).
-        /// </summary>
-        private static bool _OriginatedFromExpandChevron(Visual source, TreeViewItem item)
-        {
-            var current = source;
-            while (current is not null && !ReferenceEquals(current, item))
-            {
-                if (current is ToggleButton)
-                {
-                    return true;
-                }
-
-                current = current.GetVisualParent();
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Accordion: opening a folder collapses sibling folders (tap, chevron, or keyboard).
-        /// </summary>
-        private void _OnInsertGroupExpanded(object? sender, RoutedEventArgs e)
-        {
-            if (e.Source is not TreeViewItem expanded)
-            {
-                return;
-            }
-
-            _CollapseSiblingGroups(expanded);
-        }
-
-        /// <summary>
-        /// Collapses other expanded folders that share <paramref name="expanded"/>'s parent.
-        /// </summary>
-        private static void _CollapseSiblingGroups(TreeViewItem expanded)
-        {
-            var parent = ItemsControl.ItemsControlFromItemContainer(expanded);
-            if (parent is null)
-            {
-                return;
-            }
-
-            for (var i = 0; i < parent.ItemCount; i++)
-            {
-                if (parent.ContainerFromIndex(i) is not TreeViewItem sibling)
-                {
-                    continue;
-                }
-
-                if (ReferenceEquals(sibling, expanded) || !sibling.IsExpanded)
-                {
-                    continue;
-                }
-
-                sibling.IsExpanded = false;
-            }
-        }
-
-        /// <summary>
-        /// Enter inserts the highlighted catalog leaf from search or list focus (not SelectionChanged).
-        /// </summary>
-        private void _OnInsertPickerKeyDown(object? sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Enter || !_TryInsertHighlighted())
-            {
-                return;
-            }
-
-            e.Handled = true;
-        }
-
-        /// <summary>
-        /// Inserts <see cref="TreeView.SelectedItem"/> when it is a catalog leaf.
-        /// </summary>
-        /// <returns><see langword="true"/> when a leaf was inserted.</returns>
-        private bool _TryInsertHighlighted()
-        {
-            if (InsertList.SelectedItem is not FormatInsertPickerNode { Entry: { } entry })
-            {
-                return false;
-            }
-
-            ViewModel.InsertEntryCommand.Execute(entry);
-            return true;
         }
 
         /// <summary>
@@ -862,6 +839,13 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private void _OnTemplateFocusChanged(object? sender, RoutedEventArgs e)
         {
             _UpdateWatermarkVisibility();
+            var focused = TemplateBox.IsFocused || TemplateBox.TextArea.IsFocused;
+            if (!focused)
+            {
+                return;
+            }
+
+            (_toolsHost ?? this.FindAncestorOfType<FormatTokenToolsHost>())?.SetActiveEditor(this);
         }
 
         /// <summary>

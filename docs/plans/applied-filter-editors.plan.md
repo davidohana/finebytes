@@ -86,7 +86,7 @@ Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.pla
 1. Shared `FormatEditor` (searchable insert, caret insert, inline error + jump) wired to Formatter.
 1. Param dialogs for all arg-bearing tokens (`FormatTokenEditorRegistry` + Edit/right-click).
 
-**Reuse done:** PathMover Sub-folder, Inserter, Name List Prefix/Suffix, Audio Tag Setter fields, ID3v2 Field Setter text — all use shared `FormatEditor` (`WhenLikelyTokens` where the filter gates compile). Genre stays an editable ComboBox. Syntax highlight: [`formateditor-syntax-highlight.plan.md`](formateditor-syntax-highlight.plan.md).
+**Reuse done:** PathMover Sub-folder, Inserter, Name List Prefix/Suffix, Audio Tag Setter fields, ID3v2 Field Setter text — all use shared `FormatEditor` (`WhenLikelyTokens` where the filter gates compile). Genre stays an editable ComboBox. Syntax highlight: [`formateditor-syntax-highlight.plan.md`](formateditor-syntax-highlight.plan.md). Token tools pane (collapsible Insert+Edit host, last-focused field): [`format-token-tools-pane.plan.md`](format-token-tools-pane.plan.md).
 
 **PRs (do not merge yet):** [A #35](https://github.com/davidohana/finebytes/pull/35) · [B #36](https://github.com/davidohana/finebytes/pull/36) · [C #37](https://github.com/davidohana/finebytes/pull/37).
 

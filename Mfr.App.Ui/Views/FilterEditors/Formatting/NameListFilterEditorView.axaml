@@ -7,72 +7,76 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
   mc:Ignorable="d"
-  d:DesignWidth="420"
+  d:DesignWidth="640"
   d:DesignHeight="240"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Formatting.NameListFilterEditorView"
   x:DataType="vm:NameListFilterEditorViewModel"
 >
-  <StackPanel Spacing="8">
-    <controls:FieldsetGroup Header="Name List">
-      <StackPanel Spacing="4">
-        <ToolTip.Tip>
-          <controls:RichToolTip>
-            <TextBlock Classes="rich-tip-title" Text="One name per line." />
-            <TextBlock
-              Classes="rich-tip-body"
-              Text="The first line is used for the first Rename List item, the second line for the second item, and so on. Blank lines are empty names."
+  <fe:FormatTokenToolsHost>
+    <fe:FormatTokenToolsHost.Body>
+      <StackPanel Spacing="8">
+        <controls:FieldsetGroup Header="Name List">
+          <StackPanel Spacing="4">
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-title" Text="One name per line." />
+                <TextBlock
+                  Classes="rich-tip-body"
+                  Text="The first line is used for the first Rename List item, the second line for the second item, and so on. Blank lines are empty names."
+                />
+                <TextBlock Classes="rich-tip-bullet" Text="• Example: Alpha" />
+                <TextBlock Classes="rich-tip-bullet" Text="• Example: Beta" />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+            <TextBlock Classes="filter-editor-label" Text="Entries:" />
+            <TextBox
+              x:Name="EntriesBox"
+              Classes="filter-editor-field-wrap"
+              MinWidth="240"
+              MinHeight="88"
+              AcceptsReturn="True"
+              Watermark="Alpha&#x0a;Beta&#x0a;Gamma"
+              Text="{Binding EntriesText}"
             />
-            <TextBlock Classes="rich-tip-bullet" Text="• Example: Alpha" />
-            <TextBlock Classes="rich-tip-bullet" Text="• Example: Beta" />
-          </controls:RichToolTip>
-        </ToolTip.Tip>
-        <TextBlock Classes="filter-editor-label" Text="Entries:" />
-        <TextBox
-          x:Name="EntriesBox"
-          Classes="filter-editor-field-wrap"
-          MinWidth="240"
-          MinHeight="88"
-          AcceptsReturn="True"
-          Watermark="Alpha&#x0a;Beta&#x0a;Gamma"
-          Text="{Binding EntriesText}"
-        />
-        <controls:FilterEditorHint Text="One name per line; line n applies to Rename List item n." />
+            <controls:FilterEditorHint Text="One name per line; line n applies to Rename List item n." />
+          </StackPanel>
+        </controls:FieldsetGroup>
+        <controls:FieldsetGroup Header="Options">
+          <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
+            <controls:FilterEditorLabeledRow Label="Prefix:">
+              <ToolTip.Tip>
+                <controls:RichToolTip>
+                  <TextBlock Classes="rich-tip-title" Text="Text added before each list name." />
+                  <TextBlock Classes="rich-tip-body" Text="May include formatter tokens such as &lt;counter:…&gt;." />
+                </controls:RichToolTip>
+              </ToolTip.Tip>
+              <fe:FormatEditor
+                x:Name="PrefixEditor"
+                MinWidth="240"
+                AcceptsReturn="False"
+                ShowRightClickHint="False"
+                Text="{Binding Prefix}"
+              />
+            </controls:FilterEditorLabeledRow>
+            <controls:FilterEditorLabeledRow Label="Suffix:">
+              <ToolTip.Tip>
+                <controls:RichToolTip>
+                  <TextBlock Classes="rich-tip-title" Text="Text added after each list name." />
+                  <TextBlock Classes="rich-tip-body" Text="May include formatter tokens such as &lt;counter:…&gt;." />
+                </controls:RichToolTip>
+              </ToolTip.Tip>
+              <fe:FormatEditor
+                x:Name="SuffixEditor"
+                MinWidth="240"
+                AcceptsReturn="False"
+                ShowRightClickHint="False"
+                Text="{Binding Suffix}"
+              />
+            </controls:FilterEditorLabeledRow>
+            <controls:FilterEditorHint Text="Prefix and suffix may use formatter tokens; right-click a token to customize it." />
+          </StackPanel>
+        </controls:FieldsetGroup>
       </StackPanel>
-    </controls:FieldsetGroup>
-    <controls:FieldsetGroup Header="Options">
-      <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
-        <controls:FilterEditorLabeledRow Label="Prefix:">
-          <ToolTip.Tip>
-            <controls:RichToolTip>
-              <TextBlock Classes="rich-tip-title" Text="Text added before each list name." />
-              <TextBlock Classes="rich-tip-body" Text="May include formatter tokens such as &lt;counter:…&gt;." />
-            </controls:RichToolTip>
-          </ToolTip.Tip>
-          <fe:FormatEditor
-            x:Name="PrefixEditor"
-            MinWidth="240"
-            AcceptsReturn="False"
-            ShowRightClickHint="False"
-            Text="{Binding Prefix}"
-          />
-        </controls:FilterEditorLabeledRow>
-        <controls:FilterEditorLabeledRow Label="Suffix:">
-          <ToolTip.Tip>
-            <controls:RichToolTip>
-              <TextBlock Classes="rich-tip-title" Text="Text added after each list name." />
-              <TextBlock Classes="rich-tip-body" Text="May include formatter tokens such as &lt;counter:…&gt;." />
-            </controls:RichToolTip>
-          </ToolTip.Tip>
-          <fe:FormatEditor
-            x:Name="SuffixEditor"
-            MinWidth="240"
-            AcceptsReturn="False"
-            ShowRightClickHint="False"
-            Text="{Binding Suffix}"
-          />
-        </controls:FilterEditorLabeledRow>
-        <controls:FilterEditorHint Text="Prefix and suffix may use formatter tokens; right-click a token to customize it." />
-      </StackPanel>
-    </controls:FieldsetGroup>
-  </StackPanel>
+    </fe:FormatTokenToolsHost.Body>
+  </fe:FormatTokenToolsHost>
 </UserControl>
