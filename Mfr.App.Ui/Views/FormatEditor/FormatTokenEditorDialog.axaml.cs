@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 using Mfr.Models.Rename;
 
@@ -46,9 +47,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             ArgumentNullException.ThrowIfNull(editor);
             _editor = editor;
+            PreviewRenameItems = renameItems ?? [];
             DataContext = editor;
 
-            _preview = new FormatTokenPreviewViewModel(renameItems);
+            _preview = new FormatTokenPreviewViewModel(PreviewRenameItems);
             PreviewRow.DataContext = _preview;
             _preview.Refresh(editor.ResultingFormatString);
 
@@ -58,6 +60,35 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             Closed += _OnClosed;
+        }
+
+        /// <summary>
+        /// Gets the Rename List snapshot used by this dialog's Preview (for nested token editors).
+        /// </summary>
+        internal IReadOnlyList<RenameItem> PreviewRenameItems { get; } = [];
+
+        /// <summary>
+        /// Resolves Rename List items for Preview from <paramref name="start"/> or its owner chain:
+        /// a hosting <see cref="FormatTokenEditorDialog"/> snapshot, else <see cref="MainWindowViewModel"/>.
+        /// </summary>
+        /// <param name="start">Window that owns the FormatEditor (main window or a token dialog).</param>
+        /// <returns>Rename items for Preview, or empty when none are available.</returns>
+        internal static IReadOnlyList<RenameItem> ResolvePreviewRenameItems(Window? start)
+        {
+            for (Window? window = start; window is not null; window = window.Owner as Window)
+            {
+                if (window is FormatTokenEditorDialog { PreviewRenameItems.Count: > 0 } host)
+                {
+                    return host.PreviewRenameItems;
+                }
+
+                if (window.DataContext is MainWindowViewModel main)
+                {
+                    return [.. main.RenameListViewModel.Entries.Select(entry => entry.EngineItem)];
+                }
+            }
+
+            return [];
         }
 
         private void _OnEditorPropertyChanged(object? sender, PropertyChangedEventArgs e)

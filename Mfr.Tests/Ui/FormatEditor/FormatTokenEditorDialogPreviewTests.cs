@@ -88,5 +88,42 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             dialog.Close();
         }
+
+        /// <summary>
+        /// Verifies a nested token dialog reuses the parent dialog's Rename List Preview snapshot.
+        /// </summary>
+        [AvaloniaFact]
+        public void NestedDialog_ReusesParentPreviewRenameItems()
+        {
+            var items = new[]
+            {
+                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: ".mp3"),
+                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: ".wav", renameListIndex: 1),
+            };
+            var parent = new FormatTokenEditorDialog(new SubstrFormatTokenEditorViewModel(null), items);
+            parent.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var resolved = FormatTokenEditorDialog.ResolvePreviewRenameItems(parent);
+            Assert.Same(items[0], resolved[0]);
+            Assert.Equal(2, resolved.Count);
+
+            var nested = new FormatTokenEditorDialog(new FileDateFormatTokenEditorViewModel(null), resolved);
+            nested.Show();
+            nested.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("alpha.mp3", nested.FindControl<TextBox>("PreviewSampleBox")!.Text);
+            Assert.Equal("1", nested.FindControl<TextBlock>("PreviewItemIndexLabel")!.Text);
+            Assert.NotEqual("<Preview N/A>", nested.FindControl<TextBox>("PreviewResultBox")!.Text);
+            Assert.DoesNotContain(
+                "<Rename list is empty>",
+                nested.FindControl<TextBox>("PreviewSampleBox")!.Text,
+                StringComparison.Ordinal
+            );
+
+            nested.Close();
+            parent.Close();
+        }
     }
 }

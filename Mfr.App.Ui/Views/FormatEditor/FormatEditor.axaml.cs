@@ -8,10 +8,8 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaEdit.Rendering;
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.Views.FormatEditor
 {
@@ -926,7 +924,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
-            var dialog = new FormatTokenEditorDialog(editor, _TryGetRenameItems(owner));
+            var dialog = new FormatTokenEditorDialog(editor, FormatTokenEditorDialog.ResolvePreviewRenameItems(owner));
             var accepted = await dialog.ShowDialog<bool>(owner);
             if (!accepted)
             {
@@ -934,19 +932,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             ReplaceTokenSpan(span, editor.ResultingFormatString);
-        }
-
-        /// <summary>
-        /// Resolves the live Rename List snapshot for token Preview when hosted under the main window.
-        /// </summary>
-        private static IReadOnlyList<RenameItem> _TryGetRenameItems(Window owner)
-        {
-            if (owner.DataContext is not MainWindowViewModel main)
-            {
-                return [];
-            }
-
-            return [.. main.RenameListViewModel.Entries.Select(entry => entry.EngineItem)];
         }
 
         /// <summary>
