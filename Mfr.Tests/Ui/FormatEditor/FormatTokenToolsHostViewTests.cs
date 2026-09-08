@@ -85,9 +85,9 @@ namespace Mfr.Tests.Ui.FormatEditor
             var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "file-name");
             var picker = _NamedDescendant<FormatTokenPicker>(host, "PART_TokenPicker");
             Assert.IsType<App.Ui.ViewModels.FormatEditor.FormatTokenPickerViewModel>(picker.DataContext);
-            (
-                (App.Ui.ViewModels.FormatEditor.FormatTokenPickerViewModel)picker.DataContext
-            ).InsertEntryCommand.Execute(entry);
+            ((App.Ui.ViewModels.FormatEditor.FormatTokenPickerViewModel)picker.DataContext).InsertEntryCommand.Execute(
+                entry
+            );
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

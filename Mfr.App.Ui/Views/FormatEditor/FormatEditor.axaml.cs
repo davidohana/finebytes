@@ -14,10 +14,26 @@ namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
     /// Shared format-string editor: AvaloniaEdit field with token highlight, optional Insert/Edit chrome,
-    /// and inline parse errors. Under <see cref="FormatTokenToolsHost"/>, Insert/Edit move to the tools pane.
+    /// capped wrap auto-grow, and inline parse errors. Under <see cref="FormatTokenToolsHost"/>, Insert/Edit
+    /// move to the tools pane.
     /// </summary>
     public partial class FormatEditor : UserControl
     {
+        /// <summary>
+        /// Multiline field floor height before auto-grow.
+        /// </summary>
+        public const double MultilineMinHeight = 64;
+
+        /// <summary>
+        /// Multiline field ceiling; content scrolls after this (~5–6 wrapped lines).
+        /// </summary>
+        public const double MultilineMaxHeight = 168;
+
+        /// <summary>
+        /// Single-line field floor height; wraps and auto-grows above this without inserting newlines.
+        /// </summary>
+        public const double SingleLineMinHeight = 26;
+
         /// <summary>
         /// Defines the <see cref="Text"/> property.
         /// </summary>
@@ -239,6 +255,14 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
+        /// Test hook: remeasures capped auto-grow height from the current document.
+        /// </summary>
+        public void UpdateAutoGrowHeightForTests()
+        {
+            _UpdateAutoGrowHeight();
+        }
+
+        /// <summary>
         /// Inserts <paramref name="insertText"/> at the caret, replacing any selection.
         /// </summary>
         /// <param name="insertText">Text to insert (typically a catalog <c>InsertText</c>).</param>
@@ -405,6 +429,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ViewModel.Validate(text);
             _RefreshHighlight();
             _UpdateWatermarkVisibility();
+            _UpdateAutoGrowHeight();
         }
 
         /// <summary>
@@ -434,9 +459,17 @@ namespace Mfr.App.Ui.Views.FormatEditor
             // Selection changes often only invalidate the Selection layer; refresh Background so
             // yellow wash holes under the selection stay in sync while dragging.
             TemplateBox.TextArea.Caret.PositionChanged += _OnTemplateCaretPositionChanged;
+            TemplateBox.TextArea.TextView.VisualLinesChanged += _OnTemplateVisualLinesChanged;
             TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
             TemplateBox.TextArea.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
             TemplateBox.TextArea.AddHandler(KeyDownEvent, _OnTemplateKeyDown, RoutingStrategies.Tunnel);
+        }
+
+        /// <inheritdoc />
+        protected override void OnSizeChanged(SizeChangedEventArgs e)
+        {
+            base.OnSizeChanged(e);
+            _UpdateAutoGrowHeight();
         }
 
         /// <inheritdoc />
@@ -487,19 +520,56 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// </summary>
         private void _ApplyAcceptsReturnLayout(bool acceptsReturn)
         {
-            if (acceptsReturn)
+            TemplateBox.ClearValue(HeightProperty);
+            TemplateBox.MaxHeight = MultilineMaxHeight;
+            TemplateBox.WordWrap = true;
+            TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            TemplateBox.MinHeight = acceptsReturn ? MultilineMinHeight : SingleLineMinHeight;
+            _UpdateAutoGrowHeight();
+        }
+
+        /// <summary>
+        /// Grows the editor with wrapped content up to <see cref="MultilineMaxHeight"/> (Enter still
+        /// follows <see cref="AcceptsReturn"/>).
+        /// </summary>
+        private void _UpdateAutoGrowHeight()
+        {
+            var textView = TemplateBox.TextArea.TextView;
+            if (textView.Bounds.Width <= 0)
             {
-                TemplateBox.MinHeight = 64;
-                TemplateBox.WordWrap = true;
-                TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                 return;
             }
 
-            TemplateBox.MinHeight = 26;
-            TemplateBox.WordWrap = false;
-            TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Auto;
-            TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            textView.EnsureVisualLines();
+            var contentHeight = textView.DocumentHeight;
+            if (double.IsNaN(contentHeight) || contentHeight <= 0)
+            {
+                contentHeight = Math.Max(textView.DefaultLineHeight, 1);
+            }
+
+            var chrome =
+                TemplateBox.Padding.Top
+                + TemplateBox.Padding.Bottom
+                + TemplateBox.BorderThickness.Top
+                + TemplateBox.BorderThickness.Bottom;
+            var desired = contentHeight + chrome;
+            var minHeight = AcceptsReturn ? MultilineMinHeight : SingleLineMinHeight;
+            var height = Math.Clamp(desired, minHeight, MultilineMaxHeight);
+            if (!double.IsNaN(TemplateBox.Height) && Math.Abs(TemplateBox.Height - height) < 0.5)
+            {
+                return;
+            }
+
+            TemplateBox.Height = height;
+        }
+
+        /// <summary>
+        /// Remeasures auto-grow when wrap layout rebuilds visual lines.
+        /// </summary>
+        private void _OnTemplateVisualLinesChanged(object? sender, EventArgs e)
+        {
+            _UpdateAutoGrowHeight();
         }
 
         private void _InsertFlyoutHide()
@@ -553,6 +623,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ViewModel.Validate(text);
             _RefreshHighlight();
             _UpdateWatermarkVisibility();
+            _UpdateAutoGrowHeight();
         }
 
         private void _OnTemplateKeyDown(object? sender, KeyEventArgs e)
@@ -577,6 +648,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ViewModel.Validate(next);
             _RefreshHighlight();
             _UpdateWatermarkVisibility();
+            _UpdateAutoGrowHeight();
         }
 
         /// <summary>

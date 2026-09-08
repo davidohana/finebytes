@@ -11,6 +11,7 @@ using Avalonia.VisualTree;
 using AvaloniaEdit;
 using AvaloniaEdit.Rendering;
 using Mfr.App.Ui.Views.Controls;
+using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.App.Ui.Views.GridColumnSizing;
 using Mfr.Filters.Formatting.FormatString;
 
@@ -560,7 +561,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         /// Verifies Insert and Edit are matching square glyph buttons on one horizontal row.
         /// </summary>
         [AvaloniaFact]
-        public void InsertAndEditButtons_AreSameSize()
+        public void ToolButtons_AreSameSize()
         {
             var editor = new App.Ui.Views.FormatEditor.FormatEditor();
             var window = new Window { Content = editor };
@@ -577,6 +578,80 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.True(edit.Bounds.X > insert.Bounds.X);
             Assert.Contains(insert.GetVisualDescendants().OfType<PathIcon>(), icon => icon.Width == 12);
             Assert.Contains(edit.GetVisualDescendants().OfType<PathIcon>(), icon => icon.Width == 12);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies multiline AcceptsReturn applies min/max height caps for auto-grow.
+        /// </summary>
+        [AvaloniaFact]
+        public void AcceptsReturnTrue_AppliesAutoGrowMinAndMaxHeight()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { AcceptsReturn = true };
+            var window = new Window
+            {
+                Width = 320,
+                Height = 400,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.MultilineMinHeight, box.MinHeight);
+            Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.MultilineMaxHeight, box.MaxHeight);
+            Assert.True(box.WordWrap);
+
+            editor.Text = string.Concat(
+                Enumerable.Repeat("<file-name> <counter:initial=1,step=1> long-token-string ", 20)
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            editor.UpdateAutoGrowHeightForTests();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(box.Height >= App.Ui.Views.FormatEditor.FormatEditor.MultilineMinHeight);
+            Assert.True(box.Height <= App.Ui.Views.FormatEditor.FormatEditor.MultilineMaxHeight);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies AcceptsReturn=false starts compact, wraps for display, and auto-grows with a ceiling.
+        /// </summary>
+        [AvaloniaFact]
+        public void AcceptsReturnFalse_WrapsAndAutoGrowsWithCap()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { AcceptsReturn = false };
+            var window = new Window
+            {
+                Width = 320,
+                Height = 400,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.SingleLineMinHeight, box.MinHeight);
+            Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.MultilineMaxHeight, box.MaxHeight);
+            Assert.True(box.WordWrap);
+
+            editor.Text = string.Concat(Enumerable.Repeat("<id3v2:TIT2> <file-name> long-token-string ", 20));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            editor.UpdateAutoGrowHeightForTests();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(box.Height >= App.Ui.Views.FormatEditor.FormatEditor.SingleLineMinHeight);
+            Assert.True(box.Height <= App.Ui.Views.FormatEditor.FormatEditor.MultilineMaxHeight);
 
             window.Close();
         }
