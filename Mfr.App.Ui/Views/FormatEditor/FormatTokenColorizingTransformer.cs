@@ -6,12 +6,11 @@ using Mfr.Filters.Formatting.FormatString;
 namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
-    /// Washes validated format tokens and accents the written token name; washes the error span.
+    /// Accents the written token name inside validated format tokens.
     /// </summary>
     /// <remarks>
-    /// Each valid <c>&lt;…&gt;</c> gets a soft background. The written name (not aliases' canonical
-    /// length) gets a distinct foreground; delimiters and args keep the editor default foreground.
-    /// Nested tokens inside args are not styled separately. Error wash overlays the failing span.
+    /// Token and error backgrounds are drawn by <see cref="FormatTokenBackgroundRenderer"/> on the
+    /// Background layer so selection stays visible. This transformer only sets name foreground.
     /// </remarks>
     internal sealed class FormatTokenColorizingTransformer : DocumentColorizingTransformer
     {
@@ -21,29 +20,9 @@ namespace Mfr.App.Ui.Views.FormatEditor
         public IReadOnlyList<FormatTokenSpan> Tokens { get; set; } = [];
 
         /// <summary>
-        /// Gets or sets the failing span start, or <c>-1</c> when none.
-        /// </summary>
-        public int ErrorPosition { get; set; } = -1;
-
-        /// <summary>
-        /// Gets or sets the failing span length.
-        /// </summary>
-        public int ErrorLength { get; set; }
-
-        /// <summary>
-        /// Gets or sets the soft background wash for valid tokens.
-        /// </summary>
-        public IBrush? TokenBackground { get; set; }
-
-        /// <summary>
         /// Gets or sets the foreground for the written token name.
         /// </summary>
         public IBrush? TokenNameForeground { get; set; }
-
-        /// <summary>
-        /// Gets or sets the soft background wash for the error span.
-        /// </summary>
-        public IBrush? ErrorBackground { get; set; }
 
         /// <summary>
         /// Computes the written-name range inside a validated token span.
@@ -77,55 +56,29 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <inheritdoc />
         protected override void ColorizeLine(DocumentLine line)
         {
+            if (TokenNameForeground is null)
+            {
+                return;
+            }
+
             var lineStart = line.Offset;
             var lineEnd = line.EndOffset;
 
             foreach (var token in Tokens)
             {
-                if (token.Length < 2)
+                if (!TryGetNameRange(token, out var nameStart, out var nameEnd) || nameEnd <= nameStart)
                 {
                     continue;
                 }
 
-                if (TokenBackground is not null)
-                {
-                    _ColorizeOverlap(
-                        lineStart,
-                        lineEnd,
-                        token.Start,
-                        token.Start + token.Length,
-                        element => element.TextRunProperties.SetBackgroundBrush(TokenBackground)
-                    );
-                }
-
-                if (
-                    TokenNameForeground is not null
-                    && TryGetNameRange(token, out var nameStart, out var nameEnd)
-                    && nameEnd > nameStart
-                )
-                {
-                    _ColorizeOverlap(
-                        lineStart,
-                        lineEnd,
-                        nameStart,
-                        nameEnd,
-                        element => element.TextRunProperties.SetForegroundBrush(TokenNameForeground)
-                    );
-                }
+                _ColorizeOverlap(
+                    lineStart,
+                    lineEnd,
+                    nameStart,
+                    nameEnd,
+                    element => element.TextRunProperties.SetForegroundBrush(TokenNameForeground)
+                );
             }
-
-            if (ErrorBackground is null || ErrorPosition < 0 || ErrorLength <= 0)
-            {
-                return;
-            }
-
-            _ColorizeOverlap(
-                lineStart,
-                lineEnd,
-                ErrorPosition,
-                ErrorPosition + ErrorLength,
-                element => element.TextRunProperties.SetBackgroundBrush(ErrorBackground)
-            );
         }
 
         /// <summary>

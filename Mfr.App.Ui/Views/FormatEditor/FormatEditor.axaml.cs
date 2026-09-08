@@ -69,6 +69,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         );
 
         private readonly FormatTokenColorizingTransformer _colorizer = new();
+        private readonly FormatTokenBackgroundRenderer _backgroundRenderer = new();
 
         private bool _suppressTextSync;
         private bool _templateHooksAttached;
@@ -329,8 +330,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             TemplateBox.Options.EnableEmailHyperlinks = false;
             TemplateBox.Options.EnableHyperlinks = false;
             TemplateBox.Options.EnableImeSupport = true;
-            TemplateBox.TextArea.SelectionBrush = _ResolveBrush("TextSelectionBrush");
-            TemplateBox.TextArea.SelectionForeground = _ResolveBrush("TextSelectionForegroundBrush");
+            _ApplySelectionChrome();
 
             if (_templateHooksAttached)
             {
@@ -339,14 +339,51 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
             _templateHooksAttached = true;
             TemplateBox.TextArea.TextView.LineTransformers.Add(_colorizer);
+            TemplateBox.TextArea.TextView.BackgroundRenderers.Add(_backgroundRenderer);
             TemplateBox.TextChanged += _OnTemplateTextChanged;
             // AvaloniaEdit focuses TextArea (TemplateBox.Focusable is false), so tip visibility
             // must listen here as well as GotFocus/LostFocus on TemplateBox in AXAML.
             TemplateBox.TextArea.GotFocus += _OnTemplateFocusChanged;
             TemplateBox.TextArea.LostFocus += _OnTemplateFocusChanged;
+            // Selection changes often only invalidate the Selection layer; refresh Background so
+            // yellow wash holes under the selection stay in sync while dragging.
+            TemplateBox.TextArea.Caret.PositionChanged += _OnTemplateCaretPositionChanged;
             TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
             TemplateBox.TextArea.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
             TemplateBox.TextArea.AddHandler(KeyDownEvent, _OnTemplateKeyDown, RoutingStrategies.Tunnel);
+        }
+
+        /// <inheritdoc />
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            // Ctor may run before app theme resources resolve; never leave SelectionBrush null
+            // (that clears AvaloniaEdit's themed TextAreaSelectionBrush and hides selection).
+            _ApplySelectionChrome();
+        }
+
+        /// <summary>
+        /// Applies selection brushes when resolved — does not assign null over the control theme.
+        /// </summary>
+        private void _ApplySelectionChrome()
+        {
+            if (_ResolveBrush("TextSelectionBrush") is { } selectionBrush)
+            {
+                TemplateBox.TextArea.SelectionBrush = selectionBrush;
+            }
+
+            if (_ResolveBrush("TextSelectionForegroundBrush") is { } selectionForeground)
+            {
+                TemplateBox.TextArea.SelectionForeground = selectionForeground;
+            }
+        }
+
+        /// <summary>
+        /// Invalidates the token wash layer when the caret (and usually selection) moves.
+        /// </summary>
+        private void _OnTemplateCaretPositionChanged(object? sender, EventArgs e)
+        {
+            TemplateBox.TextArea.TextView.InvalidateLayer(KnownLayer.Background);
         }
 
         /// <summary>
@@ -776,26 +813,28 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Pushes the latest validation spans into the colorizer and redraws.
+        /// Pushes the latest validation spans into highlight layers and redraws.
         /// </summary>
         private void _RefreshHighlight()
         {
             var result = ViewModel.LastParseResult;
-            _colorizer.Tokens = result?.Tokens ?? [];
+            var tokens = result?.Tokens ?? [];
+            _colorizer.Tokens = tokens;
+            _backgroundRenderer.Tokens = tokens;
             if (result is { Success: false, ErrorPosition: >= 0, ErrorLength: > 0 })
             {
-                _colorizer.ErrorPosition = result.ErrorPosition;
-                _colorizer.ErrorLength = result.ErrorLength;
+                _backgroundRenderer.ErrorPosition = result.ErrorPosition;
+                _backgroundRenderer.ErrorLength = result.ErrorLength;
             }
             else
             {
-                _colorizer.ErrorPosition = -1;
-                _colorizer.ErrorLength = 0;
+                _backgroundRenderer.ErrorPosition = -1;
+                _backgroundRenderer.ErrorLength = 0;
             }
 
-            _colorizer.TokenBackground = _ResolveBrush("FormatTokenBackgroundBrush");
+            _backgroundRenderer.TokenBackground = _ResolveBrush("FormatTokenBackgroundBrush");
             _colorizer.TokenNameForeground = _ResolveBrush("FormatTokenNameForegroundBrush");
-            _colorizer.ErrorBackground = _ResolveBrush("FormatTokenErrorBackgroundBrush");
+            _backgroundRenderer.ErrorBackground = _ResolveBrush("FormatTokenErrorBackgroundBrush");
             TemplateBox.TextArea.TextView.Redraw();
         }
 

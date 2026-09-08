@@ -20,7 +20,7 @@ Mark recognized format tokens in the shared FormatEditor (not MFR7 red/blue zebr
 ## Implementation
 
 1. Engine: `FormatStringSyntax.TryValidate` returns prior `FormatTokenSpan`s (with `WrittenName` from the scan) on unknown-token / Compile failure (walk failures still empty).
-1. UI: `Avalonia.AvaloniaEdit` hosts the template field; `FormatTokenColorizingTransformer` washes full spans and accents written names from `LastParseResult`.
+1. UI: `Avalonia.AvaloniaEdit` hosts the template field; name foreground via `FormatTokenColorizingTransformer`; yellow/error washes via `FormatTokenBackgroundRenderer` on `KnownLayer.Background` (under selection).
 1. Themes: Light/Dark brushes in [`FilterEditor.axaml`](../../Mfr.App.Ui/Themes/FilterEditor.axaml).
 
 ## Out of scope
