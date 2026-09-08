@@ -1,12 +1,12 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F6 shipped (F6 PRs open, not merged): Applied list + Filter Configuration + FormatEditor. Next: presets, session chain, filter chrome, Filter Options polish."
+overview: "F1–F6 complete on master: Applied list + Filter Configuration + FormatEditor (reuse, highlight, token picker pane). Next: F7 presets, F8 session chain, F9 filter chrome, F10 Filter Options polish."
 todos:
   - id: f1-f5-complete
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
     status: completed
   - id: f6-formatter-format-editor
-    content: "F6 Formatter FormatEditor — shipped (PRs A/B/C); see formatter-formateditor-ux.plan.md"
+    content: "F6 Formatter FormatEditor — complete on master; see formatter-formateditor-ux.plan.md"
     status: completed
   - id: f7-presets-ui
     content: "F7 Presets UI — enable Presets / Save Preset; load/save chain via PresetManager"
@@ -27,7 +27,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-06):** **F5 complete.** Every option-bearing catalog filter has a registered Filter Configuration editor; optionless string filters stay title-only by design. Live option replace + Rename List Auto-Preview via `ToChain()` already work. Remaining work is product chrome around the chain (presets, session, help/heart) plus rich Formatter UX.
+**Status (2026-09-08):** **F1–F6 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` (catalog, param dialogs, syntax highlight, token picker pane) is wired across format-capable filters. **Next:** F7 presets → F8 session chain → F9 chrome → F10 Filter Options polish.
 
 ______________________________________________________________________
 
@@ -52,7 +52,7 @@ Editors live under `ViewModels/FilterEditors/<FilterGroup>/` ↔ `Views/FilterEd
 | **Case**       | Letters Case; Capitalize After + Sentence End → shared `CharacterList`; Casing List             |
 | **Trimming**   | Count L/R (Trim/Extract Left/Right) → shared `Count`; Shrink Duplicate Characters; Trim Between |
 | **Replace**    | Cleaner; Replacer; Replace List                                                                 |
-| **Formatting** | Counter; Inserter; Name List; Token Mover; **Formatter** (format-string box only)               |
+| **Formatting** | Counter; Inserter; Name List; Token Mover; **Formatter** (shared `FormatEditor`)                |
 | **Attributes** | Date/Time Setter; Time Shifter; Attributes Setter                                               |
 | **Audio**      | Tag Remover; Audio Tag Setter; ID3v2 Field Setter                                               |
 | **Misc**       | Fix Leading 0's; Strip Parentheses; Mover (`PathMover`)                                         |
@@ -72,15 +72,15 @@ Non-product cleanup (shared controls, clamp helpers, etc.): [f5-attributes-audio
 
 ______________________________________________________________________
 
-## Remaining backlog (F6+)
+## Remaining backlog (F7+)
 
 Ordered for product value. Do **not** mix these into a single “editor” pass — each is its own feature slice.
 
-### F6 — Formatter FormatEditor UX
+### F6 — Formatter FormatEditor UX — **done**
 
 Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.plan.md). Deep follow-ups: [f6-formateditor-deep-refactors.md](f6-formateditor-deep-refactors.md).
 
-**Shipped (PRs A–C, not merged yet):**
+**Shipped on master:**
 
 1. Public `FormatTokenCatalog` + `FormatStringSyntax.TryValidate` (engine).
 1. Shared `FormatEditor` (searchable insert, caret insert, inline error + jump) wired to Formatter.
@@ -88,7 +88,7 @@ Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.pla
 
 **Reuse done:** PathMover Sub-folder, Inserter, Name List Prefix/Suffix, Audio Tag Setter fields, ID3v2 Field Setter text — all use shared `FormatEditor` (`WhenLikelyTokens` where the filter gates compile). Genre stays an editable ComboBox. Syntax highlight: [`formateditor-syntax-highlight.plan.md`](formateditor-syntax-highlight.plan.md). Token picker pane (collapsible Insert+Edit, last-focused field): [`format-token-picker-pane.plan.md`](format-token-picker-pane.plan.md).
 
-**PRs (do not merge yet):** [A #35](https://github.com/davidohana/finebytes/pull/35) · [B #36](https://github.com/davidohana/finebytes/pull/36) · [C #37](https://github.com/davidohana/finebytes/pull/37).
+**Landed as:** [A #35](https://github.com/davidohana/finebytes/pull/35) (merged) · [B #36](https://github.com/davidohana/finebytes/pull/36) (closed; work on master) · [C #37](https://github.com/davidohana/finebytes/pull/37) (merged). Optional polish still open: FormatEditor auto-grow / expand ([#38](https://github.com/davidohana/finebytes/pull/38)).
 
 ### F7 — Presets UI
 
@@ -133,7 +133,7 @@ ______________________________________________________________________
 - Host: `FilterEditorView` / factory / base VMs / ViewLocator at `FilterEditors/` root
 - Filter Options: `Views/AppliedFilters/FilterOptionsDialog*`
 - Wiring: factory + ViewLocator; `MainWindowViewModel` already selects the editor
-- Preview: already hooked — do not re-wire for F6+ editor polish
+- Preview: already hooked — do not re-wire for F7+ product chrome
 
 ## References
 

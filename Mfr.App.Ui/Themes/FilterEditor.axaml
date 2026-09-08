@@ -3,6 +3,7 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:AvaloniaEdit="https://github.com/avaloniaui/avaloniaedit"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
 >
   <Styles.Resources>
     <ResourceDictionary>
@@ -174,6 +175,9 @@
     <Setter Property="Padding" Value="4,2" />
     <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
     <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
+  </Style>
+  <Style Selector="fe|FormatEditor[IsReadOnly=True] AvaloniaEdit|TextEditor.format-string-field">
+    <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
   </Style>
   <Style Selector="TextBlock.format-editor-watermark">
     <Setter Property="FontFamily" Value="{DynamicResource AppChromeFixedWidthFont}" />

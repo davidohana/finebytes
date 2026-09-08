@@ -109,6 +109,13 @@ namespace Mfr.App.Ui.Views.FormatEditor
         );
 
         /// <summary>
+        /// Defines the <see cref="IsReadOnly"/> property.
+        /// </summary>
+        public static readonly StyledProperty<bool> IsReadOnlyProperty = AvaloniaProperty.Register<FormatEditor, bool>(
+            nameof(IsReadOnly)
+        );
+
+        /// <summary>
         /// Defines the <see cref="ShowsToolButtons"/> property.
         /// </summary>
         public static readonly DirectProperty<FormatEditor, bool> ShowsToolButtonsProperty =
@@ -144,6 +151,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ViewModel.ValidationMode = ValidationMode;
             _ConfigureTemplateEditor();
             _ApplyAcceptsReturnLayout(AcceptsReturn);
+            _ApplyReadOnly(IsReadOnly);
             _SyncTemplateFromTextProperty(Text ?? string.Empty);
             ViewModel.Validate(Text ?? string.Empty);
             _RefreshHighlight();
@@ -247,6 +255,15 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
+        /// Gets or sets whether the field is display-only (no typing, insert, or token-edit gestures).
+        /// </summary>
+        public bool IsReadOnly
+        {
+            get => GetValue(IsReadOnlyProperty);
+            set => SetValue(IsReadOnlyProperty, value);
+        }
+
+        /// <summary>
         /// Opens the token parameter editor for the caret span, or a warning when unavailable.
         /// </summary>
         public void EditUnderCaret()
@@ -269,6 +286,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
         public void InsertTextAtCaret(string insertText)
         {
             ArgumentNullException.ThrowIfNull(insertText);
+            if (IsReadOnly)
+            {
+                return;
+            }
 
             _InsertFlyoutHide();
             var current = TemplateBox.Text ?? string.Empty;
@@ -318,6 +339,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             ArgumentNullException.ThrowIfNull(span);
             ArgumentNullException.ThrowIfNull(newInsertText);
+            if (IsReadOnly)
+            {
+                return;
+            }
 
             var current = Text ?? string.Empty;
             var start = Math.Clamp(span.Start, 0, current.Length);
@@ -386,6 +411,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
             if (change.Property == AcceptsReturnProperty)
             {
                 _ApplyAcceptsReturnLayout(change.GetNewValue<bool>());
+                return;
+            }
+
+            if (change.Property == IsReadOnlyProperty)
+            {
+                _ApplyReadOnly(change.GetNewValue<bool>());
                 return;
             }
 
@@ -546,6 +577,14 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
+        /// Syncs AvaloniaEdit read-only state (typing blocked; copy still works).
+        /// </summary>
+        private void _ApplyReadOnly(bool isReadOnly)
+        {
+            TemplateBox.IsReadOnly = isReadOnly;
+        }
+
+        /// <summary>
         /// Grows the editor with wrapped content up to <see cref="MultilineMaxHeight"/> (Enter still
         /// follows <see cref="AcceptsReturn"/>).
         /// </summary>
@@ -698,7 +737,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         private void _OnTemplatePointerPressed(object? sender, PointerPressedEventArgs e)
         {
-            if (!e.GetCurrentPoint(TemplateBox).Properties.IsRightButtonPressed)
+            if (IsReadOnly || !e.GetCurrentPoint(TemplateBox).Properties.IsRightButtonPressed)
             {
                 return;
             }
@@ -716,6 +755,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         private void _OnTemplateContextRequested(object? sender, ContextRequestedEventArgs e)
         {
+            if (IsReadOnly)
+            {
+                return;
+            }
+
             FormatTokenSpan? span;
             if (e.TryGetPosition(TemplateBox, out var point))
             {
@@ -751,6 +795,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// </summary>
         private void _EditUnderCaret()
         {
+            if (IsReadOnly)
+            {
+                return;
+            }
+
             _ = _EditUnderCaretAsync();
         }
 

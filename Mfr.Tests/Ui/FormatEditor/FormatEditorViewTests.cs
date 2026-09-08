@@ -55,6 +55,39 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies read-only mode blocks insert and uses AvaloniaEdit IsReadOnly.
+        /// </summary>
+        [AvaloniaFact]
+        public void IsReadOnly_BlocksInsertAndMarksTemplateReadOnly()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor
+            {
+                Text = "<file-name>",
+                IsReadOnly = true,
+                ShowInsertButton = false,
+                ShowEditButton = false,
+            };
+            var window = new Window
+            {
+                Width = 480,
+                Height = 200,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            Assert.True(box.IsReadOnly);
+
+            editor.InsertTextAtCaret("<ext>");
+            Assert.Equal("<file-name>", editor.Text);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies a bad template shows an error and JumpToError selects the span.
         /// </summary>
         [AvaloniaFact]

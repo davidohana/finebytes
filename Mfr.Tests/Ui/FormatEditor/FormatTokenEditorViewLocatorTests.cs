@@ -126,7 +126,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies the resulting format string is read-only and uses grayed field chrome.
+        /// Verifies the resulting format string uses a read-only FormatEditor with highlight chrome.
         /// </summary>
         [AvaloniaFact]
         public void Dialog_ResultingFormatString_IsGrayedWhenReadOnly()
@@ -137,18 +137,31 @@ namespace Mfr.Tests.Ui.FormatEditor
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var box = dialog.FindControl<TextBox>("ResultingFormatStringBox");
-            Assert.NotNull(box);
-            Assert.True(box.IsReadOnly);
-            Assert.Equal(editor.ResultingFormatString, box.Text);
-            Assert.Same(AppChromeFonts.AppChromeFixedWidthFamily, box.FontFamily);
+            var preview = dialog.FindControl<App.Ui.Views.FormatEditor.FormatEditor>("ResultingFormatStringBox");
+            Assert.NotNull(preview);
+            Assert.True(preview.IsReadOnly);
+            Assert.False(preview.ShowsToolButtons);
+            Assert.False(preview.ShowRightClickHint);
+            Assert.False(preview.AcceptsReturn);
+            Assert.Equal(editor.ResultingFormatString, preview.Text);
+
+            var templateBox = preview.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(templateBox);
+            Assert.True(templateBox.IsReadOnly);
+            Assert.Same(AppChromeFonts.AppChromeFixedWidthFamily, templateBox.FontFamily);
 
             var app = Application.Current;
             Assert.NotNull(app);
             Assert.True(app.TryGetResource("AppChromeAltSurfaceBrush", app.ActualThemeVariant, out var altRow));
             var expected = Assert.IsAssignableFrom<ISolidColorBrush>(altRow);
-            var actual = Assert.IsAssignableFrom<ISolidColorBrush>(box.Background);
+            var actual = Assert.IsAssignableFrom<ISolidColorBrush>(templateBox.Background);
             Assert.Equal(expected.Color, actual.Color);
+
+            var colorizer = Assert.Single(
+                templateBox.TextArea.TextView.LineTransformers.OfType<FormatTokenColorizingTransformer>()
+            );
+            Assert.NotEmpty(colorizer.Tokens);
+            Assert.Equal("counter", colorizer.Tokens[0].CanonicalName);
 
             dialog.Close();
         }
@@ -160,7 +173,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         public void Dialog_LabeledFields_ShareColumnAlignment()
         {
             var editor = new NowFormatTokenEditorViewModel(null);
-            var dialog = new FormatTokenEditorDialog(editor) { Width = 480 };
+            var dialog = new FormatTokenEditorDialog(editor) { Width = 520 };
             dialog.Show();
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -169,7 +182,9 @@ namespace Mfr.Tests.Ui.FormatEditor
             var formatRow = Assert.Single(rows, row => row.Label == "Format:");
             var resultingRow = Assert.Single(rows, row => row.Label == "Resulting format string:");
             var formatCombo = Assert.Single(formatRow.GetVisualDescendants().OfType<ComboBox>());
-            var resultingBox = Assert.Single(resultingRow.GetVisualDescendants().OfType<TextBox>());
+            var resultingPreview = Assert.Single(
+                resultingRow.GetVisualDescendants().OfType<App.Ui.Views.FormatEditor.FormatEditor>()
+            );
 
             Assert.True(formatCombo.IsEditable);
             Assert.Same(DateFormatExamples.All, formatCombo.ItemsSource);
@@ -183,11 +198,11 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.Equal(DateFormatExamples.DocsUri, formatDocsHint.NavigateUri);
 
             var formatOrigin = formatCombo.TranslatePoint(default, dialog);
-            var resultingOrigin = resultingBox.TranslatePoint(default, dialog);
+            var resultingOrigin = resultingPreview.TranslatePoint(default, dialog);
             Assert.NotNull(formatOrigin);
             Assert.NotNull(resultingOrigin);
             Assert.Equal(formatOrigin.Value.X, resultingOrigin.Value.X, precision: 1);
-            Assert.Equal(formatCombo.Bounds.Width, resultingBox.Bounds.Width, precision: 1);
+            Assert.Equal(formatCombo.Bounds.Width, resultingPreview.Bounds.Width, precision: 1);
 
             dialog.Close();
         }

@@ -8,8 +8,8 @@
   x:DataType="vm:IFormatTokenEditorViewModel"
   Title="{Binding Title}"
   Icon="/Assets/mfr.ico"
-  Width="480"
-  MinWidth="400"
+  Width="520"
+  MinWidth="440"
   SizeToContent="Height"
   WindowStartupLocation="CenterOwner"
   CanResize="False"
@@ -56,10 +56,13 @@
         </ContentControl.ContentTemplate>
       </ContentControl>
       <controls:FilterEditorLabeledRow Label="Resulting format string:">
-        <TextBox
+        <local:FormatEditor
           x:Name="ResultingFormatStringBox"
-          Classes="filter-editor-field format-string-field"
+          AcceptsReturn="False"
           IsReadOnly="True"
+          ShowInsertButton="False"
+          ShowEditButton="False"
+          ShowRightClickHint="False"
           HorizontalAlignment="Stretch"
           Text="{Binding ResultingFormatString, Mode=OneWay}"
         />
