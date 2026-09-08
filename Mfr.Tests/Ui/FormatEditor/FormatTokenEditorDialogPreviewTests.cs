@@ -1,9 +1,9 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
-using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Tests.Models.Filters;
 
@@ -26,18 +26,21 @@ namespace Mfr.Tests.Ui.FormatEditor
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var previewRow = Assert.Single(
-                dialog.GetVisualDescendants().OfType<FilterEditorLabeledRow>(),
-                row => row.Label == "Preview:"
-            );
             Assert.NotNull(dialog.FindControl<TextBox>("PreviewSampleBox"));
             Assert.NotNull(dialog.FindControl<TextBox>("PreviewResultBox"));
             Assert.Equal("<Rename list is empty>", dialog.FindControl<TextBox>("PreviewSampleBox")!.Text);
             Assert.Equal("<Preview N/A>", dialog.FindControl<TextBox>("PreviewResultBox")!.Text);
             Assert.False(dialog.FindControl<Button>("PreviewPreviousButton")!.IsEnabled);
             Assert.False(dialog.FindControl<Button>("PreviewNextButton")!.IsEnabled);
-            Assert.Same(previewRow, dialog.FindControl<FilterEditorLabeledRow>("PreviewRow"));
+            Assert.NotNull(dialog.FindControl<Grid>("PreviewRow"));
             Assert.NotNull(dialog.FindControl<StackPanel>("PreviewPanel"));
+
+            // Sample and result share the content column so their left edges align.
+            var sample = dialog.FindControl<TextBox>("PreviewSampleBox")!;
+            var result = dialog.FindControl<TextBox>("PreviewResultBox")!;
+            var sampleLeft = sample.TranslatePoint(default, dialog)!.Value.X;
+            var resultLeft = result.TranslatePoint(default, dialog)!.Value.X;
+            Assert.Equal(sampleLeft, resultLeft, precision: 1);
 
             dialog.Close();
         }

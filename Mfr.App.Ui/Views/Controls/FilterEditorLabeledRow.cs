@@ -18,6 +18,10 @@ namespace Mfr.App.Ui.Views.Controls
             HorizontalContentAlignmentProperty.OverrideDefaultValue<FilterEditorLabeledRow>(
                 HorizontalAlignment.Stretch
             );
+            // Single-line option rows center the label; multi-line bodies (e.g. Preview) set Top.
+            VerticalContentAlignmentProperty.OverrideDefaultValue<FilterEditorLabeledRow>(
+                VerticalAlignment.Center
+            );
         }
 
         /// <summary>

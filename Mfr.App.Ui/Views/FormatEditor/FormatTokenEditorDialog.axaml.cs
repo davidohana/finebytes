@@ -49,7 +49,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             DataContext = editor;
 
             _preview = new FormatTokenPreviewViewModel(renameItems);
-            PreviewPanel.DataContext = _preview;
+            PreviewRow.DataContext = _preview;
             _preview.Refresh(editor.ResultingFormatString);
 
             if (editor is INotifyPropertyChanged notify)

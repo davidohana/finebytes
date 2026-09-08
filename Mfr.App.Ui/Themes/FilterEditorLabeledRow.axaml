@@ -16,12 +16,16 @@
             <ColumnDefinition Width="8" />
             <ColumnDefinition Width="*" />
           </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-editor-label" VerticalAlignment="Center" Text="{TemplateBinding Label}" />
+          <TextBlock
+            Classes="filter-editor-label"
+            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+            Text="{TemplateBinding Label}"
+          />
           <ContentPresenter
             Name="PART_ContentPresenter"
             Grid.Column="2"
             HorizontalAlignment="Stretch"
-            VerticalAlignment="Center"
+            VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
             Content="{TemplateBinding Content}"
             ContentTemplate="{TemplateBinding ContentTemplate}"
             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
