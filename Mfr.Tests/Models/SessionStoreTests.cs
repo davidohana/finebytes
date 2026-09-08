@@ -17,6 +17,7 @@ namespace Mfr.Tests.Models
             Assert.Null(session.MainWindow);
             Assert.Null(session.FileList);
             Assert.Null(session.RenameList);
+            Assert.Null(session.FilterEditor);
         }
 
         [Fact]
@@ -30,6 +31,7 @@ namespace Mfr.Tests.Models
                 Assert.Null(session.MainWindow);
                 Assert.Null(session.FileList);
                 Assert.Null(session.RenameList);
+                Assert.Null(session.FilterEditor);
             }
             finally
             {
@@ -95,6 +97,7 @@ namespace Mfr.Tests.Models
                             ),
                         ],
                     },
+                    FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
                 };
 
                 SessionStore.Save(original, path);
@@ -137,6 +140,8 @@ namespace Mfr.Tests.Models
                     loaded.RenameList.VisibleColumns[1].Key
                 );
                 Assert.Null(loaded.RenameList.VisibleColumns[1].Width);
+                Assert.NotNull(loaded.FilterEditor);
+                Assert.False(loaded.FilterEditor.FormatTokenPickerExpanded);
             }
             finally
             {

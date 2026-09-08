@@ -3,6 +3,7 @@ using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.FilterEditors;
+using Mfr.Models.Config;
 
 namespace Mfr.Tests.Ui.FilterEditors
 {
@@ -21,7 +22,23 @@ namespace Mfr.Tests.Ui.FilterEditors
             FilterEditorView EditorView
         ) ShowFilterEditorPanes()
         {
-            var mainViewModel = new MainWindowViewModel();
+            return ShowFilterEditorPanes(session: null);
+        }
+
+        /// <summary>
+        /// Shows Applied Filters above Filter Configuration with an optional session document.
+        /// </summary>
+        /// <param name="session">
+        /// Session restored onto the main view model, or <see langword="null"/> for first-launch defaults.
+        /// </param>
+        /// <returns>Host window, main view model, and filter editor view.</returns>
+        public static (
+            Window Window,
+            MainWindowViewModel MainViewModel,
+            FilterEditorView EditorView
+        ) ShowFilterEditorPanes(SessionState? session)
+        {
+            var mainViewModel = new MainWindowViewModel(session: session);
             var appliedView = new AppliedFiltersView
             {
                 DataContext = mainViewModel.AppliedFiltersViewModel,
@@ -37,6 +54,7 @@ namespace Mfr.Tests.Ui.FilterEditors
                 Width = 960,
                 Height = 480,
                 Content = grid,
+                DataContext = mainViewModel,
             };
             window.Show();
             window.UpdateLayout();

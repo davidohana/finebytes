@@ -4,7 +4,9 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FormatEditor;
+using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.Views.FormatEditor
 {
@@ -17,6 +19,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// <see cref="FormatEditor"/> controls register on attach; Insert/Edit target the last-focused
     /// editor (defaults to the first registered field). Per-field Insert/Edit chrome is hidden while
     /// hosted here.
+    /// </para>
+    /// <para>
+    /// Collapse state is shared via <see cref="SessionState.FilterEditor"/> when the host lives
+    /// under a <see cref="MainWindowViewModel"/> with a loaded session (written on toggle, flushed
+    /// with <c>session.json</c> on main-window close). Missing session section defaults to expanded.
     /// </para>
     /// </remarks>
     public sealed class FormatTokenToolsHost : ContentControl
@@ -80,6 +87,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         private readonly List<FormatEditor> _editors = [];
         private readonly FormatTokenPickerViewModel _pickerViewModel;
+        private bool _isApplyingSessionExpanded;
 
         private Button? _editButton;
         private Button? _collapseButton;
@@ -230,19 +238,72 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <inheritdoc />
+        protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+        {
+            base.OnAttachedToVisualTree(e);
+            _ApplyExpandedFromSession();
+        }
+
+        /// <inheritdoc />
         protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == IsExpandedProperty)
+            if (change.Property != IsExpandedProperty)
             {
-                _RefreshChrome();
+                return;
+            }
+
+            _RefreshChrome();
+            if (!_isApplyingSessionExpanded)
+            {
+                _PersistExpandedToSession();
             }
         }
 
         private void _OnCollapseClick(object? sender, RoutedEventArgs e)
         {
             IsExpanded = !IsExpanded;
+        }
+
+        private void _ApplyExpandedFromSession()
+        {
+            var session = _TryFindSession();
+            if (session?.FilterEditor is null)
+            {
+                return;
+            }
+
+            _isApplyingSessionExpanded = true;
+            try
+            {
+                IsExpanded = session.FilterEditor.FormatTokenPickerExpanded;
+            }
+            finally
+            {
+                _isApplyingSessionExpanded = false;
+            }
+        }
+
+        private void _PersistExpandedToSession()
+        {
+            var session = _TryFindSession();
+            if (session is null)
+            {
+                return;
+            }
+
+            session.EnsureFilterEditor().FormatTokenPickerExpanded = IsExpanded;
+        }
+
+        private SessionState? _TryFindSession()
+        {
+            if (VisualRoot is TopLevel { DataContext: MainWindowViewModel { Session: { } session } })
+            {
+                return session;
+            }
+
+            return null;
         }
 
         private void _OnEditClick(object? sender, RoutedEventArgs e)

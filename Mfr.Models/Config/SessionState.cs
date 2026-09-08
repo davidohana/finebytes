@@ -34,6 +34,12 @@ namespace Mfr.Models.Config
         public SessionStateRenameList? RenameList { get; set; }
 
         /// <summary>
+        /// Filter Configuration chrome (e.g. format-token tools collapse).
+        /// </summary>
+        [JsonPropertyName("filterEditor")]
+        public SessionStateFilterEditor? FilterEditor { get; set; }
+
+        /// <summary>
         /// Returns <see cref="MainWindow"/>, creating it when missing.
         /// </summary>
         /// <returns>The main-window session object.</returns>
@@ -59,6 +65,28 @@ namespace Mfr.Models.Config
         {
             return RenameList ??= new SessionStateRenameList();
         }
+
+        /// <summary>
+        /// Returns <see cref="FilterEditor"/>, creating it when missing.
+        /// </summary>
+        /// <returns>The Filter Configuration session object.</returns>
+        public SessionStateFilterEditor EnsureFilterEditor()
+        {
+            return FilterEditor ??= new SessionStateFilterEditor();
+        }
+    }
+
+    /// <summary>
+    /// Saved Filter Configuration chrome shared across filter option editors.
+    /// </summary>
+    public sealed class SessionStateFilterEditor
+    {
+        /// <summary>
+        /// When true, the format-token picker catalog is visible; when false, only the Edit/collapse rail.
+        /// <para>Missing session section defaults to expanded on first launch.</para>
+        /// </summary>
+        [JsonPropertyName("formatTokenPickerExpanded")]
+        public bool FormatTokenPickerExpanded { get; set; } = true;
     }
 
     /// <summary>

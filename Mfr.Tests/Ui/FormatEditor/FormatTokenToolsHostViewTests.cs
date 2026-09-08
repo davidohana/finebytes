@@ -4,8 +4,12 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using AvaloniaEdit;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Filters.Formatting.FormatString;
+using Mfr.Models.Config;
+using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterEditors;
 
 namespace Mfr.Tests.Ui.FormatEditor
 {
@@ -171,6 +175,80 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies collapse is restored from <c>session.json</c> when the host attaches under a session.
+        /// </summary>
+        [AvaloniaFact]
+        public void Collapse_RestoresFromSession_WhenExpandedFalse()
+        {
+            var session = new SessionState
+            {
+                FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
+            };
+            var (host, window) = _ShowHostWithSession(session);
+
+            Assert.False(host.IsExpanded);
+            Assert.Equal(26, host.ToolsPaneWidth);
+            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies toggling collapse writes the shared session preference for later hosts.
+        /// </summary>
+        [AvaloniaFact]
+        public void Collapse_PersistsToSession_AndAppliesToNextHost()
+        {
+            var session = new SessionState();
+            var (host, window) = _ShowHostWithSession(session);
+
+            Assert.True(host.IsExpanded);
+            Assert.Null(session.FilterEditor);
+
+            host.IsExpanded = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.NotNull(session.FilterEditor);
+            Assert.False(session.FilterEditor.FormatTokenPickerExpanded);
+
+            window.Close();
+
+            var (nextHost, nextWindow) = _ShowHostWithSession(session);
+            Assert.False(nextHost.IsExpanded);
+            Assert.False(_NamedDescendant<Border>(nextHost, "PART_ToolsPane").IsVisible);
+            nextWindow.Close();
+        }
+
+        /// <summary>
+        /// Verifies a format-capable filter editor restores collapsed tools from session.
+        /// </summary>
+        [AvaloniaFact]
+        public void FilterEditor_RestoresCollapsedTokenToolsFromSession()
+        {
+            var session = new SessionState
+            {
+                FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
+            };
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(session);
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var host = editorView.GetVisualDescendants().OfType<FormatTokenToolsHost>().Single();
+            Assert.False(host.IsExpanded);
+            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
+
+            host.IsExpanded = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(session.FilterEditor!.FormatTokenPickerExpanded);
+
+            window.Close();
+        }
+
         private static T _NamedDescendant<T>(Control root, string name)
             where T : Control
         {
@@ -183,6 +261,28 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(box);
             box.Focus();
             box.TextArea.Focus();
+        }
+
+        private static (FormatTokenToolsHost Host, Window Window) _ShowHostWithSession(SessionState session)
+        {
+            var left = new App.Ui.Views.FormatEditor.FormatEditor
+            {
+                Name = "LeftEditor",
+                AcceptsReturn = false,
+                ShowRightClickHint = false,
+            };
+            var host = new FormatTokenToolsHost { Content = left };
+            var window = new Window
+            {
+                Width = 720,
+                Height = 360,
+                Content = host,
+                DataContext = new MainWindowViewModel(session: session),
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            return (host, window);
         }
 
         private static (
