@@ -826,6 +826,141 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies Edit under caret falls back to the previous token when the caret is after its exclusive end.
+        /// </summary>
+        [AvaloniaFact]
+        public void EditUnderCaret_CaretAfterToken_EditsPreviousToken()
+        {
+            var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "counter");
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { Text = entry.InsertText + "_backup" };
+            var window = new Window
+            {
+                Width = 480,
+                Height = 200,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var counter = Assert.Single(editor.ViewModel.LastParseResult!.Tokens);
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            // Exclusive end (post-insert) and deeper into the literal both fall back left.
+            box.CaretOffset = counter.Start + counter.Length;
+            box.Select(box.CaretOffset, 0);
+            Assert.True(
+                editor.EditUnderCaretForTests(
+                    accept: true,
+                    mutate: vm =>
+                    {
+                        var counterVm =
+                            Assert.IsType<App.Ui.ViewModels.FormatEditor.TokenEditors.CounterFormatTokenEditorViewModel>(
+                                vm
+                            );
+                        counterVm.Initial = 8;
+                    }
+                )
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains("initial=8", editor.Text);
+            Assert.EndsWith("_backup", editor.Text);
+
+            box.CaretOffset = editor.Text.Length;
+            box.Select(box.CaretOffset, 0);
+            Assert.True(
+                editor.EditUnderCaretForTests(
+                    accept: true,
+                    mutate: vm =>
+                    {
+                        var counterVm =
+                            Assert.IsType<App.Ui.ViewModels.FormatEditor.TokenEditors.CounterFormatTokenEditorViewModel>(
+                                vm
+                            );
+                        counterVm.Initial = 9;
+                    }
+                )
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains("initial=9", editor.Text);
+            Assert.EndsWith("_backup", editor.Text);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Edit under caret between two tokens prefers the left token, not the right.
+        /// </summary>
+        [AvaloniaFact]
+        public void EditUnderCaret_CaretBetweenTokens_EditsLeftToken()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor
+            {
+                Text = "<counter:initial=1,step=1>mid<counter:initial=2,step=1>",
+            };
+            var window = new Window
+            {
+                Width = 480,
+                Height = 200,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var tokens = editor.ViewModel.LastParseResult?.Tokens;
+            Assert.NotNull(tokens);
+            Assert.Equal(2, tokens.Count);
+            var left = tokens[0];
+            var right = tokens[1];
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            box.CaretOffset = left.Start + left.Length + 1;
+            box.Select(box.CaretOffset, 0);
+            Assert.True(box.CaretOffset < right.Start);
+
+            Assert.True(
+                editor.EditUnderCaretForTests(
+                    accept: true,
+                    mutate: vm =>
+                    {
+                        var counterVm =
+                            Assert.IsType<App.Ui.ViewModels.FormatEditor.TokenEditors.CounterFormatTokenEditorViewModel>(
+                                vm
+                            );
+                        counterVm.Initial = 6;
+                    }
+                )
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains("initial=6", editor.Text);
+            Assert.Contains("initial=2", editor.Text);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Edit under caret still warns when no token exists to the left of the caret.
+        /// </summary>
+        [AvaloniaFact]
+        public void EditUnderCaret_CaretBeforeFirstToken_ReturnsFalse()
+        {
+            var (editor, box, window, _, _) = _ShowTwoTokenEditor();
+            box.CaretOffset = 0;
+            box.Select(0, 0);
+
+            Assert.False(editor.EditUnderCaretForTests(accept: false));
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies right-click on adjacent tokens selects the glyph under the pointer (MFR7 exclusive end).
         /// </summary>
         [AvaloniaFact]

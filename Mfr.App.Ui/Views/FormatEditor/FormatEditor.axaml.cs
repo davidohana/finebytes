@@ -334,10 +334,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// </summary>
         /// <param name="accept">When <see langword="true"/>, replaces the span with the editor result.</param>
         /// <param name="mutate">Optional mutation applied to the editor before building the result.</param>
-        /// <returns><see langword="true"/> when a registered editor was created for the caret token.</returns>
+        /// <returns><see langword="true"/> when a registered editor was created for the caret token
+        /// (or the previous token to the left when the caret is not on a span).</returns>
         public bool EditUnderCaretForTests(bool accept, Action<IFormatTokenEditorViewModel>? mutate = null)
         {
-            return EditTokenAtIndexForTests(TemplateBox.CaretOffset, accept, mutate);
+            return _EditSpanForTests(_FindSpanAtOrLeftOfIndex(TemplateBox.CaretOffset), accept, mutate);
         }
 
         /// <summary>
@@ -350,7 +351,18 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <paramref name="index"/>.</returns>
         public bool EditTokenAtIndexForTests(int index, bool accept, Action<IFormatTokenEditorViewModel>? mutate = null)
         {
-            var span = _FindSpanAtIndex(index);
+            return _EditSpanForTests(_FindSpanAtIndex(index), accept, mutate);
+        }
+
+        /// <summary>
+        /// Shared test path for selecting a span and optionally applying an editor mutation.
+        /// </summary>
+        private bool _EditSpanForTests(
+            FormatTokenSpan? span,
+            bool accept,
+            Action<IFormatTokenEditorViewModel>? mutate
+        )
+        {
             if (
                 span is null
                 || !FormatTokenEditorRegistry.TryCreate(span.CanonicalName, span.Args, out var editor)
@@ -721,7 +733,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         private async Task _EditUnderCaretAsync()
         {
-            var span = _FindSpanAtIndex(TemplateBox.CaretOffset);
+            var span = _FindSpanAtOrLeftOfIndex(TemplateBox.CaretOffset);
             if (span is null)
             {
                 await _ShowMessageAsync(
@@ -848,6 +860,31 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             return tokens.FirstOrDefault(t => index >= t.Start && index < t.Start + t.Length);
+        }
+
+        /// <summary>
+        /// Resolves the token under <paramref name="index"/>, or the rightmost token that ends at or
+        /// before that index when the caret sits in literal text after a parameter.
+        /// </summary>
+        /// <remarks>
+        /// Used only for Edit under caret. Pointer hit-testing stays exact via
+        /// <see cref="_FindSpanAtIndex"/>.
+        /// </remarks>
+        private FormatTokenSpan? _FindSpanAtOrLeftOfIndex(int index)
+        {
+            var at = _FindSpanAtIndex(index);
+            if (at is not null)
+            {
+                return at;
+            }
+
+            var tokens = _TryGetParsedTokens();
+            if (tokens is null || tokens.Count == 0)
+            {
+                return null;
+            }
+
+            return tokens.Where(t => t.Start + t.Length <= index).OrderByDescending(t => t.Start).FirstOrDefault();
         }
 
         /// <summary>

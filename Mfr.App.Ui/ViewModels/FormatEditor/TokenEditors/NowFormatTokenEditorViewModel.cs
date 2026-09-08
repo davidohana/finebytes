@@ -18,7 +18,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
         }
 
         /// <summary>
-        /// Gets or sets the optional .NET format string (empty → ISO-8601 default).
+        /// Gets or sets the optional .NET format string (empty → <c>yyyy-MM-dd_HH-mm-ss</c>).
         /// </summary>
         [ObservableProperty]
         private string _format = string.Empty;

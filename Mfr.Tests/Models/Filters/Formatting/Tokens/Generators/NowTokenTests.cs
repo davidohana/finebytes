@@ -9,25 +9,28 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Generators
     public sealed class NowTokenTests
     {
         /// <summary>
-        /// Verifies the no-arg form returns a round-trip ISO 8601 UTC string.
+        /// Verifies the no-arg form uses <c>yyyy-MM-dd_HH-mm-ss</c>.
         /// </summary>
         [Fact]
-        public void Resolve_NoArg_ProducesParseableUtcString()
+        public void Resolve_NoArg_UsesDefaultFormat()
         {
             var token = new NowToken();
             var item = FilterTestHelpers.CreateRenameItem();
+            var before = DateTimeOffset.UtcNow;
 
             var result = token.Compile(tokenArgs: "")(item);
 
             Assert.True(
-                DateTimeOffset.TryParse(
+                DateTimeOffset.TryParseExact(
                     result,
+                    "yyyy-MM-dd_HH-mm-ss",
                     CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind,
+                    DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
                     out var parsed
                 )
             );
-            Assert.Equal(DateTimeKind.Utc, parsed.UtcDateTime.Kind);
+            var after = DateTimeOffset.UtcNow;
+            Assert.InRange(parsed, before.AddSeconds(-1), after.AddSeconds(1));
         }
 
         /// <summary>
