@@ -883,7 +883,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies pale token chip + name accent brushes resolve.
+        /// Verifies soft zebra token chip + name accent brushes resolve.
         /// </summary>
         [AvaloniaFact]
         public void Theme_ResolvesTokenBackgroundBrushes()
@@ -891,9 +891,11 @@ namespace Mfr.Tests.Ui.FormatEditor
             var app = Application.Current;
             Assert.NotNull(app);
             Assert.True(app.TryGetResource("FormatTokenBackgroundBrush", app.ActualThemeVariant, out var tokenBg));
+            Assert.True(app.TryGetResource("FormatTokenAltBackgroundBrush", app.ActualThemeVariant, out var tokenAltBg));
             Assert.True(app.TryGetResource("FormatTokenNameForegroundBrush", app.ActualThemeVariant, out var nameFg));
             Assert.True(app.TryGetResource("FormatTokenErrorBackgroundBrush", app.ActualThemeVariant, out var errorBg));
             Assert.IsAssignableFrom<ISolidColorBrush>(tokenBg);
+            Assert.IsAssignableFrom<ISolidColorBrush>(tokenAltBg);
             Assert.IsAssignableFrom<ISolidColorBrush>(nameFg);
             Assert.IsAssignableFrom<ISolidColorBrush>(errorBg);
             Assert.False(app.TryGetResource("FormatTokenDelimiterForegroundBrush", app.ActualThemeVariant, out _));

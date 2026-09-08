@@ -9,11 +9,12 @@ using Mfr.Filters.Formatting.FormatString;
 namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
-    /// Draws soft token and error washes under AvaloniaEdit selection (so mouse selection stays visible).
+    /// Draws soft alternating token and error washes under AvaloniaEdit selection (so mouse selection stays visible).
     /// </summary>
     /// <remarks>
     /// Uses <see cref="KnownLayer.Background"/> and skips ranges covered by the current selection so the
-    /// selection layer is not fighting a same-luminance yellow chip.
+    /// selection layer is not fighting a same-luminance chip. Even-index tokens use
+    /// <see cref="TokenBackground"/>; odd-index tokens use <see cref="TokenAltBackground"/>.
     /// </remarks>
     internal sealed class FormatTokenBackgroundRenderer : IBackgroundRenderer
     {
@@ -33,9 +34,14 @@ namespace Mfr.App.Ui.Views.FormatEditor
         public int ErrorLength { get; set; }
 
         /// <summary>
-        /// Gets or sets the soft background wash for valid tokens.
+        /// Gets or sets the soft background wash for even-index valid tokens.
         /// </summary>
         public IBrush? TokenBackground { get; set; }
+
+        /// <summary>
+        /// Gets or sets the soft background wash for odd-index valid tokens.
+        /// </summary>
+        public IBrush? TokenAltBackground { get; set; }
 
         /// <summary>
         /// Gets or sets the soft background wash for the error span.
@@ -52,24 +58,28 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ArgumentNullException.ThrowIfNull(drawingContext);
 
             var selection = _TryGetTextArea(textView)?.Selection;
-            if (TokenBackground is not null)
+            for (var i = 0; i < Tokens.Count; i++)
             {
-                foreach (var token in Tokens)
+                var token = Tokens[i];
+                if (token.Length < 2)
                 {
-                    if (token.Length < 2)
-                    {
-                        continue;
-                    }
-
-                    _DrawSegmentMinusSelection(
-                        textView,
-                        drawingContext,
-                        token.Start,
-                        token.Length,
-                        TokenBackground,
-                        selection
-                    );
+                    continue;
                 }
+
+                var brush = i % 2 == 0 ? TokenBackground : TokenAltBackground ?? TokenBackground;
+                if (brush is null)
+                {
+                    continue;
+                }
+
+                _DrawSegmentMinusSelection(
+                    textView,
+                    drawingContext,
+                    token.Start,
+                    token.Length,
+                    brush,
+                    selection
+                );
             }
 
             if (ErrorBackground is null || ErrorPosition < 0 || ErrorLength <= 0)

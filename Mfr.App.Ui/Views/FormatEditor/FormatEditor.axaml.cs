@@ -886,6 +886,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             _backgroundRenderer.TokenBackground = _ResolveBrush("FormatTokenBackgroundBrush");
+            _backgroundRenderer.TokenAltBackground = _ResolveBrush("FormatTokenAltBackgroundBrush");
             _colorizer.TokenNameForeground = _ResolveBrush("FormatTokenNameForegroundBrush");
             _backgroundRenderer.ErrorBackground = _ResolveBrush("FormatTokenErrorBackgroundBrush");
             TemplateBox.TextArea.TextView.Redraw();
