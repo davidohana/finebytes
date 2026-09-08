@@ -2,7 +2,6 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.App.Ui.Views;
 
 namespace Mfr.App.Ui.Views.RenameList
 {

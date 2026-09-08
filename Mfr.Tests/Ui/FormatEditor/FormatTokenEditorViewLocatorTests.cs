@@ -308,6 +308,56 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies height relocks when the nested source FormatEditor auto-grows (wrap), so the
+        /// footer is not clipped under a stale MaxHeight lock.
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_RelocksHeight_WhenSourceFormatEditorGrows()
+        {
+            Assert.True(FormatTokenEditorRegistry.TryCreate("substr", string.Empty, out var editor));
+            Assert.NotNull(editor);
+            var dialog = new FormatTokenEditorDialog(editor) { Width = 440 };
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var initialHeight = dialog.Bounds.Height;
+            Assert.True(initialHeight > 0);
+
+            var sourceEditor = Assert.Single(
+                dialog.GetVisualDescendants().OfType<App.Ui.Views.FormatEditor.FormatEditor>(),
+                fe => fe.Name == "SourceEditor"
+            );
+            sourceEditor.Text = string.Concat(Enumerable.Repeat("<file-name>", 24));
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            sourceEditor.UpdateAutoGrowHeightForTests();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(dialog.MinHeight, dialog.MaxHeight);
+            Assert.True(
+                dialog.Bounds.Height > initialHeight,
+                $"Expected grown height {dialog.Bounds.Height} > initial {initialHeight}."
+            );
+
+            var ok = dialog.FindControl<Button>("OkButton");
+            Assert.NotNull(ok);
+            var topLeft = ok.TranslatePoint(default, dialog);
+            Assert.NotNull(topLeft);
+            Assert.True(
+                topLeft.Value.Y + ok.Bounds.Height <= dialog.Bounds.Height + 0.5,
+                "OK button should stay fully visible after source grow."
+            );
+
+            dialog.Close();
+        }
+
+        /// <summary>
         /// Verifies Build fails loudly when the view-model is outside the TokenEditors namespace.
         /// </summary>
         [Fact]

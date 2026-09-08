@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.App.Ui.Views;
 
 namespace Mfr.App.Ui.Views.RenameList
 {

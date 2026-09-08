@@ -14,9 +14,6 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
     /// <see cref="FormatTokenPickerViewModel"/>.
     /// </para>
     /// </remarks>
-    /// <remarks>
-    /// Initializes error and Edit state for a FormatEditor instance.
-    /// </remarks>
     /// <param name="jumpToError">Selects the last validation error span.</param>
     /// <param name="editUnderCaret">Opens the token editor (or warning) for the caret token.</param>
     public sealed partial class FormatEditorViewModel(Action jumpToError, Action editUnderCaret) : ViewModelBase

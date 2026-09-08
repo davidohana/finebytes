@@ -396,7 +396,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private bool _EditSpanForTests(FormatTokenSpan? span, bool accept, Action<IFormatTokenEditorViewModel>? mutate)
         {
             if (
-                span is null
+                IsReadOnly
+                || span is null
                 || !FormatTokenEditorRegistry.TryCreate(span.CanonicalName, span.Args, out var editor)
                 || editor is null
             )
@@ -629,8 +630,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 contentHeight = Math.Max(textView.DefaultLineHeight, 1);
             }
 
-            var border =
-                TemplateBox.BorderThickness.Top + TemplateBox.BorderThickness.Bottom;
+            var border = TemplateBox.BorderThickness.Top + TemplateBox.BorderThickness.Bottom;
             var minHeight = AcceptsReturn ? MultilineMinHeight : SingleLineMinHeight;
             double height;
             if (AcceptsReturn)
@@ -641,8 +641,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             else
             {
                 // Height ignores vertical padding so we can distribute spare space equally (center text).
-                var natural =
-                    contentHeight + border + (TemplateMinVerticalPadding * 2);
+                var natural = contentHeight + border + (TemplateMinVerticalPadding * 2);
                 height = Math.Clamp(Math.Max(natural, minHeight), minHeight, MultilineMaxHeight);
                 var contentArea = Math.Max(0, height - border);
                 var spare = Math.Max(0, contentArea - contentHeight);
@@ -1105,17 +1104,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 _backgroundRenderer.ErrorLength = 0;
             }
 
-            _backgroundRenderer.TokenBackground = IsReadOnly
-                ? null
-                : _ResolveBrush("FormatTokenBackgroundBrush");
-            _backgroundRenderer.TokenAltBackground = IsReadOnly
-                ? null
-                : _ResolveBrush("FormatTokenAltBackgroundBrush");
+            _backgroundRenderer.TokenBackground = IsReadOnly ? null : _ResolveBrush("FormatTokenBackgroundBrush");
+            _backgroundRenderer.TokenAltBackground = IsReadOnly ? null : _ResolveBrush("FormatTokenAltBackgroundBrush");
             _colorizer.TokenNameForeground = _ResolveBrush("FormatTokenNameForegroundBrush");
             _colorizer.TokenNumberForeground = _ResolveBrush("FormatTokenNumberForegroundBrush");
-            _backgroundRenderer.ErrorBackground = IsReadOnly
-                ? null
-                : _ResolveBrush("FormatTokenErrorBackgroundBrush");
+            _backgroundRenderer.ErrorBackground = IsReadOnly ? null : _ResolveBrush("FormatTokenErrorBackgroundBrush");
             TemplateBox.TextArea.TextView.Redraw();
         }
 

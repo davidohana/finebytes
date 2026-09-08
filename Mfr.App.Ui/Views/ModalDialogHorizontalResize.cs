@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
@@ -9,6 +10,8 @@ namespace Mfr.App.Ui.Views
     /// </summary>
     internal static class ModalDialogHorizontalResize
     {
+        private static readonly ConditionalWeakTable<Window, object> s_attached = [];
+
         /// <summary>
         /// Attaches a one-shot open handler that measures content and locks height.
         /// </summary>
@@ -16,6 +19,12 @@ namespace Mfr.App.Ui.Views
         public static void Attach(Window window)
         {
             ArgumentNullException.ThrowIfNull(window);
+            if (s_attached.TryGetValue(window, out _))
+            {
+                return;
+            }
+
+            s_attached.Add(window, string.Empty);
 
             window.Opened += _OnOpened;
 
@@ -27,10 +36,7 @@ namespace Mfr.App.Ui.Views
                     () =>
                     {
                         window.UpdateLayout();
-                        Dispatcher.UIThread.Post(
-                            () => LockHeightToContent(window),
-                            DispatcherPriority.Render
-                        );
+                        Dispatcher.UIThread.Post(() => LockHeightToContent(window), DispatcherPriority.Render);
                     },
                     DispatcherPriority.Loaded
                 );
@@ -71,6 +77,15 @@ namespace Mfr.App.Ui.Views
 
             var frameChrome = Math.Max(0, window.Bounds.Height - window.ClientSize.Height);
             var height = contentHeight + frameChrome;
+            if (
+                Math.Abs(window.Height - height) < 0.5
+                && Math.Abs(window.MinHeight - height) < 0.5
+                && Math.Abs(window.MaxHeight - height) < 0.5
+                && window.SizeToContent == SizeToContent.Manual
+            )
+            {
+                return;
+            }
 
             window.SizeToContent = SizeToContent.Manual;
             window.Height = height;

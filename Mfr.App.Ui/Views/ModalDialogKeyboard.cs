@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Avalonia.Controls;
 
 namespace Mfr.App.Ui.Views
@@ -12,6 +13,8 @@ namespace Mfr.App.Ui.Views
     /// </remarks>
     internal static class ModalDialogKeyboard
     {
+        private static readonly ConditionalWeakTable<Window, object> s_attached = [];
+
         /// <summary>
         /// Makes <paramref name="window"/> focusable and focuses it when opened.
         /// </summary>
@@ -19,7 +22,12 @@ namespace Mfr.App.Ui.Views
         public static void Attach(Window window)
         {
             ArgumentNullException.ThrowIfNull(window);
+            if (s_attached.TryGetValue(window, out _))
+            {
+                return;
+            }
 
+            s_attached.Add(window, string.Empty);
             window.Focusable = true;
             window.Opened += (_, _) =>
             {
