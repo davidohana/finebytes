@@ -134,6 +134,23 @@
     <Setter Property="CornerRadius" Value="3" />
     <Setter Property="Padding" Value="6" />
   </Style>
+  <!-- Pane-edge grip: taller than tool buttons so it reads as collapse, not a header peer of Edit. -->
+  <Style Selector="Button.format-token-collapse-grip">
+    <Setter Property="Width" Value="18" />
+    <Setter Property="MinWidth" Value="18" />
+    <Setter Property="Height" Value="44" />
+    <Setter Property="MinHeight" Value="44" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+  </Style>
   <Style Selector="TextBox.filter-editor-field">
     <Setter Property="VerticalContentAlignment" Value="Center" />
   </Style>

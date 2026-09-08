@@ -11,58 +11,57 @@
   x:Name="Root"
 >
   <DockPanel LastChildFill="True">
-    <Border
-      x:Name="ToolsPane"
-      Classes="format-token-tools-pane"
+    <!-- Collapse grip sits left of the Tokens card, vertically centered on the list. -->
+    <DockPanel
       DockPanel.Dock="Right"
       Margin="8,0,0,0"
       Width="{Binding ToolsPaneWidth, ElementName=Root}"
       VerticalAlignment="Top"
+      MinHeight="{Binding ToolsPaneMinHeight, ElementName=Root}"
     >
-      <DockPanel LastChildFill="True">
-        <DockPanel
-          DockPanel.Dock="Top"
-          Margin="{Binding HeaderMargin, ElementName=Root}"
-          LastChildFill="True"
-        >
-          <Button
-            x:Name="CollapseButton"
-            Classes="filter-editor-button format-editor-tool"
-            DockPanel.Dock="Left"
-            ToolTip.Tip="{Binding CollapseToolTip, ElementName=Root}"
-            Click="_OnCollapseClick"
-          >
-            <PathIcon Width="12" Height="12" Data="{Binding CollapseIcon, ElementName=Root}" />
-          </Button>
-          <Button
-            x:Name="EditButton"
-            Classes="filter-editor-button format-editor-tool"
-            DockPanel.Dock="Right"
-            Margin="4,0,0,0"
-            ToolTip.Tip="Edit formatting parameter under caret in the active format field"
-            IsEnabled="{Binding HasActiveEditor, ElementName=Root}"
-            Click="_OnEditClick"
-          >
-            <PathIcon Width="12" Height="12" Data="{StaticResource FormatEditorEditGeometry}" />
-          </Button>
-          <TextBlock
-            Classes="filter-editor-label"
-            VerticalAlignment="Center"
-            Margin="6,0,0,0"
-            Text="Tokens"
-            IsVisible="{Binding IsExpanded, ElementName=Root}"
-            TextTrimming="CharacterEllipsis"
+      <Button
+        x:Name="CollapseButton"
+        Classes="format-token-collapse-grip"
+        DockPanel.Dock="Left"
+        VerticalAlignment="Center"
+        Margin="0,0,4,0"
+        ToolTip.Tip="{Binding CollapseToolTip, ElementName=Root}"
+        Click="_OnCollapseClick"
+      >
+        <PathIcon Width="10" Height="10" Data="{Binding CollapseIcon, ElementName=Root}" />
+      </Button>
+
+      <Border x:Name="ToolsPane" Classes="format-token-tools-pane" VerticalAlignment="Stretch">
+        <DockPanel LastChildFill="True">
+          <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4" LastChildFill="True">
+            <Button
+              x:Name="EditButton"
+              Classes="filter-editor-button format-editor-tool"
+              DockPanel.Dock="Right"
+              ToolTip.Tip="Edit formatting parameter under caret in the active format field"
+              IsEnabled="{Binding HasActiveEditor, ElementName=Root}"
+              Click="_OnEditClick"
+            >
+              <PathIcon Width="12" Height="12" Data="{StaticResource FormatEditorEditGeometry}" />
+            </Button>
+            <TextBlock
+              Classes="filter-editor-label"
+              VerticalAlignment="Center"
+              Text="Tokens"
+              IsVisible="{Binding IsExpanded, ElementName=Root}"
+              TextTrimming="CharacterEllipsis"
+            />
+          </DockPanel>
+
+          <fe:FormatTokenInsertPicker
+            x:Name="InsertPicker"
+            MinHeight="160"
+            MaxHeight="320"
+            IsVisible="{Binding ShowsInsertPicker, ElementName=Root}"
           />
         </DockPanel>
-
-        <fe:FormatTokenInsertPicker
-          x:Name="InsertPicker"
-          MinHeight="160"
-          MaxHeight="320"
-          IsVisible="{Binding ShowsInsertPicker, ElementName=Root}"
-        />
-      </DockPanel>
-    </Border>
+      </Border>
+    </DockPanel>
 
     <ContentControl
       x:Name="BodyHost"

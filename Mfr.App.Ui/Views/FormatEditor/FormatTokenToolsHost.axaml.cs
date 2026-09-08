@@ -18,12 +18,17 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// </remarks>
     public partial class FormatTokenToolsHost : UserControl
     {
-        private const double ExpandedPaneWidth = 280;
+        private const double ExpandedPaneWidth = 296;
 
         /// <summary>
-        /// Collapsed rail: border padding (6×2) + two 22px tool buttons + 4px gap.
+        /// Collapsed: grip (18) + gap (4) + border padding (12) + Edit (22).
         /// </summary>
-        private const double CollapsedPaneWidth = 64;
+        private const double CollapsedPaneWidth = 56;
+
+        /// <summary>
+        /// Tall enough when collapsed so the grip reads as mid-rail, not a header twin of Edit.
+        /// </summary>
+        private const double CollapsedPaneMinHeight = 88;
 
         /// <summary>
         /// Defines the <see cref="Body"/> property.
@@ -69,12 +74,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
             );
 
         /// <summary>
-        /// Defines the <see cref="HeaderMargin"/> property.
+        /// Defines the <see cref="ToolsPaneMinHeight"/> property.
         /// </summary>
-        public static readonly DirectProperty<FormatTokenToolsHost, Thickness> HeaderMarginProperty =
-            AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, Thickness>(
-                nameof(HeaderMargin),
-                o => o.HeaderMargin
+        public static readonly DirectProperty<FormatTokenToolsHost, double> ToolsPaneMinHeightProperty =
+            AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, double>(
+                nameof(ToolsPaneMinHeight),
+                o => o.ToolsPaneMinHeight
             );
 
         /// <summary>
@@ -102,7 +107,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             CollapseToolTip = "Collapse token tools";
             ToolsPaneWidth = ExpandedPaneWidth;
-            HeaderMargin = new Thickness(0, 0, 0, 4);
+            ToolsPaneMinHeight = 0;
             _pickerViewModel = new FormatEditorViewModel(
                 insertText: _InsertIntoActive,
                 jumpToError: static () => { },
@@ -159,12 +164,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets the header row margin (extra gap under the header only when expanded).
+        /// Gets the minimum height of the tools column (taller when collapsed so the grip can center).
         /// </summary>
-        public Thickness HeaderMargin
+        public double ToolsPaneMinHeight
         {
             get;
-            private set => SetAndRaise(HeaderMarginProperty, ref field, value);
+            private set => SetAndRaise(ToolsPaneMinHeightProperty, ref field, value);
         }
 
         /// <summary>
@@ -304,7 +309,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             HasActiveEditor = ActiveEditor is not null;
             ShowsInsertPicker = IsExpanded;
             ToolsPaneWidth = IsExpanded ? ExpandedPaneWidth : CollapsedPaneWidth;
-            HeaderMargin = IsExpanded ? new Thickness(0, 0, 0, 4) : default;
+            ToolsPaneMinHeight = IsExpanded ? 0 : CollapsedPaneMinHeight;
             CollapseToolTip = IsExpanded ? "Collapse token tools" : "Expand token tools";
             CollapseIcon = _ResolveGeometry(
                 IsExpanded ? "FormatTokenToolsCollapseGeometry" : "FormatTokenToolsExpandGeometry"
