@@ -184,6 +184,47 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
+        /// Restores selected steps to catalog defaults without removing them from the list.
+        /// <para>
+        /// Replaces each step's filter via <see cref="FilterCatalog.CreateDefault"/> (options, Apply To,
+        /// and scope). Keeps <see cref="AppliedFilterStepViewModel.DisplayName"/> and
+        /// <see cref="AppliedFilterStepViewModel.Enabled"/>.
+        /// </para>
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_HasSelection))]
+        public void ResetSelectedToDefaults()
+        {
+            if (_selectedSteps.Count == 0)
+            {
+                return;
+            }
+
+            var anyChanged = false;
+            _WithSingleChainChanged(() =>
+            {
+                foreach (var step in _selectedSteps)
+                {
+                    var entry = FilterCatalog.Entries.Single(catalogEntry =>
+                        catalogEntry.FilterType == step.Filter.GetType()
+                    );
+                    var defaults = FilterCatalog.CreateDefault(entry);
+                    if (Equals(step.Filter, defaults))
+                    {
+                        continue;
+                    }
+
+                    step.SetFilter(defaults);
+                    anyChanged = true;
+                }
+            });
+
+            if (anyChanged)
+            {
+                FilterOptionsApplied?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
         /// Builds a <see cref="FilterChain"/> matching the current stack.
         /// </summary>
         /// <returns>Enabled flags and filters in list order.</returns>
@@ -469,6 +510,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             RemoveStepsAtIndicesCommand.NotifyCanExecuteChanged();
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
+            ResetSelectedToDefaultsCommand.NotifyCanExecuteChanged();
             OnPropertyChanged(nameof(CanShowFilterOptions));
         }
     }

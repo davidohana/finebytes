@@ -5,10 +5,12 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:editorVm="using:Mfr.App.Ui.ViewModels.FilterEditors"
   xmlns:local="using:Mfr.App.Ui.Views.FilterEditors"
+  xmlns:resources="using:Mfr.App.Ui.Resources"
   mc:Ignorable="d"
   d:DesignWidth="480"
   d:DesignHeight="280"
   x:Class="Mfr.App.Ui.Views.FilterEditors.FilterEditorView"
+  x:Name="FilterEditorRoot"
   x:DataType="editorVm:FilterEditorViewModel"
   FontFamily="{StaticResource AppChromeFont}"
   FontSize="{StaticResource AppChromeFontSize}"
@@ -17,7 +19,18 @@
   <Border Classes="pane">
     <DockPanel>
       <Border DockPanel.Dock="Top" Classes="filter-editor-title-bar">
-        <TextBlock x:Name="AppliedFilterTitle" Classes="filter-editor-title-bar" Text="{Binding TitleText}" />
+        <DockPanel>
+          <Button
+            x:Name="ResetFilterDefaultsButton"
+            DockPanel.Dock="Right"
+            Classes="filter-editor-title-bar-button"
+            Content="↺"
+            ToolTip.Tip="{x:Static resources:AppTips.ResetFilterDefaults}"
+            IsVisible="{Binding HasSelectedStep}"
+            Command="{Binding ResetSelectedToDefaultsCommand, ElementName=FilterEditorRoot}"
+          />
+          <TextBlock x:Name="AppliedFilterTitle" Classes="filter-editor-title-bar" Text="{Binding TitleText}" />
+        </DockPanel>
       </Border>
       <ScrollViewer>
         <StackPanel Margin="8,6,8,8" IsVisible="{Binding HasSelectedStep}" Spacing="8">

@@ -4,11 +4,14 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors;
+using Mfr.App.Ui.Views.FilterEditors.Case;
 using Mfr.App.Ui.Views.FilterEditors.Space;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
+using Mfr.Filters.Case;
 using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.FilterEditors
@@ -92,6 +95,48 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             Assert.Null(mainViewModel.FilterEditorViewModel.OptionsEditor);
             Assert.Null(_OptionsEditorSlot(editorView).Content);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the title-bar reset button restores catalog defaults and refreshes the options editor.
+        /// </summary>
+        [AvaloniaFact]
+        public void Reset_button_restores_defaults_and_refreshes_editor()
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            var applied = mainViewModel.AppliedFiltersViewModel;
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            var step = applied.Steps[0];
+            step.SetDisplayName("Custom Letters");
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<LettersCaseFilterEditorView>().Single();
+            var upperCaseRadio = editor.FindControl<RadioButton>("UpperCaseRadio");
+            Assert.NotNull(upperCaseRadio);
+            upperCaseRadio.IsChecked = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(LettersCaseMode.UpperCase, ((LettersCaseFilter)step.Filter).Options.Mode);
+
+            var resetButton = editorView.FindControl<Button>("ResetFilterDefaultsButton");
+            Assert.NotNull(resetButton);
+            Assert.True(resetButton.IsVisible);
+            Assert.True(resetButton.Command!.CanExecute(null));
+            resetButton.Command.Execute(null);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("Custom Letters", step.DisplayName);
+            Assert.Equal(new LettersCaseFilter(), step.Filter);
+            Assert.Equal("Applied Filter: Custom Letters", mainViewModel.FilterEditorViewModel.TitleText);
+            var refreshed = Assert.IsType<LettersCaseFilterEditorViewModel>(
+                mainViewModel.FilterEditorViewModel.OptionsEditor
+            );
+            Assert.Equal(LettersCaseMode.Capitalize, refreshed.Mode);
 
             window.Close();
         }

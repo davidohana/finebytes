@@ -1,6 +1,7 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
+using Mfr.Models.Filters;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -197,6 +198,56 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal(["Shrink Spaces", "Letters Case"], viewModel.Steps.Select(step => step.DisplayName));
             Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
+        }
+
+        /// <summary>
+        /// Verifies reset restores catalog defaults while keeping display name, enabled, and list membership.
+        /// </summary>
+        [Fact]
+        public void ResetSelectedToDefaults_restores_options_keeps_name_and_enabled()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            var step = viewModel.Steps[0];
+            step.SetDisplayName("My Letters");
+            step.Enabled = false;
+            step.SetFilter(
+                new LettersCaseFilter(
+                    new FileExtensionTarget(),
+                    new LettersCaseOptions(LettersCaseMode.UpperCase, [])
+                )
+            );
+
+            var optionsApplied = 0;
+            viewModel.FilterOptionsApplied += (_, _) => optionsApplied++;
+            var chainChanged = _CountChainChanged(viewModel, () => viewModel.ResetSelectedToDefaultsCommand.Execute(null));
+
+            Assert.Same(step, viewModel.Steps[0]);
+            Assert.Equal("My Letters", step.DisplayName);
+            Assert.False(step.Enabled);
+            Assert.Equal(new LettersCaseFilter(), step.Filter);
+            Assert.Equal("File Prefix", step.ApplyToLabel);
+            Assert.Equal(1, chainChanged);
+            Assert.Equal(1, optionsApplied);
+        }
+
+        /// <summary>
+        /// Verifies reset is a no-op when the selected step is already at catalog defaults.
+        /// </summary>
+        [Fact]
+        public void ResetSelectedToDefaults_noop_when_already_default()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            var filterBefore = viewModel.Steps[0].Filter;
+
+            var optionsApplied = 0;
+            viewModel.FilterOptionsApplied += (_, _) => optionsApplied++;
+            var chainChanged = _CountChainChanged(viewModel, () => viewModel.ResetSelectedToDefaultsCommand.Execute(null));
+
+            Assert.Same(filterBefore, viewModel.Steps[0].Filter);
+            Assert.Equal(0, chainChanged);
+            Assert.Equal(0, optionsApplied);
         }
 
         /// <summary>

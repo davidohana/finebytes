@@ -92,5 +92,8 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Applied Filters Filter Options toolbar tip.</summary>
         public const string FilterOptions = "Edit filter name and Apply To options";
+
+        /// <summary>Filter Configuration title-bar reset tip (MFR7 Reset settings for this filter).</summary>
+        public const string ResetFilterDefaults = "Reset settings for this filter";
     }
 }

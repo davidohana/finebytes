@@ -477,7 +477,11 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
           />
-          <filtereditorsviews:FilterEditorView Grid.Row="2" DataContext="{Binding FilterEditorViewModel}" />
+          <filtereditorsviews:FilterEditorView
+            Grid.Row="2"
+            DataContext="{Binding FilterEditorViewModel}"
+            ResetSelectedToDefaultsCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel.ResetSelectedToDefaultsCommand}"
+          />
         </Grid>
       </Grid>
       <controls:PaneSplitter

@@ -113,7 +113,7 @@ Rename List / other session fields already persist; Applied Filters chain does n
 MFR7 Applied / Filter Configuration chrome still missing:
 
 1. **Instance heart / favorite** — mark an applied-step instance name (or options snapshot) as favorite; clarify product meaning vs presets before coding (MFR7 heart vs preset overlap).
-1. **Reset to defaults** — restore selected step options (+ maybe name) from `FilterCatalog.CreateDefault` / parameterless ctor without removing the step from the list.
+1. **Reset to defaults** — **done** (options / Apply To / scope via `FilterCatalog.CreateDefault`; keeps display name + enabled; title-bar `↺`).
 1. **Help `?`** — open per-filter help (ported help pages or MFR7 `Help/*.html` mapping). Wire from Filter Configuration title bar and/or Filter Options.
 
 ### F10 — Filter Options dialog polish

@@ -30,7 +30,13 @@ namespace Mfr.Tests.Ui.FilterEditors
                 DataContext = mainViewModel.AppliedFiltersViewModel,
                 AddFromPaletteCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
             };
-            var editorView = new FilterEditorView { DataContext = mainViewModel.FilterEditorViewModel };
+            var editorView = new FilterEditorView
+            {
+                DataContext = mainViewModel.FilterEditorViewModel,
+                ResetSelectedToDefaultsCommand = mainViewModel
+                    .AppliedFiltersViewModel
+                    .ResetSelectedToDefaultsCommand,
+            };
 
             var grid = new Grid { RowDefinitions = new RowDefinitions("*,*"), Children = { appliedView, editorView } };
             Grid.SetRow(editorView, 1);
