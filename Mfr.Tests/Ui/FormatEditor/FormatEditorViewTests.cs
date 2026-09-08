@@ -812,19 +812,20 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies multi-color token brushes resolve under AppChrome themes (no leftover single accent key).
+        /// Verifies pale token chip + name accent brushes resolve.
         /// </summary>
         [AvaloniaFact]
-        public void Theme_ResolvesDelimiterAndNameTokenBrushes()
+        public void Theme_ResolvesTokenBackgroundBrushes()
         {
             var app = Application.Current;
             Assert.NotNull(app);
-            Assert.True(
-                app.TryGetResource("FormatTokenDelimiterForegroundBrush", app.ActualThemeVariant, out var delim)
-            );
-            Assert.True(app.TryGetResource("FormatTokenNameForegroundBrush", app.ActualThemeVariant, out var name));
-            Assert.IsAssignableFrom<ISolidColorBrush>(delim);
-            Assert.IsAssignableFrom<ISolidColorBrush>(name);
+            Assert.True(app.TryGetResource("FormatTokenBackgroundBrush", app.ActualThemeVariant, out var tokenBg));
+            Assert.True(app.TryGetResource("FormatTokenNameForegroundBrush", app.ActualThemeVariant, out var nameFg));
+            Assert.True(app.TryGetResource("FormatTokenErrorBackgroundBrush", app.ActualThemeVariant, out var errorBg));
+            Assert.IsAssignableFrom<ISolidColorBrush>(tokenBg);
+            Assert.IsAssignableFrom<ISolidColorBrush>(nameFg);
+            Assert.IsAssignableFrom<ISolidColorBrush>(errorBg);
+            Assert.False(app.TryGetResource("FormatTokenDelimiterForegroundBrush", app.ActualThemeVariant, out _));
             Assert.False(app.TryGetResource("FormatTokenForegroundBrush", app.ActualThemeVariant, out _));
         }
 
