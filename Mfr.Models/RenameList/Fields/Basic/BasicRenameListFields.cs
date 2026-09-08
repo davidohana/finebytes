@@ -106,13 +106,13 @@ namespace Mfr.Models.RenameList.Fields.Basic
     {
         public override string Resolve(FileMeta meta)
         {
-            return meta.Prefix + meta.Extension;
+            return meta.FullFileName;
         }
 
         /// <inheritdoc />
         public override int CompareForSort(FileMeta left, FileMeta right)
         {
-            return RenameListFieldSortCompare.Path(left.Prefix + left.Extension, right.Prefix + right.Extension);
+            return RenameListFieldSortCompare.Path(left.FullFileName, right.FullFileName);
         }
     }
 
@@ -180,7 +180,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     {
         public override string Resolve(FileMeta meta)
         {
-            return _FirstDigitRun(meta.Prefix + meta.Extension);
+            return _FirstDigitRun(meta.FullFileName);
         }
 
         /// <inheritdoc />
@@ -217,16 +217,13 @@ namespace Mfr.Models.RenameList.Fields.Basic
     {
         public override string Resolve(FileMeta meta)
         {
-            return (meta.Prefix + meta.Extension).Length.ToString();
+            return meta.FullFileName.Length.ToString();
         }
 
         /// <inheritdoc />
         public override int CompareForSort(FileMeta left, FileMeta right)
         {
-            return RenameListFieldSortCompare.Int32(
-                (left.Prefix + left.Extension).Length,
-                (right.Prefix + right.Extension).Length
-            );
+            return RenameListFieldSortCompare.Int32(left.FullFileName.Length, right.FullFileName.Length);
         }
     }
 

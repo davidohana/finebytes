@@ -1,7 +1,7 @@
 namespace Mfr.Filters.Formatting.Tokens.FileName
 {
     /// <summary>
-    /// Resolves the <c>&lt;full-name&gt;</c> token to the preview file name including extension.
+    /// Resolves the <c>&lt;full-name&gt;</c> token to the preview <see cref="Mfr.Models.Rename.FileMeta.FullFileName"/>.
     /// </summary>
     [FormatTokenInfo("Full Name", "File Name", "Use full filename name including extension", "full-name")]
     internal sealed class FullNameToken : IFormatToken
@@ -14,7 +14,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         public Formatter Compile(string tokenArgs)
         {
             FormatOptionsParsing.RequireNoArgument(tokenArgs, FormatOptionsParsing.TokenDisplayName(this));
-            return item => item.Preview.Prefix + item.Preview.Extension;
+            return item => item.Preview.FullFileName;
         }
     }
 }

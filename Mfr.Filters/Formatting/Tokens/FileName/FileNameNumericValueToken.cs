@@ -5,8 +5,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Full name is preview prefix plus extension. Leading zeros are stripped. When the full name has no
-    /// digits, the token expands to <c>0</c>.
+    /// Full name is <see cref="Mfr.Models.Rename.FileMeta.FullFileName"/> on the preview snapshot.
+    /// Leading zeros are stripped. When the full name has no digits, the token expands to <c>0</c>.
     /// </para>
     /// </remarks>
     [FormatTokenInfo(
@@ -28,7 +28,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
             return item =>
             {
                 var preview = item.Preview;
-                return _ExtractNumericValue(preview.Prefix + preview.Extension);
+                return _ExtractNumericValue(preview.FullFileName);
             };
         }
 

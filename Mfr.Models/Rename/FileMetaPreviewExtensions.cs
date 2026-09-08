@@ -29,7 +29,7 @@ namespace Mfr.Models.Rename
             {
                 FilePrefixTarget => meta.Prefix,
                 FileExtensionTarget => meta.Extension,
-                FileFullNameTarget => meta.Prefix + meta.Extension,
+                FileFullNameTarget => meta.FullFileName,
                 FullPathTarget => meta.FullPath,
                 ParentDirectoryTarget => meta.DirectoryPath,
                 AncestorFolderTarget ancestorFolderTarget => meta.GetAncestorFolderSegmentName(

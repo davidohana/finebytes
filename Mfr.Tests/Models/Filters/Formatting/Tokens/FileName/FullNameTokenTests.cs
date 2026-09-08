@@ -43,7 +43,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
             item.Preview.Extension = ".flac";
 
             Assert.Equal("renamed.flac", token.Compile(tokenArgs: "")(item));
-            Assert.Equal("track01.mp3", item.Original.Prefix + item.Original.Extension);
+            Assert.Equal("track01.mp3", item.Original.FullFileName);
         }
     }
 }

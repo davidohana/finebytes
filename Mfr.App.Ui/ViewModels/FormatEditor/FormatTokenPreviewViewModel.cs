@@ -111,7 +111,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
             }
 
             var item = _renameItems[_itemIndex];
-            SampleText = item.Original.Prefix + item.Original.Extension;
+            SampleText = item.Original.FullFileName;
             ItemIndexLabel = (_itemIndex + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
             _UpdatePreviewResult();
             _NotifyNavigationChanged();

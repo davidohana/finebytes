@@ -46,7 +46,12 @@ namespace Mfr.Models.Rename
         /// <summary>
         /// Gets the absolute file path.
         /// </summary>
-        public string FullPath => Path.Combine(DirectoryPath, Prefix + Extension);
+        public string FullPath => Path.Combine(DirectoryPath, FullFileName);
+
+        /// <summary>
+        /// Gets the file name including extension (<see cref="Prefix"/> + <see cref="Extension"/>).
+        /// </summary>
+        public string FullFileName => Prefix + Extension;
 
         /// <summary>
         /// Gets or sets the absolute parent directory path.
