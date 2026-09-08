@@ -3,25 +3,25 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:fe="clr-namespace:Mfr.App.Ui.Views.FormatEditor"
 >
-  <ControlTheme x:Key="{x:Type fe:FormatTokenToolsHost}" TargetType="fe:FormatTokenToolsHost">
+  <ControlTheme x:Key="{x:Type fe:FormatTokenPickerPane}" TargetType="fe:FormatTokenPickerPane">
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="VerticalContentAlignment" Value="Stretch" />
     <Setter Property="Template">
-      <ControlTemplate TargetType="fe:FormatTokenToolsHost">
+      <ControlTemplate TargetType="fe:FormatTokenPickerPane">
         <DockPanel LastChildFill="True">
           <DockPanel
             DockPanel.Dock="Right"
             Margin="8,0,0,0"
-            Width="{TemplateBinding ToolsPaneWidth}"
+            Width="{TemplateBinding PaneWidth}"
             VerticalAlignment="Top"
-            MinHeight="{x:Static fe:FormatTokenToolsHost.ToolsPaneMinHeight}"
+            MinHeight="{x:Static fe:FormatTokenPickerPane.PaneMinHeight}"
           >
             <!-- Fixed-height rail: Edit on top, collapse grip centered — does not grow with the token list. -->
             <DockPanel
               Name="PART_GripRail"
               DockPanel.Dock="Left"
               Width="22"
-              Height="{x:Static fe:FormatTokenToolsHost.ToolsPaneMinHeight}"
+              Height="{x:Static fe:FormatTokenPickerPane.PaneMinHeight}"
               Margin="0,0,4,0"
               VerticalAlignment="Top"
             >
@@ -47,10 +47,10 @@
             </DockPanel>
 
             <Border
-              Name="PART_ToolsPane"
-              Classes="format-token-tools-pane"
+              Name="PART_PickerBody"
+              Classes="format-token-picker-pane"
               VerticalAlignment="Top"
-              MinHeight="{x:Static fe:FormatTokenToolsHost.ToolsPaneMinHeight}"
+              MinHeight="{x:Static fe:FormatTokenPickerPane.PaneMinHeight}"
               IsVisible="{TemplateBinding IsExpanded}"
             >
               <DockPanel LastChildFill="True">

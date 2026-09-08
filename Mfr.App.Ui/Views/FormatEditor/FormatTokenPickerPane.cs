@@ -11,7 +11,7 @@ using Mfr.Models.Config;
 namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
-    /// Wraps filter-option content with a collapsible format-token tools pane (Insert catalog + Edit).
+    /// Wraps filter-option content with a collapsible format-token picker pane (Insert catalog + Edit).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -22,20 +22,20 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// </para>
     /// <para>
     /// Collapse state is shared via <see cref="SessionStateFilterEditor.FormatTokenPickerExpanded"/>
-    /// when the host lives under a <see cref="MainWindowViewModel"/> with a loaded session (written
+    /// when the pane lives under a <see cref="MainWindowViewModel"/> with a loaded session (written
     /// when <see cref="IsExpanded"/> changes, flushed with <c>session.json</c> on main-window close).
     /// Missing session section defaults to expanded.
     /// </para>
     /// </remarks>
-    public sealed class FormatTokenToolsHost : ContentControl
+    public sealed class FormatTokenPickerPane : ContentControl
     {
         /// <summary>
-        /// Expanded tools column: grip rail (22) + gap (4) + catalog card (~280).
+        /// Expanded picker column: grip rail (22) + gap (4) + catalog card (~280).
         /// </summary>
         private const double ExpandedPaneWidth = 306;
 
         /// <summary>
-        /// Collapsed tools column: grip rail (22) + trailing gap (4).
+        /// Collapsed picker column: grip rail (22) + trailing gap (4).
         /// </summary>
         private const double CollapsedPaneWidth = 26;
 
@@ -43,39 +43,39 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// Stable height for the grip rail (Edit on top, collapse centered). Token list may grow
         /// taller; the rail does not, so the expand button does not jump.
         /// </summary>
-        public const double ToolsPaneMinHeight = 200;
+        public const double PaneMinHeight = 200;
 
         /// <summary>
         /// Defines the <see cref="IsExpanded"/> property.
         /// </summary>
         public static readonly StyledProperty<bool> IsExpandedProperty = AvaloniaProperty.Register<
-            FormatTokenToolsHost,
+            FormatTokenPickerPane,
             bool
         >(nameof(IsExpanded), defaultValue: true);
 
         /// <summary>
         /// Defines the <see cref="HasActiveEditor"/> property.
         /// </summary>
-        public static readonly DirectProperty<FormatTokenToolsHost, bool> HasActiveEditorProperty =
-            AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, bool>(
+        public static readonly DirectProperty<FormatTokenPickerPane, bool> HasActiveEditorProperty =
+            AvaloniaProperty.RegisterDirect<FormatTokenPickerPane, bool>(
                 nameof(HasActiveEditor),
                 o => o.HasActiveEditor
             );
 
         /// <summary>
-        /// Defines the <see cref="ToolsPaneWidth"/> property.
+        /// Defines the <see cref="PaneWidth"/> property.
         /// </summary>
-        public static readonly DirectProperty<FormatTokenToolsHost, double> ToolsPaneWidthProperty =
-            AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, double>(
-                nameof(ToolsPaneWidth),
-                o => o.ToolsPaneWidth
+        public static readonly DirectProperty<FormatTokenPickerPane, double> PaneWidthProperty =
+            AvaloniaProperty.RegisterDirect<FormatTokenPickerPane, double>(
+                nameof(PaneWidth),
+                o => o.PaneWidth
             );
 
         /// <summary>
         /// Defines the <see cref="CollapseToolTip"/> property.
         /// </summary>
-        public static readonly DirectProperty<FormatTokenToolsHost, string> CollapseToolTipProperty =
-            AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, string>(
+        public static readonly DirectProperty<FormatTokenPickerPane, string> CollapseToolTipProperty =
+            AvaloniaProperty.RegisterDirect<FormatTokenPickerPane, string>(
                 nameof(CollapseToolTip),
                 o => o.CollapseToolTip
             );
@@ -83,8 +83,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <summary>
         /// Defines the <see cref="CollapseIcon"/> property.
         /// </summary>
-        public static readonly DirectProperty<FormatTokenToolsHost, Geometry?> CollapseIconProperty =
-            AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, Geometry?>(nameof(CollapseIcon), o => o.CollapseIcon);
+        public static readonly DirectProperty<FormatTokenPickerPane, Geometry?> CollapseIconProperty =
+            AvaloniaProperty.RegisterDirect<FormatTokenPickerPane, Geometry?>(nameof(CollapseIcon), o => o.CollapseIcon);
 
         private readonly List<FormatEditor> _editors = [];
         private readonly FormatTokenPickerViewModel _pickerViewModel;
@@ -93,25 +93,25 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private Button? _editButton;
         private Button? _collapseButton;
 
-        static FormatTokenToolsHost()
+        static FormatTokenPickerPane()
         {
-            HorizontalContentAlignmentProperty.OverrideDefaultValue<FormatTokenToolsHost>(HorizontalAlignment.Stretch);
-            VerticalContentAlignmentProperty.OverrideDefaultValue<FormatTokenToolsHost>(VerticalAlignment.Stretch);
+            HorizontalContentAlignmentProperty.OverrideDefaultValue<FormatTokenPickerPane>(HorizontalAlignment.Stretch);
+            VerticalContentAlignmentProperty.OverrideDefaultValue<FormatTokenPickerPane>(VerticalAlignment.Stretch);
         }
 
         /// <summary>
-        /// Initializes the tools host and shared insert-picker view-model.
+        /// Initializes the picker pane and shared insert-picker view-model.
         /// </summary>
-        public FormatTokenToolsHost()
+        public FormatTokenPickerPane()
         {
-            CollapseToolTip = "Collapse token tools";
-            ToolsPaneWidth = ExpandedPaneWidth;
+            CollapseToolTip = "Collapse token picker";
+            PaneWidth = ExpandedPaneWidth;
             _pickerViewModel = new FormatTokenPickerViewModel(_InsertIntoActive);
             _RefreshChrome();
         }
 
         /// <inheritdoc />
-        protected override Type StyleKeyOverride => typeof(FormatTokenToolsHost);
+        protected override Type StyleKeyOverride => typeof(FormatTokenPickerPane);
 
         /// <summary>
         /// Gets or sets whether the Insert catalog body is visible (default open).
@@ -132,12 +132,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets the tools pane width for expanded vs collapsed chrome.
+        /// Gets the picker pane width for expanded vs collapsed chrome.
         /// </summary>
-        public double ToolsPaneWidth
+        public double PaneWidth
         {
             get;
-            private set => SetAndRaise(ToolsPaneWidthProperty, ref field, value);
+            private set => SetAndRaise(PaneWidthProperty, ref field, value);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <summary>
         /// Registers a descendant format field and hides its local Insert/Edit chrome.
         /// </summary>
-        /// <param name="editor">Format editor under this host.</param>
+        /// <param name="editor">Format editor under this pane.</param>
         public void RegisterEditor(FormatEditor editor)
         {
             ArgumentNullException.ThrowIfNull(editor);
@@ -206,7 +206,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// <summary>
         /// Marks <paramref name="editor"/> as the Insert/Edit target and updates the active-field cue.
         /// </summary>
-        /// <param name="editor">Focused format editor under this host.</param>
+        /// <param name="editor">Focused format editor under this pane.</param>
         public void SetActiveEditor(FormatEditor editor)
         {
             ArgumentNullException.ThrowIfNull(editor);
@@ -291,7 +291,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Writes <see cref="IsExpanded"/> into <see cref="SessionState.FilterEditor"/> for later hosts.
+        /// Writes <see cref="IsExpanded"/> into <see cref="SessionState.FilterEditor"/> for later panes.
         /// <para>Flush to disk still happens on main-window close via <c>session.json</c>.</para>
         /// </summary>
         private void _PersistExpandedToSession()
@@ -306,7 +306,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Finds the live main-window <see cref="SessionState"/> when this host is under a session-backed shell.
+        /// Finds the live main-window <see cref="SessionState"/> when this pane is under a session-backed shell.
         /// </summary>
         /// <returns>The session document, or <see langword="null"/> when absent.</returns>
         private SessionState? _TryFindSession()
@@ -359,10 +359,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private void _RefreshChrome()
         {
             HasActiveEditor = ActiveEditor is not null;
-            ToolsPaneWidth = IsExpanded ? ExpandedPaneWidth : CollapsedPaneWidth;
-            CollapseToolTip = IsExpanded ? "Collapse token tools" : "Expand token tools";
+            PaneWidth = IsExpanded ? ExpandedPaneWidth : CollapsedPaneWidth;
+            CollapseToolTip = IsExpanded ? "Collapse token picker" : "Expand token picker";
             CollapseIcon = _ResolveGeometry(
-                IsExpanded ? "FormatTokenToolsCollapseGeometry" : "FormatTokenToolsExpandGeometry"
+                IsExpanded ? "FormatTokenPickerCollapseGeometry" : "FormatTokenPickerExpandGeometry"
             );
         }
 

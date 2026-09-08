@@ -127,7 +127,7 @@
   <Style Selector="Border.format-editor-field-frame.format-editor-active-target">
     <Setter Property="BorderBrush" Value="{DynamicResource FilterEditorTitleBarBrush}" />
   </Style>
-  <Style Selector="Border.format-token-tools-pane">
+  <Style Selector="Border.format-token-picker-pane">
     <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     <Setter Property="BorderThickness" Value="1" />

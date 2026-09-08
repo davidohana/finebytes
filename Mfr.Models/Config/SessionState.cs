@@ -34,7 +34,7 @@ namespace Mfr.Models.Config
         public SessionStateRenameList? RenameList { get; set; }
 
         /// <summary>
-        /// Filter Configuration chrome (e.g. format-token tools collapse).
+        /// Filter Configuration chrome (e.g. format-token picker collapse).
         /// </summary>
         [JsonPropertyName("filterEditor")]
         public SessionStateFilterEditor? FilterEditor { get; set; }

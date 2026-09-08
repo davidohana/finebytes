@@ -11,7 +11,7 @@
         <ResourceInclude Source="/Themes/FieldsetGroup.axaml" />
         <ResourceInclude Source="/Themes/FilterEditorLabeledRow.axaml" />
         <ResourceInclude Source="/Themes/FilterEditorHint.axaml" />
-        <ResourceInclude Source="/Themes/FormatTokenToolsHost.axaml" />
+        <ResourceInclude Source="/Themes/FormatTokenPickerPane.axaml" />
         <ResourceInclude Source="/Assets/Icons.axaml" />
       </ResourceDictionary.MergedDictionaries>
       <ResourceDictionary.ThemeDictionaries>

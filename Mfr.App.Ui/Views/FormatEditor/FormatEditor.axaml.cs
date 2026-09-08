@@ -14,8 +14,8 @@ namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
     /// Shared format-string editor: AvaloniaEdit field with token highlight, optional Insert/Edit chrome,
-    /// capped wrap auto-grow, and inline parse errors. Under <see cref="FormatTokenToolsHost"/>, Insert/Edit
-    /// move to the tools pane.
+    /// capped wrap auto-grow, and inline parse errors. Under <see cref="FormatTokenPickerPane"/>, Insert/Edit
+    /// move to the picker pane.
     /// </summary>
     public partial class FormatEditor : UserControl
     {
@@ -119,7 +119,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         private bool _suppressTextSync;
         private bool _templateHooksAttached;
-        private FormatTokenToolsHost? _toolsHost;
+        private FormatTokenPickerPane? _pickerPane;
 
         /// <summary>
         /// Gets the control view-model (validation / Edit chrome).
@@ -202,7 +202,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets or sets whether the per-field Insert button is shown (hidden under a tools host).
+        /// Gets or sets whether the per-field Insert button is shown (hidden under a picker pane).
         /// </summary>
         public bool ShowInsertButton
         {
@@ -211,7 +211,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets or sets whether the per-field Edit button is shown (hidden under a tools host).
+        /// Gets or sets whether the per-field Edit button is shown (hidden under a picker pane).
         /// </summary>
         public bool ShowEditButton
         {
@@ -220,7 +220,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets or sets whether this field is the Insert/Edit target of a hosting tools pane.
+        /// Gets or sets whether this field is the Insert/Edit target of a hosting picker pane.
         /// </summary>
         public bool IsActiveTarget
         {
@@ -479,15 +479,15 @@ namespace Mfr.App.Ui.Views.FormatEditor
             // Ctor may run before app theme resources resolve; never leave SelectionBrush null
             // (that clears AvaloniaEdit's themed TextAreaSelectionBrush and hides selection).
             _ApplySelectionChrome();
-            _toolsHost = this.FindAncestorOfType<FormatTokenToolsHost>();
-            _toolsHost?.RegisterEditor(this);
+            _pickerPane = this.FindAncestorOfType<FormatTokenPickerPane>();
+            _pickerPane?.RegisterEditor(this);
         }
 
         /// <inheritdoc />
         protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
         {
-            _toolsHost?.UnregisterEditor(this);
-            _toolsHost = null;
+            _pickerPane?.UnregisterEditor(this);
+            _pickerPane = null;
             base.OnDetachedFromVisualTree(e);
         }
 
@@ -921,7 +921,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
-            _toolsHost?.SetActiveEditor(this);
+            _pickerPane?.SetActiveEditor(this);
         }
 
         /// <summary>

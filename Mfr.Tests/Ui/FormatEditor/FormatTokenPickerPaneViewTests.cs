@@ -13,40 +13,40 @@ using Mfr.Tests.Ui.FilterEditors;
 namespace Mfr.Tests.Ui.FormatEditor
 {
     /// <summary>
-    /// Headless tests for <see cref="FormatTokenToolsHost"/> last-focus Insert/Edit and collapse.
+    /// Headless tests for <see cref="FormatTokenPickerPane"/> last-focus Insert/Edit and collapse.
     /// </summary>
-    public sealed class FormatTokenToolsHostViewTests
+    public sealed class FormatTokenPickerPaneViewTests
     {
         /// <summary>
-        /// Verifies hosted format fields hide local Insert/Edit and expose the tools pane Edit.
+        /// Verifies hosted format fields hide local Insert/Edit and expose the pane Edit.
         /// </summary>
         [AvaloniaFact]
-        public void Host_HidesPerFieldChrome_AndKeepsPaneEditWhenCollapsed()
+        public void Pane_HidesPerFieldChrome_AndKeepsEditWhenCollapsed()
         {
-            var (host, left, _, window) = _ShowHostWithTwoEditors();
+            var (pane, left, _, window) = _ShowPaneWithTwoEditors();
 
             Assert.False(left.ShowInsertButton);
             Assert.False(left.ShowEditButton);
             Assert.False(left.ShowsToolButtons);
-            Assert.True(host.IsExpanded);
-            Assert.True(_NamedDescendant<Button>(host, "PART_EditButton").IsVisible);
-            Assert.Same(left, host.ActiveEditor);
+            Assert.True(pane.IsExpanded);
+            Assert.True(_NamedDescendant<Button>(pane, "PART_EditButton").IsVisible);
+            Assert.Same(left, pane.ActiveEditor);
             Assert.True(left.IsActiveTarget);
 
-            var collapse = _NamedDescendant<Button>(host, "PART_CollapseButton");
+            var collapse = _NamedDescendant<Button>(pane, "PART_CollapseButton");
             collapse.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.False(host.IsExpanded);
-            Assert.Equal(26, host.ToolsPaneWidth);
+            Assert.False(pane.IsExpanded);
+            Assert.Equal(26, pane.PaneWidth);
             Assert.Equal(
-                FormatTokenToolsHost.ToolsPaneMinHeight,
-                _NamedDescendant<DockPanel>(host, "PART_GripRail").Height
+                FormatTokenPickerPane.PaneMinHeight,
+                _NamedDescendant<DockPanel>(pane, "PART_GripRail").Height
             );
-            Assert.True(_NamedDescendant<Button>(host, "PART_EditButton").IsVisible);
+            Assert.True(_NamedDescendant<Button>(pane, "PART_EditButton").IsVisible);
             Assert.True(collapse.IsVisible);
-            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
+            Assert.False(_NamedDescendant<Border>(pane, "PART_PickerBody").IsVisible);
 
             window.Close();
         }
@@ -57,19 +57,19 @@ namespace Mfr.Tests.Ui.FormatEditor
         [AvaloniaFact]
         public void Insert_TargetsLastFocusedEditor()
         {
-            var (host, left, right, window) = _ShowHostWithTwoEditors();
+            var (pane, left, right, window) = _ShowPaneWithTwoEditors();
 
             left.Text = "L";
             right.Text = "R";
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.True(host.HasActiveEditor);
-            Assert.Same(left, host.ActiveEditor);
-            Assert.True(host.IsExpanded);
+            Assert.True(pane.HasActiveEditor);
+            Assert.Same(left, pane.ActiveEditor);
+            Assert.True(pane.IsExpanded);
 
             left.FindControl<TextEditor>("TemplateBox")!.CaretOffset = 1;
-            host.ActiveEditor!.InsertTextAtCaret("<file-name>");
+            pane.ActiveEditor!.InsertTextAtCaret("<file-name>");
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -80,13 +80,13 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Same(right, host.ActiveEditor);
+            Assert.Same(right, pane.ActiveEditor);
             Assert.True(right.IsActiveTarget);
             Assert.False(left.IsActiveTarget);
 
             right.FindControl<TextEditor>("TemplateBox")!.CaretOffset = 1;
             var entry = FormatTokenCatalog.Entries.First(e => e.CanonicalName == "file-name");
-            var picker = _NamedDescendant<FormatTokenPicker>(host, "PART_TokenPicker");
+            var picker = _NamedDescendant<FormatTokenPicker>(pane, "PART_TokenPicker");
             Assert.IsType<App.Ui.ViewModels.FormatEditor.FormatTokenPickerViewModel>(picker.DataContext);
             ((App.Ui.ViewModels.FormatEditor.FormatTokenPickerViewModel)picker.DataContext).InsertEntryCommand.Execute(
                 entry
@@ -101,24 +101,24 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies Edit on the tools pane uses the active editor caret token.
+        /// Verifies Edit on the picker pane uses the active editor caret token.
         /// </summary>
         [AvaloniaFact]
         public void PaneEdit_UsesActiveEditorToken()
         {
-            var (host, left, right, window) = _ShowHostWithTwoEditors();
+            var (pane, left, right, window) = _ShowPaneWithTwoEditors();
             left.Text = "<counter:initial=1>";
             right.Text = "plain";
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Same(left, host.ActiveEditor);
+            Assert.Same(left, pane.ActiveEditor);
 
             var box = left.FindControl<TextEditor>("TemplateBox");
             Assert.NotNull(box);
             box.CaretOffset = 2;
 
-            var edit = _NamedDescendant<Button>(host, "PART_EditButton");
+            var edit = _NamedDescendant<Button>(pane, "PART_EditButton");
             Assert.True(edit.IsEnabled);
 
             Assert.True(
@@ -136,13 +136,13 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.Contains("initial=9", left.Text, StringComparison.Ordinal);
             Assert.Equal("plain", right.Text);
-            Assert.Same(left, host.ActiveEditor);
+            Assert.Same(left, pane.ActiveEditor);
 
             _FocusEditor(right);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Same(right, host.ActiveEditor);
+            Assert.Same(right, pane.ActiveEditor);
             Assert.True(edit.IsEnabled);
 
             window.Close();
@@ -175,10 +175,10 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies a format-capable filter editor restores collapsed tools from session via the pane VM.
+        /// Verifies a format-capable filter editor restores collapsed picker from session via the pane VM.
         /// </summary>
         [AvaloniaFact]
-        public void FilterEditor_RestoresCollapsedTokenToolsFromSession()
+        public void FilterEditor_RestoresCollapsedTokenPickerFromSession()
         {
             var session = new SessionState
             {
@@ -192,11 +192,11 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var host = editorView.GetVisualDescendants().OfType<FormatTokenToolsHost>().Single();
-            Assert.False(host.IsExpanded);
-            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
+            var pane = editorView.GetVisualDescendants().OfType<FormatTokenPickerPane>().Single();
+            Assert.False(pane.IsExpanded);
+            Assert.False(_NamedDescendant<Border>(pane, "PART_PickerBody").IsVisible);
 
-            host.IsExpanded = true;
+            pane.IsExpanded = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -220,10 +220,10 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var host = editorView.GetVisualDescendants().OfType<FormatTokenToolsHost>().Single();
-            Assert.True(host.IsExpanded);
+            var pane = editorView.GetVisualDescendants().OfType<FormatTokenPickerPane>().Single();
+            Assert.True(pane.IsExpanded);
 
-            host.IsExpanded = false;
+            pane.IsExpanded = false;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -234,9 +234,9 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            host = editorView.GetVisualDescendants().OfType<FormatTokenToolsHost>().Single();
-            Assert.False(host.IsExpanded);
-            Assert.False(_NamedDescendant<Border>(host, "PART_ToolsPane").IsVisible);
+            pane = editorView.GetVisualDescendants().OfType<FormatTokenPickerPane>().Single();
+            Assert.False(pane.IsExpanded);
+            Assert.False(_NamedDescendant<Border>(pane, "PART_PickerBody").IsVisible);
 
             window.Close();
         }
@@ -256,11 +256,11 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         private static (
-            FormatTokenToolsHost Host,
+            FormatTokenPickerPane Pane,
             App.Ui.Views.FormatEditor.FormatEditor Left,
             App.Ui.Views.FormatEditor.FormatEditor Right,
             Window Window
-        ) _ShowHostWithTwoEditors()
+        ) _ShowPaneWithTwoEditors()
         {
             var left = new App.Ui.Views.FormatEditor.FormatEditor
             {
@@ -274,7 +274,7 @@ namespace Mfr.Tests.Ui.FormatEditor
                 AcceptsReturn = false,
                 ShowRightClickHint = false,
             };
-            var host = new FormatTokenToolsHost
+            var pane = new FormatTokenPickerPane
             {
                 Content = new StackPanel { Spacing = 8, Children = { left, right } },
             };
@@ -282,7 +282,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             {
                 Width = 720,
                 Height = 360,
-                Content = host,
+                Content = pane,
             };
             window.Show();
             window.UpdateLayout();
@@ -291,7 +291,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.False(left.ShowInsertButton);
             Assert.False(right.ShowEditButton);
 
-            return (host, left, right, window);
+            return (pane, left, right, window);
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
 {
     /// <summary>
     /// Searchable format-token catalog for the Insert flyout or
-    /// <see cref="Views.FormatEditor.FormatTokenToolsHost"/>.
+    /// <see cref="Views.FormatEditor.FormatTokenPickerPane"/>.
     /// </summary>
     public sealed partial class FormatTokenPickerViewModel : ViewModelBase
     {

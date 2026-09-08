@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// <remarks>
     /// <para>
     /// Expects a <see cref="FormatTokenPickerViewModel"/> as <see cref="StyledElement.DataContext"/>.
-    /// Used by the per-field Insert flyout and by <see cref="FormatTokenToolsHost"/>.
+    /// Used by the per-field Insert flyout and by <see cref="FormatTokenPickerPane"/>.
     /// </para>
     /// </remarks>
     public partial class FormatTokenPicker : UserControl

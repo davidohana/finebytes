@@ -95,7 +95,7 @@
     </DataTemplate>
   </UserControl.Resources>
 
-  <fe:FormatTokenToolsHost IsExpanded="{Binding FormatTokenPickerExpanded, Mode=TwoWay}">
+  <fe:FormatTokenPickerPane IsExpanded="{Binding FormatTokenPickerExpanded, Mode=TwoWay}">
     <StackPanel Spacing="8">
       <ItemsControl x:Name="SectionsItemsControl" ItemsSource="{Binding Sections}">
         <ItemsControl.ItemsPanel>
@@ -158,5 +158,5 @@
       </ItemsControl>
       <controls:FilterEditorHint Text="Gray a checkbox (indeterminate) to set that field only when it is currently empty." />
     </StackPanel>
-  </fe:FormatTokenToolsHost>
+  </fe:FormatTokenPickerPane>
 </UserControl>
