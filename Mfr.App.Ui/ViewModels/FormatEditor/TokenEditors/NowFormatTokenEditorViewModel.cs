@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mfr.Filters.Formatting.Tokens.Generators;
 
 namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
 {
@@ -7,6 +8,11 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
     /// </summary>
     internal sealed partial class NowFormatTokenEditorViewModel : FormatTokenEditorViewModelBase
     {
+        /// <summary>
+        /// Placeholder when Format is empty (engine uses <see cref="NowTokenDefaults.Format"/>).
+        /// </summary>
+        public const string EmptyFormatPlaceholder = "(" + NowTokenDefaults.Format + " when empty)";
+
         /// <summary>
         /// Initializes the editor from existing arguments (empty → bare <c>now</c>).
         /// </summary>
@@ -18,7 +24,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
         }
 
         /// <summary>
-        /// Gets or sets the optional .NET format string (empty → <c>yyyy-MM-dd_HH-mm-ss</c>).
+        /// Gets or sets the optional .NET format string (empty → <see cref="NowTokenDefaults.Format"/>).
         /// </summary>
         [ObservableProperty]
         private string _format = string.Empty;

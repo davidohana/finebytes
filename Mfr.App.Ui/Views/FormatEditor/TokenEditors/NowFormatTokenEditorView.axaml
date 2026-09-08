@@ -12,7 +12,7 @@
         Classes="filter-editor-field format-string-field"
         HorizontalAlignment="Stretch"
         IsEditable="True"
-        PlaceholderText="(yyyy-MM-dd_HH-mm-ss when empty)"
+        PlaceholderText="{x:Static vm:NowFormatTokenEditorViewModel.EmptyFormatPlaceholder}"
         ItemsSource="{x:Static vm:DateFormatExamples.All}"
         Text="{Binding Format}"
       />

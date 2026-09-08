@@ -1,3 +1,5 @@
+using Mfr.Filters.Formatting.Tokens.Generators;
+
 namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
 {
     /// <summary>
@@ -22,7 +24,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
         public static IReadOnlyList<string> All { get; } =
         [
             "yyyy-MM-dd",
-            "yyyy-MM-dd_HH-mm-ss",
+            NowTokenDefaults.Format,
             "yyyy-MM-dd HH:mm:ss",
             "yyyyMMdd",
             "yyyyMMdd_HHmmss",

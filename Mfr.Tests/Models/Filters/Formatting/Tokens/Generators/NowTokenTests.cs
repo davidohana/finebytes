@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Generators
     public sealed class NowTokenTests
     {
         /// <summary>
-        /// Verifies the no-arg form uses <c>yyyy-MM-dd_HH-mm-ss</c>.
+        /// Verifies the no-arg form uses <see cref="NowTokenDefaults.Format"/>.
         /// </summary>
         [Fact]
         public void Resolve_NoArg_UsesDefaultFormat()
@@ -23,7 +23,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Generators
             Assert.True(
                 DateTimeOffset.TryParseExact(
                     result,
-                    "yyyy-MM-dd_HH-mm-ss",
+                    NowTokenDefaults.Format,
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
                     out var parsed

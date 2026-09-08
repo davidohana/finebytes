@@ -1,5 +1,6 @@
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
 using Mfr.Filters.Formatting.FormatString;
+using Mfr.Filters.Formatting.Tokens.Generators;
 
 namespace Mfr.Tests.Ui.FormatEditor.TokenEditors
 {
@@ -52,6 +53,7 @@ namespace Mfr.Tests.Ui.FormatEditor.TokenEditors
             Assert.Contains("hh_mm_ss", DateFormatExamples.All);
             Assert.Contains("dd-MM-yyyy hh_mm_ss", DateFormatExamples.All);
             Assert.Contains("yyyy-MM-dd", DateFormatExamples.All);
+            Assert.Contains(NowTokenDefaults.Format, DateFormatExamples.All);
         }
 
         /// <summary>
