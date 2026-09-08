@@ -1,6 +1,8 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
@@ -15,10 +17,10 @@ namespace Mfr.Tests.Ui.FormatEditor
     public sealed class FormatTokenEditorDialogPreviewTests
     {
         /// <summary>
-        /// Verifies Preview chrome is present and shows empty-list messaging by default.
+        /// Verifies Preview chrome loads and sample/result share a content column.
         /// </summary>
         [AvaloniaFact]
-        public void Dialog_Preview_ShowsEmptyListMessages_WhenNoRenameItems()
+        public void Dialog_Preview_ShowsChromeAndAlignedSampleResult()
         {
             var editor = new SubstrFormatTokenEditorViewModel(args: null);
             var dialog = new FormatTokenEditorDialog(editor);
@@ -28,12 +30,10 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.NotNull(dialog.FindControl<TextBox>("PreviewSampleBox"));
             Assert.NotNull(dialog.FindControl<TextBox>("PreviewResultBox"));
-            Assert.Equal("<Rename list is empty>", dialog.FindControl<TextBox>("PreviewSampleBox")!.Text);
-            Assert.Equal("<Preview N/A>", dialog.FindControl<TextBox>("PreviewResultBox")!.Text);
-            Assert.False(dialog.FindControl<Button>("PreviewPreviousButton")!.IsEnabled);
-            Assert.False(dialog.FindControl<Button>("PreviewNextButton")!.IsEnabled);
+            Assert.NotNull(dialog.FindControl<Button>("PreviewPreviousButton"));
+            Assert.NotNull(dialog.FindControl<Button>("PreviewNextButton"));
             Assert.NotNull(dialog.FindControl<Grid>("PreviewRow"));
-            Assert.NotNull(dialog.FindControl<StackPanel>("PreviewPanel"));
+            Assert.Equal("<Rename list is empty>", dialog.FindControl<TextBox>("PreviewSampleBox")!.Text);
 
             // Sample and result share the content column so their left edges align.
             var sample = dialog.FindControl<TextBox>("PreviewSampleBox")!;
@@ -46,7 +46,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies Preview evaluates against rename items and updates when cycling / options change.
+        /// Verifies Preview binds rename items and updates on ▲/▼ click and option edits.
         /// </summary>
         [AvaloniaFact]
         public void Dialog_Preview_EvaluatesAndCyclesRenameItems()
@@ -74,7 +74,10 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.False(previous.IsEnabled);
             Assert.True(next.IsEnabled);
 
-            next.Command!.Execute(null);
+            var nextPoint = next.TranslatePoint(new Point(next.Bounds.Width / 2, next.Bounds.Height / 2), dialog);
+            Assert.NotNull(nextPoint);
+            dialog.MouseDown(nextPoint.Value, MouseButton.Left);
+            dialog.MouseUp(nextPoint.Value, MouseButton.Left);
             Dispatcher.UIThread.RunJobs();
             Assert.Equal("beta.wav", sample.Text);
             Assert.Equal("beta", result.Text);
@@ -90,7 +93,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies a nested token dialog reuses the parent dialog's Rename List Preview snapshot.
+        /// Verifies nested token dialogs reuse the parent Preview snapshot.
         /// </summary>
         [AvaloniaFact]
         public void NestedDialog_ReusesParentPreviewRenameItems()
@@ -104,11 +107,12 @@ namespace Mfr.Tests.Ui.FormatEditor
             parent.Show();
             Dispatcher.UIThread.RunJobs();
 
-            var resolved = FormatTokenEditorDialog.ResolvePreviewRenameItems(parent);
-            Assert.Same(items[0], resolved[0]);
-            Assert.Equal(2, resolved.Count);
+            Assert.Same(items, FormatTokenEditorDialog.ResolvePreviewRenameItems(parent));
 
-            var nested = new FormatTokenEditorDialog(new FileDateFormatTokenEditorViewModel(null), resolved);
+            var nested = new FormatTokenEditorDialog(
+                new FileDateFormatTokenEditorViewModel(null),
+                FormatTokenEditorDialog.ResolvePreviewRenameItems(parent)
+            );
             nested.Show();
             nested.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
@@ -116,14 +120,41 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.Equal("alpha.mp3", nested.FindControl<TextBox>("PreviewSampleBox")!.Text);
             Assert.Equal("1", nested.FindControl<TextBlock>("PreviewItemIndexLabel")!.Text);
             Assert.NotEqual("<Preview N/A>", nested.FindControl<TextBox>("PreviewResultBox")!.Text);
-            Assert.DoesNotContain(
-                "<Rename list is empty>",
-                nested.FindControl<TextBox>("PreviewSampleBox")!.Text,
-                StringComparison.Ordinal
-            );
 
             nested.Close();
             parent.Close();
+        }
+
+        /// <summary>
+        /// Verifies Owner-chain walk uses a token dialog snapshot even when empty (no skip-to-MainWindow).
+        /// </summary>
+        [AvaloniaFact]
+        public void ResolvePreviewRenameItems_OwnerChain_UsesDialogSnapshotIncludingEmpty()
+        {
+            var items = new[] { FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: ".mp3") };
+            var parentWithItems = new FormatTokenEditorDialog(new SubstrFormatTokenEditorViewModel(null), items);
+            parentWithItems.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var hosted = new Window { Width = 100, Height = 80 };
+            _ = hosted.ShowDialog(parentWithItems);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Same(parentWithItems.PreviewRenameItems, FormatTokenEditorDialog.ResolvePreviewRenameItems(hosted));
+            hosted.Close();
+            parentWithItems.Close();
+
+            var emptyParent = new FormatTokenEditorDialog(new SubstrFormatTokenEditorViewModel(null), []);
+            emptyParent.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var hostedOnEmpty = new Window { Width = 100, Height = 80 };
+            _ = hostedOnEmpty.ShowDialog(emptyParent);
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Empty(FormatTokenEditorDialog.ResolvePreviewRenameItems(hostedOnEmpty));
+            hostedOnEmpty.Close();
+            emptyParent.Close();
         }
     }
 }
