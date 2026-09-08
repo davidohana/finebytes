@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using AvaloniaEdit;
 using Mfr.App.Ui.Views.FormatEditor;
@@ -28,16 +29,18 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.Same(left, host.ActiveEditor);
             Assert.True(left.IsActiveTarget);
 
-            host.IsExpanded = false;
+            var collapse = host.FindControl<Button>("CollapseButton");
+            Assert.NotNull(collapse);
+            collapse.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(host.IsExpanded);
             Assert.Equal(26, host.ToolsPaneWidth);
-            Assert.Equal(200, host.ToolsPaneMinHeight);
+            Assert.Equal(FormatTokenToolsHost.ToolsPaneMinHeight, host.FindControl<DockPanel>("GripRail")!.Height);
             Assert.True(host.FindControl<Button>("EditButton")!.IsVisible);
-            Assert.True(host.FindControl<Button>("CollapseButton")!.IsVisible);
-            Assert.False(host.ShowsInsertPicker);
+            Assert.True(collapse.IsVisible);
+            Assert.False(host.FindControl<Border>("ToolsPane")!.IsVisible);
 
             window.Close();
         }
@@ -57,7 +60,7 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.True(host.HasActiveEditor);
             Assert.Same(left, host.ActiveEditor);
-            Assert.True(host.ShowsInsertPicker);
+            Assert.True(host.IsExpanded);
 
             left.FindControl<TextEditor>("TemplateBox")!.CaretOffset = 1;
             host.ActiveEditor!.InsertTextAtCaret("<file-name>");
@@ -110,6 +113,14 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(box);
             box.CaretOffset = 2;
 
+            var edit = host.FindControl<Button>("EditButton");
+            var picker = host.FindControl<FormatTokenInsertPicker>("InsertPicker");
+            Assert.NotNull(edit);
+            Assert.NotNull(picker);
+            Assert.True(edit.IsEnabled);
+            var pickerVm = Assert.IsType<App.Ui.ViewModels.FormatEditor.FormatEditorViewModel>(picker.DataContext);
+            Assert.Same(pickerVm.EditCommand, edit.Command);
+
             Assert.True(
                 left.EditUnderCaretForTests(
                     accept: true,
@@ -126,6 +137,13 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.Contains("initial=9", left.Text, StringComparison.Ordinal);
             Assert.Equal("plain", right.Text);
             Assert.Same(left, host.ActiveEditor);
+
+            _FocusEditor(right);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Same(right, host.ActiveEditor);
+            Assert.True(edit.IsEnabled);
 
             window.Close();
         }

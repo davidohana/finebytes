@@ -18,10 +18,13 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// </remarks>
     public partial class FormatTokenToolsHost : UserControl
     {
+        /// <summary>
+        /// Expanded tools column: grip rail (22) + gap (4) + catalog card (~280).
+        /// </summary>
         private const double ExpandedPaneWidth = 306;
 
         /// <summary>
-        /// Collapsed: Edit/collapse rail only (22) + gap before where the card was (unused).
+        /// Collapsed tools column: grip rail (22) + trailing gap (4).
         /// </summary>
         private const double CollapsedPaneWidth = 26;
 
@@ -29,7 +32,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// Stable height for the grip rail (Edit on top, collapse centered). Token list may grow
         /// taller; the rail does not, so the expand button does not jump.
         /// </summary>
-        private const double DefaultToolsPaneMinHeight = 200;
+        public const double ToolsPaneMinHeight = 200;
 
         /// <summary>
         /// Defines the <see cref="Body"/> property.
@@ -57,30 +60,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
             );
 
         /// <summary>
-        /// Defines the <see cref="ShowsInsertPicker"/> property.
-        /// </summary>
-        public static readonly DirectProperty<FormatTokenToolsHost, bool> ShowsInsertPickerProperty =
-            AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, bool>(
-                nameof(ShowsInsertPicker),
-                o => o.ShowsInsertPicker
-            );
-
-        /// <summary>
         /// Defines the <see cref="ToolsPaneWidth"/> property.
         /// </summary>
         public static readonly DirectProperty<FormatTokenToolsHost, double> ToolsPaneWidthProperty =
             AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, double>(
                 nameof(ToolsPaneWidth),
                 o => o.ToolsPaneWidth
-            );
-
-        /// <summary>
-        /// Defines the <see cref="ToolsPaneMinHeight"/> property.
-        /// </summary>
-        public static readonly DirectProperty<FormatTokenToolsHost, double> ToolsPaneMinHeightProperty =
-            AvaloniaProperty.RegisterDirect<FormatTokenToolsHost, double>(
-                nameof(ToolsPaneMinHeight),
-                o => o.ToolsPaneMinHeight
             );
 
         /// <summary>
@@ -108,7 +93,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             CollapseToolTip = "Collapse token tools";
             ToolsPaneWidth = ExpandedPaneWidth;
-            ToolsPaneMinHeight = DefaultToolsPaneMinHeight;
             _pickerViewModel = new FormatEditorViewModel(
                 insertText: _InsertIntoActive,
                 jumpToError: static () => { },
@@ -116,6 +100,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             );
             InitializeComponent();
             InsertPicker.DataContext = _pickerViewModel;
+            EditButton.Command = _pickerViewModel.EditCommand;
             _RefreshChrome();
         }
 
@@ -147,30 +132,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets whether the insert catalog is shown.
-        /// </summary>
-        public bool ShowsInsertPicker
-        {
-            get;
-            private set => SetAndRaise(ShowsInsertPickerProperty, ref field, value);
-        }
-
-        /// <summary>
         /// Gets the tools pane width for expanded vs collapsed chrome.
         /// </summary>
         public double ToolsPaneWidth
         {
             get;
             private set => SetAndRaise(ToolsPaneWidthProperty, ref field, value);
-        }
-
-        /// <summary>
-        /// Gets the fixed min height for the tools card and grip rail (collapse centers on this).
-        /// </summary>
-        public double ToolsPaneMinHeight
-        {
-            get;
-            private set => SetAndRaise(ToolsPaneMinHeightProperty, ref field, value);
         }
 
         /// <summary>
@@ -268,11 +235,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
             IsExpanded = !IsExpanded;
         }
 
-        private void _OnEditClick(object? sender, RoutedEventArgs e)
-        {
-            _EditActive();
-        }
-
         private void _InsertIntoActive(string insertText)
         {
             ActiveEditor?.InsertTextAtCaret(insertText);
@@ -308,9 +270,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private void _RefreshChrome()
         {
             HasActiveEditor = ActiveEditor is not null;
-            ShowsInsertPicker = IsExpanded;
             ToolsPaneWidth = IsExpanded ? ExpandedPaneWidth : CollapsedPaneWidth;
-            ToolsPaneMinHeight = DefaultToolsPaneMinHeight;
             CollapseToolTip = IsExpanded ? "Collapse token tools" : "Expand token tools";
             CollapseIcon = _ResolveGeometry(
                 IsExpanded ? "FormatTokenToolsCollapseGeometry" : "FormatTokenToolsExpandGeometry"

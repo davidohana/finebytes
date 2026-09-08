@@ -134,7 +134,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets the insert-picker control hosted in the Insert flyout (for tests and host reuse).
+        /// Gets the insert-picker control hosted in the Insert flyout (for tests).
         /// </summary>
         public FormatTokenInsertPicker InsertPickerControl => InsertPicker;
 
@@ -845,7 +845,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
-            (_toolsHost ?? this.FindAncestorOfType<FormatTokenToolsHost>())?.SetActiveEditor(this);
+            _toolsHost?.SetActiveEditor(this);
         }
 
         /// <summary>
