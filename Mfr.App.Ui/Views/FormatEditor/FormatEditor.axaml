@@ -30,7 +30,14 @@
       />
     </StackPanel>
 
-    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4" Margin="6,0,0,0" VerticalAlignment="Center">
+    <StackPanel
+      x:Name="ToolButtonsPanel"
+      DockPanel.Dock="Right"
+      Orientation="Horizontal"
+      Spacing="4"
+      Margin="6,0,0,0"
+      VerticalAlignment="Center"
+    >
       <Button
         x:Name="InsertButton"
         Classes="filter-editor-button format-editor-tool"
@@ -90,6 +97,15 @@
         Command="{Binding EditCommand}"
       >
         <PathIcon Width="12" Height="12" Data="{StaticResource FormatEditorEditGeometry}" />
+      </Button>
+      <Button
+        x:Name="ExpandButton"
+        Classes="filter-editor-button format-editor-tool"
+        ToolTip.Tip="Edit format string in a larger window"
+        IsVisible="{Binding ShowExpandButton, ElementName=Root}"
+        Click="_OnExpandClick"
+      >
+        <PathIcon Width="12" Height="12" Data="{StaticResource FormatEditorExpandGeometry}" />
       </Button>
     </StackPanel>
 

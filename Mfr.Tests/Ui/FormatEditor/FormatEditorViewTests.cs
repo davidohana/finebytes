@@ -11,6 +11,7 @@ using Avalonia.VisualTree;
 using AvaloniaEdit;
 using AvaloniaEdit.Rendering;
 using Mfr.App.Ui.Views.Controls;
+using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.App.Ui.Views.GridColumnSizing;
 using Mfr.Filters.Formatting.FormatString;
 
@@ -561,10 +562,10 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies Insert and Edit are matching square glyph buttons on one horizontal row.
+        /// Verifies Insert, Edit, and Expand are matching square glyph buttons on one horizontal row.
         /// </summary>
         [AvaloniaFact]
-        public void InsertAndEditButtons_AreSameSize()
+        public void ToolButtons_AreSameSize()
         {
             var editor = new App.Ui.Views.FormatEditor.FormatEditor();
             var window = new Window { Content = editor };
@@ -574,13 +575,179 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             var insert = editor.FindControl<Button>("InsertButton");
             var edit = editor.FindControl<Button>("EditButton");
+            var expand = editor.FindControl<Button>("ExpandButton");
             Assert.NotNull(insert);
             Assert.NotNull(edit);
+            Assert.NotNull(expand);
             Assert.Equal(insert.Bounds.Size, edit.Bounds.Size);
+            Assert.Equal(insert.Bounds.Size, expand.Bounds.Size);
             Assert.Equal(insert.Bounds.Y, edit.Bounds.Y, precision: 0);
+            Assert.Equal(insert.Bounds.Y, expand.Bounds.Y, precision: 0);
             Assert.True(edit.Bounds.X > insert.Bounds.X);
+            Assert.True(expand.Bounds.X > edit.Bounds.X);
             Assert.Contains(insert.GetVisualDescendants().OfType<PathIcon>(), icon => icon.Width == 12);
             Assert.Contains(edit.GetVisualDescendants().OfType<PathIcon>(), icon => icon.Width == 12);
+            Assert.Contains(expand.GetVisualDescendants().OfType<PathIcon>(), icon => icon.Width == 12);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies ShowExpandButton hides the expand tool without affecting Insert/Edit.
+        /// </summary>
+        [AvaloniaFact]
+        public void ShowExpandButtonFalse_HidesExpandOnly()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { ShowExpandButton = false };
+            var window = new Window { Content = editor };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var insert = editor.FindControl<Button>("InsertButton");
+            var edit = editor.FindControl<Button>("EditButton");
+            var expand = editor.FindControl<Button>("ExpandButton");
+            Assert.NotNull(insert);
+            Assert.NotNull(edit);
+            Assert.NotNull(expand);
+            Assert.True(insert.IsVisible);
+            Assert.True(edit.IsVisible);
+            Assert.False(expand.IsVisible);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the expand tool is present and the expand dialog syncs Text both ways with the host.
+        /// </summary>
+        [AvaloniaFact]
+        public void ExpandDialog_SyncsTextTwoWay_WithHost()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { Text = "host-start" };
+            var window = new Window
+            {
+                Width = 480,
+                Height = 240,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var expand = editor.FindControl<Button>("ExpandButton");
+            Assert.NotNull(expand);
+            Assert.True(expand.IsVisible);
+            Assert.Contains(
+                "larger",
+                expand.GetValue(ToolTip.TipProperty) as string,
+                StringComparison.OrdinalIgnoreCase
+            );
+
+            var dialog = editor.CreateExpandDialogForTests();
+            dialog.Show(window);
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Same(editor, dialog.Host);
+            Assert.Equal("host-start", dialog.DialogEditor.Text);
+
+            dialog.DialogEditor.Text = "from-dialog";
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("from-dialog", editor.Text);
+
+            editor.Text = "from-host";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal("from-host", dialog.DialogEditor.Text);
+
+            dialog.Close();
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        /// <summary>
+        /// Verifies expand dialog copies AcceptsReturn and uses a fixed taller editor height.
+        /// </summary>
+        [AvaloniaFact]
+        public void ExpandDialog_UsesHostAcceptsReturn_AndFixedHeight()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { AcceptsReturn = false, Text = "ab" };
+            var window = new Window { Content = editor };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var dialog = editor.CreateExpandDialogForTests();
+            dialog.Show(window);
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(dialog.DialogEditor.AcceptsReturn);
+            Assert.False(dialog.DialogEditor.ShowExpandButton);
+            var box = dialog.DialogEditor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            Assert.Equal(FormatEditorExpandDialog.DialogEditorHeight, box.Height, precision: 0);
+            Assert.True(box.WordWrap);
+
+            dialog.Close();
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies multiline AcceptsReturn applies min/max height caps for auto-grow.
+        /// </summary>
+        [AvaloniaFact]
+        public void AcceptsReturnTrue_AppliesAutoGrowMinAndMaxHeight()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { AcceptsReturn = true };
+            var window = new Window
+            {
+                Width = 320,
+                Height = 400,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.MultilineMinHeight, box.MinHeight);
+            Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.MultilineMaxHeight, box.MaxHeight);
+            Assert.True(box.WordWrap);
+
+            editor.Text = string.Concat(
+                Enumerable.Repeat("<file-name> <counter:initial=1,step=1> long-token-string ", 20)
+            );
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            editor.UpdateAutoGrowHeightForTests();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(box.Height >= App.Ui.Views.FormatEditor.FormatEditor.MultilineMinHeight);
+            Assert.True(box.Height <= App.Ui.Views.FormatEditor.FormatEditor.MultilineMaxHeight);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies AcceptsReturn=false keeps the compact single-line height (no auto-grow ceiling).
+        /// </summary>
+        [AvaloniaFact]
+        public void AcceptsReturnFalse_UsesSingleLineMinHeight()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor { AcceptsReturn = false };
+            var window = new Window { Content = editor };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.SingleLineMinHeight, box.MinHeight);
+            Assert.False(box.WordWrap);
 
             window.Close();
         }
