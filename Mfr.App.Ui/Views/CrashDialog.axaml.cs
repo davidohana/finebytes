@@ -17,6 +17,7 @@ namespace Mfr.App.Ui.Views
         public CrashDialog()
         {
             InitializeComponent();
+            ModalDialogKeyboard.Attach(this);
         }
 
         /// <summary>

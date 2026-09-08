@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -33,6 +34,16 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// Single-line field floor height; wraps and auto-grows above this without inserting newlines.
         /// </summary>
         public const double SingleLineMinHeight = 26;
+
+        /// <summary>
+        /// Horizontal padding inside the AvaloniaEdit field (matches <c>format-string-field</c> theme).
+        /// </summary>
+        public const double TemplateHorizontalPadding = 4;
+
+        /// <summary>
+        /// Minimum vertical padding when auto-grow sizes to content (keeps glyphs off the border).
+        /// </summary>
+        public const double TemplateMinVerticalPadding = 2;
 
         /// <summary>
         /// Defines the <see cref="Text"/> property.
@@ -573,6 +584,19 @@ namespace Mfr.App.Ui.Views.FormatEditor
             TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
             TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             TemplateBox.MinHeight = acceptsReturn ? MultilineMinHeight : SingleLineMinHeight;
+            if (acceptsReturn)
+            {
+                // Restore theme Padding (4,2) after single-line centering overwrote it.
+                TemplateBox.ClearValue(PaddingProperty);
+                TemplateWatermark.ClearValue(VerticalAlignmentProperty);
+                TemplateWatermark.ClearValue(MarginProperty);
+            }
+            else
+            {
+                TemplateWatermark.VerticalAlignment = VerticalAlignment.Center;
+                TemplateWatermark.Margin = new Thickness(TemplateHorizontalPadding, 0, TemplateHorizontalPadding, 0);
+            }
+
             _UpdateAutoGrowHeight();
         }
 
@@ -586,7 +610,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
         /// <summary>
         /// Grows the editor with wrapped content up to <see cref="MultilineMaxHeight"/> (Enter still
-        /// follows <see cref="AcceptsReturn"/>).
+        /// follows <see cref="AcceptsReturn"/>). Single-line hosts vertically center text in spare height.
         /// </summary>
         private void _UpdateAutoGrowHeight()
         {
@@ -603,14 +627,32 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 contentHeight = Math.Max(textView.DefaultLineHeight, 1);
             }
 
-            var chrome =
-                TemplateBox.Padding.Top
-                + TemplateBox.Padding.Bottom
-                + TemplateBox.BorderThickness.Top
-                + TemplateBox.BorderThickness.Bottom;
-            var desired = contentHeight + chrome;
+            var border =
+                TemplateBox.BorderThickness.Top + TemplateBox.BorderThickness.Bottom;
             var minHeight = AcceptsReturn ? MultilineMinHeight : SingleLineMinHeight;
-            var height = Math.Clamp(desired, minHeight, MultilineMaxHeight);
+            double height;
+            if (AcceptsReturn)
+            {
+                var chrome = TemplateBox.Padding.Top + TemplateBox.Padding.Bottom + border;
+                height = Math.Clamp(contentHeight + chrome, minHeight, MultilineMaxHeight);
+            }
+            else
+            {
+                // Height ignores vertical padding so we can distribute spare space equally (center text).
+                var natural =
+                    contentHeight + border + (TemplateMinVerticalPadding * 2);
+                height = Math.Clamp(Math.Max(natural, minHeight), minHeight, MultilineMaxHeight);
+                var contentArea = Math.Max(0, height - border);
+                var spare = Math.Max(0, contentArea - contentHeight);
+                var top = spare / 2;
+                var bottom = spare - top;
+                var nextPadding = new Thickness(TemplateHorizontalPadding, top, TemplateHorizontalPadding, bottom);
+                if (TemplateBox.Padding != nextPadding)
+                {
+                    TemplateBox.Padding = nextPadding;
+                }
+            }
+
             if (!double.IsNaN(TemplateBox.Height) && Math.Abs(TemplateBox.Height - height) < 0.5)
             {
                 return;
@@ -1022,6 +1064,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             _backgroundRenderer.TokenBackground = _ResolveBrush("FormatTokenBackgroundBrush");
             _backgroundRenderer.TokenAltBackground = _ResolveBrush("FormatTokenAltBackgroundBrush");
             _colorizer.TokenNameForeground = _ResolveBrush("FormatTokenNameForegroundBrush");
+            _colorizer.TokenNumberForeground = _ResolveBrush("FormatTokenNumberForegroundBrush");
             _backgroundRenderer.ErrorBackground = _ResolveBrush("FormatTokenErrorBackgroundBrush");
             TemplateBox.TextArea.TextView.Redraw();
         }

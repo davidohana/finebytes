@@ -690,6 +690,43 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies AcceptsReturn=false centers a short line vertically via equal spare padding.
+        /// </summary>
+        [AvaloniaFact]
+        public void AcceptsReturnFalse_CentersShortTextVertically()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor
+            {
+                AcceptsReturn = false,
+                Text = "<file-name>",
+            };
+            var window = new Window
+            {
+                Width = 320,
+                Height = 200,
+                Content = editor,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            editor.UpdateAutoGrowHeightForTests();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var box = editor.FindControl<TextEditor>("TemplateBox");
+            Assert.NotNull(box);
+            Assert.Equal(
+                App.Ui.Views.FormatEditor.FormatEditor.SingleLineMinHeight,
+                box.Height,
+                precision: 0
+            );
+            Assert.Equal(box.Padding.Top, box.Padding.Bottom, precision: 0);
+            Assert.True(box.Padding.Top >= App.Ui.Views.FormatEditor.FormatEditor.TemplateMinVerticalPadding);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Edit under caret for counter replaces the span with the editor result.
         /// </summary>
         [AvaloniaFact]

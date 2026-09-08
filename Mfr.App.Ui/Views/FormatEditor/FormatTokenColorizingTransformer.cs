@@ -6,11 +6,14 @@ using Mfr.Filters.Formatting.FormatString;
 namespace Mfr.App.Ui.Views.FormatEditor
 {
     /// <summary>
-    /// Accents the written token name inside validated format tokens.
+    /// Accents the written token name and numeric literals inside validated format tokens.
     /// </summary>
     /// <remarks>
     /// Token and error backgrounds are drawn by <see cref="FormatTokenBackgroundRenderer"/> on the
-    /// Background layer so selection stays visible. This transformer only sets name foreground.
+    /// Background layer so selection stays visible. This transformer only sets name and number
+    /// foregrounds. Numbers are scanned in <see cref="FormatTokenSpan.Args"/> (optional leading
+    /// <c>-</c> plus ASCII digits), including nested token args; nested token names are skipped so
+    /// digits in names like <c>id3v2</c> stay unaccented.
     /// </remarks>
     internal sealed class FormatTokenColorizingTransformer : DocumentColorizingTransformer
     {
@@ -23,6 +26,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// Gets or sets the foreground for the written token name.
         /// </summary>
         public IBrush? TokenNameForeground { get; set; }
+
+        /// <summary>
+        /// Gets or sets the foreground for numeric literals in token args.
+        /// </summary>
+        public IBrush? TokenNumberForeground { get; set; }
 
         /// <summary>
         /// Computes the written-name range inside a validated token span.
@@ -53,31 +61,130 @@ namespace Mfr.App.Ui.Views.FormatEditor
             return true;
         }
 
+        /// <summary>
+        /// Enumerates absolute document ranges for numeric literals in <paramref name="token"/> args.
+        /// </summary>
+        /// <param name="token">Validated token span (args may contain nested <c>&lt;…&gt;</c>).</param>
+        /// <returns>
+        /// Half-open <c>[start, end)</c> ranges for optional <c>-</c> plus one or more ASCII digits.
+        /// Nested token names are skipped; numbers in nested args are included.
+        /// </returns>
+        internal static IEnumerable<(int Start, int End)> EnumerateNumberRanges(FormatTokenSpan token)
+        {
+            if (token.Args.Length == 0 || token.Length < 2)
+            {
+                yield break;
+            }
+
+            var args = token.Args;
+            var argsStart = token.Start + token.Length - 1 - args.Length;
+            var inNestedName = false;
+
+            var i = 0;
+            while (i < args.Length)
+            {
+                var c = args[i];
+                if (inNestedName)
+                {
+                    if (c == ':')
+                    {
+                        inNestedName = false;
+                        i++;
+                        continue;
+                    }
+
+                    if (c == '>')
+                    {
+                        inNestedName = false;
+                        i++;
+                        continue;
+                    }
+
+                    i++;
+                    continue;
+                }
+
+                if (c == '<')
+                {
+                    inNestedName = true;
+                    i++;
+                    continue;
+                }
+
+                if (c == '>')
+                {
+                    i++;
+                    continue;
+                }
+
+                if (c == '-' && i + 1 < args.Length && char.IsAsciiDigit(args[i + 1]))
+                {
+                    var numberStart = i;
+                    i += 2;
+                    while (i < args.Length && char.IsAsciiDigit(args[i]))
+                    {
+                        i++;
+                    }
+
+                    yield return (argsStart + numberStart, argsStart + i);
+                    continue;
+                }
+
+                if (char.IsAsciiDigit(c))
+                {
+                    var numberStart = i;
+                    i++;
+                    while (i < args.Length && char.IsAsciiDigit(args[i]))
+                    {
+                        i++;
+                    }
+
+                    yield return (argsStart + numberStart, argsStart + i);
+                    continue;
+                }
+
+                i++;
+            }
+        }
+
         /// <inheritdoc />
         protected override void ColorizeLine(DocumentLine line)
         {
-            if (TokenNameForeground is null)
-            {
-                return;
-            }
-
             var lineStart = line.Offset;
             var lineEnd = line.EndOffset;
 
             foreach (var token in Tokens)
             {
-                if (!TryGetNameRange(token, out var nameStart, out var nameEnd) || nameEnd <= nameStart)
+                if (
+                    TokenNameForeground is not null
+                    && TryGetNameRange(token, out var nameStart, out var nameEnd)
+                    && nameEnd > nameStart
+                )
+                {
+                    _ColorizeOverlap(
+                        lineStart,
+                        lineEnd,
+                        nameStart,
+                        nameEnd,
+                        element => element.TextRunProperties.SetForegroundBrush(TokenNameForeground)
+                    );
+                }
+
+                if (TokenNumberForeground is null)
                 {
                     continue;
                 }
 
-                _ColorizeOverlap(
-                    lineStart,
-                    lineEnd,
-                    nameStart,
-                    nameEnd,
-                    element => element.TextRunProperties.SetForegroundBrush(TokenNameForeground)
-                );
+                foreach (var (numberStart, numberEnd) in EnumerateNumberRanges(token))
+                {
+                    _ColorizeOverlap(
+                        lineStart,
+                        lineEnd,
+                        numberStart,
+                        numberEnd,
+                        element => element.TextRunProperties.SetForegroundBrush(TokenNumberForeground)
+                    );
+                }
             }
         }
 

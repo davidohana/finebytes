@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views;
 
 namespace Mfr.App.Ui.Views.RenameList
 {
@@ -14,6 +15,7 @@ namespace Mfr.App.Ui.Views.RenameList
         public RenameListProgressDialog()
         {
             InitializeComponent();
+            ModalDialogKeyboard.Attach(this);
             Closing += _OnClosing;
         }
 

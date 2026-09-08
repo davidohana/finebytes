@@ -18,6 +18,7 @@
           <SolidColorBrush x:Key="FormatTokenBackgroundBrush" Color="#FFF6D5" />
           <SolidColorBrush x:Key="FormatTokenAltBackgroundBrush" Color="#E0F2E9" />
           <SolidColorBrush x:Key="FormatTokenNameForegroundBrush" Color="#2B6CB0" />
+          <SolidColorBrush x:Key="FormatTokenNumberForegroundBrush" Color="#C05621" />
           <SolidColorBrush x:Key="FormatTokenErrorBackgroundBrush" Color="#40C42B1C" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
@@ -28,6 +29,7 @@
           <SolidColorBrush x:Key="FormatTokenBackgroundBrush" Color="#4A4020" />
           <SolidColorBrush x:Key="FormatTokenAltBackgroundBrush" Color="#2A3A2E" />
           <SolidColorBrush x:Key="FormatTokenNameForegroundBrush" Color="#6CB6FF" />
+          <SolidColorBrush x:Key="FormatTokenNumberForegroundBrush" Color="#F6AD55" />
           <SolidColorBrush x:Key="FormatTokenErrorBackgroundBrush" Color="#66C42B1C" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>

@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -205,6 +206,34 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.Equal(formatCombo.Bounds.Width, resultingPreview.Bounds.Width, precision: 1);
 
             dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies Escape dismisses the token editor dialog (Cancel / <c>IsCancel</c>).
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_Escape_ClosesWithoutAccepting()
+        {
+            var editor = new NowFormatTokenEditorViewModel(null);
+            var dialog = new FormatTokenEditorDialog(editor);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(dialog.Focusable);
+            Assert.True(dialog.IsVisible);
+
+            dialog.RaiseEvent(
+                new KeyEventArgs
+                {
+                    RoutedEvent = InputElement.KeyDownEvent,
+                    Key = Key.Escape,
+                    Source = dialog,
+                }
+            );
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(dialog.IsVisible);
         }
 
         /// <summary>

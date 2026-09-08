@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.FormatEditor;
+using Mfr.App.Ui.Views;
 
 namespace Mfr.App.Ui.Views.FormatEditor
 {
@@ -15,6 +16,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         public FormatTokenEditorDialog()
         {
             InitializeComponent();
+            ModalDialogKeyboard.Attach(this);
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.Views;
 
 namespace Mfr.App.Ui.Views.AppliedFilters
 {
@@ -15,6 +16,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         public FilterOptionsDialog()
         {
             InitializeComponent();
+            ModalDialogKeyboard.Attach(this);
         }
 
         /// <summary>

@@ -14,6 +14,7 @@ namespace Mfr.App.Ui.Views
         public OkMessageDialog()
         {
             InitializeComponent();
+            ModalDialogKeyboard.Attach(this);
         }
 
         /// <summary>
@@ -22,8 +23,8 @@ namespace Mfr.App.Ui.Views
         /// <param name="title">Window title.</param>
         /// <param name="message">Message body.</param>
         public OkMessageDialog(string title, string message)
+            : this()
         {
-            InitializeComponent();
             Title = title;
             MessageText.Text = message;
         }

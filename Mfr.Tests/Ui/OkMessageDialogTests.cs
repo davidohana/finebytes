@@ -1,7 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
 using Mfr.App.Ui.Views;
 
 namespace Mfr.Tests.Ui
@@ -38,6 +40,33 @@ namespace Mfr.Tests.Ui
             Assert.Equal(0, brush.Color.A);
 
             dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies Escape closes the dialog via the OK button's <c>IsCancel</c> wiring.
+        /// </summary>
+        [AvaloniaFact]
+        public void Escape_Closes_Dialog()
+        {
+            var dialog = new OkMessageDialog("Warning", "Something happened.");
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(dialog.Focusable);
+            Assert.True(dialog.IsVisible);
+
+            dialog.RaiseEvent(
+                new KeyEventArgs
+                {
+                    RoutedEvent = InputElement.KeyDownEvent,
+                    Key = Key.Escape,
+                    Source = dialog,
+                }
+            );
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(dialog.IsVisible);
         }
     }
 }

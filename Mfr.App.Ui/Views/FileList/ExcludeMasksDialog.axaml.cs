@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.App.Ui.Views;
 
 namespace Mfr.App.Ui.Views.FileList
 {
@@ -15,6 +16,7 @@ namespace Mfr.App.Ui.Views.FileList
         public ExcludeMasksDialog()
         {
             InitializeComponent();
+            ModalDialogKeyboard.Attach(this);
         }
 
         /// <summary>

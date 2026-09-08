@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views;
 
 namespace Mfr.App.Ui.Views.RenameList
 {
@@ -20,6 +21,7 @@ namespace Mfr.App.Ui.Views.RenameList
             ArgumentNullException.ThrowIfNull(content);
 
             InitializeComponent();
+            ModalDialogKeyboard.Attach(this);
             Title = content.Title;
             SummaryText.Text = content.Summary;
             PrimaryDetailsText.Text = RenameListRowErrorDisplay.FormatPrimaryDetails(
@@ -41,6 +43,7 @@ namespace Mfr.App.Ui.Views.RenameList
         public RenameListRowErrorDialog()
         {
             InitializeComponent();
+            ModalDialogKeyboard.Attach(this);
             _copyText = string.Empty;
         }
 
