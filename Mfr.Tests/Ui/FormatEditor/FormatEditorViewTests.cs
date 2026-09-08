@@ -730,6 +730,34 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies right-click on a token cancels Avalonia's text context flyout (no Cut/Copy/Paste over the dialog).
+        /// </summary>
+        [AvaloniaFact]
+        public void RightClick_OnToken_SuppressesTextContextFlyout()
+        {
+            var (_, box, window, _, counter) = _ShowTwoTokenEditor();
+            var flyout = new MenuFlyout();
+            flyout.Items.Add(new MenuItem { Header = "Paste" });
+            box.TextArea.ContextFlyout = flyout;
+            box.Focus();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var windowPoint = _CharacterWindowPoint(window, box, counter.Start + 2);
+            window.MouseMove(windowPoint);
+            window.MouseDown(windowPoint, MouseButton.Right);
+            window.MouseUp(windowPoint, MouseButton.Right);
+
+            Assert.Equal(counter.Start, box.SelectionStart);
+            Assert.Equal(counter.Start + counter.Length, _SelectionEnd(box));
+            Assert.False(flyout.IsOpen);
+
+            // Close before draining the posted token-dialog open so ShowDialog does not block headless.
+            window.Close();
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        /// <summary>
         /// Verifies token selection stays when focus moves to the Edit button.
         /// </summary>
         [AvaloniaFact]

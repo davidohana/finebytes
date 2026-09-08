@@ -470,6 +470,13 @@ namespace Mfr.App.Ui.Views.FormatEditor
             TemplateBox.TextArea.TextView.VisualLinesChanged += _OnTemplateVisualLinesChanged;
             TemplateBox.AddHandler(DoubleTappedEvent, _OnTemplateDoubleTapped, RoutingStrategies.Bubble);
             TemplateBox.TextArea.AddHandler(PointerPressedEvent, _OnTemplatePointerPressed, RoutingStrategies.Tunnel);
+            // ContextRequested (not PointerPressed) owns the Cut/Copy/Paste flyout; handle it so the
+            // token dialog does not open under a stuck text context menu.
+            TemplateBox.TextArea.AddHandler(
+                ContextRequestedEvent,
+                _OnTemplateContextRequested,
+                RoutingStrategies.Tunnel
+            );
             TemplateBox.TextArea.AddHandler(KeyDownEvent, _OnTemplateKeyDown, RoutingStrategies.Tunnel);
         }
 
@@ -696,12 +703,30 @@ namespace Mfr.App.Ui.Views.FormatEditor
                 return;
             }
 
-            if (_TryGetCharacterIndexAt(e.GetPosition(TemplateBox)) is not { } index)
+            if (_TryGetTokenSpanAt(e.GetPosition(TemplateBox)) is not { } span)
             {
                 return;
             }
 
-            var span = _FindSpanAtIndex(index);
+            // Select on press so hit-tests match the pointer; open the editor from ContextRequested
+            // so Avalonia's text context flyout can be cancelled with e.Handled.
+            _SelectSpan(span);
+            e.Handled = true;
+        }
+
+        private void _OnTemplateContextRequested(object? sender, ContextRequestedEventArgs e)
+        {
+            FormatTokenSpan? span;
+            if (e.TryGetPosition(TemplateBox, out var point))
+            {
+                span = _TryGetTokenSpanAt(point);
+            }
+            else
+            {
+                // Keyboard context-menu key: edit the caret token when present.
+                span = _FindSpanAtOrLeftOfIndex(TemplateBox.CaretOffset);
+            }
+
             if (span is null)
             {
                 return;
@@ -709,6 +734,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
 
             _SelectSpan(span);
             e.Handled = true;
+            _CloseTemplateContextUi();
             Dispatcher.UIThread.Post(() =>
             {
                 if (!IsLoaded)
@@ -749,6 +775,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         private async Task _EditSpanAsync(FormatTokenSpan span)
         {
             _SelectSpan(span);
+            _CloseTemplateContextUi();
             if (!FormatTokenEditorRegistry.TryCreate(span.CanonicalName, span.Args, out var editor) || editor is null)
             {
                 await _ShowMessageAsync(
@@ -771,6 +798,30 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             ReplaceTokenSpan(span, editor.ResultingFormatString);
+        }
+
+        /// <summary>
+        /// Hides any text context menu/flyout on the template editor before a modal dialog.
+        /// </summary>
+        private void _CloseTemplateContextUi()
+        {
+            TemplateBox.ContextFlyout?.Hide();
+            TemplateBox.TextArea.ContextFlyout?.Hide();
+            TemplateBox.ContextMenu?.Close();
+            TemplateBox.TextArea.ContextMenu?.Close();
+        }
+
+        /// <summary>
+        /// Resolves the format-token span under <paramref name="point"/> when present.
+        /// </summary>
+        private FormatTokenSpan? _TryGetTokenSpanAt(Point point)
+        {
+            if (_TryGetCharacterIndexAt(point) is not { } index)
+            {
+                return null;
+            }
+
+            return _FindSpanAtIndex(index);
         }
 
         /// <summary>
