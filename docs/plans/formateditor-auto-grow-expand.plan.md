@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: tests
     content: "Headless tests for expand sync, layout, and auto-grow caps"
-    status: in_progress
+    status: completed
 isProject: false
 ---
 
