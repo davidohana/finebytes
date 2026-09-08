@@ -18,17 +18,18 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// </remarks>
     public partial class FormatTokenToolsHost : UserControl
     {
-        private const double ExpandedPaneWidth = 296;
+        private const double ExpandedPaneWidth = 306;
 
         /// <summary>
-        /// Collapsed: grip (18) + gap (4) + border padding (12) + Edit (22).
+        /// Collapsed: Edit/collapse rail only (22) + gap before where the card was (unused).
         /// </summary>
-        private const double CollapsedPaneWidth = 56;
+        private const double CollapsedPaneWidth = 26;
 
         /// <summary>
-        /// Tall enough when collapsed so the grip reads as mid-rail, not a header twin of Edit.
+        /// Stable height for the grip rail (Edit on top, collapse centered). Token list may grow
+        /// taller; the rail does not, so the expand button does not jump.
         /// </summary>
-        private const double CollapsedPaneMinHeight = 88;
+        private const double DefaultToolsPaneMinHeight = 200;
 
         /// <summary>
         /// Defines the <see cref="Body"/> property.
@@ -107,7 +108,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             CollapseToolTip = "Collapse token tools";
             ToolsPaneWidth = ExpandedPaneWidth;
-            ToolsPaneMinHeight = 0;
+            ToolsPaneMinHeight = DefaultToolsPaneMinHeight;
             _pickerViewModel = new FormatEditorViewModel(
                 insertText: _InsertIntoActive,
                 jumpToError: static () => { },
@@ -164,7 +165,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets the minimum height of the tools column (taller when collapsed so the grip can center).
+        /// Gets the fixed min height for the tools card and grip rail (collapse centers on this).
         /// </summary>
         public double ToolsPaneMinHeight
         {
@@ -309,7 +310,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             HasActiveEditor = ActiveEditor is not null;
             ShowsInsertPicker = IsExpanded;
             ToolsPaneWidth = IsExpanded ? ExpandedPaneWidth : CollapsedPaneWidth;
-            ToolsPaneMinHeight = IsExpanded ? 0 : CollapsedPaneMinHeight;
+            ToolsPaneMinHeight = DefaultToolsPaneMinHeight;
             CollapseToolTip = IsExpanded ? "Collapse token tools" : "Expand token tools";
             CollapseIcon = _ResolveGeometry(
                 IsExpanded ? "FormatTokenToolsCollapseGeometry" : "FormatTokenToolsExpandGeometry"

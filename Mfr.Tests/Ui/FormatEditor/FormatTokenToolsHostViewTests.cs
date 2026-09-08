@@ -33,8 +33,8 @@ namespace Mfr.Tests.Ui.FormatEditor
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(host.IsExpanded);
-            Assert.Equal(56, host.ToolsPaneWidth);
-            Assert.Equal(88, host.ToolsPaneMinHeight);
+            Assert.Equal(26, host.ToolsPaneWidth);
+            Assert.Equal(200, host.ToolsPaneMinHeight);
             Assert.True(host.FindControl<Button>("EditButton")!.IsVisible);
             Assert.True(host.FindControl<Button>("CollapseButton")!.IsVisible);
             Assert.False(host.ShowsInsertPicker);
