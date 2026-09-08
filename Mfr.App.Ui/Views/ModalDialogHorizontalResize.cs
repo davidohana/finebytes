@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Avalonia;
 using Avalonia.Controls;
@@ -11,6 +12,7 @@ namespace Mfr.App.Ui.Views
     internal static class ModalDialogHorizontalResize
     {
         private static readonly ConditionalWeakTable<Window, object> s_attached = [];
+        private static readonly ConditionalWeakTable<Window, object> s_relock = [];
 
         /// <summary>
         /// Attaches a one-shot open handler that measures content and locks height.
@@ -41,6 +43,59 @@ namespace Mfr.App.Ui.Views
                     DispatcherPriority.Loaded
                 );
             }
+        }
+
+        /// <summary>
+        /// Relocks height when <paramref name="window"/>'s <see cref="StyledElement.DataContext"/> raises
+        /// <see cref="INotifyPropertyChanged.PropertyChanged"/> for one of <paramref name="propertyNames"/>.
+        /// </summary>
+        /// <param name="window">Dialog already using <see cref="Attach"/>.</param>
+        /// <param name="propertyNames">View-model properties that change content height.</param>
+        public static void RelockOnDataContextProperties(Window window, params string[] propertyNames)
+        {
+            ArgumentNullException.ThrowIfNull(window);
+            ArgumentNullException.ThrowIfNull(propertyNames);
+            if (propertyNames.Length == 0)
+            {
+                throw new ArgumentException("At least one property name is required.", nameof(propertyNames));
+            }
+
+            if (s_relock.TryGetValue(window, out _))
+            {
+                return;
+            }
+
+            s_relock.Add(window, string.Empty);
+
+            var propertyNameToWatch = propertyNames.ToHashSet(StringComparer.Ordinal);
+            INotifyPropertyChanged? source = null;
+
+            void _OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName is null || !propertyNameToWatch.Contains(e.PropertyName))
+                {
+                    return;
+                }
+
+                Dispatcher.UIThread.Post(
+                    () =>
+                    {
+                        window.UpdateLayout();
+                        LockHeightToContent(window);
+                    },
+                    DispatcherPriority.Loaded
+                );
+            }
+
+            void _BindSource()
+            {
+                source?.PropertyChanged -= _OnPropertyChanged;
+                source = window.DataContext as INotifyPropertyChanged;
+                source?.PropertyChanged += _OnPropertyChanged;
+            }
+
+            window.DataContextChanged += (_, _) => _BindSource();
+            _BindSource();
         }
 
         /// <summary>

@@ -1,7 +1,5 @@
-using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 
 namespace Mfr.App.Ui.Views.FormatEditor
@@ -16,8 +14,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// </remarks>
     public partial class FormatTokenEditorDialog : Window
     {
-        private INotifyPropertyChanged? _heightRelockSource;
-
         /// <summary>
         /// Initializes an empty dialog (designer / XAML loader).
         /// </summary>
@@ -26,7 +22,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
             ModalDialogHorizontalResize.Attach(this);
-            DataContextChanged += _OnDataContextChanged;
+            ModalDialogHorizontalResize.RelockOnDataContextProperties(
+                this,
+                nameof(IFormatTokenEditorViewModel.ResultingFormatString)
+            );
         }
 
         /// <summary>
@@ -38,30 +37,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             ArgumentNullException.ThrowIfNull(editor);
             DataContext = editor;
-        }
-
-        private void _OnDataContextChanged(object? sender, EventArgs e)
-        {
-            _heightRelockSource?.PropertyChanged -= _OnViewModelPropertyChanged;
-            _heightRelockSource = DataContext as INotifyPropertyChanged;
-            _heightRelockSource?.PropertyChanged += _OnViewModelPropertyChanged;
-        }
-
-        private void _OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName is not nameof(IFormatTokenEditorViewModel.ResultingFormatString))
-            {
-                return;
-            }
-
-            Dispatcher.UIThread.Post(
-                () =>
-                {
-                    UpdateLayout();
-                    ModalDialogHorizontalResize.LockHeightToContent(this);
-                },
-                DispatcherPriority.Loaded
-            );
         }
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)
