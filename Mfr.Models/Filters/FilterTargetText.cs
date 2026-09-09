@@ -15,6 +15,7 @@ namespace Mfr.Models.Filters
         /// <param name="text">Resolved string when the call succeeds; otherwise empty.</param>
         /// <returns>
         /// <see langword="true"/> when the target is supported and resolution did not throw; otherwise <see langword="false"/>.
+        /// When <see langword="false"/>, <paramref name="text"/> is empty — that does not mean the field value is empty.
         /// </returns>
         public static bool TryGet(FileMeta meta, FilterTarget target, out string text)
         {

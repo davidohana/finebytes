@@ -1,4 +1,3 @@
-using System.Globalization;
 using Mfr.Models.Rename;
 using Mfr.Utils;
 
@@ -174,35 +173,13 @@ namespace Mfr.Models.RenameList.Fields.Basic
     {
         public override string Resolve(FileMeta meta)
         {
-            return _FirstDigitRun(meta.FullFileName);
+            return FileNameNumericValue.Extract(meta.FullFileName);
         }
 
         /// <inheritdoc />
         public override int CompareForSort(FileMeta left, FileMeta right)
         {
             return RenameListFieldSortCompare.ParsedInt64(Resolve(left), Resolve(right));
-        }
-
-        private static string _FirstDigitRun(string fullFileName)
-        {
-            for (var i = 0; i < fullFileName.Length; i++)
-            {
-                if (!char.IsAsciiDigit(fullFileName[i]))
-                {
-                    continue;
-                }
-
-                var end = i + 1;
-                while (end < fullFileName.Length && char.IsAsciiDigit(fullFileName[end]) && end - i < 10)
-                {
-                    end++;
-                }
-
-                return long.Parse(fullFileName.AsSpan(i, end - i), CultureInfo.InvariantCulture)
-                    .ToString(CultureInfo.InvariantCulture);
-            }
-
-            return "0";
         }
     }
 

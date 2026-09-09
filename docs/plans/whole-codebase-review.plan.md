@@ -1,13 +1,13 @@
 ---
 name: Whole codebase review
-overview: "Phased whole-repo review: Phase 0 architecture/layering gate, then full mfr-code-review slices foundation→risk→UI. Each phase applies high-confidence fixes in-pass and reports remaining findings plus ranked deeper refactors."
+overview: "Phased whole-repo review: Phase 0–1 done. Next: Phase 2 Metadata + Tags. Each phase applies high-confidence fixes in-pass and reports remaining findings plus ranked deeper refactors."
 todos:
   - id: phase-0
     content: "Phase 0: Architecture/layering gate + plan file bootstrap"
     status: completed
   - id: phase-1
     content: "Phase 1: Utils + Models core — mfr-code-review + autofix"
-    status: pending
+    status: completed
   - id: phase-2
     content: "Phase 2: Metadata + Tags — mfr-code-review + autofix"
     status: pending
@@ -71,8 +71,8 @@ flowchart TD
 | Phase                               | Status   | Notes                                                             |
 | ----------------------------------- | -------- | ----------------------------------------------------------------- |
 | **0** Architecture / layering       | **done** | Project graph healthy; Services→Views fixed; arch tests tightened |
-| **1** Utils + Models                | pending  | Next                                                              |
-| **2** Metadata + Tags               | pending  |                                                                   |
+| **1** Utils + Models                | **done** | Numeric parity + Windows path chars; TextValues deleted           |
+| **2** Metadata + Tags               | pending  | Next                                                              |
 | **3** Filters                       | pending  |                                                                   |
 | **4** Engine Preview/Commit         | pending  |                                                                   |
 | **5** Session/Config                | pending  |                                                                   |
@@ -117,7 +117,7 @@ Ui also refs Filters directly (catalog/editors). Cli does not. Engine + Filters 
 | Item                                                                      | Why defer                                                  |
 | ------------------------------------------------------------------------- | ---------------------------------------------------------- |
 | Models JSON/FS I/O (`ConfigStore`, `SessionStore`, `RenameResultSummary`) | Ownership smell, not a layer violation; revisit in Phase 5 |
-| `RenameListFieldDisplay` directory scan for folder file-count             | Domain field resolve; Phase 1 or 7 if touched              |
+| `RenameListFieldDisplay` directory scan for folder file-count             | Domain field resolve; Phase 7 if touched                   |
 | `JpegExifThumbnailReader` hand-rolled EXIF in UI Services                 | No ME package leak; optional L2 move — Phase 6             |
 | Fuller UI DAG tests (Views↛Services shortcuts, VM↛Views)                  | Nice-to-have; Phase 9 if still wanted                      |
 | Forbidden-using / package-ownership arch tests for lower layers           | csproj + spot-check enough for now; Phase 9                |
@@ -128,21 +128,81 @@ Layer picture is current; one real UI-internal leak fixed and guarded. Ready for
 
 ______________________________________________________________________
 
+## Phase 1 — L0 Utils + L1 Models core (done)
+
+**Scope:** `Mfr.Utils/`, `Mfr.Models/` (Rename, Filters targets/chain, RenameList catalog), matching `Mfr.Tests/Models/` + `Utils/`. Explore subagent used for cross-file twins.
+
+**Verdict:** Core is coherent — one Rename List field schema, FilterChain/`_Setup` contracts sound, no dual persist schemas. Applied drift/dead-code fixes; leftover items are naming collisions and intentional I/O ownership smells.
+
+### Applied (high confidence)
+
+1. **Deleted** dead `TextValues` twin of `DelimitedText` (zero production callers).
+1. **Unified File Name Numeric** via `FileNameNumericValue.Extract` (MFR7 `[0-9]{1,10}` + `long.Parse`) — Rename List field + formatter token share one owner (token previously had no 10-digit cap).
+1. **Windows path chars:** `WindowsFileNameChars.ContainsInvalidPath`; `FileMetaPreviewExtensions` no longer uses host `Path.GetInvalidPathChars` (Linux CI ↔ Windows product parity).
+1. **Docs:** `SessionState.Version` no longer says “migrations”; `PathRelations.SameOnDisk` vs `IsSamePath` trailing-sep difference clarified; `FilterTargetText.TryGet` documents false ≠ empty field.
+1. **File rename:** `ContractAssert.cs` → `Contracts.cs` (`Check` / `Require`).
+1. **Tests:** `FileNameNumericValueTests`, `WindowsFileNameCharsTests`, `PathRelations` IsSamePath cases, `FileMeta` path-write / illegal-char cases, token 11-digit cap.
+
+### Correctness (found, not changed)
+
+| Item                                                 | Notes                                                                                                                                                                           |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| “Parent Folder” label collision                      | Apply-To ancestor L1 = segment name; Rename List column = absolute `DirectoryPath`; “Parent Directory” = absolute dir target — MFR7-facing; don’t force one map without UI pass |
+| Prefix/extension writes skip Windows name validation | Ancestor segments validate; name parts rely on Cleaner / commit — product choice                                                                                                |
+| `FileMeta.Clone` shares Media/Image/Exif refs        | Safe while snapshots stay immutable                                                                                                                                             |
+
+### Deeper refactors (promoted to backlog)
+
+See backlog below (SameOnDisk collapse, FirstDelimitedSegment, folder-file-count I/O, session sort DTO, label maps).
+
+### Phase 1 exit
+
+Utils/Models numeric + path policy aligned; dead twin removed. Ready for Phase 2 (Metadata + Tags).
+
+______________________________________________________________________
+
 ## Deeper refactors backlog
 
-Ranked cost-to-value. Empty until content phases add items. Do not duplicate f5/f6 “already done.”
+Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
 
-_(none yet)_
+1. **Collapse or rename `SameOnDisk` vs `IsSamePath`**
+   Sites: `PathRelations`; callers in Engine / Ui / `RenameItem.IsPreviewPathSameOnDisk`
+   Target: one equality API + explicit trim overload, or keep both with names that cannot be confused
+   Value: closes trailing-sep footgun
+   Cost: medium churn across Engine/Ui
+   Rank: medium — Phase 4/7 if touched
+
+1. **`FirstDelimitedSegment` → `DelimitedText` only if empty-first semantics match**
+   Sites: `RenameListFieldDisplay.FirstDelimitedSegment` vs `DelimitedText.Split` (AudioTag first-segment fields)
+   Target: shared first-part helper **only if** `" ; Bob"` empty-first behavior is acceptable
+   Value: small dedup
+   Cost: low, but behavior risk
+   Rank: medium — Phase 7 if AudioTag display touched
+
+1. **Move or lazy-gate `FormatFolderFileCount` directory scan**
+   Sites: `RenameListFieldDisplay.FormatFolderFileCount`
+   Target: avoid live FS on every resolve/sort paint, or document as intentional expensive field
+   Value: paint/sort side effects
+   Cost: medium (Engine/UI cache?)
+   Rank: medium — Phase 7
+
+1. **`SessionStateRenameListSortField` vs `RenameListSortKey`**
+   Sites: session DTO vs domain sort key
+   Target: one type if JSON shape can stay identical
+   Value: thin dedup
+   Cost: session churn
+   Rank: low — Phase 5
+
+1. **Shared Apply-To / Rename List / Picard display labels**
+   Sites: `FilterTargetCatalog` vs `AudioTagRenameListFields` vs `AudioCatalogFieldMaps`
+   Target: optional Models display catalog — only if labels should converge
+   Value: unclear (MFR7 may want divergent labels)
+   Cost: high
+   Rank: low — skip unless UI pass demands it
 
 ______________________________________________________________________
 
 ## Remaining phase briefs
-
-### Phase 1 — L0 Utils + L1 Models core
-
-**Scope:** `Mfr.Utils/`, `Mfr.Models/` (esp. `Rename/`, `Filters/` targets/chain, `RenameList/` field catalog), matching tests under `Mfr.Tests/Models/`, `Utils/`.
-
-**Focus:** path helpers / Windows name chars; `FilterTargetText` / `Targets` / `FileMeta`; FilterChain contracts; `_Setup` cache `with`-copy policy if touched via Models; no dual persisted schemas.
 
 ### Phase 2 — L2 Metadata + Tags
 

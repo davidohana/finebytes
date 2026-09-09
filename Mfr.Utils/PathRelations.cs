@@ -12,11 +12,17 @@ namespace Mfr.Utils
     public static class PathRelations
     {
         /// <summary>
-        /// Whether two paths refer to the same on-disk entry under the host filesystem.
+        /// Whether two path strings are equal under the host filesystem comparer (no trailing-separator trim).
         /// </summary>
         /// <param name="first">First absolute path.</param>
         /// <param name="second">Second absolute path.</param>
-        /// <returns><c>true</c> when both paths normalize to the same on-disk entry.</returns>
+        /// <returns><c>true</c> when the comparer treats both strings as the same path text.</returns>
+        /// <remarks>
+        /// <para>
+        /// Does not trim trailing separators. Prefer <see cref="IsSamePath"/> when comparing directory paths
+        /// that may differ only by a trailing separator.
+        /// </para>
+        /// </remarks>
         public static bool SameOnDisk(string first, string second)
         {
             return PathComparers.Os.Equals(first, second);

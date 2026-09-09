@@ -1,3 +1,5 @@
+using Mfr.Utils;
+
 namespace Mfr.Filters.Formatting.Tokens.FileName
 {
     /// <summary>
@@ -6,7 +8,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// <remarks>
     /// <para>
     /// Full name is <see cref="FileMeta.FullFileName"/> on the preview snapshot.
-    /// Leading zeros are stripped. When the full name has no digits, the token expands to <c>0</c>.
+    /// Uses <see cref="FileNameNumericValue.Extract"/> (MFR7: at most 10 digits, zeros stripped via parse).
+    /// When the full name has no digits, the token expands to <c>0</c>.
     /// </para>
     /// </remarks>
     [FormatTokenInfo(
@@ -25,38 +28,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         public Formatter Compile(string tokenArgs)
         {
             FormatOptionsParsing.RequireNoArgument(tokenArgs, FormatOptionsParsing.TokenDisplayName(this));
-            return item =>
-            {
-                var preview = item.Preview;
-                return _ExtractNumericValue(preview.FullFileName);
-            };
-        }
-
-        /// <summary>
-        /// Returns the first contiguous ASCII digit run in <paramref name="fullName"/>, without leading zeros.
-        /// </summary>
-        /// <param name="fullName">Preview file name including extension.</param>
-        /// <returns><c>0</c> when no digits are present; otherwise the digit run with leading zeros removed.</returns>
-        private static string _ExtractNumericValue(string fullName)
-        {
-            for (var i = 0; i < fullName.Length; i++)
-            {
-                if (!char.IsAsciiDigit(fullName[i]))
-                {
-                    continue;
-                }
-
-                var end = i + 1;
-                while (end < fullName.Length && char.IsAsciiDigit(fullName[end]))
-                {
-                    end++;
-                }
-
-                var digits = fullName.AsSpan(i, end - i).TrimStart('0');
-                return digits.IsEmpty ? "0" : digits.ToString();
-            }
-
-            return "0";
+            return item => FileNameNumericValue.Extract(item.Preview.FullFileName);
         }
     }
 }

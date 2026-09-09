@@ -10,7 +10,7 @@ namespace Mfr.Models.Config
     public sealed class SessionState
     {
         /// <summary>
-        /// Schema version for forward-compatible migrations.
+        /// Schema version for the current session shape (unknown or older shapes load as defaults).
         /// </summary>
         [JsonPropertyName("version")]
         public int Version { get; set; } = 1;

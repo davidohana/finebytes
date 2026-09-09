@@ -155,5 +155,30 @@ namespace Mfr.Tests.Utils
 
             Assert.Equal(path, result);
         }
+
+        /// <summary>
+        /// Verifies IsSamePath trims trailing separators before comparing.
+        /// </summary>
+        [Fact]
+        public void IsSamePath_trailing_separator_difference_returns_true()
+        {
+            var without = $"{Root}root{Sep}folder";
+            var with = without + Sep;
+
+            Assert.True(PathRelations.IsSamePath(without, with));
+            Assert.False(PathRelations.SameOnDisk(without, with));
+        }
+
+        /// <summary>
+        /// Verifies IsSamePath treats case differences according to the host filesystem.
+        /// </summary>
+        [Fact]
+        public void IsSamePath_case_only_difference_matches_host_filesystem()
+        {
+            var lower = $"{Root}a{Sep}b";
+            var upper = $"{Root}a{Sep}B";
+
+            Assert.Equal(OperatingSystem.IsWindows(), PathRelations.IsSamePath(lower, upper));
+        }
     }
 }

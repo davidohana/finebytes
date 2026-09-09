@@ -201,7 +201,8 @@ namespace Mfr.Models.Rename
 
         private static bool _ContainsInvalidPathChar(string path)
         {
-            return Path.GetInvalidPathChars().Any(path.Contains);
+            // Windows-fixed set (not host Path.GetInvalidPathChars) — product renames Windows paths.
+            return WindowsFileNameChars.ContainsInvalidPath(path);
         }
     }
 }

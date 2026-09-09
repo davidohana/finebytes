@@ -75,6 +75,18 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         }
 
         /// <summary>
+        /// Verifies runs longer than 10 digits use only the first 10 (MFR7 regex cap).
+        /// </summary>
+        [Fact]
+        public void Resolve_ElevenDigitRun_UsesFirstTenDigits()
+        {
+            var token = new FileNameNumericValueToken();
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "12345678901");
+
+            Assert.Equal("1234567890", token.Compile(tokenArgs: "")(item));
+        }
+
+        /// <summary>
         /// Verifies stray arguments are rejected.
         /// </summary>
         [Fact]
