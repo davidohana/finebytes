@@ -200,6 +200,22 @@ namespace Mfr.Tests.Models.Filters.Replace
             Assert.Contains("Invalid regular expression", ex.Message, StringComparison.Ordinal);
         }
 
+        /// <summary>
+        /// Verifies an unknown formatter token in a replacement fails during setup (same as Replacer).
+        /// </summary>
+        [Fact]
+        public void Setup_UnknownFormatTokenInReplacement_Throws()
+        {
+            var filter = _CreateFilter(
+                entries: [new ReplaceListEntry("a", "<not-a-real-token>")],
+                mode: ReplacerMode.Literal,
+                caseSensitive: true,
+                replaceAll: true,
+                wholeWord: false
+            );
+            Assert.Throws<NotSupportedException>(filter.Setup);
+        }
+
         private static ReplaceListFilter _CreateFilter(
             IReadOnlyList<ReplaceListEntry> entries,
             ReplacerMode mode,

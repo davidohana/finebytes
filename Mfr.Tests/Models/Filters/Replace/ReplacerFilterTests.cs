@@ -298,7 +298,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.ThrowsAny<Exception>(f.Setup);
+            Assert.Throws<NotSupportedException>(f.Setup);
         }
     }
 }

@@ -5,6 +5,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Replace;
+using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Filters.Replace;
 using Mfr.Tests.Ui.AppliedFilters;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
@@ -30,6 +31,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             Assert.IsType<ReplacerFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<ReplacerFilterEditorView>().Single();
+            Assert.Single(editor.GetVisualDescendants().OfType<FormatTokenPickerPane>());
             var mode = editor.FindControl<ReplacerModeFieldset>("ModeFieldset");
             var matchOptions = editor.FindControl<ReplacerMatchOptionsFieldset>("MatchOptionsFieldset");
             Assert.NotNull(mode);
