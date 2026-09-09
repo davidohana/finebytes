@@ -8,10 +8,18 @@
 >
   <StackPanel Spacing="6">
     <controls:FilterEditorLabeledRow Label="Low:">
-      <TextBox Classes="filter-editor-field" Width="80" MaxLength="1" HorizontalAlignment="Left" Text="{Binding Low}" />
+      <TextBox
+        x:Name="LowBox"
+        Classes="filter-editor-field"
+        Width="80"
+        MaxLength="1"
+        HorizontalAlignment="Left"
+        Text="{Binding Low}"
+      />
     </controls:FilterEditorLabeledRow>
     <controls:FilterEditorLabeledRow Label="High:">
       <TextBox
+        x:Name="HighBox"
         Classes="filter-editor-field"
         Width="80"
         MaxLength="1"
@@ -19,5 +27,28 @@
         Text="{Binding High}"
       />
     </controls:FilterEditorLabeledRow>
+    <StackPanel Orientation="Horizontal" Spacing="6">
+      <Button
+        x:Name="DigitsSampleButton"
+        Classes="filter-editor-button"
+        Content="Digits"
+        ToolTip.Tip="Set range to 0–9."
+        Command="{Binding DigitsSampleCommand}"
+      />
+      <Button
+        x:Name="UpperLettersSampleButton"
+        Classes="filter-editor-button"
+        Content="Upper Letters"
+        ToolTip.Tip="Set range to A–Z."
+        Command="{Binding UpperLettersSampleCommand}"
+      />
+      <Button
+        x:Name="LowerLettersSampleButton"
+        Classes="filter-editor-button"
+        Content="Lower Letters"
+        ToolTip.Tip="Set range to a–z."
+        Command="{Binding LowerLettersSampleCommand}"
+      />
+    </StackPanel>
   </StackPanel>
 </UserControl>

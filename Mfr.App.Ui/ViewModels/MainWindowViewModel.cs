@@ -202,6 +202,26 @@ namespace Mfr.App.Ui.ViewModels
         public void ShowOptions() { }
 
         /// <summary>
+        /// When <see langword="true"/>, closing this window does not write <c>session.json</c>
+        /// (Reset Configuration after deleting persisted files).
+        /// </summary>
+        internal bool SuppressSessionSaveOnClose { get; set; }
+
+        /// <summary>
+        /// Raised when the user chooses Tools → Reset Configuration; the main window confirms and restarts.
+        /// </summary>
+        internal event EventHandler? ResetConfigurationRequested;
+
+        /// <summary>
+        /// Requests Reset Configuration (confirm / delete AppData / restart) via the main window.
+        /// </summary>
+        [RelayCommand]
+        public void ResetConfiguration()
+        {
+            ResetConfigurationRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
         /// Shuts down the application.
         /// </summary>
         [RelayCommand]

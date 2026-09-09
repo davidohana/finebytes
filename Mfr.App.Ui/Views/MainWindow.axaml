@@ -347,6 +347,13 @@
           IsEnabled="{Binding AppliedFiltersViewModel.CanShowFilterOptions}"
         />
       </MenuItem>
+      <MenuItem Header="_Tools">
+        <MenuItem
+          Header="Reset _Configuration"
+          Command="{Binding ResetConfigurationCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.ResetConfiguration}"
+        />
+      </MenuItem>
       <MenuItem Header="_Help">
         <MenuItem Header="About" IsEnabled="False" />
       </MenuItem>

@@ -91,6 +91,32 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
+        /// Deletes the config JSON file when it exists (Reset Configuration).
+        /// <para>Missing files are a no-op. Does not change the in-memory <see cref="Config"/>.</para>
+        /// </summary>
+        /// <param name="configFilePath">
+        /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultConfigFilePath"/> is used.
+        /// </param>
+        /// <exception cref="IOException">Thrown when the file exists but cannot be deleted.</exception>
+        public static void DeleteDefaultFile(string? configFilePath = null)
+        {
+            var path = _ResolvePath(configFilePath);
+            if (!File.Exists(path))
+            {
+                return;
+            }
+
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception ex)
+            {
+                throw new IOException($"Error deleting configuration file '{path}'.", ex);
+            }
+        }
+
+        /// <summary>
         /// Writes <see cref="Config"/> to JSON when the file is missing, so it can be hand-edited.
         /// <para>
         /// Existing files are left unchanged. Failures are swallowed so a missing AppData write does not

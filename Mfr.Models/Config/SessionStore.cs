@@ -68,6 +68,32 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
+        /// Deletes the session JSON file when it exists (Reset Configuration).
+        /// <para>Missing files are a no-op.</para>
+        /// </summary>
+        /// <param name="sessionFilePath">
+        /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultSessionFilePath"/> is used.
+        /// </param>
+        /// <exception cref="IOException">Thrown when the file exists but cannot be deleted.</exception>
+        public static void Delete(string? sessionFilePath = null)
+        {
+            var path = _ResolvePath(sessionFilePath);
+            if (!File.Exists(path))
+            {
+                return;
+            }
+
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception ex)
+            {
+                throw new IOException($"Error deleting session file '{path}'.", ex);
+            }
+        }
+
+        /// <summary>
         /// Writes <paramref name="state"/> to the session file.
         /// <para>Failures are swallowed so preference saves do not crash the app.</para>
         /// </summary>

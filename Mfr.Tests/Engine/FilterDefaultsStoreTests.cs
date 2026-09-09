@@ -149,5 +149,34 @@ namespace Mfr.Tests.Engine
             Assert.True(defaults.TryGetProperty("LettersCase", out var entry));
             Assert.Equal("LettersCase", entry.GetProperty("type").GetString());
         }
+
+        /// <summary>
+        /// Verifies DeleteFile removes the JSON and clears the cache.
+        /// </summary>
+        [Fact]
+        public void DeleteFile_removes_file_and_clears_cache()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("filter-defaults.json");
+            var store = new FilterDefaultsStore(path);
+            store.SetDefault(new LettersCaseFilter());
+            Assert.True(File.Exists(path));
+            Assert.True(store.TryGetDefault("LettersCase", out _));
+
+            store.DeleteFile();
+
+            Assert.False(File.Exists(path));
+            Assert.False(store.TryGetDefault("LettersCase", out _));
+        }
+
+        /// <summary>
+        /// Verifies DeleteFileAt is a no-op when the file is missing.
+        /// </summary>
+        [Fact]
+        public void DeleteFileAt_missing_is_noop()
+        {
+            var path = _tempDirectoryFixture.CreateTempDir().CombinePath("missing-filter-defaults.json");
+            FilterDefaultsStore.DeleteFileAt(path);
+            Assert.False(File.Exists(path));
+        }
     }
 }

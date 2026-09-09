@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Media;
@@ -71,6 +72,46 @@ namespace Mfr.Tests.Ui.FormatEditor
             Dispatcher.UIThread.RunJobs();
 
             Assert.NotNull(dialog.FindDescendantOfType<CounterFormatTokenEditorView>());
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies Digits / Upper Letters / Lower Letters sample buttons update Low/High (MFR7).
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_RandomChar_SampleButtons_UpdateLowHigh()
+        {
+            var editor = new RandomCharFormatTokenEditorViewModel(args: null);
+            var dialog = new FormatTokenEditorDialog(editor);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var body = Assert.IsType<RandomCharFormatTokenEditorView>(
+                dialog.FindDescendantOfType<RandomCharFormatTokenEditorView>()
+            );
+            var lowBox = Assert.IsType<TextBox>(body.FindControl<TextBox>("LowBox"));
+            var highBox = Assert.IsType<TextBox>(body.FindControl<TextBox>("HighBox"));
+            var digits = Assert.IsType<Button>(body.FindControl<Button>("DigitsSampleButton"));
+            var upper = Assert.IsType<Button>(body.FindControl<Button>("UpperLettersSampleButton"));
+            var lower = Assert.IsType<Button>(body.FindControl<Button>("LowerLettersSampleButton"));
+
+            _Click(dialog, digits);
+            Assert.Equal("0", editor.Low);
+            Assert.Equal("9", editor.High);
+            Assert.Equal("0", lowBox.Text);
+            Assert.Equal("9", highBox.Text);
+
+            _Click(dialog, upper);
+            Assert.Equal("A", editor.Low);
+            Assert.Equal("Z", editor.High);
+
+            _Click(dialog, lower);
+            Assert.Equal("a", editor.Low);
+            Assert.Equal("z", editor.High);
+            Assert.Equal("a", lowBox.Text);
+            Assert.Equal("z", highBox.Text);
+
             dialog.Close();
         }
 
@@ -368,6 +409,15 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.True(locator.Match(orphan));
             var ex = Assert.Throws<InvalidOperationException>(() => locator.Build(orphan));
             Assert.Contains("TokenEditors", ex.Message, StringComparison.Ordinal);
+        }
+
+        private static void _Click(Window host, Control target)
+        {
+            var point = target.TranslatePoint(new Point(target.Bounds.Width / 2, target.Bounds.Height / 2), host);
+            Assert.NotNull(point);
+            host.MouseDown(point.Value, MouseButton.Left);
+            host.MouseUp(point.Value, MouseButton.Left);
+            Dispatcher.UIThread.RunJobs();
         }
 
         private sealed class OrphanFormatTokenEditorViewModel : IFormatTokenEditorViewModel

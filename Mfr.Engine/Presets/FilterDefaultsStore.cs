@@ -118,6 +118,54 @@ namespace Mfr.Engine.Presets
         }
 
         /// <summary>
+        /// Clears the in-memory type defaults without touching disk.
+        /// </summary>
+        public void Clear()
+        {
+            _typeToDefault.Clear();
+        }
+
+        /// <summary>
+        /// Deletes the defaults JSON file when it exists and clears the in-memory cache (Reset Configuration).
+        /// <para>Missing files are a no-op aside from clearing the cache.</para>
+        /// </summary>
+        /// <exception cref="IOException">Thrown when the file exists but cannot be deleted.</exception>
+        public void DeleteFile()
+        {
+            Clear();
+            DeleteFileAt(DefaultsFilePath);
+        }
+
+        /// <summary>
+        /// Deletes <paramref name="defaultsFilePath"/> when it exists (Reset Configuration).
+        /// <para>Missing files are a no-op.</para>
+        /// </summary>
+        /// <param name="defaultsFilePath">Absolute path to <c>filter-defaults.json</c>.</param>
+        /// <exception cref="ArgumentException"><paramref name="defaultsFilePath"/> is blank.</exception>
+        /// <exception cref="IOException">Thrown when the file exists but cannot be deleted.</exception>
+        public static void DeleteFileAt(string defaultsFilePath)
+        {
+            if (string.IsNullOrWhiteSpace(defaultsFilePath))
+            {
+                throw new ArgumentException("Defaults file path must not be blank.", nameof(defaultsFilePath));
+            }
+
+            if (!File.Exists(defaultsFilePath))
+            {
+                return;
+            }
+
+            try
+            {
+                File.Delete(defaultsFilePath);
+            }
+            catch (Exception ex)
+            {
+                throw new IOException($"Error deleting filter defaults file '{defaultsFilePath}'.", ex);
+            }
+        }
+
+        /// <summary>
         /// Saves the current type defaults to disk.
         /// </summary>
         public void Save()

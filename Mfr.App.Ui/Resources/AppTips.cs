@@ -23,6 +23,9 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Toolbar tip for Options.</summary>
         public const string ShowOptions = "Options (Ctrl+,)";
 
+        /// <summary>Tools → Reset Configuration menu tip (MFR7 ResetConfiguration).</summary>
+        public const string ResetConfiguration = "Reset configuration to default values";
+
         /// <summary>Rename List Add Selected button and menu tip.</summary>
         public const string AddSelected = "Add selected (Ctrl+Shift+S)";
 

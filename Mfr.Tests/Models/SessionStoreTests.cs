@@ -151,5 +151,39 @@ namespace Mfr.Tests.Models
                 }
             }
         }
+
+        /// <summary>
+        /// Verifies a missing session file is a no-op.
+        /// </summary>
+        [Fact]
+        public void Delete_missing_is_noop()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "mfr-session-delete-missing-" + Guid.NewGuid() + ".json");
+            SessionStore.Delete(path);
+            Assert.False(File.Exists(path));
+        }
+
+        /// <summary>
+        /// Verifies an existing session file is removed.
+        /// </summary>
+        [Fact]
+        public void Delete_removes_existing_file()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "mfr-session-delete-" + Guid.NewGuid() + ".json");
+            SessionStore.Save(new SessionState(), path);
+            try
+            {
+                Assert.True(File.Exists(path));
+                SessionStore.Delete(path);
+                Assert.False(File.Exists(path));
+            }
+            finally
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+        }
     }
 }

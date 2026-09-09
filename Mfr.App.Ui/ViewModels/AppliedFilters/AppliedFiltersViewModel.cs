@@ -34,6 +34,14 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
+        /// Clears in-memory per-type add defaults after Reset Configuration deletes the file.
+        /// </summary>
+        internal void ClearFilterDefaultsCache()
+        {
+            _filterDefaults.Clear();
+        }
+
+        /// <summary>
         /// Gets applied filter steps in stack order.
         /// </summary>
         public ObservableCollection<AppliedFilterStepViewModel> Steps { get; }

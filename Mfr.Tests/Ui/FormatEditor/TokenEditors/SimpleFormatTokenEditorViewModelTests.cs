@@ -100,5 +100,31 @@ namespace Mfr.Tests.Ui.FormatEditor.TokenEditors
             Assert.Equal("random-char:0,9", parsed.BuildInnerText());
             Assert.True(FormatStringSyntax.TryValidate(parsed.ResultingFormatString).Success);
         }
+
+        /// <summary>
+        /// Verifies Digits / Upper Letters / Lower Letters samples match MFR7 presets.
+        /// </summary>
+        [Fact]
+        public void RandomChar_SampleButtons_SetRanges()
+        {
+            var vm = new RandomCharFormatTokenEditorViewModel("A,Z");
+
+            Assert.True(vm.DigitsSampleCommand.CanExecute(null));
+            vm.DigitsSampleCommand.Execute(null);
+            Assert.Equal("0", vm.Low);
+            Assert.Equal("9", vm.High);
+            Assert.Equal("random-char:0,9", vm.BuildInnerText());
+
+            vm.UpperLettersSampleCommand.Execute(null);
+            Assert.Equal("A", vm.Low);
+            Assert.Equal("Z", vm.High);
+            Assert.Equal("random-char:A,Z", vm.BuildInnerText());
+
+            vm.LowerLettersSampleCommand.Execute(null);
+            Assert.Equal("a", vm.Low);
+            Assert.Equal("z", vm.High);
+            Assert.Equal("random-char:a,z", vm.BuildInnerText());
+            Assert.True(FormatStringSyntax.TryValidate(vm.ResultingFormatString).Success);
+        }
     }
 }

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
 {
@@ -49,6 +50,39 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
             var low = _FirstCharOrDefault(Low, 'A');
             var high = _FirstCharOrDefault(High, 'Z');
             return CanonicalName + ":" + low + "," + high;
+        }
+
+        /// <summary>
+        /// Sets the range to digits <c>0</c>–<c>9</c> (MFR7 Digits sample).
+        /// </summary>
+        [RelayCommand]
+        public void DigitsSample()
+        {
+            _ApplySample("0", "9");
+        }
+
+        /// <summary>
+        /// Sets the range to uppercase letters <c>A</c>–<c>Z</c> (MFR7 Upper Letters sample).
+        /// </summary>
+        [RelayCommand]
+        public void UpperLettersSample()
+        {
+            _ApplySample("A", "Z");
+        }
+
+        /// <summary>
+        /// Sets the range to lowercase letters <c>a</c>–<c>z</c> (MFR7 Lower Letters sample).
+        /// </summary>
+        [RelayCommand]
+        public void LowerLettersSample()
+        {
+            _ApplySample("a", "z");
+        }
+
+        private void _ApplySample(string low, string high)
+        {
+            Low = low;
+            High = high;
         }
 
         private static char _FirstCharOrDefault(string text, char fallback)
