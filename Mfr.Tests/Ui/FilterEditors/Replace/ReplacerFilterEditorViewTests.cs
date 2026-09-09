@@ -7,6 +7,7 @@ using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Replace;
 using Mfr.Filters.Replace;
 using Mfr.Tests.Ui.AppliedFilters;
+using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Replace
 {
@@ -34,7 +35,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             Assert.NotNull(mode);
             Assert.NotNull(matchOptions);
             var find = editor.FindControl<TextBox>("FindBox");
-            var replacement = editor.FindControl<TextBox>("ReplacementBox");
+            var replacement = editor.FindControl<FormatEditorControl>("ReplacementEditor");
             var literal = mode.FindControl<CompactRadioButton>("LiteralRadio");
             var wildcard = mode.FindControl<CompactRadioButton>("WildcardRadio");
             var regex = mode.FindControl<CompactRadioButton>("RegexRadio");

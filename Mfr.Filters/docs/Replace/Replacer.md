@@ -1,14 +1,14 @@
 # Replacer
 
-Finds a **search** pattern in the target segment and replaces matches with **replacement** text. `mode` controls how `find` is interpreted.
+Finds a **search** pattern in the target segment and replaces matches with **replacement** text. `mode` controls how `find` is interpreted. `replacement` is a format string—formatter tokens such as `<file-name>` or `<counter:…>` expand per item before the replace runs.
 
 ## Options
 
-| Property      | Type   | Description                                                                                                       |
-| ------------- | ------ | ----------------------------------------------------------------------------------------------------------------- |
-| `find`        | string | Search pattern (meaning depends on `match.mode`). Empty → no-op.                                                  |
-| `replacement` | string | Replacement text. In `Regex` mode, `$0` / `$1`… are substitutions; in `Literal` / `Wildcard` they are plain text. |
-| `match`       | object | Shared match policy (`mode`, `caseSensitive`, `replaceAll`, `wholeWord`) — see **Match**.                         |
+| Property      | Type   | Description                                                                                                                                                                        |
+| ------------- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `find`        | string | Search pattern (meaning depends on `match.mode`). Empty → no-op.                                                                                                                   |
+| `replacement` | string | Format string used as the replacement (tokens expand per item). In `Regex` mode, `$0` / `$1`… in the expanded text are substitutions; in `Literal` / `Wildcard` `$` is plain text. |
+| `match`       | object | Shared match policy (`mode`, `caseSensitive`, `replaceAll`, `wholeWord`) — see **Match**.                                                                                          |
 
 ### Match (`match`)
 
@@ -53,6 +53,10 @@ Finds a **search** pattern in the target segment and replaces matches with **rep
 - `find`: `""`; `replacement`: `"X"`; `mode`: `Literal` — input unchanged (empty find is a no-op).
 - `find`: `"a"`; `replacement`: `"$1"`; `mode`: `Literal` — `a` → `$1` (`$` is literal outside Regex mode).
 - `find`: `@"(a)(b)"`; `replacement`: `"$2$1"`; `mode`: `Regex` — `ab` → `ba`
+- `find`: `"x"`; `replacement`: `"<counter:initial=1,step=1,padding=none,length=1,resetScope=global>"`; `mode`: `Literal`; `replaceAll`: `true`
+  - Before: `axbx` (rename list index `0`)
+  - After: `a1b1`
+  - Comment: Format tokens in `replacement` expand once per item before replace runs.
 
 For many rules in one step, use [ReplaceList](ReplaceList.md).
 

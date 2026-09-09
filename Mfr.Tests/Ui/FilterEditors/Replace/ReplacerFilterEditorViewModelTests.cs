@@ -24,6 +24,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             Assert.Equal("feat.", editor.FindWatermark);
             Assert.Equal("feature.", editor.ReplacementWatermark);
             Assert.Contains("literally", editor.FindToolTip, StringComparison.Ordinal);
+            Assert.Contains("formatter tokens", editor.ReplacementToolTip, StringComparison.Ordinal);
             Assert.DoesNotContain("$0", editor.ReplacementToolTip, StringComparison.Ordinal);
             Assert.False(editor.Match.CaseSensitive);
             Assert.True(editor.Match.ReplaceAll);

@@ -25,18 +25,18 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 #### File name
 
-| Token                         | Output                                                                                                                                    |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `<file-name>`                 | Preview prefix (no extension).                                                                                                            |
-| `<file-extension>` or `<ext>` | Preview extension (without leading dot).                                                                                                  |
-| `<full-name>`                 | Preview full file name (`Prefix` + `.` + `Extension` when present).                                                                       |
-| `<parent-folder>`             | Name of the immediate parent folder (level 1) from preview directory.                                                                     |
-| `<parent-folder:level>`       | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth.          |
-| `<full-path>`                 | Preview full path of the file.                                                                                                            |
-| `<file-or-folder>`            | `File` or `Folder` from original `Attributes.IsDirectory` (read-only; no Apply target).                                                   |
-| `<file-name-numeric-value>`   | First contiguous digit run in the preview full file name (leading zeros stripped); `0` when none. Useful for numeric sort.                |
-| `<file-name-length>`          | Character length of the preview full file name.                                                                                           |
-| `<full-path-length>`          | Character length of the preview full path.                                                                                                |
+| Token                         | Output                                                                                                                           |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `<file-name>`                 | Preview prefix (no extension).                                                                                                   |
+| `<file-extension>` or `<ext>` | Preview extension (without leading dot).                                                                                         |
+| `<full-name>`                 | Preview full file name (`Prefix` + `.` + `Extension` when present).                                                              |
+| `<parent-folder>`             | Name of the immediate parent folder (level 1) from preview directory.                                                            |
+| `<parent-folder:level>`       | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth. |
+| `<full-path>`                 | Preview full path of the file.                                                                                                   |
+| `<file-or-folder>`            | `File` or `Folder` from original `Attributes.IsDirectory` (read-only; no Apply target).                                          |
+| `<file-name-numeric-value>`   | First contiguous digit run in the preview full file name (leading zeros stripped); `0` when none. Useful for numeric sort.       |
+| `<file-name-length>`          | Character length of the preview full file name.                                                                                  |
+| `<full-path-length>`          | Character length of the preview full path.                                                                                       |
 
 #### Audio tags (canonical overlay)
 
@@ -229,23 +229,23 @@ Unknown token names fail when the filter is set up (compile / preview), not left
 
 Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows use the **global** index passed to the filter.
 
-| Options                                                                                                    | Before                                   | After                               | Comment                                                                       |
-| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ----------------------------------- | ----------------------------------------------------------------------------- |
-| `template`: `"<file-name>"`                                                                                | `song`                                   | `song`                              |                                                                               |
-| `template`: `"<parent-folder>"`<br>file under `Music\My Album\`                                            | `ignored`                                | `My Album`                          |                                                                               |
-| `template`: `"<parent-folder:2>"`<br>file under `Music\My Album\`                                          | `ignored`                                | `Music`                             | Level 2 = grandparent.                                                        |
-| `template`: `"<file-date:yyyy-MM-dd,creation>"`                                                            | `ignored`                                | `2023-04-07`                        | Creation time, common date layout.                                            |
-| `template`: `"<file-date:yyyy,creation>"`                                                                  | `ignored`                                | `2024`                              | Creation year.                                                                |
-| `template`: `"<file-date:yyyy,lastWrite>"`                                                                 | `ignored`                                | `2021`                              | Last-write year.                                                              |
-| `template`: `"<file-size>"`                                                                                | `ignored`                                | `1 KB`                              | Auto unit, 0 decimals.                                                        |
-| `template`: `"<file-size:mb,2>"`                                                                           | `ignored`                                | `1.50 MB`                           | MB, 2 decimal places.                                                         |
-| `template`: `"<drive-letter>"`                                                                             | `ignored`                                | `C`                                 | Drive letter of the file (no colon).                                          |
-| `template`: `"<counter:initial=10,step=2,padding=fixed,length=4,resetScope=global>"`<br>global index: `3`  | `ignored`                                | `0016`                              | `10 + 2×3`, fixed width `4`.                                                  |
-| `template`: `"<token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<full-name>>"`   | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `13_`                               | Track number prefix, split by `-`.                                            |
-| `template`: `"<token:tokenNumber=2,separator=_-_,includeNext=false,includePrev=false,source=<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog`                              | Artist name, split by `_-_`.                                                  |
-| `template`: `"<token:tokenNumber=2,separator=_-_,includeNext=true,includePrev=false,source=<full-name>>"`  | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog_-_Cold_Blooded_Old_Times.mp3` | Artist and title, include-next.                                               |
-| `template`: `"<substr:start=1,end=5,source=<file-name>>"`                                                  | `MyTestFileName.123`                     | `MyTes`                             | First 5 chars of prefix.                                                      |
-| `template`: `"<substr:start=5,end=-6,source=<full-name>>"`                                                 | `MyTestFileName.123`                     | `stFileNam`                         | Positive start, negative end.                                                 |
+| Options                                                                                                    | Before                                   | After                               | Comment                                                                     |
+| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
+| `template`: `"<file-name>"`                                                                                | `song`                                   | `song`                              |                                                                             |
+| `template`: `"<parent-folder>"`<br>file under `Music\My Album\`                                            | `ignored`                                | `My Album`                          |                                                                             |
+| `template`: `"<parent-folder:2>"`<br>file under `Music\My Album\`                                          | `ignored`                                | `Music`                             | Level 2 = grandparent.                                                      |
+| `template`: `"<file-date:yyyy-MM-dd,creation>"`                                                            | `ignored`                                | `2023-04-07`                        | Creation time, common date layout.                                          |
+| `template`: `"<file-date:yyyy,creation>"`                                                                  | `ignored`                                | `2024`                              | Creation year.                                                              |
+| `template`: `"<file-date:yyyy,lastWrite>"`                                                                 | `ignored`                                | `2021`                              | Last-write year.                                                            |
+| `template`: `"<file-size>"`                                                                                | `ignored`                                | `1 KB`                              | Auto unit, 0 decimals.                                                      |
+| `template`: `"<file-size:mb,2>"`                                                                           | `ignored`                                | `1.50 MB`                           | MB, 2 decimal places.                                                       |
+| `template`: `"<drive-letter>"`                                                                             | `ignored`                                | `C`                                 | Drive letter of the file (no colon).                                        |
+| `template`: `"<counter:initial=10,step=2,padding=fixed,length=4,resetScope=global>"`<br>global index: `3`  | `ignored`                                | `0016`                              | `10 + 2×3`, fixed width `4`.                                                |
+| `template`: `"<token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<full-name>>"`   | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `13_`                               | Track number prefix, split by `-`.                                          |
+| `template`: `"<token:tokenNumber=2,separator=_-_,includeNext=false,includePrev=false,source=<full-name>>"` | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog`                              | Artist name, split by `_-_`.                                                |
+| `template`: `"<token:tokenNumber=2,separator=_-_,includeNext=true,includePrev=false,source=<full-name>>"`  | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog_-_Cold_Blooded_Old_Times.mp3` | Artist and title, include-next.                                             |
+| `template`: `"<substr:start=1,end=5,source=<file-name>>"`                                                  | `MyTestFileName.123`                     | `MyTes`                             | First 5 chars of prefix.                                                    |
+| `template`: `"<substr:start=5,end=-6,source=<full-name>>"`                                                 | `MyTestFileName.123`                     | `stFileNam`                         | Positive start, negative end.                                               |
 | `template`: `"<substr:start=-1,end=2,source=<file-extension>45>"`                                          | `MyTestFileName.123`                     | `345`                               | Crossed positions: extension `123` + literal `45` → `12345`; range `(2,5]`. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).

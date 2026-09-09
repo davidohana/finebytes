@@ -234,6 +234,29 @@ namespace Mfr.Tests.Models.Filters.Replace
         }
 
         /// <summary>
+        /// Verifies formatter tokens in the replacement expand per item before replace runs (MFR7).
+        /// </summary>
+        [Fact]
+        public void Apply_FormatTokenInReplacement_ExpandsPerItem()
+        {
+            var f = new ReplacerFilter(
+                _target,
+                new ReplacerOptions(
+                    "x",
+                    "<counter:initial=1,step=1,padding=none,length=1,resetScope=global>",
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
+                )
+            );
+            Assert.Equal("a1b1", FilterTestHelpers.ApplyToPrefix(f, "axbx", renameListIndex: 0));
+            Assert.Equal("c2d2", FilterTestHelpers.ApplyToPrefix(f, "cxdx", renameListIndex: 1));
+        }
+
+        /// <summary>
         /// Verifies invalid regex patterns fail during setup (preview marks all items).
         /// </summary>
         [Fact]
@@ -254,6 +277,28 @@ namespace Mfr.Tests.Models.Filters.Replace
             );
             var ex = Assert.Throws<ArgumentException>(f.Setup);
             Assert.Contains("Invalid regular expression", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies an unknown formatter token in the replacement fails during setup.
+        /// </summary>
+        [Fact]
+        public void Setup_UnknownFormatTokenInReplacement_Throws()
+        {
+            var f = new ReplacerFilter(
+                _target,
+                new ReplacerOptions(
+                    "a",
+                    "<not-a-real-token>",
+                    Match: new ReplacerMatchOptions(
+                        Mode: ReplacerMode.Literal,
+                        CaseSensitive: true,
+                        ReplaceAll: true,
+                        WholeWord: false
+                    )
+                )
+            );
+            Assert.ThrowsAny<Exception>(f.Setup);
         }
     }
 }

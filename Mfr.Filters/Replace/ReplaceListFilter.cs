@@ -22,9 +22,9 @@ namespace Mfr.Filters.Replace
     /// Applies sequential replacements from an embedded replace list.
     /// </summary>
     /// <remarks>
-    /// Replace entries are applied in list order, sharing one mode and match flags. Unlike
-    /// <see cref="ReplacerFilter"/>, each replacement is a format string (formatter tokens such as
-    /// <c>&lt;counter:…&gt;</c> are expanded per item before the replace runs).
+    /// Replace entries are applied in list order, sharing one mode and match flags. Each replacement
+    /// is a format string (formatter tokens such as <c>&lt;counter:…&gt;</c> expand per item before the
+    /// replace runs), same as <see cref="ReplacerFilter"/>.
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Replace-list options.</param>

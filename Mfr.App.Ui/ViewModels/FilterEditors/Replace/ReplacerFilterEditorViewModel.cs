@@ -58,9 +58,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
             Match.Mode switch
             {
                 ReplacerMode.Literal or ReplacerMode.Wildcard =>
-                    "Replacement for each match.\nLeave empty to strip matches.",
+                    "Replacement for each match.\nMay include formatter tokens such as <file-name>.\nLeave empty to strip matches.",
                 ReplacerMode.Regex =>
-                    "Replacement for each match.\nLeave empty to strip matches.\n$0 / $1… refer to captured groups.",
+                    "Replacement for each match.\nMay include formatter tokens such as <file-name>.\nLeave empty to strip matches.\n$0 / $1… refer to captured groups.",
                 _ => throw new ArgumentOutOfRangeException(nameof(Match.Mode), Match.Mode, null),
             };
 
