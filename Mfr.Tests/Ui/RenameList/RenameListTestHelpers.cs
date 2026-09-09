@@ -41,17 +41,14 @@ namespace Mfr.Tests.Ui.RenameList
             RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath);
 
         /// <summary>
-        /// Builds a one-field session sort list for <see cref="RenameListViewModel.ApplySession"/>.
+        /// Builds a one-field sort list for <see cref="RenameListViewModel.ApplySession"/>.
         /// </summary>
         /// <param name="fieldKey">Sort field key.</param>
         /// <param name="descending">When <see langword="true"/>, sort descending.</param>
-        /// <returns>Single-element session field list.</returns>
-        internal static List<SessionStateRenameListSortField> SortSession(
-            RenameListFieldKey fieldKey,
-            bool descending = false
-        )
+        /// <returns>Single-element sort key list.</returns>
+        internal static List<RenameListSortKey> SortSession(RenameListFieldKey fieldKey, bool descending = false)
         {
-            return [new SessionStateRenameListSortField(fieldKey, descending)];
+            return [new RenameListSortKey(fieldKey, descending)];
         }
 
         /// <summary>

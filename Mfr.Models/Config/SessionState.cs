@@ -10,7 +10,11 @@ namespace Mfr.Models.Config
     public sealed class SessionState
     {
         /// <summary>
-        /// Schema version for the current session shape (unknown or older shapes load as defaults).
+        /// Schema version written with the current session shape.
+        /// <para>
+        /// Not used as a migrate/reject gate: unknown properties are ignored by the serializer, and missing
+        /// properties keep CLR defaults (same as first launch). Values <c>&lt;= 0</c> normalize to <c>1</c> on load/save.
+        /// </para>
         /// </summary>
         [JsonPropertyName("version")]
         public int Version { get; set; } = 1;
@@ -192,7 +196,7 @@ namespace Mfr.Models.Config
         /// <para>Null means unset (first launch uses <see cref="RenameListSortKey.DefaultKeys"/>).</para>
         /// </summary>
         [JsonPropertyName("sortFields")]
-        public List<SessionStateRenameListSortField>? SortFields { get; set; }
+        public List<RenameListSortKey>? SortFields { get; set; }
 
         /// <summary>
         /// Last Rename List visible grid columns in left-to-right order.
@@ -225,44 +229,7 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("previewEnabled")]
         public bool PreviewEnabled { get; set; } = true;
-
-        /// <summary>
-        /// Converts persisted session fields into sort keys.
-        /// </summary>
-        /// <param name="fields">Session fields in priority order.</param>
-        /// <returns>Sort keys; empty when Auto-Sort is off.</returns>
-        public static IReadOnlyList<RenameListSortKey> ToSortKeys(IReadOnlyList<SessionStateRenameListSortField> fields)
-        {
-            ArgumentNullException.ThrowIfNull(fields);
-            if (fields.Count == 0)
-            {
-                return [];
-            }
-
-            return [.. fields.Select(field => new RenameListSortKey(field.Key, field.Descending))];
-        }
-
-        /// <summary>
-        /// Converts sort keys into persisted session fields.
-        /// </summary>
-        /// <param name="keys">Sort keys in priority order.</param>
-        /// <returns>Session fields; empty when Auto-Sort is off.</returns>
-        public static List<SessionStateRenameListSortField> FromSortKeys(IReadOnlyList<RenameListSortKey> keys)
-        {
-            ArgumentNullException.ThrowIfNull(keys);
-            return [.. keys.Select(key => new SessionStateRenameListSortField(key.FieldKey, key.Descending))];
-        }
     }
-
-    /// <summary>
-    /// One persisted Rename List Auto-Sort key: field plus sort direction.
-    /// </summary>
-    /// <param name="Key">Original field key to compare.</param>
-    /// <param name="Descending">When <see langword="true"/>, sort that field descending.</param>
-    public sealed record SessionStateRenameListSortField(
-        [property: JsonPropertyName("key")] RenameListFieldKey Key,
-        [property: JsonPropertyName("descending")] bool Descending = false
-    );
 
     /// <summary>
     /// One persisted Rename List visible grid column: field identity plus optional width override.

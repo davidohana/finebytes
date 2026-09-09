@@ -15,7 +15,10 @@ namespace Mfr.Engine.Presets
     internal static class PresetJsonOptions
     {
         /// <summary>
-        /// Concrete <see cref="BaseFilter"/> types registered for preset JSON (single source of truth for polymorphism).
+        /// Concrete <see cref="BaseFilter"/> types registered for preset JSON polymorphism.
+        /// <para>
+        /// Must stay aligned with the palette <c>FilterCatalog</c>; drift is gated by catalog tests.
+        /// </para>
         /// </summary>
         internal static IReadOnlyList<JsonDerivedType> BaseFilterDerivedTypes => s_BaseFilterDerivedTypes;
 

@@ -3,6 +3,7 @@ namespace Mfr.Tests.Models
     /// <summary>
     /// Tests for <see cref="ConfigStore.ApplyCliOverrides"/>.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class ConfigStoreCliOverridesTests
     {
         public ConfigStoreCliOverridesTests()

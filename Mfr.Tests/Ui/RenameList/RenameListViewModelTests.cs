@@ -901,8 +901,8 @@ namespace Mfr.Tests.Ui.RenameList
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
             renameListViewModel.ApplySession([
-                new SessionStateRenameListSortField(previewKey),
-                new SessionStateRenameListSortField(RenameListTestHelpers.ParentFolderKey, Descending: true),
+                new RenameListSortKey(previewKey),
+                new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true),
             ]);
 
             Assert.Equal(
@@ -996,10 +996,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.ApplySession(null);
 
             Assert.True(renameListViewModel.IsAutoSort);
-            Assert.Equal(
-                SessionStateRenameList.FromSortKeys(RenameListSortKey.DefaultKeys),
-                renameListViewModel.CaptureSortFields()
-            );
+            Assert.Equal(RenameListSortKey.DefaultKeys, renameListViewModel.CaptureSortFields());
         }
 
         /// <summary>

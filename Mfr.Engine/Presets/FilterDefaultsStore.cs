@@ -147,7 +147,7 @@ namespace Mfr.Engine.Presets
         /// <exception cref="IOException">Thrown when the file exists but cannot be deleted.</exception>
         public static void DeleteFileAt(string? defaultsFilePath = null)
         {
-            var path = string.IsNullOrWhiteSpace(defaultsFilePath) ? DefaultFilePath() : defaultsFilePath;
+            var path = string.IsNullOrWhiteSpace(defaultsFilePath) ? DefaultFilePath() : defaultsFilePath.Trim();
             if (!File.Exists(path))
             {
                 return;

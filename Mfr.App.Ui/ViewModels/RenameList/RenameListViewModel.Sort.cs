@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.Input;
-using Mfr.Models.Config;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -68,23 +67,21 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Restores Auto-Sort keys from a session value.
         /// </summary>
         /// <param name="sortFields">
-        /// Session sort fields, empty to disable Auto-Sort, or <see langword="null"/> for the default keys.
+        /// Sort keys, empty to disable Auto-Sort, or <see langword="null"/> for the default keys.
         /// </param>
-        internal void ApplySession(IReadOnlyList<SessionStateRenameListSortField>? sortFields)
+        internal void ApplySession(IReadOnlyList<RenameListSortKey>? sortFields)
         {
-            var keys = sortFields is null
-                ? RenameListSortKey.DefaultKeys
-                : SessionStateRenameList.ToSortKeys(sortFields);
+            var keys = sortFields is null ? RenameListSortKey.DefaultKeys : sortFields;
             _ApplySortKeys(keys, resort: true);
         }
 
         /// <summary>
         /// Captures the current Auto-Sort keys for session save.
         /// </summary>
-        /// <returns>Session sort fields, or empty when Auto-Sort is off.</returns>
-        internal IReadOnlyList<SessionStateRenameListSortField> CaptureSortFields()
+        /// <returns>Sort keys, or empty when Auto-Sort is off.</returns>
+        internal IReadOnlyList<RenameListSortKey> CaptureSortFields()
         {
-            return SessionStateRenameList.FromSortKeys(_sortKeys);
+            return _sortKeys;
         }
 
         /// <summary>

@@ -40,6 +40,28 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
+        public void Load_non_positive_version_normalizes_to_one()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "mfr-session-ver-" + Guid.NewGuid() + ".json");
+            try
+            {
+                File.WriteAllText(
+                    path, /*lang=json,strict*/
+                    """{"version":0}"""
+                );
+                var session = SessionStore.Load(path);
+                Assert.Equal(1, session.Version);
+            }
+            finally
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+            }
+        }
+
+        [Fact]
         public void Save_and_Load_round_trip()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-round-" + Guid.NewGuid() + ".json");
@@ -73,13 +95,7 @@ namespace Mfr.Tests.Models
                     },
                     RenameList = new SessionStateRenameList
                     {
-                        SortFields =
-                        [
-                            new SessionStateRenameListSortField(
-                                RenameListTestHelpers.FullFileNameKey,
-                                Descending: true
-                            ),
-                        ],
+                        SortFields = [new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true)],
                         VisibleColumns =
                         [
                             new SessionStateRenameListColumn(
@@ -126,7 +142,7 @@ namespace Mfr.Tests.Models
                 Assert.NotNull(loaded.RenameList);
                 Assert.NotNull(loaded.RenameList.SortFields);
                 Assert.Single(loaded.RenameList.SortFields);
-                Assert.Equal(RenameListTestHelpers.FullFileNameKey, loaded.RenameList.SortFields[0].Key);
+                Assert.Equal(RenameListTestHelpers.FullFileNameKey, loaded.RenameList.SortFields[0].FieldKey);
                 Assert.True(loaded.RenameList.SortFields[0].Descending);
                 Assert.NotNull(loaded.RenameList.VisibleColumns);
                 Assert.Equal(2, loaded.RenameList.VisibleColumns.Count);

@@ -1,6 +1,6 @@
 ---
 name: Whole codebase review
-overview: "Phased whole-repo review: Phase 0–4 done. Next: Phase 5 Session/Config."
+overview: "Phased whole-repo review: Phase 0–5 done. Next: Phase 6 File List."
 todos:
   - id: phase-0
     content: "Phase 0: Architecture/layering gate + plan file bootstrap"
@@ -19,7 +19,7 @@ todos:
     status: completed
   - id: phase-5
     content: "Phase 5: Session/Config/Presets/Reset — mfr-code-review + autofix"
-    status: pending
+    status: completed
   - id: phase-6
     content: "Phase 6: File List services + UI — mfr-code-review + autofix"
     status: pending
@@ -75,7 +75,7 @@ flowchart TD
 | **2** Metadata + Tags               | **done** | Semantic 0→null; row Compare owners; detector path guard           |
 | **3** Filters                       | **done** | Setup caches + exhaustiveness; Formatting tokens OK                |
 | **4** Engine Preview/Commit         | **done** | failFast stash; rebase PreviewOk; DirectoryPath ordinal; bugbot OK |
-| **5** Session/Config                | pending  |                                                                    |
+| **5** Session/Config                | **done** | sort DTO merge; Version docs; ConfigStore test isolation           |
 | **6** File List                     | pending  |                                                                    |
 | **7** Rename List + Applied Filters | pending  |                                                                    |
 | **8** Format Editor + FilterEditors | pending  |                                                                    |
@@ -114,13 +114,13 @@ Ui also refs Filters directly (catalog/editors). Cli does not. Engine + Filters 
 
 ### Deferred (later phases / backlog)
 
-| Item                                                                      | Why defer                                                  |
-| ------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| Models JSON/FS I/O (`ConfigStore`, `SessionStore`, `RenameResultSummary`) | Ownership smell, not a layer violation; revisit in Phase 5 |
-| `RenameListFieldDisplay` directory scan for folder file-count             | Domain field resolve; Phase 7 if touched                   |
-| `JpegExifThumbnailReader` hand-rolled EXIF in UI Services                 | No ME package leak; optional L2 move — Phase 6             |
-| Fuller UI DAG tests (Views↛Services shortcuts, VM↛Views)                  | Nice-to-have; Phase 9 if still wanted                      |
-| Forbidden-using / package-ownership arch tests for lower layers           | csproj + spot-check enough for now; Phase 9                |
+| Item                                                                      | Why defer                                                                             |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Models JSON/FS I/O (`ConfigStore`, `SessionStore`, `RenameResultSummary`) | Ownership smell, not a layer violation; **kept in Phase 5** (AppData/DTO co-location) |
+| `RenameListFieldDisplay` directory scan for folder file-count             | Domain field resolve; Phase 7 if touched                                              |
+| `JpegExifThumbnailReader` hand-rolled EXIF in UI Services                 | No ME package leak; optional L2 move — Phase 6                                        |
+| Fuller UI DAG tests (Views↛Services shortcuts, VM↛Views)                  | Nice-to-have; Phase 9 if still wanted                                                 |
+| Forbidden-using / package-ownership arch tests for lower layers           | csproj + spot-check enough for now; Phase 9                                           |
 
 ### Phase 0 exit
 
@@ -270,6 +270,59 @@ Engine Preview/Commit risk gate closed with stash fail-fast + rebase scoping fix
 
 ______________________________________________________________________
 
+## Phase 5 — Session / Config / Presets / Reset (done)
+
+**Scope:** `Mfr.Models/Config/` (`ConfigStore`, `SessionStore`, `SessionState`, `MfrConfig`), `Mfr.Utils/Config/`, `Mfr.Engine/Presets/` + `PersistedConfigurationReset`, `Mfr.App.Ui/Services/Session/`, `ListEntryLength` / Reset UI hooks; matching `Mfr.Tests/`. Explore used for twins ([Session Config twins](84b16c9a-f204-495b-b8f7-a3474983f734)). Security-review subagent skipped (empty uncommitted diff); parent self-audited deserialize surfaces.
+
+**Verdict:** Persistence is coherent — one current JSON shape per store, no migration converters, UI session adapters stay thin (no second resolvers). Soft-load (session / filter-defaults) vs hard-fail (config / presets) is intentional product dialect, not a bug. Applied sort-key DTO collapse, Version honesty, defaults-path trim parity, and ConfigStore test isolation. Leftovers are structural (`ListEntryLength`↔`ConfigStore`, dual FilterCatalog/`PresetJsonOptions` registration). Phase 0 Models JSON/FS I/O smell: **keep** (see below).
+
+### Architecture (lightweight)
+
+| Check                                                                     | Verdict                                                                                                                                                                           |
+| ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project refs vs layering                                                  | **Healthy** — Config binder in L0 Utils; stores + DTOs in L1 Models; presets/reset in L4 Engine; UI Session services → Models only                                                |
+| UI `Views → ViewModels → Services`                                        | **Clean** — `UiSessionPersistence` / `WindowSession` / `SplitterSession` / `FileListSessionSnapshot` take Window + DTOs, not Views                                                |
+| Models JSON/FS I/O (`ConfigStore`, `SessionStore`, `RenameResultSummary`) | **Keep** — not a layer violation; AppData + CLI result JSON sit next to domain DTOs shared by Cli/Ui. Moving to Engine is churn without clearer ownership. Documented smell only. |
+| Filters → `ConfigStore` (`ListEntryLength`)                               | **Smell retained** — backlog #9                                                                                                                                                   |
+
+### Security (self-audit)
+
+| Surface                       | Notes                                                                                                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Session STJ                   | Concrete sealed DTOs; no polymorphism; corrupt → empty session                                                                      |
+| Config binder                 | Annotated fields only; leaf values are JSON strings; invalid → throw                                                                |
+| Preset / filter-defaults poly | Allowlisted `BaseFilter` derived types only (`PresetJsonOptions`); unknown discriminator skipped (defaults) or fails load (presets) |
+| Paths                         | Default AppData roots; explicit paths are caller-supplied (tests/CLI); no traversal gadget in stores                                |
+
+### Applied (high confidence)
+
+1. **Merged** `SessionStateRenameListSortField` into `RenameListSortKey` (`JsonPropertyName` `key` / `descending`) — one type for domain + `session.json` `sortFields`; deleted bridge `ToSortKeys` / `FromSortKeys`.
+1. **`SessionState.Version` docs** honesty (not a migrate/reject gate); normalize `<= 0` → `1` on load (parity with save).
+1. **`FilterDefaultsStore.DeleteFileAt`** trims explicit paths (parity with Session/Config resolve).
+1. **`PresetJsonOptions` docs** — no longer claims “single source of truth” vs `FilterCatalog`.
+1. **ConfigStore tests:** `ConfigStoreCollection` (DisableParallelization) + EnsureDefaultFile asserts on file JSON (avoids singleton race flake).
+1. **Tests:** session sort round-trip via `RenameListSortKey`; version normalize fact; VM/helpers updated.
+
+### Correctness (found, not changed)
+
+| Item                          | Notes                                                                         |
+| ----------------------------- | ----------------------------------------------------------------------------- |
+| Soft vs hard load             | Session/defaults soft-empty; config/presets throw — product intent            |
+| `Version` unused as gate      | STJ ignore-unknown + CLR defaults; no remaps (AGENTS policy)                  |
+| `SessionStore.TrySave`        | Test-facing; UI `SaveOnClose` uses `Save` inside its own catch                |
+| Reset leaves `presets.json`   | Documented MFR7 parity                                                        |
+| ConfigStore process singleton | Still global; collection serializes mutator tests — not a production redesign |
+
+### Deeper refactors (promoted / updated)
+
+See backlog: **#4 done**; **#9 / #10** refined (still open); **#21–#22** added.
+
+### Phase 5 exit
+
+Session/config/presets/reset hygiene closed; sort persist type unified. Ready for Phase 6 (File List).
+
+______________________________________________________________________
+
 ## Deeper refactors backlog
 
 Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
@@ -295,12 +348,8 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: medium (Engine/UI cache?)
    Rank: medium — Phase 7
 
-1. **`SessionStateRenameListSortField` vs `RenameListSortKey`**
-   Sites: session DTO vs domain sort key
-   Target: one type if JSON shape can stay identical
-   Value: thin dedup
-   Cost: session churn
-   Rank: low — Phase 5
+1. **`SessionStateRenameListSortField` vs `RenameListSortKey`** — **done Phase 5**
+   Applied: persist `RenameListSortKey` directly (`key` / `descending`); bridge type deleted.
 
 1. **Shared Apply-To / Rename List / Picard display labels**
    Sites: `FilterTargetCatalog` vs `AudioTagRenameListFields` vs `AudioCatalogFieldMaps`
@@ -331,18 +380,18 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Rank: low–medium — rename anytime; map only if editing the filter again
 
 1. **`ListEntryLength` / max line length off `ConfigStore`**
-   Sites: `ListEntryLength`; Name/Replace/Casing list parsers
-   Target: inject max length or read from a Filters-owned options type at setup (Phase 5 config pass)
-   Value: clearer ownership; testability
-   Cost: medium with config reshape
-   Rank: medium — Phase 5
+   Sites: `ListEntryLength`; Name/Replace/Casing list parsers; `MfrConfig.FilterConfig.MaxListFileLineLength`
+   Target: inject max length into parsers at setup, or Filters-owned options snapshot filled at process start (avoid live `ConfigStore.Config` reads during transform/parse)
+   Value: clearer L3 ownership; testability without process singleton; pairs with ConfigStore isolation
+   Cost: medium — parser/filter call-site + CLI override wiring
+   Rank: medium — next time touching list parsers or config reshape (Phase 5 kept coupling)
 
 1. **Generate `PresetJsonOptions` derived types from `FilterCatalog` discovery**
    Sites: `FilterCatalog` reflection vs `PresetJsonOptions.s_BaseFilterDerivedTypes` (drift gated by `FilterCatalogTests`)
    Target: one registration owner (generate JSON list from palette types, or reverse)
    Value: closes permanent dual-list surface
    Cost: medium Engine/Filters wiring
-   Rank: medium — Phase 5/9
+   Rank: medium — Phase 9 sweep or when adding many filters
 
 1. **`FilterOptionsEditorFactory` completeness vs option-bearing catalog types**
    Sites: `FilterOptionsEditorFactory` switch; missing arm → null editor
@@ -414,13 +463,23 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: low
    Rank: medium — ride along with #17 or catalog edits
 
+1. **Shared AppData delete-if-exists helper**
+   Sites: `ConfigStore.DeleteDefaultFile`, `SessionStore.Delete`, `FilterDefaultsStore.DeleteFileAt`
+   Target: one small `AppDataFile.DeleteIfExists(path, errorMessage)` (or Models helper)
+   Value: tiny dedup of identical try/delete wrappers
+   Cost: low; three call sites
+   Rank: low — cosmetic; skip unless touching all three
+
+1. **Unify soft-load / hard-fail documentation (not behavior)**
+   Sites: `SessionStore` / `FilterDefaultsStore` soft-empty vs `ConfigStore` / `PresetManager` throw
+   Target: short remarks cross-links stating intentional dialects; do **not** unify failure modes without product change
+   Value: onboarding clarity
+   Cost: docs only
+   Rank: low — docs pass anytime
+
 ______________________________________________________________________
 
 ## Remaining phase briefs
-
-### Phase 5 — Session / Config / Presets / Reset
-
-**Scope:** Models/Engine config + presets, `Mfr.App.Ui/Services/Session/`, `PersistedConfigurationReset`. One current JSON schema; corrupt → defaults.
 
 ### Phase 6 — File List (services + UI)
 

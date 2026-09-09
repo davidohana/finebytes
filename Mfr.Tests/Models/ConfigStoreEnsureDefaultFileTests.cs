@@ -1,8 +1,11 @@
+using System.Text.Json;
+
 namespace Mfr.Tests.Models
 {
     /// <summary>
     /// Tests for <see cref="ConfigStore.EnsureDefaultFile"/>.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class ConfigStoreEnsureDefaultFileTests
     {
         [Fact]
@@ -17,11 +20,14 @@ namespace Mfr.Tests.Models
                 ConfigStore.EnsureDefaultFile(configPath);
 
                 Assert.True(File.Exists(configPath));
-                ConfigStore.Load(configPath);
-                Assert.Equal(1000, ConfigStore.Config.Filters.MaxListFileLineLength);
-                Assert.Equal(100, ConfigStore.Config.Log.MaxSessionFiles);
-                Assert.Equal(string.Empty, ConfigStore.Config.Log.DirectoryPath);
-                Assert.Equal("session-", ConfigStore.Config.Log.FilePrefix);
+                using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
+                Assert.Equal(
+                    "1000",
+                    doc.RootElement.GetProperty("filters").GetProperty("maxListFileLineLength").GetString()
+                );
+                Assert.Equal("100", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
+                Assert.Equal(string.Empty, doc.RootElement.GetProperty("log").GetProperty("directoryPath").GetString());
+                Assert.Equal("session-", doc.RootElement.GetProperty("log").GetProperty("filePrefix").GetString());
             }
             finally
             {
@@ -48,8 +54,12 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStore.EnsureDefaultFile(configPath);
-                ConfigStore.Load(configPath);
-                Assert.Equal(2500, ConfigStore.Config.Filters.MaxListFileLineLength);
+                using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
+                Assert.Equal(
+                    "2500",
+                    doc.RootElement.GetProperty("filters").GetProperty("maxListFileLineLength").GetString()
+                );
+                Assert.False(doc.RootElement.TryGetProperty("log", out _));
             }
             finally
             {

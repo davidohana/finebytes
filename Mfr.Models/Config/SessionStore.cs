@@ -139,6 +139,11 @@ namespace Mfr.Models.Config
             {
                 var json = File.ReadAllText(path);
                 var state = JsonSerializer.Deserialize<SessionState>(json, s_JsonOptions) ?? new SessionState();
+                if (state.Version <= 0)
+                {
+                    state.Version = 1;
+                }
+
                 return state;
             }
             catch
