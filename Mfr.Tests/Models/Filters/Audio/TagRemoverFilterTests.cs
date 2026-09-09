@@ -298,7 +298,7 @@ namespace Mfr.Tests.Models.Filters.Audio
                 inFolderIndex: 0,
                 directoryPath: Path.GetDirectoryName(absolutePath)!,
                 prefix: Path.GetFileNameWithoutExtension(absolutePath),
-                extension: Path.GetExtension(absolutePath)
+                extension: FileMeta.ExtensionWithoutDot(absolutePath)
             );
 
             return new RenameItem(meta);

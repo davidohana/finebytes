@@ -67,8 +67,8 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var items = new[]
             {
-                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: ".mp3"),
-                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: ".wav", renameListIndex: 1),
+                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "mp3"),
+                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "wav", renameListIndex: 1),
             };
             var editor = new SubstrFormatTokenEditorViewModel("start=1,end=-1,source=<file-name>");
             var dialog = new FormatTokenEditorDialog(editor, items);
@@ -114,8 +114,8 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var items = new[]
             {
-                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: ".mp3"),
-                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: ".wav", renameListIndex: 1),
+                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "mp3"),
+                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "wav", renameListIndex: 1),
             };
             var parent = new FormatTokenEditorDialog(new SubstrFormatTokenEditorViewModel(null), items);
             parent.Show();
@@ -148,7 +148,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         [AvaloniaFact]
         public void ResolvePreviewRenameItems_OwnerChain_UsesDialogSnapshotIncludingEmpty()
         {
-            var items = new[] { FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: ".mp3") };
+            var items = new[] { FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "mp3") };
             var parentWithItems = new FormatTokenEditorDialog(new SubstrFormatTokenEditorViewModel(null), items);
             parentWithItems.Show();
             Dispatcher.UIThread.RunJobs();

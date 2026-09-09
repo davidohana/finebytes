@@ -204,7 +204,7 @@ namespace Mfr.Tests.Engine
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
                 prefix: Path.GetFileNameWithoutExtension(fileName),
-                extension: Path.GetExtension(fileName),
+                extension: FileMeta.ExtensionWithoutDot(fileName),
                 attributes: FileAttributes.Normal
             );
             return new RenameItem(meta) { Status = RenameStatus.PreviewOk };
@@ -227,7 +227,7 @@ namespace Mfr.Tests.Engine
         {
             item.Preview.DirectoryPath = directoryPath;
             item.Preview.Prefix = Path.GetFileNameWithoutExtension(fileName);
-            item.Preview.Extension = Path.GetExtension(fileName);
+            item.Preview.Extension = FileMeta.ExtensionWithoutDot(fileName);
         }
     }
 }

@@ -63,7 +63,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             Assert.Equal(Path.Combine(staging, "song.mp3"), item.Preview.FullPath);
             Assert.Equal(staging, item.Preview.DirectoryPath);
             Assert.Equal("song", item.Preview.Prefix);
-            Assert.Equal(".mp3", item.Preview.Extension);
+            Assert.Equal("mp3", item.Preview.Extension);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             );
             Assert.Equal(archived, item.Preview.DirectoryPath);
             Assert.Equal("song", item.Preview.Prefix);
-            Assert.Equal(".mp3", item.Preview.Extension);
+            Assert.Equal("mp3", item.Preview.Extension);
             Assert.Equal(Path.Combine(archived, "song.mp3"), item.Preview.FullPath);
         }
 

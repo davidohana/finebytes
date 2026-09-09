@@ -8,11 +8,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
     public sealed class FileNameLengthTokenTests
     {
         /// <summary>
-        /// Verifies the token returns the character length of preview prefix plus extension.
+        /// Verifies the token returns the character length of the preview full file name.
         /// </summary>
         [Theory]
-        [InlineData("song", ".mp3", "8")]
-        [InlineData("", ".txt", "4")]
+        [InlineData("song", "mp3", "8")]
+        [InlineData("", "txt", "4")]
         [InlineData("a", "", "1")]
         [InlineData("", "", "0")]
         public void Resolve_ReturnsPreviewFullNameLength(string prefix, string extension, string expected)
@@ -31,11 +31,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_UsesPreviewNotOriginal()
         {
             var token = new FileNameLengthToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "short", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "short", extension: "mp3");
             item.Preview.Prefix = "much-longer-name";
 
             Assert.Equal("20", token.Compile(tokenArgs: "")(item));
-            Assert.Equal(9, item.Original.Prefix.Length + item.Original.Extension.Length);
+            Assert.Equal(9, item.Original.FullFileName.Length);
         }
 
         /// <summary>

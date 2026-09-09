@@ -30,7 +30,7 @@ For Filter Configuration **option editors** (VM / AXAML / factory / tests), use 
    | `targetType` value | Fields                                         | Addresses                                                                            |
    | ------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------ |
    | `FilePrefix`       | (none)                                         | Prefix (name without extension)                                                      |
-   | `FileExtension`    | (none)                                         | Extension without leading dot (MFR7 parity; storage still uses Path.GetExtension)    |
+   | `FileExtension`    | (none)                                         | Extension without leading dot                                                        |
    | `FileFullName`     | (none)                                         | Full file name (prefix + extension); writes parse via `Path.GetFileName` rules       |
    | `AncestorFolder`   | `level`: positive integer                      | Single ancestor segment name vs preview directory                                    |
    | `FullPath`         | (none)                                         | Entire preview full path                                                             |

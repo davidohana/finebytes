@@ -162,7 +162,7 @@ namespace Mfr.Tests.Engine
         private static RenameItem _CreateFileItem(string directoryPath, string fileName)
         {
             var prefix = Path.GetFileNameWithoutExtension(fileName);
-            var extension = Path.GetExtension(fileName);
+            var extension = FileMeta.ExtensionWithoutDot(fileName);
             var meta = new FileMeta(
                 renameListIndex: 0,
                 inFolderIndex: 0,
@@ -193,7 +193,7 @@ namespace Mfr.Tests.Engine
         {
             var directoryPath = Path.GetDirectoryName(sourcePath)!;
             var prefix = Path.GetFileNameWithoutExtension(sourcePath);
-            var extension = Path.GetExtension(sourcePath);
+            var extension = FileMeta.ExtensionWithoutDot(sourcePath);
             var attributes = File.Exists(sourcePath) ? FileAttributes.Normal : FileAttributes.Directory;
             var meta = new FileMeta(
                 renameListIndex: 0,
@@ -211,7 +211,7 @@ namespace Mfr.Tests.Engine
         {
             item.Preview.DirectoryPath = directoryPath;
             item.Preview.Prefix = Path.GetFileNameWithoutExtension(fileName);
-            item.Preview.Extension = Path.GetExtension(fileName);
+            item.Preview.Extension = FileMeta.ExtensionWithoutDot(fileName);
         }
     }
 }

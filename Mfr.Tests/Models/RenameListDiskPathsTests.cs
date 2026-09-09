@@ -84,7 +84,7 @@ namespace Mfr.Tests.Models
                 inFolderIndex: 0,
                 directoryPath: @"D:\tmp",
                 prefix: Path.GetFileNameWithoutExtension(fileName),
-                extension: Path.GetExtension(fileName)
+                extension: FileMeta.ExtensionWithoutDot(fileName)
             );
         }
     }

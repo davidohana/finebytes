@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             int renameListIndex = 0,
             Action<FileMeta>? configureOriginal = null,
             string prefix = "song",
-            string extension = ".mp3"
+            string extension = "mp3"
         )
         {
             var meta = new FileMeta(

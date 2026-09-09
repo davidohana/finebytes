@@ -147,7 +147,7 @@ namespace Mfr.Tests.Models
             var directory = TestPaths.Absolute("Photos", "2024");
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "vacation007",
-                extension: ".jpg",
+                extension: "jpg",
                 directory: directory
             );
             var fullPath = Path.Combine(directory, "vacation007.jpg");
@@ -189,7 +189,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Resolve_preview_field_uses_preview_snapshot()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: "txt");
             item.Preview.Prefix = "after";
 
             var originalKey = RenameListFieldKey.Original(
@@ -209,7 +209,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void IsPreviewChanged_true_only_for_changed_preview_keys()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: "txt");
             var originalKey = RenameListFieldKey.Original(
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FullName
@@ -263,9 +263,9 @@ namespace Mfr.Tests.Models
         }
 
         [Theory]
-        [InlineData("track01", ".mp3", "1")]
-        [InlineData("no-digits", ".txt", "0")]
-        [InlineData("img00042", ".png", "42")]
+        [InlineData("track01", "mp3", "1")]
+        [InlineData("no-digits", "txt", "0")]
+        [InlineData("img00042", "png", "42")]
         public void Resolve_file_name_numeric_matches_mfr7_first_digit_run(
             string prefix,
             string extension,
@@ -369,7 +369,7 @@ namespace Mfr.Tests.Models
         public void Image_and_jpeg_fields_resolve_cached_metadata()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                extension: ".jpg",
+                extension: "jpg",
                 configureOriginal: meta =>
                 {
                     meta.Image = new ImageProperties
@@ -436,7 +436,7 @@ namespace Mfr.Tests.Models
         public void Media_mpeg_and_jpeg_camera_fields_resolve_cached_metadata()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                extension: ".mp3",
+                extension: "mp3",
                 configureOriginal: meta =>
                 {
                     meta.Media = new MediaProperties
@@ -567,7 +567,7 @@ namespace Mfr.Tests.Models
         public void AudioTag_title_preview_differs_after_AudioTagSetter()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                extension: ".mp3",
+                extension: "mp3",
                 configureOriginal: meta =>
                     meta.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "OldTitle")
             );
@@ -702,7 +702,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void CompareForSort_orders_field_load_errors_after_non_error_values()
         {
-            var errored = FilterTestHelpers.CreateRenameItem(prefix: "bad", extension: ".mp3");
+            var errored = FilterTestHelpers.CreateRenameItem(prefix: "bad", extension: "mp3");
             errored.SetTagLibMetadataLoadError(new IOException("missing file"));
             var alphaTitle = _ItemWithSemantic(SemanticAudioField.Title, "Alpha");
             var zebraTitle = _ItemWithSemantic(SemanticAudioField.Title, "Zebra");
@@ -714,7 +714,7 @@ namespace Mfr.Tests.Models
             Assert.True(RenameListFieldCatalog.CompareForSort(errored, titleKey, zebraTitle) > 0);
             Assert.True(RenameListFieldCatalog.CompareForSort(zebraTitle, titleKey, errored) < 0);
 
-            var otherErrored = FilterTestHelpers.CreateRenameItem(prefix: "also-bad", extension: ".mp3");
+            var otherErrored = FilterTestHelpers.CreateRenameItem(prefix: "also-bad", extension: "mp3");
             otherErrored.SetTagLibMetadataLoadError(new IOException("also missing"));
             Assert.Equal(0, RenameListFieldCatalog.CompareForSort(errored, titleKey, otherErrored));
         }
@@ -751,12 +751,12 @@ namespace Mfr.Tests.Models
 
             var widthTen = FilterTestHelpers.CreateRenameItem(
                 prefix: "wide",
-                extension: ".jpg",
+                extension: "jpg",
                 configureOriginal: meta => meta.Image = new ImageProperties { Width = 10 }
             );
             var widthTwo = FilterTestHelpers.CreateRenameItem(
                 prefix: "narrow",
-                extension: ".jpg",
+                extension: "jpg",
                 configureOriginal: meta => meta.Image = new ImageProperties { Width = 2 }
             );
             var widthKey = RenameListFieldKey.Original(ImageRenameListFields.Group, "Width");
@@ -768,19 +768,19 @@ namespace Mfr.Tests.Models
         {
             var tenHours = FilterTestHelpers.CreateRenameItem(
                 prefix: "long",
-                extension: ".mp3",
+                extension: "mp3",
                 configureOriginal: meta => meta.Media = new MediaProperties { Duration = TimeSpan.FromHours(10) }
             );
             var oneHour = FilterTestHelpers.CreateRenameItem(
                 prefix: "short",
-                extension: ".mp3",
+                extension: "mp3",
                 configureOriginal: meta => meta.Media = new MediaProperties { Duration = TimeSpan.FromHours(1) }
             );
             var durationKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "Duration");
             Assert.True(RenameListFieldCatalog.CompareForSort(oneHour, durationKey, tenHours) < 0);
 
-            var fileTen = FilterTestHelpers.CreateRenameItem(prefix: "file10", extension: ".txt");
-            var fileTwo = FilterTestHelpers.CreateRenameItem(prefix: "file2", extension: ".txt");
+            var fileTen = FilterTestHelpers.CreateRenameItem(prefix: "file10", extension: "txt");
+            var fileTwo = FilterTestHelpers.CreateRenameItem(prefix: "file2", extension: "txt");
             var numericKey = RenameListFieldKey.Original(
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FileNameNumeric
@@ -793,7 +793,7 @@ namespace Mfr.Tests.Models
         {
             var lowImageItem = FilterTestHelpers.CreateRenameItem(
                 prefix: "low",
-                extension: ".jpg",
+                extension: "jpg",
                 configureOriginal: meta =>
                 {
                     meta.Exif = new ExifData
@@ -807,7 +807,7 @@ namespace Mfr.Tests.Models
             );
             var highImageItem = FilterTestHelpers.CreateRenameItem(
                 prefix: "high",
-                extension: ".jpg",
+                extension: "jpg",
                 configureOriginal: meta =>
                 {
                     meta.Exif = new ExifData
@@ -882,7 +882,7 @@ namespace Mfr.Tests.Models
         {
             return FilterTestHelpers.CreateRenameItem(
                 prefix: "track",
-                extension: ".mp3",
+                extension: "mp3",
                 configureOriginal: meta =>
                 {
                     meta.AudioTagOverlay.ContainerFormat = AudioContainerFormat.Mpeg;

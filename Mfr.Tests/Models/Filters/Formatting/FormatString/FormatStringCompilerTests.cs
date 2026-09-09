@@ -23,14 +23,14 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
-                extension: ".mp3",
+                extension: "mp3",
                 directory: TestPaths.Absolute("Music", "My Album")
             );
 
             var compiled = FormatStringCompiler.Compile(template: "<file-name><ext>-<parent-folder>");
             var result = compiled(item);
 
-            Assert.Equal("song.mp3-My Album", result);
+            Assert.Equal("songmp3-My Album", result);
         }
 
         /// <summary>
@@ -39,12 +39,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         [Fact]
         public void ResolveTemplate_TokensMixedWithLiterals_PreservesLiterals()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "song", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "song", extension: "mp3");
 
             var compiled = FormatStringCompiler.Compile(template: "Track: <file-name> [<ext>]");
             var result = compiled(item);
 
-            Assert.Equal("Track: song [.mp3]", result);
+            Assert.Equal("Track: song [mp3]", result);
         }
 
         /// <summary>

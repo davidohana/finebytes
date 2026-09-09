@@ -7,7 +7,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Full name is preview prefix plus extension. Uses preview so the value tracks predicted renames.
+    /// Full name is preview <see cref="FileMeta.FullFileName"/>. Uses preview so the value tracks predicted renames.
     /// </para>
     /// </remarks>
     [FormatTokenInfo("File Name Length", "File Name", "Character length of the preview full name", "file-name-length")]
@@ -24,8 +24,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
             return item =>
             {
                 var preview = item.Preview;
-                var length = preview.Prefix.Length + preview.Extension.Length;
-                return length.ToString(CultureInfo.InvariantCulture);
+                return preview.FullFileName.Length.ToString(CultureInfo.InvariantCulture);
             };
         }
     }

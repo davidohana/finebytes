@@ -209,7 +209,7 @@ namespace Mfr.Tests.Models.Filters
                 inFolderIndex: 0,
                 directoryPath: directory,
                 prefix: Path.GetFileNameWithoutExtension(fullPath),
-                extension: Path.GetExtension(fullPath),
+                extension: FileMeta.ExtensionWithoutDot(fullPath),
                 fileSize: File.Exists(fullPath) ? new FileInfo(fullPath).Length : 0
             );
 

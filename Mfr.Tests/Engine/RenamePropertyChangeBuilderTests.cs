@@ -50,14 +50,14 @@ namespace Mfr.Tests.Engine
         {
             var original = _CloneBaseline();
             var item = new RenameItem(original);
-            item.Preview.Extension = ".flac";
+            item.Preview.Extension = "flac";
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
             Assert.Equal("Extension", row.Property);
-            Assert.Equal(".mp3", row.OldValue);
-            Assert.Equal(".flac", row.NewValue);
+            Assert.Equal("mp3", row.OldValue);
+            Assert.Equal("flac", row.NewValue);
         }
 
         /// <summary>
@@ -289,7 +289,7 @@ namespace Mfr.Tests.Engine
         {
             var testItem = FilterTestHelpers.CreateRenameItem(
                 prefix: "song",
-                extension: ".mp3",
+                extension: "mp3",
                 directory: directoryPath ?? @"D:\In",
                 attributes: FileAttributes.Normal,
                 creationTime: creationTime ?? new DateTime(2024, 6, 1, 12, 30, 45, DateTimeKind.Unspecified),

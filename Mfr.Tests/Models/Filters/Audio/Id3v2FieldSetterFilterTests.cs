@@ -159,7 +159,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         public void Apply_OnFlac_ThrowsNotSupported()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                extension: ".flac",
+                extension: "flac",
                 configureOriginal: m =>
                 {
                     m.AudioTagOverlay = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [] } };

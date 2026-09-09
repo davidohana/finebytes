@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.RenameList
             var directory = TestPaths.Absolute("Photos", "2024");
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "vacation007",
-                extension: ".jpg",
+                extension: "jpg",
                 directory: directory
             );
             var entry = RenameListEntry.ToEntry(item);
@@ -33,7 +33,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void ToEntry_preview_field_follows_preview_snapshot()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: "txt");
             item.Preview.Prefix = "after";
 
             var entry = RenameListEntry.ToEntry(item);

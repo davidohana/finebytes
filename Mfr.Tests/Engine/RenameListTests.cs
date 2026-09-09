@@ -83,7 +83,7 @@ namespace Mfr.Tests.Engine
             );
             Assert.Equal([0, 1, 2], entries.Select(e => e.Original.RenameListIndex));
             Assert.Equal("beta", entries[0].Original.Prefix);
-            Assert.Equal(".log", entries[0].Original.Extension);
+            Assert.Equal("log", entries[0].Original.Extension);
             Assert.All(entries, e => Assert.Equal(_tempRoot, e.Original.DirectoryPath));
         }
 

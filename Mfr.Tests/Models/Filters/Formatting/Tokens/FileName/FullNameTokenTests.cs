@@ -14,7 +14,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_ConcatenatesPrefixAndExtension()
         {
             var token = new FullNameToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track01", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track01", extension: "mp3");
 
             Assert.Equal("track01.mp3", token.Compile(tokenArgs: "")(item));
         }
@@ -38,9 +38,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_UsesPreviewNotOriginal()
         {
             var token = new FullNameToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track01", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track01", extension: "mp3");
             item.Preview.Prefix = "renamed";
-            item.Preview.Extension = ".flac";
+            item.Preview.Extension = "flac";
 
             Assert.Equal("renamed.flac", token.Compile(tokenArgs: "")(item));
             Assert.Equal("track01.mp3", item.Original.FullFileName);

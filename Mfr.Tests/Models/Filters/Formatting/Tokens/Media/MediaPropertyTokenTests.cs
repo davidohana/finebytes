@@ -138,7 +138,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
             var fullPath = Path.GetFullPath(fixturePath);
             var directory = Path.GetDirectoryName(fullPath)!;
             var prefix = Path.GetFileNameWithoutExtension(fullPath);
-            var extension = Path.GetExtension(fullPath);
+            var extension = FileMeta.ExtensionWithoutDot(fullPath);
 
             var meta = new FileMeta(
                 renameListIndex: 0,

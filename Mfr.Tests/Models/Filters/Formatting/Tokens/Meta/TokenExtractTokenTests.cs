@@ -32,7 +32,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3"
+                extension: "mp3"
             );
             Assert.Equal(
                 "13_",
@@ -48,7 +48,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3"
+                extension: "mp3"
             );
             Assert.Equal(
                 "Smog",
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_LastToken_ReturnsLastPart()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: "txt");
             Assert.Equal("c.txt", _token.Compile(_Named(3, "_", false, false, "a_b_c.txt"))(item));
         }
 
@@ -76,7 +76,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3"
+                extension: "mp3"
             );
             Assert.Equal(
                 "Smog_-_Cold_Blooded_Old_Times.mp3",
@@ -90,7 +90,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_IncludeNext_Token1_ReturnsFullSource()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: "txt");
             Assert.Equal("a_b_c.txt", _token.Compile(_Named(1, "_", true, false, "a_b_c.txt"))(item));
         }
 
@@ -102,7 +102,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_IncludePrev_ReturnsLeftPortion()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: "txt");
             Assert.Equal("a_b", _token.Compile(_Named(2, "_", false, true, "a_b_c.txt"))(item));
         }
 
@@ -112,7 +112,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_IncludePrev_LastToken_ReturnsFullSource()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: "txt");
             Assert.Equal("a_b_c.txt", _token.Compile(_Named(3, "_", false, true, "a_b_c.txt"))(item));
         }
 
@@ -124,7 +124,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_BothIncludeFlags_ReturnsFullSource()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: "txt");
             Assert.Equal("a_b_c.txt", _token.Compile(_Named(2, "_", true, true, "a_b_c.txt"))(item));
         }
 
@@ -134,7 +134,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_NamedOptions_OrderIndependent()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b_c", extension: "txt");
             Assert.Equal(
                 "b",
                 _token.Compile("source=a_b_c.txt,separator=_,tokenNumber=2,includePrev=false,includeNext=false")(item)
@@ -151,7 +151,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3"
+                extension: "mp3"
             );
             var compiled = FormatStringCompiler.Compile(
                 "<token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=<full-name>>"
@@ -167,7 +167,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3"
+                extension: "mp3"
             );
             var compiled = FormatStringCompiler.Compile(
                 "<token:tokenNumber=2,separator=_-_,includeNext=false,includePrev=false,source=<full-name>>"
@@ -183,7 +183,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "13_-_Smog_-_Cold_Blooded_Old_Times",
-                extension: ".mp3"
+                extension: "mp3"
             );
             var compiled = FormatStringCompiler.Compile(
                 "<token:tokenNumber=2,separator=_-_,includeNext=true,includePrev=false,source=<full-name>>"
@@ -221,7 +221,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_TokenNumberZero_Throws()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: "txt");
             var ex = Assert.Throws<ArgumentException>(() =>
                 _token.Compile(_Named(0, "_", false, false, "a_b.txt"))(item)
             );
@@ -234,7 +234,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_TokenNumberOutOfRange_Throws()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: "txt");
             var ex = Assert.Throws<ArgumentException>(() =>
                 _token.Compile(_Named(5, "_", false, false, "a_b.txt"))(item)
             );
@@ -247,7 +247,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_NumericIncludeFlag_Throws()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "a_b", extension: "txt");
             var ex = Assert.Throws<ArgumentException>(() =>
                 _token.Compile("tokenNumber=1,separator=_,includeNext=1,includePrev=false,source=a_b.txt")(item)
             );
@@ -257,7 +257,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Meta
         [Fact]
         public void Resolve_EmptySeparator_Throws()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: ".txt");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "abc", extension: "txt");
             var ex = Assert.Throws<ArgumentException>(() =>
                 _token.Compile("tokenNumber=1,separator=,includeNext=false,includePrev=false,source=abc.txt")(item)
             );

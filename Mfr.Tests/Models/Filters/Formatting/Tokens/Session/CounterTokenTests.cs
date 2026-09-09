@@ -193,7 +193,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Session
                     inFolderIndex: 0,
                     directoryPath: @"C:\Music\Album",
                     prefix: "x",
-                    extension: ".mp3",
+                    extension: "mp3",
                     renameListTotalCount: 0,
                     renameListFolderSiblingCount: 0
                 )

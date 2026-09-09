@@ -53,7 +53,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     inFolderIndex: 0,
                     directoryPath: TestPaths.Absolute("album"),
                     prefix: "sample-name",
-                    extension: ".txt"
+                    extension: "txt"
                 )
             );
             var step = new AppliedFilterStepViewModel("Extract Left", new ExtractLeftFilter());
@@ -95,7 +95,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     inFolderIndex: 0,
                     directoryPath: TestPaths.Absolute("album"),
                     prefix: "track",
-                    extension: ".mp3"
+                    extension: "mp3"
                 )
             );
             var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());

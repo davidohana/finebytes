@@ -63,7 +63,7 @@ namespace Mfr.Tests.Models.Filters
         {
             var filter = new FormatterFilter(new XiphFieldTarget("title"), new FormatterOptions("VorbisTitle"));
             var item = FilterTestHelpers.CreateRenameItem(
-                extension: ".flac",
+                extension: "flac",
                 configureOriginal: m =>
                 {
                     m.AudioTagOverlay = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [] } };
@@ -115,7 +115,7 @@ namespace Mfr.Tests.Models.Filters
         {
             var filter = new FormatterFilter(new Id3v2FrameTarget("TIT2"), new FormatterOptions("Nope"));
             var item = FilterTestHelpers.CreateRenameItem(
-                extension: ".flac",
+                extension: "flac",
                 configureOriginal: m =>
                 {
                     m.AudioTagOverlay = new AudioTagOverlay { Xiph = new XiphTagData { Fields = [] } };

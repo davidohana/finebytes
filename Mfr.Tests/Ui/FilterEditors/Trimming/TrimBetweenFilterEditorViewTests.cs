@@ -105,7 +105,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     inFolderIndex: 0,
                     directoryPath: TestPaths.Absolute("album"),
                     prefix: "abcdef",
-                    extension: ".txt"
+                    extension: "txt"
                 )
             );
             var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());

@@ -30,8 +30,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         /// Verifies digits in the extension are found when the prefix has none (MFR7 FullName behavior).
         /// </summary>
         [Theory]
-        [InlineData("song", ".mp3", "3")]
-        [InlineData("clip", ".mp4", "4")]
+        [InlineData("song", "mp3", "3")]
+        [InlineData("clip", "mp4", "4")]
         public void Resolve_DigitsOnlyInExtension_ReturnsExtensionNumber(
             string prefix,
             string extension,
@@ -48,10 +48,10 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         /// Verifies full names without digits expand to <c>0</c>.
         /// </summary>
         [Theory]
-        [InlineData("track", ".txt")]
+        [InlineData("track", "txt")]
         [InlineData("", "")]
-        [InlineData("no-digits", ".bak")]
-        [InlineData("photo", ".jpg")]
+        [InlineData("no-digits", "bak")]
+        [InlineData("photo", "jpg")]
         public void Resolve_FullNameWithoutDigits_ReturnsZero(string prefix, string extension)
         {
             var token = new FileNameNumericValueToken();

@@ -49,7 +49,7 @@ namespace Mfr.Engine.RenameList
         {
             var directoryPath = Path.GetDirectoryName(fullPath) ?? "";
             var prefix = Path.GetFileNameWithoutExtension(fullPath);
-            var extension = Path.GetExtension(fullPath);
+            var extension = FileMeta.ExtensionWithoutDot(fullPath);
             return (directoryPath, prefix, extension);
         }
 

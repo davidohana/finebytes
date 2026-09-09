@@ -268,7 +268,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "Sound Effects - Bats In The Belfry",
-                extension: ".mp3"
+                extension: "mp3"
             );
 
             var ok = FormatStringSyntax.TryEvaluate("<file-name>", item, out var result, out var error);
@@ -286,7 +286,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 prefix: "Sound Effects - Bats In The Belfry",
-                extension: ".mp3"
+                extension: "mp3"
             );
             var template = "<substr:start=1,end=-1,source=<file-name>>";
 

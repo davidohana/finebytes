@@ -40,7 +40,7 @@ namespace Mfr.Tests.Models
                     inFolderIndex: 0,
                     directoryPath: directory,
                     prefix: Path.GetFileNameWithoutExtension(path),
-                    extension: Path.GetExtension(path),
+                    extension: FileMeta.ExtensionWithoutDot(path),
                     renameListFolderSiblingCount: 1
                 )
             );
@@ -118,7 +118,7 @@ namespace Mfr.Tests.Models
                     inFolderIndex: 0,
                     directoryPath: directory,
                     prefix: Path.GetFileNameWithoutExtension(path),
-                    extension: Path.GetExtension(path),
+                    extension: FileMeta.ExtensionWithoutDot(path),
                     renameListFolderSiblingCount: 1
                 )
             );
@@ -131,7 +131,7 @@ namespace Mfr.Tests.Models
                 inFolderIndex: 0,
                 directoryPath: Path.GetTempPath(),
                 prefix: "x",
-                extension: ".mp3",
+                extension: "mp3",
                 renameListFolderSiblingCount: 1
             )
             {

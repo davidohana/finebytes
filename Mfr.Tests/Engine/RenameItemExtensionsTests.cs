@@ -17,7 +17,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void ApplyFilters_AllFiltersDisabled_LeavesPreviewAtOriginal()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: "mp3");
             var firstChain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: new FilePrefixTarget(),
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void ApplyFilters_PrefixFilters_ApplyInOrder()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track old", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track old", extension: "mp3");
             var chain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: new FilePrefixTarget(),
@@ -106,7 +106,7 @@ namespace Mfr.Tests.Engine
             chain.ApplyFilters(item);
 
             Assert.Equal("song new", item.Preview.Prefix);
-            Assert.Equal(".mp3", item.Preview.Extension);
+            Assert.Equal("mp3", item.Preview.Extension);
             Assert.Equal(Path.Combine(item.Original.DirectoryPath, "song new.mp3"), item.Preview.FullPath);
         }
 
@@ -116,7 +116,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void ApplyFilters_ExtensionAndFullModes_UpdatePreview()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: "mp3");
             var chain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: new FileExtensionTarget(),
@@ -141,17 +141,17 @@ namespace Mfr.Tests.Engine
             chain.ApplyFilters(item);
 
             Assert.Equal("renamed.final", item.Preview.Prefix);
-            Assert.Equal(".wav", item.Preview.Extension);
+            Assert.Equal("wav", item.Preview.Extension);
             Assert.Equal(Path.Combine(item.Original.DirectoryPath, "renamed.final.wav"), item.Preview.FullPath);
         }
 
         /// <summary>
-        /// Verifies Extension-target filters see text without the leading dot and restore it on write.
+        /// Verifies Extension-target filters operate without a leading-dot separator.
         /// </summary>
         [Fact]
         public void ApplyFilters_ExtensionTarget_DoesNotIncludeLeadingDot()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: ".mp3");
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: "mp3");
             var chain = FilterChain.CreateAllEnabled([
                 new LettersCaseFilter(
                     new FileExtensionTarget(),
@@ -163,7 +163,7 @@ namespace Mfr.Tests.Engine
             chain.ApplyFilters(item);
 
             Assert.Equal("track", item.Preview.Prefix);
-            Assert.Equal(".MP3", item.Preview.Extension);
+            Assert.Equal("MP3", item.Preview.Extension);
             Assert.Equal("track.MP3", item.Preview.FullFileName);
         }
 

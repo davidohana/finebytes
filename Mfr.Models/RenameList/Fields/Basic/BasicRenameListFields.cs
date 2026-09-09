@@ -155,13 +155,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     {
         public override string Resolve(FileMeta meta)
         {
-            var extension = meta.Extension;
-            if (extension.Length == 0)
-            {
-                return string.Empty;
-            }
-
-            return extension.StartsWith('.') ? extension[1..] : extension;
+            return meta.Extension;
         }
 
         /// <inheritdoc />

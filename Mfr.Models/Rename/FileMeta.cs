@@ -10,7 +10,7 @@ namespace Mfr.Models.Rename
     /// <param name="inFolderIndex">Zero-based index within the parent folder.</param>
     /// <param name="directoryPath">Absolute path to the parent directory.</param>
     /// <param name="prefix">File name without extension.</param>
-    /// <param name="extension">File extension including the leading dot.</param>
+    /// <param name="extension">File extension without the leading dot.</param>
     /// <param name="attributes">Filesystem attributes for this entry.</param>
     /// <param name="creationTime">File creation time (local), from scan or synthetic tests.</param>
     /// <param name="lastWriteTime">Last write time (local), from scan or synthetic tests.</param>
@@ -49,9 +49,9 @@ namespace Mfr.Models.Rename
         public string FullPath => Path.Combine(DirectoryPath, FullFileName);
 
         /// <summary>
-        /// Gets the file name including extension (<see cref="Prefix"/> + <see cref="Extension"/>).
+        /// Gets the file name including extension (<see cref="Prefix"/>, a separator dot when needed, and <see cref="Extension"/>).
         /// </summary>
-        public string FullFileName => Prefix + Extension;
+        public string FullFileName => Extension.Length == 0 ? Prefix : Prefix + "." + Extension;
 
         /// <summary>
         /// Gets or sets the absolute parent directory path.
@@ -64,9 +64,20 @@ namespace Mfr.Models.Rename
         public string Prefix { get; set; } = prefix;
 
         /// <summary>
-        /// Gets or sets the file extension including the leading dot.
+        /// Gets or sets the file extension without the leading dot.
         /// </summary>
         public string Extension { get; set; } = extension;
+
+        /// <summary>
+        /// Returns the extension of <paramref name="path"/> without a leading dot (empty when none).
+        /// </summary>
+        /// <param name="path">File path or file name.</param>
+        /// <returns>Extension text suitable for <see cref="Extension"/> storage.</returns>
+        public static string ExtensionWithoutDot(string path)
+        {
+            var extension = Path.GetExtension(path);
+            return extension.StartsWith('.') ? extension[1..] : extension;
+        }
 
         /// <summary>
         /// Gets or sets filesystem attributes (preview may differ from scan-time original).

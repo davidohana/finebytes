@@ -95,9 +95,9 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_DoesNotChangeExtension()
         {
             var filter = new PathMoverFilter(new PathMoverOptions(Dest));
-            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", extension: ".flac", directory: Source);
+            var item = FilterTestHelpers.ApplyReturnItem(filter, "track", extension: "flac", directory: Source);
 
-            Assert.Equal(".flac", item.Preview.Extension);
+            Assert.Equal("flac", item.Preview.Extension);
         }
 
         /// <summary>

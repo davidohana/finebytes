@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models.Filters
         /// Builds a <see cref="RenameItem"/> for filter tests with predictable paths and indices.
         /// </summary>
         /// <param name="prefix">File name without extension.</param>
-        /// <param name="extension">Extension including the leading dot.</param>
+        /// <param name="extension">Extension without the leading dot.</param>
         /// <param name="renameListIndex">Zero-based index across all files.</param>
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
         /// <param name="directory">Parent directory path, or a default when null.</param>
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Models.Filters
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
             string prefix = "track",
-            string extension = ".mp3",
+            string extension = "mp3",
             int renameListIndex = 0,
             int inFolderIndex = 0,
             string? directory = null,
@@ -113,15 +113,15 @@ namespace Mfr.Tests.Models.Filters
                 return AudioContainerFormat.Unknown;
             }
 
-            return extension.Trim().ToLowerInvariant() switch
+            return extension.Trim().TrimStart('.').ToLowerInvariant() switch
             {
-                ".mp3" or ".mp2" or ".mp1" => AudioContainerFormat.Mpeg,
-                ".flac" => AudioContainerFormat.Flac,
-                ".ogg" or ".oga" or ".opus" => AudioContainerFormat.Ogg,
-                ".m4a" or ".m4b" or ".mp4" or ".m4v" => AudioContainerFormat.Mpeg4,
-                ".wma" or ".asf" => AudioContainerFormat.Asf,
-                ".wav" => AudioContainerFormat.Riff,
-                ".ape" => AudioContainerFormat.Ape,
+                "mp3" or "mp2" or "mp1" => AudioContainerFormat.Mpeg,
+                "flac" => AudioContainerFormat.Flac,
+                "ogg" or "oga" or "opus" => AudioContainerFormat.Ogg,
+                "m4a" or "m4b" or "mp4" or "m4v" => AudioContainerFormat.Mpeg4,
+                "wma" or "asf" => AudioContainerFormat.Asf,
+                "wav" => AudioContainerFormat.Riff,
+                "ape" => AudioContainerFormat.Ape,
                 _ => AudioContainerFormat.Unknown,
             };
         }
@@ -139,7 +139,7 @@ namespace Mfr.Tests.Models.Filters
         public static string ApplyToPrefix(
             BaseFilter filter,
             string inputPrefix,
-            string extension = ".mp3",
+            string extension = "mp3",
             int renameListIndex = 0,
             int inFolderIndex = 0,
             string? directory = null
@@ -164,7 +164,7 @@ namespace Mfr.Tests.Models.Filters
         public static RenameItem ApplyReturnItem(
             BaseFilter filter,
             string inputPrefix,
-            string extension = ".mp3",
+            string extension = "mp3",
             int renameListIndex = 0,
             int inFolderIndex = 0,
             string? directory = null

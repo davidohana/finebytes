@@ -28,8 +28,7 @@ namespace Mfr.Models.Rename
             return target switch
             {
                 FilePrefixTarget => meta.Prefix,
-                // MFR7 Apply Target Extension omits the leading dot; filters must not see or edit it.
-                FileExtensionTarget => _ExtensionWithoutLeadingDot(meta.Extension),
+                FileExtensionTarget => meta.Extension,
                 FileFullNameTarget => meta.FullFileName,
                 FullPathTarget => meta.FullPath,
                 ParentDirectoryTarget => meta.DirectoryPath,
@@ -66,8 +65,7 @@ namespace Mfr.Models.Rename
                     meta.Prefix = value;
                     return;
                 case FileExtensionTarget:
-                    // Round-trip MFR7-style filter text (no leading dot) into Path.GetExtension form.
-                    meta.Extension = _ExtensionWithLeadingDot(value);
+                    meta.Extension = value;
                     return;
                 case FileFullNameTarget:
                     _SetFullFileNameFromValue(meta, value);
@@ -89,34 +87,8 @@ namespace Mfr.Models.Rename
         private static void _SetFullFileNameFromValue(FileMeta meta, string fullValue)
         {
             var fullName = Path.GetFileName(fullValue);
-            meta.Extension = Path.GetExtension(fullName);
+            meta.Extension = FileMeta.ExtensionWithoutDot(fullName);
             meta.Prefix = Path.GetFileNameWithoutExtension(fullName);
-        }
-
-        /// <summary>
-        /// Strips a leading dot from stored extension text for filter apply (MFR7 parity).
-        /// </summary>
-        private static string _ExtensionWithoutLeadingDot(string extension)
-        {
-            if (extension.Length == 0)
-            {
-                return string.Empty;
-            }
-
-            return extension.StartsWith('.') ? extension[1..] : extension;
-        }
-
-        /// <summary>
-        /// Restores <see cref="FileMeta.Extension"/> storage form (leading dot when non-empty).
-        /// </summary>
-        private static string _ExtensionWithLeadingDot(string value)
-        {
-            if (value.Length == 0)
-            {
-                return string.Empty;
-            }
-
-            return value.StartsWith('.') ? value : "." + value;
         }
 
         /// <summary>
@@ -172,7 +144,7 @@ namespace Mfr.Models.Rename
             }
 
             meta.DirectoryPath = directory;
-            meta.Extension = Path.GetExtension(fileName);
+            meta.Extension = FileMeta.ExtensionWithoutDot(fileName);
             meta.Prefix = Path.GetFileNameWithoutExtension(fileName);
         }
 

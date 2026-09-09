@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters
                 inFolderIndex: 0,
                 directoryPath: TestPaths.Absolute("album"),
                 prefix: "track",
-                extension: ".mp3"
+                extension: "mp3"
             );
 
             Assert.True(FilterTargetText.TryGet(meta, new FilePrefixTarget(), out var prefix));
@@ -39,7 +39,7 @@ namespace Mfr.Tests.Models.Filters
                     inFolderIndex: 0,
                     directoryPath: TestPaths.Absolute("album"),
                     prefix: "original",
-                    extension: ".txt"
+                    extension: "txt"
                 )
             );
             item.Preview.Prefix = "previewed";

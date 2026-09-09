@@ -33,7 +33,7 @@ namespace Mfr.Tests.Engine
                 inFolderIndex: 0,
                 directoryPath: dir,
                 prefix: "a",
-                extension: ".txt"
+                extension: "txt"
             );
             var item = new RenameItem(meta) { Status = RenameStatus.PreviewOk };
             item.Preview.Prefix = "b";
@@ -86,7 +86,7 @@ namespace Mfr.Tests.Engine
                 inFolderIndex: 0,
                 directoryPath: dir,
                 prefix: "a",
-                extension: ".txt"
+                extension: "txt"
             );
             var item = new RenameItem(meta) { Status = RenameStatus.PreviewOk };
             item.Preview.Prefix = "b";

@@ -28,7 +28,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 | Token                         | Output                                                                                                                                    |
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `<file-name>`                 | Preview prefix (no extension).                                                                                                            |
-| `<file-extension>` or `<ext>` | Preview extension (with dot).                                                                                                             |
+| `<file-extension>` or `<ext>` | Preview extension (without leading dot).                                                                                                  |
 | `<full-name>`                 | Preview prefix + extension.                                                                                                               |
 | `<parent-folder>`             | Name of the immediate parent folder (level 1) from preview directory.                                                                     |
 | `<parent-folder:level>`       | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth.          |
@@ -246,7 +246,7 @@ Assume directory `Music\My Album\` when using `<parent-folder>`. Counter rows us
 | `template`: `"<token:tokenNumber=2,separator=_-_,includeNext=true,includePrev=false,source=<full-name>>"`  | `13_-_Smog_-_Cold_Blooded_Old_Times.mp3` | `Smog_-_Cold_Blooded_Old_Times.mp3` | Artist and title, include-next.                                               |
 | `template`: `"<substr:start=1,end=5,source=<file-name>>"`                                                  | `MyTestFileName.123`                     | `MyTes`                             | First 5 chars of prefix.                                                      |
 | `template`: `"<substr:start=5,end=-6,source=<full-name>>"`                                                 | `MyTestFileName.123`                     | `stFileNam`                         | Positive start, negative end.                                                 |
-| `template`: `"<substr:start=-1,end=2,source=<file-extension>45>"`                                          | `MyTestFileName.123`                     | `2345`                              | Crossed positions: extension `.123` + literal `45` → `.12345`; range `(2,6]`. |
+| `template`: `"<substr:start=-1,end=2,source=<file-extension>45>"`                                          | `MyTestFileName.123`                     | `345`                               | Crossed positions: extension `123` + literal `45` → `12345`; range `(2,5]`. |
 
 For sequential numbering without a full template, see [Counter](Counter.md).
 
