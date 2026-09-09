@@ -350,9 +350,19 @@ namespace Mfr.App.Ui.Views.RenameList
 
             var dataTransfer = new DataTransfer();
             dataTransfer.Add(DataTransferItem.Create(InternalReorderFormat, "1"));
+            var sampleEntry = _viewModel.SelectedEntries[0];
+            dataTransfer.Add(
+                DataTransferItem.Create(
+                    RenameListSampleDragPayload.Format,
+                    new RenameListSampleDragPayload(sampleEntry.FullPath).ToJson()
+                )
+            );
             try
             {
-                await DragDrop.DoDragDropAsync(dragArgs, dataTransfer, DragDropEffects.Move).ConfigureAwait(true);
+                // Copy so Visual Trim Helper can accept the sample payload; Move still used for reorder drops.
+                await DragDrop
+                    .DoDragDropAsync(dragArgs, dataTransfer, DragDropEffects.Copy | DragDropEffects.Move)
+                    .ConfigureAwait(true);
             }
             finally
             {

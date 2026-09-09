@@ -1,0 +1,28 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Trimming"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="100"
+  x:Class="Mfr.App.Ui.Views.Controls.VisualTrimHelperView"
+  x:DataType="vm:VisualTrimHelperViewModel"
+>
+  <StackPanel Spacing="4">
+    <TextBlock Classes="filter-editor-label" Text="Visual Trim Helper:" />
+    <TextBox
+      x:Name="TrimHelperText"
+      Classes="filter-editor-field"
+      IsReadOnly="True"
+      AcceptsReturn="False"
+      TextWrapping="NoWrap"
+      MinHeight="28"
+      Text="{Binding DisplayText, Mode=OneWay}"
+      ToolTip.Tip="Select characters to set positions; drag a Rename List item to change the sample."
+    />
+    <controls:FilterEditorHint Text="Select text to set positions; drag a Rename List item to change the sample." />
+  </StackPanel>
+</UserControl>

@@ -1,5 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
@@ -50,9 +52,104 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies Visual Trim Helper pointer selection updates Trim Left count on the chain.
+        /// </summary>
+        [AvaloniaFact]
+        public void Visual_trim_helper_selection_updates_trim_left_count()
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var optionsEditor = Assert.IsType<CountFilterEditorViewModel>(
+                mainViewModel.FilterEditorViewModel.OptionsEditor
+            );
+            optionsEditor.TrimHelper.SetSampleText("abcdef");
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var helperView = editorView.GetVisualDescendants().OfType<VisualTrimHelperView>().Single();
+            var textBox = helperView.FindControl<TextBox>("TrimHelperText");
+            Assert.NotNull(textBox);
+            Assert.Equal("abcdef", textBox.Text);
+
+            textBox.SelectionStart = 0;
+            textBox.SelectionEnd = 4;
+            _RaisePointerReleased(textBox);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(4, _CountOf(mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter));
+            Assert.Equal(0, textBox.SelectionStart);
+            Assert.Equal(4, textBox.SelectionEnd);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies spinner changes update the helper TextBox selection highlight.
+        /// </summary>
+        [AvaloniaFact]
+        public void Count_spinner_updates_helper_text_selection()
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var optionsEditor = Assert.IsType<CountFilterEditorViewModel>(
+                mainViewModel.FilterEditorViewModel.OptionsEditor
+            );
+            optionsEditor.TrimHelper.SetSampleText("abcdef");
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<CountFilterEditorView>().Single();
+            var spinner = editor.FindControl<CompactNumericUpDown>("CountSpinner");
+            var textBox = editor
+                .GetVisualDescendants()
+                .OfType<VisualTrimHelperView>()
+                .Single()
+                .FindControl<TextBox>("TrimHelperText");
+            Assert.NotNull(spinner);
+            Assert.NotNull(textBox);
+
+            spinner.Value = 2;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(0, textBox.SelectionStart);
+            Assert.Equal(2, textBox.SelectionEnd);
+
+            window.Close();
+        }
+
         private static int _CountOf(BaseFilter filter)
         {
             return Assert.IsAssignableFrom<ICountOptionsFilter>(filter).Options.Count;
+        }
+
+        private static void _RaisePointerReleased(Control control)
+        {
+            var pointer = new Pointer(1, PointerType.Mouse, true);
+            var props = new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonReleased);
+            control.RaiseEvent(
+                new PointerReleasedEventArgs(
+                    control,
+                    pointer,
+                    control,
+                    new Point(1, 1),
+                    0,
+                    props,
+                    KeyModifiers.None,
+                    MouseButton.Left
+                )
+                {
+                    RoutedEvent = InputElement.PointerReleasedEvent,
+                }
+            );
         }
     }
 }

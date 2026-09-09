@@ -45,7 +45,16 @@ namespace Mfr.App.Ui.Views.DragAndDrop
                 return null;
             }
 
-            return JsonSerializer.Deserialize<T>(json, _JsonOptions);
+            try
+            {
+                return JsonSerializer.Deserialize<T>(json, _JsonOptions);
+            }
+            catch (JsonException)
+            {
+                // Drag transfers often carry multiple string formats; TryGetRaw may return a
+                // sibling item's payload (e.g. reorder marker "1"). Treat that as absent.
+                return null;
+            }
         }
 
         /// <summary>
@@ -65,9 +74,15 @@ namespace Mfr.App.Ui.Views.DragAndDrop
 
             foreach (var item in dataTransfer.Items)
             {
-                if (item.TryGetRaw(format) is string json)
+                if (item.TryGetRaw(format) is not string json)
                 {
-                    return Deserialize<T>(json);
+                    continue;
+                }
+
+                var payload = Deserialize<T>(json);
+                if (payload is not null)
+                {
+                    return payload;
                 }
             }
 

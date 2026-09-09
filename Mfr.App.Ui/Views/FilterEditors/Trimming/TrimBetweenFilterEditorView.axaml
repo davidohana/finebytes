@@ -7,7 +7,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
   d:DesignWidth="420"
-  d:DesignHeight="160"
+  d:DesignHeight="220"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Trimming.TrimBetweenFilterEditorView"
   x:DataType="vm:TrimBetweenFilterEditorViewModel"
 >
@@ -99,5 +99,6 @@
         </Grid>
       </StackPanel>
     </controls:FieldsetGroup>
+    <controls:VisualTrimHelperView x:Name="TrimHelper" DataContext="{Binding TrimHelper}" />
   </StackPanel>
 </UserControl>

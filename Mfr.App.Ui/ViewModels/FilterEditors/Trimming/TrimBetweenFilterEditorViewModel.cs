@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Trimming;
+using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
 {
@@ -13,11 +14,30 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public TrimBetweenFilterEditorViewModel(AppliedFilterStepViewModel step)
+        /// <param name="sampleRenameItems">Rename List items for Visual Trim Helper init; may be empty.</param>
+        /// <param name="resolveRenameItemByFullPath">
+        /// Looks up a Rename List row by original full path for helper drag-drop.
+        /// </param>
+        public TrimBetweenFilterEditorViewModel(
+            AppliedFilterStepViewModel step,
+            IReadOnlyList<RenameItem>? sampleRenameItems = null,
+            Func<string, RenameItem?>? resolveRenameItemByFullPath = null
+        )
             : base(step)
         {
+            TrimHelper = new VisualTrimHelperViewModel();
+            TrimHelper.SelectionApplied += _OnTrimHelperSelectionApplied;
+            TrimHelper.SampleChanged += _OnTrimHelperSampleChanged;
+            _ConfigureTrimHelper(resolveRenameItemByFullPath);
             _SyncFromFilter();
+            TrimHelper.InitFromRenameItems(sampleRenameItems ?? []);
+            _SyncTrimHelperHighlight();
         }
+
+        /// <summary>
+        /// Gets the Visual Trim Helper for this editor.
+        /// </summary>
+        public VisualTrimHelperViewModel TrimHelper { get; }
 
         /// <summary>
         /// Gets the Left/Right choices for position anchors.
@@ -48,13 +68,73 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         [ObservableProperty]
         private Side _endAnchor = Side.Left;
 
-        partial void OnStartValueChanged(decimal value) => _ApplyOptions();
+        partial void OnStartValueChanged(decimal value)
+        {
+            _ApplyOptions();
+            _SyncTrimHelperHighlight();
+        }
 
-        partial void OnStartAnchorChanged(Side value) => _ApplyOptions();
+        partial void OnStartAnchorChanged(Side value)
+        {
+            _ApplyOptions();
+            _SyncTrimHelperHighlight();
+        }
 
-        partial void OnEndValueChanged(decimal value) => _ApplyOptions();
+        partial void OnEndValueChanged(decimal value)
+        {
+            _ApplyOptions();
+            _SyncTrimHelperHighlight();
+        }
 
-        partial void OnEndAnchorChanged(Side value) => _ApplyOptions();
+        partial void OnEndAnchorChanged(Side value)
+        {
+            _ApplyOptions();
+            _SyncTrimHelperHighlight();
+        }
+
+        private void _ConfigureTrimHelper(Func<string, RenameItem?>? resolveRenameItemByFullPath)
+        {
+            if (Step.Filter is not TrimBetweenFilter filter)
+            {
+                return;
+            }
+
+            TrimHelper.Configure(VisualTrimHelperMapping.Mode.Range, filter.Target, resolveRenameItemByFullPath);
+        }
+
+        private void _OnTrimHelperSelectionApplied(object? sender, EventArgs e)
+        {
+            if (IsLoading || TrimHelper.AppliedRangeStart is not { } start || TrimHelper.AppliedRangeEnd is not { } end)
+            {
+                return;
+            }
+
+            LoadWithoutApplying(() =>
+            {
+                StartValue = start;
+                StartAnchor = Side.Left;
+                EndValue = end;
+                EndAnchor = Side.Left;
+            });
+            _ApplyOptions();
+        }
+
+        private void _OnTrimHelperSampleChanged(object? sender, EventArgs e)
+        {
+            _SyncTrimHelperHighlight();
+        }
+
+        private void _SyncTrimHelperHighlight()
+        {
+            if (IsLoading)
+            {
+                return;
+            }
+
+            var start = new Position(Value: ClampToInt(StartValue, 1, 1000), Anchor: StartAnchor);
+            var end = new Position(Value: ClampToInt(EndValue, 1, 1000), Anchor: EndAnchor);
+            TrimHelper.SyncHighlightFromRange(start, end);
+        }
 
         private void _SyncFromFilter()
         {

@@ -37,11 +37,12 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(dialog.FindControl<Grid>("PreviewRow"));
             Assert.Equal(
                 ["Options", "Preview", "Resulting format string"],
-                dialog
-                    .GetVisualDescendants()
-                    .OfType<FieldsetGroup>()
-                    .Select(group => group.Header?.ToString() ?? string.Empty)
-                    .ToArray()
+                [
+                    .. dialog
+                        .GetVisualDescendants()
+                        .OfType<FieldsetGroup>()
+                        .Select(group => group.Header?.ToString() ?? string.Empty),
+                ]
             );
             Assert.Equal(
                 FormatTokenPreviewViewModel.EmptyListSampleText,

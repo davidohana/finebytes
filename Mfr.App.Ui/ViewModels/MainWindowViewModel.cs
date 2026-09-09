@@ -55,6 +55,15 @@ namespace Mfr.App.Ui.ViewModels
             RenameListViewModel = new RenameListViewModel(FileListViewModel);
             FilterEditorViewModel = new FilterEditorViewModel();
             FilterEditorViewModel.ApplySession(session);
+            FilterEditorViewModel.SetSampleRenameItemSource(
+                () => [.. RenameListViewModel.Entries.Select(entry => entry.EngineItem)],
+                fullPath =>
+                    RenameListViewModel
+                        .Entries.Select(entry => entry.EngineItem)
+                        .FirstOrDefault(item =>
+                            string.Equals(item.Original.FullPath, fullPath, StringComparison.OrdinalIgnoreCase)
+                        )
+            );
             if (session is not null)
             {
                 FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));

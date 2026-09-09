@@ -2,6 +2,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Models.Config;
+using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors
 {
@@ -11,6 +12,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
     public sealed partial class FilterEditorViewModel : ViewModelBase
     {
         private SessionState? _session;
+        private Func<IReadOnlyList<RenameItem>>? _resolveSampleRenameItems;
+        private Func<string, RenameItem?>? _resolveRenameItemByFullPath;
 
         /// <summary>
         /// Gets whether an Applied Filters row is driving the configuration pane.
@@ -41,6 +44,22 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         private bool _formatTokenPickerExpanded = true;
 
         /// <summary>
+        /// Supplies Rename List sample resolution for Visual Trim Helper editors.
+        /// </summary>
+        /// <param name="resolveSampleRenameItems">Returns current Rename List engine items (first used for init).</param>
+        /// <param name="resolveRenameItemByFullPath">Looks up a row by original full path for drag-drop.</param>
+        internal void SetSampleRenameItemSource(
+            Func<IReadOnlyList<RenameItem>> resolveSampleRenameItems,
+            Func<string, RenameItem?> resolveRenameItemByFullPath
+        )
+        {
+            ArgumentNullException.ThrowIfNull(resolveSampleRenameItems);
+            ArgumentNullException.ThrowIfNull(resolveRenameItemByFullPath);
+            _resolveSampleRenameItems = resolveSampleRenameItems;
+            _resolveRenameItemByFullPath = resolveRenameItemByFullPath;
+        }
+
+        /// <summary>
         /// Restores Filter Configuration chrome from <paramref name="session"/> and keeps a live write-through.
         /// </summary>
         /// <param name="session">
@@ -64,7 +83,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             var step = selectedSteps.Count > 0 ? selectedSteps[0] : null;
             HasSelectedStep = step is not null;
             TitleText = step is null ? string.Empty : $"Applied Filter: {step.DisplayName}";
-            OptionsEditor = step is null ? null : FilterOptionsEditorFactory.Create(step);
+            var sampleItems = _resolveSampleRenameItems?.Invoke();
+            OptionsEditor = step is null
+                ? null
+                : FilterOptionsEditorFactory.Create(step, sampleItems, _resolveRenameItemByFullPath);
         }
 
         partial void OnFormatTokenPickerExpandedChanged(bool value)

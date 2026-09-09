@@ -73,6 +73,48 @@ namespace Mfr.Filters.Trimming
         }
 
         /// <summary>
+        /// Maps start/end positions to a 0-based inclusive selection range in <paramref name="text"/>.
+        /// </summary>
+        /// <param name="text">Sample string (same value the filter would trim).</param>
+        /// <param name="start">Inclusive start position.</param>
+        /// <param name="end">Inclusive end position.</param>
+        /// <param name="startIndex">0-based selection start when mapping succeeds.</param>
+        /// <param name="length">Selection length when mapping succeeds.</param>
+        /// <returns>
+        /// <see langword="true"/> when <paramref name="text"/> is non-empty and a range was computed; otherwise <see langword="false"/>.
+        /// </returns>
+        public static bool TryGetSelectionRange(
+            string text,
+            Position start,
+            Position end,
+            out int startIndex,
+            out int length
+        )
+        {
+            ArgumentNullException.ThrowIfNull(text);
+            ArgumentNullException.ThrowIfNull(start);
+            ArgumentNullException.ThrowIfNull(end);
+
+            if (text.Length == 0)
+            {
+                startIndex = 0;
+                length = 0;
+                return false;
+            }
+
+            var from = _GetAbsoluteIndex(start, text.Length);
+            var to = _GetAbsoluteIndex(end, text.Length);
+            if (from > to)
+            {
+                (from, to) = (to, from);
+            }
+
+            startIndex = from;
+            length = to - from + 1;
+            return true;
+        }
+
+        /// <summary>
         /// Maps a 1-based left/right <see cref="Position"/> to a 0-based index in <paramref name="length"/>.
         /// </summary>
         /// <param name="position">Inclusive trim endpoint.</param>

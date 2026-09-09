@@ -31,5 +31,6 @@
         />
       </StackPanel>
     </controls:FieldsetGroup>
+    <controls:VisualTrimHelperView x:Name="TrimHelper" DataContext="{Binding TrimHelper}" />
   </StackPanel>
 </UserControl>
