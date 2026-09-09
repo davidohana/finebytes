@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Trimming;
@@ -293,7 +294,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                         return true;
                     }
                     default:
-                        return false;
+                        throw new UnreachableException($"Unknown Visual Trim Helper mode '{_mode}'.");
                 }
             }
             finally

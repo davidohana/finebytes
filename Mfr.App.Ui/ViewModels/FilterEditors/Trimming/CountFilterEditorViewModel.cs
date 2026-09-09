@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters;
@@ -57,7 +58,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                 TrimRightFilter => "Removes this many characters from the end of the target.",
                 ExtractLeftFilter => "Keeps this many characters from the start; drops the rest.",
                 ExtractRightFilter => "Keeps this many characters from the end; drops the rest.",
-                _ => "How many characters this filter uses.",
+                _ => throw new UnreachableException($"Count editor does not support {Step.Filter.GetType().Name}."),
             };
 
         /// <summary>
@@ -90,7 +91,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             {
                 TrimLeftFilter or ExtractLeftFilter => VisualTrimHelperMapping.Mode.LeftEdge,
                 TrimRightFilter or ExtractRightFilter => VisualTrimHelperMapping.Mode.RightEdge,
-                _ => VisualTrimHelperMapping.Mode.LeftEdge,
+                _ => throw new UnreachableException($"Count editor does not support {Step.Filter.GetType().Name}."),
             };
             var resolveItems = resolveSampleRenameItems ?? (sampleRenameItems is null ? null : () => sampleRenameItems);
             TrimHelper.Configure(mode, stringFilter.Target, resolveRenameItemByFullPath, resolveItems);

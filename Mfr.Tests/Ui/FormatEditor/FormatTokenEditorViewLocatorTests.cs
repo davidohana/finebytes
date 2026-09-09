@@ -223,10 +223,11 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies token-editor fields and the resulting string share one label/control column.
+        /// Verifies the Now Format field, docs hint, and resulting preview, plus SharedSizeGroup
+        /// alignment between the Format control and the Preview sample column.
         /// </summary>
         [AvaloniaFact]
-        public void Dialog_LabeledFields_ShareColumnAlignment()
+        public void Dialog_Now_FormatField_Aligns_With_Preview_Column()
         {
             var editor = new NowFormatTokenEditorViewModel(null);
             var dialog = new FormatTokenEditorDialog(editor) { Width = 520 };
@@ -234,14 +235,11 @@ namespace Mfr.Tests.Ui.FormatEditor
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var rows = dialog.GetVisualDescendants().OfType<FilterEditorLabeledRow>().ToList();
-            var formatRow = Assert.Single(rows, row => row.Label == "Format:");
-            var resultingRow = Assert.Single(rows, row => row.Label == "Resulting format string:");
-            var formatCombo = Assert.Single(formatRow.GetVisualDescendants().OfType<ComboBox>());
-            var resultingPreview = Assert.Single(
-                resultingRow.GetVisualDescendants().OfType<App.Ui.Views.FormatEditor.FormatEditor>()
+            var formatRow = Assert.Single(
+                dialog.GetVisualDescendants().OfType<FilterEditorLabeledRow>(),
+                row => row.Label == "Format:"
             );
-
+            var formatCombo = Assert.Single(formatRow.GetVisualDescendants().OfType<ComboBox>());
             Assert.True(formatCombo.IsEditable);
             Assert.Same(DateFormatExamples.All, formatCombo.ItemsSource);
             Assert.Equal(editor.Format, formatCombo.Text);
@@ -253,12 +251,22 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.Equal(DateFormatExamples.DocsLinkText, formatDocsHint.LinkText);
             Assert.Equal(DateFormatExamples.DocsUri, formatDocsHint.NavigateUri);
 
+            var resultingPreview = dialog.FindControl<App.Ui.Views.FormatEditor.FormatEditor>(
+                "ResultingFormatStringBox"
+            );
+            Assert.NotNull(resultingPreview);
+            Assert.True(resultingPreview.IsReadOnly);
+            Assert.Equal(editor.ResultingFormatString, resultingPreview.Text);
+
+            var previewPanel = dialog.FindControl<StackPanel>("PreviewPanel");
+            Assert.NotNull(previewPanel);
+
             var formatOrigin = formatCombo.TranslatePoint(default, dialog);
-            var resultingOrigin = resultingPreview.TranslatePoint(default, dialog);
+            var previewOrigin = previewPanel.TranslatePoint(default, dialog);
             Assert.NotNull(formatOrigin);
-            Assert.NotNull(resultingOrigin);
-            Assert.Equal(formatOrigin.Value.X, resultingOrigin.Value.X, precision: 1);
-            Assert.Equal(formatCombo.Bounds.Width, resultingPreview.Bounds.Width, precision: 1);
+            Assert.NotNull(previewOrigin);
+            Assert.Equal(formatOrigin.Value.X, previewOrigin.Value.X, precision: 1);
+            Assert.Equal(formatCombo.Bounds.Width, previewPanel.Bounds.Width, precision: 1);
 
             dialog.Close();
         }

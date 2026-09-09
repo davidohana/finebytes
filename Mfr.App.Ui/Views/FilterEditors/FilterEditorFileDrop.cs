@@ -6,30 +6,10 @@ using Mfr.App.Ui.Views.DragAndDrop;
 namespace Mfr.App.Ui.Views.FilterEditors
 {
     /// <summary>
-    /// Shared File List / Explorer file-drop helpers for Filter Configuration editors.
+    /// Shared File List / Explorer folder-drop helpers for Filter Configuration editors.
     /// </summary>
     internal static class FilterEditorFileDrop
     {
-        /// <summary>
-        /// Returns whether <paramref name="e"/> carries filesystem items.
-        /// </summary>
-        /// <param name="e">Drag event.</param>
-        /// <returns><see langword="true"/> when a file/folder payload is present.</returns>
-        public static bool HasFiles(DragEventArgs e)
-        {
-            return LocalFileDrop.HasFiles(e);
-        }
-
-        /// <summary>
-        /// Reads local filesystem paths from a file-drop transfer.
-        /// </summary>
-        /// <param name="e">Drag event.</param>
-        /// <returns>Local paths in drop order; empty when none resolve.</returns>
-        public static IReadOnlyList<string> ReadLocalPaths(DragEventArgs e)
-        {
-            return LocalFileDrop.ReadLocalPaths(e);
-        }
-
         /// <summary>
         /// Resolves the first dropped path to a folder: directories as-is; files use their parent directory.
         /// </summary>
@@ -75,20 +55,20 @@ namespace Mfr.App.Ui.Views.FilterEditors
 
         private static void _OnFolderDragOver(object? sender, DragEventArgs e)
         {
-            e.DragEffects = HasFiles(e) ? DragDropEffects.Copy : DragDropEffects.None;
+            e.DragEffects = LocalFileDrop.HasFiles(e) ? DragDropEffects.Copy : DragDropEffects.None;
             e.Handled = true;
         }
 
         private static void _OnFolderDrop(DragEventArgs e, Action<string> applyFolderPath)
         {
             e.Handled = true;
-            if (!HasFiles(e))
+            if (!LocalFileDrop.HasFiles(e))
             {
                 e.DragEffects = DragDropEffects.None;
                 return;
             }
 
-            var folder = TryResolveFolderPath(ReadLocalPaths(e));
+            var folder = TryResolveFolderPath(LocalFileDrop.ReadLocalPaths(e));
             if (folder is null)
             {
                 e.DragEffects = DragDropEffects.None;

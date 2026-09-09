@@ -4,6 +4,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
@@ -66,10 +67,10 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies non-string filters show the title only.
+        /// Verifies Audio Tag Remover loads its options editor in the configuration host.
         /// </summary>
         [AvaloniaFact]
-        public void Non_string_filter_shows_title_only()
+        public void Tag_remover_loads_options_editor()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
             mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
@@ -78,6 +79,8 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             Assert.Equal("Applied Filter: Audio Tag Remover", mainViewModel.FilterEditorViewModel.TitleText);
             Assert.Equal("Applied Filter: Audio Tag Remover", _TitleText(editorView));
+            Assert.IsType<TagRemoverFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
+            Assert.NotNull(_OptionsEditorSlot(editorView).Content);
 
             window.Close();
         }

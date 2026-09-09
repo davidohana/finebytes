@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Space;
@@ -214,7 +215,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
                 SpaceCharacterDefinition.Underscore => '_',
                 SpaceCharacterDefinition.Other when OtherCharacter.Length > 0 => OtherCharacter[0],
                 SpaceCharacterDefinition.Other => '\0',
-                _ => '\0',
+                _ => throw new UnreachableException($"Unknown space-character definition '{Definition}'."),
             };
         }
 

@@ -1,6 +1,6 @@
 ---
 name: Whole codebase review
-overview: "Phased whole-repo review: Phase 0–7 done. Next: Phase 8 Format Editor + FilterEditors."
+overview: "Phased whole-repo review: Phase 0–8 done. Next: Phase 9 CLI + arch tests + backlog/debts sweep."
 todos:
   - id: phase-0
     content: "Phase 0: Architecture/layering gate + plan file bootstrap"
@@ -28,7 +28,7 @@ todos:
     status: completed
   - id: phase-8
     content: "Phase 8: Format Editor + FilterEditors (respect f5/f6 prior art)"
-    status: pending
+    status: completed
   - id: phase-9
     content: "Phase 9: CLI + architecture tests + backlog/debts sweep"
     status: pending
@@ -78,7 +78,7 @@ flowchart TD
 | **5** Session/Config                | **done** | sort DTO merge; Version docs; ConfigStore test isolation           |
 | **6** File List                     | **done** | path sentinel reuse; history cap; thumb CTS; explore twins OK      |
 | **7** Rename List + Applied Filters | **done** | DnD formats/paths; FS-root helper; OrderedDraft→ListReorder        |
-| **8** Format Editor + FilterEditors | pending  |                                                                    |
+| **8** Format Editor + FilterEditors | **done** | Factory+locator coverage; exhaustiveness; stale dialog test        |
 | **9** CLI + arch tests + sweep      | pending  |                                                                    |
 
 ______________________________________________________________________
@@ -414,6 +414,50 @@ Rename List + Applied Filters / Palette hygiene closed; DnD Views→Views leak f
 
 ______________________________________________________________________
 
+## Phase 8 — Format Editor + FilterEditors (done)
+
+**Scope:** Format Editor (`ViewModels/Views/FormatEditor`, token editors) + `FilterEditors/<FilterGroup>/`; matching `Mfr.Tests/Ui/FilterEditors|FormatEditor`. Explore used for cross-file twins ([Format/Filter twins](68959676-c553-4061-8dfc-7917202273e2)). Respect f5/f6 already-done items (do not re-open Date/Time merge, Attributes radios, Tag Remover catalog UI, FormatStringScan walk, nested `source=` FormatEditor, etc.).
+
+**Verdict:** Format Editor + Filter Configuration editors are coherent — Views → ViewModels, live option replace via shared `LoadWithoutApplying` / `ApplyIfChanged`, convention ViewLocators, no second domain options resolver in Views. Applied factory/locator completeness (#11), dead drop wrappers, exhaustiveness, and stale dialog alignment test. Leftovers are structural (named-arg parse twin from f6, inclusive position helpers, ViewLocator merge).
+
+### Architecture (lightweight)
+
+| Check                         | Verdict                                                                                   |
+| ----------------------------- | ----------------------------------------------------------------------------------------- |
+| Views → ViewModels → Services | **Clean** — editors bind VMs; folder picker / file-drop are view glue                     |
+| Second resolver in UI         | **None** for filter options — factory + registry own “who has an editor”; Views only host |
+| Domain policy in UI           | **Clean** — parsers / clamp / Compile stay in Filters; UI soft-parse for dialogs          |
+| f5/f6 already-done            | **Untouched**                                                                             |
+
+### Applied (high confidence)
+
+1. **`FilterOptionsEditorFactory` completeness tests** — option-bearing catalog types must get a non-null editor; optionless allowlist gated; ViewLocator resolves every factory editor (`FilterOptionsEditorFactoryTests`). Closes backlog **#11**.
+1. **Deleted** unused `FilterEditorFileDrop.HasFiles` / `ReadLocalPaths` wrappers — Path Mover calls `LocalFileDrop` directly inside folder-drop handlers.
+1. **Exhaustiveness:** `VisualTrimHelperViewModel` mode switch, `SpaceCharacterFilterEditorViewModel._ResolveSpaceCharacter`, `CountFilterEditorViewModel` tooltip/mode → `UnreachableException` (no silent defaults).
+1. **Stale host test:** `Non_string_filter_shows_title_only` → `Tag_remover_loads_options_editor` (Tag Remover has an options body).
+1. **Stale FormatTokenEditor dialog test:** FieldsetGroup layout no longer uses a labeled “Resulting format string” row — updated to assert Format ↔ Preview SharedSizeGroup alignment.
+1. **Tests:** FilterEditors + FormatEditor suites **251 passed**.
+
+### Correctness (found, not changed)
+
+| Item                                                     | Notes                                                                                                  |
+| -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| Space Character Other + empty → `\0`                     | Intentional; filter setup throws (MFR7) — do not silently fall back to space (f5 follow-up superseded) |
+| `ReplaceList` `parseEntries: false` on match-flag change | Avoids lossy re-parse when search contains `=>`                                                        |
+| Named-arg parse twin still duplicated                    | Soft dialog vs Compile throw dialects — backlog **#29** (f6 #1)                                        |
+| Inclusive left/right index twins                         | TrimBetween `Side` ↔ ApplyScope `StringScopeAnchor`; Inserter insert-before stays separate — **#12**   |
+| Counter filter UI vs `<counter>` token UI                | Surfaces differ; `CounterPadding` already shared (Phase 3)                                             |
+
+### Deeper refactors (promoted / updated)
+
+See backlog: **#11 done**; **#12** refined; **#27–#28** unchanged; **#29–#31** added from Phase 8 / f6 carry-in.
+
+### Phase 8 exit
+
+Format Editor + FilterEditors hygiene closed; factory silent-null footgun gated. Ready for Phase 9 (CLI + arch tests + backlog/debts sweep).
+
+______________________________________________________________________
+
 ## Deeper refactors backlog
 
 Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
@@ -484,19 +528,15 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: medium Engine/Filters wiring
    Rank: medium — Phase 9 sweep or when adding many filters
 
-1. **`FilterOptionsEditorFactory` completeness vs option-bearing catalog types**
-   Sites: `FilterOptionsEditorFactory` switch; missing arm → null editor
-   Target: architecture/UI test that every filter with options records has an editor arm (optionless filters exempt)
-   Value: silent missing-editor footgun
-   Cost: low–medium test + maybe factory map
-   Rank: medium — Phase 8
+1. **`FilterOptionsEditorFactory` completeness vs option-bearing catalog types** — **done Phase 8**
+   Applied: `FilterOptionsEditorFactoryTests` (option-bearing ↔ non-null editor; optionless allowlist; ViewLocator for every factory editor).
 
-1. **Shared 1-based string-position helper**
-   Sites: `SubstringApplyScope`, `TrimBetweenFilter._GetAbsoluteIndex`, `InserterFilter._ComputeInsertIndex`, `<substr>` (`SubstringToken`)
-   Target: shared helper for dialects that match; document Inserter/`substr` negative-from-end separately
-   Value: one place for clamp/anchor bugs
-   Cost: medium behavior risk
-   Rank: medium — Phase 7/8 if ApplyScope touched
+1. **Shared inclusive left/right string-position helper**
+   Sites: `SubstringApplyScope` / `StringApplyScopeTransform._ResolveIndex` ↔ `TrimBetweenFilter._GetAbsoluteIndex` (`Side` vs `StringScopeAnchor`); `<substr>` signed positions stay separate
+   Target: one Models/Filters helper for inclusive left/right 1-based → 0-based; **do not** merge Inserter `_ComputeInsertIndex` (insert-before / append dialect)
+   Value: one place for clamp/anchor bugs on slice endpoints
+   Cost: medium behavior risk; enum unify optional
+   Rank: medium — ride along when next touching ApplyScope or Trim Between
 
 1. **Shared innermost-ancestor rewrite helper**
    Sites: `RenamePreviewFolderRebaser._RebaseItemAgainstAncestors` ↔ `CommitPlanner._ResolveActualSourcePath`
@@ -598,6 +638,27 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: low test
    Rank: medium — Phase 9 or when adding a FilterGroup
 
+1. **Share named-arg parse with Filters** (f6 #1 carry-in)
+   Sites: `NamedFormatOptionsBuilder` (`TryParse` / `_SplitNamedArgumentSegments`) ↔ `FormatOptionsParsing.SplitNamedArgumentSegments` / `ParseNamedKeyValuePairs`
+   Target: one public owner in `Mfr.Filters` (or Utils); UI wraps throw→bool and keeps Join / FormatInt / FormatBool / soft Get helpers
+   Value: dialog OK and Compile cannot drift on nested `source=<…>` / `key=value` rules
+   Cost: medium — public API + Filters tests; keep soft dialog defaults separate from Compile throws
+   Rank: high — best remaining Phase 8 structural win; do when next touching FormatEditor tokens or named options
+
+1. **Merge convention ViewLocators**
+   Sites: `FilterEditorViewLocator` ↔ `FormatTokenEditorViewLocator` (near-identical namespace suffix rewrite)
+   Target: one generic `ConventionViewLocator` (VM ns prefix → View ns prefix) parameterized by match type
+   Value: delete ~80 LOC twin; one place for naming-convention bugs
+   Cost: low–medium Avalonia template wiring + two test suites
+   Rank: medium — ride along when adding another convention locator
+
+1. **Multiline list Entries fieldset control** (f5 #6 carry-in)
+   Sites: Name List + Replace List Entries AXAML fieldsets (Casing List is space-separated — not a twin)
+   Target: shared multiline Entries control / hint chrome where semantics match
+   Value: less AXAML drift
+   Cost: medium
+   Rank: medium — only if Entries layout keeps churning
+
 ______________________________________________________________________
 
 ## Remaining phase briefs
@@ -610,9 +671,9 @@ See report above. `debts.md` shell ops remain deferred.
 
 See report above. Open rename-list feature phases 14b–16 untouched.
 
-### Phase 8 — Format Editor + FilterEditors
+### Phase 8 — Format Editor + FilterEditors — **done**
 
-**Scope:** Format Editor + `FilterEditors/<FilterGroup>/`; skip f5/f6 already-done items.
+See report above. f5/f6 already-done items not re-litigated.
 
 ### Phase 9 — CLI + architecture tests + sweep
 
