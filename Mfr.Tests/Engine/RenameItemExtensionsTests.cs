@@ -1,3 +1,4 @@
+using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Replace;
 using Mfr.Tests.Models.Filters;
@@ -120,8 +121,8 @@ namespace Mfr.Tests.Engine
                 new ReplacerFilter(
                     Target: new FileExtensionTarget(),
                     Options: new ReplacerOptions(
-                        ".mp3",
-                        ".flac",
+                        "mp3",
+                        "flac",
                         Match: new ReplacerMatchOptions(
                             Mode: ReplacerMode.Literal,
                             CaseSensitive: true,
@@ -142,6 +143,28 @@ namespace Mfr.Tests.Engine
             Assert.Equal("renamed.final", item.Preview.Prefix);
             Assert.Equal(".wav", item.Preview.Extension);
             Assert.Equal(Path.Combine(item.Original.DirectoryPath, "renamed.final.wav"), item.Preview.FullPath);
+        }
+
+        /// <summary>
+        /// Verifies Extension-target filters see text without the leading dot and restore it on write.
+        /// </summary>
+        [Fact]
+        public void ApplyFilters_ExtensionTarget_DoesNotIncludeLeadingDot()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: ".mp3");
+            var chain = FilterChain.CreateAllEnabled([
+                new LettersCaseFilter(
+                    new FileExtensionTarget(),
+                    new LettersCaseOptions(LettersCaseMode.UpperCase, [])
+                ),
+            ]);
+
+            chain.SetupFilters();
+            chain.ApplyFilters(item);
+
+            Assert.Equal("track", item.Preview.Prefix);
+            Assert.Equal(".MP3", item.Preview.Extension);
+            Assert.Equal("track.MP3", item.Preview.FullFileName);
         }
 
         /// <summary>

@@ -31,8 +31,14 @@ namespace Mfr.Models.Filters
     public sealed record FilePrefixTarget : FilterTarget;
 
     /// <summary>
-    /// Targets the file extension including the leading dot (<c>extension</c> segment).
+    /// Targets the file extension without the leading dot (MFR7 Apply Target Extension parity).
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <see cref="Rename.FileMeta.Extension"/> still stores <see cref="M:System.IO.Path.GetExtension(System.String)"/>
+    /// form (with a leading dot). Filter get/set strips and restores that separator so filters never see or edit it.
+    /// </para>
+    /// </remarks>
     public sealed record FileExtensionTarget : FilterTarget;
 
     /// <summary>

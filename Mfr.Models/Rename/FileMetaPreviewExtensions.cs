@@ -28,7 +28,8 @@ namespace Mfr.Models.Rename
             return target switch
             {
                 FilePrefixTarget => meta.Prefix,
-                FileExtensionTarget => meta.Extension,
+                // MFR7 Apply Target Extension omits the leading dot; filters must not see or edit it.
+                FileExtensionTarget => _ExtensionWithoutLeadingDot(meta.Extension),
                 FileFullNameTarget => meta.FullFileName,
                 FullPathTarget => meta.FullPath,
                 ParentDirectoryTarget => meta.DirectoryPath,
@@ -65,7 +66,8 @@ namespace Mfr.Models.Rename
                     meta.Prefix = value;
                     return;
                 case FileExtensionTarget:
-                    meta.Extension = value;
+                    // Round-trip MFR7-style filter text (no leading dot) into Path.GetExtension form.
+                    meta.Extension = _ExtensionWithLeadingDot(value);
                     return;
                 case FileFullNameTarget:
                     _SetFullFileNameFromValue(meta, value);
@@ -89,6 +91,32 @@ namespace Mfr.Models.Rename
             var fullName = Path.GetFileName(fullValue);
             meta.Extension = Path.GetExtension(fullName);
             meta.Prefix = Path.GetFileNameWithoutExtension(fullName);
+        }
+
+        /// <summary>
+        /// Strips a leading dot from stored extension text for filter apply (MFR7 parity).
+        /// </summary>
+        private static string _ExtensionWithoutLeadingDot(string extension)
+        {
+            if (extension.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            return extension.StartsWith('.') ? extension[1..] : extension;
+        }
+
+        /// <summary>
+        /// Restores <see cref="FileMeta.Extension"/> storage form (leading dot when non-empty).
+        /// </summary>
+        private static string _ExtensionWithLeadingDot(string value)
+        {
+            if (value.Length == 0)
+            {
+                return string.Empty;
+            }
+
+            return value.StartsWith('.') ? value : "." + value;
         }
 
         /// <summary>
