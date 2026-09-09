@@ -99,8 +99,21 @@ namespace Mfr.App.Ui.Views.DragAndDrop
         public static DataTransfer CreateTransfer<T>(DataFormat<string> format, T payload)
         {
             var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(format, Serialize(payload)));
+            Add(dataTransfer, format, payload);
             return dataTransfer;
+        }
+
+        /// <summary>
+        /// Appends one serialized payload item to an existing <paramref name="dataTransfer"/>.
+        /// </summary>
+        /// <typeparam name="T">Payload record type.</typeparam>
+        /// <param name="dataTransfer">Transfer to extend (e.g. multi-format Rename List drag).</param>
+        /// <param name="format">Payload data format.</param>
+        /// <param name="payload">Value to serialize.</param>
+        public static void Add<T>(DataTransfer dataTransfer, DataFormat<string> format, T payload)
+        {
+            ArgumentNullException.ThrowIfNull(dataTransfer);
+            dataTransfer.Add(DataTransferItem.Create(format, Serialize(payload)));
         }
     }
 }

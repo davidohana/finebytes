@@ -17,12 +17,30 @@ namespace Mfr.App.Ui.Views.RenameList
         );
 
         /// <summary>
-        /// Serializes this payload for drag transport.
+        /// Serializes the payload for drag transport.
         /// </summary>
         /// <returns>JSON payload string.</returns>
         public string Serialize()
         {
             return JsonDragPayload.Serialize(this);
+        }
+
+        /// <summary>
+        /// Builds a transfer containing only this payload.
+        /// </summary>
+        /// <returns>Transfer ready for <see cref="DragDrop.DoDragDropAsync"/>.</returns>
+        public DataTransfer CreateTransfer()
+        {
+            return JsonDragPayload.CreateTransfer(Format, this);
+        }
+
+        /// <summary>
+        /// Appends this payload to an existing <paramref name="dataTransfer"/> (e.g. with reorder marker).
+        /// </summary>
+        /// <param name="dataTransfer">Transfer to extend.</param>
+        public void AddTo(DataTransfer dataTransfer)
+        {
+            JsonDragPayload.Add(dataTransfer, Format, this);
         }
 
         /// <summary>

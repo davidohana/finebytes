@@ -24,6 +24,24 @@ namespace Mfr.App.Ui.Views.FilterPalette
         }
 
         /// <summary>
+        /// Builds a transfer containing only this payload.
+        /// </summary>
+        /// <returns>Transfer ready for <see cref="DragDrop.DoDragDropAsync"/>.</returns>
+        public DataTransfer CreateTransfer()
+        {
+            return JsonDragPayload.CreateTransfer(Format, this);
+        }
+
+        /// <summary>
+        /// Appends this payload to an existing <paramref name="dataTransfer"/>.
+        /// </summary>
+        /// <param name="dataTransfer">Transfer to extend.</param>
+        public void AddTo(DataTransfer dataTransfer)
+        {
+            JsonDragPayload.Add(dataTransfer, Format, this);
+        }
+
+        /// <summary>
         /// Reads an Available Filters catalog payload from drag data.
         /// </summary>
         /// <param name="dataTransfer">Drag data, or <see langword="null"/>.</param>

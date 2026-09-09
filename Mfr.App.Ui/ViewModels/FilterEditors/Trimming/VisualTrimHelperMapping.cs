@@ -68,33 +68,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         }
 
         /// <summary>
-        /// Maps a non-empty selection to 1-based inclusive left-anchored Trim Between positions.
-        /// </summary>
-        /// <param name="selectionStart">Selection start (0-based).</param>
-        /// <param name="selectionLength">Selection length (must be &gt; 0).</param>
-        /// <param name="startValue">1-based inclusive start from the left.</param>
-        /// <param name="endValue">1-based inclusive end from the left.</param>
-        /// <returns><see langword="true"/> when <paramref name="selectionLength"/> is positive.</returns>
-        internal static bool SelectionToLeftAnchoredRange(
-            int selectionStart,
-            int selectionLength,
-            out int startValue,
-            out int endValue
-        )
-        {
-            if (selectionLength <= 0)
-            {
-                startValue = 0;
-                endValue = 0;
-                return false;
-            }
-
-            startValue = selectionStart + 1;
-            endValue = selectionStart + selectionLength;
-            return true;
-        }
-
-        /// <summary>
         /// Maps a left-edge count to a highlight range.
         /// </summary>
         /// <param name="count">Trim/extract character count.</param>

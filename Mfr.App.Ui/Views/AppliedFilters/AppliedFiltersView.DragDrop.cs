@@ -58,10 +58,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             }
 
             var payload = new AppliedFilterDragPayload(indices);
-            return new ListBoxDragStart(
-                JsonDragPayload.CreateTransfer(AppliedFilterDragPayload.Format, payload),
-                DragDropEffects.Move
-            );
+            return new ListBoxDragStart(payload.CreateTransfer(), DragDropEffects.Move);
         }
 
         private void _OnListPointerReleased(object? sender, PointerReleasedEventArgs e)

@@ -20,7 +20,7 @@ Implemented: shared helper control, Count + Trim Between wiring, Rename List sam
 ## Key files
 
 - `Mfr.Models/Filters/FilterTargetText.cs`
-- `Mfr.Filters/Trimming/TrimBetweenFilter.cs` (`TryGetSelectionRange`)
+- `Mfr.Filters/Trimming/TrimBetweenFilter.cs` (`TryGetSelectionRange` / `TryGetPositionsFromSelection`)
 - `Mfr.App.Ui/ViewModels/FilterEditors/Trimming/VisualTrimHelperMapping.cs`
 - `Mfr.App.Ui/ViewModels/FilterEditors/Trimming/VisualTrimHelperViewModel.cs`
 - `Mfr.App.Ui/Views/Controls/VisualTrimHelperView.*`

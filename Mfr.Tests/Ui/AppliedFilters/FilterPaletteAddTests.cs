@@ -91,8 +91,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.NotNull(appliedList);
 
             var payload = new FilterPaletteDragPayload([lettersCase.Type]);
-            var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(FilterPaletteDragPayload.Format, payload.Serialize()));
+            var dataTransfer = payload.CreateTransfer();
 
             appliedList.RaiseEvent(
                 new DragEventArgs(DragDrop.DropEvent, dataTransfer, appliedList, default, KeyModifiers.None)
@@ -122,8 +121,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
             var payload = new AppliedFilterDragPayload([0]);
-            var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(AppliedFilterDragPayload.Format, payload.Serialize()));
+            var dataTransfer = payload.CreateTransfer();
 
             paletteList.RaiseEvent(
                 new DragEventArgs(DragDrop.DropEvent, dataTransfer, paletteList, default, KeyModifiers.None)

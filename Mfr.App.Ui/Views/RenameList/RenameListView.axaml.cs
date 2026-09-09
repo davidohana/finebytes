@@ -351,12 +351,7 @@ namespace Mfr.App.Ui.Views.RenameList
             var dataTransfer = new DataTransfer();
             dataTransfer.Add(DataTransferItem.Create(InternalReorderFormat, "1"));
             var sampleEntry = _viewModel.SelectedEntries[0];
-            dataTransfer.Add(
-                DataTransferItem.Create(
-                    RenameListSampleDragPayload.Format,
-                    new RenameListSampleDragPayload(sampleEntry.EngineItem.Original.FullPath).Serialize()
-                )
-            );
+            new RenameListSampleDragPayload(sampleEntry.EngineItem.Original.FullPath).AddTo(dataTransfer);
             try
             {
                 // Copy so Visual Trim Helper can accept the sample payload; Move still used for reorder drops.

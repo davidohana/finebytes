@@ -73,7 +73,7 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             var effect = payload.Kind == ShuttleDragKind.AvailableField ? DragDropEffects.Copy : DragDropEffects.Move;
-            return new ListBoxDragStart(JsonDragPayload.CreateTransfer(ShuttleDragPayload.Format, payload), effect);
+            return new ListBoxDragStart(payload.CreateTransfer(), effect);
         }
 
         private void _OnListPointerReleased(object? sender, PointerReleasedEventArgs e)

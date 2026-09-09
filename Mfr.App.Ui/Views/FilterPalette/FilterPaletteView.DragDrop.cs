@@ -53,10 +53,7 @@ namespace Mfr.App.Ui.Views.FilterPalette
                 return null;
             }
 
-            return new ListBoxDragStart(
-                JsonDragPayload.CreateTransfer(FilterPaletteDragPayload.Format, payload),
-                DragDropEffects.Copy
-            );
+            return new ListBoxDragStart(payload.CreateTransfer(), DragDropEffects.Copy);
         }
 
         private void _OnListPointerReleased(object? sender, PointerReleasedEventArgs e)

@@ -222,8 +222,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ShuttleDragKind.AvailableField,
                 [ShuttleFieldKeyCodec.Encode(nameField.OriginalKey)]
             );
-            var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(ShuttleDragPayload.Format, payload.Serialize()));
+            var dataTransfer = payload.CreateTransfer();
 
             selectedList.RaiseEvent(
                 new DragEventArgs(DragDrop.DropEvent, dataTransfer, selectedList, default, KeyModifiers.None)
@@ -251,8 +250,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ShuttleDragKind.AvailableField,
                 [ShuttleFieldKeyCodec.Encode(nameField.OriginalKey)]
             );
-            var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(ShuttleDragPayload.Format, payload.Serialize()));
+            var dataTransfer = payload.CreateTransfer();
 
             var firstItem = selectedList.ContainerFromIndex(0) as ListBoxItem;
             Assert.NotNull(firstItem);

@@ -3,7 +3,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 namespace Mfr.Tests.Ui.FilterEditors.Trimming
 {
     /// <summary>
-    /// Unit tests for <see cref="VisualTrimHelperMapping"/> formulas.
+    /// Unit tests for <see cref="VisualTrimHelperMapping"/> count-edge formulas.
     /// </summary>
     public sealed class VisualTrimHelperMappingTests
     {
@@ -39,40 +39,6 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             Assert.Equal(6, count);
             Assert.Equal(4, highlightStart);
             Assert.Equal(6, highlightLength);
-        }
-
-        /// <summary>
-        /// Verifies range mapping to 1-based inclusive left-anchored positions.
-        /// </summary>
-        [Fact]
-        public void SelectionToLeftAnchoredRange_maps_inclusive_positions()
-        {
-            Assert.True(
-                VisualTrimHelperMapping.SelectionToLeftAnchoredRange(
-                    selectionStart: 1,
-                    selectionLength: 3,
-                    out var start,
-                    out var end
-                )
-            );
-            Assert.Equal(2, start);
-            Assert.Equal(4, end);
-        }
-
-        /// <summary>
-        /// Verifies empty selection is rejected for range mode.
-        /// </summary>
-        [Fact]
-        public void SelectionToLeftAnchoredRange_rejects_empty_selection()
-        {
-            Assert.False(
-                VisualTrimHelperMapping.SelectionToLeftAnchoredRange(
-                    selectionStart: 2,
-                    selectionLength: 0,
-                    out _,
-                    out _
-                )
-            );
         }
 
         /// <summary>

@@ -1,4 +1,7 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views.AppliedFilters;
@@ -55,6 +58,33 @@ namespace Mfr.Tests.Ui.FilterEditors
             Dispatcher.UIThread.RunJobs();
 
             return (window, mainViewModel, editorView);
+        }
+
+        /// <summary>
+        /// Raises a left-button pointer release on <paramref name="control"/> (e.g. Visual Trim Helper selection).
+        /// </summary>
+        /// <param name="control">Control that handles <see cref="InputElement.PointerReleasedEvent"/>.</param>
+        public static void RaisePointerReleased(Control control)
+        {
+            ArgumentNullException.ThrowIfNull(control);
+
+            var pointer = new Pointer(1, PointerType.Mouse, true);
+            var props = new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonReleased);
+            control.RaiseEvent(
+                new PointerReleasedEventArgs(
+                    control,
+                    pointer,
+                    control,
+                    new Point(1, 1),
+                    0,
+                    props,
+                    KeyModifiers.None,
+                    MouseButton.Left
+                )
+                {
+                    RoutedEvent = InputElement.PointerReleasedEvent,
+                }
+            );
         }
     }
 }

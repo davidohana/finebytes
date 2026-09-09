@@ -1,7 +1,5 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
@@ -77,7 +75,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
 
             textBox.SelectionStart = 0;
             textBox.SelectionEnd = 4;
-            _RaisePointerReleased(textBox);
+            FilterEditorTestUi.RaisePointerReleased(textBox);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -129,27 +127,6 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         private static int _CountOf(BaseFilter filter)
         {
             return Assert.IsAssignableFrom<ICountOptionsFilter>(filter).Options.Count;
-        }
-
-        private static void _RaisePointerReleased(Control control)
-        {
-            var pointer = new Pointer(1, PointerType.Mouse, true);
-            var props = new PointerPointProperties(RawInputModifiers.None, PointerUpdateKind.LeftButtonReleased);
-            control.RaiseEvent(
-                new PointerReleasedEventArgs(
-                    control,
-                    pointer,
-                    control,
-                    new Point(1, 1),
-                    0,
-                    props,
-                    KeyModifiers.None,
-                    MouseButton.Left
-                )
-                {
-                    RoutedEvent = InputElement.PointerReleasedEvent,
-                }
-            );
         }
     }
 }

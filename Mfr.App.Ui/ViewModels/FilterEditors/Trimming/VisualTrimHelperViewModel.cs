@@ -230,19 +230,19 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                     case VisualTrimHelperMapping.Mode.Range:
                     {
                         if (
-                            !VisualTrimHelperMapping.SelectionToLeftAnchoredRange(
+                            !TrimBetweenFilter.TryGetPositionsFromSelection(
                                 selectionStart,
                                 selectionLength,
-                                out var startValue,
-                                out var endValue
+                                out var start,
+                                out var end
                             )
                         )
                         {
                             return false;
                         }
 
-                        AppliedRangeStart = startValue;
-                        AppliedRangeEnd = endValue;
+                        AppliedRangeStart = start.Value;
+                        AppliedRangeEnd = end.Value;
                         _SetHighlight(selectionStart, selectionLength);
                         SelectionApplied?.Invoke(this, EventArgs.Empty);
                         return true;

@@ -107,6 +107,33 @@ namespace Mfr.Filters.Trimming
         }
 
         /// <summary>
+        /// Maps a non-empty 0-based selection to 1-based inclusive left-anchored positions.
+        /// </summary>
+        /// <param name="selectionStart">Selection start (0-based).</param>
+        /// <param name="selectionLength">Selection length (must be &gt; 0).</param>
+        /// <param name="start">Left-anchored inclusive start when mapping succeeds.</param>
+        /// <param name="end">Left-anchored inclusive end when mapping succeeds.</param>
+        /// <returns><see langword="true"/> when <paramref name="selectionLength"/> is positive.</returns>
+        public static bool TryGetPositionsFromSelection(
+            int selectionStart,
+            int selectionLength,
+            out Position start,
+            out Position end
+        )
+        {
+            if (selectionLength <= 0)
+            {
+                start = new Position(0, Side.Left);
+                end = new Position(0, Side.Left);
+                return false;
+            }
+
+            start = new Position(selectionStart + 1, Side.Left);
+            end = new Position(selectionStart + selectionLength, Side.Left);
+            return true;
+        }
+
+        /// <summary>
         /// Maps a 1-based left/right <see cref="Position"/> to a 0-based index in <paramref name="length"/>.
         /// </summary>
         /// <param name="position">Inclusive trim endpoint.</param>

@@ -26,7 +26,7 @@ namespace Mfr.Tests.Ui.DragAndDrop
         [Fact]
         public void Deserialize_sample_payload_round_trips()
         {
-            var json = JsonDragPayload.Serialize(new RenameListSampleDragPayload(TestPaths.Absolute("a.txt")));
+            var json = new RenameListSampleDragPayload(TestPaths.Absolute("a.txt")).Serialize();
             var payload = JsonDragPayload.Deserialize<RenameListSampleDragPayload>(json);
             Assert.NotNull(payload);
             Assert.Equal(TestPaths.Absolute("a.txt"), payload.FullPath);
