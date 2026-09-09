@@ -5,41 +5,51 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Replace"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
+  xmlns:formatString="using:Mfr.Filters.Formatting.FormatString"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="280"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Replace.ReplaceListFilterEditorView"
   x:DataType="vm:ReplaceListFilterEditorViewModel"
 >
-  <StackPanel Spacing="8">
-    <controls:ReplacerModeFieldset x:Name="ModeFieldset" GroupName="ReplaceListMode" DataContext="{Binding Match}" />
-    <controls:FieldsetGroup Header="Replace List">
-      <StackPanel Spacing="4">
-        <ToolTip.Tip>
-          <controls:RichToolTip>
-            <TextBlock Classes="rich-tip-title" Text="One search/replace pair per line." />
-            <TextBlock
-              Classes="rich-tip-body"
-              Text="Separate search and replacement with =&gt;. A lone search line strips matches. Spaces are allowed."
-            />
-            <TextBlock Classes="rich-tip-bullet" Text="• Example: a =&gt; b" />
-            <TextBlock Classes="rich-tip-bullet" Text="• Example: Blue Train =&gt; Blue_Train" />
-            <TextBlock Classes="rich-tip-bullet" Text="• Example: x  (removes x)" />
-          </controls:RichToolTip>
-        </ToolTip.Tip>
-        <TextBlock Classes="filter-editor-label" Text="Entries:" />
-        <TextBox
-          x:Name="EntriesBox"
-          Classes="filter-editor-field-wrap"
-          MinWidth="240"
-          MinHeight="88"
-          AcceptsReturn="True"
-          Watermark="{Binding EntriesWatermark}"
-          Text="{Binding EntriesText}"
-        />
-        <controls:FilterEditorHint Text="One pair per line: search => replacement (lone search removes)." />
-      </StackPanel>
-    </controls:FieldsetGroup>
-    <controls:ReplacerMatchOptionsFieldset x:Name="MatchOptionsFieldset" DataContext="{Binding Match}" />
-  </StackPanel>
+  <fe:FormatTokenPickerPane IsExpanded="{Binding FormatTokenPickerExpanded, Mode=TwoWay}">
+    <StackPanel Spacing="8">
+      <controls:ReplacerModeFieldset x:Name="ModeFieldset" GroupName="ReplaceListMode" DataContext="{Binding Match}" />
+      <controls:FieldsetGroup Header="Replace List">
+        <StackPanel Spacing="4">
+          <ToolTip.Tip>
+            <controls:RichToolTip>
+              <TextBlock Classes="rich-tip-title" Text="One search/replace pair per line." />
+              <TextBlock
+                Classes="rich-tip-body"
+                Text="Separate search and replacement with =&gt;. A lone search line strips matches. Spaces are allowed. The replacement may include formatter tokens such as &lt;counter:…&gt;."
+              />
+              <TextBlock Classes="rich-tip-bullet" Text="• Example: a =&gt; b" />
+              <TextBlock Classes="rich-tip-bullet" Text="• Example: Blue Train =&gt; Blue_Train" />
+              <TextBlock Classes="rich-tip-bullet" Text="• Example: x  (removes x)" />
+              <TextBlock
+                Classes="rich-tip-bullet"
+                Text="• Example: [0-9]+ =&gt; &lt;counter:initial=1,step=1,padding=none,length=2,resetScope=global&gt;"
+              />
+            </controls:RichToolTip>
+          </ToolTip.Tip>
+          <TextBlock Classes="filter-editor-label" Text="Entries:" />
+          <fe:FormatEditor
+            x:Name="EntriesEditor"
+            MinWidth="240"
+            MinHeight="88"
+            HorizontalAlignment="Stretch"
+            AcceptsReturn="True"
+            ShowRightClickHint="False"
+            ValidationMode="{x:Static formatString:FormatStringValidationMode.WhenLikelyTokens}"
+            Watermark="{Binding EntriesWatermark}"
+            Text="{Binding EntriesText}"
+          />
+          <controls:FilterEditorHint Text="One pair per line: search => replacement (tokens on replacement; lone search removes)." />
+        </StackPanel>
+      </controls:FieldsetGroup>
+      <controls:ReplacerMatchOptionsFieldset x:Name="MatchOptionsFieldset" DataContext="{Binding Match}" />
+    </StackPanel>
+  </fe:FormatTokenPickerPane>
 </UserControl>
