@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Mfr.Utils;
 using TagLib;
 using TagLib.Mpeg;
@@ -113,7 +114,7 @@ namespace Mfr.Metadata
                 TagLib.Mpeg.Version.Version2 => "2",
                 TagLib.Mpeg.Version.Version25 => "2.5",
                 TagLib.Mpeg.Version.Unknown => string.Empty,
-                _ => string.Empty,
+                _ => throw new UnreachableException($"Unexpected MPEG version '{version}'."),
             };
         }
     }

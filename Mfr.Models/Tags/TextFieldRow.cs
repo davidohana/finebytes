@@ -39,6 +39,18 @@ namespace Mfr.Models.Tags
         }
 
         /// <summary>
+        /// Orders rows by key, then by values, for stable equality and Apply ordering.
+        /// </summary>
+        /// <param name="left">First row.</param>
+        /// <param name="right">Second row.</param>
+        /// <returns>Negative, zero, or positive per ordinal key then value sequence.</returns>
+        public static int Compare(TextFieldRow left, TextFieldRow right)
+        {
+            var byKey = string.CompareOrdinal(left.Key, right.Key);
+            return byKey != 0 ? byKey : OrdinalSequence.Compare(left.Values, right.Values);
+        }
+
+        /// <summary>
         /// Returns whether two field-row arrays are ordinal-equal in order and content.
         /// </summary>
         /// <param name="left">First array of rows, expected to be sorted.</param>

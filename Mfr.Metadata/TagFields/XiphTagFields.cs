@@ -45,7 +45,7 @@ namespace Mfr.Metadata.TagFields
                 return null;
             }
 
-            rows.Sort(_CompareRows);
+            rows.Sort(TextFieldRow.Compare);
             return new XiphTagData { Fields = [.. rows] };
         }
 
@@ -94,12 +94,6 @@ namespace Mfr.Metadata.TagFields
 
                 live.SetField(row.Key, [.. row.Values]);
             }
-        }
-
-        private static int _CompareRows(TextFieldRow a, TextFieldRow b)
-        {
-            var byKey = string.CompareOrdinal(a.Key, b.Key);
-            return byKey != 0 ? byKey : OrdinalSequence.Compare(a.Values, b.Values);
         }
     }
 }

@@ -83,6 +83,18 @@ namespace Mfr.Models.Tags.Apple
         /// </summary>
         public ImmutableArray<string> Values { get; init; }
 
+        /// <summary>
+        /// Orders rows by atom type bytes, then values, for stable equality and Apply ordering.
+        /// </summary>
+        /// <param name="left">First row.</param>
+        /// <param name="right">Second row.</param>
+        /// <returns>Negative, zero, or positive per atom type then value sequence.</returns>
+        public static int Compare(AppleAtomRow left, AppleAtomRow right)
+        {
+            var byType = left.AtomType.AsSpan().SequenceCompareTo(right.AtomType.AsSpan());
+            return byType != 0 ? byType : OrdinalSequence.Compare(left.Values, right.Values);
+        }
+
         /// <inheritdoc />
         public bool Equals(AppleAtomRow other)
         {

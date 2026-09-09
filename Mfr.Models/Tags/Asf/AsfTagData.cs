@@ -74,5 +74,18 @@ namespace Mfr.Models.Tags.Asf
     /// </summary>
     /// <param name="Name">Descriptor name.</param>
     /// <param name="Value">String form suitable for round-trip (see persistence layer).</param>
-    public readonly record struct AsfDescriptorRow(string Name, string Value);
+    public readonly record struct AsfDescriptorRow(string Name, string Value)
+    {
+        /// <summary>
+        /// Orders rows by name, then value, for stable equality and Apply ordering.
+        /// </summary>
+        /// <param name="left">First row.</param>
+        /// <param name="right">Second row.</param>
+        /// <returns>Negative, zero, or positive per ordinal name then value.</returns>
+        public static int Compare(AsfDescriptorRow left, AsfDescriptorRow right)
+        {
+            var byName = string.CompareOrdinal(left.Name, right.Name);
+            return byName != 0 ? byName : string.CompareOrdinal(left.Value, right.Value);
+        }
+    }
 }

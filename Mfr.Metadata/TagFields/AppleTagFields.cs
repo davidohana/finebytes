@@ -56,13 +56,13 @@ namespace Mfr.Metadata.TagFields
                     continue;
                 }
 
-                rows.Add(
-                    new AppleAtomRow
-                    {
-                        AtomType = ImmutableArray.Create(boxType.Data),
-                        Values = [.. texts.Select(static t => t.Trim())],
-                    }
-                );
+                var values = DelimitedText.TrimNonEmpty(texts);
+                if (values.Length == 0)
+                {
+                    continue;
+                }
+
+                rows.Add(new AppleAtomRow { AtomType = ImmutableArray.Create(boxType.Data), Values = values });
             }
 
             if (rows.Count == 0)
@@ -70,7 +70,7 @@ namespace Mfr.Metadata.TagFields
                 return null;
             }
 
-            rows.Sort(_CompareRows);
+            rows.Sort(AppleAtomRow.Compare);
             return new AppleTagData { Atoms = [.. rows] };
         }
 
@@ -124,12 +124,6 @@ namespace Mfr.Metadata.TagFields
             }
 
             return hexToRow;
-        }
-
-        private static int _CompareRows(AppleAtomRow a, AppleAtomRow b)
-        {
-            var byType = a.AtomType.AsSpan().SequenceCompareTo(b.AtomType.AsSpan());
-            return byType != 0 ? byType : OrdinalSequence.Compare(a.Values, b.Values);
         }
     }
 }

@@ -45,5 +45,22 @@ namespace Mfr.Models.Tags.Id3v1
         /// </para>
         /// </remarks>
         public byte? Genre { get; init; }
+
+        /// <summary>
+        /// Whether every modeled scalar is absent (whitespace strings and null numerics/genre).
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> when the block should be pruned to <see langword="null"/> on the overlay.
+        /// </returns>
+        public bool IsEmpty()
+        {
+            return string.IsNullOrWhiteSpace(Title)
+                && string.IsNullOrWhiteSpace(Artist)
+                && string.IsNullOrWhiteSpace(Album)
+                && Year is null
+                && string.IsNullOrWhiteSpace(Comment)
+                && Track is null
+                && Genre is null;
+        }
     }
 }

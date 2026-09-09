@@ -38,7 +38,7 @@ namespace Mfr.Metadata.TagFields
                 return null;
             }
 
-            frames.Sort(_CompareFrames);
+            frames.Sort(Id3v2ModeledFrame.Compare);
             return new Id3v2TagData { Version = live.Version, Frames = [.. frames] };
         }
 
@@ -298,32 +298,6 @@ namespace Mfr.Metadata.TagFields
             };
         }
 
-        private static int _CompareFrames(Id3v2ModeledFrame a, Id3v2ModeledFrame b)
-        {
-            var byId = string.CompareOrdinal(a.FrameId, b.FrameId);
-            if (byId != 0)
-            {
-                return byId;
-            }
-
-            var byLang = string.CompareOrdinal(a.Language, b.Language);
-            if (byLang != 0)
-            {
-                return byLang;
-            }
-
-            var byDesc = string.CompareOrdinal(a.Description, b.Description);
-            if (byDesc != 0)
-            {
-                return byDesc;
-            }
-
-            return OrdinalSequence.Compare(a.TextValues, b.TextValues);
-        }
-
-        /// <remarks>
-        /// <c>COMM</c> and <c>USLT</c> carry a single text payload, unlike the multi-value text frames.
-        /// </remarks>
         private static ImmutableArray<string> _SingleText(string? text)
         {
             var trimmed = text.TrimmedOrNull();

@@ -1,4 +1,5 @@
 using Mfr.Models.Tags;
+using Mfr.Utils;
 using TagLib;
 
 namespace Mfr.Metadata
@@ -19,18 +20,13 @@ namespace Mfr.Metadata
         /// </summary>
         /// <param name="absolutePath">Fully qualified filesystem path to an existing file.</param>
         /// <returns>The detected container, or <see cref="AudioContainerFormat.Unknown"/> when unmodeled.</returns>
-        /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty or relative.</exception>
+        /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
         /// <exception cref="IOException">TagLib cannot open the file.</exception>
         /// <exception cref="CorruptFileException">Thrown by TagLib when the file structure is unreadable.</exception>
         /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
         public static AudioContainerFormat Detect(string absolutePath)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(absolutePath);
-
-            if (!Path.IsPathFullyQualified(absolutePath))
-            {
-                throw new ArgumentException("Path must be fully qualified.", nameof(absolutePath));
-            }
+            absolutePath.RequireExistingRegularFile();
 
             using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
             return DetectFrom(file);

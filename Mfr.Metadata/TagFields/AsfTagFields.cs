@@ -55,7 +55,12 @@ namespace Mfr.Metadata.TagFields
                 rows.Add(new AsfDescriptorRow(descriptor.Name, descriptor.ToString()));
             }
 
-            rows.Sort(_CompareRows);
+            if (rows.Count == 0)
+            {
+                return null;
+            }
+
+            rows.Sort(AsfDescriptorRow.Compare);
             return new AsfTagData { Descriptors = [.. rows] };
         }
 
@@ -157,12 +162,6 @@ namespace Mfr.Metadata.TagFields
             }
 
             return nameToValue;
-        }
-
-        private static int _CompareRows(AsfDescriptorRow a, AsfDescriptorRow b)
-        {
-            var byName = string.CompareOrdinal(a.Name, b.Name);
-            return byName != 0 ? byName : string.CompareOrdinal(a.Value, b.Value);
         }
     }
 }

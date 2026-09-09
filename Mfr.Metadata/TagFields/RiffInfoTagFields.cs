@@ -50,7 +50,7 @@ namespace Mfr.Metadata.TagFields
                 return null;
             }
 
-            rows.Sort(_CompareRows);
+            rows.Sort(RiffInfoFieldRow.Compare);
             return new RiffInfoTagData { Fields = [.. rows] };
         }
 
@@ -116,12 +116,6 @@ namespace Mfr.Metadata.TagFields
             }
 
             return keyToValue;
-        }
-
-        private static int _CompareRows(RiffInfoFieldRow a, RiffInfoFieldRow b)
-        {
-            var byKey = string.CompareOrdinal(a.Key, b.Key);
-            return byKey != 0 ? byKey : string.CompareOrdinal(a.Value, b.Value);
         }
     }
 }

@@ -105,7 +105,7 @@ namespace Mfr.Metadata.TagFields
             }
 
             var rows = keyToValues.Select(static kvp => new TextFieldRow(kvp.Key, kvp.Value)).ToList();
-            rows.Sort(_CompareRows);
+            rows.Sort(TextFieldRow.Compare);
             return new ApeTagData { Fields = [.. rows] };
         }
 
@@ -199,12 +199,6 @@ namespace Mfr.Metadata.TagFields
             {
                 keyToValues[countKey] = [count];
             }
-        }
-
-        private static int _CompareRows(TextFieldRow a, TextFieldRow b)
-        {
-            var byKey = string.CompareOrdinal(a.Key, b.Key);
-            return byKey != 0 ? byKey : OrdinalSequence.Compare(a.Values, b.Values);
         }
     }
 }

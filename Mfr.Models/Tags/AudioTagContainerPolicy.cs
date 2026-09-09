@@ -41,7 +41,7 @@ namespace Mfr.Models.Tags
                 AudioContainerFormat.Riff => _RiffBlocks,
                 AudioContainerFormat.Ape => _ApeBlocks,
                 AudioContainerFormat.Unknown => [],
-                _ => [],
+                _ => throw new System.Diagnostics.UnreachableException($"Unexpected audio container '{container}'."),
             };
         }
 
@@ -129,7 +129,7 @@ namespace Mfr.Models.Tags
                 AudioContainerFormat.Riff => "WAV",
                 AudioContainerFormat.Ape => "Monkey's Audio",
                 AudioContainerFormat.Unknown => "unrecognized audio",
-                _ => "unrecognized audio",
+                _ => throw new System.Diagnostics.UnreachableException($"Unexpected audio container '{container}'."),
             };
         }
     }

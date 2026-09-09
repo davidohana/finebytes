@@ -1,6 +1,6 @@
 ---
 name: Whole codebase review
-overview: "Phased whole-repo review: Phase 0–1 + 3–4 done. Next: Phase 2 Metadata + Tags (still pending), then Phase 5 Session/Config."
+overview: "Phased whole-repo review: Phase 0–4 done. Next: Phase 5 Session/Config."
 todos:
   - id: phase-0
     content: "Phase 0: Architecture/layering gate + plan file bootstrap"
@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: phase-2
     content: "Phase 2: Metadata + Tags — mfr-code-review + autofix"
-    status: pending
+    status: completed
   - id: phase-3
     content: "Phase 3: Filters pipeline (Formatting last) — mfr-code-review + autofix"
     status: completed
@@ -72,7 +72,7 @@ flowchart TD
 | ----------------------------------- | -------- | ------------------------------------------------------------------ |
 | **0** Architecture / layering       | **done** | Project graph healthy; Services→Views fixed; arch tests tightened  |
 | **1** Utils + Models                | **done** | Numeric parity + Windows path chars; TextValues deleted            |
-| **2** Metadata + Tags               | pending  | Still next (skipped ahead to 3 in one pass)                        |
+| **2** Metadata + Tags               | **done** | Semantic 0→null; row Compare owners; detector path guard           |
 | **3** Filters                       | **done** | Setup caches + exhaustiveness; Formatting tokens OK                |
 | **4** Engine Preview/Commit         | **done** | failFast stash; rebase PreviewOk; DirectoryPath ordinal; bugbot OK |
 | **5** Session/Config                | pending  |                                                                    |
@@ -161,6 +161,44 @@ Utils/Models numeric + path policy aligned; dead twin removed. Ready for Phase 2
 
 ______________________________________________________________________
 
+## Phase 2 — L2 Metadata + Tags (done)
+
+**Scope:** `Mfr.Metadata/`, `Mfr.Models/Tags/`, docs `audio-tag-model.md` / `image-metadata-model.md`, `Mfr.Tests/Metadata/` + `Mfr.Tests/Models/Tags/`. Explore subagent used for cross-file twins ([Metadata Tags twins](4089d359-8272-4d95-8c6a-4fcf3322505e)).
+
+**Verdict:** Layering matches the design — TagLib/ME stay in Metadata; overlay/semantic/merge/policy stay in Models; field-patch Apply never dual-writes `file.Tag`. Image/EXIF lazy map is coherent and allowlist-gated. Applied numeric clear parity, shared row/frame comparers (killing `\0`-Join drift), detector path hardening, and empty-block prune on ASF/Apple reads. Leftovers are known-key catalogs for Ape/Riff (Xiph already has `XiphKnownKeys`) and optional TagLib open helper.
+
+### Applied (high confidence)
+
+1. **`SemanticFields._ParseNullableUInt`:** `"0"` → `null` (aligned with Id3v1 field IO, projection `_ParseUInt`, and audio-tag-model “never store 0”).
+1. **`Id3v1TagData.IsEmpty`:** one owner; SemanticMerge + BlockFieldIo prune through it.
+1. **Shared `Compare` on row/frame types:** `TextFieldRow`, `Id3v2ModeledFrame`, `AppleAtomRow`, `AsfDescriptorRow`, `RiffInfoFieldRow` — Metadata TagFields + SemanticMerge + BlockFieldIo (removed divergent `Join('\0')` sorts).
+1. **`AudioTagContainerDetector.Detect`:** `RequireExistingRegularFile` (parity with Read/Apply/image opens).
+1. **`AsfTagFields.Read`:** empty descriptor list → `null` block (same as other readers).
+1. **`AppleTagFields.Read`:** `DelimitedText.TrimNonEmpty` + skip empty value rows.
+1. **Exhaustiveness:** `MediaPropertiesReader` MPEG version + `AudioTagContainerPolicy` container switches → `UnreachableException`.
+1. **Docs:** `TagBlocksStructurallyEquals` no longer falsely inheritdocs `Equals`; clarifies same contract / named call-site API.
+1. **Tests:** `SemanticFieldsTests` zero-clear theory; detector missing-file ArgumentException.
+
+### Correctness (found, not changed)
+
+| Item                                                    | Notes                                                                                                                      |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `SemanticFields` year/BPM range                         | No 1–9999 / 1–65535 clamp — `AudioTagSetterFilter` owns product ranges; direct BlockFieldIo Id3v1 year still maxes at 9999 |
+| `TagBlocksStructurallyEquals` vs `Equals`               | Same body; Engine prefers the long name for “blocks only” clarity — optional rename later (backlog)                        |
+| Live Id3v1 empty (`Id3v1TagFields._IsEffectivelyEmpty`) | TagLib sentinels (`Year == 0`, …) — keep separate from `Id3v1TagData.IsEmpty`                                              |
+| Apple binary atoms / freeform catalog                   | Intentionally unmodeled; BPM/track/disc text gaps documented in merge                                                      |
+| Image ME allowlist vs TagLib photo tokens               | Separate caches by design (`image-*` / `exif-*` vs `media-photo-*`)                                                        |
+
+### Deeper refactors (promoted to backlog)
+
+See backlog items 17–20 below.
+
+### Phase 2 exit
+
+Metadata I/O + Tags domain hygiene closed; numeric clear and sort/compare ownership fixed. Ready for Phase 5 (Session/Config) — Phases 3–4 already done.
+
+______________________________________________________________________
+
 ## Phase 3 — L3 Filters pipeline (done)
 
 **Scope:** `Mfr.Filters/` by group (Formatting tokens/compiler last), `FilterCatalog`, `BaseFilter` setup caches; matching `Mfr.Tests/Models/Filters/`. Explore subagent used for cross-file twins.
@@ -228,7 +266,7 @@ See backlog items 1 (updated), 13–16 below.
 
 ### Phase 4 exit
 
-Engine Preview/Commit risk gate closed with stash fail-fast + rebase scoping fixes. Ready for Phase 5 (Session/Config) or Phase 2 if resumed.
+Engine Preview/Commit risk gate closed with stash fail-fast + rebase scoping fixes. Ready for Phase 5 (Session/Config).
 
 ______________________________________________________________________
 
@@ -348,13 +386,37 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: low–medium Models churn
    Rank: low–medium — ride along when editing add/refresh or RenameItem
 
+1. **`ApeKnownKeys` / `RiffInfoKnownKeys` (mirror `XiphKnownKeys`)**
+   Sites: `ApeTagFields._KnownKeys` + alias map; `RiffInfoTagFields._KnownKeys`; hardcoded keys in `SemanticAudioTag` / `AudioTagSemanticMerge`
+   Target: Models-owned known-key lists (+ Ape alias fold) used by Metadata read and merge/projection
+   Value: closes key-list drift (Xiph already has one owner)
+   Cost: medium — Metadata + Models + Filter Options Apply-To if exposed
+   Rank: medium — do when next touching Ape/Riff field IO
+
+1. **TagLib open helper**
+   Sites: `AudioTagPersistence` / `TagLibFileReader` / `MediaPropertiesReader` / `AudioTagContainerDetector` (`RequireExistingRegularFile` + `LocalFileAbstraction`)
+   Target: internal `TagLibFileOpen.OpenExisting(path)` (or similar) in Metadata
+   Value: one open/guard pattern
+   Cost: low churn, Metadata-only
+   Rank: medium — ride along when next editing persistence opens
+
+1. **Collapse `TagBlocksStructurallyEquals` onto `Equals`**
+   Sites: `AudioTagOverlay`; Engine `RenamePropertyChangeBuilder` uses structural name
+   Target: keep `Equals` only, or obsolete the long alias
+   Value: one public name
+   Cost: low call-site rename
+   Rank: low — optional clarity pass
+
+1. **Wire catalog maps to existing key constants**
+   Sites: `AudioCatalogFieldMaps` re-lists `MUSICBRAINZ_*` / ASF `"MusicBrainz/…"` already on `XiphKnownKeys` / `AsfDescriptorNames`
+   Target: reference those constants from the catalog rows (do not collapse the catalog table)
+   Value: string-literal drift closed for catalog IDs
+   Cost: low
+   Rank: medium — ride along with #17 or catalog edits
+
 ______________________________________________________________________
 
 ## Remaining phase briefs
-
-### Phase 2 — L2 Metadata + Tags
-
-**Scope:** `Mfr.Metadata/`, `Mfr.Models/Tags/`, docs `audio-tag-model.md` / `image-metadata-model.md`, `Mfr.Tests/Metadata/`.
 
 ### Phase 5 — Session / Config / Presets / Reset
 

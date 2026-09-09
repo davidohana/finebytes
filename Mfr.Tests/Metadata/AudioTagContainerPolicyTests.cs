@@ -132,6 +132,14 @@ namespace Mfr.Tests.Metadata
             Assert.Contains("fully qualified", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
+        [Fact]
+        public void Detect_MissingFile_ThrowsArgumentException()
+        {
+            var missing = Path.Combine(_tempDirectoryFixture.TempDir, "does-not-exist.mp3");
+            var ex = Assert.Throws<ArgumentException>(() => MetadataContainerDetector.Detect(missing));
+            Assert.Contains("does not exist", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
         /// <summary>
         /// The read that loads the overlay must also stamp the container so filters never reopen the file.
         /// </summary>

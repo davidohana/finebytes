@@ -70,5 +70,18 @@ namespace Mfr.Models.Tags.RiffInfo
     /// </summary>
     /// <param name="Key">Four-character INFO id (for example <c>INAM</c>).</param>
     /// <param name="Value">Trimmed text value.</param>
-    public readonly record struct RiffInfoFieldRow(string Key, string Value);
+    public readonly record struct RiffInfoFieldRow(string Key, string Value)
+    {
+        /// <summary>
+        /// Orders rows by key, then value, for stable equality and Apply ordering.
+        /// </summary>
+        /// <param name="left">First row.</param>
+        /// <param name="right">Second row.</param>
+        /// <returns>Negative, zero, or positive per ordinal key then value.</returns>
+        public static int Compare(RiffInfoFieldRow left, RiffInfoFieldRow right)
+        {
+            var byKey = string.CompareOrdinal(left.Key, right.Key);
+            return byKey != 0 ? byKey : string.CompareOrdinal(left.Value, right.Value);
+        }
+    }
 }

@@ -253,7 +253,17 @@ namespace Mfr.Models.Tags
             AudioTagSemanticMerge.MergeIntoPresentBlocks(this, semantic);
         }
 
-        /// <inheritdoc cref="Equals(AudioTagOverlay?)" />
+        /// <summary>
+        /// Whether every tag block matches <paramref name="other"/> (ignores <see cref="ContainerFormat"/>).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Same contract as <see cref="Equals(AudioTagOverlay?)"/>; kept as a named method for call sites that
+        /// emphasize block content rather than object equality.
+        /// </para>
+        /// </remarks>
+        /// <param name="other">Overlay to compare, or <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> when both overlays carry equal blocks.</returns>
         public bool TagBlocksStructurallyEquals(AudioTagOverlay? other)
         {
             if (other is null)

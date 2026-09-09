@@ -78,7 +78,7 @@ namespace Mfr.Models.Tags
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, null),
             };
 
-            overlay.Id3v1 = _IsId3v1Empty(updated) ? null : updated;
+            overlay.Id3v1 = updated.IsEmpty() ? null : updated;
         }
 
         /// <summary>
@@ -160,7 +160,7 @@ namespace Mfr.Models.Tags
                 }
             }
 
-            frames.Sort(_CompareFrames);
+            frames.Sort(Id3v2ModeledFrame.Compare);
             overlay.Id3v2 =
                 frames.Count == 0 ? null : new Id3v2TagData { Version = existing.Version, Frames = [.. frames] };
         }
@@ -224,15 +224,7 @@ namespace Mfr.Models.Tags
                 }
             }
 
-            rows.Sort(
-                static (a, b) =>
-                {
-                    var byKey = string.CompareOrdinal(a.Key, b.Key);
-                    return byKey != 0
-                        ? byKey
-                        : string.CompareOrdinal(string.Join('\0', a.Values), string.Join('\0', b.Values));
-                }
-            );
+            rows.Sort(TextFieldRow.Compare);
 
             overlay.Xiph = rows.Count == 0 ? null : new XiphTagData { Fields = [.. rows] };
         }
@@ -337,40 +329,6 @@ namespace Mfr.Models.Tags
         private static string? _NormalizeDescription(string? description)
         {
             return string.IsNullOrWhiteSpace(description) ? null : description.Trim();
-        }
-
-        private static int _CompareFrames(Id3v2ModeledFrame a, Id3v2ModeledFrame b)
-        {
-            var byId = string.CompareOrdinal(a.FrameId, b.FrameId);
-            if (byId != 0)
-            {
-                return byId;
-            }
-
-            var byLang = string.CompareOrdinal(a.Language ?? string.Empty, b.Language ?? string.Empty);
-            if (byLang != 0)
-            {
-                return byLang;
-            }
-
-            var byDesc = string.CompareOrdinal(a.Description ?? string.Empty, b.Description ?? string.Empty);
-            if (byDesc != 0)
-            {
-                return byDesc;
-            }
-
-            return string.CompareOrdinal(string.Join('\0', a.TextValues), string.Join('\0', b.TextValues));
-        }
-
-        private static bool _IsId3v1Empty(Id3v1TagData data)
-        {
-            return string.IsNullOrWhiteSpace(data.Title)
-                && string.IsNullOrWhiteSpace(data.Artist)
-                && string.IsNullOrWhiteSpace(data.Album)
-                && data.Year is null
-                && string.IsNullOrWhiteSpace(data.Comment)
-                && data.Track is null
-                && data.Genre is null;
         }
 
         private static byte? _ParseGenreByte(string trimmed)

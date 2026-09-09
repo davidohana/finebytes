@@ -88,7 +88,7 @@ namespace Mfr.Models.Tags
                 Genre = genreByte,
             };
 
-            return _IsId3v1Empty(merged) ? null : merged;
+            return merged.IsEmpty() ? null : merged;
         }
 
         private static Id3v2TagData? _MergeId3v2(Id3v2TagData existing, SemanticAudioTag common)
@@ -111,7 +111,7 @@ namespace Mfr.Models.Tags
             _SetTrackPair(frames, "TPOS", common.Disc, common.DiscCount);
             _MergeCatalogId3v2(frames, common);
 
-            frames.Sort(_CompareId3v2Frames);
+            frames.Sort(Id3v2ModeledFrame.Compare);
             // Preserve an intentionally empty Id3v2 block (create/recommended target) until fields are set or the
             // block is explicitly nulled by a remover. Prune only when the prior snapshot already had modeled frames
             // and this merge cleared them all.
@@ -230,13 +230,7 @@ namespace Mfr.Models.Tags
                 return null;
             }
 
-            rows.Sort(
-                static (a, b) =>
-                {
-                    var byName = string.CompareOrdinal(a.Name, b.Name);
-                    return byName != 0 ? byName : string.CompareOrdinal(a.Value, b.Value);
-                }
-            );
+            rows.Sort(AsfDescriptorRow.Compare);
 
             return new AsfTagData { Descriptors = [.. rows] };
         }
@@ -263,18 +257,7 @@ namespace Mfr.Models.Tags
                 return null;
             }
 
-            atoms.Sort(
-                static (a, b) =>
-                {
-                    var byType = a.AtomType.AsSpan().SequenceCompareTo(b.AtomType.AsSpan());
-                    if (byType != 0)
-                    {
-                        return byType;
-                    }
-
-                    return OrdinalSequence.Compare(a.Values, b.Values);
-                }
-            );
+            atoms.Sort(AppleAtomRow.Compare);
 
             return new AppleTagData { Atoms = [.. atoms] };
         }
@@ -450,7 +433,7 @@ namespace Mfr.Models.Tags
             _AddRiff(rows, "ICOP", common.Copyright);
             _AddRiff(rows, "ICRD", common.Year?.ToString(CultureInfo.InvariantCulture));
             _AddRiff(rows, "ITRK", common.Track?.ToString(CultureInfo.InvariantCulture));
-            rows.Sort(static (a, b) => string.CompareOrdinal(a.Key, b.Key));
+            rows.Sort(RiffInfoFieldRow.Compare);
             return [.. rows];
         }
 
@@ -587,53 +570,8 @@ namespace Mfr.Models.Tags
         private static ImmutableArray<TextFieldRow> _SortedRows(Dictionary<string, ImmutableArray<string>> map)
         {
             var rows = map.Select(static kvp => new TextFieldRow(kvp.Key, kvp.Value)).ToList();
-            rows.Sort(_CompareTextFieldRows);
+            rows.Sort(TextFieldRow.Compare);
             return [.. rows];
-        }
-
-        private static int _CompareTextFieldRows(TextFieldRow a, TextFieldRow b)
-        {
-            var byKey = string.CompareOrdinal(a.Key, b.Key);
-            if (byKey != 0)
-            {
-                return byKey;
-            }
-
-            return OrdinalSequence.Compare(a.Values, b.Values);
-        }
-
-        private static int _CompareId3v2Frames(Id3v2ModeledFrame a, Id3v2ModeledFrame b)
-        {
-            var byId = string.CompareOrdinal(a.FrameId, b.FrameId);
-            if (byId != 0)
-            {
-                return byId;
-            }
-
-            var byLang = string.CompareOrdinal(a.Language, b.Language);
-            if (byLang != 0)
-            {
-                return byLang;
-            }
-
-            var byDesc = string.CompareOrdinal(a.Description, b.Description);
-            if (byDesc != 0)
-            {
-                return byDesc;
-            }
-
-            return OrdinalSequence.Compare(a.TextValues, b.TextValues);
-        }
-
-        private static bool _IsId3v1Empty(Id3v1TagData data)
-        {
-            return string.IsNullOrWhiteSpace(data.Title)
-                && string.IsNullOrWhiteSpace(data.Artist)
-                && string.IsNullOrWhiteSpace(data.Album)
-                && data.Year is null
-                && string.IsNullOrWhiteSpace(data.Comment)
-                && data.Track is null
-                && data.Genre is null;
         }
     }
 }

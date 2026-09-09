@@ -114,6 +114,35 @@ namespace Mfr.Models.Tags.Id3v2
         /// </summary>
         public ImmutableArray<string> TextValues { get; init; } = [];
 
+        /// <summary>
+        /// Orders frames by id, language, description, then text values for stable equality and Apply ordering.
+        /// </summary>
+        /// <param name="left">First frame.</param>
+        /// <param name="right">Second frame.</param>
+        /// <returns>Negative, zero, or positive per ordinal identity then value sequence.</returns>
+        public static int Compare(Id3v2ModeledFrame left, Id3v2ModeledFrame right)
+        {
+            var byId = string.CompareOrdinal(left.FrameId, right.FrameId);
+            if (byId != 0)
+            {
+                return byId;
+            }
+
+            var byLang = string.CompareOrdinal(left.Language, right.Language);
+            if (byLang != 0)
+            {
+                return byLang;
+            }
+
+            var byDesc = string.CompareOrdinal(left.Description, right.Description);
+            if (byDesc != 0)
+            {
+                return byDesc;
+            }
+
+            return OrdinalSequence.Compare(left.TextValues, right.TextValues);
+        }
+
         /// <inheritdoc />
         public bool Equals(Id3v2ModeledFrame? other)
         {

@@ -171,7 +171,8 @@ namespace Mfr.Models.Tags
                 );
             }
 
-            return parsed;
+            // Numerics clear to null, never 0 (same rule as overlay projection and Id3v1 field IO).
+            return parsed == 0 ? null : parsed;
         }
     }
 }
