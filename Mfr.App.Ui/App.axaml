@@ -35,6 +35,7 @@
     <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
     <StyleInclude Source="/Themes/CompactNumericUpDown.axaml" />
     <StyleInclude Source="/Themes/CompactToggle.axaml" />
+    <StyleInclude Source="/Themes/MessageDialog.axaml" />
     <StyleInclude Source="/Themes/FilterEditor.axaml" />
     <StyleInclude Source="/Themes/RenameList.axaml" />
     <!-- Light selection highlight for all editable text. -->

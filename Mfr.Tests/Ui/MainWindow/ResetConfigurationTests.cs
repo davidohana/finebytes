@@ -1,6 +1,7 @@
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.Views;
 using AppMainWindow = Mfr.App.Ui.Views.MainWindow;
 
 namespace Mfr.Tests.Ui.MainWindow
@@ -25,11 +26,14 @@ namespace Mfr.Tests.Ui.MainWindow
                 DataContext = viewModel,
                 Width = 800,
                 Height = 600,
-                ConfirmResetForTests = () => Task.FromResult(false),
-                DeletePersistedConfigurationForTests = () => deleted = true,
-                ResolveExecutablePathForTests = () => @"C:\fake\mfr.exe",
-                StartProcessForTests = _ => started = true,
-                ShutdownForTests = () => shutdown = true,
+                ResetConfigurationHooks = new ResetConfigurationHooks
+                {
+                    Confirm = () => Task.FromResult(false),
+                    DeletePersistedConfiguration = () => deleted = true,
+                    ResolveExecutablePath = () => @"C:\fake\mfr.exe",
+                    StartProcess = _ => started = true,
+                    Shutdown = () => shutdown = true,
+                },
             };
             window.Show();
             Dispatcher.UIThread.RunJobs();
@@ -61,11 +65,14 @@ namespace Mfr.Tests.Ui.MainWindow
                 DataContext = viewModel,
                 Width = 800,
                 Height = 600,
-                ConfirmResetForTests = () => Task.FromResult(true),
-                DeletePersistedConfigurationForTests = () => deleted = true,
-                ResolveExecutablePathForTests = () => @"C:\fake\mfr.exe",
-                StartProcessForTests = path => startedPath = path,
-                ShutdownForTests = () => shutdown = true,
+                ResetConfigurationHooks = new ResetConfigurationHooks
+                {
+                    Confirm = () => Task.FromResult(true),
+                    DeletePersistedConfiguration = () => deleted = true,
+                    ResolveExecutablePath = () => @"C:\fake\mfr.exe",
+                    StartProcess = path => startedPath = path,
+                    Shutdown = () => shutdown = true,
+                },
             };
             window.Show();
             Dispatcher.UIThread.RunJobs();
@@ -118,15 +125,18 @@ namespace Mfr.Tests.Ui.MainWindow
                 DataContext = viewModel,
                 Width = 800,
                 Height = 600,
-                ConfirmResetForTests = async () =>
+                ResetConfigurationHooks = new ResetConfigurationHooks
                 {
-                    confirmCalls++;
-                    return await tcs.Task;
+                    Confirm = async () =>
+                    {
+                        confirmCalls++;
+                        return await tcs.Task;
+                    },
+                    DeletePersistedConfiguration = () => deleted++,
+                    ResolveExecutablePath = () => @"C:\fake\mfr.exe",
+                    StartProcess = _ => { },
+                    Shutdown = () => { },
                 },
-                DeletePersistedConfigurationForTests = () => deleted++,
-                ResolveExecutablePathForTests = () => @"C:\fake\mfr.exe",
-                StartProcessForTests = _ => { },
-                ShutdownForTests = () => { },
             };
             window.Show();
             Dispatcher.UIThread.RunJobs();

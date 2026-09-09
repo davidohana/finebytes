@@ -27,29 +27,9 @@ namespace Mfr.App.Ui.Views
         }
 
         /// <summary>
-        /// Optional override for the reset confirmation dialog (tests).
+        /// Optional Reset Configuration overrides for headless tests; leave null in production.
         /// </summary>
-        internal Func<Task<bool>>? ConfirmResetForTests { get; set; }
-
-        /// <summary>
-        /// Optional override for resolving the executable path (tests).
-        /// </summary>
-        internal Func<string?>? ResolveExecutablePathForTests { get; set; }
-
-        /// <summary>
-        /// Optional override for starting a replacement process (tests).
-        /// </summary>
-        internal Action<string>? StartProcessForTests { get; set; }
-
-        /// <summary>
-        /// Optional override for AppData file deletion (tests).
-        /// </summary>
-        internal Action? DeletePersistedConfigurationForTests { get; set; }
-
-        /// <summary>
-        /// Optional override for shutting down after a successful reset restart (tests).
-        /// </summary>
-        internal Action? ShutdownForTests { get; set; }
+        internal ResetConfigurationHooks? ResetConfigurationHooks { get; set; }
 
         private void _OnDataContextChanged(object? sender, EventArgs e)
         {
@@ -107,10 +87,11 @@ namespace Mfr.App.Ui.Views
             _resetConfigurationInProgress = true;
             try
             {
+                var hooks = ResetConfigurationHooks;
                 bool accepted;
-                if (ConfirmResetForTests is not null)
+                if (hooks?.Confirm is not null)
                 {
-                    accepted = await ConfirmResetForTests();
+                    accepted = await hooks.Confirm();
                 }
                 else
                 {
@@ -128,9 +109,9 @@ namespace Mfr.App.Ui.Views
 
                 try
                 {
-                    if (DeletePersistedConfigurationForTests is not null)
+                    if (hooks?.DeletePersistedConfiguration is not null)
                     {
-                        DeletePersistedConfigurationForTests();
+                        hooks.DeletePersistedConfiguration();
                     }
                     else
                     {
@@ -149,7 +130,7 @@ namespace Mfr.App.Ui.Views
 
                 viewModel.SuppressSessionSaveOnClose = true;
 
-                var exePath = ResolveExecutablePathForTests?.Invoke() ?? _ResolveExecutablePath();
+                var exePath = hooks?.ResolveExecutablePath?.Invoke() ?? _ResolveExecutablePath();
                 if (string.IsNullOrWhiteSpace(exePath))
                 {
                     await new OkMessageDialog(
@@ -161,9 +142,9 @@ namespace Mfr.App.Ui.Views
 
                 try
                 {
-                    if (StartProcessForTests is not null)
+                    if (hooks?.StartProcess is not null)
                     {
-                        StartProcessForTests(exePath);
+                        hooks.StartProcess(exePath);
                     }
                     else
                     {
@@ -179,9 +160,9 @@ namespace Mfr.App.Ui.Views
                     return;
                 }
 
-                if (ShutdownForTests is not null)
+                if (hooks?.Shutdown is not null)
                 {
-                    ShutdownForTests();
+                    hooks.Shutdown();
                     return;
                 }
 

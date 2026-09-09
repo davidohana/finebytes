@@ -37,6 +37,8 @@ isProject: false
 ## Implementation
 
 - [`ConfirmMessageDialog`](../../Mfr.App.Ui/Views/ConfirmMessageDialog.axaml) — OK/Cancel; `ShowDialog<bool>`
+- Shared footer chrome: [`Themes/MessageDialog.axaml`](../../Mfr.App.Ui/Themes/MessageDialog.axaml) (`message-dialog-footer`)
 - [`PersistedConfigurationReset`](../../Mfr.Engine/Config/PersistedConfigurationReset.cs) — deletes the three AppData files
 - [`MainWindow`](../../Mfr.App.Ui/Views/MainWindow.axaml): **Tools → Reset Configuration**; orchestration in code-behind
 - [`MainWindowViewModel.ResetConfigurationCommand`](../../Mfr.App.Ui/ViewModels/MainWindowViewModel.cs) + `SuppressSessionSaveOnClose`
+- Headless seams: [`ResetConfigurationHooks`](../../Mfr.App.Ui/Views/ResetConfigurationHooks.cs)

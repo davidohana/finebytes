@@ -36,14 +36,14 @@ namespace Mfr.Tests.Ui
 
             var ok = dialog.FindControl<Button>("OkButton");
             Assert.NotNull(ok);
-            Assert.Contains("confirm-message-footer", ok.Classes);
+            Assert.Contains("message-dialog-footer", ok.Classes);
             Assert.True(ok.IsDefault);
             var okBrush = Assert.IsAssignableFrom<ISolidColorBrush>(ok.Background);
             Assert.Equal(0, okBrush.Color.A);
 
             var cancel = dialog.FindControl<Button>("CancelButton");
             Assert.NotNull(cancel);
-            Assert.Contains("confirm-message-footer", cancel.Classes);
+            Assert.Contains("message-dialog-footer", cancel.Classes);
             Assert.True(cancel.IsCancel);
 
             dialog.Close(false);

@@ -35,7 +35,7 @@ namespace Mfr.Tests.Ui
 
             var ok = dialog.FindControl<Button>("OkButton");
             Assert.NotNull(ok);
-            Assert.Contains("ok-message-footer", ok.Classes);
+            Assert.Contains("message-dialog-footer", ok.Classes);
             var brush = Assert.IsAssignableFrom<ISolidColorBrush>(ok.Background);
             Assert.Equal(0, brush.Color.A);
 
