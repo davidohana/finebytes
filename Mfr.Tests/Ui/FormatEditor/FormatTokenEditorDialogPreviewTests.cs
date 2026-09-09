@@ -4,8 +4,10 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 using Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors;
+using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Tests.Models.Filters;
 
@@ -33,6 +35,14 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(dialog.FindControl<Button>("PreviewPreviousButton"));
             Assert.NotNull(dialog.FindControl<Button>("PreviewNextButton"));
             Assert.NotNull(dialog.FindControl<Grid>("PreviewRow"));
+            Assert.Equal(
+                ["Options", "Preview", "Resulting format string"],
+                dialog
+                    .GetVisualDescendants()
+                    .OfType<FieldsetGroup>()
+                    .Select(group => group.Header?.ToString() ?? string.Empty)
+                    .ToArray()
+            );
             Assert.Equal(
                 FormatTokenPreviewViewModel.EmptyListSampleText,
                 dialog.FindControl<TextBox>("PreviewSampleBox")!.Text

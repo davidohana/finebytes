@@ -59,25 +59,26 @@
       <Button Classes="format-token-editor-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
     </StackPanel>
 
-    <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
-      <ContentControl HorizontalAlignment="Stretch" Content="{Binding}">
-        <ContentControl.ContentTemplate>
-          <local:FormatTokenEditorViewLocator />
-        </ContentControl.ContentTemplate>
-      </ContentControl>
+    <StackPanel Spacing="8" Grid.IsSharedSizeScope="True">
+      <controls:FieldsetGroup Header="Options">
+        <ContentControl HorizontalAlignment="Stretch" Content="{Binding}">
+          <ContentControl.ContentTemplate>
+            <local:FormatTokenEditorViewLocator />
+          </ContentControl.ContentTemplate>
+        </ContentControl>
+      </controls:FieldsetGroup>
 
-      <Grid x:Name="PreviewRow" x:DataType="vm:FormatTokenPreviewViewModel">
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition
-            Width="Auto"
-            SharedSizeGroup="{x:Static controls:FilterEditorLabeledRow.LabelSharedSizeGroup}"
-          />
-          <ColumnDefinition Width="8" />
-          <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <StackPanel Spacing="4" VerticalAlignment="Top">
-          <TextBlock Classes="filter-editor-label" Text="Preview:" />
-          <StackPanel Orientation="Horizontal" Spacing="2">
+      <controls:FieldsetGroup Header="Preview">
+        <Grid x:Name="PreviewRow" x:DataType="vm:FormatTokenPreviewViewModel">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition
+              Width="Auto"
+              SharedSizeGroup="{x:Static controls:FilterEditorLabeledRow.LabelSharedSizeGroup}"
+            />
+            <ColumnDefinition Width="8" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Top">
             <Button
               x:Name="PreviewPreviousButton"
               Classes="filter-editor-button format-editor-tool"
@@ -102,26 +103,26 @@
               IsEnabled="{Binding CanGoNext}"
             />
           </StackPanel>
-        </StackPanel>
-        <StackPanel x:Name="PreviewPanel" Grid.Column="2" Spacing="4">
-          <TextBox
-            x:Name="PreviewSampleBox"
-            Classes="filter-editor-field format-string-field"
-            IsReadOnly="True"
-            Text="{Binding SampleText}"
-            HorizontalAlignment="Stretch"
-          />
-          <TextBox
-            x:Name="PreviewResultBox"
-            Classes="filter-editor-field format-string-field"
-            IsReadOnly="True"
-            Text="{Binding PreviewResult}"
-            HorizontalAlignment="Stretch"
-          />
-        </StackPanel>
-      </Grid>
+          <StackPanel x:Name="PreviewPanel" Grid.Column="2" Spacing="4">
+            <TextBox
+              x:Name="PreviewSampleBox"
+              Classes="filter-editor-field format-string-field"
+              IsReadOnly="True"
+              Text="{Binding SampleText}"
+              HorizontalAlignment="Stretch"
+            />
+            <TextBox
+              x:Name="PreviewResultBox"
+              Classes="filter-editor-field format-string-field"
+              IsReadOnly="True"
+              Text="{Binding PreviewResult}"
+              HorizontalAlignment="Stretch"
+            />
+          </StackPanel>
+        </Grid>
+      </controls:FieldsetGroup>
 
-      <controls:FilterEditorLabeledRow Label="Resulting format string:">
+      <controls:FieldsetGroup Header="Resulting format string">
         <local:FormatEditor
           x:Name="ResultingFormatStringBox"
           AcceptsReturn="False"
@@ -132,7 +133,7 @@
           HorizontalAlignment="Stretch"
           Text="{Binding ResultingFormatString, Mode=OneWay}"
         />
-      </controls:FilterEditorLabeledRow>
+      </controls:FieldsetGroup>
     </StackPanel>
   </DockPanel>
 </Window>
