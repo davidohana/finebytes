@@ -9,6 +9,10 @@ namespace Mfr.App.Cli
     {
         internal const string DefaultLogLevelName = "info";
 
+        /// <summary>
+        /// Starts the shared file session log plus the CLI console sink.
+        /// </summary>
+        /// <param name="logLevel">Minimum level for both sinks.</param>
         internal static void Start(LogEventLevel logLevel)
         {
             LogSession.Start(
@@ -18,6 +22,12 @@ namespace Mfr.App.Cli
             );
         }
 
+        /// <summary>
+        /// Maps CLI level names (<c>debug|info|warn|error</c>) to Serilog levels.
+        /// </summary>
+        /// <param name="value">Raw option value; blank uses <see cref="DefaultLogLevelName"/>.</param>
+        /// <returns>The resolved Serilog level.</returns>
+        /// <exception cref="UserException">Thrown when the value is not a supported level name.</exception>
         internal static LogEventLevel ParseLogLevel(string? value)
         {
             var normalized = value.IsBlank() ? DefaultLogLevelName : value.Trim().ToLowerInvariant();

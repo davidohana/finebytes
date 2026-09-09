@@ -25,12 +25,7 @@ namespace Mfr.App.Cli
                 app.WithDescription($"Magic File Renamer v{_GetAssemblyVersionString()}.");
                 app.Run(args);
             }
-            catch (CommandParseException exception)
-            {
-                var parserMessage = exception.Message.IsBlank() ? "Invalid arguments." : exception.Message;
-                throw new UserException(parserMessage);
-            }
-            catch (CommandRuntimeException exception)
+            catch (Exception exception) when (exception is CommandParseException or CommandRuntimeException)
             {
                 var parserMessage = exception.Message.IsBlank() ? "Invalid arguments." : exception.Message;
                 throw new UserException(parserMessage);
@@ -201,7 +196,7 @@ namespace Mfr.App.Cli
             public bool IncludeSubdirs { get; init; }
 
             [CommandOption("--core")]
-            [Description("Continue-On-Rename-Errors instead of stopping at the first failure.")]
+            [Description("Continue on rename (commit) errors instead of stopping at the first failure (CORE).")]
             public bool ContinueOnRenameError { get; init; }
 
             [CommandOption("-c|--confirm")]

@@ -58,7 +58,7 @@ namespace Mfr.Tests.Architecture
         [Fact]
         public void LayeredProjects_OnlyReferenceStrictlyLowerLayers()
         {
-            var repoRoot = _FindRepoRoot();
+            var repoRoot = ArchitectureRepoPaths.FindRepoRoot();
 
             foreach (var (projectPath, layer) in _projectRelativePathToLayer.OrderByDescending(kv => kv.Value))
             {
@@ -87,7 +87,7 @@ namespace Mfr.Tests.Architecture
         [Fact]
         public void TestsProject_ReferencesEntryPointsOnly()
         {
-            var repoRoot = _FindRepoRoot();
+            var repoRoot = ArchitectureRepoPaths.FindRepoRoot();
 
             var refs = _LoadProjectReferencePaths(repoRoot, @"Mfr.Tests\Mfr.Tests.csproj");
 
@@ -124,25 +124,6 @@ namespace Mfr.Tests.Architecture
                     .Select(fullPath => Path.GetRelativePath(repoRoot, fullPath))
                     .Select(relativePath => relativePath.Replace('/', '\\')),
             ];
-        }
-
-        private static string _FindRepoRoot()
-        {
-            var directory = new DirectoryInfo(Directory.GetCurrentDirectory());
-
-            while (directory is not null)
-            {
-                var solutionPath = Path.Combine(directory.FullName, "finebytes.slnx");
-
-                if (File.Exists(solutionPath))
-                {
-                    return directory.FullName;
-                }
-
-                directory = directory.Parent;
-            }
-
-            throw new InvalidOperationException("Could not locate repository root containing finebytes.slnx.");
         }
     }
 }

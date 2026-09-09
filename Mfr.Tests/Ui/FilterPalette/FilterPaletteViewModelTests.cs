@@ -29,6 +29,23 @@ namespace Mfr.Tests.Ui.FilterPalette
         }
 
         /// <summary>
+        /// Verifies every <see cref="FilterGroup"/> has a toolbar button (All stays separate as null).
+        /// </summary>
+        [Fact]
+        public void Groups_Cover_Every_FilterGroup_Enum_Value()
+        {
+            var viewModel = new FilterPaletteViewModel();
+            var toolbarGroups = viewModel
+                .Groups.Where(g => g.Group is not null)
+                .Select(g => g.Group!.Value)
+                .ToHashSet();
+            var enumGroups = Enum.GetValues<FilterGroup>().ToHashSet();
+
+            Assert.Equal(enumGroups, toolbarGroups);
+            Assert.Equal(1, viewModel.Groups.Count(g => g.Group is null));
+        }
+
+        /// <summary>
         /// Verifies selecting Case shows only Case filters and updates selection flags.
         /// </summary>
         [Fact]

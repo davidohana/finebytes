@@ -77,17 +77,7 @@ namespace Mfr.App.Cli
 
         private static CliExitCode _Execute(CliOptions options)
         {
-            if (options.PresetsFilePath.IsBlank())
-            {
-                throw new UserException("Presets file path is required.");
-            }
-
             var presetManager = new PresetManager(options.PresetsFilePath);
-            if (options.PresetName.IsBlank())
-            {
-                throw new UserException("Preset name is required.");
-            }
-
             presetManager.LoadPresets();
 
             var preset = presetManager.NameToPreset.TryGetValue(options.PresetName, out var loadedPreset)

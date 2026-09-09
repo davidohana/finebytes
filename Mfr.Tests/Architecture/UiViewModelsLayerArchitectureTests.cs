@@ -3,27 +3,27 @@
 namespace Mfr.Tests.Architecture
 {
     /// <summary>
-    /// Verifies <c>Mfr.App.Ui/Services</c> does not depend on ViewModels or Views.
+    /// Verifies <c>Mfr.App.Ui/ViewModels</c> does not depend on Views.
     /// </summary>
     /// <remarks>
     /// Target flow inside the UI project: Views → ViewModels → Services → Engine / Models / Utils.
     /// </remarks>
-    public sealed class UiServicesLayerArchitectureTests
+    public sealed class UiViewModelsLayerArchitectureTests
     {
-        private static readonly string[] _ForbiddenNamespaces = ["Mfr.App.Ui.ViewModels", "Mfr.App.Ui.Views"];
+        private static readonly string[] _ForbiddenNamespaces = ["Mfr.App.Ui.Views"];
 
         /// <summary>
-        /// Services source must not import or qualify ViewModels or Views types.
+        /// ViewModels source must not import or qualify Views types.
         /// </summary>
         [Fact]
-        public void Services_DoNotReference_ViewModelsOrViews()
+        public void ViewModels_DoNotReference_Views()
         {
             var repoRoot = ArchitectureRepoPaths.FindRepoRoot();
-            var servicesRoot = Path.Combine(repoRoot, "Mfr.App.Ui", "Services");
-            Assert.True(Directory.Exists(servicesRoot), $"Expected Services folder at '{servicesRoot}'.");
+            var viewModelsRoot = Path.Combine(repoRoot, "Mfr.App.Ui", "ViewModels");
+            Assert.True(Directory.Exists(viewModelsRoot), $"Expected ViewModels folder at '{viewModelsRoot}'.");
 
             var violations = Directory
-                .EnumerateFiles(servicesRoot, "*.cs", SearchOption.AllDirectories)
+                .EnumerateFiles(viewModelsRoot, "*.cs", SearchOption.AllDirectories)
                 .SelectMany(path =>
                     File.ReadLines(path)
                         .Select((line, index) => (Path: path, LineNumber: index + 1, Line: line))
@@ -38,7 +38,7 @@ namespace Mfr.Tests.Architecture
 
             Assert.True(
                 violations.Count == 0,
-                "Mfr.App.Ui/Services must not reference ViewModels or Views. Violations:"
+                "Mfr.App.Ui/ViewModels must not reference Views. Violations:"
                     + Environment.NewLine
                     + string.Join(Environment.NewLine, violations)
             );
