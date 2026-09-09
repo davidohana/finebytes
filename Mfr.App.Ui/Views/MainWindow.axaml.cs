@@ -14,6 +14,7 @@ namespace Mfr.App.Ui.Views
     public partial class MainWindow : Window
     {
         private MainWindowViewModel? _boundViewModel;
+        private bool _resetConfigurationInProgress;
 
         /// <summary>
         /// Initializes the main window.
@@ -88,94 +89,114 @@ namespace Mfr.App.Ui.Views
             await dialog.ShowDialog(this);
         }
 
+        /// <summary>
+        /// Confirms Reset Configuration, deletes AppData files, skips session save, and restarts.
+        /// </summary>
         private async Task _ResetConfigurationAsync()
         {
+            if (_resetConfigurationInProgress)
+            {
+                return;
+            }
+
             if (DataContext is not MainWindowViewModel viewModel)
             {
                 return;
             }
 
-            bool accepted;
-            if (ConfirmResetForTests is not null)
-            {
-                accepted = await ConfirmResetForTests();
-            }
-            else
-            {
-                var confirm = new ConfirmMessageDialog(
-                    title: "Confirmation",
-                    message: "Reset configuration to default values? Magic File Renamer will close and restart."
-                );
-                accepted = await confirm.ShowDialog<bool>(this);
-            }
-
-            if (!accepted)
-            {
-                return;
-            }
-
+            _resetConfigurationInProgress = true;
             try
             {
-                if (DeletePersistedConfigurationForTests is not null)
+                bool accepted;
+                if (ConfirmResetForTests is not null)
                 {
-                    DeletePersistedConfigurationForTests();
+                    accepted = await ConfirmResetForTests();
                 }
                 else
                 {
-                    PersistedConfigurationReset.DeleteAppDataFiles();
-                    viewModel.AppliedFiltersViewModel.ClearFilterDefaultsCache();
+                    var confirm = new ConfirmMessageDialog(
+                        title: "Confirmation",
+                        message: "Reset configuration to default values? Magic File Renamer will close and restart."
+                    );
+                    accepted = await confirm.ShowDialog<bool>(this);
                 }
-            }
-            catch (Exception)
-            {
-                await new OkMessageDialog(
-                    title: "Magic File Renamer",
-                    message: "Failed to reset configuration. Error Deleting configuration file."
-                ).ShowDialog(this);
-                return;
-            }
 
-            viewModel.SuppressSessionSaveOnClose = true;
-
-            var exePath = ResolveExecutablePathForTests?.Invoke() ?? _ResolveExecutablePath();
-            if (string.IsNullOrWhiteSpace(exePath))
-            {
-                await new OkMessageDialog(
-                    title: "Magic File Renamer",
-                    message: "Failed to restart MFR program file."
-                ).ShowDialog(this);
-                return;
-            }
-
-            try
-            {
-                if (StartProcessForTests is not null)
+                if (!accepted)
                 {
-                    StartProcessForTests(exePath);
+                    return;
                 }
-                else
+
+                try
                 {
-                    Process.Start(new ProcessStartInfo { FileName = exePath, UseShellExecute = true });
+                    if (DeletePersistedConfigurationForTests is not null)
+                    {
+                        DeletePersistedConfigurationForTests();
+                    }
+                    else
+                    {
+                        PersistedConfigurationReset.DeleteAppDataFiles();
+                        viewModel.AppliedFiltersViewModel.ClearFilterDefaultsCache();
+                    }
                 }
-            }
-            catch (Exception)
-            {
-                await new OkMessageDialog(
-                    title: "Magic File Renamer",
-                    message: "Failed to restart MFR program file."
-                ).ShowDialog(this);
-                return;
-            }
+                catch (Exception)
+                {
+                    await new OkMessageDialog(
+                        title: "Magic File Renamer",
+                        message: "Failed to reset configuration. Error Deleting configuration file."
+                    ).ShowDialog(this);
+                    return;
+                }
 
-            if (ShutdownForTests is not null)
-            {
-                ShutdownForTests();
-                return;
-            }
+                viewModel.SuppressSessionSaveOnClose = true;
 
-            viewModel.Exit();
+                var exePath = ResolveExecutablePathForTests?.Invoke() ?? _ResolveExecutablePath();
+                if (string.IsNullOrWhiteSpace(exePath))
+                {
+                    await new OkMessageDialog(
+                        title: "Magic File Renamer",
+                        message: "Failed to restart MFR program file."
+                    ).ShowDialog(this);
+                    return;
+                }
+
+                try
+                {
+                    if (StartProcessForTests is not null)
+                    {
+                        StartProcessForTests(exePath);
+                    }
+                    else
+                    {
+                        Process.Start(new ProcessStartInfo { FileName = exePath, UseShellExecute = true });
+                    }
+                }
+                catch (Exception)
+                {
+                    await new OkMessageDialog(
+                        title: "Magic File Renamer",
+                        message: "Failed to restart MFR program file."
+                    ).ShowDialog(this);
+                    return;
+                }
+
+                if (ShutdownForTests is not null)
+                {
+                    ShutdownForTests();
+                    return;
+                }
+
+                viewModel.Exit();
+            }
+            finally
+            {
+                _resetConfigurationInProgress = false;
+            }
         }
 
+        /// <summary>
+        /// Resolves the running executable path for spawning a replacement process.
+        /// </summary>
+        /// <returns>Absolute path, or <see langword="null"/> when it cannot be determined.</returns>
         private static string? _ResolveExecutablePath()
         {
             if (!string.IsNullOrWhiteSpace(Environment.ProcessPath))

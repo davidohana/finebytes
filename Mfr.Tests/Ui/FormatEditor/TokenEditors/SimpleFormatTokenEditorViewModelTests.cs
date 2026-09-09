@@ -124,6 +124,11 @@ namespace Mfr.Tests.Ui.FormatEditor.TokenEditors
             Assert.Equal("a", vm.Low);
             Assert.Equal("z", vm.High);
             Assert.Equal("random-char:a,z", vm.BuildInnerText());
+
+            vm.SymbolsSampleCommand.Execute(null);
+            Assert.Equal("!", vm.Low);
+            Assert.Equal("/", vm.High);
+            Assert.Equal("random-char:!,/", vm.BuildInnerText());
             Assert.True(FormatStringSyntax.TryValidate(vm.ResultingFormatString).Success);
         }
     }

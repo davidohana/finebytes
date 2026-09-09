@@ -95,6 +95,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             var digits = Assert.IsType<Button>(body.FindControl<Button>("DigitsSampleButton"));
             var upper = Assert.IsType<Button>(body.FindControl<Button>("UpperLettersSampleButton"));
             var lower = Assert.IsType<Button>(body.FindControl<Button>("LowerLettersSampleButton"));
+            var symbols = Assert.IsType<Button>(body.FindControl<Button>("SymbolsSampleButton"));
 
             _Click(dialog, digits);
             Assert.Equal("0", editor.Low);
@@ -111,6 +112,12 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.Equal("z", editor.High);
             Assert.Equal("a", lowBox.Text);
             Assert.Equal("z", highBox.Text);
+
+            _Click(dialog, symbols);
+            Assert.Equal("!", editor.Low);
+            Assert.Equal("/", editor.High);
+            Assert.Equal("!", lowBox.Text);
+            Assert.Equal("/", highBox.Text);
 
             dialog.Close();
         }

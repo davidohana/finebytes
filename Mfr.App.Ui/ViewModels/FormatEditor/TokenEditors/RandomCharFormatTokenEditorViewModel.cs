@@ -79,6 +79,15 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
             _ApplySample("a", "z");
         }
 
+        /// <summary>
+        /// Sets the range to ASCII punctuation symbols <c>!</c>–<c>/</c>.
+        /// </summary>
+        [RelayCommand]
+        public void SymbolsSample()
+        {
+            _ApplySample("!", "/");
+        }
+
         private void _ApplySample(string low, string high)
         {
             Low = low;

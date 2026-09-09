@@ -102,5 +102,49 @@ namespace Mfr.Tests.Ui.MainWindow
 
             Assert.True(viewModel.SuppressSessionSaveOnClose);
         }
+
+        /// <summary>
+        /// Verifies a second Reset Configuration request while confirm is pending is ignored.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task ResetConfiguration_Ignores_Reentrant_Request()
+        {
+            var confirmCalls = 0;
+            var deleted = 0;
+            var tcs = new TaskCompletionSource<bool>();
+            var viewModel = new MainWindowViewModel(session: new SessionState());
+            var window = new AppMainWindow
+            {
+                DataContext = viewModel,
+                Width = 800,
+                Height = 600,
+                ConfirmResetForTests = async () =>
+                {
+                    confirmCalls++;
+                    return await tcs.Task;
+                },
+                DeletePersistedConfigurationForTests = () => deleted++,
+                ResolveExecutablePathForTests = () => @"C:\fake\mfr.exe",
+                StartProcessForTests = _ => { },
+                ShutdownForTests = () => { },
+            };
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            viewModel.ResetConfiguration();
+            Dispatcher.UIThread.RunJobs();
+            viewModel.ResetConfiguration();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(1, confirmCalls);
+
+            tcs.SetResult(true);
+            await Task.Yield();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(1, confirmCalls);
+            Assert.Equal(1, deleted);
+            window.Close();
+        }
     }
 }

@@ -27,28 +27,37 @@
         Text="{Binding High}"
       />
     </controls:FilterEditorLabeledRow>
-    <StackPanel Orientation="Horizontal" Spacing="6">
-      <Button
-        x:Name="DigitsSampleButton"
-        Classes="filter-editor-button"
-        Content="Digits"
-        ToolTip.Tip="Set range to 0–9."
-        Command="{Binding DigitsSampleCommand}"
-      />
-      <Button
-        x:Name="UpperLettersSampleButton"
-        Classes="filter-editor-button"
-        Content="Upper Letters"
-        ToolTip.Tip="Set range to A–Z."
-        Command="{Binding UpperLettersSampleCommand}"
-      />
-      <Button
-        x:Name="LowerLettersSampleButton"
-        Classes="filter-editor-button"
-        Content="Lower Letters"
-        ToolTip.Tip="Set range to a–z."
-        Command="{Binding LowerLettersSampleCommand}"
-      />
-    </StackPanel>
+    <controls:FilterEditorLabeledRow Label="">
+      <WrapPanel Orientation="Horizontal" ItemSpacing="6" LineSpacing="6">
+        <Button
+          x:Name="DigitsSampleButton"
+          Classes="filter-editor-button"
+          Content="Digits"
+          ToolTip.Tip="Set range to 0–9."
+          Command="{Binding DigitsSampleCommand}"
+        />
+        <Button
+          x:Name="UpperLettersSampleButton"
+          Classes="filter-editor-button"
+          Content="Upper Letters"
+          ToolTip.Tip="Set range to A–Z."
+          Command="{Binding UpperLettersSampleCommand}"
+        />
+        <Button
+          x:Name="LowerLettersSampleButton"
+          Classes="filter-editor-button"
+          Content="Lower Letters"
+          ToolTip.Tip="Set range to a–z."
+          Command="{Binding LowerLettersSampleCommand}"
+        />
+        <Button
+          x:Name="SymbolsSampleButton"
+          Classes="filter-editor-button"
+          Content="Symbols"
+          ToolTip.Tip="Set range to !–/ (ASCII punctuation)."
+          Command="{Binding SymbolsSampleCommand}"
+        />
+      </WrapPanel>
+    </controls:FilterEditorLabeledRow>
   </StackPanel>
 </UserControl>

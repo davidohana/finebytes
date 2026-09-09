@@ -33,11 +33,7 @@ namespace Mfr.Engine.Config
         {
             ConfigStore.DeleteDefaultFile(configFilePath);
             SessionStore.Delete(sessionFilePath);
-            FilterDefaultsStore.DeleteFileAt(
-                string.IsNullOrWhiteSpace(filterDefaultsFilePath)
-                    ? FilterDefaultsStore.DefaultFilePath()
-                    : filterDefaultsFilePath
-            );
+            FilterDefaultsStore.DeleteFileAt(filterDefaultsFilePath);
         }
     }
 }

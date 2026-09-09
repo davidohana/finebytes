@@ -137,31 +137,29 @@ namespace Mfr.Engine.Presets
         }
 
         /// <summary>
-        /// Deletes <paramref name="defaultsFilePath"/> when it exists (Reset Configuration).
+        /// Deletes the filter-defaults JSON file when it exists (Reset Configuration).
         /// <para>Missing files are a no-op.</para>
         /// </summary>
-        /// <param name="defaultsFilePath">Absolute path to <c>filter-defaults.json</c>.</param>
-        /// <exception cref="ArgumentException"><paramref name="defaultsFilePath"/> is blank.</exception>
+        /// <param name="defaultsFilePath">
+        /// Absolute path to <c>filter-defaults.json</c>. When <c>null</c> or whitespace,
+        /// <see cref="DefaultFilePath"/> is used.
+        /// </param>
         /// <exception cref="IOException">Thrown when the file exists but cannot be deleted.</exception>
-        public static void DeleteFileAt(string defaultsFilePath)
+        public static void DeleteFileAt(string? defaultsFilePath = null)
         {
-            if (string.IsNullOrWhiteSpace(defaultsFilePath))
-            {
-                throw new ArgumentException("Defaults file path must not be blank.", nameof(defaultsFilePath));
-            }
-
-            if (!File.Exists(defaultsFilePath))
+            var path = string.IsNullOrWhiteSpace(defaultsFilePath) ? DefaultFilePath() : defaultsFilePath;
+            if (!File.Exists(path))
             {
                 return;
             }
 
             try
             {
-                File.Delete(defaultsFilePath);
+                File.Delete(path);
             }
             catch (Exception ex)
             {
-                throw new IOException($"Error deleting filter defaults file '{defaultsFilePath}'.", ex);
+                throw new IOException($"Error deleting filter defaults file '{path}'.", ex);
             }
         }
 
