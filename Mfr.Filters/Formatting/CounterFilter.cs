@@ -111,12 +111,7 @@ namespace Mfr.Filters.Formatting
                     var listCount = usePerFolder
                         ? item.Original.RenameListFolderSiblingCount
                         : item.Original.RenameListTotalCount;
-                    if (listCount <= 0)
-                    {
-                        return 0;
-                    }
-
-                    return CounterPadding.AutomaticDigitWidth(Options.Start, Options.Step, maxIndex: listCount - 1);
+                    return CounterPadding.ResolveAutomaticPadWidth(Options.Start, Options.Step, listCount);
                 case CounterLeadingZerosMode.Custom:
                     return Math.Max(Options.CustomLength, 1);
                 default:

@@ -1,4 +1,5 @@
 using System.Globalization;
+using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting
 {
@@ -21,6 +22,27 @@ namespace Mfr.Filters.Formatting
             var v0 = start + ((long)step * 0);
             var v1 = start + ((long)step * maxIndex);
             return Math.Max(_DigitCount(v0), _DigitCount(v1));
+        }
+
+        /// <summary>
+        /// Resolves automatic pad width from a rename-list or folder sibling count.
+        /// </summary>
+        /// <param name="start">Counter value at index 0.</param>
+        /// <param name="step">Increment per index.</param>
+        /// <param name="listCount">
+        /// Active scope length (<see cref="FileMeta.RenameListTotalCount"/> or
+        /// <see cref="FileMeta.RenameListFolderSiblingCount"/>). Must be positive.
+        /// </param>
+        /// <returns>Digit width for <see cref="Format"/>.</returns>
+        /// <exception cref="InvalidOperationException">When <paramref name="listCount"/> is not positive.</exception>
+        internal static int ResolveAutomaticPadWidth(int start, int step, int listCount)
+        {
+            Check.That(
+                listCount > 0,
+                "Counter automatic padding requires rename-list counts on the item (run preview from a populated rename list)."
+            );
+
+            return AutomaticDigitWidth(start: start, step: step, maxIndex: listCount - 1);
         }
 
         /// <summary>

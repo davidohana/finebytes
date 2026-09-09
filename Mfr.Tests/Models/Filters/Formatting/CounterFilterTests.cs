@@ -204,10 +204,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         }
 
         /// <summary>
-        /// Verifies Automatic with missing list counts leaves the value unpadded.
+        /// Verifies Automatic with missing list counts throws (same policy as <c>&lt;counter&gt;</c>).
         /// </summary>
         [Fact]
-        public void Apply_Automatic_MissingListCount_NoPadding()
+        public void Apply_Automatic_MissingListCount_Throws()
         {
             var f = new CounterFilter(
                 _target,
@@ -224,8 +224,8 @@ namespace Mfr.Tests.Models.Filters.Formatting
 
             var item = FilterTestHelpers.CreateRenameItem(prefix: "x", renameListIndex: 0, renameListTotalCount: 0);
             f.Setup();
-            f.Apply(item);
-            Assert.Equal("1", item.Preview.Prefix);
+            var ex = Assert.Throws<InvalidOperationException>(() => f.Apply(item));
+            Assert.Contains("automatic padding", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         /// <summary>

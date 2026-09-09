@@ -215,13 +215,7 @@ namespace Mfr.Filters.Formatting.Tokens.Session
                     var listCount = usePerFolder
                         ? item.Original.RenameListFolderSiblingCount
                         : item.Original.RenameListTotalCount;
-                    Check.That(
-                        listCount > 0,
-                        "Counter token automatic padding requires rename-list counts on the item (run preview from a populated rename list)."
-                    );
-
-                    var maxIndex = Math.Max(listCount - 1, 0);
-                    return CounterPadding.AutomaticDigitWidth(start: start, step: step, maxIndex: maxIndex);
+                    return CounterPadding.ResolveAutomaticPadWidth(start: start, step: step, listCount: listCount);
                 case CounterPaddingMode.Fixed:
                     Require.That(
                         leadingZeroesTotalLength >= 1,

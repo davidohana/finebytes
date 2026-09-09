@@ -165,7 +165,7 @@ ______________________________________________________________________
 
 **Scope:** `Mfr.Filters/` by group (Formatting tokens/compiler last), `FilterCatalog`, `BaseFilter` setup caches; matching `Mfr.Tests/Models/Filters/`. Explore subagent used for cross-file twins.
 
-**Verdict:** Pipeline is sound — palette reflection + `PresetJsonOptions` stay aligned via existing catalog/polymorphism tests; `_Setup` caches that existed were already unconditional. Applied local setup-cache moves, exhaustiveness, and CharacterRun/KISS cleanup. Leftovers are structural (regex compile per replace, sentence-casing twins, ConfigStore line-length).
+**Verdict:** Pipeline is sound — palette reflection + `PresetJsonOptions` stay aligned via existing catalog/polymorphism tests; `_Setup` caches that existed were already unconditional. Applied local setup-cache moves, exhaustiveness, CharacterRun/KISS cleanup, and Counter auto-pad unify. Leftovers are structural (regex compile per replace, sentence-casing twins, ConfigStore line-length, dual JSON registration).
 
 ### Applied (high confidence)
 
@@ -174,7 +174,8 @@ ______________________________________________________________________
 1. **`AudioTagSetterFilter`:** early-return when no semantic fields configured (skip `EnsureTagLibLoaded` / merge).
 1. **Exhaustive switches:** `LettersCaseFilter`, `AttributesSetterFilter`, Media/Image/Mpeg property formatters → `UnreachableException` (no silent fall-through).
 1. **Dead `partial`** on `FormatterFilter`; non-nullable compiled `Formatter` fields on Formatter / Inserter / NameList / ReplaceList (drop `Check.NotNull` after setup).
-1. **Tests:** Cleaner + SpaceAfter `with`-clear drops prior cache; full `Mfr.Tests.Models.Filters` suite green (731).
+1. **Counter automatic pad-width:** one owner `CounterPadding.ResolveAutomaticPadWidth` — filter and `<counter>` both throw when list counts are missing (was silent no-pad on filter). Follow-up from [Filters cross-file twins](3a7748bf-dc7c-4ea3-9e19-c836c70a17e6).
+1. **Tests:** Cleaner + SpaceAfter `with`-clear; CounterFilter missing-count throws; filter suite green.
 
 ### Correctness (found, not changed)
 
@@ -183,10 +184,12 @@ ______________________________________________________________________
 | `ContainsLikelyFormatTokens` vs always-`Compile` | Inserter / AudioTag / Id3v2 use heuristic literals; Replacer / ReplaceList / Formatter / NameList / PathMover always compile (MFR7 format-string replacements). Intentional. |
 | `ListEntryLength` → `ConfigStore`                | Filters read process config max line length; ownership smell → Phase 5                                                                                                       |
 | `UppercaseInitialsFilter` SYSLIB1045 disable     | Documented; GeneratedRegex noise — leave                                                                                                                                     |
+| Sentence-end defaults                            | Options/JSON/`RenameItem` default `".!?"`; add-to-list `"-.!"` (MFR7). Documented in filter docs — keep                                                                      |
+| LettersCase vs CasingList sentence-initial       | Divergent letter/separator rules — backlog #7                                                                                                                                |
 
 ### Deeper refactors (promoted to backlog)
 
-See backlog items 6–9 below.
+See backlog items 6–12 below.
 
 ### Phase 3 exit
 
@@ -260,6 +263,27 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Value: clearer ownership; testability
    Cost: medium with config reshape
    Rank: medium — Phase 5
+
+1. **Generate `PresetJsonOptions` derived types from `FilterCatalog` discovery**
+   Sites: `FilterCatalog` reflection vs `PresetJsonOptions.s_BaseFilterDerivedTypes` (drift gated by `FilterCatalogTests`)
+   Target: one registration owner (generate JSON list from palette types, or reverse)
+   Value: closes permanent dual-list surface
+   Cost: medium Engine/Filters wiring
+   Rank: medium — Phase 5/9
+
+1. **`FilterOptionsEditorFactory` completeness vs option-bearing catalog types**
+   Sites: `FilterOptionsEditorFactory` switch; missing arm → null editor
+   Target: architecture/UI test that every filter with options records has an editor arm (optionless filters exempt)
+   Value: silent missing-editor footgun
+   Cost: low–medium test + maybe factory map
+   Rank: medium — Phase 8
+
+1. **Shared 1-based string-position helper**
+   Sites: `SubstringApplyScope`, `TrimBetweenFilter._GetAbsoluteIndex`, `InserterFilter._ComputeInsertIndex`, `<substr>` (`SubstringToken`)
+   Target: shared helper for dialects that match; document Inserter/`substr` negative-from-end separately
+   Value: one place for clamp/anchor bugs
+   Cost: medium behavior risk
+   Rank: medium — Phase 7/8 if ApplyScope touched
 
 ______________________________________________________________________
 
