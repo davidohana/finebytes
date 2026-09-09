@@ -5,7 +5,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Returns the drive letter (e.g. <c>C:</c>) for local paths, or <c>$</c> for UNC paths.
+    /// Returns the drive letter only (e.g. <c>C</c>, no trailing colon) for local paths, or <c>$</c> for UNC paths.
     /// </para>
     /// </remarks>
     [FormatTokenInfo(
@@ -27,12 +27,17 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
             return item =>
             {
                 var root = Path.GetPathRoot(item.Original.DirectoryPath) ?? string.Empty;
+                if (root.Length == 0)
+                {
+                    return string.Empty;
+                }
+
                 if (root.StartsWith(@"\\", StringComparison.Ordinal))
                 {
                     return "$";
                 }
 
-                return root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+                return char.ToUpperInvariant(root[0]).ToString();
             };
         }
     }

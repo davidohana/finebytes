@@ -8,15 +8,15 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
     public sealed class DriveLetterTokenTests
     {
         /// <summary>
-        /// Verifies a local path returns the drive letter without a trailing separator.
+        /// Verifies a local path returns the drive letter only (no colon).
         /// </summary>
         [WindowsFact]
-        public void Resolve_LocalPath_ReturnsDriveWithoutSeparator()
+        public void Resolve_LocalPath_ReturnsDriveLetterOnly()
         {
             var token = new DriveLetterToken();
             var item = FilterTestHelpers.CreateRenameItem(directory: @"C:\Medical Data\patients");
 
-            Assert.Equal("C:", token.Compile(tokenArgs: "")(item));
+            Assert.Equal("C", token.Compile(tokenArgs: "")(item));
         }
 
         /// <summary>
