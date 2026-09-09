@@ -183,7 +183,11 @@
     <Setter Property="ClipToBounds" Value="True" />
     <Setter Property="Padding" Value="0" />
   </Style>
-  <Style Selector="Border.format-editor-field-frame.format-editor-active-target">
+  <!-- Token fields only: blue when focused or last Insert/Edit target. Plain TextBoxes stay chrome gray. -->
+  <Style
+    Selector="Border.format-editor-field-frame.format-editor-active-target,
+              fe|FormatEditor:focus-within Border.format-editor-field-frame"
+  >
     <Setter Property="BorderBrush" Value="{DynamicResource FilterEditorTitleBarBrush}" />
   </Style>
   <Style Selector="Border.format-token-picker-pane">

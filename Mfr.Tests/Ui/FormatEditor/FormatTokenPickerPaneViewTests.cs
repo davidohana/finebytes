@@ -51,10 +51,10 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
-        /// Verifies a sole hosted format field stays the Insert target without the active-target border cue.
+        /// Verifies a sole hosted format field is the Insert target and shows the blue border cue.
         /// </summary>
         [AvaloniaFact]
-        public void SingleEditor_IsActiveWithoutBorderCue()
+        public void SingleEditor_IsActiveTargetWithBorderCue()
         {
             var editor = new App.Ui.Views.FormatEditor.FormatEditor
             {
@@ -74,7 +74,7 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.Same(editor, pane.ActiveEditor);
             Assert.True(pane.HasActiveEditor);
-            Assert.False(editor.IsActiveTarget);
+            Assert.True(editor.IsActiveTarget);
 
             window.Close();
         }

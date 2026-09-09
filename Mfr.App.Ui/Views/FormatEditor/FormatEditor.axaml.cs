@@ -239,11 +239,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets or sets whether this field shows the multi-field Insert/Edit target cue.
+        /// Gets or sets whether this field is the last-focused Insert/Edit target (blue border cue).
         /// </summary>
         /// <remarks>
-        /// Set by <see cref="FormatTokenPickerPane"/> only when more than one hosted format field
-        /// needs disambiguation. A sole field never gets the blue border (it is not keyboard focus).
+        /// Set by <see cref="FormatTokenPickerPane"/> for the active token field. Standalone editors
+        /// also turn blue while keyboard-focused via <c>:focus-within</c> styles.
         /// </remarks>
         public bool IsActiveTarget
         {
