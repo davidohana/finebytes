@@ -1,5 +1,5 @@
+using Avalonia.Controls;
 using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.Views;
 using Mfr.Models.Config;
 using Mfr.Utils;
 
@@ -14,15 +14,16 @@ namespace Mfr.App.Ui.Services.Session
         /// Restores remembered main-window layout from <paramref name="session"/>.
         /// </summary>
         /// <param name="window">Main window to configure.</param>
+        /// <param name="panes">Pane grids for splitter restore.</param>
         /// <param name="session">Loaded session document.</param>
         /// <remarks>
         /// File List mask fields and Rename List session fields are restored separately via
         /// <see cref="FileListSessionSnapshot.FromSessionState"/> and pane apply/capture methods.
         /// </remarks>
-        public static void TryRestore(MainWindow window, SessionState session)
+        public static void TryRestore(Window window, MainWindowPaneGrids panes, SessionState session)
         {
             ArgumentNullException.ThrowIfNull(window);
-
+            ArgumentNullException.ThrowIfNull(panes);
             ArgumentNullException.ThrowIfNull(session);
 
             var windowRestored = false;
@@ -32,7 +33,7 @@ namespace Mfr.App.Ui.Services.Session
             {
                 windowRestored = WindowSession.TryRestore(window, session.MainWindow);
 
-                SplitterSession.TryRestore(window, session.MainWindow?.Splitters);
+                SplitterSession.TryRestore(panes, session.MainWindow?.Splitters);
             }
 
             if (!windowRestored)
@@ -45,6 +46,7 @@ namespace Mfr.App.Ui.Services.Session
         /// Updates <c>session.json</c>: window/folder when their remember flags are on; masks and Rename List always.
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
+        /// <param name="panes">Pane grids for splitter capture.</param>
         /// <param name="session">Live session document to merge into and write.</param>
         /// <param name="fileListSnapshot">
         /// File List mask and folder fields to persist, or <see langword="null"/> when unavailable.
@@ -53,13 +55,15 @@ namespace Mfr.App.Ui.Services.Session
         /// Rename List session fields, or <see langword="null"/> to leave the saved section unchanged.
         /// </param>
         public static void SaveOnClose(
-            MainWindow window,
+            Window window,
+            MainWindowPaneGrids panes,
             SessionState session,
             FileListSessionSnapshot? fileListSnapshot,
             SessionStateRenameList? renameList = null
         )
         {
             ArgumentNullException.ThrowIfNull(window);
+            ArgumentNullException.ThrowIfNull(panes);
             ArgumentNullException.ThrowIfNull(session);
 
             try
@@ -71,7 +75,7 @@ namespace Mfr.App.Ui.Services.Session
                 {
                     var captured = WindowSession.Capture(window);
                     captured.RememberWindowState = rememberWindow;
-                    captured.Splitters = SplitterSession.Capture(window);
+                    captured.Splitters = SplitterSession.Capture(panes);
                     session.MainWindow = captured;
                 }
 

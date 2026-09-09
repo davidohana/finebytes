@@ -31,6 +31,21 @@ namespace Mfr.App.Ui.Views
         /// </summary>
         internal ResetConfigurationHooks? ResetConfigurationHooks { get; set; }
 
+        /// <summary>
+        /// Builds the pane-grid handle used by session splitter restore/capture.
+        /// </summary>
+        /// <returns>Named grids for <see cref="SplitterSession"/>.</returns>
+        internal MainWindowPaneGrids GetPaneGrids()
+        {
+            return new MainWindowPaneGrids
+            {
+                TopPanes = TopPanesGrid,
+                FilterLists = FilterListsGrid,
+                FilterPanes = FilterPanesGrid,
+                MainPanes = MainPanesGrid,
+            };
+        }
+
         private void _OnDataContextChanged(object? sender, EventArgs e)
         {
             if (_boundViewModel is not null)
@@ -218,6 +233,7 @@ namespace Mfr.App.Ui.Views
 
             UiSessionPersistence.SaveOnClose(
                 this,
+                GetPaneGrids(),
                 session,
                 viewModel.FileListViewModel.CaptureSession(),
                 viewModel.RenameListViewModel.CaptureSession()

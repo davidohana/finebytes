@@ -106,11 +106,14 @@ namespace Mfr.Tests.Ui.MainWindow
             _Drag(splitter, deltaX: 80, deltaY: 0);
             window.UpdateLayout();
 
-            var captured = SplitterSession.Capture(window);
+            var captured = SplitterSession.Capture(window.GetPaneGrids());
             Assert.NotNull(captured.FileList);
 
             var other = _ShowMainWindow();
-            SplitterSession.TryRestore(other, new SessionStateSplitters { FileList = captured.FileList });
+            SplitterSession.TryRestore(
+                other.GetPaneGrids(),
+                new SessionStateSplitters { FileList = captured.FileList }
+            );
             other.UpdateLayout();
 
             var restored = other.TopPanesGrid;

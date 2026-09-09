@@ -40,7 +40,7 @@ namespace Mfr.App.Ui
                     ),
                 };
 
-                UiSessionPersistence.TryRestore(mainWindow, session);
+                UiSessionPersistence.TryRestore(mainWindow, mainWindow.GetPaneGrids(), session);
 
                 desktop.MainWindow = mainWindow;
 #if DEBUG

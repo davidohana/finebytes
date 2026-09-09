@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Mfr.App.Ui.Views;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.Services.Session
@@ -12,34 +11,38 @@ namespace Mfr.App.Ui.Services.Session
         /// <summary>
         /// Restores pane star ratios from <paramref name="saved"/> when each value is in (0, 1).
         /// </summary>
-        /// <param name="window">Main window whose pane grids are updated.</param>
+        /// <param name="panes">Main window pane grids to update.</param>
         /// <param name="saved">Persisted splitter ratios, or null to skip.</param>
-        public static void TryRestore(MainWindow window, SessionStateSplitters? saved)
+        public static void TryRestore(MainWindowPaneGrids panes, SessionStateSplitters? saved)
         {
+            ArgumentNullException.ThrowIfNull(panes);
+
             if (saved is null)
             {
                 return;
             }
 
-            _SetColumnRatio(window.TopPanesGrid, saved.FileList);
-            _SetColumnRatio(window.FilterListsGrid, saved.AvailableApplied);
-            _SetRowRatio(window.FilterPanesGrid, saved.FilterLists);
-            _SetRowRatio(window.MainPanesGrid, saved.TopPanes);
+            _SetColumnRatio(panes.TopPanes, saved.FileList);
+            _SetColumnRatio(panes.FilterLists, saved.AvailableApplied);
+            _SetRowRatio(panes.FilterPanes, saved.FilterLists);
+            _SetRowRatio(panes.MainPanes, saved.TopPanes);
         }
 
         /// <summary>
-        /// Builds a <see cref="SessionStateSplitters"/> from the main window's current pane sizes.
+        /// Builds a <see cref="SessionStateSplitters"/> from the current pane sizes.
         /// </summary>
-        /// <param name="window">Window being closed.</param>
+        /// <param name="panes">Pane grids whose sizes are captured.</param>
         /// <returns>Session payload ready to persist.</returns>
-        public static SessionStateSplitters Capture(MainWindow window)
+        public static SessionStateSplitters Capture(MainWindowPaneGrids panes)
         {
+            ArgumentNullException.ThrowIfNull(panes);
+
             return new SessionStateSplitters
             {
-                FileList = _ColumnRatio(window.TopPanesGrid),
-                AvailableApplied = _ColumnRatio(window.FilterListsGrid),
-                FilterLists = _RowRatio(window.FilterPanesGrid),
-                TopPanes = _RowRatio(window.MainPanesGrid),
+                FileList = _ColumnRatio(panes.TopPanes),
+                AvailableApplied = _ColumnRatio(panes.FilterLists),
+                FilterLists = _RowRatio(panes.FilterPanes),
+                TopPanes = _RowRatio(panes.MainPanes),
             };
         }
 

@@ -12,9 +12,10 @@ namespace Mfr.Tests.Architecture
     /// <list type="bullet">
     /// <item>L5 Entry — <c>Mfr.App.Cli</c> and <c>Mfr.App.Ui</c></item>
     /// <item>L4 Engine — <c>Mfr.Engine</c></item>
-    /// <item>L3 Domain rules — <c>Mfr.Filters</c> and <c>Mfr.Metadata</c> (<c>Mfr.Metadata</c> sits between model and formatting rules)</item>
-    /// <item>L2 Domain model — <c>Mfr.Models</c></item>
-    /// <item>L1 Shared utilities — <c>Mfr.Utils</c></item>
+    /// <item>L3 Domain rules — <c>Mfr.Filters</c></item>
+    /// <item>L2 Tagged media I/O — <c>Mfr.Metadata</c></item>
+    /// <item>L1 Domain model — <c>Mfr.Models</c></item>
+    /// <item>L0 Shared utilities — <c>Mfr.Utils</c></item>
     /// </list>
     /// <para>Supporting tests <c>Mfr.Tests</c> are checked separately.</para>
     /// <para>
