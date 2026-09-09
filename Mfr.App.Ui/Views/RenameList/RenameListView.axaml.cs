@@ -354,7 +354,7 @@ namespace Mfr.App.Ui.Views.RenameList
             dataTransfer.Add(
                 DataTransferItem.Create(
                     RenameListSampleDragPayload.Format,
-                    new RenameListSampleDragPayload(sampleEntry.FullPath).ToJson()
+                    new RenameListSampleDragPayload(sampleEntry.EngineItem.Original.FullPath).Serialize()
                 )
             );
             try

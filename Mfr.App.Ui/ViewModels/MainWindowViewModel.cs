@@ -12,6 +12,7 @@ using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Engine.Presets;
 using Mfr.Models.Config;
+using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels
 {
@@ -60,9 +61,7 @@ namespace Mfr.App.Ui.ViewModels
                 fullPath =>
                     RenameListViewModel
                         .Entries.Select(entry => entry.EngineItem)
-                        .FirstOrDefault(item =>
-                            string.Equals(item.Original.FullPath, fullPath, StringComparison.OrdinalIgnoreCase)
-                        )
+                        .FirstOrDefault(item => PathComparers.Os.Equals(item.Original.FullPath, fullPath))
             );
             if (session is not null)
             {

@@ -56,20 +56,12 @@ namespace Mfr.Filters.Trimming
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            if (string.IsNullOrEmpty(value))
+            if (!TryGetSelectionRange(value, Options.Start, Options.End, out var startIndex, out var length))
             {
                 return value;
             }
 
-            var startIndex = _GetAbsoluteIndex(Options.Start, value.Length);
-            var endIndex = _GetAbsoluteIndex(Options.End, value.Length);
-
-            if (startIndex > endIndex)
-            {
-                (startIndex, endIndex) = (endIndex, startIndex);
-            }
-
-            return value.Remove(startIndex, endIndex - startIndex + 1);
+            return value.Remove(startIndex, length);
         }
 
         /// <summary>

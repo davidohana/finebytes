@@ -50,11 +50,7 @@ namespace Mfr.App.Ui.Views.Controls
 
         private void _OnHelperPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (
-                e.PropertyName
-                is nameof(VisualTrimHelperViewModel.DisplayText)
-                    or nameof(VisualTrimHelperViewModel.SampleText)
-            )
+            if (e.PropertyName is nameof(VisualTrimHelperViewModel.DisplayText))
             {
                 _QueueApplyHighlight();
             }
@@ -65,6 +61,9 @@ namespace Mfr.App.Ui.Views.Controls
             _QueueApplyHighlight();
         }
 
+        /// <summary>
+        /// Queues a highlight apply after layout/bindings so first-show selection sticks.
+        /// </summary>
         private void _QueueApplyHighlight()
         {
             if (_highlightApplyQueued)
@@ -83,6 +82,9 @@ namespace Mfr.App.Ui.Views.Controls
             );
         }
 
+        /// <summary>
+        /// Writes the VM highlight onto the TextBox, syncing text first when the binding lags.
+        /// </summary>
         private void _ApplyHighlight()
         {
             if (_helper is null || !_helper.HasSample || _isApplyingHighlight)
@@ -155,9 +157,7 @@ namespace Mfr.App.Ui.Views.Controls
 
         private static bool _CanAcceptDrop(DragEventArgs e)
         {
-            return e.DataTransfer is not null
-                && e.DataTransfer.Formats.Contains(RenameListSampleDragPayload.Format)
-                && RenameListSampleDragPayload.TryRead(e.DataTransfer) is not null;
+            return RenameListSampleDragPayload.TryRead(e.DataTransfer) is not null;
         }
     }
 }

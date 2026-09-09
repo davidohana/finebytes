@@ -1,6 +1,8 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
+using Mfr.Filters;
 using Mfr.Filters.Trimming;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Ui.FilterEditors.Trimming
 {
@@ -62,6 +64,48 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             // Default ExtractLeft count is 1 → highlight first character.
             Assert.Equal(0, editor.TrimHelper.HighlightStart);
             Assert.Equal(1, editor.TrimHelper.HighlightLength);
+        }
+
+        /// <summary>
+        /// Verifies dropping a sample into an empty helper applies the current count highlight.
+        /// </summary>
+        [Fact]
+        public void First_sample_drop_syncs_highlight_from_count()
+        {
+            var filter = new TrimLeftFilter(new FilePrefixTarget(), new CountFilterOptions(Count: 3));
+            var step = new AppliedFilterStepViewModel("Trim Left", filter);
+            var editor = new CountFilterEditorViewModel(step);
+            Assert.False(editor.TrimHelper.HasSample);
+
+            editor.TrimHelper.SetSampleText("abcdef");
+
+            Assert.Equal(0, editor.TrimHelper.HighlightStart);
+            Assert.Equal(3, editor.TrimHelper.HighlightLength);
+        }
+
+        /// <summary>
+        /// Verifies Rename List path resolve uses the filter Apply Target string.
+        /// </summary>
+        [Fact]
+        public void TryResolveRenameListDrop_reads_apply_target()
+        {
+            var item = new RenameItem(
+                new FileMeta(
+                    renameListIndex: 0,
+                    inFolderIndex: 0,
+                    directoryPath: TestPaths.Absolute("album"),
+                    prefix: "track",
+                    extension: ".mp3"
+                )
+            );
+            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var editor = new CountFilterEditorViewModel(
+                step,
+                resolveRenameItemByFullPath: path => PathComparers.Os.Equals(path, item.Original.FullPath) ? item : null
+            );
+
+            Assert.True(editor.TrimHelper.TryResolveRenameListDrop(item.Original.FullPath, out var resolved));
+            Assert.Equal("track", resolved);
         }
     }
 }

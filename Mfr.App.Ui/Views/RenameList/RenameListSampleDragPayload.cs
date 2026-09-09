@@ -20,7 +20,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// Serializes this payload for drag transport.
         /// </summary>
         /// <returns>JSON payload string.</returns>
-        public string ToJson()
+        public string Serialize()
         {
             return JsonDragPayload.Serialize(this);
         }

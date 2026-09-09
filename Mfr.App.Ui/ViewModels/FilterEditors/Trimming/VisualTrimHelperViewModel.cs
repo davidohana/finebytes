@@ -115,7 +115,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         }
 
         /// <summary>
-        /// Replaces the sample with explicit text (e.g. text/file drop).
+        /// Replaces the sample with explicit text (e.g. after a Rename List drop).
         /// </summary>
         /// <param name="text">Sample string; empty clears back to the placeholder.</param>
         public void SetSampleText(string text)
