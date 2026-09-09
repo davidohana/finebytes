@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Mfr.App.Ui.Views.RenameList;
+using Mfr.App.Ui.Views.DragAndDrop;
 
 namespace Mfr.App.Ui.Views.FileList
 {
@@ -34,7 +34,7 @@ namespace Mfr.App.Ui.Views.FileList
 
         private void _OnRenameListDragOver(object? sender, DragEventArgs e)
         {
-            if (e.DataTransfer?.Formats.Contains(RenameListView.InternalReorderFormat) != true)
+            if (e.DataTransfer?.Formats.Contains(RenameListDragFormats.InternalReorder) != true)
             {
                 return;
             }
@@ -73,7 +73,7 @@ namespace Mfr.App.Ui.Views.FileList
 
         private bool _CanAcceptRenameListDragBack(DragEventArgs e)
         {
-            var isRenameListDrag = e.DataTransfer?.Formats.Contains(RenameListView.InternalReorderFormat) == true;
+            var isRenameListDrag = e.DataTransfer?.Formats.Contains(RenameListDragFormats.InternalReorder) == true;
             if (!isRenameListDrag)
             {
                 return false;

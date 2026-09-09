@@ -40,6 +40,13 @@ namespace Mfr.Models.RenameList
         /// </summary>
         /// <param name="meta">Scan metadata for the row.</param>
         /// <returns>Invariant digit string, or empty when the directory does not exist.</returns>
+        /// <remarks>
+        /// <para>
+        /// Performs a live <see cref="Directory.GetFiles(string)"/> on every resolve/sort paint for this field.
+        /// That matches MFR7’s expensive FileCount column; do not call from hot paths unless the column is visible.
+        /// Caching belongs in a dedicated pass if paint cost becomes measurable.
+        /// </para>
+        /// </remarks>
         internal static string FormatFolderFileCount(FileMeta meta)
         {
             var directoryPath = meta.Attributes.IsDirectory() ? meta.FullPath : meta.DirectoryPath;

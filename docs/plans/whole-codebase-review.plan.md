@@ -1,6 +1,6 @@
 ---
 name: Whole codebase review
-overview: "Phased whole-repo review: Phase 0–6 done. Next: Phase 7 Rename List + Applied Filters."
+overview: "Phased whole-repo review: Phase 0–7 done. Next: Phase 8 Format Editor + FilterEditors."
 todos:
   - id: phase-0
     content: "Phase 0: Architecture/layering gate + plan file bootstrap"
@@ -25,7 +25,7 @@ todos:
     status: completed
   - id: phase-7
     content: "Phase 7: Rename List UI + Applied Filters/Palette — mfr-code-review + autofix"
-    status: pending
+    status: completed
   - id: phase-8
     content: "Phase 8: Format Editor + FilterEditors (respect f5/f6 prior art)"
     status: pending
@@ -77,7 +77,7 @@ flowchart TD
 | **4** Engine Preview/Commit         | **done** | failFast stash; rebase PreviewOk; DirectoryPath ordinal; bugbot OK |
 | **5** Session/Config                | **done** | sort DTO merge; Version docs; ConfigStore test isolation           |
 | **6** File List                     | **done** | path sentinel reuse; history cap; thumb CTS; explore twins OK      |
-| **7** Rename List + Applied Filters | pending  |                                                                    |
+| **7** Rename List + Applied Filters | **done** | DnD formats/paths; FS-root helper; OrderedDraft→ListReorder        |
 | **8** Format Editor + FilterEditors | pending  |                                                                    |
 | **9** CLI + arch tests + sweep      | pending  |                                                                    |
 
@@ -369,6 +369,51 @@ File List hygiene closed; browse ownership confirmed. Ready for Phase 7 (Rename 
 
 ______________________________________________________________________
 
+## Phase 7 — Rename List UI + Applied Filters / Palette (done)
+
+**Scope:** `Mfr.App.Ui` Rename List + Applied Filters + Filter Palette (ViewModels / Views / Services); matching `Mfr.Tests/Ui/RenameList|AppliedFilters|FilterPalette`. Explore subagent used for DnD + label-map twins ([DnD twins](3c2d6d02-da59-4607-bf7b-05d797f7270c)). Respect open [`rename-list-ui.plan.md`](rename-list-ui.plan.md) **14b–16** — shipped code only; no GO/export/manual-rename feature work.
+
+**Verdict:** Shipped Rename List / Applied Filters / Palette is coherent — Views → ViewModels → Services, ListBox DnD already shared, add-source soft-gate complements Engine hard-reject, progress UI remaps preview labels over `LoadMetadata`. Applied high-value DnD ownership fixes (#23–#24), shared FS-root helper (#25), OrderedDraft→`ListReorder`, and FileCount docs. Leftovers are optional DataGrid session merge, progress enum honesty, and product-gated label catalogs.
+
+### Architecture (lightweight)
+
+| Check                                | Verdict                                                                                     |
+| ------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Views → ViewModels → Services        | **Clean**                                                                                   |
+| Services → Views                     | **Clean**                                                                                   |
+| File List → Rename List Views import | **Was smell; fixed** — `RenameListDragFormats` under `Views/DragAndDrop`                    |
+| Domain policy in UI                  | **Clean** — add expansion stays in Engine; UI only maps rows→sources                        |
+| Second resolver / label maps         | Apply-To vs Rename List labels diverge by product (MFR7); do not merge without UI pass (#5) |
+| Open feature phases 14b–16           | **Untouched**                                                                               |
+
+### Applied (high confidence)
+
+1. **`RenameListDragFormats.InternalReorder`** — moved format out of `RenameListView`; File List drag-back no longer imports Rename List.
+1. **`LocalFileDrop.HasFiles` / `ReadLocalPaths`** — one owner; `FilterEditorFileDrop` + Rename List grid drop call it.
+1. **`PathRelations.IsFilesystemRoot`** — UI soft-catch + Engine `_ThrowIfRootPath` share the root rule.
+1. **`OrderedDraft.TryMoveIndicesTo`** — delegates to `ListReorder.TryMoveIndicesTo` (selection tracking kept).
+1. **`FormatFolderFileCount` remarks** — documents live `GetFiles` on resolve/sort paint (intentional MFR7 cost).
+1. **Tests:** `PathRelationsTests.IsFilesystemRoot_*`; Rename List helpers updated for new format.
+
+### Correctness (found, not changed)
+
+| Item                                                                                                   | Notes                                                                                                       |
+| ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Progress phase `LoadMetadata` for preview filter apply                                                 | Enum docs + `RenameListProgressCopy` remapping are honest enough; optional `ApplyPreview` stays backlog #15 |
+| Apply-To “Ancestor Folder” option vs `GetLabel` “Parent Folder” (level 1) vs “Parent Directory” target | Confusing trio; MFR7-facing — don’t rename without UI pass                                                  |
+| Semantic audio Apply-To vs Rename List display names                                                   | Artist/Performers etc. diverge; product vocabulary (#5)                                                     |
+| Grid DnD press/snapshot fork (File List vs Rename List)                                                | Small asymmetry (Rename re-applies snapshot on move); optional `DataGridDragSession` (#26)                  |
+
+### Deeper refactors (promoted / refined)
+
+See backlog: #3 FileCount cache demoted after docs; #15 kept; #23–#25 **done**; #26 DataGrid session retained; **#27** drop-mark brush; **#28** palette group exhaustiveness.
+
+### Phase 7 exit
+
+Rename List + Applied Filters / Palette hygiene closed; DnD Views→Views leak fixed. Ready for Phase 8 (Format Editor + FilterEditors).
+
+______________________________________________________________________
+
 ## Deeper refactors backlog
 
 Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
@@ -387,12 +432,12 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: low, but behavior risk
    Rank: medium — Phase 7 if AudioTag display touched
 
-1. **Move or lazy-gate `FormatFolderFileCount` directory scan**
+1. **Move or lazy-gate `FormatFolderFileCount` directory scan** — **docs Phase 7**
    Sites: `RenameListFieldDisplay.FormatFolderFileCount`
-   Target: avoid live FS on every resolve/sort paint, or document as intentional expensive field
+   Target: remarks now document live `GetFiles` on resolve/sort paint (MFR7 FileCount). Optional cache only if measured cost.
    Value: paint/sort side effects
    Cost: medium (Engine/UI cache?)
-   Rank: medium — Phase 7
+   Rank: low–medium — skip unless profiling shows FileCount column hot
 
 1. **`SessionStateRenameListSortField` vs `RenameListSortKey`** — **done Phase 5**
    Applied: persist `RenameListSortKey` directly (`key` / `descending`); bridge type deleted.
@@ -472,7 +517,7 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Target: add `ApplyPreview` (or rename) so engine enum matches work; update UI binding
    Value: removes papered-over phase lie
    Cost: low–medium enum + UI/tests
-   Rank: medium — Phase 7 if progress dialog touched
+   Rank: medium — Phase 7 reviewed; UI remapping adequate; do when next editing Engine progress tracker
 
 1. **Path split + preview-field reset helpers**
    Sites: `RenameItemSnapshotBuilder` ↔ `FileMetaPreviewExtensions.SetFromAbsoluteFullPath`; `ResetState` ↔ `ClearPreview`
@@ -523,33 +568,35 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: docs only
    Rank: low — docs pass anytime
 
-1. **Move Rename List internal drag format out of `RenameListView`**
-   Sites: `RenameListView.InternalReorderFormat`; `FileListView.DragDrop` imports `Views.RenameList`
-   Target: shared constant under `Views/DragAndDrop` (e.g. `RenameListDragFormats.InternalReorder`)
-   Value: closes Views→Views coupling; File List no longer references Rename List type
-   Cost: low — few call sites + drop tests
-   Rank: high — do first in Phase 7 when touching either DnD surface
+1. **Move Rename List internal drag format out of `RenameListView`** — **done Phase 7**
+   Applied: `RenameListDragFormats.InternalReorder` under `Views/DragAndDrop`; File List no longer imports Rename List.
 
-1. **Shared local file-drop path reader**
-   Sites: `FilterEditorFileDrop.ReadLocalPaths` ↔ `RenameListView._ReadDroppedFilePaths` (identical loops)
-   Target: one helper under `Views/DragAndDrop` (or keep on a neutral type); Filter editors + Rename List call it
-   Value: deletes twin; one place for TryGetLocalPath quirks
-   Cost: low — rename call sites; Phase 7/8
-   Rank: high — ride with #23 or FilterEditor drops
+1. **Shared local file-drop path reader** — **done Phase 7**
+   Applied: `LocalFileDrop.HasFiles` / `ReadLocalPaths`; `FilterEditorFileDrop` + Rename List call it.
 
-1. **Shared “filesystem root?” gate for add sources**
-   Sites: `RenameListAddSourceResolver.IsValidSourcePath` ↔ `AddedSourceResolver._ThrowIfRootPath`
-   Target: Utils/Models helper `PathRelations.IsFilesystemRoot(path)` (or similar); UI soft-reject + Engine throw
-   Value: one root rule; prevents UI/Engine drift
-   Cost: low–medium — two dialects (bool vs throw) stay at call sites
-   Rank: medium — Phase 7 if add-source touched; else when editing Engine resolver
+1. **Shared “filesystem root?” gate for add sources** — **done Phase 7**
+   Applied: `PathRelations.IsFilesystemRoot`; UI soft-catch + Engine `_ThrowIfRootPath` throw dialect retained.
 
 1. **DataGrid multi-select drag press/snapshot session**
    Sites: `FileListView` + `RenameListView` DataGrid press/threshold/snapshot vs `ListBoxDragSession`
    Target: optional DataGrid-aware session sibling (same Avalonia collapse fix); payloads stay pane-specific
    Value: one gesture machine for grids; fewer press-collapse bugs
    Cost: medium–high — two large code-behinds; careful headless coverage
-   Rank: medium — Phase 7 if either grid DnD is edited; do not force a merge for elegance alone
+   Rank: medium — do when next editing either grid DnD; do not force a merge for elegance alone
+
+1. **Shared salmon drop-mark brush**
+   Sites: `ListBoxDropMark`, Rename List grid append mark, theme `RenameListDropIndicatorBrush` / `#FA8072` fallbacks
+   Target: one brush resource (or constant) for insert indicators
+   Value: tiny visual drift closed
+   Cost: low — resources + 2–3 call sites
+   Rank: low — cosmetic; ride along if touching drop marks
+
+1. **FilterPalette group toolbar vs `FilterGroup` exhaustiveness**
+   Sites: `FilterPaletteViewModel` hardcoded `Groups` list vs `FilterGroup` enum / `FilterCatalog`
+   Target: UI/architecture test that every `FilterGroup` has a toolbar button (All stays separate)
+   Value: silent missing-group footgun when a new filter group lands
+   Cost: low test
+   Rank: medium — Phase 9 or when adding a FilterGroup
 
 ______________________________________________________________________
 
@@ -559,9 +606,9 @@ ______________________________________________________________________
 
 See report above. `debts.md` shell ops remain deferred.
 
-### Phase 7 — Rename List UI + Applied Filters / Palette
+### Phase 7 — Rename List UI + Applied Filters / Palette — **done**
 
-**Scope:** Rename List + Applied Filters + Palette; respect open [`rename-list-ui.plan.md`](rename-list-ui.plan.md) phases 14b–16 — review shipped code only.
+See report above. Open rename-list feature phases 14b–16 untouched.
 
 ### Phase 8 — Format Editor + FilterEditors
 

@@ -213,9 +213,7 @@ namespace Mfr.Engine.RenameList
         /// </summary>
         private static void _ThrowIfRootPath(string directoryPath)
         {
-            var fullDirectory = Path.GetFullPath(directoryPath);
-            var root = Path.GetPathRoot(fullDirectory) ?? string.Empty;
-            if (string.Equals(root, fullDirectory, PathComparers.OsComparison))
+            if (PathRelations.IsFilesystemRoot(directoryPath))
             {
                 throw new UserException($"Root paths cannot be added as rename sources: '{directoryPath}'.");
             }

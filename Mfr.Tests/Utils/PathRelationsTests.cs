@@ -180,5 +180,15 @@ namespace Mfr.Tests.Utils
 
             Assert.Equal(OperatingSystem.IsWindows(), PathRelations.IsSamePath(lower, upper));
         }
+
+        /// <summary>
+        /// Verifies IsFilesystemRoot recognizes volume roots and rejects nested paths.
+        /// </summary>
+        [Fact]
+        public void IsFilesystemRoot_volume_root_true_nested_false()
+        {
+            Assert.True(PathRelations.IsFilesystemRoot(Root));
+            Assert.False(PathRelations.IsFilesystemRoot($"{Root}a{Sep}b"));
+        }
     }
 }

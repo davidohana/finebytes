@@ -75,6 +75,29 @@ namespace Mfr.Utils
         }
 
         /// <summary>
+        /// Whether <paramref name="path"/> is a drive or filesystem root after <see cref="Path.GetFullPath(string)"/>.
+        /// </summary>
+        /// <param name="path">Candidate file or directory path.</param>
+        /// <returns>
+        /// <see langword="true"/> when the full path equals its path root; otherwise <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// Used by Rename List add-source soft-reject (UI) and Engine hard-reject for the same root rule.
+        /// Callers that must not throw (UI) should catch path-resolution failures; Engine lets them propagate.
+        /// </para>
+        /// </remarks>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="path"/> cannot be resolved by the host.</exception>
+        /// <exception cref="NotSupportedException">Thrown when <paramref name="path"/> is not supported on the host.</exception>
+        /// <exception cref="IOException">Thrown when the host cannot resolve <paramref name="path"/>.</exception>
+        public static bool IsFilesystemRoot(string path)
+        {
+            var fullPath = Path.GetFullPath(path);
+            var root = Path.GetPathRoot(fullPath);
+            return !string.IsNullOrEmpty(root) && string.Equals(root, fullPath, PathComparers.OsComparison);
+        }
+
+        /// <summary>
         /// Whether <paramref name="candidate"/> is a strict descendant of <paramref name="ancestor"/> using a custom comparer.
         /// </summary>
         /// <param name="candidate">Absolute candidate path.</param>

@@ -340,32 +340,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ArgumentNullException.ThrowIfNull(sourceIndices);
 
             newIndices = [];
-            var sortedSources = sourceIndices.Distinct().OrderBy(i => i).ToList();
-            if (sortedSources.Count == 0)
-            {
-                return false;
-            }
-
-            if (sortedSources.Any(index => index < 0 || index >= _items.Count))
-            {
-                return false;
-            }
-
-            targetIndex = Math.Clamp(targetIndex, 0, _items.Count);
-            var movingItems = sortedSources.Select(index => _items[index]).ToList();
             var hasAnchor = _selectedIndex >= 0 && _selectedIndex < _items.Count;
             var trackedAnchor = hasAnchor ? _keyOf(_items[_selectedIndex]) : default;
 
-            foreach (var index in sortedSources.OrderByDescending(i => i))
+            if (!ListReorder.TryMoveIndicesTo(_items, sourceIndices, targetIndex, out newIndices))
             {
-                _items.RemoveAt(index);
+                return false;
             }
 
-            var insertIndex = targetIndex - sortedSources.Count(index => index < targetIndex);
-            insertIndex = Math.Clamp(insertIndex, 0, _items.Count);
-            _items.InsertRange(insertIndex, movingItems);
-
-            newIndices = [.. Enumerable.Range(insertIndex, movingItems.Count)];
             var newAnchor = hasAnchor
                 ? _items.FindIndex(item => EqualityComparer<TKey>.Default.Equals(_keyOf(item), trackedAnchor))
                 : -1;

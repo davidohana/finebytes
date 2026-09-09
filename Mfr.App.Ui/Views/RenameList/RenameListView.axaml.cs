@@ -7,12 +7,12 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -25,13 +25,6 @@ namespace Mfr.App.Ui.Views.RenameList
         private const string DropMarkClass = "drop-mark";
         private const string FixedWidthFontClass = "fixed-width-font";
         private const double DragThreshold = 4;
-
-        /// <summary>
-        /// Application format for dragging Rename List rows to reorder within the grid.
-        /// </summary>
-        internal static readonly DataFormat<string> InternalReorderFormat = DataFormat.CreateStringApplicationFormat(
-            "mfr-rename-list-reorder"
-        );
 
         private RenameListViewModel? _viewModel;
         private bool _isSyncingSelection;
@@ -349,7 +342,7 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.CancelAutoSort();
 
             var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(InternalReorderFormat, "1"));
+            dataTransfer.Add(DataTransferItem.Create(RenameListDragFormats.InternalReorder, "1"));
             var sampleEntry = _viewModel.SelectedEntries[0];
             new RenameListSampleDragPayload(sampleEntry.EngineItem.Original.FullPath).AddTo(dataTransfer);
             try
@@ -560,7 +553,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            var paths = _ReadDroppedFilePaths(e);
+            var paths = LocalFileDrop.ReadLocalPaths(e);
             if (paths.Count == 0)
             {
                 _ClearDropMark();
@@ -794,35 +787,12 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private static bool _CanAcceptFileDrop(DragEventArgs e)
         {
-            return e.DataTransfer?.Formats.Contains(DataFormat.File) == true;
+            return LocalFileDrop.HasFiles(e);
         }
 
         private static bool _IsInternalReorder(DragEventArgs e)
         {
-            return e.DataTransfer?.Formats.Contains(InternalReorderFormat) == true;
-        }
-
-        private static List<string> _ReadDroppedFilePaths(DragEventArgs e)
-        {
-            var files = e.DataTransfer?.TryGetFiles();
-            if (files is null || files.Length == 0)
-            {
-                return [];
-            }
-
-            var paths = new List<string>(files.Length);
-            foreach (var file in files)
-            {
-                var path = file.TryGetLocalPath();
-                if (string.IsNullOrWhiteSpace(path))
-                {
-                    continue;
-                }
-
-                paths.Add(path);
-            }
-
-            return paths;
+            return e.DataTransfer?.Formats.Contains(RenameListDragFormats.InternalReorder) == true;
         }
 
         private void _OnSelectionChanged(object? sender, SelectionChangedEventArgs e)

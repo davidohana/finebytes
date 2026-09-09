@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
+using Mfr.App.Ui.Views.DragAndDrop;
 
 namespace Mfr.App.Ui.Views.FilterEditors
 {
@@ -17,7 +17,7 @@ namespace Mfr.App.Ui.Views.FilterEditors
         /// <returns><see langword="true"/> when a file/folder payload is present.</returns>
         public static bool HasFiles(DragEventArgs e)
         {
-            return e.DataTransfer?.Formats.Contains(DataFormat.File) == true;
+            return LocalFileDrop.HasFiles(e);
         }
 
         /// <summary>
@@ -27,25 +27,7 @@ namespace Mfr.App.Ui.Views.FilterEditors
         /// <returns>Local paths in drop order; empty when none resolve.</returns>
         public static IReadOnlyList<string> ReadLocalPaths(DragEventArgs e)
         {
-            var files = e.DataTransfer?.TryGetFiles();
-            if (files is null || files.Length == 0)
-            {
-                return [];
-            }
-
-            var paths = new List<string>(files.Length);
-            foreach (var file in files)
-            {
-                var path = file.TryGetLocalPath();
-                if (string.IsNullOrWhiteSpace(path))
-                {
-                    continue;
-                }
-
-                paths.Add(path);
-            }
-
-            return paths;
+            return LocalFileDrop.ReadLocalPaths(e);
         }
 
         /// <summary>

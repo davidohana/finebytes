@@ -6,6 +6,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 
@@ -54,11 +55,11 @@ namespace Mfr.Tests.Ui.RenameList
         /// <summary>
         /// Builds a dummy internal-reorder <see cref="DataTransfer"/> used by Rename List row drags.
         /// </summary>
-        /// <returns>Transfer containing <see cref="RenameListView.InternalReorderFormat"/>.</returns>
+        /// <returns>Transfer containing <see cref="RenameListDragFormats.InternalReorder"/>.</returns>
         internal static DataTransfer CreateInternalReorderDataTransfer()
         {
             var dataTransfer = new DataTransfer();
-            dataTransfer.Add(DataTransferItem.Create(RenameListView.InternalReorderFormat, "1"));
+            dataTransfer.Add(DataTransferItem.Create(RenameListDragFormats.InternalReorder, "1"));
             return dataTransfer;
         }
 

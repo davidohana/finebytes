@@ -78,9 +78,7 @@ namespace Mfr.App.Ui.Services.RenameList
 
             try
             {
-                var fullPath = Path.GetFullPath(path);
-                var root = Path.GetPathRoot(fullPath);
-                return !string.IsNullOrEmpty(root) && !string.Equals(root, fullPath, PathComparers.OsComparison);
+                return !PathRelations.IsFilesystemRoot(path);
             }
             catch (Exception ex) when (ex is ArgumentException or NotSupportedException or IOException)
             {
