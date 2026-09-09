@@ -23,10 +23,11 @@ Implemented: shared helper control, Count + Trim Between wiring, Rename List sam
 - `Mfr.Models/Filters/FilterTargetText.cs`
 - `Mfr.Filters/Trimming/TrimBetweenFilter.cs` (`TryGetSelectionRange` / `TryGetPositionsFromSelection`)
 - `Mfr.App.Ui/ViewModels/FilterEditors/Trimming/VisualTrimHelperMapping.cs`
+- `Mfr.App.Ui/ViewModels/RenameList/RenameListItemNavigatorViewModel.cs` (shared ▲/▼ chrome)
 - `Mfr.App.Ui/ViewModels/FilterEditors/Trimming/VisualTrimHelperViewModel.cs`
 - `Mfr.App.Ui/Views/Controls/VisualTrimHelperView.*`
 - `Mfr.App.Ui/Views/RenameList/RenameListSampleDragPayload.cs`
-- Count / Trim Between editor VM + AXAML
+- Count / Trim Between editor VM + AXAML (`IHasVisualTrimHelper`)
 - `FilterEditorViewModel.SetSampleRenameItemSource` + `MainWindowViewModel` wiring
 
 ## Out of scope

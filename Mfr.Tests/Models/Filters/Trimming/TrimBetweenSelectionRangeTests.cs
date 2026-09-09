@@ -106,12 +106,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         public void TryGetPositionsFromSelection_rejects_empty_selection()
         {
             Assert.False(
-                TrimBetweenFilter.TryGetPositionsFromSelection(
-                    selectionStart: 2,
-                    selectionLength: 0,
-                    out _,
-                    out _
-                )
+                TrimBetweenFilter.TryGetPositionsFromSelection(selectionStart: 2, selectionLength: 0, out _, out _)
             );
         }
 
@@ -134,7 +129,13 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 )
             );
             Assert.True(
-                TrimBetweenFilter.TryGetSelectionRange(text, start, end, out var roundTripStart, out var roundTripLength)
+                TrimBetweenFilter.TryGetSelectionRange(
+                    text,
+                    start,
+                    end,
+                    out var roundTripStart,
+                    out var roundTripLength
+                )
             );
             Assert.Equal(selectionStart, roundTripStart);
             Assert.Equal(selectionLength, roundTripLength);

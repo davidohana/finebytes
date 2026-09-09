@@ -153,10 +153,7 @@ namespace Mfr.Tests.Engine
         {
             var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: "mp3");
             var chain = FilterChain.CreateAllEnabled([
-                new LettersCaseFilter(
-                    new FileExtensionTarget(),
-                    new LettersCaseOptions(LettersCaseMode.UpperCase, [])
-                ),
+                new LettersCaseFilter(new FileExtensionTarget(), new LettersCaseOptions(LettersCaseMode.UpperCase, [])),
             ]);
 
             chain.SetupFilters();

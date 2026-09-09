@@ -94,15 +94,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// </summary>
         internal void RefreshTrimHelperRenameItems()
         {
-            if (OptionsEditor is CountFilterEditorViewModel count)
+            if (OptionsEditor is IHasVisualTrimHelper editor)
             {
-                count.TrimHelper.RefreshRenameItems();
-                return;
-            }
-
-            if (OptionsEditor is TrimBetweenFilterEditorViewModel trimBetween)
-            {
-                trimBetween.TrimHelper.RefreshRenameItems();
+                editor.TrimHelper.RefreshRenameItems();
             }
         }
 

@@ -169,10 +169,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         {
             var items = new List<RenameItem>();
             var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
-            var editor = new CountFilterEditorViewModel(
-                step,
-                resolveSampleRenameItems: () => items
-            );
+            var editor = new CountFilterEditorViewModel(step, resolveSampleRenameItems: () => items);
             Assert.False(editor.TrimHelper.HasSample);
             Assert.False(editor.TrimHelper.CanGoNext);
             Assert.Equal(string.Empty, editor.TrimHelper.ItemIndexLabel);

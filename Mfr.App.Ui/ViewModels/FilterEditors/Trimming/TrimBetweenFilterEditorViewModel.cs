@@ -8,7 +8,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
     /// <summary>
     /// Filter Configuration editor for <see cref="TrimBetweenFilter"/>.
     /// </summary>
-    internal sealed partial class TrimBetweenFilterEditorViewModel : FilterOptionsEditorViewModel
+    internal sealed partial class TrimBetweenFilterEditorViewModel : FilterOptionsEditorViewModel, IHasVisualTrimHelper
     {
         /// <summary>
         /// Initializes the editor from the current step filter.
@@ -110,8 +110,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                 return;
             }
 
-            var resolveItems =
-                resolveSampleRenameItems ?? (sampleRenameItems is null ? null : () => sampleRenameItems);
+            var resolveItems = resolveSampleRenameItems ?? (sampleRenameItems is null ? null : () => sampleRenameItems);
             TrimHelper.Configure(
                 VisualTrimHelperMapping.Mode.Range,
                 filter.Target,

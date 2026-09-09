@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
     /// <summary>
     /// Filter Configuration editor for count-based filters (Trim/Extract Left/Right).
     /// </summary>
-    internal sealed partial class CountFilterEditorViewModel : FilterOptionsEditorViewModel
+    internal sealed partial class CountFilterEditorViewModel : FilterOptionsEditorViewModel, IHasVisualTrimHelper
     {
         /// <summary>
         /// Initializes the editor from the current step filter.
@@ -92,8 +92,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                 TrimRightFilter or ExtractRightFilter => VisualTrimHelperMapping.Mode.RightEdge,
                 _ => VisualTrimHelperMapping.Mode.LeftEdge,
             };
-            var resolveItems =
-                resolveSampleRenameItems ?? (sampleRenameItems is null ? null : () => sampleRenameItems);
+            var resolveItems = resolveSampleRenameItems ?? (sampleRenameItems is null ? null : () => sampleRenameItems);
             TrimHelper.Configure(mode, stringFilter.Target, resolveRenameItemByFullPath, resolveItems);
         }
 

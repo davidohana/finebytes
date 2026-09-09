@@ -1,6 +1,5 @@
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Trimming;
 using Mfr.Models.Filters;
 using Mfr.Models.Rename;
@@ -11,7 +10,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
     /// <summary>
     /// Shared Visual Trim Helper state for Count and Trim Between editors (MFR7 parity).
     /// </summary>
-    internal sealed partial class VisualTrimHelperViewModel : ObservableObject
+    internal sealed partial class VisualTrimHelperViewModel : RenameListItemNavigatorViewModel
     {
         /// <summary>
         /// Placeholder shown until a Rename List item or drop fills the sample.
@@ -22,8 +21,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         private FilterTarget? _target;
         private Func<string, RenameItem?>? _resolveRenameItemByFullPath;
         private Func<IReadOnlyList<RenameItem>>? _resolveRenameItems;
-        private IReadOnlyList<RenameItem> _renameItems = [];
-        private int _itemIndex;
         private bool _isApplyingSelection;
 
         /// <summary>
@@ -46,12 +43,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         /// </summary>
         [ObservableProperty]
         private string _displayText = PlaceholderText;
-
-        /// <summary>
-        /// Gets the 1-based item index label, or empty when the Rename List is empty.
-        /// </summary>
-        [ObservableProperty]
-        private string _itemIndexLabel = string.Empty;
 
         /// <summary>
         /// Gets whether <see cref="DisplayText"/> is real sample text (not the placeholder).
@@ -89,16 +80,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         public int? AppliedRangeEnd { get; private set; }
 
         /// <summary>
-        /// Gets whether Previous is enabled.
-        /// </summary>
-        public bool CanGoPrevious => _renameItems.Count > 0 && _itemIndex > 0;
-
-        /// <summary>
-        /// Gets whether Next is enabled.
-        /// </summary>
-        public bool CanGoNext => _renameItems.Count > 0 && _itemIndex < _renameItems.Count - 1;
-
-        /// <summary>
         /// Configures mapping mode and Rename List resolvers used for init, navigation, and drops.
         /// </summary>
         /// <param name="mode">Left edge, right edge, or inclusive range.</param>
@@ -132,15 +113,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         public void InitFromRenameItems(IReadOnlyList<RenameItem>? items = null)
         {
             _ReloadRenameItems(items);
-            _itemIndex = 0;
-            if (_renameItems.Count == 0 || _target is null)
+            SetItemIndex(0);
+            if (RenameItemCount == 0 || _target is null)
             {
-                ItemIndexLabel = string.Empty;
-                _NotifyNavigationChanged();
+                SyncItemIndexLabel();
+                NotifyNavigationChanged();
                 return;
             }
 
-            _ApplyCurrentItem();
+            ApplyCurrentItem();
         }
 
         /// <summary>
@@ -153,18 +134,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         public void RefreshRenameItems()
         {
             _ReloadRenameItems();
-            if (_renameItems.Count == 0 || _target is null)
+            if (RenameItemCount == 0 || _target is null)
             {
-                _itemIndex = 0;
-                ItemIndexLabel = string.Empty;
-                _NotifyNavigationChanged();
+                SetItemIndex(0);
+                SyncItemIndexLabel();
+                NotifyNavigationChanged();
                 return;
             }
 
             if (!HasSample)
             {
-                _itemIndex = 0;
-                _ApplyCurrentItem();
+                SetItemIndex(0);
+                ApplyCurrentItem();
                 return;
             }
 
@@ -172,15 +153,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             if (matchedIndex < 0)
             {
                 // Keep the custom/stale sample; ▼ from here lands on the first list item.
-                _itemIndex = -1;
-                ItemIndexLabel = string.Empty;
-                _NotifyNavigationChanged();
+                SetItemIndex(-1);
+                SyncItemIndexLabel();
+                NotifyNavigationChanged();
                 return;
             }
 
-            _itemIndex = matchedIndex;
-            ItemIndexLabel = (_itemIndex + 1).ToString(CultureInfo.InvariantCulture);
-            _NotifyNavigationChanged();
+            SetItemIndex(matchedIndex);
+            SyncItemIndexLabel();
+            NotifyNavigationChanged();
         }
 
         /// <summary>
@@ -191,40 +172,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         {
             ArgumentNullException.ThrowIfNull(text);
             _SetSampleText(text);
-        }
-
-        /// <summary>
-        /// Moves to the previous Rename List item when available.
-        /// </summary>
-        [RelayCommand(CanExecute = nameof(CanGoPrevious))]
-        public void GoPrevious()
-        {
-            _ReloadRenameItems();
-            if (!CanGoPrevious)
-            {
-                _NotifyNavigationChanged();
-                return;
-            }
-
-            _itemIndex--;
-            _ApplyCurrentItem();
-        }
-
-        /// <summary>
-        /// Moves to the next Rename List item when available.
-        /// </summary>
-        [RelayCommand(CanExecute = nameof(CanGoNext))]
-        public void GoNext()
-        {
-            _ReloadRenameItems();
-            if (!CanGoNext)
-            {
-                _NotifyNavigationChanged();
-                return;
-            }
-
-            _itemIndex++;
-            _ApplyCurrentItem();
         }
 
         /// <summary>
@@ -395,15 +342,46 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             var index = _FindItemIndex(fullPathFromRenameList);
             if (index >= 0)
             {
-                _itemIndex = index;
-                _ApplyCurrentItem();
+                SetItemIndex(index);
+                ApplyCurrentItem();
                 return true;
             }
 
+            SetItemIndex(-1);
             _SetSampleText(resolved);
-            ItemIndexLabel = string.Empty;
-            _NotifyNavigationChanged();
+            SyncItemIndexLabel();
+            NotifyNavigationChanged();
             return true;
+        }
+
+        /// <summary>
+        /// Reloads the live Rename List before ▲/▼ can-execute checks.
+        /// </summary>
+        protected override void PrepareNavigation()
+        {
+            _ReloadRenameItems();
+        }
+
+        /// <summary>
+        /// Sets sample text and index chrome from the current navigator index.
+        /// </summary>
+        protected override void ApplyCurrentItem()
+        {
+            if (RenameItemCount == 0 || _target is null)
+            {
+                SyncItemIndexLabel();
+                NotifyNavigationChanged();
+                return;
+            }
+
+            var item = RenameItems[ItemIndex];
+            if (FilterTargetText.TryGet(item, _target, out var text))
+            {
+                _SetSampleText(text, forceNotify: true);
+            }
+
+            SyncItemIndexLabel();
+            NotifyNavigationChanged();
         }
 
         /// <summary>
@@ -413,33 +391,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         {
             if (items is not null)
             {
-                _renameItems = items;
+                ReplaceRenameItems(items);
                 return;
             }
 
-            _renameItems = _resolveRenameItems?.Invoke() ?? [];
-        }
-
-        /// <summary>
-        /// Sets sample text and index chrome from <see cref="_itemIndex"/>.
-        /// </summary>
-        private void _ApplyCurrentItem()
-        {
-            if (_renameItems.Count == 0 || _target is null)
-            {
-                ItemIndexLabel = string.Empty;
-                _NotifyNavigationChanged();
-                return;
-            }
-
-            var item = _renameItems[_itemIndex];
-            if (FilterTargetText.TryGet(item, _target, out var text))
-            {
-                _SetSampleText(text, forceNotify: true);
-            }
-
-            ItemIndexLabel = (_itemIndex + 1).ToString(CultureInfo.InvariantCulture);
-            _NotifyNavigationChanged();
+            ReplaceRenameItems(_resolveRenameItems?.Invoke() ?? []);
         }
 
         /// <summary>
@@ -447,9 +403,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         /// </summary>
         private int _FindItemIndex(string fullPath)
         {
-            for (var i = 0; i < _renameItems.Count; i++)
+            for (var i = 0; i < RenameItemCount; i++)
             {
-                if (PathComparers.Os.Equals(_renameItems[i].Original.FullPath, fullPath))
+                if (PathComparers.Os.Equals(RenameItems[i].Original.FullPath, fullPath))
                 {
                     return i;
                 }
@@ -468,10 +424,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                 return -1;
             }
 
-            for (var i = 0; i < _renameItems.Count; i++)
+            for (var i = 0; i < RenameItemCount; i++)
             {
                 if (
-                    FilterTargetText.TryGet(_renameItems[i], _target, out var text)
+                    FilterTargetText.TryGet(RenameItems[i], _target, out var text)
                     && string.Equals(text, sampleText, StringComparison.Ordinal)
                 )
                 {
@@ -505,17 +461,6 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             HighlightStart = start;
             HighlightLength = length;
             HighlightChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// Raises CanGo* property and command can-execute changes.
-        /// </summary>
-        private void _NotifyNavigationChanged()
-        {
-            OnPropertyChanged(nameof(CanGoPrevious));
-            OnPropertyChanged(nameof(CanGoNext));
-            GoPreviousCommand.NotifyCanExecuteChanged();
-            GoNextCommand.NotifyCanExecuteChanged();
         }
     }
 }

@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Formatting.FormatString;
 using Mfr.Models.Rename;
 
@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
     /// MFR7-style Preview band for <see cref="Views.FormatEditor.FormatTokenEditorDialog"/>:
     /// cycles Rename List items and evaluates the resulting token string against the current item.
     /// </summary>
-    public sealed partial class FormatTokenPreviewViewModel : ViewModelBase
+    public sealed partial class FormatTokenPreviewViewModel : RenameListItemNavigatorViewModel
     {
         /// <summary>
         /// Sample text when the Rename List snapshot is empty (MFR7 parity).
@@ -26,9 +26,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         /// </summary>
         public const string ErrorPrefix = "ERROR: ";
 
-        private readonly IReadOnlyList<RenameItem> _renameItems;
         private string _resultingFormatString = string.Empty;
-        private int _itemIndex;
 
         /// <summary>
         /// Initializes preview state from a Rename List snapshot.
@@ -36,8 +34,8 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         /// <param name="renameItems">Items to cycle; empty when the list is unavailable.</param>
         public FormatTokenPreviewViewModel(IReadOnlyList<RenameItem>? renameItems = null)
         {
-            _renameItems = renameItems ?? [];
-            _ApplyCurrentItem();
+            ReplaceRenameItems(renameItems ?? []);
+            ApplyCurrentItem();
         }
 
         /// <summary>
@@ -53,22 +51,6 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         private string _previewResult = PreviewUnavailableText;
 
         /// <summary>
-        /// Gets the 1-based item index label, or empty when the Rename List is empty.
-        /// </summary>
-        [ObservableProperty]
-        private string _itemIndexLabel = string.Empty;
-
-        /// <summary>
-        /// Gets whether Previous is enabled.
-        /// </summary>
-        public bool CanGoPrevious => _renameItems.Count > 0 && _itemIndex > 0;
-
-        /// <summary>
-        /// Gets whether Next is enabled.
-        /// </summary>
-        public bool CanGoNext => _renameItems.Count > 0 && _itemIndex < _renameItems.Count - 1;
-
-        /// <summary>
         /// Re-evaluates preview against <paramref name="resultingFormatString"/>.
         /// </summary>
         /// <param name="resultingFormatString">Full <c>&lt;token…&gt;</c> text from the editor.</param>
@@ -79,54 +61,24 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         }
 
         /// <summary>
-        /// Moves to the previous Rename List item when available.
-        /// </summary>
-        [RelayCommand(CanExecute = nameof(CanGoPrevious))]
-        public void GoPrevious()
-        {
-            if (!CanGoPrevious)
-            {
-                return;
-            }
-
-            _itemIndex--;
-            _ApplyCurrentItem();
-        }
-
-        /// <summary>
-        /// Moves to the next Rename List item when available.
-        /// </summary>
-        [RelayCommand(CanExecute = nameof(CanGoNext))]
-        public void GoNext()
-        {
-            if (!CanGoNext)
-            {
-                return;
-            }
-
-            _itemIndex++;
-            _ApplyCurrentItem();
-        }
-
-        /// <summary>
         /// Updates sample / index chrome and re-evaluates the preview result.
         /// </summary>
-        private void _ApplyCurrentItem()
+        protected override void ApplyCurrentItem()
         {
-            if (_renameItems.Count == 0)
+            if (RenameItemCount == 0)
             {
                 SampleText = EmptyListSampleText;
-                ItemIndexLabel = string.Empty;
+                SyncItemIndexLabel();
                 PreviewResult = PreviewUnavailableText;
-                _NotifyNavigationChanged();
+                NotifyNavigationChanged();
                 return;
             }
 
-            var item = _renameItems[_itemIndex];
+            var item = RenameItems[ItemIndex];
             SampleText = item.Original.FullFileName;
-            ItemIndexLabel = (_itemIndex + 1).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            SyncItemIndexLabel();
             _UpdatePreviewResult();
-            _NotifyNavigationChanged();
+            NotifyNavigationChanged();
         }
 
         /// <summary>
@@ -134,13 +86,13 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         /// </summary>
         private void _UpdatePreviewResult()
         {
-            if (_renameItems.Count == 0)
+            if (RenameItemCount == 0)
             {
                 PreviewResult = PreviewUnavailableText;
                 return;
             }
 
-            var item = _renameItems[_itemIndex];
+            var item = RenameItems[ItemIndex];
             if (FormatStringSyntax.TryEvaluate(_resultingFormatString, item, out var result, out var error))
             {
                 PreviewResult = result;
@@ -148,17 +100,6 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
             }
 
             PreviewResult = ErrorPrefix + error;
-        }
-
-        /// <summary>
-        /// Raises navigation property and command can-execute changes.
-        /// </summary>
-        private void _NotifyNavigationChanged()
-        {
-            OnPropertyChanged(nameof(CanGoPrevious));
-            OnPropertyChanged(nameof(CanGoNext));
-            GoPreviousCommand.NotifyCanExecuteChanged();
-            GoNextCommand.NotifyCanExecuteChanged();
         }
     }
 }
