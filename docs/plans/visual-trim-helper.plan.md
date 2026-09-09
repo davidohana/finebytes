@@ -11,11 +11,11 @@ Implemented: shared helper control, Count + Trim Between wiring, Rename List sam
 - Read-only sample text box labeled **Visual Trim Helper:**; placeholder `[ Drag Item Here ]`.
 - **Init:** first Rename List item’s Apply Target string via `FilterTargetText` on **Original**.
 - **Drop:** Rename List item only (resolve via Apply Target). File List / Explorer / plain text drops are rejected.
-- **Selection → options** on pointer release:
+- **Selection → options** on pointer release (works on sample **or** the `[ Drag Item Here ]` placeholder, matching MFR7):
   - Left Trim / Left Extract → force `[0, end)` → `Count`
   - Right Trim / Right Extract → force `[start, N)` → `Count`
   - Trim Between → 1-based inclusive **Left**-anchored `Position`s (no MFR7 “count from the right” checkbox)
-- **Options → selection:** spinner/combo re-highlights the sample.
+- **Options → selection:** spinner/combo re-highlights the displayed text (sample or placeholder).
 
 ## Key files
 

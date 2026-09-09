@@ -54,6 +54,24 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         }
 
         /// <summary>
+        /// Verifies selection on the placeholder text still updates start/end (MFR7 parity).
+        /// </summary>
+        [Fact]
+        public void Placeholder_selection_updates_left_anchored_range()
+        {
+            var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());
+            var editor = new TrimBetweenFilterEditorViewModel(step);
+            Assert.False(editor.TrimHelper.HasSample);
+            Assert.Equal(VisualTrimHelperViewModel.PlaceholderText, editor.TrimHelper.DisplayText);
+
+            Assert.True(editor.TrimHelper.TryApplyPointerSelection(selectionStart: 2, selectionLength: 4));
+            Assert.Equal(3, editor.StartValue);
+            Assert.Equal(Side.Left, editor.StartAnchor);
+            Assert.Equal(6, editor.EndValue);
+            Assert.Equal(Side.Left, editor.EndAnchor);
+        }
+
+        /// <summary>
         /// Verifies spinner/anchor changes update the helper highlight.
         /// </summary>
         [Fact]
@@ -101,7 +119,9 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());
             var editor = new TrimBetweenFilterEditorViewModel(step);
             Assert.False(editor.TrimHelper.HasSample);
-            Assert.Equal(0, editor.TrimHelper.HighlightLength);
+            // Default 2–4 highlight already applies to the placeholder.
+            Assert.Equal(1, editor.TrimHelper.HighlightStart);
+            Assert.Equal(3, editor.TrimHelper.HighlightLength);
 
             editor.TrimHelper.SetSampleText("abcdef");
 

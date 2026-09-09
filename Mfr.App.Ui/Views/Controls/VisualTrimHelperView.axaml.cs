@@ -87,7 +87,7 @@ namespace Mfr.App.Ui.Views.Controls
         /// </summary>
         private void _ApplyHighlight()
         {
-            if (_helper is null || !_helper.HasSample || _isApplyingHighlight)
+            if (_helper is null || _isApplyingHighlight)
             {
                 return;
             }
@@ -116,7 +116,8 @@ namespace Mfr.App.Ui.Views.Controls
 
         private void _OnPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
-            if (_helper is null || !_helper.HasSample || _isApplyingHighlight)
+            // Selection applies to DisplayText (sample or "[ Drag Item Here ]"), matching MFR7.
+            if (_helper is null || _isApplyingHighlight)
             {
                 return;
             }

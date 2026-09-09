@@ -130,21 +130,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         /// <param name="count">Current filter count.</param>
         public void SyncHighlightFromCount(int count)
         {
-            if (!HasSample)
-            {
-                return;
-            }
-
+            // MFR7 updates selection on the TextBox text, including the placeholder.
+            var textLength = DisplayText.Length;
             if (_mode == VisualTrimHelperMapping.Mode.LeftEdge)
             {
-                VisualTrimHelperMapping.CountToLeftHighlight(count, SampleText.Length, out var start, out var length);
+                VisualTrimHelperMapping.CountToLeftHighlight(count, textLength, out var start, out var length);
                 _SetHighlight(start, length);
                 return;
             }
 
             if (_mode == VisualTrimHelperMapping.Mode.RightEdge)
             {
-                VisualTrimHelperMapping.CountToRightHighlight(count, SampleText.Length, out var start, out var length);
+                VisualTrimHelperMapping.CountToRightHighlight(count, textLength, out var start, out var length);
                 _SetHighlight(start, length);
             }
         }
@@ -158,14 +155,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         {
             ArgumentNullException.ThrowIfNull(start);
             ArgumentNullException.ThrowIfNull(end);
-            if (!HasSample)
-            {
-                return;
-            }
 
+            // MFR7 updates selection on the TextBox text, including the placeholder.
             if (
                 !TrimBetweenFilter.TryGetSelectionRange(
-                    SampleText,
+                    DisplayText,
                     start,
                     end,
                     out var highlightStart,
@@ -187,7 +181,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         /// <returns><see langword="true"/> when options should be updated from applied fields.</returns>
         public bool TryApplyPointerSelection(int selectionStart, int selectionLength)
         {
-            if (!HasSample || _isApplyingSelection)
+            // MFR7 maps selection against whatever is in the box, including "[ Drag Item Here ]".
+            if (_isApplyingSelection)
             {
                 return false;
             }
@@ -218,7 +213,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                     {
                         var count = VisualTrimHelperMapping.SelectionToRightCount(
                             selectionStart,
-                            SampleText.Length,
+                            DisplayText.Length,
                             out var highlightStart,
                             out var highlightLength
                         );

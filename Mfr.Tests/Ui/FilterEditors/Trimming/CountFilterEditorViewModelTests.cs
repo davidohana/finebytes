@@ -27,6 +27,23 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         }
 
         /// <summary>
+        /// Verifies selection on the placeholder text still updates Count (MFR7 parity).
+        /// </summary>
+        [Fact]
+        public void Placeholder_selection_updates_count()
+        {
+            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var editor = new CountFilterEditorViewModel(step);
+            Assert.False(editor.TrimHelper.HasSample);
+            Assert.Equal(VisualTrimHelperViewModel.PlaceholderText, editor.TrimHelper.DisplayText);
+
+            Assert.True(editor.TrimHelper.TryApplyPointerSelection(selectionStart: 0, selectionLength: 5));
+            Assert.Equal(5, editor.Count);
+            Assert.Equal(0, editor.TrimHelper.HighlightStart);
+            Assert.Equal(5, editor.TrimHelper.HighlightLength);
+        }
+
+        /// <summary>
         /// Verifies spinner changes request a right-edge highlight.
         /// </summary>
         [Fact]
@@ -76,6 +93,9 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             var step = new AppliedFilterStepViewModel("Trim Left", filter);
             var editor = new CountFilterEditorViewModel(step);
             Assert.False(editor.TrimHelper.HasSample);
+            // Default count highlight already applies to the placeholder.
+            Assert.Equal(0, editor.TrimHelper.HighlightStart);
+            Assert.Equal(3, editor.TrimHelper.HighlightLength);
 
             editor.TrimHelper.SetSampleText("abcdef");
 
