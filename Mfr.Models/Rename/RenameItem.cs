@@ -1,6 +1,5 @@
 using Mfr.Models.Media;
 using Mfr.Models.Tags;
-using Mfr.Utils;
 
 namespace Mfr.Models.Rename
 {
@@ -313,15 +312,6 @@ namespace Mfr.Models.Rename
         internal bool IsPreviewPathUnchanged()
         {
             return string.Equals(Original.FullPath, Preview.FullPath, StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Whether the preview path resolves to the same on-disk entry as the original under the host filesystem.
-        /// </summary>
-        /// <returns><c>true</c> when both paths refer to the same on-disk entry, even when textual casing differs.</returns>
-        internal bool IsPreviewPathSameOnDisk()
-        {
-            return PathRelations.SameOnDisk(Original.FullPath, Preview.FullPath);
         }
 
         /// <summary>

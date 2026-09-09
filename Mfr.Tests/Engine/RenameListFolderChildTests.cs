@@ -119,7 +119,7 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// On Windows, a case-only rename of a file is committed via a temp-name dance, producing the new casing.
+        /// On Windows, a case-only rename of a file commits via a direct move (same path, new casing).
         /// </summary>
         [Fact]
         public void Case_only_file_rename_on_windows_applies_new_casing()
@@ -156,7 +156,7 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// On Windows, a case-only rename of a folder applies via the temp-name dance and preserves the contained file.
+        /// On Windows, a case-only rename of a folder commits via a direct move and preserves the contained file.
         /// </summary>
         [Fact]
         public void Case_only_folder_rename_on_windows_applies_new_casing()

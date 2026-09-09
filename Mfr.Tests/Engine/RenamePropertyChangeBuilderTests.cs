@@ -79,10 +79,11 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Directory comparison ignores case so Windows-only casing tweaks do not emit a row.
+        /// Directory comparison is ordinal so case-only path renames emit a DirectoryPath row
+        /// (aligned with <see cref="RenameItem.IsPreviewPathUnchanged"/> / <see cref="RenameItem.HasPreviewChanges"/>).
         /// </summary>
         [Fact]
-        public void BuildChangeRows_DirectoryPathCaseOnly_DoesNotEmitDirectoryRow()
+        public void BuildChangeRows_DirectoryPathCaseOnly_EmitsDirectoryRow()
         {
             var original = _CloneBaseline(directoryPath: @"D:\Music\Album");
             var item = new RenameItem(original);
@@ -90,7 +91,10 @@ namespace Mfr.Tests.Engine
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
-            Assert.Empty(rows);
+            var row = Assert.Single(rows);
+            Assert.Equal("DirectoryPath", row.Property);
+            Assert.Equal(@"D:\Music\Album", row.OldValue);
+            Assert.Equal(@"d:\music\album", row.NewValue);
         }
 
         /// <summary>

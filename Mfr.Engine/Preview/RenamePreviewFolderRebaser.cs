@@ -18,8 +18,9 @@ namespace Mfr.Engine.Preview
     /// there or write to a stale location.
     /// </para>
     /// <para>
-    /// Only folder items whose preview path differs from the original participate as rebase sources.
-    /// Items with preview errors are left alone so the conflict detector can still surface their state.
+    /// Only <see cref="RenameStatus.PreviewOk"/> folder items whose preview path differs from the
+    /// original participate as rebase sources. Preview-error folders are ignored as ancestors;
+    /// preview-error descendants are left alone so the conflict detector can still surface their state.
     /// </para>
     /// </remarks>
     internal static class RenamePreviewFolderRebaser
@@ -39,7 +40,12 @@ namespace Mfr.Engine.Preview
         {
             ArgumentNullException.ThrowIfNull(items);
 
-            var folderRenames = PreviewFolderPathChanges.Collect(items);
+            // Only PreviewOk folders participate as rebase sources — same scope as conflict detection
+            // and commit planning. A PreviewError folder may hold a partial path mutate; do not rebase
+            // descendants against it.
+            var folderRenames = PreviewFolderPathChanges.Collect(
+                items.Where(item => item.Status == RenameStatus.PreviewOk)
+            );
             if (folderRenames.Count == 0)
             {
                 return;

@@ -64,12 +64,14 @@ namespace Mfr.Engine.Preview
                 newValue: preview.Extension,
                 comparison: StringComparison.Ordinal
             );
+            // Ordinal (not OS ignore-case): case-only directory renames are real changes on Windows
+            // and must appear in change rows, matching IsPreviewPathUnchanged / HasPreviewChanges.
             _AddRenamePropertyChangeIfStringDiffers(
                 changes,
                 propertyName: "DirectoryPath",
                 oldValue: original.DirectoryPath,
                 newValue: preview.DirectoryPath,
-                comparison: StringComparison.OrdinalIgnoreCase
+                comparison: StringComparison.Ordinal
             );
         }
 

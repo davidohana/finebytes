@@ -107,6 +107,14 @@ namespace Mfr.Engine.Commit
                     if (stashSucceeded)
                     {
                         inFlightStashedItems.Add(stashStep.Item);
+                        continue;
+                    }
+
+                    // Stash failure is a per-item error: honor fail-fast so later cycle members
+                    // (and the rest of the plan) are not attempted against a path that never vacated.
+                    if (failFast)
+                    {
+                        stopped = true;
                     }
 
                     continue;

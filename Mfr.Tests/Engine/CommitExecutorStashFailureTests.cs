@@ -73,6 +73,71 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies a failing stash with fail-fast stops later plan steps (cycle partner stays skipped).
+        /// </summary>
+        public void Execute_StashFailure_FailFast_StopsLaterFinalizeSteps()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var pathA = dir.CombinePath("a.txt");
+            var pathB = dir.CombinePath("b.txt");
+            File.WriteAllText(pathA, "a");
+            File.WriteAllText(pathB, "b");
+
+            var itemA = new RenameItem(
+                new FileMeta(renameListIndex: 0, inFolderIndex: 0, directoryPath: dir, prefix: "a", extension: "txt")
+            )
+            {
+                Status = RenameStatus.PreviewOk,
+            };
+            itemA.Preview.Prefix = "b";
+
+            var itemB = new RenameItem(
+                new FileMeta(renameListIndex: 1, inFolderIndex: 1, directoryPath: dir, prefix: "b", extension: "txt")
+            )
+            {
+                Status = RenameStatus.PreviewOk,
+            };
+            itemB.Preview.Prefix = "a";
+
+            var tempPath = RenameItemMover.AllocateTempPath(itemA.Original.FullPath);
+            var plan = new CommitPlan(
+                Steps:
+                [
+                    new StashStep(itemA, tempPath),
+                    new FinalizeStep(itemB, itemB.Original.FullPath),
+                    new FinalizeStep(itemA, tempPath),
+                ],
+                UnresolvableCycleItems: []
+            );
+
+            var simulateMessage = "mfr-test stash failure fail-fast";
+            RenameItemMover.StashSourceToTempSubstitute = (_, _) => throw new IOException(simulateMessage);
+            try
+            {
+                var results = CommitExecutor.Execute(
+                    plan: plan,
+                    allItems: [itemA, itemB],
+                    confirmBeforeApply: null,
+                    failFast: true,
+                    dryRun: false
+                );
+
+                Assert.Equal(2, results.Count);
+                Assert.Equal(RenameStatus.CommitError, results[0].Status);
+                Assert.Equal(simulateMessage, results[0].Error);
+                Assert.Equal(RenameStatus.CommitSkipped, results[1].Status);
+                Assert.True(File.Exists(pathA));
+                Assert.True(File.Exists(pathB));
+                Assert.False(File.Exists(tempPath));
+            }
+            finally
+            {
+                RenameItemMover.StashSourceToTempSubstitute = null;
+            }
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies dry-run does not invoke stash (substitute stays unused).
         /// </summary>
         public void Execute_StashSubstitute_NotUsed_WhenDryRun()

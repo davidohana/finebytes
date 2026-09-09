@@ -25,8 +25,11 @@ namespace Mfr.Engine.Commit
         /// <param name="tempPath">Unique temp destination path.</param>
         /// <remarks>
         /// <para>
-        /// Used for cycle resolution and case-only renames. <see cref="RenameItem.Original"/> is not updated;
-        /// callers must follow up with <see cref="FinalizeCommit"/> before the preview can be considered applied.
+        /// Used for cycle resolution only. Case-only renames commit via a direct
+        /// <see cref="File.Move(string, string, bool)"/> / <see cref="Directory.Move(string, string)"/> in
+        /// <see cref="FinalizeCommit"/> (.NET accepts same-path different-casing on Windows).
+        /// <see cref="RenameItem.Original"/> is not updated; callers must follow up with
+        /// <see cref="FinalizeCommit"/> before the preview can be considered applied.
         /// </para>
         /// </remarks>
         internal static void StashSourceToTemp(RenameItem item, string tempPath)

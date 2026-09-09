@@ -1,6 +1,6 @@
 ---
 name: Whole codebase review
-overview: "Phased whole-repo review: Phase 0–1 + 3 done. Next: Phase 2 Metadata + Tags (still pending), then Phase 4 Engine."
+overview: "Phased whole-repo review: Phase 0–1 + 3–4 done. Next: Phase 2 Metadata + Tags (still pending), then Phase 5 Session/Config."
 todos:
   - id: phase-0
     content: "Phase 0: Architecture/layering gate + plan file bootstrap"
@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: phase-4
     content: "Phase 4: Engine Preview + Commit risk gate (+ bugbot)"
-    status: pending
+    status: completed
   - id: phase-5
     content: "Phase 5: Session/Config/Presets/Reset — mfr-code-review + autofix"
     status: pending
@@ -68,18 +68,18 @@ flowchart TD
 
 ## Status
 
-| Phase                               | Status   | Notes                                                             |
-| ----------------------------------- | -------- | ----------------------------------------------------------------- |
-| **0** Architecture / layering       | **done** | Project graph healthy; Services→Views fixed; arch tests tightened |
-| **1** Utils + Models                | **done** | Numeric parity + Windows path chars; TextValues deleted           |
-| **2** Metadata + Tags               | pending  | Still next (skipped ahead to 3 in one pass)                       |
-| **3** Filters                       | **done** | Setup caches + exhaustiveness; Formatting tokens OK               |
-| **4** Engine Preview/Commit         | pending  |                                                                   |
-| **5** Session/Config                | pending  |                                                                   |
-| **6** File List                     | pending  |                                                                   |
-| **7** Rename List + Applied Filters | pending  |                                                                   |
-| **8** Format Editor + FilterEditors | pending  |                                                                   |
-| **9** CLI + arch tests + sweep      | pending  |                                                                   |
+| Phase                               | Status   | Notes                                                              |
+| ----------------------------------- | -------- | ------------------------------------------------------------------ |
+| **0** Architecture / layering       | **done** | Project graph healthy; Services→Views fixed; arch tests tightened  |
+| **1** Utils + Models                | **done** | Numeric parity + Windows path chars; TextValues deleted            |
+| **2** Metadata + Tags               | pending  | Still next (skipped ahead to 3 in one pass)                        |
+| **3** Filters                       | **done** | Setup caches + exhaustiveness; Formatting tokens OK                |
+| **4** Engine Preview/Commit         | **done** | failFast stash; rebase PreviewOk; DirectoryPath ordinal; bugbot OK |
+| **5** Session/Config                | pending  |                                                                    |
+| **6** File List                     | pending  |                                                                    |
+| **7** Rename List + Applied Filters | pending  |                                                                    |
+| **8** Format Editor + FilterEditors | pending  |                                                                    |
+| **9** CLI + arch tests + sweep      | pending  |                                                                    |
 
 ______________________________________________________________________
 
@@ -197,16 +197,51 @@ Filters setup/transform hygiene improved; Formatting registry/compiler coherent.
 
 ______________________________________________________________________
 
+## Phase 4 — L4 Engine Preview + Commit (done)
+
+**Scope:** `Mfr.Engine/Preview/`, `Commit/`, RenameList Preview/Commit/plan plumbing (not unfinished rename-list UI 14b–16; Presets/Config deferred to Phase 5). Matching `Mfr.Tests/Engine/`. Explore twins + bugbot on uncommitted fixes.
+
+**Verdict:** Preview → rebase → conflict → plan → execute spine is sound and single-owned; UI does not re-plan. Applied fail-fast on stash failure, PreviewOk-only rebase ancestors, ordinal DirectoryPath change rows, and dead-API/doc cleanup. Leftovers are structural twins (ancestor rewrite loops, vacate graph, path-equality naming) and progress-phase labeling.
+
+### Applied (high confidence)
+
+1. **`CommitExecutor` fail-fast on stash failure:** stash errors now set `stopped` when `failFast` (previously only finalize failures did) so cycle partners are not attempted against a path that never vacated.
+1. **`RenamePreviewFolderRebaser`:** folder ancestors from `PreviewFolderPathChanges.Collect` restricted to `PreviewOk` (aligned with conflict/planner scoping).
+1. **`RenamePropertyChangeBuilder` DirectoryPath:** `OrdinalIgnoreCase` → `Ordinal` so case-only directory renames appear in change rows (matches `IsPreviewPathUnchanged` / `HasPreviewChanges`).
+1. **Deleted** unused `RenameItem.IsPreviewPathSameOnDisk` (dead twin of `PathRelations.SameOnDisk` / `DiffersOnlyInCase`).
+1. **Docs:** stash is cycle-only (not case-only); case-only commit uses direct `File`/`Directory.Move`; folder-child test summaries updated.
+1. **Tests:** stash fail-fast cycle skip; PreviewError folder not used as rebase ancestor; DirectoryPath case-only emits row. Engine suite green (231). Bugbot on uncommitted Engine delta: no findings.
+
+### Correctness (found, not changed)
+
+| Item                                                        | Notes                                                                                              |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Preview cancel still plans partial list                     | Documented on `RenameList.Preview`; intentional                                                    |
+| Conflict `Exists` not re-checked at commit                  | TOCTOU by design; FS errors become CommitError                                                     |
+| `failFast: false` after stash failure                       | Later cycle members may still hit FS errors (same-item finalize skipped via `Status != PreviewOk`) |
+| Progress phase `LoadMetadata` used for preview filter apply | UI remaps labels via `RenameListProgressCopy`; enum docs already mention preview                   |
+| Case-only commit without temp stash                         | .NET Move accepts same-path different casing on Windows — verified by folder-child tests           |
+
+### Deeper refactors (promoted to backlog)
+
+See backlog items 1 (updated), 13–16 below.
+
+### Phase 4 exit
+
+Engine Preview/Commit risk gate closed with stash fail-fast + rebase scoping fixes. Ready for Phase 5 (Session/Config) or Phase 2 if resumed.
+
+______________________________________________________________________
+
 ## Deeper refactors backlog
 
 Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
 
 1. **Collapse or rename `SameOnDisk` vs `IsSamePath`**
-   Sites: `PathRelations`; callers in Engine / Ui / `RenameItem.IsPreviewPathSameOnDisk`
+   Sites: `PathRelations`; callers in Engine / Ui (dead `IsPreviewPathSameOnDisk` removed in Phase 4)
    Target: one equality API + explicit trim overload, or keep both with names that cannot be confused
    Value: closes trailing-sep footgun
    Cost: medium churn across Engine/Ui
-   Rank: medium — Phase 4/7 if touched
+   Rank: medium — Phase 7 if touched; Engine callers already deliberate
 
 1. **`FirstDelimitedSegment` → `DelimitedText` only if empty-first semantics match**
    Sites: `RenameListFieldDisplay.FirstDelimitedSegment` vs `DelimitedText.Split` (AudioTag first-segment fields)
@@ -285,6 +320,34 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: medium behavior risk
    Rank: medium — Phase 7/8 if ApplyScope touched
 
+1. **Shared innermost-ancestor rewrite helper**
+   Sites: `RenamePreviewFolderRebaser._RebaseItemAgainstAncestors` ↔ `CommitPlanner._ResolveActualSourcePath`
+   Target: one `ApplyInnermostAncestorRewrites(path, ancestors, matchPredicate)` with call-site selectors (preview-dir vs original-fullpath)
+   Value: closes compose-order / ReplaceAncestor drift
+   Cost: medium — two match dialects must stay explicit
+   Rank: medium — do when next touching rebase or planner
+
+1. **Vacate policy vs path-shift / containment edges**
+   Sites: `PreviewConflictDetector._WillBeVacatedByBatch` ↔ `CommitPlanner` path-shift + containment
+   Target: optional shared “batch path graph” helper, or documented invariant tests that conflict vacate ≡ planner order assumptions
+   Value: prevents silent preview-ok / commit-fail drift
+   Cost: medium–high behavior risk
+   Rank: medium — add invariant tests first if touching either side
+
+1. **Preview progress phase naming**
+   Sites: `RenameListProgressPhase.LoadMetadata` used for filter apply; `RenameListProgressCopy` remaps UI titles
+   Target: add `ApplyPreview` (or rename) so engine enum matches work; update UI binding
+   Value: removes papered-over phase lie
+   Cost: low–medium enum + UI/tests
+   Rank: medium — Phase 7 if progress dialog touched
+
+1. **Path split + preview-field reset helpers**
+   Sites: `RenameItemSnapshotBuilder` ↔ `FileMetaPreviewExtensions.SetFromAbsoluteFullPath`; `ResetState` ↔ `ClearPreview`
+   Target: shared path-dissection helper; private reset-of-preview-fields on `RenameItem`
+   Value: small dedup / fewer clone-reset omissions
+   Cost: low–medium Models churn
+   Rank: low–medium — ride along when editing add/refresh or RenameItem
+
 ______________________________________________________________________
 
 ## Remaining phase briefs
@@ -292,10 +355,6 @@ ______________________________________________________________________
 ### Phase 2 — L2 Metadata + Tags
 
 **Scope:** `Mfr.Metadata/`, `Mfr.Models/Tags/`, docs `audio-tag-model.md` / `image-metadata-model.md`, `Mfr.Tests/Metadata/`.
-
-### Phase 4 — L4 Engine Preview + Commit (risk gate)
-
-**Scope:** Preview / Commit / RenameList engine; prefer `bugbot` after fixes. Review **engine** correctness — not unfinished rename-list UI (14b–16).
 
 ### Phase 5 — Session / Config / Presets / Reset
 

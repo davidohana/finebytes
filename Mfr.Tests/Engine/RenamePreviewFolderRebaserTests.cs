@@ -118,6 +118,30 @@ namespace Mfr.Tests.Engine
             Assert.Equal(RenameStatus.PreviewError, fileItem.Status);
         }
 
+        /// <summary>
+        /// Verifies a PreviewError folder is not used as a rebase ancestor for PreviewOk descendants.
+        /// </summary>
+        [Fact]
+        public void RebaseDescendants_preview_error_folder_is_not_used_as_ancestor()
+        {
+            var folderItem = _CreateDirectoryItem(fullPath: _Path("A"), previewFullPath: _Path("A2"));
+            folderItem.SetPreviewError(message: "folder failed", cause: null);
+
+            var fileItem = _CreateFileItem(
+                fullPath: _Path("A", "track.txt"),
+                previewDirectoryPath: _Path("A"),
+                previewFileName: "song.txt"
+            );
+            var expectedDirectory = fileItem.Preview.DirectoryPath;
+            var expectedPath = fileItem.Preview.FullPath;
+
+            RenamePreviewFolderRebaser.RebaseDescendants([folderItem, fileItem]);
+
+            Assert.Equal(expectedDirectory, fileItem.Preview.DirectoryPath);
+            Assert.Equal(expectedPath, fileItem.Preview.FullPath);
+            Assert.Equal(RenameStatus.PreviewOk, fileItem.Status);
+        }
+
         private static RenameItem _CreateDirectoryItem(string fullPath, string previewFullPath)
         {
             var item = _CreateItem(fullPath: fullPath, attributes: FileAttributes.Directory);
