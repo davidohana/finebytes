@@ -104,7 +104,7 @@ namespace Mfr.App.Ui.Services.FileList
             {
                 using var thumbStream = new MemoryStream(embeddedJpeg, writable: false);
                 var native = new Bitmap(thumbStream);
-                // Camera EXIF thumbs are often ~160px; stretching them to Huge (256) looks blocky.
+                // Camera EXIF thumbs are often ~160px; stretching them to DecodeWidth looks blocky.
                 if (native.PixelSize.Width < width)
                 {
                     native.Dispose();

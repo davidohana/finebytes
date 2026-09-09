@@ -539,45 +539,65 @@ namespace Mfr.App.Ui.Views.FileList
             _isSyncingSelection = true;
             try
             {
-                if (_viewModel.IsReportView)
+                switch (_ActiveListingHost())
                 {
-                    _ApplySelection(ReportGrid, force);
-                    return;
-                }
-
-                if (_viewModel.IsListView)
-                {
-                    _ApplySelection(ListViewList, force);
-                    return;
-                }
-
-                if (_viewModel.IsSmallIconsView)
-                {
-                    _ApplySelection(SmallIconsList, force);
-                    return;
-                }
-
-                if (_viewModel.IsLargeIconsView)
-                {
-                    _ApplySelection(LargeIconsList, force);
-                    return;
-                }
-
-                if (_viewModel.IsTilesView)
-                {
-                    _ApplySelection(TilesList, force);
-                    return;
-                }
-
-                if (_viewModel.IsThumbnailsView)
-                {
-                    _ApplySelection(ThumbnailsList, force);
+                    case DataGrid grid:
+                        _ApplySelection(grid, force);
+                        break;
+                    case ListBox listBox:
+                        _ApplySelection(listBox, force);
+                        break;
+                    default:
+                        break;
                 }
             }
             finally
             {
                 _isSyncingSelection = false;
             }
+        }
+
+        /// <summary>
+        /// Control that hosts the visible listing for the current view mode.
+        /// </summary>
+        private Control? _ActiveListingHost()
+        {
+            if (_viewModel is null)
+            {
+                return null;
+            }
+
+            if (_viewModel.IsReportView)
+            {
+                return ReportGrid;
+            }
+
+            if (_viewModel.IsListView)
+            {
+                return ListViewList;
+            }
+
+            if (_viewModel.IsSmallIconsView)
+            {
+                return SmallIconsList;
+            }
+
+            if (_viewModel.IsLargeIconsView)
+            {
+                return LargeIconsList;
+            }
+
+            if (_viewModel.IsTilesView)
+            {
+                return TilesList;
+            }
+
+            if (_viewModel.IsThumbnailsView)
+            {
+                return ThumbnailsList;
+            }
+
+            return null;
         }
 
         private void _ApplySelection(ListBox listBox, bool force = false)
@@ -716,42 +736,7 @@ namespace Mfr.App.Ui.Views.FileList
 
         private bool _IsActiveListingSender(object? sender)
         {
-            if (_viewModel is null)
-            {
-                return false;
-            }
-
-            if (_viewModel.IsReportView)
-            {
-                return ReferenceEquals(sender, ReportGrid);
-            }
-
-            if (_viewModel.IsListView)
-            {
-                return ReferenceEquals(sender, ListViewList);
-            }
-
-            if (_viewModel.IsSmallIconsView)
-            {
-                return ReferenceEquals(sender, SmallIconsList);
-            }
-
-            if (_viewModel.IsLargeIconsView)
-            {
-                return ReferenceEquals(sender, LargeIconsList);
-            }
-
-            if (_viewModel.IsTilesView)
-            {
-                return ReferenceEquals(sender, TilesList);
-            }
-
-            if (_viewModel.IsThumbnailsView)
-            {
-                return ReferenceEquals(sender, ThumbnailsList);
-            }
-
-            return false;
+            return ReferenceEquals(sender, _ActiveListingHost());
         }
 
         private void _OnEntriesKeyDown(object? sender, KeyEventArgs e)

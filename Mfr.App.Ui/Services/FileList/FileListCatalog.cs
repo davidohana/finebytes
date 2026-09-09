@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using Mfr.Utils;
@@ -105,7 +106,7 @@ namespace Mfr.App.Ui.Services.FileList
                 FileListListingFailure.TimedOut => "Timed out reading this folder.",
                 FileListListingFailure.Unavailable => "Could not read this folder.",
                 FileListListingFailure.None => string.Empty,
-                _ => "Could not read this folder.",
+                _ => throw new UnreachableException($"Unhandled listing failure: {failure}."),
             };
         }
 

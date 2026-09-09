@@ -1,3 +1,5 @@
+using Mfr.App.Ui.Services.FileList;
+
 namespace Mfr.App.Ui.ViewModels.FileList
 {
     /// <summary>
@@ -31,9 +33,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public const int ExtraLarge = 192;
 
         /// <summary>
-        /// Largest preview: 256 pixels. Bitmaps are decoded at this width.
+        /// Largest preview: matches <see cref="ImageThumbnailLoader.DecodeWidth"/>.
         /// </summary>
-        public const int Huge = 256;
+        public const int Huge = ImageThumbnailLoader.DecodeWidth;
 
         /// <summary>
         /// Starting size when Thumbnails view is first used.

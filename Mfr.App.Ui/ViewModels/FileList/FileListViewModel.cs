@@ -53,6 +53,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         ];
 
         private const int _MaxRememberedMasks = 10;
+        private const int _MaxRememberedPaths = 20;
 
         /// <summary>
         /// Default exclude patterns; applied only when exclude masks are enabled.
@@ -954,6 +955,10 @@ namespace Mfr.App.Ui.ViewModels.FileList
             }
 
             PathHistory.Insert(0, displayPath);
+            while (PathHistory.Count > _MaxRememberedPaths)
+            {
+                PathHistory.RemoveAt(PathHistory.Count - 1);
+            }
         }
 
         private void _RememberMask(string mask)

@@ -275,7 +275,7 @@ namespace Mfr.App.Ui.Services.FileList
         /// </summary>
         /// <param name="path">File List path or sentinel.</param>
         /// <returns><see langword="false"/> for This PC, Network, or blank.</returns>
-        public static bool IsFilesystemFolderPath(string path)
+        public static bool IsFilesystemFolderPath(string? path)
         {
             if (IsComputerPath(path) || IsNetworkPath(path))
             {

@@ -1,6 +1,6 @@
 ---
 name: Whole codebase review
-overview: "Phased whole-repo review: Phase 0–5 done. Next: Phase 6 File List."
+overview: "Phased whole-repo review: Phase 0–6 done. Next: Phase 7 Rename List + Applied Filters."
 todos:
   - id: phase-0
     content: "Phase 0: Architecture/layering gate + plan file bootstrap"
@@ -22,7 +22,7 @@ todos:
     status: completed
   - id: phase-6
     content: "Phase 6: File List services + UI — mfr-code-review + autofix"
-    status: pending
+    status: completed
   - id: phase-7
     content: "Phase 7: Rename List UI + Applied Filters/Palette — mfr-code-review + autofix"
     status: pending
@@ -76,7 +76,7 @@ flowchart TD
 | **3** Filters                       | **done** | Setup caches + exhaustiveness; Formatting tokens OK                |
 | **4** Engine Preview/Commit         | **done** | failFast stash; rebase PreviewOk; DirectoryPath ordinal; bugbot OK |
 | **5** Session/Config                | **done** | sort DTO merge; Version docs; ConfigStore test isolation           |
-| **6** File List                     | pending  |                                                                    |
+| **6** File List                     | **done** | path sentinel reuse; history cap; thumb CTS; explore twins OK      |
 | **7** Rename List + Applied Filters | pending  |                                                                    |
 | **8** Format Editor + FilterEditors | pending  |                                                                    |
 | **9** CLI + arch tests + sweep      | pending  |                                                                    |
@@ -118,7 +118,7 @@ Ui also refs Filters directly (catalog/editors). Cli does not. Engine + Filters 
 | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
 | Models JSON/FS I/O (`ConfigStore`, `SessionStore`, `RenameResultSummary`) | Ownership smell, not a layer violation; **kept in Phase 5** (AppData/DTO co-location) |
 | `RenameListFieldDisplay` directory scan for folder file-count             | Domain field resolve; Phase 7 if touched                                              |
-| `JpegExifThumbnailReader` hand-rolled EXIF in UI Services                 | No ME package leak; optional L2 move — Phase 6                                        |
+| `JpegExifThumbnailReader` hand-rolled EXIF in UI Services                 | **Resolved Phase 6 — keep in UI** (ME does not own thumb bytes; L2 move low value)    |
 | Fuller UI DAG tests (Views↛Services shortcuts, VM↛Views)                  | Nice-to-have; Phase 9 if still wanted                                                 |
 | Forbidden-using / package-ownership arch tests for lower layers           | csproj + spot-check enough for now; Phase 9                                           |
 
@@ -323,6 +323,52 @@ Session/config/presets/reset hygiene closed; sort persist type unified. Ready fo
 
 ______________________________________________________________________
 
+## Phase 6 — File List services + UI (done)
+
+**Scope:** `Mfr.App.Ui/ViewModels/FileList/`, `Views/FileList/`, `Services/FileList/`; matching `Mfr.Tests/Ui/FileList/` (+ Thumbnails / `RenameListAddSourceResolver` bridge). Explore used for cross-file twins ([File List twins](7aa8d555-fbca-4f79-bfc0-860f2f58892c)). `debts.md` shell ops (Cut/Copy/Paste/Delete, Properties) — **still accurate**, not implemented.
+
+**Verdict:** File List is coherent — single browse resolver (`FileListCatalog.TryResolvePath`), breadcrumb policy in `FileListPath`, Views → VM → Services clean, no second catalog in UI. Applied sentinel/persistable-folder reuse, path-history cap, thumbnail CTS safety, decode-width ownership, and listing-host dedup. Leftovers are cross-pane DnD twins and optional root-gate / shell-opener unification (Phase 7+). Phase 0 `JpegExifThumbnailReader` L2 move: **skip** (see below).
+
+### Architecture (lightweight)
+
+| Check                                      | Verdict                                                                                                                                                        |
+| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Project refs vs layering                   | **Healthy** — File List services stay Avalonia/UI; no Engine/Metadata package leak                                                                             |
+| UI `Views → ViewModels → Services`         | **Clean** — catalog/path/icons/shell in Services; VM binds; Views own gestures                                                                                 |
+| Second resolver in UI                      | **None** — navigate / locate / start path all call `FileListCatalog.TryResolvePath`                                                                            |
+| `JpegExifThumbnailReader` vs Metadata EXIF | **Keep in UI** — binary IFD1 thumb for Avalonia decode; ME maps tag fields, does not own preview bytes. Optional L2 move is low value / Avalonia coupling risk |
+| Views → Views (`InternalReorderFormat`)    | **Smell retained** — backlog #23                                                                                                                               |
+| `debts.md` File List context menu          | **Still accurate** — Cut/Copy/Paste/Delete + Properties deferred; view-mode radios intentionally menu-only                                                     |
+
+### Applied (high confidence)
+
+1. **`IsFilesystemFolderPath(string?)`** — one sentinel gate; `UiSessionPersistence._IsPersistableFolder` and `RenameListAddSourceResolver.CanAddAllFrom` reuse it (+ `Directory.Exists` for persist).
+1. **Path history cap** (`_MaxRememberedPaths = 20`) — parity with mask suggestions; stops unbounded address-bar / Network-seed growth.
+1. **`FileListThumbnailSession.BeginLoad`** calls `CancelLoad` first — no leaked CTS on overlapping passes.
+1. **`ThumbnailSizes.Huge = ImageThumbnailLoader.DecodeWidth`** — one decode-width constant (test already asserted equality).
+1. **`FormatListingError`** exhaustive → `UnreachableException` (no silent default string).
+1. **`FileListView._ActiveListingHost`** — one owner for view-mode → control; selection sync / active-sender share it.
+1. **Tests:** `NavigateTo_Keeps_Only_Last_20_Paths`. File List + Thumbnails + AddSourceResolver: **142 passed**.
+
+### Correctness (found, not changed)
+
+| Item                                                       | Notes                                                                                 |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| Path history does not promote on revisit                   | Unlike masks; behavior change → optional later                                        |
+| Network listing timeout leaves uncancellable SMB work      | Documented; ContinueWith observes faults                                              |
+| Failed thumbnail decode cached as null until folder reload | Intentional (avoid hammering bad files)                                               |
+| UI root reject vs Engine `_ThrowIfRootPath`                | Complementary gates; extract shared “is FS root?” only if touching both (backlog #25) |
+
+### Deeper refactors (promoted / updated)
+
+See backlog **#23–#26** below. JpegExif L2: **do not** — keep under What to keep.
+
+### Phase 6 exit
+
+File List hygiene closed; browse ownership confirmed. Ready for Phase 7 (Rename List + Applied Filters / Palette).
+
+______________________________________________________________________
+
 ## Deeper refactors backlog
 
 Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
@@ -477,13 +523,41 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: docs only
    Rank: low — docs pass anytime
 
+1. **Move Rename List internal drag format out of `RenameListView`**
+   Sites: `RenameListView.InternalReorderFormat`; `FileListView.DragDrop` imports `Views.RenameList`
+   Target: shared constant under `Views/DragAndDrop` (e.g. `RenameListDragFormats.InternalReorder`)
+   Value: closes Views→Views coupling; File List no longer references Rename List type
+   Cost: low — few call sites + drop tests
+   Rank: high — do first in Phase 7 when touching either DnD surface
+
+1. **Shared local file-drop path reader**
+   Sites: `FilterEditorFileDrop.ReadLocalPaths` ↔ `RenameListView._ReadDroppedFilePaths` (identical loops)
+   Target: one helper under `Views/DragAndDrop` (or keep on a neutral type); Filter editors + Rename List call it
+   Value: deletes twin; one place for TryGetLocalPath quirks
+   Cost: low — rename call sites; Phase 7/8
+   Rank: high — ride with #23 or FilterEditor drops
+
+1. **Shared “filesystem root?” gate for add sources**
+   Sites: `RenameListAddSourceResolver.IsValidSourcePath` ↔ `AddedSourceResolver._ThrowIfRootPath`
+   Target: Utils/Models helper `PathRelations.IsFilesystemRoot(path)` (or similar); UI soft-reject + Engine throw
+   Value: one root rule; prevents UI/Engine drift
+   Cost: low–medium — two dialects (bool vs throw) stay at call sites
+   Rank: medium — Phase 7 if add-source touched; else when editing Engine resolver
+
+1. **DataGrid multi-select drag press/snapshot session**
+   Sites: `FileListView` + `RenameListView` DataGrid press/threshold/snapshot vs `ListBoxDragSession`
+   Target: optional DataGrid-aware session sibling (same Avalonia collapse fix); payloads stay pane-specific
+   Value: one gesture machine for grids; fewer press-collapse bugs
+   Cost: medium–high — two large code-behinds; careful headless coverage
+   Rank: medium — Phase 7 if either grid DnD is edited; do not force a merge for elegance alone
+
 ______________________________________________________________________
 
 ## Remaining phase briefs
 
-### Phase 6 — File List (services + UI)
+### Phase 6 — File List (services + UI) — **done**
 
-**Scope:** File List VM/Views + `Services/FileList/`; note `debts.md` shell ops as deferred.
+See report above. `debts.md` shell ops remain deferred.
 
 ### Phase 7 — Rename List UI + Applied Filters / Palette
 

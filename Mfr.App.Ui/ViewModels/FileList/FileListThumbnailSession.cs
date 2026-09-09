@@ -37,6 +37,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="entries">Visible File List rows.</param>
         public void BeginLoad(IEnumerable<FileListEntry> entries)
         {
+            CancelLoad();
+
             var pending = new List<FileListEntry>();
             foreach (var entry in entries)
             {

@@ -145,6 +145,33 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
+        /// Verifies address-bar path history keeps only the 20 most recent folders.
+        /// </summary>
+        [Fact]
+        public void NavigateTo_Keeps_Only_Last_20_Paths()
+        {
+            var root = _tempDirectoryFixture.CreateTempDir();
+            var folders = new List<string>(21);
+            for (var i = 1; i <= 21; i++)
+            {
+                var folder = Path.Combine(root, $"folder{i:D2}");
+                Directory.CreateDirectory(folder);
+                folders.Add(folder);
+            }
+
+            var viewModel = _CreateViewModel(folders[0]);
+            for (var i = 1; i < folders.Count; i++)
+            {
+                viewModel.NavigateTo(folders[i]);
+            }
+
+            Assert.Equal(20, viewModel.PathHistory.Count);
+            Assert.Equal(folders[^1], viewModel.PathHistory[0]);
+            Assert.Equal(folders[1], viewModel.PathHistory[^1]);
+            Assert.DoesNotContain(folders[0], viewModel.PathHistory);
+        }
+
+        /// <summary>
         /// Verifies exclude masks hide matching files from the listing when enabled.
         /// </summary>
         [Fact]

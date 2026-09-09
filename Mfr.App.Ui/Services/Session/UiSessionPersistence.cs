@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.Models.Config;
-using Mfr.Utils;
 
 namespace Mfr.App.Ui.Services.Session
 {
@@ -127,17 +126,7 @@ namespace Mfr.App.Ui.Services.Session
 
         private static bool _IsPersistableFolder(string? path)
         {
-            if (path.IsBlank())
-            {
-                return false;
-            }
-
-            if (FileListPath.IsComputerPath(path) || FileListPath.IsNetworkPath(path))
-            {
-                return false;
-            }
-
-            return Directory.Exists(path);
+            return FileListPath.IsFilesystemFolderPath(path) && Directory.Exists(path);
         }
     }
 }
