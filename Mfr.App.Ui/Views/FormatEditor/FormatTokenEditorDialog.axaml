@@ -36,16 +36,6 @@
     <Style Selector="Button.format-token-editor-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
-    <Style Selector="Border.format-token-preview-index">
-      <Setter Property="MinWidth" Value="28" />
-      <Setter Property="Height" Value="22" />
-      <Setter Property="Padding" Value="4,0" />
-      <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
   </Window.Styles>
   <DockPanel Margin="12">
     <StackPanel
@@ -86,7 +76,7 @@
               Command="{Binding GoPreviousCommand}"
               IsEnabled="{Binding CanGoPrevious}"
             />
-            <Border Classes="format-token-preview-index">
+            <Border Classes="rename-list-item-index">
               <TextBlock
                 x:Name="PreviewItemIndexLabel"
                 Text="{Binding ItemIndexLabel}"

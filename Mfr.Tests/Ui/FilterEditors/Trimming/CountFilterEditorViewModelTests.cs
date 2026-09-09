@@ -187,6 +187,33 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         }
 
         /// <summary>
+        /// Verifies an unmatched custom sample clears the index without inventing a list position.
+        /// </summary>
+        [Fact]
+        public void Refresh_unmatched_sample_clears_index_and_next_selects_first()
+        {
+            var items = new List<RenameItem>
+            {
+                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"),
+                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1),
+            };
+            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var editor = new CountFilterEditorViewModel(step, resolveSampleRenameItems: () => items);
+            editor.TrimHelper.SetSampleText("custom-sample");
+
+            editor.TrimHelper.RefreshRenameItems();
+
+            Assert.Equal("custom-sample", editor.TrimHelper.SampleText);
+            Assert.Equal(string.Empty, editor.TrimHelper.ItemIndexLabel);
+            Assert.False(editor.TrimHelper.CanGoPrevious);
+            Assert.True(editor.TrimHelper.CanGoNext);
+
+            editor.TrimHelper.GoNext();
+            Assert.Equal("alpha", editor.TrimHelper.SampleText);
+            Assert.Equal("1", editor.TrimHelper.ItemIndexLabel);
+        }
+
+        /// <summary>
         /// Verifies Rename List path resolve uses the filter Apply Target string.
         /// </summary>
         [Fact]

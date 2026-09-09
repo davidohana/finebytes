@@ -11,18 +11,6 @@
   x:Class="Mfr.App.Ui.Views.Controls.VisualTrimHelperView"
   x:DataType="vm:VisualTrimHelperViewModel"
 >
-  <UserControl.Styles>
-    <Style Selector="Border.trim-helper-item-index">
-      <Setter Property="MinWidth" Value="28" />
-      <Setter Property="Height" Value="22" />
-      <Setter Property="Padding" Value="4,0" />
-      <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-  </UserControl.Styles>
   <StackPanel Spacing="4">
     <TextBlock Classes="filter-editor-label" Text="Visual Trim Helper:" />
     <Grid ColumnDefinitions="Auto,8,*">
@@ -35,7 +23,7 @@
           IsEnabled="{Binding CanGoPrevious}"
           ToolTip.Tip="Previous Rename List item"
         />
-        <Border Classes="trim-helper-item-index">
+        <Border Classes="rename-list-item-index">
           <TextBlock
             x:Name="TrimHelperItemIndexLabel"
             Text="{Binding ItemIndexLabel}"

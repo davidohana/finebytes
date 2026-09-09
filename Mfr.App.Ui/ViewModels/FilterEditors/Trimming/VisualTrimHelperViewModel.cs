@@ -169,7 +169,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             }
 
             var matchedIndex = _FindItemIndexBySampleText(SampleText);
-            _itemIndex = matchedIndex >= 0 ? matchedIndex : Math.Clamp(_itemIndex, 0, _renameItems.Count - 1);
+            if (matchedIndex < 0)
+            {
+                // Keep the custom/stale sample; ▼ from here lands on the first list item.
+                _itemIndex = -1;
+                ItemIndexLabel = string.Empty;
+                _NotifyNavigationChanged();
+                return;
+            }
+
+            _itemIndex = matchedIndex;
             ItemIndexLabel = (_itemIndex + 1).ToString(CultureInfo.InvariantCulture);
             _NotifyNavigationChanged();
         }
@@ -397,6 +406,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             return true;
         }
 
+        /// <summary>
+        /// Reloads from an explicit list or the live resolver.
+        /// </summary>
         private void _ReloadRenameItems(IReadOnlyList<RenameItem>? items = null)
         {
             if (items is not null)
@@ -408,6 +420,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             _renameItems = _resolveRenameItems?.Invoke() ?? [];
         }
 
+        /// <summary>
+        /// Sets sample text and index chrome from <see cref="_itemIndex"/>.
+        /// </summary>
         private void _ApplyCurrentItem()
         {
             if (_renameItems.Count == 0 || _target is null)
@@ -427,6 +442,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             _NotifyNavigationChanged();
         }
 
+        /// <summary>
+        /// Finds the Rename List index for an original full path, or <c>-1</c>.
+        /// </summary>
         private int _FindItemIndex(string fullPath)
         {
             for (var i = 0; i < _renameItems.Count; i++)
@@ -440,6 +458,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             return -1;
         }
 
+        /// <summary>
+        /// Finds the first Rename List index whose Apply Target string equals <paramref name="sampleText"/>.
+        /// </summary>
         private int _FindItemIndexBySampleText(string sampleText)
         {
             if (_target is null)
@@ -461,6 +482,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             return -1;
         }
 
+        /// <summary>
+        /// Updates <see cref="SampleText"/> / <see cref="DisplayText"/> and raises <see cref="SampleChanged"/>.
+        /// </summary>
         private void _SetSampleText(string text, bool forceNotify = false)
         {
             if (!forceNotify && SampleText == text)
@@ -473,6 +497,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             SampleChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Stores highlight bounds and raises <see cref="HighlightChanged"/>.
+        /// </summary>
         private void _SetHighlight(int start, int length)
         {
             HighlightStart = start;
@@ -480,6 +507,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             HighlightChanged?.Invoke(this, EventArgs.Empty);
         }
 
+        /// <summary>
+        /// Raises CanGo* property and command can-execute changes.
+        /// </summary>
         private void _NotifyNavigationChanged()
         {
             OnPropertyChanged(nameof(CanGoPrevious));

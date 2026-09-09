@@ -147,6 +147,16 @@
     <Setter Property="MinWidth" Value="22" />
     <Setter Property="Padding" Value="0" />
   </Style>
+  <Style Selector="Border.rename-list-item-index">
+    <Setter Property="MinWidth" Value="28" />
+    <Setter Property="Height" Value="22" />
+    <Setter Property="Padding" Value="4,0" />
+    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+  </Style>
   <Style Selector="Border.format-editor-field-frame">
     <Setter Property="BorderThickness" Value="1" />
     <Setter Property="BorderBrush" Value="Transparent" />
