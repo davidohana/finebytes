@@ -239,8 +239,12 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Gets or sets whether this field is the Insert/Edit target of a hosting picker pane.
+        /// Gets or sets whether this field shows the multi-field Insert/Edit target cue.
         /// </summary>
+        /// <remarks>
+        /// Set by <see cref="FormatTokenPickerPane"/> only when more than one hosted format field
+        /// needs disambiguation. A sole field never gets the blue border (it is not keyboard focus).
+        /// </remarks>
         public bool IsActiveTarget
         {
             get => GetValue(IsActiveTargetProperty);

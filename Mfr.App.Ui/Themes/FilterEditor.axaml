@@ -159,8 +159,9 @@
   </Style>
   <Style Selector="Border.format-editor-field-frame">
     <Setter Property="BorderThickness" Value="1" />
-    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="ClipToBounds" Value="True" />
     <Setter Property="Padding" Value="0" />
   </Style>
   <Style Selector="Border.format-editor-field-frame.format-editor-active-target">
@@ -206,8 +207,8 @@
     <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
     <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
     <Setter Property="Padding" Value="4,2" />
     <Setter Property="HorizontalScrollBarVisibility" Value="Disabled" />
     <Setter Property="VerticalScrollBarVisibility" Value="Disabled" />

@@ -51,6 +51,35 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies a sole hosted format field stays the Insert target without the active-target border cue.
+        /// </summary>
+        [AvaloniaFact]
+        public void SingleEditor_IsActiveWithoutBorderCue()
+        {
+            var editor = new App.Ui.Views.FormatEditor.FormatEditor
+            {
+                AcceptsReturn = false,
+                ShowRightClickHint = false,
+            };
+            var pane = new FormatTokenPickerPane { Content = editor };
+            var window = new Window
+            {
+                Width = 480,
+                Height = 280,
+                Content = pane,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Same(editor, pane.ActiveEditor);
+            Assert.True(pane.HasActiveEditor);
+            Assert.False(editor.IsActiveTarget);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Insert targets the last-focused format field among multiple hosted editors.
         /// </summary>
         [AvaloniaFact]

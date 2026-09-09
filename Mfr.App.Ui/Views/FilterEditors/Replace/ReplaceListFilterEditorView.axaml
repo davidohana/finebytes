@@ -34,7 +34,6 @@
               />
             </controls:RichToolTip>
           </ToolTip.Tip>
-          <TextBlock Classes="filter-editor-label" Text="Entries:" />
           <fe:FormatEditor
             x:Name="EntriesEditor"
             MinWidth="240"

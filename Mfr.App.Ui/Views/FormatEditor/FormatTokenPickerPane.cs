@@ -15,8 +15,9 @@ namespace Mfr.App.Ui.Views.FormatEditor
     /// <para>
     /// Child content is the options body (<see cref="ContentControl.Content"/>). Descendant
     /// <see cref="FormatEditor"/> controls register on attach; Insert/Edit target the last-focused
-    /// editor (defaults to the first registered field). Per-field Insert/Edit chrome is hidden while
-    /// hosted here.
+    /// editor (defaults to the first registered field). The active-field border cue is shown only when
+    /// more than one format field is hosted (single-field panes must not look focused). Per-field
+    /// Insert/Edit chrome is hidden while hosted here.
     /// </para>
     /// <para>
     /// Collapse state is driven by bound <see cref="IsExpanded"/> (Filter Configuration option editors
@@ -179,7 +180,11 @@ namespace Mfr.App.Ui.Views.FormatEditor
             if (ActiveEditor is null)
             {
                 _SetActiveEditor(editor);
+                return;
             }
+
+            // Count may have crossed into multi-field; refresh the disambiguation cue.
+            _RefreshActiveTargetCues();
         }
 
         /// <summary>
@@ -191,8 +196,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
             ArgumentNullException.ThrowIfNull(editor);
 
             _editors.Remove(editor);
+            editor.IsActiveTarget = false;
             if (!ReferenceEquals(ActiveEditor, editor))
             {
+                _RefreshActiveTargetCues();
                 return;
             }
 
@@ -200,7 +207,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Marks <paramref name="editor"/> as the Insert/Edit target and updates the active-field cue.
+        /// Marks <paramref name="editor"/> as the Insert/Edit target and updates the multi-field cue.
         /// </summary>
         /// <param name="editor">Focused format editor under this pane.</param>
         public void SetActiveEditor(FormatEditor editor)
@@ -269,22 +276,25 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             if (ReferenceEquals(ActiveEditor, editor))
             {
+                _RefreshActiveTargetCues();
                 return;
             }
 
-            var previous = ActiveEditor;
             ActiveEditor = editor;
-            if (previous is { } prior)
-            {
-                prior.IsActiveTarget = false;
-            }
-
-            if (ActiveEditor is { } active)
-            {
-                active.IsActiveTarget = true;
-            }
-
+            _RefreshActiveTargetCues();
             _RefreshChrome();
+        }
+
+        /// <summary>
+        /// Applies <see cref="FormatEditor.IsActiveTarget"/> only when several fields need disambiguation.
+        /// </summary>
+        private void _RefreshActiveTargetCues()
+        {
+            var showCue = _editors.Count > 1;
+            foreach (var hosted in _editors)
+            {
+                hosted.IsActiveTarget = showCue && ReferenceEquals(hosted, ActiveEditor);
+            }
         }
 
         private void _RefreshChrome()
