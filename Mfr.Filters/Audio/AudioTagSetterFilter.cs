@@ -153,6 +153,11 @@ namespace Mfr.Filters.Audio
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
         {
+            if (!_HasAnyConfiguredSemanticField())
+            {
+                return;
+            }
+
             item.EnsureTagLibLoaded();
             var tags = item.Preview.AudioTagOverlay;
             var semanticTag = SemanticAudioTag.FromOverlay(tags);
@@ -369,11 +374,6 @@ namespace Mfr.Filters.Audio
                     fieldLabel: "discCount",
                     static (m, v) => m with { DiscCount = v }
                 );
-            }
-
-            if (!_HasAnyConfiguredSemanticField())
-            {
-                return;
             }
 
             tags.MergeSemantic(semanticTag);

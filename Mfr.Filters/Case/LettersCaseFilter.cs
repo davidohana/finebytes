@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text;
 
 namespace Mfr.Filters.Case
@@ -146,7 +147,7 @@ namespace Mfr.Filters.Case
                 LettersCaseMode.Capitalize => _ApplyCapitalize(value, Options.CapitalizeSkipWords, item.WordSeparator),
                 LettersCaseMode.SentenceCase => _ApplySentenceCase(value, item.WordSeparator, item.SentenceEndChars),
                 LettersCaseMode.InvertCase => _InvertCase(value),
-                _ => value,
+                _ => throw new UnreachableException(),
             };
         }
 

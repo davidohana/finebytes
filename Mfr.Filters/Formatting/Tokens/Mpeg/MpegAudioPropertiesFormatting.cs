@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 
 namespace Mfr.Filters.Formatting.Tokens.Mpeg
@@ -33,7 +34,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
                 MpegAudioPropertyField.Mode => mpeg.ChannelMode,
                 MpegAudioPropertyField.Original => PropertyValueFormatting.YesNo(mpeg.IsOriginal),
                 MpegAudioPropertyField.Protection => PropertyValueFormatting.YesNo(mpeg.IsProtected),
-                _ => string.Empty,
+                _ => throw new UnreachableException(),
             };
         }
 

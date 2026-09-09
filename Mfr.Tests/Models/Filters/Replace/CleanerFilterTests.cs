@@ -125,5 +125,21 @@ namespace Mfr.Tests.Models.Filters.Replace
             );
             Assert.Equal("ba", FilterTestHelpers.ApplyToPrefix(f, "a"));
         }
+
+        /// <summary>
+        /// Verifies clearing custom chars via <c>with</c> does not keep the prior setup cache.
+        /// </summary>
+        [Fact]
+        public void With_ClearingCustomChars_DropsPriorCleanup()
+        {
+            var filter = new CleanerFilter(
+                _target,
+                new CleanerOptions(RemoveIllegalChars: false, CustomCharsToRemove: "@", Replacement: "_")
+            );
+            filter.Setup();
+
+            var cleared = filter with { Options = filter.Options with { CustomCharsToRemove = "" } };
+            Assert.Equal("a@b", FilterTestHelpers.ApplyToPrefix(cleared, "a@b"));
+        }
     }
 }

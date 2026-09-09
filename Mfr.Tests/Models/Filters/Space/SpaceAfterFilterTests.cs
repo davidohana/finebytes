@@ -78,5 +78,18 @@ namespace Mfr.Tests.Models.Filters.Space
             afterFilter.Apply(item);
             Assert.Equal("x,_y", item.Preview.Prefix);
         }
+
+        /// <summary>
+        /// Verifies clearing AfterChars via <c>with</c> does not keep the prior trigger cache.
+        /// </summary>
+        [Fact]
+        public void With_ClearingAfterChars_DropsPriorTriggers()
+        {
+            var filter = _CreateFilter(",");
+            filter.Setup();
+
+            var cleared = filter with { Options = filter.Options with { AfterChars = "" } };
+            Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(cleared, "a,b"));
+        }
     }
 }

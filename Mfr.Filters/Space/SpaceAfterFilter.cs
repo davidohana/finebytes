@@ -28,6 +28,8 @@ namespace Mfr.Filters.Space
         StringApplyScope? ApplyScope = null
     ) : StringTargetFilter(Target, ApplyScope)
     {
+        private HashSet<char>? _triggerChars;
+
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, comma/semicolon/exclamation triggers).
         /// </summary>
@@ -40,14 +42,21 @@ namespace Mfr.Filters.Space
         /// </summary>
         public override string Type => "SpaceAfter";
 
+        /// <inheritdoc />
+        protected override void _Setup()
+        {
+            // Unconditional assign (BaseFilter._Setup): `with` copies this field; empty AfterChars must clear it.
+            _triggerChars = string.IsNullOrEmpty(Options.AfterChars) ? null : [.. Options.AfterChars];
+        }
+
         protected override string _TransformValue(string value, RenameItem item)
         {
-            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(Options.AfterChars))
+            var triggers = _triggerChars;
+            if (string.IsNullOrEmpty(value) || triggers is null)
             {
                 return value;
             }
 
-            var triggers = new HashSet<char>(Options.AfterChars);
             var sep = item.WordSeparator;
             var onlyWhenNext = Options.OnlyWhenNextIsLetterOrDigit;
             var builder = new StringBuilder(value.Length + 8);

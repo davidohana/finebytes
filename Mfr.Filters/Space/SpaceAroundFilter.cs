@@ -31,6 +31,8 @@ namespace Mfr.Filters.Space
         StringApplyScope? ApplyScope = null
     ) : StringTargetFilter(Target, ApplyScope)
     {
+        private HashSet<char>? _triggerChars;
+
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, hyphen triggers).
         /// </summary>
@@ -45,14 +47,21 @@ namespace Mfr.Filters.Space
         /// </summary>
         public override string Type => "SpaceAround";
 
+        /// <inheritdoc />
+        protected override void _Setup()
+        {
+            // Unconditional assign (BaseFilter._Setup): `with` copies this field; empty AroundChars must clear it.
+            _triggerChars = string.IsNullOrEmpty(Options.AroundChars) ? null : [.. Options.AroundChars];
+        }
+
         protected override string _TransformValue(string value, RenameItem item)
         {
-            if (string.IsNullOrEmpty(value) || string.IsNullOrEmpty(Options.AroundChars))
+            var triggers = _triggerChars;
+            if (string.IsNullOrEmpty(value) || triggers is null)
             {
                 return value;
             }
 
-            var triggers = new HashSet<char>(Options.AroundChars);
             var sep = item.WordSeparator;
             var onlyWhenNeighbor = Options.OnlyWhenNeighboringAreLettersOrDigits;
             var builder = new StringBuilder(value.Length + 16);

@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+using System.Text;
 
 namespace Mfr.Filters
 {
@@ -17,8 +17,27 @@ namespace Mfr.Filters
         {
             ArgumentNullException.ThrowIfNull(value);
 
-            var pattern = Regex.Escape(character.ToString()) + "{2,}";
-            return Regex.Replace(value, pattern, _ => character.ToString());
+            if (value.Length < 2)
+            {
+                return value;
+            }
+
+            var builder = new StringBuilder(value.Length);
+            var previous = value[0];
+            builder.Append(previous);
+            for (var i = 1; i < value.Length; i++)
+            {
+                var c = value[i];
+                if (c == character && previous == character)
+                {
+                    continue;
+                }
+
+                builder.Append(c);
+                previous = c;
+            }
+
+            return builder.ToString();
         }
     }
 }

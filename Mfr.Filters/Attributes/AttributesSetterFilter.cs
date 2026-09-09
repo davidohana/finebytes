@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Text.Json.Serialization;
 
 namespace Mfr.Filters.Attributes
@@ -78,7 +79,7 @@ namespace Mfr.Filters.Attributes
                 AttributeTriState.Keep => current,
                 AttributeTriState.Set => current | flag,
                 AttributeTriState.Clear => current & ~flag,
-                _ => current,
+                _ => throw new UnreachableException(),
             };
         }
     }

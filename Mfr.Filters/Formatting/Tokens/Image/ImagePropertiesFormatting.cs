@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using Mfr.Utils;
 
@@ -30,7 +31,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
                 ImagePropertyField.HorizontalResolutionDpi => _FormatDpi(image.HorizontalResolutionDpi),
                 ImagePropertyField.VerticalResolutionDpi => _FormatDpi(image.VerticalResolutionDpi),
                 ImagePropertyField.FrameCount => PropertyValueFormatting.PositiveInt(image.FrameCount),
-                _ => string.Empty,
+                _ => throw new UnreachableException(),
             };
         }
 

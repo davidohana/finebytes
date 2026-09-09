@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting
 {
@@ -46,7 +45,7 @@ namespace Mfr.Filters.Formatting
         StringApplyScope? ApplyScope = null
     ) : StringTargetFilter(Target, ApplyScope)
     {
-        private Formatter? _compiledText;
+        private Formatter _compiledText = FormatStringCompiler.EmptyFormatter;
 
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, position 1 from start).
@@ -84,8 +83,7 @@ namespace Mfr.Filters.Formatting
         /// <inheritdoc />
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var compiledText = Check.NotNull(_compiledText, "InserterFilter setup must complete before transform.");
-            var inserted = compiledText(item);
+            var inserted = _compiledText(item);
             if (inserted.Length == 0)
             {
                 return value;

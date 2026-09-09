@@ -1,6 +1,6 @@
 ---
 name: Whole codebase review
-overview: "Phased whole-repo review: Phase 0–1 done. Next: Phase 2 Metadata + Tags. Each phase applies high-confidence fixes in-pass and reports remaining findings plus ranked deeper refactors."
+overview: "Phased whole-repo review: Phase 0–1 + 3 done. Next: Phase 2 Metadata + Tags (still pending), then Phase 4 Engine."
 todos:
   - id: phase-0
     content: "Phase 0: Architecture/layering gate + plan file bootstrap"
@@ -13,7 +13,7 @@ todos:
     status: pending
   - id: phase-3
     content: "Phase 3: Filters pipeline (Formatting last) — mfr-code-review + autofix"
-    status: pending
+    status: completed
   - id: phase-4
     content: "Phase 4: Engine Preview + Commit risk gate (+ bugbot)"
     status: pending
@@ -72,8 +72,8 @@ flowchart TD
 | ----------------------------------- | -------- | ----------------------------------------------------------------- |
 | **0** Architecture / layering       | **done** | Project graph healthy; Services→Views fixed; arch tests tightened |
 | **1** Utils + Models                | **done** | Numeric parity + Windows path chars; TextValues deleted           |
-| **2** Metadata + Tags               | pending  | Next                                                              |
-| **3** Filters                       | pending  |                                                                   |
+| **2** Metadata + Tags               | pending  | Still next (skipped ahead to 3 in one pass)                       |
+| **3** Filters                       | **done** | Setup caches + exhaustiveness; Formatting tokens OK               |
 | **4** Engine Preview/Commit         | pending  |                                                                   |
 | **5** Session/Config                | pending  |                                                                   |
 | **6** File List                     | pending  |                                                                   |
@@ -161,6 +161,39 @@ Utils/Models numeric + path policy aligned; dead twin removed. Ready for Phase 2
 
 ______________________________________________________________________
 
+## Phase 3 — L3 Filters pipeline (done)
+
+**Scope:** `Mfr.Filters/` by group (Formatting tokens/compiler last), `FilterCatalog`, `BaseFilter` setup caches; matching `Mfr.Tests/Models/Filters/`. Explore subagent used for cross-file twins.
+
+**Verdict:** Pipeline is sound — palette reflection + `PresetJsonOptions` stay aligned via existing catalog/polymorphism tests; `_Setup` caches that existed were already unconditional. Applied local setup-cache moves, exhaustiveness, and CharacterRun/KISS cleanup. Leftovers are structural (regex compile per replace, sentence-casing twins, ConfigStore line-length).
+
+### Applied (high confidence)
+
+1. **Setup caches** for char-set options that rebuilt `HashSet` every transform: `CleanerFilter`, `SpaceAfterFilter`, `SpaceAroundFilter`, `CapitalizeAfterFilter` (unconditional assign / clear-to-null for `with`).
+1. **`CharacterRunHelpers`:** regex → linear collapse (Shrink Spaces / Shrink Duplicate Characters).
+1. **`AudioTagSetterFilter`:** early-return when no semantic fields configured (skip `EnsureTagLibLoaded` / merge).
+1. **Exhaustive switches:** `LettersCaseFilter`, `AttributesSetterFilter`, Media/Image/Mpeg property formatters → `UnreachableException` (no silent fall-through).
+1. **Dead `partial`** on `FormatterFilter`; non-nullable compiled `Formatter` fields on Formatter / Inserter / NameList / ReplaceList (drop `Check.NotNull` after setup).
+1. **Tests:** Cleaner + SpaceAfter `with`-clear drops prior cache; full `Mfr.Tests.Models.Filters` suite green (731).
+
+### Correctness (found, not changed)
+
+| Item                                             | Notes                                                                                                                                                                        |
+| ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ContainsLikelyFormatTokens` vs always-`Compile` | Inserter / AudioTag / Id3v2 use heuristic literals; Replacer / ReplaceList / Formatter / NameList / PathMover always compile (MFR7 format-string replacements). Intentional. |
+| `ListEntryLength` → `ConfigStore`                | Filters read process config max line length; ownership smell → Phase 5                                                                                                       |
+| `UppercaseInitialsFilter` SYSLIB1045 disable     | Documented; GeneratedRegex noise — leave                                                                                                                                     |
+
+### Deeper refactors (promoted to backlog)
+
+See backlog items 6–9 below.
+
+### Phase 3 exit
+
+Filters setup/transform hygiene improved; Formatting registry/compiler coherent. Ready for Phase 4 (Engine Preview/Commit) once Phase 2 is done or explicitly skipped again.
+
+______________________________________________________________________
+
 ## Deeper refactors backlog
 
 Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
@@ -200,6 +233,34 @@ Ranked cost-to-value. Do not duplicate f5/f6 “already done.”
    Cost: high
    Rank: low — skip unless UI pass demands it
 
+1. **Cache compiled regex in Replacer / ReplaceList setup**
+   Sites: `ReplacerMatching.ReplaceSegment` builds `new Regex` every call; filters already `_Setup`
+   Target: compile pattern (+ flags) once in `_Setup`, reuse in transform (list = one regex per entry)
+   Value: preview cost on large lists
+   Cost: medium — mode/flags/`with` must invalidate; WholeWord wrapping
+   Rank: medium — do when profiling preview or touching Replace
+
+1. **Sentence-initial uppercasing twin**
+   Sites: `LettersCaseFilter._ApplySentenceCase` vs `CasingListFilter._UppercaseSentenceInitials` (ASCII-letter vs `IsLetter` nuance)
+   Target: one shared helper **only if** MFR7 parity allows unifying letter detection
+   Value: one behavior for sentence starts
+   Cost: medium behavior risk
+   Rank: medium — Case group only if product wants one rule
+
+1. **`AudioTagSetterFilter` PascalCase private formatter fields**
+   Sites: `PerformersFormatter`, `TitleFormatter`, …
+   Target: `_performersFormatter`-style names (or a field→formatter map)
+   Value: naming clarity; optional map reduces ApplyCore boilerplate
+   Cost: medium churn in one large file
+   Rank: low–medium — rename anytime; map only if editing the filter again
+
+1. **`ListEntryLength` / max line length off `ConfigStore`**
+   Sites: `ListEntryLength`; Name/Replace/Casing list parsers
+   Target: inject max length or read from a Filters-owned options type at setup (Phase 5 config pass)
+   Value: clearer ownership; testability
+   Cost: medium with config reshape
+   Rank: medium — Phase 5
+
 ______________________________________________________________________
 
 ## Remaining phase briefs
@@ -207,10 +268,6 @@ ______________________________________________________________________
 ### Phase 2 — L2 Metadata + Tags
 
 **Scope:** `Mfr.Metadata/`, `Mfr.Models/Tags/`, docs `audio-tag-model.md` / `image-metadata-model.md`, `Mfr.Tests/Metadata/`.
-
-### Phase 3 — L3 Filters pipeline
-
-**Scope:** `Mfr.Filters/` by group (Formatting tokens/compiler **last**), `FilterCatalog`, `BaseFilter` setup caches.
 
 ### Phase 4 — L4 Engine Preview + Commit (risk gate)
 

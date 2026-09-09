@@ -1,5 +1,4 @@
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting
 {
@@ -16,13 +15,13 @@ namespace Mfr.Filters.Formatting
     /// <param name="Options">Formatter options.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>
     [FilterPalette(FilterGroup.Formatting, "Formatter")]
-    public sealed partial record FormatterFilter(
+    public sealed record FormatterFilter(
         FilterTarget Target,
         FormatterOptions Options,
         StringApplyScope? ApplyScope = null
     ) : StringTargetFilter(Target, ApplyScope)
     {
-        private Formatter? _compiledTemplate;
+        private Formatter _compiledTemplate = FormatStringCompiler.EmptyFormatter;
 
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty template).
@@ -44,7 +43,7 @@ namespace Mfr.Filters.Formatting
         protected override string _TransformValue(string value, RenameItem item)
         {
             _ = value;
-            return Check.NotNull(_compiledTemplate, "FormatterFilter setup must complete before transform.")(item);
+            return _compiledTemplate(item);
         }
     }
 }

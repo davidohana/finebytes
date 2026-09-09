@@ -1,5 +1,4 @@
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting
 {
@@ -44,8 +43,8 @@ namespace Mfr.Filters.Formatting
         StringApplyScope? ApplyScope = null
     ) : StringTargetFilter(Target, ApplyScope)
     {
-        private Formatter? _compiledPrefix;
-        private Formatter? _compiledSuffix;
+        private Formatter _compiledPrefix = FormatStringCompiler.EmptyFormatter;
+        private Formatter _compiledSuffix = FormatStringCompiler.EmptyFormatter;
 
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty list).
@@ -82,9 +81,6 @@ namespace Mfr.Filters.Formatting
                 return value;
             }
 
-            var compiledPrefix = Check.NotNull(_compiledPrefix, "Name-list setup must complete before transform.");
-            var compiledSuffix = Check.NotNull(_compiledSuffix, "Name-list setup must complete before transform.");
-
             var index = item.Original.RenameListIndex;
             if (index < 0 || index >= entries.Count)
             {
@@ -94,7 +90,7 @@ namespace Mfr.Filters.Formatting
             }
 
             var middle = entries[index] ?? string.Empty;
-            return compiledPrefix(item) + middle + compiledSuffix(item);
+            return _compiledPrefix(item) + middle + _compiledSuffix(item);
         }
     }
 }

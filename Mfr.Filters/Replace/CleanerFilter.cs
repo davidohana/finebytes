@@ -21,6 +21,8 @@ namespace Mfr.Filters.Replace
     public sealed record CleanerFilter(FilterTarget Target, CleanerOptions Options, StringApplyScope? ApplyScope = null)
         : StringTargetFilter(Target, ApplyScope)
     {
+        private HashSet<char>? _charsToClean;
+
         /// <summary>
         /// Creates a filter with add-to-list defaults (file prefix, illegal chars on, MFR7 custom cleanup list).
         /// </summary>
@@ -39,17 +41,25 @@ namespace Mfr.Filters.Replace
         /// </summary>
         public override string Type => "Cleaner";
 
-        protected override string _TransformValue(string value, RenameItem item)
+        /// <inheritdoc />
+        protected override void _Setup()
         {
-            // Windows illegal-name set: this product renames Windows files (see WindowsFileNameChars).
+            // Unconditional assign (BaseFilter._Setup): `with` copies this field; clearing options must rebuild.
             var customChars = Options.CustomCharsToRemove ?? "";
             var chars = customChars.ToHashSet();
             if (Options.RemoveIllegalChars)
             {
+                // Windows illegal-name set: this product renames Windows files (see WindowsFileNameChars).
                 WindowsFileNameChars.AddInvalidTo(chars);
             }
 
-            if (chars.Count == 0)
+            _charsToClean = chars.Count == 0 ? null : chars;
+        }
+
+        protected override string _TransformValue(string value, RenameItem item)
+        {
+            var chars = _charsToClean;
+            if (chars is null)
             {
                 return value;
             }

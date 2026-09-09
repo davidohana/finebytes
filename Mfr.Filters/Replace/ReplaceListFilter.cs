@@ -1,6 +1,5 @@
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Utils;
 
 namespace Mfr.Filters.Replace
 {
@@ -36,7 +35,7 @@ namespace Mfr.Filters.Replace
         StringApplyScope? ApplyScope = null
     ) : StringTargetFilter(Target, ApplyScope)
     {
-        private List<(string Search, Formatter CompiledReplacement)>? _compiledEntries;
+        private List<(string Search, Formatter CompiledReplacement)> _compiledEntries = [];
 
         /// <summary>
         /// Creates a filter with add-to-list defaults (file prefix, empty list, replace all, whole word).
@@ -55,6 +54,7 @@ namespace Mfr.Filters.Replace
         protected override void _Setup()
         {
             var entries = ReplaceListParser.Validate(Options.Entries);
+            // Unconditional assign (BaseFilter._Setup): `with` copies this field; empty list must clear prior entries.
             _compiledEntries = [.. entries.Select(e => (e.Search, FormatStringCompiler.Compile(e.Replacement)))];
 
             if (Options.Match.Mode != ReplacerMode.Regex)
@@ -70,14 +70,13 @@ namespace Mfr.Filters.Replace
 
         protected override string _TransformValue(string value, RenameItem item)
         {
-            var compiledEntries = Check.NotNull(_compiledEntries, "Replace-list setup must complete before transform.");
-            if (compiledEntries.Count == 0)
+            if (_compiledEntries.Count == 0)
             {
                 return value;
             }
 
             var transformed = value;
-            foreach (var (search, compiledReplacement) in compiledEntries)
+            foreach (var (search, compiledReplacement) in _compiledEntries)
             {
                 var replacement = compiledReplacement(item);
                 var replacerOptions = new ReplacerOptions(Find: search, Replacement: replacement, Match: Options.Match);

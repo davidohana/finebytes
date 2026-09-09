@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace Mfr.Filters.Formatting.Tokens.Media
 {
     /// <summary>
@@ -35,7 +37,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
                 MediaPropertyField.PhotoWidth => PropertyValueFormatting.PositiveInt(media.PhotoWidth),
                 MediaPropertyField.PhotoHeight => PropertyValueFormatting.PositiveInt(media.PhotoHeight),
                 MediaPropertyField.PhotoQuality => PropertyValueFormatting.PositiveInt(media.PhotoQuality),
-                _ => string.Empty,
+                _ => throw new UnreachableException(),
             };
         }
     }
