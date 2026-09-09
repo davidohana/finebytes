@@ -29,7 +29,7 @@ Add the missing **Preview** section to [`FormatTokenEditorDialog`](../../Mfr.App
 ## Behavior
 
 - **Shared** for every token that opens this dialog.
-- Sample = rename-list item **full file name** (`Prefix + Extension`), read-only.
+- Sample = rename-list item **full file name** (`FileMeta.FullFileName`), read-only.
 - ▲ / ▼ + **1-based** index label; start at index 0.
 - Output = evaluate **only** the token under edit (`ResultingFormatString`).
 - Empty list: `"<Rename list is empty>"` / `"<Preview N/A>"`, buttons disabled.

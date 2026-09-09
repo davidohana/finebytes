@@ -29,13 +29,13 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `<file-name>`                 | Preview prefix (no extension).                                                                                                            |
 | `<file-extension>` or `<ext>` | Preview extension (without leading dot).                                                                                                  |
-| `<full-name>`                 | Preview prefix + extension.                                                                                                               |
+| `<full-name>`                 | Preview full file name (`Prefix` + `.` + `Extension` when present).                                                                       |
 | `<parent-folder>`             | Name of the immediate parent folder (level 1) from preview directory.                                                                     |
 | `<parent-folder:level>`       | Ancestor folder name at the given level (1 = immediate parent, 2 = grandparent, …). Returns empty when level exceeds path depth.          |
 | `<full-path>`                 | Preview full path of the file.                                                                                                            |
 | `<file-or-folder>`            | `File` or `Folder` from original `Attributes.IsDirectory` (read-only; no Apply target).                                                   |
-| `<file-name-numeric-value>`   | First contiguous digit run in the preview full name (prefix + extension; leading zeros stripped); `0` when none. Useful for numeric sort. |
-| `<file-name-length>`          | Character length of the preview full name (prefix + extension).                                                                           |
+| `<file-name-numeric-value>`   | First contiguous digit run in the preview full file name (leading zeros stripped); `0` when none. Useful for numeric sort.                |
+| `<file-name-length>`          | Character length of the preview full file name.                                                                                           |
 | `<full-path-length>`          | Character length of the preview full path.                                                                                                |
 
 #### Audio tags (canonical overlay)

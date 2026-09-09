@@ -76,7 +76,7 @@ namespace Mfr.Models.Rename
         public static string ExtensionWithoutDot(string path)
         {
             var extension = Path.GetExtension(path);
-            return extension.StartsWith('.') ? extension[1..] : extension;
+            return extension.Length == 0 ? string.Empty : extension[1..];
         }
 
         /// <summary>

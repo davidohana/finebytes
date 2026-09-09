@@ -113,7 +113,7 @@ namespace Mfr.Tests.Models.Filters
                 return AudioContainerFormat.Unknown;
             }
 
-            return extension.Trim().TrimStart('.').ToLowerInvariant() switch
+            return extension.Trim().ToLowerInvariant() switch
             {
                 "mp3" or "mp2" or "mp1" => AudioContainerFormat.Mpeg,
                 "flac" => AudioContainerFormat.Flac,

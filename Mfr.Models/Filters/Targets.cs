@@ -36,7 +36,7 @@ namespace Mfr.Models.Filters
     public sealed record FileExtensionTarget : FilterTarget;
 
     /// <summary>
-    /// Targets the full file name (<c>prefix + extension</c>); writes parse with <see cref="M:System.IO.Path.GetFileName(System.String)"/> rules.
+    /// Targets the full file name (<see cref="Rename.FileMeta.FullFileName"/>); writes parse with <see cref="M:System.IO.Path.GetFileName(System.String)"/> rules.
     /// </summary>
     public sealed record FileFullNameTarget : FilterTarget;
 
@@ -52,7 +52,7 @@ namespace Mfr.Models.Filters
     public sealed record AncestorFolderTarget(int Level) : FilterTarget;
 
     /// <summary>
-    /// Targets the item’s preview full file path (<c>directory + prefix + extension</c>).
+    /// Targets the item’s preview full file path (<see cref="Rename.FileMeta.FullPath"/>).
     /// </summary>
     /// <remarks>
     /// Writes must assign a fully qualified path that includes directory and file name.
