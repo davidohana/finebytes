@@ -112,6 +112,23 @@
     <Setter Property="Height" Value="22" />
     <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
+  <!--
+    Fluent paints PART_BorderElement accent-blue on :focus/:pointerover; that fights FormatEditor
+    chrome frames. Keep AppChrome borders so Find-style TextBoxes match Replace.
+  -->
+  <Style
+    Selector="TextBox.filter-editor-field /template/ Border#PART_BorderElement,
+              TextBox.filter-editor-field-wrap /template/ Border#PART_BorderElement,
+              TextBox.filter-editor-field:pointerover /template/ Border#PART_BorderElement,
+              TextBox.filter-editor-field:focus /template/ Border#PART_BorderElement,
+              TextBox.filter-editor-field:focus-within /template/ Border#PART_BorderElement,
+              TextBox.filter-editor-field-wrap:pointerover /template/ Border#PART_BorderElement,
+              TextBox.filter-editor-field-wrap:focus /template/ Border#PART_BorderElement,
+              TextBox.filter-editor-field-wrap:focus-within /template/ Border#PART_BorderElement"
+  >
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+  </Style>
   <Style Selector="TextBox.filter-editor-field[IsReadOnly=True], TextBox.filter-editor-field-wrap[IsReadOnly=True]">
     <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
@@ -121,8 +138,10 @@
               TextBox.filter-editor-field-wrap[IsReadOnly=True] /template/ Border#PART_BorderElement,
               TextBox.filter-editor-field[IsReadOnly=True]:pointerover /template/ Border#PART_BorderElement,
               TextBox.filter-editor-field[IsReadOnly=True]:focus /template/ Border#PART_BorderElement,
+              TextBox.filter-editor-field[IsReadOnly=True]:focus-within /template/ Border#PART_BorderElement,
               TextBox.filter-editor-field-wrap[IsReadOnly=True]:pointerover /template/ Border#PART_BorderElement,
-              TextBox.filter-editor-field-wrap[IsReadOnly=True]:focus /template/ Border#PART_BorderElement"
+              TextBox.filter-editor-field-wrap[IsReadOnly=True]:focus /template/ Border#PART_BorderElement,
+              TextBox.filter-editor-field-wrap[IsReadOnly=True]:focus-within /template/ Border#PART_BorderElement"
   >
     <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />

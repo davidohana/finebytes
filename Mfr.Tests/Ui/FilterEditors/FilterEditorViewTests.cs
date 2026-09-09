@@ -238,6 +238,18 @@ namespace Mfr.Tests.Ui.FilterEditors
                 .First(border => border.Classes.Contains("filter-editor-title-bar"));
             Assert.Equal(22, titleBar.MinHeight);
 
+            Assert.True(box.Focus());
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var app = Assert.IsAssignableFrom<Application>(Application.Current);
+            Assert.True(app.TryGetResource("AppChromeBorderBrush", app.ActualThemeVariant, out var chromeBorder));
+            var border = Assert.Single(
+                box.GetVisualDescendants().OfType<Border>(),
+                part => part.Name == "PART_BorderElement"
+            );
+            Assert.Same(chromeBorder, border.BorderBrush);
+
             window.Close();
         }
 
