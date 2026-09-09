@@ -47,6 +47,9 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.False(started);
             Assert.False(shutdown);
             Assert.False(viewModel.SuppressSessionSaveOnClose);
+
+            // Closing must not hit real AppData; Cancel leaves SuppressSessionSaveOnClose false.
+            viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
         }
 
@@ -154,6 +157,8 @@ namespace Mfr.Tests.Ui.MainWindow
 
             Assert.Equal(1, confirmCalls);
             Assert.Equal(1, deleted);
+            // OK path already sets SuppressSessionSaveOnClose; keep it so Close cannot write AppData.
+            Assert.True(viewModel.SuppressSessionSaveOnClose);
             window.Close();
         }
     }
