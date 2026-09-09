@@ -56,7 +56,7 @@
       <TextBox
         x:Name="TrimHelperText"
         Grid.Column="2"
-        Classes="filter-editor-field"
+        Classes="filter-editor-field format-string-field"
         IsReadOnly="True"
         AcceptsReturn="False"
         TextWrapping="NoWrap"
