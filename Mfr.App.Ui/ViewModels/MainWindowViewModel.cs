@@ -315,6 +315,7 @@ namespace Mfr.App.Ui.ViewModels
         private void _OnPreviewInputsChanged(object? sender, EventArgs e)
         {
             _RequestPreview();
+            FilterEditorViewModel.RefreshTrimHelperRenameItems();
         }
 
         /// <summary>

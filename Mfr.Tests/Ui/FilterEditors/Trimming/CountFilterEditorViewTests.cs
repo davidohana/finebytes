@@ -124,6 +124,25 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies Visual Trim Helper exposes ▲/▼ navigation controls.
+        /// </summary>
+        [AvaloniaFact]
+        public void Visual_trim_helper_exposes_navigation_buttons()
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var helperView = editorView.GetVisualDescendants().OfType<VisualTrimHelperView>().Single();
+            Assert.NotNull(helperView.FindControl<Button>("TrimHelperPreviousButton"));
+            Assert.NotNull(helperView.FindControl<Button>("TrimHelperNextButton"));
+            Assert.NotNull(helperView.FindControl<TextBlock>("TrimHelperItemIndexLabel"));
+
+            window.Close();
+        }
+
         private static int _CountOf(BaseFilter filter)
         {
             return Assert.IsAssignableFrom<ICountOptionsFilter>(filter).Options.Count;

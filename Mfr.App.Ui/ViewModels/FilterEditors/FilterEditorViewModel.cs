@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Models.Config;
 using Mfr.Models.Rename;
 
@@ -83,10 +84,26 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             var step = selectedSteps.Count > 0 ? selectedSteps[0] : null;
             HasSelectedStep = step is not null;
             TitleText = step is null ? string.Empty : $"Applied Filter: {step.DisplayName}";
-            var sampleItems = _resolveSampleRenameItems?.Invoke();
             OptionsEditor = step is null
                 ? null
-                : FilterOptionsEditorFactory.Create(step, sampleItems, _resolveRenameItemByFullPath);
+                : FilterOptionsEditorFactory.Create(step, _resolveSampleRenameItems, _resolveRenameItemByFullPath);
+        }
+
+        /// <summary>
+        /// Reloads Visual Trim Helper Rename List navigation when the list membership changes.
+        /// </summary>
+        internal void RefreshTrimHelperRenameItems()
+        {
+            if (OptionsEditor is CountFilterEditorViewModel count)
+            {
+                count.TrimHelper.RefreshRenameItems();
+                return;
+            }
+
+            if (OptionsEditor is TrimBetweenFilterEditorViewModel trimBetween)
+            {
+                trimBetween.TrimHelper.RefreshRenameItems();
+            }
         }
 
         partial void OnFormatTokenPickerExpandedChanged(bool value)

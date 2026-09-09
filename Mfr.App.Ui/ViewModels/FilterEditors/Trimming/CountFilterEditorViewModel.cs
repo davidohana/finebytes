@@ -15,23 +15,30 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        /// <param name="sampleRenameItems">Rename List items for Visual Trim Helper init; may be empty.</param>
+        /// <param name="sampleRenameItems">
+        /// Optional Rename List snapshot for Visual Trim Helper init; used when
+        /// <paramref name="resolveSampleRenameItems"/> is null.
+        /// </param>
         /// <param name="resolveRenameItemByFullPath">
         /// Looks up a Rename List row by original full path for helper drag-drop.
+        /// </param>
+        /// <param name="resolveSampleRenameItems">
+        /// Live Rename List items for helper init/navigation; preferred over a one-shot snapshot.
         /// </param>
         public CountFilterEditorViewModel(
             AppliedFilterStepViewModel step,
             IReadOnlyList<RenameItem>? sampleRenameItems = null,
-            Func<string, RenameItem?>? resolveRenameItemByFullPath = null
+            Func<string, RenameItem?>? resolveRenameItemByFullPath = null,
+            Func<IReadOnlyList<RenameItem>>? resolveSampleRenameItems = null
         )
             : base(step)
         {
             TrimHelper = new VisualTrimHelperViewModel();
             TrimHelper.SelectionApplied += _OnTrimHelperSelectionApplied;
             TrimHelper.SampleChanged += _OnTrimHelperSampleChanged;
-            _ConfigureTrimHelper(resolveRenameItemByFullPath);
+            _ConfigureTrimHelper(resolveRenameItemByFullPath, resolveSampleRenameItems, sampleRenameItems);
             _SyncFromFilter();
-            TrimHelper.InitFromRenameItems(sampleRenameItems ?? []);
+            TrimHelper.InitFromRenameItems();
             TrimHelper.SyncHighlightFromCount(ClampToInt(Count, 0, 9999));
         }
 
@@ -68,7 +75,11 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             }
         }
 
-        private void _ConfigureTrimHelper(Func<string, RenameItem?>? resolveRenameItemByFullPath)
+        private void _ConfigureTrimHelper(
+            Func<string, RenameItem?>? resolveRenameItemByFullPath,
+            Func<IReadOnlyList<RenameItem>>? resolveSampleRenameItems,
+            IReadOnlyList<RenameItem>? sampleRenameItems
+        )
         {
             if (Step.Filter is not StringTargetFilter stringFilter)
             {
@@ -81,7 +92,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
                 TrimRightFilter or ExtractRightFilter => VisualTrimHelperMapping.Mode.RightEdge,
                 _ => VisualTrimHelperMapping.Mode.LeftEdge,
             };
-            TrimHelper.Configure(mode, stringFilter.Target, resolveRenameItemByFullPath);
+            var resolveItems =
+                resolveSampleRenameItems ?? (sampleRenameItems is null ? null : () => sampleRenameItems);
+            TrimHelper.Configure(mode, stringFilter.Target, resolveRenameItemByFullPath, resolveItems);
         }
 
         private void _OnTrimHelperSelectionApplied(object? sender, EventArgs e)

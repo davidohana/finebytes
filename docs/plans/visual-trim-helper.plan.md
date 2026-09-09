@@ -9,8 +9,9 @@ Implemented: shared helper control, Count + Trim Between wiring, Rename List sam
 ## Behavior (MFR7 parity)
 
 - Read-only sample text box labeled **Visual Trim Helper:**; placeholder `[ Drag Item Here ]`.
-- **Init:** first Rename List item’s Apply Target string via `FilterTargetText` on **Original**.
-- **Drop:** Rename List item only (resolve via Apply Target). File List / Explorer / plain text drops are rejected.
+- **Init:** first Rename List item’s Apply Target string via `FilterTargetText` on **Original** (live list resolver).
+- **Navigate:** ▲ / ▼ cycle Rename List items (same pattern as Format Token Preview); index label shows 1-based position. Reloads the live list on show / membership change so buttons enable after late adds.
+- **Drop:** Rename List item only (resolve via Apply Target); syncs navigator index when the path is in the list. File List / Explorer / plain text drops are rejected.
 - **Selection → options** on pointer release (works on sample **or** the `[ Drag Item Here ]` placeholder, matching MFR7):
   - Left Trim / Left Extract → force `[0, end)` → `Count`
   - Right Trim / Right Extract → force `[start, N)` → `Count`

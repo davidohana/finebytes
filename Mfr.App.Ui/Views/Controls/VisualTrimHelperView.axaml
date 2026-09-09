@@ -11,18 +11,60 @@
   x:Class="Mfr.App.Ui.Views.Controls.VisualTrimHelperView"
   x:DataType="vm:VisualTrimHelperViewModel"
 >
+  <UserControl.Styles>
+    <Style Selector="Border.trim-helper-item-index">
+      <Setter Property="MinWidth" Value="28" />
+      <Setter Property="Height" Value="22" />
+      <Setter Property="Padding" Value="4,0" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Styles>
   <StackPanel Spacing="4">
     <TextBlock Classes="filter-editor-label" Text="Visual Trim Helper:" />
-    <TextBox
-      x:Name="TrimHelperText"
-      Classes="filter-editor-field"
-      IsReadOnly="True"
-      AcceptsReturn="False"
-      TextWrapping="NoWrap"
-      MinHeight="28"
-      Text="{Binding DisplayText, Mode=OneWay}"
-      ToolTip.Tip="Select characters to set positions; drag a Rename List item to change the sample."
-    />
-    <controls:FilterEditorHint Text="Select text to set positions; drag a Rename List item to change the sample." />
+    <Grid ColumnDefinitions="Auto,8,*">
+      <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+        <Button
+          x:Name="TrimHelperPreviousButton"
+          Classes="filter-editor-button format-editor-tool"
+          Content="▲"
+          Command="{Binding GoPreviousCommand}"
+          IsEnabled="{Binding CanGoPrevious}"
+          ToolTip.Tip="Previous Rename List item"
+        />
+        <Border Classes="trim-helper-item-index">
+          <TextBlock
+            x:Name="TrimHelperItemIndexLabel"
+            Text="{Binding ItemIndexLabel}"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            TextAlignment="Center"
+          />
+        </Border>
+        <Button
+          x:Name="TrimHelperNextButton"
+          Classes="filter-editor-button format-editor-tool"
+          Content="▼"
+          Command="{Binding GoNextCommand}"
+          IsEnabled="{Binding CanGoNext}"
+          ToolTip.Tip="Next Rename List item"
+        />
+      </StackPanel>
+      <TextBox
+        x:Name="TrimHelperText"
+        Grid.Column="2"
+        Classes="filter-editor-field"
+        IsReadOnly="True"
+        AcceptsReturn="False"
+        TextWrapping="NoWrap"
+        MinHeight="28"
+        Text="{Binding DisplayText, Mode=OneWay}"
+        ToolTip.Tip="Select characters to set positions; use ▲/▼ or drag a Rename List item to change the sample."
+      />
+    </Grid>
+    <controls:FilterEditorHint Text="Select text to set positions; use ▲/▼ or drag a Rename List item to change the sample." />
   </StackPanel>
 </UserControl>

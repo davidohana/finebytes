@@ -1,7 +1,10 @@
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mfr.Filters.Trimming;
 using Mfr.Models.Filters;
 using Mfr.Models.Rename;
+using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
 {
@@ -18,6 +21,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         private VisualTrimHelperMapping.Mode _mode = VisualTrimHelperMapping.Mode.LeftEdge;
         private FilterTarget? _target;
         private Func<string, RenameItem?>? _resolveRenameItemByFullPath;
+        private Func<IReadOnlyList<RenameItem>>? _resolveRenameItems;
+        private IReadOnlyList<RenameItem> _renameItems = [];
+        private int _itemIndex;
         private bool _isApplyingSelection;
 
         /// <summary>
@@ -31,7 +37,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         public event EventHandler? HighlightChanged;
 
         /// <summary>
-        /// Raised when the sample string changes (init or Rename List drop).
+        /// Raised when the sample string changes (init, navigation, or Rename List drop).
         /// </summary>
         public event EventHandler? SampleChanged;
 
@@ -40,6 +46,12 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         /// </summary>
         [ObservableProperty]
         private string _displayText = PlaceholderText;
+
+        /// <summary>
+        /// Gets the 1-based item index label, or empty when the Rename List is empty.
+        /// </summary>
+        [ObservableProperty]
+        private string _itemIndexLabel = string.Empty;
 
         /// <summary>
         /// Gets whether <see cref="DisplayText"/> is real sample text (not the placeholder).
@@ -77,51 +89,133 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         public int? AppliedRangeEnd { get; private set; }
 
         /// <summary>
-        /// Configures mapping mode and the Apply Target used to resolve Rename List drops/init.
+        /// Gets whether Previous is enabled.
+        /// </summary>
+        public bool CanGoPrevious => _renameItems.Count > 0 && _itemIndex > 0;
+
+        /// <summary>
+        /// Gets whether Next is enabled.
+        /// </summary>
+        public bool CanGoNext => _renameItems.Count > 0 && _itemIndex < _renameItems.Count - 1;
+
+        /// <summary>
+        /// Configures mapping mode and Rename List resolvers used for init, navigation, and drops.
         /// </summary>
         /// <param name="mode">Left edge, right edge, or inclusive range.</param>
         /// <param name="target">Current filter apply target.</param>
         /// <param name="resolveRenameItemByFullPath">
         /// Looks up a Rename List row by original full path for drag-drop; optional.
         /// </param>
+        /// <param name="resolveRenameItems">
+        /// Returns the current Rename List engine items for init/navigation; optional.
+        /// </param>
         public void Configure(
             VisualTrimHelperMapping.Mode mode,
             FilterTarget target,
-            Func<string, RenameItem?>? resolveRenameItemByFullPath = null
+            Func<string, RenameItem?>? resolveRenameItemByFullPath = null,
+            Func<IReadOnlyList<RenameItem>>? resolveRenameItems = null
         )
         {
             ArgumentNullException.ThrowIfNull(target);
             _mode = mode;
             _target = target;
             _resolveRenameItemByFullPath = resolveRenameItemByFullPath;
+            _resolveRenameItems = resolveRenameItems;
         }
 
         /// <summary>
         /// Fills the sample from the first Rename List item when present (MFR7 <c>OnTrimHelperInit</c>).
         /// </summary>
-        /// <param name="items">Current Rename List engine items.</param>
-        public void InitFromRenameItems(IReadOnlyList<RenameItem> items)
+        /// <param name="items">
+        /// Optional explicit snapshot; when null, uses the resolver from <see cref="Configure"/>.
+        /// </param>
+        public void InitFromRenameItems(IReadOnlyList<RenameItem>? items = null)
         {
-            ArgumentNullException.ThrowIfNull(items);
-            if (items.Count == 0 || _target is null)
+            _ReloadRenameItems(items);
+            _itemIndex = 0;
+            if (_renameItems.Count == 0 || _target is null)
             {
+                ItemIndexLabel = string.Empty;
+                _NotifyNavigationChanged();
                 return;
             }
 
-            if (FilterTargetText.TryGet(items[0], _target, out var text))
-            {
-                _SetSampleText(text);
-            }
+            _ApplyCurrentItem();
         }
 
         /// <summary>
-        /// Replaces the sample with explicit text (e.g. after a Rename List drop).
+        /// Reloads Rename List items from the configured resolver and updates navigation chrome.
+        /// <para>
+        /// When the helper still shows the placeholder and items are now available, selects the first item.
+        /// Otherwise keeps the current sample and rebinds the index when possible.
+        /// </para>
+        /// </summary>
+        public void RefreshRenameItems()
+        {
+            _ReloadRenameItems();
+            if (_renameItems.Count == 0 || _target is null)
+            {
+                _itemIndex = 0;
+                ItemIndexLabel = string.Empty;
+                _NotifyNavigationChanged();
+                return;
+            }
+
+            if (!HasSample)
+            {
+                _itemIndex = 0;
+                _ApplyCurrentItem();
+                return;
+            }
+
+            var matchedIndex = _FindItemIndexBySampleText(SampleText);
+            _itemIndex = matchedIndex >= 0 ? matchedIndex : Math.Clamp(_itemIndex, 0, _renameItems.Count - 1);
+            ItemIndexLabel = (_itemIndex + 1).ToString(CultureInfo.InvariantCulture);
+            _NotifyNavigationChanged();
+        }
+
+        /// <summary>
+        /// Replaces the sample with explicit text (e.g. tests or a drop not in the list).
         /// </summary>
         /// <param name="text">Sample string; empty clears back to the placeholder.</param>
         public void SetSampleText(string text)
         {
             ArgumentNullException.ThrowIfNull(text);
             _SetSampleText(text);
+        }
+
+        /// <summary>
+        /// Moves to the previous Rename List item when available.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(CanGoPrevious))]
+        public void GoPrevious()
+        {
+            _ReloadRenameItems();
+            if (!CanGoPrevious)
+            {
+                _NotifyNavigationChanged();
+                return;
+            }
+
+            _itemIndex--;
+            _ApplyCurrentItem();
+        }
+
+        /// <summary>
+        /// Moves to the next Rename List item when available.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(CanGoNext))]
+        public void GoNext()
+        {
+            _ReloadRenameItems();
+            if (!CanGoNext)
+            {
+                _NotifyNavigationChanged();
+                return;
+            }
+
+            _itemIndex++;
+            _ApplyCurrentItem();
         }
 
         /// <summary>
@@ -276,9 +370,100 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             return false;
         }
 
-        private void _SetSampleText(string text)
+        /// <summary>
+        /// Applies a Rename List drop: syncs the navigator index when the path is in the list.
+        /// </summary>
+        /// <param name="fullPathFromRenameList">Original full path from Rename List drag payload.</param>
+        /// <returns><see langword="true"/> when the sample was updated.</returns>
+        public bool TryApplyRenameListDrop(string fullPathFromRenameList)
         {
-            if (SampleText == text)
+            if (!TryResolveRenameListDrop(fullPathFromRenameList, out var resolved))
+            {
+                return false;
+            }
+
+            _ReloadRenameItems();
+            var index = _FindItemIndex(fullPathFromRenameList);
+            if (index >= 0)
+            {
+                _itemIndex = index;
+                _ApplyCurrentItem();
+                return true;
+            }
+
+            _SetSampleText(resolved);
+            ItemIndexLabel = string.Empty;
+            _NotifyNavigationChanged();
+            return true;
+        }
+
+        private void _ReloadRenameItems(IReadOnlyList<RenameItem>? items = null)
+        {
+            if (items is not null)
+            {
+                _renameItems = items;
+                return;
+            }
+
+            _renameItems = _resolveRenameItems?.Invoke() ?? [];
+        }
+
+        private void _ApplyCurrentItem()
+        {
+            if (_renameItems.Count == 0 || _target is null)
+            {
+                ItemIndexLabel = string.Empty;
+                _NotifyNavigationChanged();
+                return;
+            }
+
+            var item = _renameItems[_itemIndex];
+            if (FilterTargetText.TryGet(item, _target, out var text))
+            {
+                _SetSampleText(text, forceNotify: true);
+            }
+
+            ItemIndexLabel = (_itemIndex + 1).ToString(CultureInfo.InvariantCulture);
+            _NotifyNavigationChanged();
+        }
+
+        private int _FindItemIndex(string fullPath)
+        {
+            for (var i = 0; i < _renameItems.Count; i++)
+            {
+                if (PathComparers.Os.Equals(_renameItems[i].Original.FullPath, fullPath))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private int _FindItemIndexBySampleText(string sampleText)
+        {
+            if (_target is null)
+            {
+                return -1;
+            }
+
+            for (var i = 0; i < _renameItems.Count; i++)
+            {
+                if (
+                    FilterTargetText.TryGet(_renameItems[i], _target, out var text)
+                    && string.Equals(text, sampleText, StringComparison.Ordinal)
+                )
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private void _SetSampleText(string text, bool forceNotify = false)
+        {
+            if (!forceNotify && SampleText == text)
             {
                 return;
             }
@@ -293,6 +478,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
             HighlightStart = start;
             HighlightLength = length;
             HighlightChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void _NotifyNavigationChanged()
+        {
+            OnPropertyChanged(nameof(CanGoPrevious));
+            OnPropertyChanged(nameof(CanGoNext));
+            GoPreviousCommand.NotifyCanExecuteChanged();
+            GoNextCommand.NotifyCanExecuteChanged();
         }
     }
 }

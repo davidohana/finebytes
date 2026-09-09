@@ -29,8 +29,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// Creates an options editor for <paramref name="step"/>, or <see langword="null"/> when unsupported.
         /// </summary>
         /// <param name="step">Selected applied-filter row.</param>
-        /// <param name="sampleRenameItems">
-        /// Rename List items for Visual Trim Helper init. Ignored by editors that do not use the helper.
+        /// <param name="resolveSampleRenameItems">
+        /// Live Rename List items for Visual Trim Helper init/navigation. Ignored by editors that do not use the helper.
         /// </param>
         /// <param name="resolveRenameItemByFullPath">
         /// Looks up a Rename List row by original full path for Visual Trim Helper drag-drop.
@@ -38,7 +38,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// <returns>Editor view model, or <see langword="null"/> for optionless / not-yet-implemented types.</returns>
         internal static FilterOptionsEditorViewModel? Create(
             AppliedFilterStepViewModel step,
-            IReadOnlyList<RenameItem>? sampleRenameItems = null,
+            Func<IReadOnlyList<RenameItem>>? resolveSampleRenameItems = null,
             Func<string, RenameItem?>? resolveRenameItemByFullPath = null
         )
         {
@@ -53,14 +53,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 CasingListFilter => new CasingListFilterEditorViewModel(step),
                 ICountOptionsFilter => new CountFilterEditorViewModel(
                     step,
-                    sampleRenameItems,
-                    resolveRenameItemByFullPath
+                    resolveRenameItemByFullPath: resolveRenameItemByFullPath,
+                    resolveSampleRenameItems: resolveSampleRenameItems
                 ),
                 ShrinkDuplicateCharactersFilter => new ShrinkDuplicateCharactersFilterEditorViewModel(step),
                 TrimBetweenFilter => new TrimBetweenFilterEditorViewModel(
                     step,
-                    sampleRenameItems,
-                    resolveRenameItemByFullPath
+                    resolveRenameItemByFullPath: resolveRenameItemByFullPath,
+                    resolveSampleRenameItems: resolveSampleRenameItems
                 ),
                 FixLeadingZerosFilter => new FixLeadingZerosFilterEditorViewModel(step),
                 StripParenthesesFilter => new StripParenthesesFilterEditorViewModel(step),

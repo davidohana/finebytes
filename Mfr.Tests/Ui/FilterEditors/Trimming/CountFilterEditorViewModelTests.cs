@@ -2,6 +2,7 @@ using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters;
 using Mfr.Filters.Trimming;
+using Mfr.Tests.Models.Filters;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Ui.FilterEditors.Trimming
@@ -101,6 +102,88 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
 
             Assert.Equal(0, editor.TrimHelper.HighlightStart);
             Assert.Equal(3, editor.TrimHelper.HighlightLength);
+        }
+
+        /// <summary>
+        /// Verifies ▲/▼ cycle Rename List samples and update the index label.
+        /// </summary>
+        [Fact]
+        public void Navigate_cycles_rename_list_samples()
+        {
+            var items = new[]
+            {
+                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"),
+                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1),
+            };
+            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var editor = new CountFilterEditorViewModel(step, sampleRenameItems: items);
+
+            Assert.Equal("alpha", editor.TrimHelper.SampleText);
+            Assert.Equal("1", editor.TrimHelper.ItemIndexLabel);
+            Assert.False(editor.TrimHelper.CanGoPrevious);
+            Assert.True(editor.TrimHelper.CanGoNext);
+
+            Assert.True(editor.TrimHelper.GoNextCommand.CanExecute(null));
+            editor.TrimHelper.GoNext();
+            Assert.Equal("beta", editor.TrimHelper.SampleText);
+            Assert.Equal("2", editor.TrimHelper.ItemIndexLabel);
+            Assert.True(editor.TrimHelper.CanGoPrevious);
+            Assert.False(editor.TrimHelper.CanGoNext);
+
+            editor.TrimHelper.GoPrevious();
+            Assert.Equal("alpha", editor.TrimHelper.SampleText);
+            Assert.Equal("1", editor.TrimHelper.ItemIndexLabel);
+        }
+
+        /// <summary>
+        /// Verifies a Rename List drop jumps the navigator to that item.
+        /// </summary>
+        [Fact]
+        public void Drop_syncs_navigator_index()
+        {
+            var items = new[]
+            {
+                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"),
+                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1),
+            };
+            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var editor = new CountFilterEditorViewModel(
+                step,
+                sampleRenameItems: items,
+                resolveRenameItemByFullPath: path =>
+                    items.FirstOrDefault(i => PathComparers.Os.Equals(path, i.Original.FullPath))
+            );
+
+            Assert.True(editor.TrimHelper.TryApplyRenameListDrop(items[1].Original.FullPath));
+            Assert.Equal("beta", editor.TrimHelper.SampleText);
+            Assert.Equal("2", editor.TrimHelper.ItemIndexLabel);
+            Assert.True(editor.TrimHelper.CanGoPrevious);
+            Assert.False(editor.TrimHelper.CanGoNext);
+        }
+
+        /// <summary>
+        /// Verifies RefreshRenameItems picks up items added after the editor was created.
+        /// </summary>
+        [Fact]
+        public void Refresh_enables_navigation_after_late_list_add()
+        {
+            var items = new List<RenameItem>();
+            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var editor = new CountFilterEditorViewModel(
+                step,
+                resolveSampleRenameItems: () => items
+            );
+            Assert.False(editor.TrimHelper.HasSample);
+            Assert.False(editor.TrimHelper.CanGoNext);
+            Assert.Equal(string.Empty, editor.TrimHelper.ItemIndexLabel);
+
+            items.Add(FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"));
+            items.Add(FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1));
+            editor.TrimHelper.RefreshRenameItems();
+
+            Assert.Equal("alpha", editor.TrimHelper.SampleText);
+            Assert.Equal("1", editor.TrimHelper.ItemIndexLabel);
+            Assert.True(editor.TrimHelper.CanGoNext);
         }
 
         /// <summary>

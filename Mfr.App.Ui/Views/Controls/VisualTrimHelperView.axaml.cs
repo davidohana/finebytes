@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -24,11 +25,18 @@ namespace Mfr.App.Ui.Views.Controls
         {
             InitializeComponent();
             DataContextChanged += _OnDataContextChanged;
-            AttachedToVisualTree += (_, _) => _QueueApplyHighlight();
+            AttachedToVisualTree += _OnAttachedToVisualTree;
             TrimHelperText.AddHandler(PointerReleasedEvent, _OnPointerReleased, RoutingStrategies.Tunnel);
             DragDrop.SetAllowDrop(TrimHelperText, true);
             TrimHelperText.AddHandler(DragDrop.DragOverEvent, _OnDragOver);
             TrimHelperText.AddHandler(DragDrop.DropEvent, _OnDrop);
+        }
+
+        private void _OnAttachedToVisualTree(object? sender, VisualTreeAttachmentEventArgs e)
+        {
+            // Re-query Rename List when the helper is shown so ▲/▼ enable after late list adds.
+            _helper?.RefreshRenameItems();
+            _QueueApplyHighlight();
         }
 
         private void _OnDataContextChanged(object? sender, EventArgs e)
@@ -44,6 +52,7 @@ namespace Mfr.App.Ui.Views.Controls
             {
                 _helper.HighlightChanged += _OnHighlightChanged;
                 _helper.PropertyChanged += _OnHelperPropertyChanged;
+                _helper.RefreshRenameItems();
                 _QueueApplyHighlight();
             }
         }
@@ -149,9 +158,8 @@ namespace Mfr.App.Ui.Views.Controls
                 return;
             }
 
-            if (_helper.TryResolveRenameListDrop(payload.FullPath, out var resolved))
+            if (_helper.TryApplyRenameListDrop(payload.FullPath))
             {
-                _helper.SetSampleText(resolved);
                 e.Handled = true;
             }
         }
