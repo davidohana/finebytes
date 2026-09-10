@@ -95,7 +95,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
 
         /// <summary>
         /// Verifies every <c>Audio\\Tag</c> token maps to a semantic field and uses
-        /// <see cref="SemanticAudioFieldLabels"/> (resolved at catalog build, not from attribute text).
+        /// <see cref="SemanticAudioFieldLabels"/> / <see cref="SemanticAudioFieldTips"/>
+        /// (resolved at catalog build, not from attribute text alone).
         /// </summary>
         [Fact]
         public void Audio_tag_display_names_match_semantic_labels()
@@ -144,6 +145,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
                     e => string.Equals(e.CanonicalName, canonicalName, StringComparison.Ordinal)
                 );
                 Assert.Equal(SemanticAudioFieldLabels.For(field), entry.DisplayName);
+                Assert.Equal(SemanticAudioFieldTips.For(field), entry.ShortDescription);
             }
         }
 

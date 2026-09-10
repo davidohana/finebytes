@@ -14,7 +14,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
     /// </summary>
     /// <param name="Label">Target display text.</param>
     /// <param name="Prototype">Target template; parameterized fields are applied in <see cref="BuildTarget"/>.</param>
-    public sealed record FilterTargetOption(string Label, FilterTarget Prototype)
+    /// <param name="Tip">Optional tooltip clarifying the target.</param>
+    public sealed record FilterTargetOption(string Label, FilterTarget Prototype, string? Tip = null)
     {
         /// <summary>
         /// Builds a <see cref="FilterTarget"/> from this option and optional parameterized fields.

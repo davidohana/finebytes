@@ -162,11 +162,14 @@
             HorizontalAlignment="Stretch"
             ItemsSource="{Binding TargetOptions}"
             SelectedItem="{Binding SelectedTargetOption}"
-            ToolTip.Tip="Specific field within the selected category."
+            ToolTip.Tip="{Binding SelectedTargetToolTip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
           >
             <ComboBox.ItemTemplate>
               <DataTemplate x:DataType="vm:FilterTargetOption">
-                <TextBlock Text="{Binding Label}" />
+                <TextBlock
+                  Text="{Binding Label}"
+                  ToolTip.Tip="{Binding Tip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+                />
               </DataTemplate>
             </ComboBox.ItemTemplate>
           </ComboBox>

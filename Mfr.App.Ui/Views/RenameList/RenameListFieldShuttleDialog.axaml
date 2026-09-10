@@ -6,6 +6,7 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
   xmlns:models="using:Mfr.Models.RenameList"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
   mc:Ignorable="d"
   d:DesignWidth="720"
   d:DesignHeight="440"
@@ -253,7 +254,10 @@
               >
                 <ListBox.ItemTemplate>
                   <DataTemplate x:DataType="models:RenameListField">
-                    <TextBlock Text="{Binding DisplayName}" />
+                    <TextBlock
+                      Text="{Binding DisplayName}"
+                      ToolTip.Tip="{Binding Description, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+                    />
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
@@ -269,7 +273,11 @@
               >
                 <ListBox.ItemTemplate>
                   <DataTemplate x:DataType="models:RenameListField">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
+                    <StackPanel
+                      Orientation="Horizontal"
+                      Spacing="4"
+                      ToolTip.Tip="{Binding Description, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+                    >
                       <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
                       <Border Classes="rename-list-preview-glyph">
                         <TextBlock Text="P" />
@@ -337,7 +345,11 @@
                 </ListBox.ContextMenu>
                 <ListBox.ItemTemplate>
                   <DataTemplate x:DataType="vm:RenameListFieldShuttleColumnRow">
-                    <StackPanel Orientation="Horizontal" Spacing="4">
+                    <StackPanel
+                      Orientation="Horizontal"
+                      Spacing="4"
+                      ToolTip.Tip="{Binding Description, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+                    >
                       <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
                       <Border Classes="rename-list-preview-glyph" IsVisible="{Binding IsPreview}">
                         <TextBlock Text="P" />
@@ -383,7 +395,10 @@
               >
                 <ListBox.ItemTemplate>
                   <DataTemplate x:DataType="models:RenameListField">
-                    <TextBlock Text="{Binding DisplayName}" />
+                    <TextBlock
+                      Text="{Binding DisplayName}"
+                      ToolTip.Tip="{Binding Description, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+                    />
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
@@ -443,7 +458,11 @@
                 </ListBox.ContextMenu>
                 <ListBox.ItemTemplate>
                   <DataTemplate x:DataType="vm:RenameListFieldShuttleSortRow">
-                    <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                    <Grid
+                      ColumnDefinitions="Auto,*,Auto"
+                      VerticalAlignment="Center"
+                      ToolTip.Tip="{Binding Description, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+                    >
                       <Border Grid.Column="0" Classes="field-shuttle-priority">
                         <TextBlock Text="{Binding Priority}" />
                       </Border>

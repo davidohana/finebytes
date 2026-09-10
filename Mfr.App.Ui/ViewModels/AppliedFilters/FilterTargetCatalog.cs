@@ -160,7 +160,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 .. Enum.GetValues<SemanticAudioField>()
                     .Select(field => new FilterTargetOption(
                         SemanticAudioFieldLabels.For(field),
-                        new SemanticAudioFieldTarget(field)
+                        new SemanticAudioFieldTarget(field),
+                        SemanticAudioFieldTips.For(field)
                     )),
             ];
         }
@@ -191,7 +192,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             [
                 .. XiphKnownKeys.All.Select(key => new FilterTargetOption(
                     _GetXiphKeyLabel(key),
-                    new XiphFieldTarget(key)
+                    new XiphFieldTarget(key),
+                    _GetXiphKeyTip(key)
                 )),
             ];
         }
@@ -238,6 +240,38 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 "TEMPO" => "Tempo",
                 "CONDUCTOR" => SemanticAudioFieldLabels.For(SemanticAudioField.Conductor),
                 _ => key,
+            };
+        }
+
+        /// <summary>
+        /// Optional Apply-To tip for a Xiph key when it maps to a shared semantic field tip.
+        /// </summary>
+        private static string? _GetXiphKeyTip(string key)
+        {
+            var catalogRow = AudioCatalogFieldMaps.All.FirstOrDefault(row =>
+                string.Equals(row.XiphKey, key, StringComparison.OrdinalIgnoreCase)
+            );
+            if (catalogRow is not null)
+            {
+                return SemanticAudioFieldTips.For(catalogRow.Field);
+            }
+
+            return key.ToUpperInvariant() switch
+            {
+                "TITLE" => SemanticAudioFieldTips.For(SemanticAudioField.Title),
+                "ALBUM" => SemanticAudioFieldTips.For(SemanticAudioField.Album),
+                "ARTIST" => SemanticAudioFieldTips.For(SemanticAudioField.Performers),
+                "ALBUMARTIST" => SemanticAudioFieldTips.For(SemanticAudioField.AlbumArtists),
+                "COMPOSER" => SemanticAudioFieldTips.For(SemanticAudioField.Composers),
+                "GENRE" => SemanticAudioFieldTips.For(SemanticAudioField.Genre),
+                "COMMENT" => SemanticAudioFieldTips.For(SemanticAudioField.Comment),
+                "LYRICS" => SemanticAudioFieldTips.For(SemanticAudioField.Lyrics),
+                "COPYRIGHT" => SemanticAudioFieldTips.For(SemanticAudioField.Copyright),
+                "GROUPING" => SemanticAudioFieldTips.For(SemanticAudioField.Grouping),
+                "YEAR" => SemanticAudioFieldTips.For(SemanticAudioField.Year),
+                "BPM" => SemanticAudioFieldTips.For(SemanticAudioField.BeatsPerMinute),
+                "CONDUCTOR" => SemanticAudioFieldTips.For(SemanticAudioField.Conductor),
+                _ => null,
             };
         }
     }

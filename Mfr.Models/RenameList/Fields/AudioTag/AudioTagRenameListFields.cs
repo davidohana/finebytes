@@ -63,7 +63,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         ];
 
         /// <summary>
-        /// Creates a semantic column with the shared display label.
+        /// Creates a semantic column with the shared display label and tooltip.
         /// </summary>
         private static AudioTagSemanticRenameListField _Semantic(
             string propertyKey,
@@ -75,24 +75,31 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
                 propertyKey,
                 SemanticAudioFieldLabels.For(field),
                 field,
-                defaultWidth
+                defaultWidth,
+                SemanticAudioFieldTips.For(field)
             );
         }
 
         /// <summary>
-        /// Creates a first-segment column with the shared first-segment label.
+        /// Creates a first-segment column with the shared first-segment label and tooltip.
         /// </summary>
         private static AudioTagFirstSegmentRenameListField _First(string propertyKey, SemanticAudioField field)
         {
             return new AudioTagFirstSegmentRenameListField(
                 propertyKey,
                 SemanticAudioFieldLabels.FirstSegment(field),
-                field
+                field,
+                SemanticAudioFieldTips.FirstSegment(field)
             );
         }
     }
 
-    internal sealed class AudioTagTagTypesField() : AudioTagRenameListField("TagTypes", "Tag Types")
+    internal sealed class AudioTagTagTypesField()
+        : AudioTagRenameListField(
+            "TagTypes",
+            "Tag Types",
+            description: "Which embedded tag blocks are present (e.g. Id3v2;Xiph)."
+        )
     {
         public override string Resolve(FileMeta meta)
         {

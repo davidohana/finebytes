@@ -6,6 +6,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views.Controls;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -146,8 +147,10 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameListGridColumns.SetFieldKey(column, key);
 
             column.HeaderTemplate = canUserSort
-                ? new FuncDataTemplate<object>((_, _) => _BuildSortableHeader(listViewModel, headerText, key))
-                : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key));
+                ? new FuncDataTemplate<object>(
+                    (_, _) => _BuildSortableHeader(listViewModel, headerText, key, field.Description)
+                )
+                : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key, field.Description));
 
             column.PropertyChanged += (_, args) => _OnGridColumnPropertyChanged(column, args);
             return column;
@@ -233,21 +236,24 @@ namespace Mfr.App.Ui.Views.RenameList
             return catalogWidth is int catalogPixelWidth ? Math.Max(catalogPixelWidth, minHeaderWidth) : minHeaderWidth;
         }
 
-        private static Control _CreateHeaderContent(string headerText, RenameListFieldKey key)
+        private static Control _CreateHeaderContent(string headerText, RenameListFieldKey key, string? description)
         {
             var root = RenameListPreviewGlyph.CreateLabelRow(headerText, key.IsPreview);
             RenameListGridColumns.StampHeaderFieldKey(root, key);
+            _ApplyFieldDescriptionTip(root, description);
             return root;
         }
 
         private static Grid _BuildSortableHeader(
             RenameListViewModel viewModel,
             string headerText,
-            RenameListFieldKey fieldKey
+            RenameListFieldKey fieldKey,
+            string? description
         )
         {
             var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
             RenameListGridColumns.StampHeaderFieldKey(grid, fieldKey);
+            _ApplyFieldDescriptionTip(grid, description);
 
             var title = new TextBlock
             {
@@ -276,6 +282,19 @@ namespace Mfr.App.Ui.Views.RenameList
             _WireSortGlyphUpdates(grid, glyph, priority, direction, viewModel, fieldKey);
 
             return grid;
+        }
+
+        /// <summary>
+        /// Attaches a wrapping field description tooltip when <paramref name="description"/> is set.
+        /// </summary>
+        private static void _ApplyFieldDescriptionTip(Control target, string? description)
+        {
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                return;
+            }
+
+            ToolTip.SetTip(target, RichToolTip.Wrap(description));
         }
 
         private static void _WireSortGlyphUpdates(

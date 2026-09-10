@@ -20,6 +20,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public string Label => RenameListSortDisplay.GetFieldLabel(Key.FieldKey);
 
         /// <summary>
+        /// Gets the catalog field tooltip, or <see langword="null"/> when none.
+        /// </summary>
+        public string? Description => RenameListFieldCatalog.GetField(Key.FieldKey).Description;
+
+        /// <summary>
         /// Gets the direction glyph for the row toggle.
         /// </summary>
         public string DirectionGlyph => Key.Descending ? "↓" : "↑";

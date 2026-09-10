@@ -34,6 +34,21 @@ namespace Mfr.Tests.Models
             Assert.Equal(17, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
         }
 
+        /// <summary>
+        /// Verifies Audio Tag columns expose shared Artist / first-segment tooltips.
+        /// </summary>
+        [Fact]
+        public void Audio_tag_fields_expose_semantic_descriptions()
+        {
+            var artist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "Performers");
+            var firstArtist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "FirstPerformer");
+            var albumArtist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "AlbumArtists");
+
+            Assert.Equal(SemanticAudioFieldTips.Artist, artist.Description);
+            Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Description);
+            Assert.Equal(SemanticAudioFieldTips.FirstSegment(SemanticAudioField.Performers), firstArtist.Description);
+        }
+
         [Fact]
         public void Catalog_group_order_matches_shuttle_dropdown()
         {

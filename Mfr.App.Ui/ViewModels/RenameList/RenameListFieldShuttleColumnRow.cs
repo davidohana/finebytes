@@ -15,6 +15,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public string DisplayName => RenameListFieldCatalog.GetField(Column.Key).DisplayName;
 
         /// <summary>
+        /// Gets the catalog field tooltip, or <see langword="null"/> when none.
+        /// </summary>
+        public string? Description => RenameListFieldCatalog.GetField(Column.Key).Description;
+
+        /// <summary>
         /// Gets whether the selected column shows preview values.
         /// </summary>
         public bool IsPreview => Column.Key.IsPreview;

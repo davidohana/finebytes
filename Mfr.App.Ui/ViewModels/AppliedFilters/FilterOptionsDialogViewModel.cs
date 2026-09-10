@@ -84,7 +84,25 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Gets or sets the selected Apply-To target.
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(SelectedTargetToolTip))]
         private FilterTargetOption? _selectedTargetOption;
+
+        /// <summary>
+        /// Gets the tooltip for the selected Apply-To target (field tip or a generic fallback).
+        /// </summary>
+        public string SelectedTargetToolTip
+        {
+            get
+            {
+                var tip = SelectedTargetOption?.Tip;
+                if (string.IsNullOrWhiteSpace(tip))
+                {
+                    return "Specific field within the selected category.";
+                }
+
+                return tip;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the ID3v2 language for multi-instance frames.

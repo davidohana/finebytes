@@ -158,6 +158,20 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(PathFieldLabels.ParentFolder, FilterTargetCatalog.GetLabel(new AncestorFolderTarget(1)));
         }
 
+        /// <summary>
+        /// Verifies Audio Tag Apply-To options carry shared semantic field tips.
+        /// </summary>
+        [Fact]
+        public void Audio_tag_options_include_semantic_field_tips()
+        {
+            var audioGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Audio Tag");
+            var artist = Assert.Single(audioGroup.Targets, t => t.Label == "Artist");
+            var albumArtist = Assert.Single(audioGroup.Targets, t => t.Label == "Album Artist");
+
+            Assert.Equal(SemanticAudioFieldTips.Artist, artist.Tip);
+            Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
+        }
+
         private sealed record UnknownFilterTarget : FilterTarget;
     }
 }

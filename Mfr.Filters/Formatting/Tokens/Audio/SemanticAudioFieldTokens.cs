@@ -40,7 +40,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo(null, "Audio\\Tag", "Artist from the audio tag overlay", "audio-artist")]
+    [FormatTokenInfo(null, "Audio\\Tag", SemanticAudioFieldTips.Artist, "audio-artist")]
     internal sealed class AudioArtistToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-artist&gt;</c> (joined artists).</summary>
@@ -49,7 +49,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo(null, "Audio\\Tag", "Album artist from the audio tag overlay", "audio-album-artist")]
+    [FormatTokenInfo(null, "Audio\\Tag", SemanticAudioFieldTips.AlbumArtist, "audio-album-artist")]
     internal sealed class AudioAlbumArtistToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-album-artist&gt;</c>.</summary>
@@ -76,7 +76,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo(null, "Audio\\Tag", "Genre from the audio tag overlay", "audio-genre")]
+    [FormatTokenInfo(null, "Audio\\Tag", SemanticAudioFieldTips.Genre, "audio-genre")]
     internal sealed class AudioGenreToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-genre&gt;</c>.</summary>
@@ -130,7 +130,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo(null, "Audio\\Tag", "Composer from the audio tag overlay", "audio-composer")]
+    [FormatTokenInfo(null, "Audio\\Tag", SemanticAudioFieldTips.Composer, "audio-composer")]
     internal sealed class AudioComposerToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-composer&gt;</c>.</summary>
