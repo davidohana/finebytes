@@ -84,19 +84,7 @@ namespace Mfr.Models.Config
         public static void Delete(string? sessionFilePath = null)
         {
             var path = _ResolvePath(sessionFilePath);
-            if (!File.Exists(path))
-            {
-                return;
-            }
-
-            try
-            {
-                File.Delete(path);
-            }
-            catch (Exception ex)
-            {
-                throw new IOException($"Error deleting session file '{path}'.", ex);
-            }
+            AppDataFile.DeleteFileIfExists(path, "session file");
         }
 
         /// <summary>

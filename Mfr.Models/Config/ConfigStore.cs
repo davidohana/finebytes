@@ -108,19 +108,7 @@ namespace Mfr.Models.Config
         public static void DeleteDefaultFile(string? configFilePath = null)
         {
             var path = _ResolvePath(configFilePath);
-            if (!File.Exists(path))
-            {
-                return;
-            }
-
-            try
-            {
-                File.Delete(path);
-            }
-            catch (Exception ex)
-            {
-                throw new IOException($"Error deleting configuration file '{path}'.", ex);
-            }
+            AppDataFile.DeleteFileIfExists(path, "configuration file");
         }
 
         /// <summary>

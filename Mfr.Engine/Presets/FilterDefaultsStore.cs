@@ -15,8 +15,8 @@ namespace Mfr.Engine.Presets
     /// </summary>
     /// <remarks>
     /// Soft-load dialect: corrupt or missing → empty cache (factory defaults on add); the app continues.
-    /// Same policy as <see cref="Mfr.Models.Config.SessionStore"/>; opposite of hard-fail
-    /// <see cref="Mfr.Models.Config.ConfigStore"/> and <see cref="PresetManager"/>.
+    /// Same policy as <see cref="Models.Config.SessionStore"/>; opposite of hard-fail
+    /// <see cref="Models.Config.ConfigStore"/> and <see cref="PresetManager"/>.
     /// Do not unify these modes — the split is intentional product dialect.
     /// </remarks>
     /// <param name="defaultsFilePath">Path to the JSON file of type defaults.</param>
@@ -154,19 +154,7 @@ namespace Mfr.Engine.Presets
         public static void DeleteFileAt(string? defaultsFilePath = null)
         {
             var path = string.IsNullOrWhiteSpace(defaultsFilePath) ? DefaultFilePath() : defaultsFilePath.Trim();
-            if (!File.Exists(path))
-            {
-                return;
-            }
-
-            try
-            {
-                File.Delete(path);
-            }
-            catch (Exception ex)
-            {
-                throw new IOException($"Error deleting filter defaults file '{path}'.", ex);
-            }
+            AppDataFile.DeleteFileIfExists(path, "filter defaults file");
         }
 
         /// <summary>
