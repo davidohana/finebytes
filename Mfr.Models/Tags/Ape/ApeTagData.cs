@@ -7,8 +7,8 @@ namespace Mfr.Models.Tags.Ape
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Only modeled keys are stored; unknown on-disk items are left for field-patch Apply. Rows are sorted for
-    /// stable equality.
+    /// Only modeled keys (<see cref="ApeKnownKeys.All"/>) are stored; unknown on-disk items are left for
+    /// field-patch Apply. Rows are sorted for stable equality.
     /// </para>
     /// </remarks>
     public sealed class ApeTagData : IEquatable<ApeTagData?>

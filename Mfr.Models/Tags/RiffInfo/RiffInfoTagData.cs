@@ -8,6 +8,7 @@ namespace Mfr.Models.Tags.RiffInfo
     /// <remarks>
     /// <para>
     /// Rows are sorted by key for stable equality. Unknown INFO keys stay on disk under field-patch Apply.
+    /// Modeled keys are listed in <see cref="RiffInfoKnownKeys.All"/>.
     /// </para>
     /// </remarks>
     public sealed class RiffInfoTagData : IEquatable<RiffInfoTagData?>

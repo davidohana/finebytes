@@ -13,47 +13,16 @@ namespace Mfr.Metadata.TagFields
     /// <remarks>
     /// <para>
     /// Read folds alias spellings into their modeled key and splits <c>number/total</c> pairs so counts reach
-    /// their own key. Item lookup is case-insensitive, so casing variants need no alias entry. Unknown on-disk
-    /// items survive every patch by omission.
+    /// their own key. Item lookup is case-insensitive, so casing variants need no alias entry. Only keys in
+    /// <see cref="ApeKnownKeys.All"/> are read or written; unknown on-disk items survive every patch by omission.
     /// </para>
     /// </remarks>
     internal static class ApeTagFields
     {
-        private static readonly string[] _KnownKeys =
-        [
-            "Title",
-            "Album",
-            "Artist",
-            "Album Artist",
-            "Composer",
-            "Genre",
-            "Comment",
-            "Lyrics",
-            "Copyright",
-            "Grouping",
-            "Year",
-            "Track",
-            "TrackCount",
-            "Disc",
-            "DiscCount",
-            "BPM",
-            "Conductor",
-            "MUSICBRAINZ_ARTISTID",
-            "MUSICBRAINZ_ALBUMID",
-            "MUSICBRAINZ_ALBUMARTISTID",
-            "MUSICBRAINZ_TRACKID",
-            "MUSICBRAINZ_DISCID",
-            "MUSICBRAINZ_ALBUMSTATUS",
-            "MUSICBRAINZ_ALBUMTYPE",
-            "MUSICBRAINZ_RELEASECOUNTRY",
-            "MUSICIP_PUID",
-            "ASIN",
-        ];
-
         // Spellings other taggers use for a modeled APE key; values are stored under the modeled key.
         private static readonly Dictionary<string, string> _AliasToKnownKey = new(StringComparer.Ordinal)
         {
-            ["ALBUMARTIST"] = "Album Artist",
+            ["ALBUMARTIST"] = ApeKnownKeys.AlbumArtist,
         };
 
         /// <summary>
@@ -69,7 +38,7 @@ namespace Mfr.Metadata.TagFields
             }
 
             var keyToValues = new Dictionary<string, ImmutableArray<string>>(StringComparer.Ordinal);
-            foreach (var key in _KnownKeys)
+            foreach (var key in ApeKnownKeys.All)
             {
                 var values = _ReadItem(live, key);
                 if (values.Length == 0)
@@ -96,8 +65,8 @@ namespace Mfr.Metadata.TagFields
                 keyToValues[knownKey] = values;
             }
 
-            _SplitCountPair(keyToValues, numberKey: "Track", countKey: "TrackCount");
-            _SplitCountPair(keyToValues, numberKey: "Disc", countKey: "DiscCount");
+            _SplitCountPair(keyToValues, numberKey: ApeKnownKeys.Track, countKey: ApeKnownKeys.TrackCount);
+            _SplitCountPair(keyToValues, numberKey: ApeKnownKeys.Disc, countKey: ApeKnownKeys.DiscCount);
 
             if (keyToValues.Count == 0)
             {
@@ -140,7 +109,7 @@ namespace Mfr.Metadata.TagFields
 
         private static void _WriteAll(ApeTag live, ApeTagData data)
         {
-            foreach (var key in _KnownKeys)
+            foreach (var key in ApeKnownKeys.All)
             {
                 live.RemoveItem(key);
             }

@@ -1,4 +1,6 @@
+using Mfr.Models.Tags.Ape;
 using Mfr.Models.Tags.Id3v2;
+using Mfr.Models.Tags.RiffInfo;
 using Mfr.Models.Tags.Xiph;
 
 namespace Mfr.Tests.Models
@@ -36,6 +38,28 @@ namespace Mfr.Tests.Models
             Assert.NotEmpty(XiphKnownKeys.All);
             Assert.Equal(XiphKnownKeys.All.Count, XiphKnownKeys.All.Distinct(StringComparer.Ordinal).Count());
             Assert.All(XiphKnownKeys.All, key => Assert.Equal(key.ToUpperInvariant(), key));
+        }
+
+        /// <summary>
+        /// Verifies known APE keys used by Metadata and semantic merge stay unique and non-empty.
+        /// </summary>
+        [Fact]
+        public void Ape_known_keys_are_unique()
+        {
+            Assert.NotEmpty(ApeKnownKeys.All);
+            Assert.Equal(ApeKnownKeys.All.Count, ApeKnownKeys.All.Distinct(StringComparer.Ordinal).Count());
+        }
+
+        /// <summary>
+        /// Verifies known RIFF INFO fourCCs used by Metadata and semantic merge stay unique and uppercase.
+        /// </summary>
+        [Fact]
+        public void Riff_info_known_keys_are_unique_uppercase()
+        {
+            Assert.NotEmpty(RiffInfoKnownKeys.All);
+            Assert.Equal(RiffInfoKnownKeys.All.Count, RiffInfoKnownKeys.All.Distinct(StringComparer.Ordinal).Count());
+            Assert.All(RiffInfoKnownKeys.All, key => Assert.Equal(key.ToUpperInvariant(), key));
+            Assert.All(RiffInfoKnownKeys.All, key => Assert.Equal(4, key.Length));
         }
     }
 }

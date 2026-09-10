@@ -159,23 +159,27 @@ namespace Mfr.Models.Tags
         private static ApeTagData? _MergeApe(ApeTagData existing, SemanticAudioTag common)
         {
             var map = _ToMutableMultimap(existing.Fields);
-            _SetMapScalar(map, "Title", common.Title);
-            _SetMapScalar(map, "Album", common.Album);
-            _SetMapList(map, "Artist", common.Performers);
-            _SetMapList(map, "Album Artist", common.AlbumArtists);
-            _SetMapList(map, "Composer", common.Composers);
-            _SetMapScalar(map, "Genre", common.Genre);
-            _SetMapScalar(map, "Comment", common.Comment);
-            _SetMapScalar(map, "Lyrics", common.Lyrics);
-            _SetMapScalar(map, "Copyright", common.Copyright);
-            _SetMapScalar(map, "Grouping", common.Grouping);
-            _SetMapScalar(map, "Year", common.Year?.ToString(CultureInfo.InvariantCulture));
-            _SetMapScalar(map, "Track", common.Track?.ToString(CultureInfo.InvariantCulture));
-            _SetMapScalar(map, "TrackCount", common.TrackCount?.ToString(CultureInfo.InvariantCulture));
-            _SetMapScalar(map, "Disc", common.Disc?.ToString(CultureInfo.InvariantCulture));
-            _SetMapScalar(map, "DiscCount", common.DiscCount?.ToString(CultureInfo.InvariantCulture));
-            _SetMapScalar(map, "BPM", common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
-            _SetMapScalar(map, "Conductor", common.Conductor);
+            _SetMapScalar(map, ApeKnownKeys.Title, common.Title);
+            _SetMapScalar(map, ApeKnownKeys.Album, common.Album);
+            _SetMapList(map, ApeKnownKeys.Artist, common.Performers);
+            _SetMapList(map, ApeKnownKeys.AlbumArtist, common.AlbumArtists);
+            _SetMapList(map, ApeKnownKeys.Composer, common.Composers);
+            _SetMapScalar(map, ApeKnownKeys.Genre, common.Genre);
+            _SetMapScalar(map, ApeKnownKeys.Comment, common.Comment);
+            _SetMapScalar(map, ApeKnownKeys.Lyrics, common.Lyrics);
+            _SetMapScalar(map, ApeKnownKeys.Copyright, common.Copyright);
+            _SetMapScalar(map, ApeKnownKeys.Grouping, common.Grouping);
+            _SetMapScalar(map, ApeKnownKeys.Year, common.Year?.ToString(CultureInfo.InvariantCulture));
+            _SetMapScalar(map, ApeKnownKeys.Track, common.Track?.ToString(CultureInfo.InvariantCulture));
+            _SetMapScalar(map, ApeKnownKeys.TrackCount, common.TrackCount?.ToString(CultureInfo.InvariantCulture));
+            _SetMapScalar(map, ApeKnownKeys.Disc, common.Disc?.ToString(CultureInfo.InvariantCulture));
+            _SetMapScalar(map, ApeKnownKeys.DiscCount, common.DiscCount?.ToString(CultureInfo.InvariantCulture));
+            _SetMapScalar(
+                map,
+                ApeKnownKeys.BeatsPerMinute,
+                common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture)
+            );
+            _SetMapScalar(map, ApeKnownKeys.Conductor, common.Conductor);
             _MergeCatalogMap(map, common, static row => row.ApeKey);
 
             var rows = _SortedRows(map);
@@ -425,14 +429,14 @@ namespace Mfr.Models.Tags
         private static ImmutableArray<RiffInfoFieldRow> _RiffRowsFromCommon(SemanticAudioTag common)
         {
             var rows = new List<RiffInfoFieldRow>();
-            _AddRiff(rows, "INAM", common.Title);
-            _AddRiff(rows, "IPRD", common.Album);
-            _AddRiff(rows, "IART", common.Performers);
-            _AddRiff(rows, "IGNR", common.Genre);
-            _AddRiff(rows, "ICMT", common.Comment);
-            _AddRiff(rows, "ICOP", common.Copyright);
-            _AddRiff(rows, "ICRD", common.Year?.ToString(CultureInfo.InvariantCulture));
-            _AddRiff(rows, "ITRK", common.Track?.ToString(CultureInfo.InvariantCulture));
+            _AddRiff(rows, RiffInfoKnownKeys.Title, common.Title);
+            _AddRiff(rows, RiffInfoKnownKeys.Album, common.Album);
+            _AddRiff(rows, RiffInfoKnownKeys.Artist, common.Performers);
+            _AddRiff(rows, RiffInfoKnownKeys.Genre, common.Genre);
+            _AddRiff(rows, RiffInfoKnownKeys.Comment, common.Comment);
+            _AddRiff(rows, RiffInfoKnownKeys.Copyright, common.Copyright);
+            _AddRiff(rows, RiffInfoKnownKeys.Year, common.Year?.ToString(CultureInfo.InvariantCulture));
+            _AddRiff(rows, RiffInfoKnownKeys.Track, common.Track?.ToString(CultureInfo.InvariantCulture));
             rows.Sort(RiffInfoFieldRow.Compare);
             return [.. rows];
         }

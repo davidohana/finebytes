@@ -11,16 +11,14 @@ namespace Mfr.Metadata.TagFields
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Chunks are addressed by their standard fourCC rather than through TagLib's <see cref="InfoTag"/> façade
-    /// properties, which map several common fields to non-standard ids (Album→<c>DIRC</c>,
-    /// Performers→<c>ISTR</c>, Track→<c>IPRT</c>) that other taggers do not read. A chunk holds a single
-    /// string, so multi-value semantics stay inside that string verbatim.
+    /// Chunks are addressed by their standard fourCC (<see cref="RiffInfoKnownKeys.All"/>) rather than through
+    /// TagLib's <see cref="InfoTag"/> façade properties, which map several common fields to non-standard ids
+    /// (Album→<c>DIRC</c>, Performers→<c>ISTR</c>, Track→<c>IPRT</c>) that other taggers do not read. A chunk
+    /// holds a single string, so multi-value semantics stay inside that string verbatim.
     /// </para>
     /// </remarks>
     internal static class RiffInfoTagFields
     {
-        private static readonly string[] _KnownKeys = ["INAM", "IPRD", "IART", "IGNR", "ICMT", "ICOP", "ICRD", "ITRK"];
-
         /// <summary>
         /// Reads the file's known INFO chunks.
         /// </summary>
@@ -34,7 +32,7 @@ namespace Mfr.Metadata.TagFields
             }
 
             var rows = new List<RiffInfoFieldRow>();
-            foreach (var key in _KnownKeys)
+            foreach (var key in RiffInfoKnownKeys.All)
             {
                 var value = DelimitedText.JoinOrNull(live.GetValuesAsStrings(key));
                 if (value is null)
@@ -85,7 +83,7 @@ namespace Mfr.Metadata.TagFields
 
         private static void _WriteAll(InfoTag live, RiffInfoTagData data)
         {
-            foreach (var key in _KnownKeys)
+            foreach (var key in RiffInfoKnownKeys.All)
             {
                 live.RemoveValue(key);
             }

@@ -11,7 +11,8 @@ namespace Mfr.Metadata.TagFields
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Only the keys listed here are read or written; unknown on-disk keys survive every patch by omission.
+    /// Only the keys listed in <see cref="XiphKnownKeys.All"/> are read or written; unknown on-disk keys
+    /// survive every patch by omission.
     /// </para>
     /// </remarks>
     internal static class XiphTagFields
