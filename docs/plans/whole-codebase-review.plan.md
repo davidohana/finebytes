@@ -223,7 +223,7 @@ ______________________________________________________________________
 | `ListEntryLength` → `ConfigStore`                | Filters read process config max line length; ownership smell → Phase 5                                                                                                       |
 | `UppercaseInitialsFilter` SYSLIB1045 disable     | Documented; GeneratedRegex noise — leave                                                                                                                                     |
 | Sentence-end defaults                            | Options/JSON/`RenameItem` default `".!?"`; add-to-list `"-.!"` (MFR7). Documented in filter docs — keep                                                                      |
-| LettersCase vs CasingList sentence-initial       | Divergent letter/separator rules — backlog #7                                                                                                                                |
+| LettersCase vs CasingList sentence-initial       | **Done** — `SentenceInitialCasing` shared helper                                                                                                                             |
 
 ### Deeper refactors (promoted to backlog)
 
@@ -538,13 +538,6 @@ Suggested order if chasing correctness only: optionally #10 / #15 / #9 (Open —
    Cost: medium — mode/flags/`with` invalidate; WholeWord wrapping
    Rank: **skip** — perf only; do when profiling preview or touching Replace
 
-1. **Sentence-initial uppercasing twin** (was #7)
-   Sites: LettersCase vs CasingList sentence initials
-   Target: one helper **only if** MFR7 parity allows unifying letter detection
-   Value: one behavior for sentence starts
-   Cost: medium behavior risk
-   Rank: **skip** — product/MFR7 gated; do not force one rule
-
 1. **DataGrid multi-select drag press/snapshot session** (was #26)
    Sites: FileListView + RenameListView vs ListBoxDragSession
    Target: optional DataGrid-aware session sibling
@@ -618,6 +611,8 @@ Suggested order if chasing correctness only: optionally #10 / #15 / #9 (Open —
 
 ### Closed (history)
 
+1. **Sentence-initial uppercasing twin** (was #7) — **done**
+   `SentenceInitialCasing.UppercaseInitials` shared by LettersCase sentence mode + CasingList; Unicode `IsLetter` + scan-past non-letters; sentence-end requires word separator (LettersCase rule)
 1. **Wire catalog maps to existing key constants** (was #20) — **done**
    `AudioCatalogFieldMaps` Xiph/APE/ASF columns reference `XiphKnownKeys` / `ApeKnownKeys` / `AsfDescriptorNames`; Xiph catalog IDs promoted to named consts; APE catalog IDs alias Xiph (shared Vorbis-style spelling); `FilterTargetKeyCatalogTests` guards map keys stay in known-key `All` lists
 1. **`ApeKnownKeys` / `RiffInfoKnownKeys`** (was #17) — **done**

@@ -22,8 +22,9 @@ Changes letter casing on the target segment. **Capitalize** and **sentence case*
 - **`WeirdCase`** — Random/mixed case per `weirdUppercaseChancePercent` / `weirdFixedPlaces`.
 - **`Capitalize`** — Each word (between word separators) capitalized; `capitalizeSkipWords` stay lower.
 - **`SentenceCase`**
-  - Whole segment lowercased, then first letter of segment and after sentence ends (see
-    [SentenceEndCharacters](SentenceEndCharacters.md)), when followed by separator(s).
+  - Whole segment lowercased, then first letter (scanning past leading non-letters) and after sentence ends
+    (see [SentenceEndCharacters](SentenceEndCharacters.md)), when followed by separator(s). Same initial rules as
+    [CasingList](CasingList.md) `uppercaseSentenceInitial`.
 - **`InvertCase`** — Swap upper ↔ lower for letters.
 
 ## Examples
@@ -39,6 +40,7 @@ Changes letter casing on the target segment. **Capitalize** and **sentence case*
   - Before: `hello world. next line.`
   - After: `Hello world. Next line.`
 - `mode`: `SentenceCase` — `école. über next.` → `École. Über next.`
+- `mode`: `SentenceCase` — `03 - hello. next` → `03 - Hello. Next`
 - `mode`: `InvertCase` — `Hello` → `hELLO`
 - [SentenceEndCharacters](SentenceEndCharacters.md); `characters`: `":;"`; [LettersCase](LettersCase.md);
   `mode`: `SentenceCase`

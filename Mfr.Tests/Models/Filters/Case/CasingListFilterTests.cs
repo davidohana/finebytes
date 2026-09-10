@@ -90,6 +90,32 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
+        /// Verifies sentence-initial mode does not capitalize after punctuation without a separator.
+        /// </summary>
+        [Fact]
+        public void Apply_WithUppercaseSentenceInitial_RequiresSeparatorAfterSentenceEnd()
+        {
+            var filter = _CreateFilter(words: [], uppercaseSentenceInitial: true);
+
+            var result = FilterTestHelpers.ApplyToPrefix(filter, "hello.world");
+
+            Assert.Equal("Hello.world", result);
+        }
+
+        /// <summary>
+        /// Verifies sentence-initial mode uppercases non-ASCII letters.
+        /// </summary>
+        [Fact]
+        public void Apply_WithUppercaseSentenceInitial_CapitalizesNonAsciiLetters()
+        {
+            var filter = _CreateFilter(words: [], uppercaseSentenceInitial: true);
+
+            var result = FilterTestHelpers.ApplyToPrefix(filter, "école. über next");
+
+            Assert.Equal("École. Über next", result);
+        }
+
+        /// <summary>
         /// Verifies setup fails when a configured word contains a space.
         /// </summary>
         [Fact]

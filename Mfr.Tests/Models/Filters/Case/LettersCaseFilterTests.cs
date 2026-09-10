@@ -295,6 +295,16 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
+        /// Verifies sentence case capitalizes the first letter after leading non-letters.
+        /// </summary>
+        [Fact]
+        public void Apply_SentenceCase_SkipsLeadingNonLetters()
+        {
+            var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
+            Assert.Equal("03 - Hello. Next", FilterTestHelpers.ApplyToPrefix(f, "03 - hello. next"));
+        }
+
+        /// <summary>
         /// Verifies sentence case capitalizes after punctuation when one or more separator chars follow.
         /// </summary>
         [Fact]

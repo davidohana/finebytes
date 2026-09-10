@@ -36,9 +36,9 @@ namespace Mfr.Filters.Case
     /// <remarks>
     /// <para><b>Capitalize</b> and <b>sentence case</b> differ as follows: capitalize uppercases the
     /// first letter of each segment between occurrences of the current word separator (skip-words apply
-    /// per segment). Sentence case lowercases the whole string, then capitalizes the first letter of the
-    /// text and the first letter after <c>.</c> <c>!</c> or <c>?</c> when followed by one or more
-    /// occurrences of the current word separator (U+0020 SPACE by default).</para>
+    /// per segment). Sentence case lowercases the whole string, then capitalizes the first letter
+    /// (scanning past leading non-letters) and the first letter after <c>.</c> <c>!</c> or <c>?</c> when
+    /// followed by one or more occurrences of the current word separator (U+0020 SPACE by default).</para>
     /// <para>See each enum member for a concrete before/after example.</para>
     /// </remarks>
     public enum LettersCaseMode
@@ -84,11 +84,11 @@ namespace Mfr.Filters.Case
         /// <summary>
         /// Sentence case: lowercase, then capitalize sentence starts.
         /// <para>
-        /// Lowercases the string, then capitalizes the first letter of the whole string and the first
-        /// letter after characters in <see cref="RenameItem.SentenceEndChars"/> (default <c>".!?"</c>;
+        /// Lowercases the string, then capitalizes the first letter (scanning past leading non-letters) and
+        /// the first letter after characters in <see cref="RenameItem.SentenceEndChars"/> (default <c>".!?"</c>;
         /// set by <c>SentenceEndCharacters</c> when used earlier in the chain) when followed by one or more
         /// word-separator characters (same as capitalize: default U+0020 SPACE; set by <c>SpaceCharacter</c>
-        /// when used earlier in the chain).
+        /// when used earlier in the chain). Shared with <see cref="CasingListFilter"/> sentence-initial mode.
         /// </para>
         /// </summary>
         /// <example>
@@ -279,7 +279,7 @@ namespace Mfr.Filters.Case
         }
 
         /// <summary>
-        /// Lowercases the segment, then uppercases sentence starts (string start and after end+separator).
+        /// Lowercases the segment, then uppercases sentence starts via <see cref="SentenceInitialCasing"/>.
         /// </summary>
         private static string _ApplySentenceCase(string input, char wordSeparator, string sentenceEndChars)
         {
@@ -288,46 +288,7 @@ namespace Mfr.Filters.Case
                 return input;
             }
 
-            var chars = input.ToLowerInvariant().ToCharArray();
-            _TryUppercaseLetterAt(chars, 0);
-
-            for (var i = 0; i < chars.Length - 1; i++)
-            {
-                var isSentenceEnd = chars[i] != wordSeparator && sentenceEndChars.Contains(chars[i]);
-                if (!isSentenceEnd || chars[i + 1] != wordSeparator)
-                {
-                    continue;
-                }
-
-                var j = i + 2;
-                while (j < chars.Length && chars[j] == wordSeparator)
-                {
-                    j++;
-                }
-
-                if (j >= chars.Length)
-                {
-                    continue;
-                }
-
-                _TryUppercaseLetterAt(chars, j);
-            }
-
-            return new string(chars);
-        }
-
-        /// <summary>
-        /// Uppercases the character at <paramref name="index"/> when it is a letter (any script).
-        /// </summary>
-        private static void _TryUppercaseLetterAt(char[] chars, int index)
-        {
-            var c = chars[index];
-            if (!char.IsLetter(c))
-            {
-                return;
-            }
-
-            chars[index] = char.ToUpperInvariant(c);
+            return SentenceInitialCasing.UppercaseInitials(input.ToLowerInvariant(), wordSeparator, sentenceEndChars);
         }
 
         /// <summary>

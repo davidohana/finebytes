@@ -8,8 +8,9 @@ Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceE
 
 - **`words`** (`string[]`) — Words to apply by exact spelling. Duplicates: **last wins**.
 - **`uppercaseSentenceInitial`** (bool, default `false`)
-  - If `true`, after list application, uppercases the first letter at the start of the segment and after configured
-    sentence ends.
+  - If `true`, after list application, uppercases sentence starts with the same boundary rules as
+    [LettersCase](LettersCase.md) **SentenceCase** (first letter, scanning past leading non-letters; after
+    sentence-end characters when followed by the word separator). Does **not** lowercase the rest of the text.
 
 ## Editor text format
 

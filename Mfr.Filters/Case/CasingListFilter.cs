@@ -10,9 +10,9 @@ namespace Mfr.Filters.Case
     /// Words to apply by exact spelling (case-insensitive match). Empty list is a no-op.
     /// </param>
     /// <param name="UppercaseSentenceInitial">
-    /// When <c>true</c>, uppercases the first letter at string start and after sentence-end boundaries
-    /// (see <see cref="RenameItem.SentenceEndChars"/>, set by <c>SentenceEndCharacters</c> when used earlier
-    /// in the chain; default <c>".!?"</c>).
+    /// When <c>true</c>, uppercases sentence starts via the same rules as Letters Case sentence mode
+    /// (first letter, and after <see cref="RenameItem.SentenceEndChars"/> when followed by the word separator;
+    /// default ends <c>".!?"</c>). Does not lowercase the rest of the text.
     /// </param>
     public sealed record CasingListOptions(IReadOnlyList<string> Words, bool UppercaseSentenceInitial = false);
 
@@ -78,7 +78,7 @@ namespace Mfr.Filters.Case
                 return transformed;
             }
 
-            return _UppercaseSentenceInitials(
+            return SentenceInitialCasing.UppercaseInitials(
                 input: transformed,
                 wordSeparator: item.WordSeparator,
                 sentenceEndChars: item.SentenceEndChars
@@ -137,70 +137,6 @@ namespace Mfr.Filters.Case
             var originalWord = word.ToString();
             var lowerWord = originalWord.ToLowerInvariant();
             output.Append(lowerWordToCasing.GetValueOrDefault(lowerWord, originalWord));
-        }
-
-        /// <summary>
-        /// Uppercases the first letter of the text and of each sentence-start token.
-        /// </summary>
-        /// <param name="input">Input text to process.</param>
-        /// <param name="wordSeparator">Configured word separator character.</param>
-        /// <param name="sentenceEndChars">Characters treated as sentence boundaries.</param>
-        /// <returns>Text with sentence starts uppercased.</returns>
-        private static string _UppercaseSentenceInitials(string input, char wordSeparator, string sentenceEndChars)
-        {
-            if (input.Length == 0)
-            {
-                return input;
-            }
-
-            var chars = input.ToCharArray();
-            _UppercaseFirstAsciiLetter(chars, startIndex: 0);
-
-            var sentenceEndToIsIncluded = new HashSet<char>(sentenceEndChars.Where(c => c != wordSeparator));
-            if (sentenceEndToIsIncluded.Count == 0)
-            {
-                return new string(chars);
-            }
-
-            for (var i = 0; i < chars.Length; i++)
-            {
-                if (!sentenceEndToIsIncluded.Contains(chars[i]))
-                {
-                    continue;
-                }
-
-                var nextIndex = i + 1;
-                while (nextIndex < chars.Length && chars[nextIndex] == wordSeparator)
-                {
-                    nextIndex++;
-                }
-
-                _UppercaseFirstAsciiLetter(chars, nextIndex);
-            }
-
-            return new string(chars);
-        }
-
-        /// <summary>
-        /// Uppercases the first lowercase ASCII letter from the specified index, or stops at the first uppercase letter.
-        /// </summary>
-        /// <param name="chars">Character buffer to mutate in place.</param>
-        /// <param name="startIndex">Inclusive index where scanning begins.</param>
-        private static void _UppercaseFirstAsciiLetter(char[] chars, int startIndex)
-        {
-            for (var i = startIndex; i < chars.Length; i++)
-            {
-                if (char.IsAsciiLetterLower(chars[i]))
-                {
-                    chars[i] = char.ToUpperInvariant(chars[i]);
-                    return;
-                }
-
-                if (char.IsAsciiLetterUpper(chars[i]))
-                {
-                    return;
-                }
-            }
         }
     }
 }
