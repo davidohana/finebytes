@@ -25,9 +25,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal(2, list.ItemCount);
             Assert.Equal("Shrink Spaces", _RowDisplayName(list, 0));
-            Assert.Equal("File Prefix", AppliedFiltersTestUi.RowApplyToLabel(list, 0));
+            Assert.Equal("File Name", AppliedFiltersTestUi.RowApplyToLabel(list, 0));
             Assert.Equal("Letters Case", _RowDisplayName(list, 1));
-            Assert.Equal("File Prefix", AppliedFiltersTestUi.RowApplyToLabel(list, 1));
+            Assert.Equal("File Name", AppliedFiltersTestUi.RowApplyToLabel(list, 1));
             Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
             Assert.Single(list.Selection.SelectedIndexes);
 

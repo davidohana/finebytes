@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var step = viewModel.Steps[0];
             Assert.True(step.Enabled);
             Assert.Equal("Shrink Spaces", step.DisplayName);
-            Assert.Equal("File Prefix", step.ApplyToLabel);
+            Assert.Equal("File Name", step.ApplyToLabel);
             Assert.IsType<ShrinkSpacesFilter>(step.Filter);
             Assert.Equal([step], viewModel.SelectedSteps);
         }
@@ -225,7 +225,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal("My Letters", step.DisplayName);
             Assert.False(step.Enabled);
             Assert.Equal(new LettersCaseFilter(), step.Filter);
-            Assert.Equal("File Prefix", step.ApplyToLabel);
+            Assert.Equal("File Name", step.ApplyToLabel);
             Assert.Equal(1, chainChanged);
             Assert.Equal(1, optionsApplied);
         }

@@ -30,14 +30,14 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             new(
                 AudioTagSetterFieldKind.Performers,
                 AudioTagSetterFieldGroup.Basic,
-                "Set performer(s):",
+                "Set artist:",
                 "Primary artists. Use ';' to separate multiple values.",
                 Watermark: "<parent-folder:1>"
             ),
             new(
                 AudioTagSetterFieldKind.AlbumArtists,
                 AudioTagSetterFieldGroup.Basic,
-                "Set album artist(s):",
+                "Set album artist:",
                 "Album artists. Use ';' to separate multiple values.",
                 Watermark: "<parent-folder:1>"
             ),
@@ -65,7 +65,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             new(
                 AudioTagSetterFieldKind.Genre,
                 AudioTagSetterFieldGroup.Basic,
-                "Set genre(s):",
+                "Set genre:",
                 "Use ';' to separate multiple values. ID3v1 accepts only predefined genre names.",
                 Watermark: "Rock",
                 UsesGenreCombo: true
@@ -109,7 +109,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
             new(
                 AudioTagSetterFieldKind.Composers,
                 AudioTagSetterFieldGroup.Extended,
-                "Set composer(s):",
+                "Set composer:",
                 "Composers. Use ';' to separate multiple values.",
                 Watermark: "J. S. Bach"
             ),

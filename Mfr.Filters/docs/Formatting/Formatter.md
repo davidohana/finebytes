@@ -49,7 +49,7 @@ Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateR
 | Token                          | Output                                                         |
 | ------------------------------ | -------------------------------------------------------------- |
 | `<audio-title>`                | Title; empty when unset.                                       |
-| `<audio-artist>`               | Performers (joined overlay string); empty when unset.          |
+| `<audio-artist>`               | Artist (joined overlay string); empty when unset.              |
 | `<audio-album-artist>`         | Album artists; empty when unset.                               |
 | `<audio-album>`                | Album; empty when unset.                                       |
 | `<audio-year>`                 | Year as decimal digits; empty when unset.                      |

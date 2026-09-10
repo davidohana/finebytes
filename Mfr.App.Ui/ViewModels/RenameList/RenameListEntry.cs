@@ -91,7 +91,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public string FileFolder => GetFieldText(_itemTypeKey);
 
         /// <summary>
-        /// Gets the parent folder path shown in the Parent Folder column.
+        /// Gets the parent directory path shown in the Parent Directory column.
         /// </summary>
         public string ParentFolder => GetFieldText(_folderKey);
 

@@ -15,8 +15,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private static readonly FilterTargetGroupOption _fileNameGroup = new(
             "File Name",
             [
-                new FilterTargetOption("File Prefix", new FilePrefixTarget()),
-                new FilterTargetOption("Extension", new FileExtensionTarget()),
+                new FilterTargetOption("File Name", new FilePrefixTarget()),
+                new FilterTargetOption("File Extension", new FileExtensionTarget()),
                 new FilterTargetOption("Full File Name", new FileFullNameTarget()),
             ]
         );
@@ -26,7 +26,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             [
                 new FilterTargetOption("Full Path", new FullPathTarget()),
                 new FilterTargetOption("Parent Directory", new ParentDirectoryTarget()),
-                new FilterTargetOption("Ancestor Folder", new AncestorFolderTarget(1)),
+                new FilterTargetOption("Parent Folder", new AncestorFolderTarget(1)),
             ]
         );
 
@@ -197,37 +197,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
         private static string _GetSemanticAudioLabel(SemanticAudioField field)
         {
-            return field switch
-            {
-                SemanticAudioField.Title => "Title",
-                SemanticAudioField.Album => "Album",
-                SemanticAudioField.Performers => "Artist",
-                SemanticAudioField.AlbumArtists => "Album Artist",
-                SemanticAudioField.Composers => "Composer",
-                SemanticAudioField.Genre => "Genre",
-                SemanticAudioField.Comment => "Comment",
-                SemanticAudioField.Lyrics => "Lyrics",
-                SemanticAudioField.Copyright => "Copyright",
-                SemanticAudioField.Grouping => "Grouping",
-                SemanticAudioField.Year => "Year",
-                SemanticAudioField.Track => "Track",
-                SemanticAudioField.TrackCount => "Track Count",
-                SemanticAudioField.Disc => "Disc",
-                SemanticAudioField.DiscCount => "Disc Count",
-                SemanticAudioField.BeatsPerMinute => "BPM",
-                SemanticAudioField.Conductor => "Conductor",
-                SemanticAudioField.MusicBrainzArtistId => "MusicBrainz Artist Id",
-                SemanticAudioField.MusicBrainzReleaseId => "MusicBrainz Release Id",
-                SemanticAudioField.MusicBrainzTrackId => "MusicBrainz Track Id",
-                SemanticAudioField.MusicBrainzReleaseArtistId => "MusicBrainz Release Artist Id",
-                SemanticAudioField.MusicBrainzDiscId => "MusicBrainz Disc Id",
-                SemanticAudioField.MusicBrainzReleaseStatus => "MusicBrainz Release Status",
-                SemanticAudioField.MusicBrainzReleaseType => "MusicBrainz Release Type",
-                SemanticAudioField.MusicBrainzReleaseCountry => "MusicBrainz Release Country",
-                SemanticAudioField.MusicIpId => "MusicIP Id",
-                SemanticAudioField.AmazonId => "Amazon Id",
-                _ => field.ToString(),
-            };
+            return SemanticAudioFieldLabels.For(field);
         }
 
         private static string _GetXiphKeyLabel(string key)
@@ -258,16 +228,20 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 "BPM" => "BPM",
                 "TEMPO" => "Tempo",
                 "CONDUCTOR" => "Conductor",
-                "MUSICBRAINZ_ARTISTID" => "MusicBrainz Artist Id",
-                "MUSICBRAINZ_ALBUMID" => "MusicBrainz Album Id",
-                "MUSICBRAINZ_ALBUMARTISTID" => "MusicBrainz Album Artist Id",
-                "MUSICBRAINZ_TRACKID" => "MusicBrainz Track Id",
-                "MUSICBRAINZ_DISCID" => "MusicBrainz Disc Id",
-                "MUSICBRAINZ_ALBUMSTATUS" => "MusicBrainz Album Status",
-                "MUSICBRAINZ_ALBUMTYPE" => "MusicBrainz Album Type",
-                "MUSICBRAINZ_RELEASECOUNTRY" => "MusicBrainz Release Country",
-                "MUSICIP_PUID" => "MusicIP Id",
-                "ASIN" => "Amazon Id",
+                "MUSICBRAINZ_ARTISTID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzArtistId),
+                "MUSICBRAINZ_ALBUMID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzReleaseId),
+                "MUSICBRAINZ_ALBUMARTISTID" => SemanticAudioFieldLabels.For(
+                    SemanticAudioField.MusicBrainzReleaseArtistId
+                ),
+                "MUSICBRAINZ_TRACKID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzTrackId),
+                "MUSICBRAINZ_DISCID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzDiscId),
+                "MUSICBRAINZ_ALBUMSTATUS" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzReleaseStatus),
+                "MUSICBRAINZ_ALBUMTYPE" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzReleaseType),
+                "MUSICBRAINZ_RELEASECOUNTRY" => SemanticAudioFieldLabels.For(
+                    SemanticAudioField.MusicBrainzReleaseCountry
+                ),
+                "MUSICIP_PUID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicIpId),
+                "ASIN" => SemanticAudioFieldLabels.For(SemanticAudioField.AmazonId),
                 _ => key,
             };
         }

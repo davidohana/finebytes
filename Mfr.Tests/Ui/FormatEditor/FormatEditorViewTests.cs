@@ -393,7 +393,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var leaf = Assert.Single(fileNameGroup.Children, n => n.Entry?.CanonicalName == "file-name");
+            var leaf = Assert.Single(fileNameGroup.Children, n => n.Entry?.CanonicalName == "file-extension");
             var leafContainer = Assert.IsType<TreeViewItem>(groupContainer.ContainerFromItem(leaf));
             var leafTitle = Assert.Single(
                 leafContainer.GetVisualDescendants().OfType<TextBlock>(),

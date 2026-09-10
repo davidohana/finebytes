@@ -147,7 +147,8 @@ ______________________________________________________________________
 
 | Item                                                 | Notes                                                                                                                                                                           |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| “Parent Folder” label collision                      | Apply-To ancestor L1 = segment name; Rename List column = absolute `DirectoryPath`; “Parent Directory” = absolute dir target — MFR7-facing; don’t force one map without UI pass |
+| “Parent Folder” label collision                      | **Done** — Parent Directory = absolute; Parent Folder = ancestor segment                                                                                                        |
+| Semantic audio Apply-To vs Rename List display names                                                   | **Done** — `SemanticAudioFieldLabels` (Picard A for MB)                                                     |
 | Prefix/extension writes skip Windows name validation | Ancestor segments validate; name parts rely on Cleaner / commit — product choice                                                                                                |
 | `FileMeta.Clone` shares Media/Image/Exif refs        | Safe while snapshots stay immutable                                                                                                                                             |
 
@@ -383,7 +384,7 @@ ______________________________________________________________________
 | Services → Views                     | **Clean**                                                                                   |
 | File List → Rename List Views import | **Was smell; fixed** — `RenameListDragFormats` under `Views/DragAndDrop`                    |
 | Domain policy in UI                  | **Clean** — add expansion stays in Engine; UI only maps rows→sources                        |
-| Second resolver / label maps         | Apply-To vs Rename List labels diverge by product (MFR7); do not merge without UI pass (#5) |
+| Second resolver / label maps         | **Done** — shared `SemanticAudioFieldLabels` + path label pass (#5)                         |
 | Open feature phases 14b–16           | **Untouched**                                                                               |
 
 ### Applied (high confidence)
@@ -400,8 +401,8 @@ ______________________________________________________________________
 | Item                                                                                                   | Notes                                                                                                       |
 | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
 | Progress phase `LoadMetadata` for preview filter apply                                                 | Enum docs + `RenameListProgressCopy` remapping are honest enough; optional `ApplyPreview` stays backlog #15 |
-| Apply-To “Ancestor Folder” option vs `GetLabel` “Parent Folder” (level 1) vs “Parent Directory” target | Confusing trio; MFR7-facing — don’t rename without UI pass                                                  |
-| Semantic audio Apply-To vs Rename List display names                                                   | Artist/Performers etc. diverge; product vocabulary (#5)                                                     |
+| Apply-To “Ancestor Folder” option vs `GetLabel` “Parent Folder” (level 1) vs “Parent Directory” target | **Done** — option L1 = Parent Folder; Parent Directory = absolute dir                                       |
+| Semantic audio Apply-To vs Rename List display names                                                   | **Done** — `SemanticAudioFieldLabels` (Picard A for MB)                                                     |
 | Grid DnD press/snapshot fork (File List vs Rename List)                                                | Small asymmetry (Rename re-applies snapshot on move); optional `DataGridDragSession` (#26)                  |
 
 ### Deeper refactors (promoted / refined)
@@ -597,9 +598,6 @@ Suggested order if chasing correctness only: optionally #10 / #15 / #9 (Open —
 1. **Move or lazy-gate `FormatFolderFileCount` directory scan** (was #3) — docs Phase 7
    Rank: **skip** — perf; unless profiling shows FileCount column hot
 
-1. **Shared Apply-To / Rename List / Picard display labels** (was #5)
-   Rank: **skip** — product vocabulary; unless UI pass demands label convergence
-
 1. **Shared AppData delete-if-exists helper** (was #21)
    Rank: **skip** — cosmetic; unless touching all three stores
 
@@ -611,6 +609,8 @@ Suggested order if chasing correctness only: optionally #10 / #15 / #9 (Open —
 
 ### Closed (history)
 
+1. **Shared Apply-To / Rename List / Picard display labels** (was #5) — **done**
+   `SemanticAudioFieldLabels` (+ Picard TXXX from `AudioCatalogFieldMaps`); path trio: Parent Directory = absolute dir, Parent Folder = ancestor segment; File Name / File Extension / Full Path / Full Path Length; Artist/Album Artist/Composer/Genre/BPM; MusicBrainz Album* / ASIN / MusicIP PUID
 1. **Sentence-initial uppercasing twin** (was #7) — **done**
    `SentenceInitialCasing.UppercaseInitials` shared by LettersCase sentence mode + CasingList; Unicode `IsLetter` + scan-past non-letters; sentence-end requires word separator (LettersCase rule)
 1. **Wire catalog maps to existing key constants** (was #20) — **done**

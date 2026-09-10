@@ -35,16 +35,16 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Performers", "Audio\\Tag", "Performers from the audio tag overlay", "audio-artist")]
+    [FormatTokenInfo("Artist", "Audio\\Tag", "Artist from the audio tag overlay", "audio-artist")]
     internal sealed class AudioArtistToken : SemanticAudioFieldTokenBase
     {
-        /// <summary>Registers <c>&lt;audio-artist&gt;</c> (joined performers).</summary>
+        /// <summary>Registers <c>&lt;audio-artist&gt;</c> (joined artists).</summary>
         public AudioArtistToken()
             : base(["audio-artist"], SemanticAudioField.Performers) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Album Artist", "Audio\\Tag", "Album artists from the audio tag overlay", "audio-album-artist")]
+    [FormatTokenInfo("Album Artist", "Audio\\Tag", "Album artist from the audio tag overlay", "audio-album-artist")]
     internal sealed class AudioAlbumArtistToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-album-artist&gt;</c>.</summary>
@@ -71,7 +71,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Genres", "Audio\\Tag", "Genre from the audio tag overlay", "audio-genre")]
+    [FormatTokenInfo("Genre", "Audio\\Tag", "Genre from the audio tag overlay", "audio-genre")]
     internal sealed class AudioGenreToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-genre&gt;</c>.</summary>
@@ -125,7 +125,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Composers", "Audio\\Tag", "Composers from the audio tag overlay", "audio-composer")]
+    [FormatTokenInfo("Composer", "Audio\\Tag", "Composer from the audio tag overlay", "audio-composer")]
     internal sealed class AudioComposerToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-composer&gt;</c>.</summary>
@@ -161,7 +161,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Beats Per Minute", "Audio\\Tag", "BPM from the audio tag overlay", "audio-bpm")]
+    [FormatTokenInfo("BPM", "Audio\\Tag", "BPM from the audio tag overlay", "audio-bpm")]
     internal sealed class AudioBpmToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-bpm&gt;</c>.</summary>
@@ -179,7 +179,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("MusicBrainz Artist Id", "Audio\\Tag", "MusicBrainz artist ID", "audio-mb-artist-id")]
+    [FormatTokenInfo("MusicBrainz Artist Id", "Audio\\Tag", "MusicBrainz artist Id", "audio-mb-artist-id")]
     internal sealed class AudioMbArtistIdToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-mb-artist-id&gt;</c>.</summary>
@@ -188,7 +188,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("MusicBrainz Release Id", "Audio\\Tag", "MusicBrainz release ID", "audio-mb-release-id")]
+    [FormatTokenInfo("MusicBrainz Album Id", "Audio\\Tag", "MusicBrainz album Id", "audio-mb-release-id")]
     internal sealed class AudioMbReleaseIdToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-mb-release-id&gt;</c>.</summary>
@@ -198,9 +198,9 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
 
     /// <inheritdoc />
     [FormatTokenInfo(
-        "MusicBrainz Release Artist Id",
+        "MusicBrainz Album Artist Id",
         "Audio\\Tag",
-        "MusicBrainz release artist ID",
+        "MusicBrainz album artist Id",
         "audio-mb-release-artist-id"
     )]
     internal sealed class AudioMbReleaseArtistIdToken : SemanticAudioFieldTokenBase
@@ -211,7 +211,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("MusicBrainz Track Id", "Audio\\Tag", "MusicBrainz track ID", "audio-mb-track-id")]
+    [FormatTokenInfo("MusicBrainz Track Id", "Audio\\Tag", "MusicBrainz track Id", "audio-mb-track-id")]
     internal sealed class AudioMbTrackIdToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-mb-track-id&gt;</c>.</summary>
@@ -220,7 +220,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("MusicBrainz Disc Id", "Audio\\Tag", "MusicBrainz disc ID", "audio-mb-disc-id")]
+    [FormatTokenInfo("MusicBrainz Disc Id", "Audio\\Tag", "MusicBrainz disc Id", "audio-mb-disc-id")]
     internal sealed class AudioMbDiscIdToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-mb-disc-id&gt;</c>.</summary>
@@ -229,12 +229,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo(
-        "MusicBrainz Release Status",
-        "Audio\\Tag",
-        "MusicBrainz release status",
-        "audio-mb-release-status"
-    )]
+    [FormatTokenInfo("MusicBrainz Album Status", "Audio\\Tag", "MusicBrainz album status", "audio-mb-release-status")]
     internal sealed class AudioMbReleaseStatusToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-mb-release-status&gt;</c>.</summary>
@@ -243,7 +238,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("MusicBrainz Release Type", "Audio\\Tag", "MusicBrainz release type", "audio-mb-release-type")]
+    [FormatTokenInfo("MusicBrainz Album Type", "Audio\\Tag", "MusicBrainz album type", "audio-mb-release-type")]
     internal sealed class AudioMbReleaseTypeToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-mb-release-type&gt;</c>.</summary>
@@ -253,9 +248,9 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
 
     /// <inheritdoc />
     [FormatTokenInfo(
-        "MusicBrainz Release Country",
+        "MusicBrainz Album Release Country",
         "Audio\\Tag",
-        "MusicBrainz release country",
+        "MusicBrainz album release country",
         "audio-mb-release-country"
     )]
     internal sealed class AudioMbReleaseCountryToken : SemanticAudioFieldTokenBase
@@ -266,7 +261,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("MusicIP Id", "Audio\\Tag", "MusicIP PUID", "audio-musicip-id")]
+    [FormatTokenInfo("MusicIP PUID", "Audio\\Tag", "MusicIP PUID", "audio-musicip-id")]
     internal sealed class AudioMusicIpIdToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-musicip-id&gt;</c>.</summary>
@@ -275,7 +270,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Amazon Id", "Audio\\Tag", "Amazon ASIN", "audio-amazon-id")]
+    [FormatTokenInfo("ASIN", "Audio\\Tag", "Amazon ASIN", "audio-amazon-id")]
     internal sealed class AudioAmazonIdToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-amazon-id&gt;</c>.</summary>

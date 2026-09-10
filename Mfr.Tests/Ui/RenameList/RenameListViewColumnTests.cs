@@ -82,7 +82,7 @@ namespace Mfr.Tests.Ui.RenameList
             );
             var fileFolderHeaderOnlyWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth("File/Folder");
             var parentFolderMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                "Parent Folder",
+                "Parent Directory",
                 reserveSortGlyph: true
             );
             var fullFileNameMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
@@ -128,13 +128,13 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var fullPathLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full Path Name Length");
+            var fullPathLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full Path Length");
             var previewFileNameLengthMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 "File Name Length",
                 reservePreviewGlyph: true
             );
             var fullPathLengthWithGlyph = RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                "Full Path Name Length",
+                "Full Path Length",
                 reserveSortGlyph: true
             );
 
@@ -246,7 +246,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             _RaiseHeaderContextMenu(originalHeader);
             Assert.Equal(
-                ["(Parent Folder)", "Hide Field", "Select Visible Fields...", "Select Sort Fields..."],
+                ["(Parent Directory)", "Hide Field", "Select Visible Fields...", "Select Sort Fields..."],
                 _MenuHeaders(originalHeader.ContextMenu)
             );
 
@@ -348,7 +348,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             var parentFolderMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                "Parent Folder",
+                "Parent Directory",
                 reserveSortGlyph: true
             );
 
@@ -543,9 +543,9 @@ namespace Mfr.Tests.Ui.RenameList
                 FilterTestHelpers.CreateRenameItem(prefix: "01 - Tales of Endurance (Part 1)", directory: parentFolder)
             );
 
-            var parentMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Parent Folder", reserveSortGlyph: true);
+            var parentMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Parent Directory", reserveSortGlyph: true);
             var fullPathMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                "Full File Path",
+                "Full Path",
                 reserveSortGlyph: true
             );
             var parentFit = RenameListGridColumnWidths.GetAutoFitWidth([parentEntry], parentFolderKey, parentMin);

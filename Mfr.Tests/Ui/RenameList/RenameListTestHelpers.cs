@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.RenameList
             RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType);
 
         /// <summary>
-        /// Original field key for Parent Folder.
+        /// Original field key for Parent Directory.
         /// </summary>
         internal static RenameListFieldKey ParentFolderKey =>
             RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Ui.RenameList
             RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
         /// <summary>
-        /// Original field key for Full File Path.
+        /// Original field key for Full Path.
         /// </summary>
         internal static RenameListFieldKey FullPathKey =>
             RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath);

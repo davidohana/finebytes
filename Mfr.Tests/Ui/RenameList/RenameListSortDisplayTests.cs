@@ -16,7 +16,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(RenameListSortDisplay.AutoSortOffSummary, RenameListSortDisplay.FormatSummary([]));
 
             Assert.Equal(
-                "1. File/Folder ↑\n2. Parent Folder ↑\n3. Full File Name ↑",
+                "1. File/Folder ↑\n2. Parent Directory ↑\n3. Full File Name ↑",
                 RenameListSortDisplay.FormatSummary(RenameListSortKey.DefaultKeys)
             );
 
@@ -27,7 +27,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ])
             );
 
-            Assert.Equal("Full File Path", RenameListSortDisplay.GetFieldLabel(RenameListTestHelpers.FullPathKey));
+            Assert.Equal("Full Path", RenameListSortDisplay.GetFieldLabel(RenameListTestHelpers.FullPathKey));
         }
 
         [Fact]

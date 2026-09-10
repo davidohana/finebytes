@@ -32,7 +32,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Single(dialogVm.SelectedColumnRows);
             Assert.Single(dialogVm.SelectedSortRows);
             Assert.Equal("File Name", dialogVm.SelectedColumnRows[0].DisplayName);
-            Assert.Equal("Full File Path", dialogVm.SelectedSortRows[0].Label);
+            Assert.Equal("Full Path", dialogVm.SelectedSortRows[0].Label);
         }
 
         [Fact]

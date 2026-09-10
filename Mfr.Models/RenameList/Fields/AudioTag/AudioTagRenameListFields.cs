@@ -9,6 +9,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// <remarks>
     /// Semantic fields are <c>ReadWriteApply</c> (previewable). First-segment and Tag Types stay
     /// original-only (<c>ReadOnly</c>), matching MFR7 <c>AudioTagPgInfo</c>.
+    /// Display names come from <see cref="SemanticAudioFieldLabels"/> (alphabetical by those labels).
     /// </remarks>
     public static class AudioTagRenameListFields
     {
@@ -23,79 +24,72 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         public const string GroupLabel = "Audio Tag";
 
         /// <summary>
-        /// Audio Tag group fields in MFR7 alphabetical display-name order.
+        /// Audio Tag group fields in alphabetical display-name order.
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
-            new AudioTagSemanticRenameListField("AlbumArtists", "Album Artists", SemanticAudioField.AlbumArtists),
-            new AudioTagSemanticRenameListField("Album", "Album", SemanticAudioField.Album),
-            new AudioTagSemanticRenameListField("AmazonId", "Amazon ID", SemanticAudioField.AmazonId),
-            new AudioTagSemanticRenameListField(
-                "BeatsPerMinute",
-                "Beats Per Minute",
-                SemanticAudioField.BeatsPerMinute
-            ),
-            new AudioTagSemanticRenameListField("Comment", "Comment", SemanticAudioField.Comment),
-            new AudioTagSemanticRenameListField("Composers", "Composers", SemanticAudioField.Composers),
-            new AudioTagSemanticRenameListField("Conductor", "Conductor", SemanticAudioField.Conductor),
-            new AudioTagSemanticRenameListField("Copyright", "Copyright", SemanticAudioField.Copyright),
-            new AudioTagSemanticRenameListField("DiscCount", "Disc Count", SemanticAudioField.DiscCount),
-            new AudioTagSemanticRenameListField("Disc", "Disc", SemanticAudioField.Disc),
-            new AudioTagFirstSegmentRenameListField("FirstAlbumArtist", "AlbumArtist", SemanticAudioField.AlbumArtists),
-            new AudioTagFirstSegmentRenameListField("FirstComposer", "Composer", SemanticAudioField.Composers),
-            new AudioTagFirstSegmentRenameListField("FirstGenre", "Genre", SemanticAudioField.Genre),
-            new AudioTagFirstSegmentRenameListField("FirstPerformer", "Performer", SemanticAudioField.Performers),
-            new AudioTagSemanticRenameListField("Genres", "Genres", SemanticAudioField.Genre),
-            new AudioTagSemanticRenameListField("Grouping", "Grouping", SemanticAudioField.Grouping),
-            new AudioTagSemanticRenameListField("Lyrics", "Lyrics", SemanticAudioField.Lyrics),
-            new AudioTagSemanticRenameListField(
-                "MusicBrainzArtistId",
-                "Music Brainz Artist ID",
-                SemanticAudioField.MusicBrainzArtistId
-            ),
-            new AudioTagSemanticRenameListField(
-                "MusicBrainzDiscId",
-                "Music Brainz Disc ID",
-                SemanticAudioField.MusicBrainzDiscId
-            ),
-            new AudioTagSemanticRenameListField(
-                "MusicBrainzReleaseArtistId",
-                "Music Brainz Release Artist ID",
-                SemanticAudioField.MusicBrainzReleaseArtistId
-            ),
-            new AudioTagSemanticRenameListField(
-                "MusicBrainzReleaseCountry",
-                "Music Brainz Release Country",
-                SemanticAudioField.MusicBrainzReleaseCountry
-            ),
-            new AudioTagSemanticRenameListField(
-                "MusicBrainzReleaseId",
-                "Music Brainz Release ID",
-                SemanticAudioField.MusicBrainzReleaseId
-            ),
-            new AudioTagSemanticRenameListField(
-                "MusicBrainzReleaseStatus",
-                "Music Brainz Release Status",
-                SemanticAudioField.MusicBrainzReleaseStatus
-            ),
-            new AudioTagSemanticRenameListField(
-                "MusicBrainzReleaseType",
-                "Music Brainz Release Type",
-                SemanticAudioField.MusicBrainzReleaseType
-            ),
-            new AudioTagSemanticRenameListField(
-                "MusicBrainzTrackId",
-                "Music Brainz Track ID",
-                SemanticAudioField.MusicBrainzTrackId
-            ),
-            new AudioTagSemanticRenameListField("MusicIpId", "MusicIP ID", SemanticAudioField.MusicIpId),
-            new AudioTagSemanticRenameListField("Performers", "Performers", SemanticAudioField.Performers),
+            _Semantic("Album", SemanticAudioField.Album),
+            _Semantic("AlbumArtists", SemanticAudioField.AlbumArtists),
+            _First("FirstAlbumArtist", SemanticAudioField.AlbumArtists),
+            _Semantic("Performers", SemanticAudioField.Performers),
+            _First("FirstPerformer", SemanticAudioField.Performers),
+            _Semantic("AmazonId", SemanticAudioField.AmazonId),
+            _Semantic("BeatsPerMinute", SemanticAudioField.BeatsPerMinute),
+            _Semantic("Comment", SemanticAudioField.Comment),
+            _Semantic("Composers", SemanticAudioField.Composers),
+            _First("FirstComposer", SemanticAudioField.Composers),
+            _Semantic("Conductor", SemanticAudioField.Conductor),
+            _Semantic("Copyright", SemanticAudioField.Copyright),
+            _Semantic("Disc", SemanticAudioField.Disc),
+            _Semantic("DiscCount", SemanticAudioField.DiscCount),
+            _Semantic("Genres", SemanticAudioField.Genre),
+            _First("FirstGenre", SemanticAudioField.Genre),
+            _Semantic("Grouping", SemanticAudioField.Grouping),
+            _Semantic("Lyrics", SemanticAudioField.Lyrics),
+            _Semantic("MusicBrainzReleaseArtistId", SemanticAudioField.MusicBrainzReleaseArtistId),
+            _Semantic("MusicBrainzReleaseId", SemanticAudioField.MusicBrainzReleaseId),
+            _Semantic("MusicBrainzReleaseCountry", SemanticAudioField.MusicBrainzReleaseCountry),
+            _Semantic("MusicBrainzReleaseStatus", SemanticAudioField.MusicBrainzReleaseStatus),
+            _Semantic("MusicBrainzReleaseType", SemanticAudioField.MusicBrainzReleaseType),
+            _Semantic("MusicBrainzArtistId", SemanticAudioField.MusicBrainzArtistId),
+            _Semantic("MusicBrainzDiscId", SemanticAudioField.MusicBrainzDiscId),
+            _Semantic("MusicBrainzTrackId", SemanticAudioField.MusicBrainzTrackId),
+            _Semantic("MusicIpId", SemanticAudioField.MusicIpId),
             new AudioTagTagTypesField(),
-            new AudioTagSemanticRenameListField("Title", "Title", SemanticAudioField.Title),
-            new AudioTagSemanticRenameListField("TrackCount", "Track Count", SemanticAudioField.TrackCount),
-            new AudioTagSemanticRenameListField("Track", "Track", SemanticAudioField.Track, defaultWidth: 40),
-            new AudioTagSemanticRenameListField("Year", "Year", SemanticAudioField.Year, defaultWidth: 60),
+            _Semantic("Title", SemanticAudioField.Title),
+            _Semantic("Track", SemanticAudioField.Track, defaultWidth: 40),
+            _Semantic("TrackCount", SemanticAudioField.TrackCount),
+            _Semantic("Year", SemanticAudioField.Year, defaultWidth: 60),
         ];
+
+        /// <summary>
+        /// Creates a semantic column with the shared display label.
+        /// </summary>
+        private static AudioTagSemanticRenameListField _Semantic(
+            string propertyKey,
+            SemanticAudioField field,
+            int defaultWidth = 100
+        )
+        {
+            return new AudioTagSemanticRenameListField(
+                propertyKey,
+                SemanticAudioFieldLabels.For(field),
+                field,
+                defaultWidth
+            );
+        }
+
+        /// <summary>
+        /// Creates a first-segment column with the shared first-segment label.
+        /// </summary>
+        private static AudioTagFirstSegmentRenameListField _First(string propertyKey, SemanticAudioField field)
+        {
+            return new AudioTagFirstSegmentRenameListField(
+                propertyKey,
+                SemanticAudioFieldLabels.FirstSegment(field),
+                field
+            );
+        }
     }
 
     internal sealed class AudioTagTagTypesField() : AudioTagRenameListField("TagTypes", "Tag Types")

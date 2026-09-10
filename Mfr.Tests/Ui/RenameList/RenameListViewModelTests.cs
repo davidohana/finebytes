@@ -806,7 +806,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ],
                 renameListViewModel.SortKeys
             );
-            Assert.Equal("1. Full File Path ↑\n2. File/Folder ↓", renameListViewModel.SortSummaryText);
+            Assert.Equal("1. Full Path ↑\n2. File/Folder ↓", renameListViewModel.SortSummaryText);
             Assert.Equal(2, renameListViewModel.ColumnSortStates[RenameListTestHelpers.FileFolderKey].Priority);
             Assert.True(renameListViewModel.ColumnSortStates[RenameListTestHelpers.FileFolderKey].IsDescending);
             Assert.False(renameListViewModel.ColumnSortStates[RenameListTestHelpers.ParentFolderKey].IsActive);

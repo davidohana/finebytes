@@ -17,7 +17,7 @@ namespace Mfr.Models.RenameList
     )
     {
         /// <summary>
-        /// Default Auto-Sort keys: File/Folder, Parent Folder, then Full File Name. Empty session value disables Auto-Sort.
+        /// Default Auto-Sort keys: File/Folder, Parent Directory, then Full File Name. Empty session value disables Auto-Sort.
         /// </summary>
         public static IReadOnlyList<RenameListSortKey> DefaultKeys { get; } =
         [

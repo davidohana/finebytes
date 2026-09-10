@@ -24,6 +24,10 @@ namespace Mfr.Tests.Models
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(BasicRenameListField.Group).Count);
             Assert.Equal(6, RenameListFieldCatalog.GetFieldsForGroup(ExtendedRenameListFields.Group).Count);
             Assert.Equal(32, RenameListFieldCatalog.GetFieldsForGroup(AudioTagRenameListFields.Group).Count);
+            Assert.Equal(
+                AudioTagRenameListFields.All.OrderBy(f => f.DisplayName, StringComparer.OrdinalIgnoreCase).ToList(),
+                AudioTagRenameListFields.All.ToList()
+            );
             Assert.Equal(15, RenameListFieldCatalog.GetFieldsForGroup(MediaRenameListFields.Group).Count);
             Assert.Equal(11, RenameListFieldCatalog.GetFieldsForGroup(MpegRenameListFields.Group).Count);
             Assert.Equal(7, RenameListFieldCatalog.GetFieldsForGroup(ImageRenameListFields.Group).Count);
@@ -102,9 +106,9 @@ namespace Mfr.Tests.Models
 
         [Theory]
         [InlineData(BasicRenameListFields.Key.Name, "File Name", 150, true, true)]
-        [InlineData(BasicRenameListFields.Key.Folder, "Parent Folder", 240, true, true)]
+        [InlineData(BasicRenameListFields.Key.Folder, "Parent Directory", 240, true, true)]
         [InlineData(BasicRenameListFields.Key.FullName, "Full File Name", 180, true, true)]
-        [InlineData(BasicRenameListFields.Key.FullPath, "Full File Path", 180, true, true)]
+        [InlineData(BasicRenameListFields.Key.FullPath, "Full Path", 180, true, true)]
         public void Field_definitions_with_width_overrides_carry_mfr7_labels_and_flags(
             string propertyKey,
             string displayName,
@@ -128,7 +132,7 @@ namespace Mfr.Tests.Models
         [InlineData(BasicRenameListFields.Key.Extension, "File Extension", true)]
         [InlineData(BasicRenameListFields.Key.FileNameNumeric, "File Name Numeric Value", false)]
         [InlineData(BasicRenameListFields.Key.FileNameLength, "File Name Length", true)]
-        [InlineData(BasicRenameListFields.Key.FullPathLength, "Full Path Name Length", true)]
+        [InlineData(BasicRenameListFields.Key.FullPathLength, "Full Path Length", true)]
         public void Field_definitions_without_width_overrides_use_header_fit_default(
             string propertyKey,
             string displayName,

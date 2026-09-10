@@ -1,4 +1,5 @@
 using Mfr.Filters.Formatting.FormatString;
+using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Models.Filters.Formatting.FormatString
 {
@@ -89,6 +90,31 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
                 .ToList();
 
             Assert.Equal(ordered, [.. FormatTokenCatalog.Entries]);
+        }
+
+        /// <summary>
+        /// Verifies Audio\\Tag semantic tokens use <see cref="Mfr.Models.Tags.SemanticAudioFieldLabels"/>.
+        /// </summary>
+        [Theory]
+        [InlineData("audio-artist", SemanticAudioField.Performers)]
+        [InlineData("audio-album-artist", SemanticAudioField.AlbumArtists)]
+        [InlineData("audio-genre", SemanticAudioField.Genre)]
+        [InlineData("audio-composer", SemanticAudioField.Composers)]
+        [InlineData("audio-bpm", SemanticAudioField.BeatsPerMinute)]
+        [InlineData("audio-mb-release-id", SemanticAudioField.MusicBrainzReleaseId)]
+        [InlineData("audio-mb-release-artist-id", SemanticAudioField.MusicBrainzReleaseArtistId)]
+        [InlineData("audio-mb-release-status", SemanticAudioField.MusicBrainzReleaseStatus)]
+        [InlineData("audio-mb-release-type", SemanticAudioField.MusicBrainzReleaseType)]
+        [InlineData("audio-mb-release-country", SemanticAudioField.MusicBrainzReleaseCountry)]
+        [InlineData("audio-musicip-id", SemanticAudioField.MusicIpId)]
+        [InlineData("audio-amazon-id", SemanticAudioField.AmazonId)]
+        public void Audio_tag_display_names_match_semantic_labels(string canonicalName, SemanticAudioField field)
+        {
+            var entry = Assert.Single(
+                FormatTokenCatalog.Entries,
+                e => string.Equals(e.CanonicalName, canonicalName, StringComparison.Ordinal)
+            );
+            Assert.Equal(SemanticAudioFieldLabels.For(field), entry.DisplayName);
         }
     }
 }

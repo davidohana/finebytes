@@ -32,9 +32,9 @@ namespace Mfr.Tests.Ui.RenameList
                 var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
                 var explanation = RenameListFieldCatalog.DescribeLoadError(item, titleKey);
 
-                var hint = RenameListCellHint.FormatLoadError("Album Artists", explanation);
+                var hint = RenameListCellHint.FormatLoadError("Album Artist", explanation);
                 Assert.Equal(2, hint.Runs.Count);
-                Assert.Equal("Album Artists", hint.Runs[0].Text);
+                Assert.Equal("Album Artist", hint.Runs[0].Text);
                 Assert.Contains("Could not read metadata:", hint.Runs[1].Text, StringComparison.Ordinal);
                 Assert.Contains("audio or media metadata", hint.Runs[1].Text, StringComparison.Ordinal);
             }

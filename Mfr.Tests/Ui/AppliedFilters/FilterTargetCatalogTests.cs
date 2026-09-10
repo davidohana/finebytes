@@ -10,7 +10,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
     public sealed class FilterTargetCatalogTests
     {
         /// <summary>
-        /// Verifies unknown <see cref="FilterTarget"/> types fall back to File Prefix.
+        /// Verifies unknown <see cref="FilterTarget"/> types fall back to File Name.
         /// </summary>
         [Fact]
         public void Resolve_falls_back_to_file_prefix_for_unknown_target_type()

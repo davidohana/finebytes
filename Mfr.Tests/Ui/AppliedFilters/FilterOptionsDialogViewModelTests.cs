@@ -78,7 +78,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             applied.ApplyFilterOptions(dialog);
 
-            Assert.Equal("Extension", applied.Steps[0].ApplyToLabel);
+            Assert.Equal("File Extension", applied.Steps[0].ApplyToLabel);
 
             var filter = (ShrinkSpacesFilter)applied.ToChain().Steps[0].Filter;
 
@@ -416,7 +416,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             applied.ApplyFilterOptions(dialog);
 
-            Assert.Equal("File Prefix (Substring)", applied.Steps[0].ApplyToLabel);
+            Assert.Equal("File Name (Substring)", applied.Steps[0].ApplyToLabel);
 
             var filter = (ShrinkSpacesFilter)applied.ToChain().Steps[0].Filter;
 
@@ -452,7 +452,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             applied.ApplyFilterOptions(dialog);
 
-            Assert.Equal("File Prefix (Token)", applied.Steps[0].ApplyToLabel);
+            Assert.Equal("File Name (Token)", applied.Steps[0].ApplyToLabel);
 
             var filter = (ShrinkSpacesFilter)applied.ToChain().Steps[0].Filter;
 
