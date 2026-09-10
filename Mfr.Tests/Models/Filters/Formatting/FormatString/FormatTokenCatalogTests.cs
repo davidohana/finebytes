@@ -93,28 +93,57 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         }
 
         /// <summary>
-        /// Verifies Audio\\Tag semantic tokens use <see cref="Mfr.Models.Tags.SemanticAudioFieldLabels"/>.
+        /// Verifies every <c>Audio\\Tag</c> token maps to a semantic field and uses
+        /// <see cref="SemanticAudioFieldLabels"/>.
         /// </summary>
-        [Theory]
-        [InlineData("audio-artist", SemanticAudioField.Performers)]
-        [InlineData("audio-album-artist", SemanticAudioField.AlbumArtists)]
-        [InlineData("audio-genre", SemanticAudioField.Genre)]
-        [InlineData("audio-composer", SemanticAudioField.Composers)]
-        [InlineData("audio-bpm", SemanticAudioField.BeatsPerMinute)]
-        [InlineData("audio-mb-release-id", SemanticAudioField.MusicBrainzReleaseId)]
-        [InlineData("audio-mb-release-artist-id", SemanticAudioField.MusicBrainzReleaseArtistId)]
-        [InlineData("audio-mb-release-status", SemanticAudioField.MusicBrainzReleaseStatus)]
-        [InlineData("audio-mb-release-type", SemanticAudioField.MusicBrainzReleaseType)]
-        [InlineData("audio-mb-release-country", SemanticAudioField.MusicBrainzReleaseCountry)]
-        [InlineData("audio-musicip-id", SemanticAudioField.MusicIpId)]
-        [InlineData("audio-amazon-id", SemanticAudioField.AmazonId)]
-        public void Audio_tag_display_names_match_semantic_labels(string canonicalName, SemanticAudioField field)
+        [Fact]
+        public void Audio_tag_display_names_match_semantic_labels()
         {
-            var entry = Assert.Single(
-                FormatTokenCatalog.Entries,
-                e => string.Equals(e.CanonicalName, canonicalName, StringComparison.Ordinal)
+            var canonicalNameToField = new Dictionary<string, SemanticAudioField>(StringComparer.Ordinal)
+            {
+                ["audio-title"] = SemanticAudioField.Title,
+                ["audio-artist"] = SemanticAudioField.Performers,
+                ["audio-album-artist"] = SemanticAudioField.AlbumArtists,
+                ["audio-album"] = SemanticAudioField.Album,
+                ["audio-year"] = SemanticAudioField.Year,
+                ["audio-genre"] = SemanticAudioField.Genre,
+                ["audio-track"] = SemanticAudioField.Track,
+                ["audio-track-count"] = SemanticAudioField.TrackCount,
+                ["audio-disc"] = SemanticAudioField.Disc,
+                ["audio-disc-count"] = SemanticAudioField.DiscCount,
+                ["audio-comment"] = SemanticAudioField.Comment,
+                ["audio-composer"] = SemanticAudioField.Composers,
+                ["audio-lyrics"] = SemanticAudioField.Lyrics,
+                ["audio-copyright"] = SemanticAudioField.Copyright,
+                ["audio-grouping"] = SemanticAudioField.Grouping,
+                ["audio-bpm"] = SemanticAudioField.BeatsPerMinute,
+                ["audio-conductor"] = SemanticAudioField.Conductor,
+                ["audio-mb-artist-id"] = SemanticAudioField.MusicBrainzArtistId,
+                ["audio-mb-release-id"] = SemanticAudioField.MusicBrainzReleaseId,
+                ["audio-mb-release-artist-id"] = SemanticAudioField.MusicBrainzReleaseArtistId,
+                ["audio-mb-track-id"] = SemanticAudioField.MusicBrainzTrackId,
+                ["audio-mb-disc-id"] = SemanticAudioField.MusicBrainzDiscId,
+                ["audio-mb-release-status"] = SemanticAudioField.MusicBrainzReleaseStatus,
+                ["audio-mb-release-type"] = SemanticAudioField.MusicBrainzReleaseType,
+                ["audio-mb-release-country"] = SemanticAudioField.MusicBrainzReleaseCountry,
+                ["audio-musicip-id"] = SemanticAudioField.MusicIpId,
+                ["audio-amazon-id"] = SemanticAudioField.AmazonId,
+            };
+
+            Assert.Equal(Enum.GetValues<SemanticAudioField>().Length, canonicalNameToField.Count);
+            Assert.Equal(
+                canonicalNameToField.Count,
+                FormatTokenCatalog.Entries.Count(e => e.GroupPath == "Audio\\Tag")
             );
-            Assert.Equal(SemanticAudioFieldLabels.For(field), entry.DisplayName);
+
+            foreach (var (canonicalName, field) in canonicalNameToField)
+            {
+                var entry = Assert.Single(
+                    FormatTokenCatalog.Entries,
+                    e => string.Equals(e.CanonicalName, canonicalName, StringComparison.Ordinal)
+                );
+                Assert.Equal(SemanticAudioFieldLabels.For(field), entry.DisplayName);
+            }
         }
     }
 }

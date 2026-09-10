@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
 
@@ -13,7 +14,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         /// Verifies unknown <see cref="FilterTarget"/> types fall back to File Name.
         /// </summary>
         [Fact]
-        public void Resolve_falls_back_to_file_prefix_for_unknown_target_type()
+        public void Resolve_falls_back_to_file_name_for_unknown_target_type()
         {
             var (group, option, ancestorFolderLevel) = FilterTargetCatalog.Resolve(new UnknownFilterTarget());
 
@@ -92,6 +93,49 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Assert.Equal(Id3v2FrameLabels.For(frameId), option.Label);
                 Assert.NotEqual(frameId, option.Label);
             }
+        }
+
+        /// <summary>
+        /// Verifies Xiph keys that share a semantic field reuse <see cref="SemanticAudioFieldLabels"/>.
+        /// </summary>
+        [Fact]
+        public void GetLabel_xiph_overlapping_keys_use_semantic_audio_labels()
+        {
+            Assert.Equal(
+                SemanticAudioFieldLabels.For(SemanticAudioField.Title),
+                FilterTargetCatalog.GetLabel(new XiphFieldTarget("TITLE"))
+            );
+            Assert.Equal(
+                SemanticAudioFieldLabels.For(SemanticAudioField.Performers),
+                FilterTargetCatalog.GetLabel(new XiphFieldTarget("ARTIST"))
+            );
+            Assert.Equal(
+                SemanticAudioFieldLabels.For(SemanticAudioField.BeatsPerMinute),
+                FilterTargetCatalog.GetLabel(new XiphFieldTarget("BPM"))
+            );
+
+            foreach (var row in AudioCatalogFieldMaps.All)
+            {
+                Assert.Equal(
+                    SemanticAudioFieldLabels.For(row.Field),
+                    FilterTargetCatalog.GetLabel(new XiphFieldTarget(row.XiphKey))
+                );
+            }
+        }
+
+        /// <summary>
+        /// Verifies Xiph-only keys keep distinct wording (not the semantic Track/Disc/Comment labels).
+        /// </summary>
+        [Fact]
+        public void GetLabel_xiph_only_keys_keep_distinct_wording()
+        {
+            Assert.Equal("Track Number", FilterTargetCatalog.GetLabel(new XiphFieldTarget("TRACKNUMBER")));
+            Assert.NotEqual(
+                SemanticAudioFieldLabels.For(SemanticAudioField.Track),
+                FilterTargetCatalog.GetLabel(new XiphFieldTarget("TRACKNUMBER"))
+            );
+            Assert.Equal("Description", FilterTargetCatalog.GetLabel(new XiphFieldTarget("DESCRIPTION")));
+            Assert.Equal("Tempo", FilterTargetCatalog.GetLabel(new XiphFieldTarget("TEMPO")));
         }
 
         private sealed record UnknownFilterTarget : FilterTarget;

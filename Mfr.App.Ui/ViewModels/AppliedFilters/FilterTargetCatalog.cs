@@ -158,7 +158,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             [
                 .. Enum.GetValues<SemanticAudioField>()
                     .Select(field => new FilterTargetOption(
-                        _GetSemanticAudioLabel(field),
+                        SemanticAudioFieldLabels.For(field),
                         new SemanticAudioFieldTarget(field)
                     )),
             ];
@@ -195,53 +195,47 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             ];
         }
 
-        private static string _GetSemanticAudioLabel(SemanticAudioField field)
-        {
-            return SemanticAudioFieldLabels.For(field);
-        }
-
+        /// <summary>
+        /// Friendly Apply-To label for a Xiph key: catalog IDs follow
+        /// <see cref="SemanticAudioFieldLabels"/>; overlapping common keys reuse that map; Xiph-only
+        /// aliases keep distinct wording (e.g. Track Number vs Track).
+        /// </summary>
         private static string _GetXiphKeyLabel(string key)
         {
+            var catalogRow = AudioCatalogFieldMaps.All.FirstOrDefault(row =>
+                string.Equals(row.XiphKey, key, StringComparison.OrdinalIgnoreCase)
+            );
+            if (catalogRow is not null)
+            {
+                return SemanticAudioFieldLabels.For(catalogRow.Field);
+            }
+
             return key.ToUpperInvariant() switch
             {
-                "TITLE" => "Title",
-                "ALBUM" => "Album",
-                "ARTIST" => "Artist",
-                "ALBUMARTIST" => "Album Artist",
-                "COMPOSER" => "Composer",
-                "GENRE" => "Genre",
+                "TITLE" => SemanticAudioFieldLabels.For(SemanticAudioField.Title),
+                "ALBUM" => SemanticAudioFieldLabels.For(SemanticAudioField.Album),
+                "ARTIST" => SemanticAudioFieldLabels.For(SemanticAudioField.Performers),
+                "ALBUMARTIST" => SemanticAudioFieldLabels.For(SemanticAudioField.AlbumArtists),
+                "COMPOSER" => SemanticAudioFieldLabels.For(SemanticAudioField.Composers),
+                "GENRE" => SemanticAudioFieldLabels.For(SemanticAudioField.Genre),
                 "DESCRIPTION" => "Description",
-                "COMMENT" => "Comment",
-                "LYRICS" => "Lyrics",
+                "COMMENT" => SemanticAudioFieldLabels.For(SemanticAudioField.Comment),
+                "LYRICS" => SemanticAudioFieldLabels.For(SemanticAudioField.Lyrics),
                 "UNSYNCEDLYRICS" => "Unsynced Lyrics",
-                "COPYRIGHT" => "Copyright",
-                "GROUPING" => "Grouping",
+                "COPYRIGHT" => SemanticAudioFieldLabels.For(SemanticAudioField.Copyright),
+                "GROUPING" => SemanticAudioFieldLabels.For(SemanticAudioField.Grouping),
                 "CONTENTGROUP" => "Content Group",
                 "DATE" => "Date",
-                "YEAR" => "Year",
+                "YEAR" => SemanticAudioFieldLabels.For(SemanticAudioField.Year),
                 "TRACKNUMBER" => "Track Number",
                 "TRACKTOTAL" => "Track Total",
                 "TOTALTRACKS" => "Total Tracks",
                 "DISCNUMBER" => "Disc Number",
                 "DISCTOTAL" => "Disc Total",
                 "TOTALDISCS" => "Total Discs",
-                "BPM" => "BPM",
+                "BPM" => SemanticAudioFieldLabels.For(SemanticAudioField.BeatsPerMinute),
                 "TEMPO" => "Tempo",
-                "CONDUCTOR" => "Conductor",
-                "MUSICBRAINZ_ARTISTID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzArtistId),
-                "MUSICBRAINZ_ALBUMID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzReleaseId),
-                "MUSICBRAINZ_ALBUMARTISTID" => SemanticAudioFieldLabels.For(
-                    SemanticAudioField.MusicBrainzReleaseArtistId
-                ),
-                "MUSICBRAINZ_TRACKID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzTrackId),
-                "MUSICBRAINZ_DISCID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzDiscId),
-                "MUSICBRAINZ_ALBUMSTATUS" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzReleaseStatus),
-                "MUSICBRAINZ_ALBUMTYPE" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicBrainzReleaseType),
-                "MUSICBRAINZ_RELEASECOUNTRY" => SemanticAudioFieldLabels.For(
-                    SemanticAudioField.MusicBrainzReleaseCountry
-                ),
-                "MUSICIP_PUID" => SemanticAudioFieldLabels.For(SemanticAudioField.MusicIpId),
-                "ASIN" => SemanticAudioFieldLabels.For(SemanticAudioField.AmazonId),
+                "CONDUCTOR" => SemanticAudioFieldLabels.For(SemanticAudioField.Conductor),
                 _ => key,
             };
         }

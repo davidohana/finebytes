@@ -65,7 +65,7 @@ namespace Mfr.Models.Tags
         [SuppressMessage(
             "Style",
             "IDE0072:Add missing cases",
-            Justification = "Catalog fields are registered in _BuildMap; default covers future enum members."
+            Justification = "Catalog fields are filled from AudioCatalogFieldMaps in _BuildMap; default throws for new non-catalog members."
         )]
         private static string _CommonLabel(SemanticAudioField field)
         {
@@ -88,7 +88,11 @@ namespace Mfr.Models.Tags
                 SemanticAudioField.DiscCount => "Disc Count",
                 SemanticAudioField.BeatsPerMinute => "BPM",
                 SemanticAudioField.Conductor => "Conductor",
-                _ => field.ToString(),
+                _ => throw new ArgumentOutOfRangeException(
+                    nameof(field),
+                    field,
+                    "Non-catalog semantic fields must have an explicit display label."
+                ),
             };
         }
     }
