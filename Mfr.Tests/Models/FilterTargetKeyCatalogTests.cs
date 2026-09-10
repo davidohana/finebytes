@@ -1,3 +1,4 @@
+using Mfr.Models.Tags;
 using Mfr.Models.Tags.Ape;
 using Mfr.Models.Tags.Id3v2;
 using Mfr.Models.Tags.RiffInfo;
@@ -60,6 +61,31 @@ namespace Mfr.Tests.Models
             Assert.Equal(RiffInfoKnownKeys.All.Count, RiffInfoKnownKeys.All.Distinct(StringComparer.Ordinal).Count());
             Assert.All(RiffInfoKnownKeys.All, key => Assert.Equal(key.ToUpperInvariant(), key));
             Assert.All(RiffInfoKnownKeys.All, key => Assert.Equal(4, key.Length));
+        }
+
+        /// <summary>
+        /// Verifies semantic catalog map rows stay wired to Xiph/APE known-key owners (no orphan IDs).
+        /// </summary>
+        [Fact]
+        public void Audio_catalog_field_maps_keys_are_in_known_key_owners()
+        {
+            Assert.NotEmpty(AudioCatalogFieldMaps.All);
+            Assert.Equal(
+                AudioCatalogFieldMaps.All.Count,
+                AudioCatalogFieldMaps.All.Select(static row => row.Field).Distinct().Count()
+            );
+
+            Assert.All(
+                AudioCatalogFieldMaps.All,
+                static row =>
+                {
+                    Assert.Contains(row.XiphKey, XiphKnownKeys.All);
+                    Assert.Contains(row.ApeKey, ApeKnownKeys.All);
+                    Assert.Equal(row.XiphKey, row.ApeKey);
+                    Assert.False(string.IsNullOrWhiteSpace(row.AsfDescriptor));
+                    Assert.False(string.IsNullOrWhiteSpace(row.Id3v2TxxxDescription));
+                }
+            );
         }
     }
 }

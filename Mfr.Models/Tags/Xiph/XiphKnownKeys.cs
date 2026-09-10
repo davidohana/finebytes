@@ -10,6 +10,36 @@ namespace Mfr.Models.Tags.Xiph
     /// </remarks>
     public static class XiphKnownKeys
     {
+        /// <summary>MusicBrainz artist ID comment key.</summary>
+        public const string MusicBrainzArtistId = "MUSICBRAINZ_ARTISTID";
+
+        /// <summary>MusicBrainz album/release ID comment key.</summary>
+        public const string MusicBrainzReleaseId = "MUSICBRAINZ_ALBUMID";
+
+        /// <summary>MusicBrainz album artist ID comment key.</summary>
+        public const string MusicBrainzReleaseArtistId = "MUSICBRAINZ_ALBUMARTISTID";
+
+        /// <summary>MusicBrainz track ID comment key.</summary>
+        public const string MusicBrainzTrackId = "MUSICBRAINZ_TRACKID";
+
+        /// <summary>MusicBrainz disc ID comment key.</summary>
+        public const string MusicBrainzDiscId = "MUSICBRAINZ_DISCID";
+
+        /// <summary>MusicBrainz album status comment key.</summary>
+        public const string MusicBrainzReleaseStatus = "MUSICBRAINZ_ALBUMSTATUS";
+
+        /// <summary>MusicBrainz album type comment key.</summary>
+        public const string MusicBrainzReleaseType = "MUSICBRAINZ_ALBUMTYPE";
+
+        /// <summary>MusicBrainz release country comment key.</summary>
+        public const string MusicBrainzReleaseCountry = "MUSICBRAINZ_RELEASECOUNTRY";
+
+        /// <summary>MusicIP PUID comment key.</summary>
+        public const string MusicIpId = "MUSICIP_PUID";
+
+        /// <summary>Amazon ASIN comment key.</summary>
+        public const string AmazonId = "ASIN";
+
         /// <summary>
         /// Known keys in stable display order for Filter Options and Metadata field I/O.
         /// </summary>
@@ -39,16 +69,16 @@ namespace Mfr.Models.Tags.Xiph
             "BPM",
             "TEMPO",
             "CONDUCTOR",
-            "MUSICBRAINZ_ARTISTID",
-            "MUSICBRAINZ_ALBUMID",
-            "MUSICBRAINZ_ALBUMARTISTID",
-            "MUSICBRAINZ_TRACKID",
-            "MUSICBRAINZ_DISCID",
-            "MUSICBRAINZ_ALBUMSTATUS",
-            "MUSICBRAINZ_ALBUMTYPE",
-            "MUSICBRAINZ_RELEASECOUNTRY",
-            "MUSICIP_PUID",
-            "ASIN",
+            MusicBrainzArtistId,
+            MusicBrainzReleaseId,
+            MusicBrainzReleaseArtistId,
+            MusicBrainzTrackId,
+            MusicBrainzDiscId,
+            MusicBrainzReleaseStatus,
+            MusicBrainzReleaseType,
+            MusicBrainzReleaseCountry,
+            MusicIpId,
+            AmazonId,
         ];
     }
 }

@@ -1,3 +1,5 @@
+using Mfr.Models.Tags.Xiph;
+
 namespace Mfr.Models.Tags.Ape
 {
     /// <summary>
@@ -6,7 +8,8 @@ namespace Mfr.Models.Tags.Ape
     /// <remarks>
     /// <para>
     /// Unknown on-disk items survive field-patch by omission; only keys listed in <see cref="All"/> are
-    /// loaded or written. Item lookup is case-insensitive at the TagLib boundary.
+    /// loaded or written. Item lookup is case-insensitive at the TagLib boundary. Catalog identifier
+    /// keys share Vorbis-style spellings with <see cref="XiphKnownKeys"/> and alias those constants.
     /// </para>
     /// </remarks>
     public static class ApeKnownKeys
@@ -62,35 +65,35 @@ namespace Mfr.Models.Tags.Ape
         /// <summary>Conductor item.</summary>
         public const string Conductor = "Conductor";
 
-        /// <summary>MusicBrainz artist ID item.</summary>
-        public const string MusicBrainzArtistId = "MUSICBRAINZ_ARTISTID";
+        /// <summary>MusicBrainz artist ID item (Vorbis-style; aliases <see cref="XiphKnownKeys.MusicBrainzArtistId"/>).</summary>
+        public const string MusicBrainzArtistId = XiphKnownKeys.MusicBrainzArtistId;
 
-        /// <summary>MusicBrainz album/release ID item.</summary>
-        public const string MusicBrainzReleaseId = "MUSICBRAINZ_ALBUMID";
+        /// <summary>MusicBrainz album/release ID item (Vorbis-style; aliases <see cref="XiphKnownKeys.MusicBrainzReleaseId"/>).</summary>
+        public const string MusicBrainzReleaseId = XiphKnownKeys.MusicBrainzReleaseId;
 
-        /// <summary>MusicBrainz album artist ID item.</summary>
-        public const string MusicBrainzReleaseArtistId = "MUSICBRAINZ_ALBUMARTISTID";
+        /// <summary>MusicBrainz album artist ID item (Vorbis-style; aliases <see cref="XiphKnownKeys.MusicBrainzReleaseArtistId"/>).</summary>
+        public const string MusicBrainzReleaseArtistId = XiphKnownKeys.MusicBrainzReleaseArtistId;
 
-        /// <summary>MusicBrainz track ID item.</summary>
-        public const string MusicBrainzTrackId = "MUSICBRAINZ_TRACKID";
+        /// <summary>MusicBrainz track ID item (Vorbis-style; aliases <see cref="XiphKnownKeys.MusicBrainzTrackId"/>).</summary>
+        public const string MusicBrainzTrackId = XiphKnownKeys.MusicBrainzTrackId;
 
-        /// <summary>MusicBrainz disc ID item.</summary>
-        public const string MusicBrainzDiscId = "MUSICBRAINZ_DISCID";
+        /// <summary>MusicBrainz disc ID item (Vorbis-style; aliases <see cref="XiphKnownKeys.MusicBrainzDiscId"/>).</summary>
+        public const string MusicBrainzDiscId = XiphKnownKeys.MusicBrainzDiscId;
 
-        /// <summary>MusicBrainz album status item.</summary>
-        public const string MusicBrainzReleaseStatus = "MUSICBRAINZ_ALBUMSTATUS";
+        /// <summary>MusicBrainz album status item (Vorbis-style; aliases <see cref="XiphKnownKeys.MusicBrainzReleaseStatus"/>).</summary>
+        public const string MusicBrainzReleaseStatus = XiphKnownKeys.MusicBrainzReleaseStatus;
 
-        /// <summary>MusicBrainz album type item.</summary>
-        public const string MusicBrainzReleaseType = "MUSICBRAINZ_ALBUMTYPE";
+        /// <summary>MusicBrainz album type item (Vorbis-style; aliases <see cref="XiphKnownKeys.MusicBrainzReleaseType"/>).</summary>
+        public const string MusicBrainzReleaseType = XiphKnownKeys.MusicBrainzReleaseType;
 
-        /// <summary>MusicBrainz release country item.</summary>
-        public const string MusicBrainzReleaseCountry = "MUSICBRAINZ_RELEASECOUNTRY";
+        /// <summary>MusicBrainz release country item (Vorbis-style; aliases <see cref="XiphKnownKeys.MusicBrainzReleaseCountry"/>).</summary>
+        public const string MusicBrainzReleaseCountry = XiphKnownKeys.MusicBrainzReleaseCountry;
 
-        /// <summary>MusicIP PUID item.</summary>
-        public const string MusicIpId = "MUSICIP_PUID";
+        /// <summary>MusicIP PUID item (Vorbis-style; aliases <see cref="XiphKnownKeys.MusicIpId"/>).</summary>
+        public const string MusicIpId = XiphKnownKeys.MusicIpId;
 
-        /// <summary>Amazon ASIN item.</summary>
-        public const string AmazonId = "ASIN";
+        /// <summary>Amazon ASIN item (Vorbis-style; aliases <see cref="XiphKnownKeys.AmazonId"/>).</summary>
+        public const string AmazonId = XiphKnownKeys.AmazonId;
 
         /// <summary>
         /// Known keys in stable display order for Metadata field I/O.

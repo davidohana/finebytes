@@ -165,7 +165,7 @@ ______________________________________________________________________
 
 **Scope:** `Mfr.Metadata/`, `Mfr.Models/Tags/`, docs `audio-tag-model.md` / `image-metadata-model.md`, `Mfr.Tests/Metadata/` + `Mfr.Tests/Models/Tags/`. Explore subagent used for cross-file twins ([Metadata Tags twins](4089d359-8272-4d95-8c6a-4fcf3322505e)).
 
-**Verdict:** Layering matches the design — TagLib/ME stay in Metadata; overlay/semantic/merge/policy stay in Models; field-patch Apply never dual-writes `file.Tag`. Image/EXIF lazy map is coherent and allowlist-gated. Applied numeric clear parity, shared row/frame comparers (killing `\0`-Join drift), detector path hardening, and empty-block prune on ASF/Apple reads. Ape/Riff known keys live in Models (`ApeKnownKeys` / `RiffInfoKnownKeys`, same pattern as `XiphKnownKeys`). TagLib open helper is done (`TagLibFileAccess.OpenExisting`). Catalog map→key-constant wiring remains open (#20).
+**Verdict:** Layering matches the design — TagLib/ME stay in Metadata; overlay/semantic/merge/policy stay in Models; field-patch Apply never dual-writes `file.Tag`. Image/EXIF lazy map is coherent and allowlist-gated. Applied numeric clear parity, shared row/frame comparers (killing `\0`-Join drift), detector path hardening, and empty-block prune on ASF/Apple reads. Ape/Riff known keys live in Models (`ApeKnownKeys` / `RiffInfoKnownKeys`, same pattern as `XiphKnownKeys`). TagLib open helper is done (`TagLibFileAccess.OpenExisting`). Catalog map→key-constant wiring is done (`AudioCatalogFieldMaps` → `XiphKnownKeys` / `ApeKnownKeys` / `AsfDescriptorNames`).
 
 ### Applied (high confidence)
 
@@ -504,16 +504,7 @@ ______________________________________________________________________
 
 Ranked by **correctness mandate** (should it be done?), not effort. Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
-Suggested order if chasing correctness only: **#20**, then optionally #10 / #15 / #9.
-
-### Open — do (correctness)
-
-1. **Wire catalog maps to existing key constants** (was #20)
-   Sites: `AudioCatalogFieldMaps` vs `XiphKnownKeys` / `ApeKnownKeys` / `AsfDescriptorNames`
-   Target: reference constants from catalog rows
-   Value: string-literal drift closed for catalog IDs
-   Cost: low
-   Rank: **do** — next correctness pass; Ape/Riff known keys already Models-owned
+Suggested order if chasing correctness only: optionally #10 / #15 / #9 (Open — do correctness is empty).
 
 ### Open — should (weaker correctness / ownership)
 
@@ -627,6 +618,8 @@ Suggested order if chasing correctness only: **#20**, then optionally #10 / #15 
 
 ### Closed (history)
 
+1. **Wire catalog maps to existing key constants** (was #20) — **done**
+   `AudioCatalogFieldMaps` Xiph/APE/ASF columns reference `XiphKnownKeys` / `ApeKnownKeys` / `AsfDescriptorNames`; Xiph catalog IDs promoted to named consts; APE catalog IDs alias Xiph (shared Vorbis-style spelling); `FilterTargetKeyCatalogTests` guards map keys stay in known-key `All` lists
 1. **`ApeKnownKeys` / `RiffInfoKnownKeys`** (was #17) — **done**
    Models-owned `ApeKnownKeys` / `RiffInfoKnownKeys` (named consts + `All`, mirror `XiphKnownKeys`); Metadata Ape/Riff field I/O drops private `_KnownKeys`; SemanticAudioTag + semantic merge use named consts; catalog map wiring left for #20; Apply-To not exposed for Ape/Riff
 1. **Shared inclusive left/right string-position helper** (was #12) — **done**

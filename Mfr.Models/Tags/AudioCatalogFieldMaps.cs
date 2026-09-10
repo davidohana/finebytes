@@ -1,3 +1,7 @@
+using Mfr.Models.Tags.Ape;
+using Mfr.Models.Tags.Asf;
+using Mfr.Models.Tags.Xiph;
+
 namespace Mfr.Models.Tags
 {
     /// <summary>
@@ -7,6 +11,8 @@ namespace Mfr.Models.Tags
     /// <para>
     /// ID3v2 stores these as <c>TXXX</c> content descriptors; Xiph/APE use Vorbis-style keys; ASF uses
     /// extended content descriptor names. Apple freeform atoms and RIFF INFO are not mapped here.
+    /// Xiph, APE, and ASF columns reference <see cref="XiphKnownKeys"/>, <see cref="ApeKnownKeys"/>, and
+    /// <see cref="AsfDescriptorNames"/> so catalog IDs cannot drift from those owners.
     /// </para>
     /// </remarks>
     public static class AudioCatalogFieldMaps
@@ -31,61 +37,73 @@ namespace Mfr.Models.Tags
             new(
                 SemanticAudioField.MusicBrainzArtistId,
                 "MusicBrainz Artist Id",
-                "MUSICBRAINZ_ARTISTID",
-                "MUSICBRAINZ_ARTISTID",
-                "MusicBrainz/Artist Id"
+                XiphKnownKeys.MusicBrainzArtistId,
+                ApeKnownKeys.MusicBrainzArtistId,
+                AsfDescriptorNames.MusicBrainzArtistId
             ),
             new(
                 SemanticAudioField.MusicBrainzReleaseId,
                 "MusicBrainz Album Id",
-                "MUSICBRAINZ_ALBUMID",
-                "MUSICBRAINZ_ALBUMID",
-                "MusicBrainz/Album Id"
+                XiphKnownKeys.MusicBrainzReleaseId,
+                ApeKnownKeys.MusicBrainzReleaseId,
+                AsfDescriptorNames.MusicBrainzReleaseId
             ),
             new(
                 SemanticAudioField.MusicBrainzReleaseArtistId,
                 "MusicBrainz Album Artist Id",
-                "MUSICBRAINZ_ALBUMARTISTID",
-                "MUSICBRAINZ_ALBUMARTISTID",
-                "MusicBrainz/Album Artist Id"
+                XiphKnownKeys.MusicBrainzReleaseArtistId,
+                ApeKnownKeys.MusicBrainzReleaseArtistId,
+                AsfDescriptorNames.MusicBrainzReleaseArtistId
             ),
             new(
                 SemanticAudioField.MusicBrainzTrackId,
                 "MusicBrainz Track Id",
-                "MUSICBRAINZ_TRACKID",
-                "MUSICBRAINZ_TRACKID",
-                "MusicBrainz/Track Id"
+                XiphKnownKeys.MusicBrainzTrackId,
+                ApeKnownKeys.MusicBrainzTrackId,
+                AsfDescriptorNames.MusicBrainzTrackId
             ),
             new(
                 SemanticAudioField.MusicBrainzDiscId,
                 "MusicBrainz Disc Id",
-                "MUSICBRAINZ_DISCID",
-                "MUSICBRAINZ_DISCID",
-                "MusicBrainz/Disc Id"
+                XiphKnownKeys.MusicBrainzDiscId,
+                ApeKnownKeys.MusicBrainzDiscId,
+                AsfDescriptorNames.MusicBrainzDiscId
             ),
             new(
                 SemanticAudioField.MusicBrainzReleaseStatus,
                 "MusicBrainz Album Status",
-                "MUSICBRAINZ_ALBUMSTATUS",
-                "MUSICBRAINZ_ALBUMSTATUS",
-                "MusicBrainz/Album Status"
+                XiphKnownKeys.MusicBrainzReleaseStatus,
+                ApeKnownKeys.MusicBrainzReleaseStatus,
+                AsfDescriptorNames.MusicBrainzReleaseStatus
             ),
             new(
                 SemanticAudioField.MusicBrainzReleaseType,
                 "MusicBrainz Album Type",
-                "MUSICBRAINZ_ALBUMTYPE",
-                "MUSICBRAINZ_ALBUMTYPE",
-                "MusicBrainz/Album Type"
+                XiphKnownKeys.MusicBrainzReleaseType,
+                ApeKnownKeys.MusicBrainzReleaseType,
+                AsfDescriptorNames.MusicBrainzReleaseType
             ),
             new(
                 SemanticAudioField.MusicBrainzReleaseCountry,
                 "MusicBrainz Album Release Country",
-                "MUSICBRAINZ_RELEASECOUNTRY",
-                "MUSICBRAINZ_RELEASECOUNTRY",
-                "MusicBrainz/Album Release Country"
+                XiphKnownKeys.MusicBrainzReleaseCountry,
+                ApeKnownKeys.MusicBrainzReleaseCountry,
+                AsfDescriptorNames.MusicBrainzReleaseCountry
             ),
-            new(SemanticAudioField.MusicIpId, "MusicIP PUID", "MUSICIP_PUID", "MUSICIP_PUID", "MusicIP/PUID"),
-            new(SemanticAudioField.AmazonId, "ASIN", "ASIN", "ASIN", "ASIN"),
+            new(
+                SemanticAudioField.MusicIpId,
+                "MusicIP PUID",
+                XiphKnownKeys.MusicIpId,
+                ApeKnownKeys.MusicIpId,
+                AsfDescriptorNames.MusicIpId
+            ),
+            new(
+                SemanticAudioField.AmazonId,
+                "ASIN",
+                XiphKnownKeys.AmazonId,
+                ApeKnownKeys.AmazonId,
+                AsfDescriptorNames.AmazonId
+            ),
         ];
     }
 }
