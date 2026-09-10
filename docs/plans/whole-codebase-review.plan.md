@@ -575,14 +575,13 @@ _(empty)_
 1. **Shared AppData delete-if-exists helper** (was #21)
    Rank: **skip** — cosmetic; unless touching all three stores
 
-1. **Unify soft-load / hard-fail documentation** (was #22)
-   Rank: **skip** — docs pass anytime; do **not** unify failure modes
-
 1. **Shared salmon drop-mark brush** (was #27)
    Rank: **skip** — cosmetic; ride along if touching drop marks
 
 ### Closed (history)
 
+1. **Unify soft-load / hard-fail documentation** (was #22) — **done**
+   Closed: docs only; modes unchanged. Soft-load (`SessionStore`, `FilterDefaultsStore`) vs hard-fail (`ConfigStore`, `PresetManager`) stated in type remarks + `AGENTS.md` persistence; do not unify
 1. **Preview progress phase naming** (was #15) — **done**
    `RenameListProgressPhase.ApplyPreview` + `BeginPreviewPhase`; `LoadMetadata` is hydrate/refresh/add-after-resolve only; UI `ShowMetadataProgress` covers both row phases; Preview copy uses `ApplyPreview` as initial phase
 1. **`ListEntryLength` / max line length off `ConfigStore`** (was #9) — **done**

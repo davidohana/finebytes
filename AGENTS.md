@@ -49,7 +49,8 @@
 
 - Do **not** add JSON converters, dual-property records, or load-time adapters to read old saved shapes (renamed keys, removed enums, old property names).
 - Persist **one current schema** per field (`session.json`, config snapshots, etc.). Use normal `[JsonPropertyName]` / record properties — not custom migration converters.
-- On load, missing or unrecognized persisted data may fall back to **defaults** (same as first launch). Do not silently remap obsolete values unless the user explicitly asks for migration.
+- **Soft-load vs hard-fail (do not unify):** Session (`SessionStore`) and filter-defaults (`FilterDefaultsStore`) soft-load — corrupt/missing → empty/defaults, app continues. Config (`ConfigStore`) and presets (`PresetManager`) hard-fail — invalid → throw / abort load. See type remarks on those four types.
+- On soft-load stores, missing or unrecognized fields may fall back to **defaults** (same as first launch). Do not silently remap obsolete values unless the user explicitly asks for migration.
 - Do **not** add tests whose only purpose is proving legacy JSON still loads after a schema change.
 - When replacing a persisted type (e.g. sort keys: enum → field key), delete the old type and update callers/tests; do not keep both paths “just in case.”
 

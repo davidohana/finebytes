@@ -10,6 +10,13 @@ namespace Mfr.Models.Config
     /// </summary>
     /// <remarks>
     /// <para>
+    /// Hard-fail dialect: when a config file exists but is invalid (or an explicit path is missing),
+    /// <see cref="Load"/> throws <see cref="InvalidDataException"/> and aborts load. A missing default
+    /// AppData file is fine (in-memory defaults). Opposite of soft-load
+    /// <see cref="SessionStore"/> and <c>FilterDefaultsStore</c> (Engine); same family as
+    /// <c>PresetManager</c> (Engine). Do not unify these modes — intentional product dialect.
+    /// </para>
+    /// <para>
     /// When the default AppData file is missing, <see cref="EnsureDefaultFile"/> writes one with current
     /// defaults so the user can hand-edit filter and log settings (there is no Options UI for these).
     /// When a property is omitted, values still come from <see cref="MfrConfig"/> field initializers.

@@ -8,6 +8,12 @@ namespace Mfr.Models.Config
     /// Loads and saves <see cref="SessionState"/> from <c>session.json</c>.
     /// <para>Missing or corrupt files yield an empty session; load never throws to the caller.</para>
     /// </summary>
+    /// <remarks>
+    /// Soft-load dialect: corrupt or missing → empty <see cref="SessionState"/>; the app continues.
+    /// Same policy as <c>FilterDefaultsStore</c> (Engine); opposite of hard-fail
+    /// <see cref="ConfigStore"/> and <c>PresetManager</c> (Engine).
+    /// Do not unify these modes — the split is intentional product dialect.
+    /// </remarks>
     public static class SessionStore
     {
         private static readonly JsonSerializerOptions s_JsonOptions = new()

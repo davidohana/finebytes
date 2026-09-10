@@ -7,6 +7,13 @@ namespace Mfr.Engine.Presets
     /// <summary>
     /// Creates a preset manager that reads and caches presets from a single JSON file.
     /// </summary>
+    /// <remarks>
+    /// Hard-fail dialect: missing or invalid <c>presets.json</c> → <see cref="LoadPresets"/> throws
+    /// (<see cref="UserException"/> / wrapped IO) and aborts load. Same family as
+    /// <see cref="Mfr.Models.Config.ConfigStore"/>; opposite of soft-load
+    /// <see cref="Mfr.Models.Config.SessionStore"/> and <see cref="FilterDefaultsStore"/>.
+    /// Do not unify these modes — the split is intentional product dialect.
+    /// </remarks>
     /// <param name="presetsFilePath">Path to the JSON file containing all presets.</param>
     public sealed class PresetManager(string presetsFilePath)
     {
