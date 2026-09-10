@@ -56,7 +56,7 @@ namespace Mfr.Engine.Preview
                     continue;
                 }
 
-                var willBeVacatedByBatch = _WillBeVacatedByBatch(
+                var willBeVacatedByBatch = BatchDestinationVacate.WillBeVacated(
                     destinationPath: destinationPath,
                     movingSourcePaths: movingSourcePaths,
                     folderRenameAncestors: folderRenameAncestors
@@ -117,37 +117,6 @@ namespace Mfr.Engine.Preview
                 .Where(group => group.Count() > 1)
                 .Select(group => group.Key)
                 .ToHashSet(PathComparers.Os);
-        }
-
-        /// <summary>
-        /// Returns <c>true</c> if <paramref name="destinationPath"/> will be free by the time
-        /// the batch commits, so occupying it is not a conflict.
-        /// </summary>
-        /// <param name="destinationPath">The preview destination path to test.</param>
-        /// <param name="movingSourcePaths">
-        /// Paths that are moving away from their current location during this batch.
-        /// A destination that is itself a moving source will be vacated before it is claimed.
-        /// </param>
-        /// <param name="folderRenameAncestors">
-        /// Folders in this batch that are being renamed to a different path.
-        /// Any path that is a descendant of one of these folders is implicitly vacated when
-        /// the ancestor folder moves.
-        /// </param>
-        private static bool _WillBeVacatedByBatch(
-            string destinationPath,
-            HashSet<string> movingSourcePaths,
-            IReadOnlyList<RenameItem> folderRenameAncestors
-        )
-        {
-            if (movingSourcePaths.Contains(destinationPath))
-            {
-                return true;
-            }
-
-            // A descendant path is implicitly vacated when its ancestor folder is renamed away.
-            return folderRenameAncestors.Any(folderRename =>
-                PathRelations.IsDescendantOf(candidate: destinationPath, ancestor: folderRename.Original.FullPath)
-            );
         }
     }
 }

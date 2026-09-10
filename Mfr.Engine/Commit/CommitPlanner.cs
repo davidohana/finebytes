@@ -98,7 +98,7 @@ namespace Mfr.Engine.Commit
     /// existing skip path.
     /// </para>
     /// <para>
-    /// Dependency edges <c>X depends on Y</c> mean <c>Y</c> must commit before <c>X</c>. Two kinds of edges exist:
+    /// Dependency edges <c>X depends on Y</c> mean <c>Y</c> must commit before <c>X</c>. Three kinds of edges exist:
     /// </para>
     /// <para>
     /// 1. Containment: if <c>Y</c> is a folder being renamed and <c>X.Original.FullPath</c> is a descendant of
@@ -107,6 +107,10 @@ namespace Mfr.Engine.Commit
     /// <para>
     /// 2. Path-shift: if <c>X.Preview.FullPath</c> equals <c>Y.Original.FullPath</c>, <c>Y</c> must move first to vacate
     /// the path <c>X</c> claims.
+    /// </para>
+    /// <para>
+    /// 3. Folder destination vacate: if <c>X.Preview.FullPath</c> is a descendant of a renamed folder <c>Y</c>'s
+    /// original path, <c>Y</c> must move first — same policy as <see cref="BatchDestinationVacate"/>.
     /// </para>
     /// </remarks>
     internal static class CommitPlanner
@@ -180,7 +184,7 @@ namespace Mfr.Engine.Commit
         /// An empty set means the item has no prerequisites and is immediately eligible.
         /// </returns>
         /// <remarks>
-        /// <para>Two kinds of edge are recognised:</para>
+        /// <para>Three kinds of edge are recognised:</para>
         /// <para>
         /// <b>Containment:</b> if <c>other</c> is a folder being renamed and <c>subject.Original.FullPath</c>
         /// is a descendant of <c>other.Original.FullPath</c>, then <c>other</c> must commit first so the
@@ -189,6 +193,10 @@ namespace Mfr.Engine.Commit
         /// <para>
         /// <b>Path-shift:</b> if <c>subject.Preview.FullPath</c> equals <c>other.Original.FullPath</c>,
         /// then <c>other</c> must vacate that path before <c>subject</c> can claim it.
+        /// </para>
+        /// <para>
+        /// <b>Folder destination vacate:</b> if <c>subject.Preview.FullPath</c> is under a renamed folder's
+        /// original path, that folder must commit first (mirrors <see cref="BatchDestinationVacate"/>).
         /// </para>
         /// <para>
         /// Edges are built with original-path lookup and a renamed-folder pass, not an all-pairs scan,
@@ -207,6 +215,7 @@ namespace Mfr.Engine.Commit
             }
 
             _AddPathShiftEdges(participants, dependsOn);
+            _AddFolderDestinationVacateEdges(participants, folderRenames, dependsOn);
             _AddContainmentEdges(participants, folderRenames, dependsOn);
             return dependsOn;
         }
@@ -242,6 +251,48 @@ namespace Mfr.Engine.Commit
                 }
 
                 dependsOn[subject].Add(other);
+            }
+        }
+
+        /// <summary>
+        /// Adds edges so a claimer of a path under a renamed folder waits for that folder to vacate it.
+        /// </summary>
+        /// <remarks>
+        /// Mirrors <see cref="BatchDestinationVacate.IsVacatedByFolderRename"/> so conflict detection and
+        /// commit order stay aligned when a destination is freed only by an ancestor folder move.
+        /// </remarks>
+        private static void _AddFolderDestinationVacateEdges(
+            IReadOnlyList<RenameItem> participants,
+            IReadOnlyList<RenameItem> folderRenames,
+            Dictionary<RenameItem, HashSet<RenameItem>> dependsOn
+        )
+        {
+            if (folderRenames.Count == 0)
+            {
+                return;
+            }
+
+            foreach (var subject in participants)
+            {
+                if (subject.IsPreviewPathUnchanged())
+                {
+                    continue;
+                }
+
+                foreach (
+                    var folderRename in BatchDestinationVacate.FoldersThatVacate(
+                        subject.Preview.FullPath,
+                        folderRenames
+                    )
+                )
+                {
+                    if (ReferenceEquals(subject, folderRename))
+                    {
+                        continue;
+                    }
+
+                    dependsOn[subject].Add(folderRename);
+                }
             }
         }
 

@@ -504,16 +504,9 @@ ______________________________________________________________________
 
 Ranked by **correctness mandate** (should it be done?), not effort. Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
-Suggested order if chasing correctness only: **#14 → #13 → #1 → #12 → #17 → #20**, then optionally #10 / #15 / #9.
+Suggested order if chasing correctness only: **#13 → #1 → #12 → #17 → #20**, then optionally #10 / #15 / #9.
 
 ### Open — do (correctness)
-
-1. **Vacate policy vs path-shift / containment edges** (was #14)
-   Sites: conflict vacate ↔ CommitPlanner path-shift
-   Target: shared batch path graph helper, or invariant tests first
-   Value: prevents preview-ok / commit-fail drift (worst failure class)
-   Cost: medium–high behavior risk
-   Rank: **do** — highest correctness stake; invariant tests first if touching either side
 
 1. **Shared innermost-ancestor rewrite helper** (was #13)
    Sites: `RenamePreviewFolderRebaser` ↔ `CommitPlanner._ResolveActualSourcePath`
@@ -662,6 +655,8 @@ Suggested order if chasing correctness only: **#14 → #13 → #1 → #12 → #1
 
 ### Closed (history)
 
+1. **Vacate policy vs path-shift / containment edges** (was #14) — **done**
+   Shared `BatchDestinationVacate` (exact move + folder-descendant); conflict detector uses it; planner adds folder-destination-vacate edges alongside path-shift / containment; `VacatePathShiftInvariantTests` locks preview-ok ↔ finalize order (path-shift, swap stash, folder vacate, containment)
 1. **TagLib open helper** (was #18) — **done**
    `TagLibFileAccess.OpenExisting(path)` (internal) — `RequireExistingRegularFile` + `TagLib.File.Create(LocalFileAbstraction)`; public `Read` one-open snapshot on same type; call sites: AudioTagPersistence / MediaPropertiesReader / AudioTagContainerDetector
 1. **Share named-arg parse with Filters** (was #29; f6 #1) — **done**
