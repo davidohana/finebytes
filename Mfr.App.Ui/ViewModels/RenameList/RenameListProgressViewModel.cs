@@ -134,7 +134,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets whether the per-row progress line should be shown.
         /// </summary>
-        public bool ShowMetadataProgress => Phase == RenameListProgressPhase.LoadMetadata;
+        public bool ShowMetadataProgress =>
+            Phase is RenameListProgressPhase.LoadMetadata or RenameListProgressPhase.ApplyPreview;
 
         /// <summary>
         /// Gets whether the determinate progress bar should be shown.

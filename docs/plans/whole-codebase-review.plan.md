@@ -258,7 +258,7 @@ ______________________________________________________________________
 | Preview cancel still plans partial list                     | Documented on `RenameList.Preview`; intentional                                                    |
 | Conflict `Exists` not re-checked at commit                  | TOCTOU by design; FS errors become CommitError                                                     |
 | `failFast: false` after stash failure                       | Later cycle members may still hit FS errors (same-item finalize skipped via `Status != PreviewOk`) |
-| Progress phase `LoadMetadata` used for preview filter apply | UI remaps labels via `RenameListProgressCopy`; enum docs already mention preview                   |
+| Progress phase `LoadMetadata` used for preview filter apply | **Done** — `ApplyPreview` phase + `BeginPreviewPhase`                                              |
 | Case-only commit without temp stash                         | .NET Move accepts same-path different casing on Windows — verified by folder-child tests           |
 
 ### Deeper refactors (promoted to backlog)
@@ -374,7 +374,7 @@ ______________________________________________________________________
 
 **Scope:** `Mfr.App.Ui` Rename List + Applied Filters + Filter Palette (ViewModels / Views / Services); matching `Mfr.Tests/Ui/RenameList|AppliedFilters|FilterPalette`. Explore subagent used for DnD + label-map twins ([DnD twins](3c2d6d02-da59-4607-bf7b-05d797f7270c)). Respect open [`rename-list-ui.plan.md`](rename-list-ui.plan.md) **14b–16** — shipped code only; no GO/export/manual-rename feature work.
 
-**Verdict:** Shipped Rename List / Applied Filters / Palette is coherent — Views → ViewModels → Services, ListBox DnD already shared, add-source soft-gate complements Engine hard-reject, progress UI remaps preview labels over `LoadMetadata`. Applied high-value DnD ownership fixes (#23–#24), shared FS-root helper (#25), OrderedDraft→`ListReorder`, and FileCount docs. Leftovers are optional DataGrid session merge, progress enum honesty, and product-gated label catalogs.
+**Verdict:** Shipped Rename List / Applied Filters / Palette is coherent — Views → ViewModels → Services, ListBox DnD already shared, add-source soft-gate complements Engine hard-reject, progress uses distinct `LoadMetadata` / `ApplyPreview` phases. Applied high-value DnD ownership fixes (#23–#24), shared FS-root helper (#25), OrderedDraft→`ListReorder`, and FileCount docs. Leftovers are optional DataGrid session merge and product-gated label catalogs.
 
 ### Architecture (lightweight)
 
@@ -398,16 +398,16 @@ ______________________________________________________________________
 
 ### Correctness (found, not changed)
 
-| Item                                                                                                   | Notes                                                                                                       |
-| ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
-| Progress phase `LoadMetadata` for preview filter apply                                                 | Enum docs + `RenameListProgressCopy` remapping are honest enough; optional `ApplyPreview` stays backlog #15 |
-| Apply-To “Ancestor Folder” option vs `GetLabel` “Parent Folder” (level 1) vs “Parent Directory” target | **Done** — option L1 = Parent Folder; Parent Directory = absolute dir                                       |
-| Semantic audio Apply-To vs Rename List display names                                                   | **Done** — `SemanticAudioFieldLabels` (Picard A for MB)                                                     |
-| Grid DnD press/snapshot fork (File List vs Rename List)                                                | Small asymmetry (Rename re-applies snapshot on move); optional `DataGridDragSession` (#26)                  |
+| Item                                                                                                   | Notes                                                                                      |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------ |
+| Progress phase `LoadMetadata` for preview filter apply                                                 | **Done** — `ApplyPreview` + `BeginPreviewPhase`; UI shows per-row progress for both phases |
+| Apply-To “Ancestor Folder” option vs `GetLabel` “Parent Folder” (level 1) vs “Parent Directory” target | **Done** — option L1 = Parent Folder; Parent Directory = absolute dir                      |
+| Semantic audio Apply-To vs Rename List display names                                                   | **Done** — `SemanticAudioFieldLabels` (Picard A for MB)                                    |
+| Grid DnD press/snapshot fork (File List vs Rename List)                                                | Small asymmetry (Rename re-applies snapshot on move); optional `DataGridDragSession` (#26) |
 
 ### Deeper refactors (promoted / refined)
 
-See backlog: #3 FileCount cache demoted after docs; #15 kept; #23–#25 **done**; #26 DataGrid session retained; **#27** drop-mark brush; **#28** palette group exhaustiveness.
+See backlog: #3 FileCount cache demoted after docs; #15 **done**; #23–#25 **done**; #26 DataGrid session retained; **#27** drop-mark brush; **#28** palette group exhaustiveness.
 
 ### Phase 7 exit
 
@@ -505,16 +505,11 @@ ______________________________________________________________________
 
 Ranked by **correctness mandate** (should it be done?), not effort. Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
-Suggested order if chasing correctness only: optionally #15 (Open — do correctness is empty).
+Suggested order if chasing correctness only: (none — Open should is empty).
 
 ### Open — should (weaker correctness / ownership)
 
-1. **Preview progress phase naming** (was #15)
-   Sites: `LoadMetadata` used for filter apply; UI remaps titles
-   Target: add `ApplyPreview` (or rename)
-   Value: removes papered-over phase lie (API honesty, not wrong results)
-   Cost: low–medium enum + UI/tests
-   Rank: **should** — do when next editing Engine progress tracker
+_(empty)_
 
 ### Open — do not (not a correctness mandate)
 
@@ -595,6 +590,8 @@ Suggested order if chasing correctness only: optionally #15 (Open — do correct
 
 ### Closed (history)
 
+1. **Preview progress phase naming** (was #15) — **done**
+   `RenameListProgressPhase.ApplyPreview` + `BeginPreviewPhase`; `LoadMetadata` is hydrate/refresh/add-after-resolve only; UI `ShowMetadataProgress` covers both row phases; Preview copy uses `ApplyPreview` as initial phase
 1. **`ListEntryLength` / max line length off `ConfigStore`** (was #9) — **done**
    Filters-owned `ListEntryLength.Configure`/`MaxLength` (default 1000); parsers take optional explicit max; Ui/Cli sync via `FilterRuntimeConfig.SyncFromConfigStore` after Load/CLI overrides; Filters no longer references `Mfr.Models.Config`
 1. **Generate `PresetJsonOptions` derived types from `FilterCatalog`** (was #10) — **done**

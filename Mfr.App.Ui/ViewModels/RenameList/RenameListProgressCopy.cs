@@ -56,7 +56,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     MetadataLineLabel: "Refreshing"
                 ),
                 RenameListProgressOperation.Preview => new Spec(
-                    InitialPhase: RenameListProgressPhase.LoadMetadata,
+                    InitialPhase: RenameListProgressPhase.ApplyPreview,
                     ShowResolve: false,
                     Title: "Previewing ...",
                     TitleWhenLoadingMetadata: null,

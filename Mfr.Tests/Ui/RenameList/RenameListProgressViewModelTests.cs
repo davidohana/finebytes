@@ -330,7 +330,7 @@ namespace Mfr.Tests.Ui.RenameList
                                 AddedCount: 0,
                                 LastPath: "C:\\a.txt",
                                 MetadataTotalCount: 10,
-                                Phase: RenameListProgressPhase.LoadMetadata,
+                                Phase: RenameListProgressPhase.ApplyPreview,
                                 MetadataProcessedCount: 4
                             )
                         );
@@ -340,6 +340,7 @@ namespace Mfr.Tests.Ui.RenameList
                 .ConfigureAwait(true);
 
             Assert.True(completed);
+            Assert.Equal(RenameListProgressPhase.ApplyPreview, viewModel.Phase);
             Assert.Equal("Previewing ...", viewModel.DialogTitle);
             Assert.Equal("Previewing: 4 of 10 files", viewModel.MetadataProgressText);
             Assert.True(viewModel.ShowMetadataProgress);
@@ -421,7 +422,7 @@ namespace Mfr.Tests.Ui.RenameList
         )]
         [InlineData(
             RenameListProgressOperation.Preview,
-            RenameListProgressPhase.LoadMetadata,
+            RenameListProgressPhase.ApplyPreview,
             false,
             "Previewing ...",
             "Previewing ...",
@@ -444,10 +445,9 @@ namespace Mfr.Tests.Ui.RenameList
                 resolveTitle,
                 RenameListProgressCopy.DialogTitle(operation, RenameListProgressPhase.ResolveSources)
             );
-            Assert.Equal(
-                metadataTitle,
-                RenameListProgressCopy.DialogTitle(operation, RenameListProgressPhase.LoadMetadata)
-            );
+            var rowPhase =
+                operation == RenameListProgressOperation.Add ? RenameListProgressPhase.LoadMetadata : initialPhase;
+            Assert.Equal(metadataTitle, RenameListProgressCopy.DialogTitle(operation, rowPhase));
             Assert.Equal(
                 metadataLine,
                 RenameListProgressCopy.MetadataProgressText(operation, processedCount: 2, totalCount: 5)

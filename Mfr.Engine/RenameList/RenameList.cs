@@ -464,7 +464,7 @@ namespace Mfr.Engine.RenameList
             ArgumentNullException.ThrowIfNull(chain);
 
             var tracker = new RenameListProgressTracker(progress, cancellationToken);
-            tracker.BeginMetadataPhase(_renameItems.Count);
+            tracker.BeginPreviewPhase(_renameItems.Count);
 
             foreach (var item in _renameItems)
             {

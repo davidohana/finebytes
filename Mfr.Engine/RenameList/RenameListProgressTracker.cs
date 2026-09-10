@@ -6,9 +6,10 @@ namespace Mfr.Engine.RenameList
     /// <param name="ScannedCount">Filesystem entries visited during resolve.</param>
     /// <param name="AddedCount">Items newly accepted into the rename list during resolve.</param>
     /// <param name="LastPath">Most recent path considered.</param>
-    /// <param name="MetadataTotalCount">Total rows for metadata/preview work; zero during resolve.</param>
+    /// <param name="MetadataTotalCount">Total rows for <see cref="RenameListProgressPhase.LoadMetadata"/> or
+    /// <see cref="RenameListProgressPhase.ApplyPreview"/>; zero during resolve.</param>
     /// <param name="Phase">Current stage of the operation.</param>
-    /// <param name="MetadataProcessedCount">Rows processed during metadata hydrate or preview.</param>
+    /// <param name="MetadataProcessedCount">Rows processed during metadata hydrate/refresh or preview apply.</param>
     public sealed record RenameListProgress(
         int ScannedCount,
         int AddedCount,
@@ -32,7 +33,7 @@ namespace Mfr.Engine.RenameList
 
         private readonly IProgress<RenameListProgress>? _progress = progress;
 
-        // 0 so the first OnScanned/OnAdded reports immediately (same as BeginMetadataPhase).
+        // 0 so the first OnScanned/OnAdded reports immediately (same as BeginMetadataPhase / BeginPreviewPhase).
         private long _lastReportTicks;
         private RenameListProgressPhase _phase = RenameListProgressPhase.ResolveSources;
         private int _metadataProcessedCount;
@@ -64,16 +65,21 @@ namespace Mfr.Engine.RenameList
         public CancellationToken Token { get; } = cancellationToken;
 
         /// <summary>
-        /// Switches progress to the per-row work stage (metadata hydrate or preview).
+        /// Switches progress to per-row metadata hydrate or refresh (<see cref="RenameListProgressPhase.LoadMetadata"/>).
         /// </summary>
         /// <param name="totalItems">Rows to process.</param>
         public void BeginMetadataPhase(int totalItems)
         {
-            _phase = RenameListProgressPhase.LoadMetadata;
-            _metadataProcessedCount = 0;
-            _metadataTotalCount = totalItems;
-            _lastReportTicks = 0;
-            _Report();
+            _BeginRowPhase(RenameListProgressPhase.LoadMetadata, totalItems);
+        }
+
+        /// <summary>
+        /// Switches progress to per-row preview filter apply (<see cref="RenameListProgressPhase.ApplyPreview"/>).
+        /// </summary>
+        /// <param name="totalItems">Rows to process.</param>
+        public void BeginPreviewPhase(int totalItems)
+        {
+            _BeginRowPhase(RenameListProgressPhase.ApplyPreview, totalItems);
         }
 
         /// <summary>
@@ -99,7 +105,7 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Records one row processed during metadata hydrate or preview.
+        /// Records one row processed during metadata hydrate/refresh or preview apply.
         /// </summary>
         /// <param name="path">Path whose row was processed or skipped.</param>
         public void OnMetadataProcessed(string path)
@@ -107,6 +113,15 @@ namespace Mfr.Engine.RenameList
             _metadataProcessedCount++;
             LastPath = path;
             _ThrottledReport();
+        }
+
+        private void _BeginRowPhase(RenameListProgressPhase phase, int totalItems)
+        {
+            _phase = phase;
+            _metadataProcessedCount = 0;
+            _metadataTotalCount = totalItems;
+            _lastReportTicks = 0;
+            _Report();
         }
 
         /// <summary>

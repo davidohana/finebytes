@@ -1453,6 +1453,34 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies preview reports <see cref="RenameListProgressPhase.ApplyPreview"/> with per-row totals.
+        /// </summary>
+        [Fact]
+        public void Preview_Reports_ApplyPreview_Phase()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "preview.txt");
+            var reports = new List<RenameListProgress>();
+            var renameList = new RenameList();
+            renameList.AddSources([path]);
+
+            renameList.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ]),
+                progress: new SynchronousProgress<RenameListProgress>(reports.Add)
+            );
+
+            Assert.NotEmpty(reports);
+            var last = reports[^1];
+            Assert.Equal(RenameListProgressPhase.ApplyPreview, last.Phase);
+            Assert.Equal(1, last.MetadataProcessedCount);
+            Assert.Equal(1, last.MetadataTotalCount);
+        }
+
+        /// <summary>
         /// Verifies canceling during metadata hydrate discards the staging batch.
         /// </summary>
         [Fact]

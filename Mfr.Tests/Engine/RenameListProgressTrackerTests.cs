@@ -30,6 +30,26 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies preview phase reports <see cref="RenameListProgressPhase.ApplyPreview"/> with a row total.
+        /// </summary>
+        [Fact]
+        public void Preview_Phase_Reports_ApplyPreview()
+        {
+            var reports = new List<RenameListProgress>();
+            var tracker = new RenameListProgressTracker(new SynchronousProgress<RenameListProgress>(reports.Add));
+
+            tracker.BeginPreviewPhase(3);
+            tracker.OnMetadataProcessed(@"C:\a.txt");
+            tracker.ReportFinal();
+
+            var last = reports[^1];
+            Assert.Equal(RenameListProgressPhase.ApplyPreview, last.Phase);
+            Assert.Equal(1, last.MetadataProcessedCount);
+            Assert.Equal(3, last.MetadataTotalCount);
+            Assert.Equal(@"C:\a.txt", last.LastPath);
+        }
+
+        /// <summary>
         /// Verifies cancel is visible as soon as the token is signaled.
         /// </summary>
         [Fact]

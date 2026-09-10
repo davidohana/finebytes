@@ -11,8 +11,13 @@ namespace Mfr.Engine.RenameList
         ResolveSources,
 
         /// <summary>
-        /// Reading TagLib / MetadataExtractor caches, or applying preview filters per row.
+        /// Reading TagLib / MetadataExtractor caches (hydrate, refresh, or add-after-resolve).
         /// </summary>
         LoadMetadata,
+
+        /// <summary>
+        /// Applying preview filters per rename-list row.
+        /// </summary>
+        ApplyPreview,
     }
 }
