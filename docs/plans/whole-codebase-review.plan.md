@@ -221,7 +221,7 @@ ______________________________________________________________________
 | Item                                             | Notes                                                                                                                                                                        |
 | ------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ContainsLikelyFormatTokens` vs always-`Compile` | Inserter / AudioTag / Id3v2 use heuristic literals; Replacer / ReplaceList / Formatter / NameList / PathMover always compile (MFR7 format-string replacements). Intentional. |
-| `ListEntryLength` → `ConfigStore`                | Filters read process config max line length; ownership smell → Phase 5                                                                                                       |
+| `ListEntryLength` → `ConfigStore`                | **Done** — Filters-owned `Configure`/`MaxLength`; hosts sync via `FilterRuntimeConfig`                                                                                       |
 | `UppercaseInitialsFilter` SYSLIB1045 disable     | Documented; GeneratedRegex noise — leave                                                                                                                                     |
 | Sentence-end defaults                            | Options/JSON/`RenameItem` default `".!?"`; add-to-list `"-.!"` (MFR7). Documented in filter docs — keep                                                                      |
 | LettersCase vs CasingList sentence-initial       | **Done** — `SentenceInitialCasing` shared helper                                                                                                                             |
@@ -275,7 +275,7 @@ ______________________________________________________________________
 
 **Scope:** `Mfr.Models/Config/` (`ConfigStore`, `SessionStore`, `SessionState`, `MfrConfig`), `Mfr.Utils/Config/`, `Mfr.Engine/Presets/` + `PersistedConfigurationReset`, `Mfr.App.Ui/Services/Session/`, `ListEntryLength` / Reset UI hooks; matching `Mfr.Tests/`. Explore used for twins ([Session Config twins](84b16c9a-f204-495b-b8f7-a3474983f734)). Security-review subagent skipped (empty uncommitted diff); parent self-audited deserialize surfaces.
 
-**Verdict:** Persistence is coherent — one current JSON shape per store, no migration converters, UI session adapters stay thin (no second resolvers). Soft-load (session / filter-defaults) vs hard-fail (config / presets) is intentional product dialect, not a bug. Applied sort-key DTO collapse, Version honesty, defaults-path trim parity, and ConfigStore test isolation. Leftovers are structural (`ListEntryLength`↔`ConfigStore`, dual FilterCatalog/`PresetJsonOptions` registration). Phase 0 Models JSON/FS I/O smell: **keep** (see below).
+**Verdict:** Persistence is coherent — one current JSON shape per store, no migration converters, UI session adapters stay thin (no second resolvers). Soft-load (session / filter-defaults) vs hard-fail (config / presets) is intentional product dialect, not a bug. Applied sort-key DTO collapse, Version honesty, defaults-path trim parity, and ConfigStore test isolation. Leftovers that were structural (`ListEntryLength`↔`ConfigStore`, dual FilterCatalog/`PresetJsonOptions` registration) are now closed. Phase 0 Models JSON/FS I/O smell: **keep** (see below).
 
 ### Architecture (lightweight)
 
@@ -284,7 +284,7 @@ ______________________________________________________________________
 | Project refs vs layering                                                  | **Healthy** — Config binder in L0 Utils; stores + DTOs in L1 Models; presets/reset in L4 Engine; UI Session services → Models only                                                |
 | UI `Views → ViewModels → Services`                                        | **Clean** — `UiSessionPersistence` / `WindowSession` / `SplitterSession` / `FileListSessionSnapshot` take Window + DTOs, not Views                                                |
 | Models JSON/FS I/O (`ConfigStore`, `SessionStore`, `RenameResultSummary`) | **Keep** — not a layer violation; AppData + CLI result JSON sit next to domain DTOs shared by Cli/Ui. Moving to Engine is churn without clearer ownership. Documented smell only. |
-| Filters → `ConfigStore` (`ListEntryLength`)                               | **Smell retained** — backlog #9                                                                                                                                                   |
+| Filters → `ConfigStore` (`ListEntryLength`)                               | **Done** — `ListEntryLength.Configure` + `FilterRuntimeConfig.SyncFromConfigStore` (Ui/Cli)                                                                                       |
 
 ### Security (self-audit)
 
@@ -316,7 +316,7 @@ ______________________________________________________________________
 
 ### Deeper refactors (promoted / updated)
 
-See backlog: **#4 done**; **#9 / #10** refined (still open); **#21–#22** added.
+See backlog: **#4 done**; **#9 / #10** done; **#21–#22** added.
 
 ### Phase 5 exit
 
@@ -505,7 +505,7 @@ ______________________________________________________________________
 
 Ranked by **correctness mandate** (should it be done?), not effort. Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
-Suggested order if chasing correctness only: optionally #15 / #9 (Open — do correctness is empty).
+Suggested order if chasing correctness only: optionally #15 (Open — do correctness is empty).
 
 ### Open — should (weaker correctness / ownership)
 
@@ -515,13 +515,6 @@ Suggested order if chasing correctness only: optionally #15 / #9 (Open — do co
    Value: removes papered-over phase lie (API honesty, not wrong results)
    Cost: low–medium enum + UI/tests
    Rank: **should** — do when next editing Engine progress tracker
-
-1. **`ListEntryLength` / max line length off `ConfigStore`** (was #9)
-   Sites: list parsers; `MfrConfig.FilterConfig.MaxListFileLineLength`
-   Target: inject max length at setup / Filters-owned snapshot
-   Value: clearer L3 ownership; testability without process singleton
-   Cost: medium — parser/filter + CLI override wiring
-   Rank: **should** — layering/testability, not wrong-rename bugs; next config/parser reshape
 
 ### Open — do not (not a correctness mandate)
 
@@ -602,6 +595,8 @@ Suggested order if chasing correctness only: optionally #15 / #9 (Open — do co
 
 ### Closed (history)
 
+1. **`ListEntryLength` / max line length off `ConfigStore`** (was #9) — **done**
+   Filters-owned `ListEntryLength.Configure`/`MaxLength` (default 1000); parsers take optional explicit max; Ui/Cli sync via `FilterRuntimeConfig.SyncFromConfigStore` after Load/CLI overrides; Filters no longer references `Mfr.Models.Config`
 1. **Generate `PresetJsonOptions` derived types from `FilterCatalog`** (was #10) — **done**
    `PresetJsonOptions.BaseFilterDerivedTypes` built from `FilterCatalog.Entries` (FilterType + Type); manual dual list + group usings removed; implement-filter skill no longer requires editing PresetJsonOptions
 1. **Shared Apply-To / Rename List / Picard display labels** (was #5) — **done**

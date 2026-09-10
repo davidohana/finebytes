@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Filters.Formatting;
 
 namespace Mfr.Tests.Models.Filters.Formatting
@@ -68,10 +69,12 @@ namespace Mfr.Tests.Models.Filters.Formatting
         [Fact]
         public void Validate_EntryTooLong_Throws()
         {
-            var maxLen = ConfigStore.Config.Filters.MaxListFileLineLength;
+            var maxLen = ListEntryLength.DefaultMaxLength;
             var tooLong = new string('x', maxLen + 1);
 
-            var ex = Assert.Throws<UserException>(() => NameListParser.Validate([tooLong]));
+            var ex = Assert.Throws<UserException>(() =>
+                NameListParser.Validate([tooLong], maxListFileLineLength: maxLen)
+            );
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
         }
 

@@ -14,7 +14,7 @@ Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceE
 
 ## Editor text format
 
-The Filter Configuration pane edits `words` as **space-separated** text (e.g. `and or with RMX`). Each word is limited to 1000 characters (same cap as name-list lines and replace-list search/replacement).
+The Filter Configuration pane edits `words` as **space-separated** text (e.g. `and or with RMX`). Each word is limited to the configured maximum (default 1000 characters; same cap as name-list lines and replace-list search/replacement).
 
 ## Examples
 

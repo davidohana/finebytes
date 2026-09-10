@@ -40,10 +40,17 @@ namespace Mfr.Filters.Case
         /// Builds a case-insensitive map from configured words (last duplicate wins).
         /// </summary>
         /// <param name="words">Canonical word spellings.</param>
+        /// <param name="maxListFileLineLength">
+        /// Maximum characters per word; defaults to <see cref="ListEntryLength.MaxLength"/>.
+        /// </param>
         /// <returns>Map from lowercased word to canonical form; empty when <paramref name="words"/> is empty.</returns>
-        internal static Dictionary<string, string> BuildMap(IReadOnlyList<string> words)
+        internal static Dictionary<string, string> BuildMap(
+            IReadOnlyList<string> words,
+            int? maxListFileLineLength = null
+        )
         {
             ArgumentNullException.ThrowIfNull(words);
+            var maxLen = maxListFileLineLength ?? ListEntryLength.MaxLength;
 
             var lowerWordToCasing = new Dictionary<string, string>(StringComparer.Ordinal);
             for (var i = 0; i < words.Count; i++)
@@ -55,7 +62,7 @@ namespace Mfr.Filters.Case
                     throw new UserException($"Casing-list word {index} cannot be empty.");
                 }
 
-                ListEntryLength.ThrowIfTooLong(word, $"Casing-list word {index}");
+                ListEntryLength.ThrowIfTooLong(word, $"Casing-list word {index}", maxLen);
 
                 if (word.Any(char.IsWhiteSpace))
                 {

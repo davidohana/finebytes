@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Filters.Case;
 
 namespace Mfr.Tests.Models.Filters.Case
@@ -90,9 +91,11 @@ namespace Mfr.Tests.Models.Filters.Case
         [Fact]
         public void BuildMap_WordTooLong_Throws()
         {
-            var longWord = new string('x', ConfigStore.Config.Filters.MaxListFileLineLength + 1);
+            var longWord = new string('x', ListEntryLength.DefaultMaxLength + 1);
 
-            var ex = Assert.Throws<UserException>(() => CasingListParser.BuildMap([longWord]));
+            var ex = Assert.Throws<UserException>(() =>
+                CasingListParser.BuildMap([longWord], maxListFileLineLength: ListEntryLength.DefaultMaxLength)
+            );
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
         }
     }

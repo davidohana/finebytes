@@ -1,3 +1,6 @@
+using Mfr.Engine.Config;
+using Mfr.Filters;
+
 namespace Mfr.Tests.Models
 {
     /// <summary>
@@ -11,6 +14,7 @@ namespace Mfr.Tests.Models
             var emptyConfigPath = Path.Combine(Path.GetTempPath(), "mfr-test-empty-config-" + Guid.NewGuid() + ".json");
             File.WriteAllText(emptyConfigPath, """{}""");
             ConfigStore.Load(emptyConfigPath);
+            FilterRuntimeConfig.SyncFromConfigStore();
         }
 
         [Fact]
@@ -48,6 +52,8 @@ namespace Mfr.Tests.Models
         {
             ConfigStore.ApplyCliOverrides(["filters.maxListFileLineLength=2500"]);
             Assert.Equal(2500, ConfigStore.Config.Filters.MaxListFileLineLength);
+            FilterRuntimeConfig.SyncFromConfigStore();
+            Assert.Equal(2500, ListEntryLength.MaxLength);
         }
 
         [Fact]

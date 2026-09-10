@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Filters.Replace;
 
 namespace Mfr.Tests.Models.Filters.Replace
@@ -69,11 +70,13 @@ namespace Mfr.Tests.Models.Filters.Replace
         [InlineData(false)]
         public void Validate_PartTooLong_Throws(bool isSearch)
         {
-            var maxLen = ConfigStore.Config.Filters.MaxListFileLineLength;
+            var maxLen = ListEntryLength.DefaultMaxLength;
             var tooLong = new string('x', maxLen + 1);
             var entry = isSearch ? new ReplaceListEntry(tooLong, "b") : new ReplaceListEntry("a", tooLong);
 
-            var ex = Assert.Throws<UserException>(() => ReplaceListParser.Validate([entry]));
+            var ex = Assert.Throws<UserException>(() =>
+                ReplaceListParser.Validate([entry], maxListFileLineLength: maxLen)
+            );
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
         }
 

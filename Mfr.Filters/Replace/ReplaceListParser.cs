@@ -82,13 +82,22 @@ namespace Mfr.Filters.Replace
         /// </summary>
         /// <remarks>
         /// Empty list is allowed (no-op). Each search must be non-empty. Search and replacement may
-        /// contain whitespace. Replacement may be empty (strip).
+        /// contain whitespace. Replacement may be empty (strip). Search and replacement lengths are
+        /// limited to <paramref name="maxListFileLineLength"/> (or <see cref="ListEntryLength.MaxLength"/>
+        /// when omitted; default 1000).
         /// </remarks>
         /// <param name="entries">Configured search/replace pairs in apply order.</param>
+        /// <param name="maxListFileLineLength">
+        /// Maximum characters per search/replacement; defaults to <see cref="ListEntryLength.MaxLength"/>.
+        /// </param>
         /// <returns>The same <paramref name="entries"/> list after checks succeed.</returns>
-        internal static IReadOnlyList<ReplaceListEntry> Validate(IReadOnlyList<ReplaceListEntry> entries)
+        internal static IReadOnlyList<ReplaceListEntry> Validate(
+            IReadOnlyList<ReplaceListEntry> entries,
+            int? maxListFileLineLength = null
+        )
         {
             ArgumentNullException.ThrowIfNull(entries);
+            var maxLen = maxListFileLineLength ?? ListEntryLength.MaxLength;
 
             for (var i = 0; i < entries.Count; i++)
             {
@@ -101,8 +110,8 @@ namespace Mfr.Filters.Replace
                     throw new UserException($"Replace-list entry {index}: search cannot be empty.");
                 }
 
-                ListEntryLength.ThrowIfTooLong(search, $"Replace-list entry {index}: search");
-                ListEntryLength.ThrowIfTooLong(replacement, $"Replace-list entry {index}: replacement");
+                ListEntryLength.ThrowIfTooLong(search, $"Replace-list entry {index}: search", maxLen);
+                ListEntryLength.ThrowIfTooLong(replacement, $"Replace-list entry {index}: replacement", maxLen);
             }
 
             return entries;

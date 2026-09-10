@@ -14,7 +14,7 @@ Line `k` applies to the item whose `RenameListIndex` is `k`. If the item index i
 
 ## Editor text format
 
-The Filter Configuration pane edits `entries` as **one name per line**. Interior blank lines are empty names. A trailing newline after the last non-empty line does not add an extra entry. Comment-like text (`//`, `# `) is a name, not a comment. Each line is limited to 1000 characters.
+The Filter Configuration pane edits `entries` as **one name per line**. Interior blank lines are empty names. A trailing newline after the last non-empty line does not add an extra entry. Comment-like text (`//`, `# `) is a name, not a comment. Each line is limited to the configured maximum (default 1000 characters).
 
 **Example editor text**
 
