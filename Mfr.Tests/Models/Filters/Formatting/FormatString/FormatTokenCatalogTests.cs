@@ -94,9 +94,9 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         }
 
         /// <summary>
-        /// Verifies every <c>Audio\\Tag</c> token maps to a semantic field and uses
-        /// <see cref="SemanticAudioFieldLabels"/> / <see cref="SemanticAudioFieldTips"/>
-        /// (resolved at catalog build, not from attribute text alone).
+        /// Verifies every <c>Audio\\Tag</c> token maps to a semantic field, uses
+        /// <see cref="SemanticAudioFieldLabels"/> for display names, and clarifying tips
+        /// match <see cref="SemanticAudioFieldTips"/> when present on the attribute.
         /// </summary>
         [Fact]
         public void Audio_tag_display_names_match_semantic_labels()

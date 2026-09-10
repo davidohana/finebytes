@@ -15,6 +15,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public int Priority => Index + 1;
 
         /// <summary>
+        /// Gets the catalog field for this sort key.
+        /// </summary>
+        public RenameListField Field => RenameListFieldCatalog.GetField(Key.FieldKey);
+
+        /// <summary>
         /// Gets the user-visible field label.
         /// </summary>
         public string Label => RenameListSortDisplay.GetFieldLabel(Key.FieldKey);
@@ -22,7 +27,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the catalog field tooltip, or <see langword="null"/> when none.
         /// </summary>
-        public string? Description => RenameListFieldCatalog.GetField(Key.FieldKey).Description;
+        public string? Description => Field.Description;
 
         /// <summary>
         /// Gets the direction glyph for the row toggle.

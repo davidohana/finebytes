@@ -10,14 +10,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed record RenameListFieldShuttleColumnRow(int Index, RenameListVisibleColumn Column)
     {
         /// <summary>
+        /// Gets the catalog field for this column.
+        /// </summary>
+        public RenameListField Field => RenameListFieldCatalog.GetField(Column.Key);
+
+        /// <summary>
         /// Gets the catalog field display name without preview decoration.
         /// </summary>
-        public string DisplayName => RenameListFieldCatalog.GetField(Column.Key).DisplayName;
+        public string DisplayName => Field.DisplayName;
 
         /// <summary>
         /// Gets the catalog field tooltip, or <see langword="null"/> when none.
         /// </summary>
-        public string? Description => RenameListFieldCatalog.GetField(Column.Key).Description;
+        public string? Description => Field.Description;
 
         /// <summary>
         /// Gets whether the selected column shows preview values.

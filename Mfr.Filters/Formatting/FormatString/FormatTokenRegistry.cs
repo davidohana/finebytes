@@ -60,7 +60,7 @@ namespace Mfr.Filters.Formatting.FormatString
                     new FormatTokenCatalogEntry(
                         DisplayName: _ResolveCatalogDisplayName(token, info, tokenType),
                         GroupPath: info.Group,
-                        ShortDescription: _ResolveCatalogShortDescription(token, info),
+                        ShortDescription: info.ShortDescription,
                         InsertText: "<" + info.Initial + ">",
                         CanonicalName: canonicalName
                     )
@@ -106,20 +106,6 @@ namespace Mfr.Filters.Formatting.FormatString
             }
 
             return info.DisplayName;
-        }
-
-        /// <summary>
-        /// Resolves the picker tip: semantic audio tokens use <see cref="SemanticAudioFieldTips"/>;
-        /// others keep <see cref="FormatTokenInfoAttribute.ShortDescription"/>.
-        /// </summary>
-        private static string _ResolveCatalogShortDescription(IFormatToken token, FormatTokenInfoAttribute info)
-        {
-            if (token is SemanticAudioFieldTokenBase audio)
-            {
-                return SemanticAudioFieldTips.For(audio.Field) ?? info.ShortDescription;
-            }
-
-            return info.ShortDescription;
         }
 
         private sealed record RegistryData(

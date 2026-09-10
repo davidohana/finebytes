@@ -27,26 +27,15 @@ namespace Mfr.Tests.Models.Tags
         }
 
         /// <summary>
-        /// Verifies Artist / Album Artist tips distinguish roles and multi-value joining.
-        /// </summary>
-        [Fact]
-        public void For_artist_tips_clarify_role_and_multi_value()
-        {
-            Assert.Contains("Track performers", SemanticAudioFieldTips.Artist, StringComparison.Ordinal);
-            Assert.Contains("Album-level", SemanticAudioFieldTips.AlbumArtist, StringComparison.Ordinal);
-            Assert.Contains("`;`", SemanticAudioFieldTips.Artist, StringComparison.Ordinal);
-        }
-
-        /// <summary>
         /// Verifies first-segment tips name the parent field and original-only behavior.
         /// </summary>
         [Fact]
         public void FirstSegment_clarifies_parent_and_original_only()
         {
-            var tip = SemanticAudioFieldTips.FirstSegment(SemanticAudioField.Performers);
-            Assert.Contains("Artist", tip, StringComparison.Ordinal);
-            Assert.Contains("`;`", tip, StringComparison.Ordinal);
-            Assert.Contains("original-only", tip, StringComparison.Ordinal);
+            Assert.Equal(
+                "Only the first Artist value before `;`. Same tag as Artist; original-only column.",
+                SemanticAudioFieldTips.FirstSegment(SemanticAudioField.Performers)
+            );
         }
     }
 }

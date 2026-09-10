@@ -188,6 +188,22 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal(PathFieldTips.ParentFolder, folder.Tip);
         }
 
+        /// <summary>
+        /// Verifies Xiph ARTIST / ALBUMARTIST Apply-To options reuse semantic clarifying tips.
+        /// </summary>
+        [Fact]
+        public void Xiph_artist_options_include_semantic_field_tips()
+        {
+            var xiphGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Xiph");
+            var artist = Assert.Single(xiphGroup.Targets, t => t.Label == "Artist");
+            var albumArtist = Assert.Single(xiphGroup.Targets, t => t.Label == "Album Artist");
+            var title = Assert.Single(xiphGroup.Targets, t => t.Label == "Title");
+
+            Assert.Equal(SemanticAudioFieldTips.Artist, artist.Tip);
+            Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
+            Assert.Null(title.Tip);
+        }
+
         private sealed record UnknownFilterTarget : FilterTarget;
     }
 }

@@ -256,18 +256,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Optional Apply-To tip for a Xiph key when it maps to a clarifying semantic field tip.
+        /// Optional Apply-To tip for a Xiph key when the common key matches a clarifying semantic tip.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Catalog-ID keys (<see cref="AudioCatalogFieldMaps"/>) intentionally stay quiet — their labels
+        /// are already specific. Only role / multi-value common keys get tips.
+        /// </para>
+        /// </remarks>
         private static string? _GetXiphKeyTip(string key)
         {
-            var catalogRow = AudioCatalogFieldMaps.All.FirstOrDefault(row =>
-                string.Equals(row.XiphKey, key, StringComparison.OrdinalIgnoreCase)
-            );
-            if (catalogRow is not null)
-            {
-                return SemanticAudioFieldTips.For(catalogRow.Field);
-            }
-
             return key.ToUpperInvariant() switch
             {
                 "ARTIST" => SemanticAudioFieldTips.Artist,
