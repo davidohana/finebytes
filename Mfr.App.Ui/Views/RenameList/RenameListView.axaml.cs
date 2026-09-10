@@ -212,6 +212,16 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
             }
 
+            if (KeyGestureMatch.Matches(e, AppShortcuts.ShowProperties))
+            {
+                if (_viewModel.ShowPropertiesCommand.CanExecute(null))
+                {
+                    _viewModel.ShowPropertiesCommand.Execute(null);
+                    e.Handled = true;
+                    return true;
+                }
+            }
+
             if (KeyGestureMatch.Matches(e, AppShortcuts.MoveSelectedUp))
             {
                 if (_viewModel.MoveSelectedUpCommand.CanExecute(null))

@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–13 + 14a done. Next: 14b → 14c → 14d → 14e → 14f → 15 → 16."
+overview: "Phases 1–13 + 14a + 14e done. Next: 14b → 14c → 14d → 14f → 15 → 16."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -111,8 +111,8 @@ todos:
     content: "14d: Manual Rename Field (F2) — overrides, blue cells, Cancel, F5 reset"
     status: pending
   - id: phase-14e
-    content: "14e: Properties — Alt+Enter + row menu → Windows property sheet"
-    status: pending
+    content: "14e: Properties — Alt+Enter + row menu → Windows property sheet (+ File List + Show in Explorer)"
+    status: completed
   - id: phase-14f
     content: "14f: Drag-out FileDrop to Explorer (selected rows)"
     status: pending
@@ -135,34 +135,33 @@ Canonical plan: this file under `docs/plans/`. Sources: [mfr7 help](d:/Devl/mfr7
 
 ```mermaid
 flowchart LR
-  Done[1–13 + 14a]
+  Done[1–13 + 14a + 14e]
   P14b[14b Export]
   P14c[14c Free Names]
   P14d[14d Manual F2]
-  P14e[14e Properties]
   P14f[14f Drag-out]
   P15[15 GO]
   P16[16 Legend]
   Done --> P14b --> P14c --> P14d
-  P14d --> P14e --> P14f --> P15 --> P16
+  P14d --> P14f --> P15 --> P16
 ```
 
 ______________________________________________________________________
 
-## Status (2026-09-06)
+## Status (2026-09-10)
 
 |                |                                                              |
 | -------------- | ------------------------------------------------------------ |
-| **Shipped**    | Phases **1–13** and **14a**                                  |
+| **Shipped**    | Phases **1–13**, **14a**, and **14e**                        |
 | **Next**       | **14b** Export Name List                                     |
-| **Then**       | 14c → 14d → 14e → 14f → **15** GO → **16** color legend      |
+| **Then**       | 14c → 14d → 14f → **15** GO → **16** color legend           |
 | **Blocked on** | 16 needs 14d (blue) + 15 (plum); 15 must honor 14d overrides |
 
 ______________________________________________________________________
 
-## Shipped (1–13, 14a) — consolidated
+## Shipped (1–13, 14a, 14e) — consolidated
 
-Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, and Remove Unchanged. Detail below is reference only; do not re-open unless a regression.
+Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
 
 | Block                    | What shipped                                                                                                                                                                           |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -177,6 +176,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 | **12** Preview metadata  | Extended dates/attrs + AudioTag semantic (`ReadWriteApply`) preview cols; First\* / Tag Types / Image / Jpeg / Media / Mpeg stay original-only; Size / Folder File Count original-only |
 | **13** Hygiene           | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                                                      |
 | **14a** Remove Unchanged | Preview-column header menu → `RenameList.RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                                                 |
+| **14e** Properties       | Alt+Enter + row **Properties** → shell property sheet; **Show in Explorer** on Rename List; same Properties on File List (clears debts.md dialog bullet)                               |
 
 **Already reusable for remaining work (do not rebuild):**
 
@@ -186,6 +186,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 - Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs) — insert 14b/14c after Remove Unchanged
 - Cell/row classes: red / gray / lavender in `RenameListView.axaml`; **blue** and **plum** still missing
 - `MainWindowViewModel.Go()` + `AppShortcuts.Go` / menu / toolbar — **stubs**; Ctrl+G labeled but no-op ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
+- `IFileShellOpener.ShowProperties` / `RevealInFileManager` — shared by File List and Rename List
 
 **Write vs preview (important for 14c/14d):**
 
@@ -204,7 +205,6 @@ ______________________________________________________________________
 | **14b** Export Name List   | Column → UTF-8 `.txt`; save dialog; optional open in editor | —                            |
 | **14c** Free Names Edit    | Same lines → `NameListFilter` on Applied Filters            | 14b helper + `SupportsWrite` |
 | **14d** Manual Rename (F2) | Force original/preview; blue cells; Cancel; F5 clears       | `SupportsWrite`              |
-| **14e** Properties         | Alt+Enter / row menu → Windows property sheet               | — (parallel-safe after 14d)  |
 | **14f** Drag-out           | Selected rows as FileDrop to Explorer                       | coexist with 4d reorder      |
 | **15** GO                  | `Ctrl+G` → Commit; plum apply errors; Show Rename Error     | 14d overrides in commit path |
 | **16** Color legend        | Toolbar toggle + side panel                                 | 14d blue + 15 plum           |
@@ -271,17 +271,19 @@ Largest substep — model + blue highlight (required before Phase 16).
 
 **Out of scope here:** disk commit (15).
 
-### 14e — Properties
+### 14e — Properties (done)
 
-Windows property sheet for the focused item (MFR7 Alt+Enter / row **Properties**; single selection).
+Windows property sheet for the focused item (MFR7 Alt+Enter / row **Properties**; single selection). Also shipped: File List Properties (same shell verb) and Rename List **Show in Explorer**.
 
-**Work**
+**Work completed**
 
-- Row context menu + `Alt+Enter` when Rename List focused and selection non-empty.
-- Shell `"properties"` verb on `FullPath` (Windows). Thin helper; fake opener in VM tests.
-- Distinct from File List Properties debt in [debts.md](../../docs/debts.md) — do not block on that.
+- Row context menu + `Alt+Enter` when Rename List focused and selection is exactly one row.
+- Shell `"properties"` verb on `FullPath` via `IFileShellOpener.ShowProperties` (Windows `ShellExecuteEx`); null opener elsewhere; recording opener in VM tests.
+- File List: same Properties command + Alt+Enter when listing focused.
+- Rename List: **Show in Explorer** (reveal focused row) alongside Locate.
+- Cleared File List Properties debt in [debts.md](../../docs/debts.md).
 
-**Tests:** enabled/disabled with selection; opener called with path; headless menu item present.
+**Tests:** enabled/disabled with selection; opener called with path; headless menu items present.
 
 ### 14f — Drag-out to Explorer
 
@@ -349,5 +351,5 @@ ______________________________________________________________________
 1. **14b** — `GenerateNameList` + header Export + save/Edit?
 1. **14c** — `SupportsWrite` + field→`FilterTarget` + add named `NameListFilter`
 1. **14d** — force model + F2/Cancel + blue + F5 clear
-1. **14e** Properties → **14f** drag-out
+1. **14f** drag-out
 1. **15** GO UI + plum → **16** legend

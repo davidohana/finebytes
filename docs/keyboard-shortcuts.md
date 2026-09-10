@@ -40,6 +40,7 @@ Ctrl+L is the address bar (Explorer / Chrome). Log is Ctrl+Shift+L so the two do
 | Reset thumbnail size | Ctrl+0, Ctrl+numpad 0                              | Thumbnails view, not while typing      |
 | First item           | Home                                               | File listing focused, not while typing |
 | Last item            | End                                                | File listing focused, not while typing |
+| Properties           | Alt+Enter                                          | File listing focused                   |
 | Commit typed path    | Enter                                              | Address bar edit                       |
 | Cancel typed path    | Esc                                                | Address bar edit                       |
 
@@ -58,6 +59,7 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 | Remove selected rows    | Del          | Rename List grid focused  |
 | Clear                   | Ctrl+Shift+C | Main window               |
 | Locate in File List     | F4           | Rename List grid focused  |
+| Properties              | Alt+Enter    | Rename List grid focused  |
 | Refresh                 | F5           | Rename List grid focused  |
 | Move selected up        | Ctrl+↑       | Rename List grid focused  |
 | Move selected down      | Ctrl+↓       | Rename List grid focused  |

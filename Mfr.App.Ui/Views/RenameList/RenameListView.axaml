@@ -37,6 +37,12 @@
           Command="{Binding LocateInFileListCommand}"
           InputGesture="{x:Static input:AppShortcuts.LocateInFileList}"
         />
+        <MenuItem Header="Show in Explorer" Command="{Binding ShowInExplorerCommand}" />
+        <MenuItem
+          Header="Properties"
+          Command="{Binding ShowPropertiesCommand}"
+          InputGesture="{x:Static input:AppShortcuts.ShowProperties}"
+        />
         <MenuItem
           Header="Refresh"
           Command="{Binding RefreshCommand}"

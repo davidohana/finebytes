@@ -18,5 +18,8 @@ namespace Mfr.App.Ui.Services.FileList
 
         /// <inheritdoc />
         public void OpenFolderInFileManager(string folderPath) { }
+
+        /// <inheritdoc />
+        public void ShowProperties(string path) { }
     }
 }

@@ -134,10 +134,19 @@ namespace Mfr.Tests.Ui.RenameList
         /// Creates a Rename List view model over a File List at <paramref name="directoryPath"/>.
         /// </summary>
         /// <param name="directoryPath">Directory path, or a new temp dir when omitted.</param>
+        /// <param name="shellOpener">
+        /// Shell opener for Properties / Show in Explorer, or <see langword="null"/> for the null opener.
+        /// </param>
         /// <returns>Rename List view model.</returns>
-        public RenameListViewModel CreateRenameListViewModel(string? directoryPath = null)
+        public RenameListViewModel CreateRenameListViewModel(
+            string? directoryPath = null,
+            IFileShellOpener? shellOpener = null
+        )
         {
-            return new RenameListViewModel(CreateFileListViewModel(directoryPath ?? CreateTempDir()));
+            return new RenameListViewModel(
+                CreateFileListViewModel(directoryPath ?? CreateTempDir()),
+                shellOpener ?? NullFileShellOpener.Instance
+            );
         }
 
         /// <summary>

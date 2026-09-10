@@ -9,6 +9,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.Input;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.Views.GridColumnSizing;
@@ -746,6 +747,11 @@ namespace Mfr.App.Ui.Views.FileList
                 return;
             }
 
+            if (_TryHandleShowProperties(e))
+            {
+                return;
+            }
+
             if (_TryHandleArrowNavigation(sender, e))
             {
                 return;
@@ -762,6 +768,28 @@ namespace Mfr.App.Ui.Views.FileList
             }
 
             e.Handled = true;
+        }
+
+        private bool _TryHandleShowProperties(KeyEventArgs e)
+        {
+            if (_viewModel is null || e.Handled)
+            {
+                return false;
+            }
+
+            if (!KeyGestureMatch.Matches(e, AppShortcuts.ShowProperties))
+            {
+                return false;
+            }
+
+            if (!_viewModel.ShowPropertiesCommand.CanExecute(null))
+            {
+                return false;
+            }
+
+            _viewModel.ShowPropertiesCommand.Execute(null);
+            e.Handled = true;
+            return true;
         }
 
         private bool _TryHandleArrowNavigation(object? sender, KeyEventArgs e)

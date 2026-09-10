@@ -2,6 +2,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.Collections;
+using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Models.Config;
 using Mfr.Models.RenameList;
@@ -15,6 +16,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel : ViewModelBase
     {
         private readonly FileListViewModel _fileListViewModel;
+        private readonly IFileShellOpener _shellOpener;
         private readonly EngineRenameList _renameList = new();
         private readonly List<RenameListEntry> _selectedEntries = [];
         private List<RenameListSortKey> _sortKeys = [];
@@ -23,10 +25,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Initializes the Rename List and listens for File List changes that affect add commands.
         /// </summary>
         /// <param name="fileListViewModel">File List pane used as the add source.</param>
-        public RenameListViewModel(FileListViewModel fileListViewModel)
+        /// <param name="shellOpener">
+        /// Opens paths with the OS shell, or <see langword="null"/> to use the OS default.
+        /// </param>
+        public RenameListViewModel(
+            FileListViewModel fileListViewModel,
+            IFileShellOpener? shellOpener = null
+        )
         {
             ArgumentNullException.ThrowIfNull(fileListViewModel);
             _fileListViewModel = fileListViewModel;
+            _shellOpener = shellOpener ?? FileShellOpener.CreateDefault();
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;
             Progress.PropertyChanged += _OnProgressPropertyChanged;
@@ -197,6 +206,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
+            ShowInExplorerCommand.NotifyCanExecuteChanged();
+            ShowPropertiesCommand.NotifyCanExecuteChanged();
             _NotifyShowLoadErrorsChanged();
             _NotifyShowPreviewErrorChanged();
         }
@@ -319,6 +330,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return !IsBusy && _GetFocusedSelectedEntry() is not null;
         }
 
+        private bool _CanShowInExplorer()
+        {
+            return !IsBusy && _GetFocusedSelectedEntry() is not null;
+        }
+
+        private bool _CanShowProperties()
+        {
+            return !IsBusy && _selectedEntries.Count == 1;
+        }
+
         private RenameListEntry? _GetFocusedSelectedEntry()
         {
             return _selectedEntries.Count > 0 ? _selectedEntries[^1] : null;
@@ -340,6 +361,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             LocateInFileListCommand.NotifyCanExecuteChanged();
+            ShowInExplorerCommand.NotifyCanExecuteChanged();
+            ShowPropertiesCommand.NotifyCanExecuteChanged();
             _NotifyShowLoadErrorsChanged();
             _NotifyShowPreviewErrorChanged();
             _NotifyRefreshChanged();

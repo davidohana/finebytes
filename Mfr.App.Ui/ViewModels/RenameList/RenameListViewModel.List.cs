@@ -239,5 +239,34 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             LastLocateError = $"Failed to locate \"{fullPath}\" in the File List.";
         }
+
+        /// <summary>
+        /// Reveals the focused Rename List row in the OS file manager.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanShowInExplorer))]
+        public void ShowInExplorer()
+        {
+            var entry = _GetFocusedSelectedEntry();
+            if (entry is null)
+            {
+                return;
+            }
+
+            _shellOpener.RevealInFileManager(entry.EngineItem.Original.FullPath);
+        }
+
+        /// <summary>
+        /// Shows the OS property sheet for the single selected Rename List row.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanShowProperties))]
+        public void ShowProperties()
+        {
+            if (_selectedEntries.Count != 1)
+            {
+                return;
+            }
+
+            _shellOpener.ShowProperties(_selectedEntries[0].EngineItem.Original.FullPath);
+        }
     }
 }

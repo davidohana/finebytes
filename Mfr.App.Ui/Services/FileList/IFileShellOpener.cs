@@ -22,5 +22,11 @@ namespace Mfr.App.Ui.Services.FileList
         /// </summary>
         /// <param name="folderPath">Directory path to open.</param>
         void OpenFolderInFileManager(string folderPath);
+
+        /// <summary>
+        /// Shows the OS property sheet for <paramref name="path"/> when supported.
+        /// </summary>
+        /// <param name="path">File or folder path.</param>
+        void ShowProperties(string path);
     }
 }

@@ -233,6 +233,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         [NotifyCanExecuteChangedFor(nameof(OpenSelectedCommand))]
         [NotifyCanExecuteChangedFor(nameof(CopyPathCommand))]
         [NotifyCanExecuteChangedFor(nameof(ShowInExplorerCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ShowPropertiesCommand))]
         private FileListEntry? _selectedEntry;
 
         /// <summary>
@@ -508,6 +509,20 @@ namespace Mfr.App.Ui.ViewModels.FileList
             }
 
             _shellOpener.OpenFolderInFileManager(CurrentPath);
+        }
+
+        /// <summary>
+        /// Shows the OS property sheet for the focused File List entry.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanShowProperties))]
+        public void ShowProperties()
+        {
+            if (SelectedEntry is null)
+            {
+                return;
+            }
+
+            _shellOpener.ShowProperties(SelectedEntry.FullPath);
         }
 
         /// <summary>
@@ -800,11 +815,17 @@ namespace Mfr.App.Ui.ViewModels.FileList
             return FileListPath.IsFilesystemFolderPath(CurrentPath);
         }
 
+        private bool _CanShowProperties()
+        {
+            return SelectedEntry is not null;
+        }
+
         private void _NotifySelectionCommandsChanged()
         {
             OpenSelectedCommand.NotifyCanExecuteChanged();
             CopyPathCommand.NotifyCanExecuteChanged();
             ShowInExplorerCommand.NotifyCanExecuteChanged();
+            ShowPropertiesCommand.NotifyCanExecuteChanged();
         }
 
         private void _Navigate(string? path)

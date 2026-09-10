@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FileList"
   xmlns:views="using:Mfr.App.Ui.Views.FileList"
+  xmlns:input="using:Mfr.App.Ui.Input"
   mc:Ignorable="d"
   d:DesignWidth="280"
   d:DesignHeight="400"
@@ -26,6 +27,11 @@
         <MenuItem Header="Add All" Command="{Binding #FileListRoot.AddAllCommand}" />
         <Separator />
         <MenuItem Header="Show in Explorer" Command="{Binding ShowInExplorerCommand}" />
+        <MenuItem
+          Header="Properties"
+          Command="{Binding ShowPropertiesCommand}"
+          InputGesture="{x:Static input:AppShortcuts.ShowProperties}"
+        />
         <MenuItem Header="Copy path" Command="{Binding CopyPathCommand}" />
         <Separator />
         <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />

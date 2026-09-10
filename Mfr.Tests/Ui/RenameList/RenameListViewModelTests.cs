@@ -1154,6 +1154,78 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies Show in Explorer reveals the focused Rename List row.
+        /// </summary>
+        [Fact]
+        public async Task ShowInExplorer_Reveals_Focused_Entry()
+        {
+            var shell = new RecordingShellOpener();
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, shell);
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            await renameListViewModel.AddPathsAsync([alphaPath, Path.Combine(dir, "beta.md")]);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            Assert.True(renameListViewModel.ShowInExplorerCommand.CanExecute(null));
+            renameListViewModel.ShowInExplorer();
+
+            Assert.Equal([alphaPath], shell.RevealedInFileManager);
+        }
+
+        /// <summary>
+        /// Verifies Show in Explorer is disabled when the Rename List selection is empty.
+        /// </summary>
+        [Fact]
+        public void ShowInExplorerCommand_Disabled_When_Selection_Empty()
+        {
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            renameListViewModel.SetSelectedEntries([]);
+
+            Assert.False(renameListViewModel.ShowInExplorerCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Properties shows the shell property sheet for a single selected row.
+        /// </summary>
+        [Fact]
+        public async Task ShowProperties_Shows_Selected_Entry()
+        {
+            var shell = new RecordingShellOpener();
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, shell);
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            await renameListViewModel.AddPathsAsync([alphaPath]);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            Assert.True(renameListViewModel.ShowPropertiesCommand.CanExecute(null));
+            renameListViewModel.ShowProperties();
+
+            Assert.Equal([alphaPath], shell.ShownProperties);
+        }
+
+        /// <summary>
+        /// Verifies Properties is disabled when zero or multiple rows are selected.
+        /// </summary>
+        [Fact]
+        public async Task ShowPropertiesCommand_Disabled_Unless_Single_Selection()
+        {
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync(
+                [Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]
+            );
+
+            renameListViewModel.SetSelectedEntries([]);
+            Assert.False(renameListViewModel.ShowPropertiesCommand.CanExecute(null));
+
+            renameListViewModel.SetSelectedEntries([.. renameListViewModel.Entries]);
+            Assert.False(renameListViewModel.ShowPropertiesCommand.CanExecute(null));
+
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+            Assert.True(renameListViewModel.ShowPropertiesCommand.CanExecute(null));
+        }
+
+        /// <summary>
         /// Verifies canceling a long add discards the in-progress batch and leaves add commands enabled.
         /// </summary>
         [Fact]
@@ -1252,6 +1324,26 @@ namespace Mfr.Tests.Ui.RenameList
         private static IReadOnlyList<string> _PreviewNames(RenameListViewModel renameListViewModel)
         {
             return [.. renameListViewModel.Entries.Select(entry => entry.FullFileName)];
+        }
+
+        private sealed class RecordingShellOpener : IFileShellOpener
+        {
+            public List<string> RevealedInFileManager { get; } = [];
+            public List<string> ShownProperties { get; } = [];
+
+            public void OpenWithDefaultApp(string path) { }
+
+            public void RevealInFileManager(string path)
+            {
+                RevealedInFileManager.Add(path);
+            }
+
+            public void OpenFolderInFileManager(string folderPath) { }
+
+            public void ShowProperties(string path)
+            {
+                ShownProperties.Add(path);
+            }
         }
 
         /// <summary>

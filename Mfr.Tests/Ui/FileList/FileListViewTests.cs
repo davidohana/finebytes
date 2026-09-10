@@ -76,6 +76,7 @@ namespace Mfr.Tests.Ui.FileList
                 Assert.Contains("Add Selected", headers);
                 Assert.Contains("Add All", headers);
                 Assert.Contains("Show in Explorer", headers);
+                Assert.Contains("Properties", headers);
                 Assert.Contains("Copy path", headers);
                 Assert.Contains("Refresh", headers);
                 Assert.Contains("Go Up", headers);

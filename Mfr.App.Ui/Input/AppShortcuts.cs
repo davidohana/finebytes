@@ -8,7 +8,7 @@ namespace Mfr.App.Ui.Input
     /// Keep <c>docs/keyboard-shortcuts.md</c> in sync with these gestures.
     /// Window-level <see cref="KeyBinding"/>s use the members here, including File List
     /// view types (Ctrl+1 through Ctrl+6). Pane-local keys (Backspace, thumbnail zoom,
-    /// address Enter/Esc, Applied Filters Del/Ctrl+Arrow) are handled in the pane views. Toolbar tip text lives in
+    /// address Enter/Esc, Applied Filters Del/Ctrl+Arrow, Properties Alt+Enter) are handled in the pane views. Toolbar tip text lives in
     /// <see cref="Resources.AppTips"/>.
     /// </para>
     /// </summary>
@@ -88,6 +88,9 @@ namespace Mfr.App.Ui.Input
 
         /// <summary>Locates the selected Rename List row in the File List when the grid has focus.</summary>
         public static KeyGesture LocateInFileList { get; } = new(Key.F4);
+
+        /// <summary>Shows the OS property sheet for the focused File List or Rename List item.</summary>
+        public static KeyGesture ShowProperties { get; } = new(Key.Enter, KeyModifiers.Alt);
 
         /// <summary>Moves selected Rename List rows up when the grid has focus.</summary>
         public static KeyGesture MoveSelectedUp { get; } = new(Key.Up, KeyModifiers.Control);

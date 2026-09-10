@@ -1225,6 +1225,36 @@ namespace Mfr.Tests.Ui.FileList
             Assert.False(viewModel.ShowInExplorerCommand.CanExecute(null));
         }
 
+        /// <summary>
+        /// Verifies Properties shows the shell property sheet for the focused selection.
+        /// </summary>
+        [Fact]
+        public void ShowProperties_Shows_Selected_Entry()
+        {
+            var shell = new RecordingShellOpener();
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shell);
+            var file = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([file], file);
+
+            Assert.True(viewModel.ShowPropertiesCommand.CanExecute(null));
+            viewModel.ShowProperties();
+
+            Assert.Equal([file.FullPath], shell.ShownProperties);
+        }
+
+        /// <summary>
+        /// Verifies Properties is disabled when nothing is selected.
+        /// </summary>
+        [Fact]
+        public void ShowPropertiesCommand_Disabled_When_Selection_Empty()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.SetSelectedEntries([]);
+
+            Assert.False(viewModel.ShowPropertiesCommand.CanExecute(null));
+        }
+
         private static bool _IsDriveName(string name)
         {
             return name.Contains(':', StringComparison.Ordinal);
@@ -1319,6 +1349,7 @@ namespace Mfr.Tests.Ui.FileList
             public List<string> OpenedWithDefaultApp { get; } = [];
             public List<string> RevealedInFileManager { get; } = [];
             public List<string> OpenedFolders { get; } = [];
+            public List<string> ShownProperties { get; } = [];
 
             public void OpenWithDefaultApp(string path)
             {
@@ -1333,6 +1364,11 @@ namespace Mfr.Tests.Ui.FileList
             public void OpenFolderInFileManager(string folderPath)
             {
                 OpenedFolders.Add(folderPath);
+            }
+
+            public void ShowProperties(string path)
+            {
+                ShownProperties.Add(path);
             }
         }
 

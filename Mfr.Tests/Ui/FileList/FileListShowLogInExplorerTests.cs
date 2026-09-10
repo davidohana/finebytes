@@ -116,6 +116,8 @@ namespace Mfr.Tests.Ui.FileList
             }
 
             public void OpenFolderInFileManager(string folderPath) { }
+
+            public void ShowProperties(string path) { }
         }
     }
 }
