@@ -49,6 +49,8 @@ namespace Mfr.Tests.Models
                 f => f.PropertyKey == BasicRenameListFields.Key.Folder
             );
             var mpegCopyright = Assert.Single(MpegRenameListFields.All, f => f.PropertyKey == "Copyright");
+            var jpegAuthor = Assert.Single(JpegRenameListFields.All, f => f.PropertyKey == "ExifDirectory*40093");
+            var jpegArtist = Assert.Single(JpegRenameListFields.All, f => f.PropertyKey == "ExifDirectory*315");
 
             Assert.Equal(SemanticAudioFieldTips.Artist, artist.Tip);
             Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
@@ -56,6 +58,8 @@ namespace Mfr.Tests.Models
             Assert.Null(title.Tip);
             Assert.Equal(PathFieldTips.ParentDirectory, parentDirectory.Tip);
             Assert.Equal(MpegRenameListFieldTips.Copyright, mpegCopyright.Tip);
+            Assert.Equal(JpegRenameListFieldTips.Author, jpegAuthor.Tip);
+            Assert.Equal(JpegRenameListFieldTips.Artist, jpegArtist.Tip);
         }
 
         [Fact]
