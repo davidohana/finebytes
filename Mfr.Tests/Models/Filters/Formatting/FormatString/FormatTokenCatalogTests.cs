@@ -1,5 +1,4 @@
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Models.Rename;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.Tags;
 

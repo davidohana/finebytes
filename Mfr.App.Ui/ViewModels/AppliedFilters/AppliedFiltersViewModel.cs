@@ -116,6 +116,37 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
+        /// Appends a concrete filter instance and selects it (Free Names Edit and similar).
+        /// </summary>
+        /// <param name="filter">Fully configured filter to add (not a catalog default).</param>
+        /// <param name="preferredDisplayName">
+        /// Desired list label; when already taken, appends <c>*</c> until unique (MFR7 Free Names).
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="filter"/> is null, or <paramref name="preferredDisplayName"/> is null.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="preferredDisplayName"/> is whitespace-only.</exception>
+        public void AddAndSelect(BaseFilter filter, string preferredDisplayName)
+        {
+            ArgumentNullException.ThrowIfNull(filter);
+            ArgumentNullException.ThrowIfNull(preferredDisplayName);
+
+            var trimmedName = preferredDisplayName.Trim();
+            if (trimmedName.Length == 0)
+            {
+                throw new ArgumentException(
+                    "Display name cannot be empty or whitespace.",
+                    nameof(preferredDisplayName)
+                );
+            }
+
+            var displayName = _GenerateUniqueDisplayName(trimmedName);
+            var step = new AppliedFilterStepViewModel(displayName, filter);
+            _WithSingleChainChanged(() => Steps.Add(step));
+            SetSelectedSteps([step]);
+        }
+
+        /// <summary>
         /// Removes the selected steps from the stack.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_HasSelection))]
@@ -413,6 +444,20 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             return $"{entry.DisplayName} ({sameTypeCount + 1})";
+        }
+
+        /// <summary>
+        /// Ensures <paramref name="preferredDisplayName"/> is unique among step labels by appending <c>*</c>.
+        /// </summary>
+        private string _GenerateUniqueDisplayName(string preferredDisplayName)
+        {
+            var displayName = preferredDisplayName;
+            while (Steps.Any(step => string.Equals(step.DisplayName, displayName, StringComparison.Ordinal)))
+            {
+                displayName += "*";
+            }
+
+            return displayName;
         }
 
         private void _MoveSelected(int offset)

@@ -246,7 +246,13 @@ namespace Mfr.Tests.Ui.RenameList
 
             _RaiseHeaderContextMenu(originalHeader);
             Assert.Equal(
-                ["(Parent Directory)", "Hide Field", "Select Visible Fields...", "Select Sort Fields..."],
+                [
+                    "(Parent Directory)",
+                    "Hide Field",
+                    "Free Names Edit",
+                    "Select Visible Fields...",
+                    "Select Sort Fields...",
+                ],
                 _MenuHeaders(originalHeader.ContextMenu)
             );
 
@@ -256,11 +262,55 @@ namespace Mfr.Tests.Ui.RenameList
                     "(Full File Name)",
                     "Hide Field",
                     "Remove Unchanged Items",
+                    "Free Names Edit",
                     "Select Visible Fields...",
                     "Select Sort Fields...",
                 ],
                 _MenuHeaders(previewHeader.ContextMenu)
             );
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Free Names Edit is omitted on non-writable columns.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Header_menu_omits_free_names_edit_on_non_writable_column()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]);
+            var lengthKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FileNameLength
+            );
+            renameListViewModel.ApplyVisibleColumnsFromSession([
+                new SessionStateRenameListColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                ),
+                new SessionStateRenameListColumn(lengthKey),
+            ]);
+
+            var (view, window) = _context.Show(renameListViewModel);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+
+            var lengthHeader = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeader>()
+                .First(header => RenameListGridColumns.TryResolveFieldKey(header) == lengthKey);
+
+            _RaiseHeaderContextMenu(lengthHeader);
+            Assert.Equal(
+                ["(File Name Length)", "Hide Field", "Select Visible Fields...", "Select Sort Fields..."],
+                _MenuHeaders(lengthHeader.ContextMenu)
+            );
+            Assert.DoesNotContain("Free Names Edit", _MenuHeaders(lengthHeader.ContextMenu));
 
             window.Close();
         }
@@ -543,11 +593,11 @@ namespace Mfr.Tests.Ui.RenameList
                 FilterTestHelpers.CreateRenameItem(prefix: "01 - Tales of Endurance (Part 1)", directory: parentFolder)
             );
 
-            var parentMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Parent Directory", reserveSortGlyph: true);
-            var fullPathMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
-                "Full Path",
+            var parentMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
+                "Parent Directory",
                 reserveSortGlyph: true
             );
+            var fullPathMin = RenameListGridColumnWidths.GetMinimumHeaderWidth("Full Path", reserveSortGlyph: true);
             var parentFit = RenameListGridColumnWidths.GetAutoFitWidth([parentEntry], parentFolderKey, parentMin);
             var fullPathFit = RenameListGridColumnWidths.GetAutoFitWidth([fullPathEntry], fullPathKey, fullPathMin);
 

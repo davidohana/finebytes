@@ -1,5 +1,4 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
-using Mfr.Models.Rename;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;

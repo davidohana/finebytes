@@ -3,8 +3,8 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.Services.Session;
+using Mfr.App.Ui.Services.Shell;
 using Mfr.Engine.Logging;
 using Mfr.Utils;
 

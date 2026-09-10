@@ -26,7 +26,7 @@ namespace Mfr.Tests.Models
             Assert.Equal(32, RenameListFieldCatalog.GetFieldsForGroup(AudioTagRenameListFields.Group).Count);
             Assert.Equal(
                 AudioTagRenameListFields.All.OrderBy(f => f.DisplayName, StringComparer.OrdinalIgnoreCase).ToList(),
-                AudioTagRenameListFields.All.ToList()
+                [.. AudioTagRenameListFields.All]
             );
             Assert.Equal(15, RenameListFieldCatalog.GetFieldsForGroup(MediaRenameListFields.Group).Count);
             Assert.Equal(11, RenameListFieldCatalog.GetFieldsForGroup(MpegRenameListFields.Group).Count);
@@ -564,6 +564,83 @@ namespace Mfr.Tests.Models
                 Assert.Equal(supportsPreview, field.SupportsPreview);
                 Assert.True(field.IsSortable, field.PropertyKey);
                 Assert.True(RenameListFieldCatalog.IsSortableKey(field.OriginalKey), field.PropertyKey);
+            }
+        }
+
+        [Theory]
+        [InlineData(BasicRenameListFields.Key.Name, typeof(FilePrefixTarget))]
+        [InlineData(BasicRenameListFields.Key.Extension, typeof(FileExtensionTarget))]
+        [InlineData(BasicRenameListFields.Key.FullName, typeof(FileFullNameTarget))]
+        [InlineData(BasicRenameListFields.Key.Folder, typeof(ParentDirectoryTarget))]
+        [InlineData(BasicRenameListFields.Key.FullPath, typeof(FullPathTarget))]
+        public void Basic_writable_fields_map_to_filter_targets(string propertyKey, Type expectedTargetType)
+        {
+            var field = RenameListFieldCatalog.GetField(BasicRenameListField.Group, propertyKey);
+
+            Assert.True(field.SupportsWrite);
+            Assert.IsType(expectedTargetType, field.WriteTarget);
+        }
+
+        [Theory]
+        [InlineData(BasicRenameListFields.Key.ItemType)]
+        [InlineData(BasicRenameListFields.Key.FileNameNumeric)]
+        [InlineData(BasicRenameListFields.Key.FileNameLength)]
+        [InlineData(BasicRenameListFields.Key.FullPathLength)]
+        public void Basic_non_writable_fields_omit_write_target(string propertyKey)
+        {
+            var field = RenameListFieldCatalog.GetField(BasicRenameListField.Group, propertyKey);
+
+            Assert.False(field.SupportsWrite);
+            Assert.Null(field.WriteTarget);
+        }
+
+        [Fact]
+        public void Extended_fields_are_not_writable_even_with_preview()
+        {
+            foreach (var field in RenameListFieldCatalog.GetFieldsForGroup(ExtendedRenameListFields.Group))
+            {
+                Assert.False(field.SupportsWrite, field.PropertyKey);
+                Assert.Null(field.WriteTarget);
+            }
+        }
+
+        [Fact]
+        public void AudioTag_semantic_fields_are_writable_with_semantic_targets()
+        {
+            foreach (var field in RenameListFieldCatalog.GetFieldsForGroup(AudioTagRenameListFields.Group))
+            {
+                if (field is AudioTagSemanticRenameListField semantic)
+                {
+                    Assert.True(field.SupportsWrite, field.PropertyKey);
+                    var target = Assert.IsType<SemanticAudioFieldTarget>(field.WriteTarget);
+                    Assert.Equal(semantic.Field, target.Field);
+                    continue;
+                }
+
+                Assert.False(field.SupportsWrite, field.PropertyKey);
+                Assert.Null(field.WriteTarget);
+            }
+        }
+
+        [Fact]
+        public void Original_only_groups_are_not_writable()
+        {
+            string[] originalOnlyGroups =
+            [
+                MediaRenameListFields.Group,
+                MpegRenameListFields.Group,
+                ImageRenameListFields.Group,
+                JpegRenameListFields.Group,
+            ];
+
+            foreach (
+                var field in RenameListFieldCatalog.All.Where(catalogField =>
+                    originalOnlyGroups.Contains(catalogField.GroupId)
+                )
+            )
+            {
+                Assert.False(field.SupportsWrite, field.PropertyKey);
+                Assert.Null(field.WriteTarget);
             }
         }
 

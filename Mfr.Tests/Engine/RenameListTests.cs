@@ -624,6 +624,47 @@ namespace Mfr.Tests.Engine
             Assert.Single(renameList.RenameItems);
         }
 
+        /// <summary>
+        /// Verifies CollectNameList returns catalog display text in list order for original and preview keys.
+        /// </summary>
+        [Fact]
+        public void CollectNameList_returns_display_text_in_list_order()
+        {
+            var (helloPath, worldPath) = TestHelpers.CreateFiles(_tempRoot, "hello.txt", "world.txt");
+
+            var renameList = new RenameList();
+            renameList.AddSources([helloPath, worldPath]);
+            renameList.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ])
+            );
+
+            var originalKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+            Assert.Equal(["hello.txt", "world.txt"], renameList.CollectNameList(originalKey));
+            Assert.Equal(["HELLO.txt", "WORLD.txt"], renameList.CollectNameList(previewKey));
+        }
+
+        /// <summary>
+        /// Verifies CollectNameList returns an empty list when there are no rename items.
+        /// </summary>
+        [Fact]
+        public void CollectNameList_empty_list_returns_empty()
+        {
+            var renameList = new RenameList();
+            var key = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+
+            Assert.Empty(renameList.CollectNameList(key));
+        }
+
         [Fact]
         /// <summary>
         /// Verifies that removing multiple items reindexes list and per-folder indices.

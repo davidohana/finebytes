@@ -1,3 +1,4 @@
+using Mfr.Models.Filters;
 using Mfr.Models.Rename;
 using Mfr.Utils;
 
@@ -81,7 +82,8 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.Folder,
             displayName: PathFieldLabels.ParentDirectory,
-            defaultWidth: 240
+            defaultWidth: 240,
+            writeTarget: new ParentDirectoryTarget()
         )
     {
         public override string Resolve(FileMeta meta)
@@ -100,7 +102,8 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FullName,
             displayName: PathFieldLabels.FullFileName,
-            defaultWidth: 180
+            defaultWidth: 180,
+            writeTarget: new FileFullNameTarget()
         )
     {
         public override string Resolve(FileMeta meta)
@@ -119,7 +122,8 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FullPath,
             displayName: PathFieldLabels.FullPath,
-            defaultWidth: 180
+            defaultWidth: 180,
+            writeTarget: new FullPathTarget()
         )
     {
         public override string Resolve(FileMeta meta)
@@ -138,7 +142,8 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.Name,
             displayName: PathFieldLabels.FileName,
-            defaultWidth: 150
+            defaultWidth: 150,
+            writeTarget: new FilePrefixTarget()
         )
     {
         public override string Resolve(FileMeta meta)
@@ -156,7 +161,8 @@ namespace Mfr.Models.RenameList.Fields.Basic
     internal sealed class BasicExtensionField()
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.Extension,
-            displayName: PathFieldLabels.FileExtension
+            displayName: PathFieldLabels.FileExtension,
+            writeTarget: new FileExtensionTarget()
         )
     {
         public override string Resolve(FileMeta meta)

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
+using Mfr.Filters.Formatting;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -55,6 +56,35 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             SetSelectedEntries([]);
+        }
+
+        /// <summary>
+        /// Creates a Name List filter from this column's display lines and adds it to Applied Filters (MFR7 Free Names Edit).
+        /// </summary>
+        /// <param name="key">Original or preview field key from the header menu.</param>
+        /// <remarks>
+        /// <para>
+        /// Writable fields only (<see cref="RenameListField.SupportsWrite"/>). Embeds lines in
+        /// <see cref="NameListOptions.Entries"/> — no temp file. Selects the
+        /// new step so Filter Configuration shows the existing Name List editor.
+        /// </para>
+        /// </remarks>
+        public void FreeNamesEdit(RenameListFieldKey key)
+        {
+            if (IsBusy || _appliedFilters is null)
+            {
+                return;
+            }
+
+            var field = RenameListFieldCatalog.GetField(key);
+            if (field.WriteTarget is null)
+            {
+                return;
+            }
+
+            var lines = _renameList.CollectNameList(key);
+            var filter = new NameListFilter(field.WriteTarget, new NameListOptions(Entries: lines));
+            _appliedFilters.AddAndSelect(filter, $"{field.DisplayName} List");
         }
 
         /// <summary>

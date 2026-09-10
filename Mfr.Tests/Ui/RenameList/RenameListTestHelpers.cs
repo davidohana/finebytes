@@ -5,6 +5,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.Shell;
+using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.DragAndDrop;
@@ -138,15 +139,20 @@ namespace Mfr.Tests.Ui.RenameList
         /// <param name="shellOpener">
         /// Shell opener for Properties / Show in Explorer, or <see langword="null"/> for the null opener.
         /// </param>
+        /// <param name="appliedFilters">
+        /// Applied Filters for Free Names Edit tests, or <see langword="null"/> when not needed.
+        /// </param>
         /// <returns>Rename List view model.</returns>
         public RenameListViewModel CreateRenameListViewModel(
             string? directoryPath = null,
-            IFileShellOpener? shellOpener = null
+            IFileShellOpener? shellOpener = null,
+            AppliedFiltersViewModel? appliedFilters = null
         )
         {
             return new RenameListViewModel(
                 CreateFileListViewModel(directoryPath ?? CreateTempDir()),
-                shellOpener ?? NullFileShellOpener.Instance
+                shellOpener ?? NullFileShellOpener.Instance,
+                appliedFilters
             );
         }
 

@@ -117,7 +117,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <para>
         /// Order: title → Hide Field → (preview) Remove Unchanged → Export Name List (14b) →
         /// Free Names Edit (14c, writable) → Select Visible Fields → Select Sort Fields.
-        /// Insert 14b/14c items in this method so order stays one place.
+        /// Insert 14b Export before Free Names so order stays one place.
         /// </para>
         /// </remarks>
         private static ContextMenu _BuildColumnHeaderContextMenu(
@@ -141,6 +141,19 @@ namespace Mfr.App.Ui.Views.RenameList
                         "Remove Unchanged Items",
                         AppTips.RemoveUnchangedItems,
                         () => viewModel.RemoveUnchanged(fieldKey)
+                    )
+                );
+            }
+
+            // 14b Export Name List — any column (insert here before Free Names Edit).
+
+            if (field.SupportsWrite)
+            {
+                menu.Items.Add(
+                    _CreateTipMenuItem(
+                        "Free Names Edit",
+                        AppTips.FreeNamesEdit,
+                        () => viewModel.FreeNamesEdit(fieldKey)
                     )
                 );
             }

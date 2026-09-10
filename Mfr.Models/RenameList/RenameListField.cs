@@ -1,3 +1,4 @@
+using Mfr.Models.Filters;
 using Mfr.Models.Rename;
 
 namespace Mfr.Models.RenameList
@@ -17,6 +18,10 @@ namespace Mfr.Models.RenameList
     /// When <see langword="true"/>, a preview column variant may be added (MFR7 non-<c>ReadOnly</c> fields).
     /// </param>
     /// <param name="metadataRequirement">Lazy disk metadata required before resolving this field.</param>
+    /// <param name="writeTarget">
+    /// Filter target filters can write for Free Names / Manual Rename (MFR7 <c>ReadWriteApply</c>);
+    /// <see langword="null"/> when the field is not writable.
+    /// </param>
     public abstract class RenameListField(
         string groupId,
         string groupDisplayName,
@@ -25,7 +30,8 @@ namespace Mfr.Models.RenameList
         int? defaultWidth = null,
         bool isSortable = true,
         bool supportsPreview = true,
-        RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None
+        RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None,
+        FilterTarget? writeTarget = null
     )
     {
         /// <summary>
@@ -67,6 +73,17 @@ namespace Mfr.Models.RenameList
         /// Gets lazy disk metadata that must be loaded before resolving this field.
         /// </summary>
         public RenameListMetadataRequirement MetadataRequirement { get; } = metadataRequirement;
+
+        /// <summary>
+        /// Gets the filter target filters can write for Free Names / Manual Rename, or
+        /// <see langword="null"/> when this field is not writable (MFR7 <c>ReadWriteApply</c> only).
+        /// </summary>
+        public FilterTarget? WriteTarget { get; } = writeTarget;
+
+        /// <summary>
+        /// Gets whether Free Names Edit and Manual Rename may target this field.
+        /// </summary>
+        public bool SupportsWrite => WriteTarget is not null;
 
         /// <summary>
         /// Gets the original (non-preview) field key for this field.

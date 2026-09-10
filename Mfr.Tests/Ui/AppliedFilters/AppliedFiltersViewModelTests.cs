@@ -1,5 +1,6 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Case;
+using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
 
 namespace Mfr.Tests.Ui.AppliedFilters
@@ -27,6 +28,53 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal("File Name", step.ApplyToLabel);
             Assert.IsType<ShrinkSpacesFilter>(step.Filter);
             Assert.Equal([step], viewModel.SelectedSteps);
+        }
+
+        /// <summary>
+        /// Verifies AddAndSelect appends a concrete filter, keeps its options, and selects it.
+        /// </summary>
+        [Fact]
+        public void AddAndSelect_appends_concrete_filter_and_selects()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([viewModel.Steps[0]]);
+
+            var nameList = new NameListFilter(new FilePrefixTarget(), new NameListOptions(Entries: ["alpha", "beta"]));
+            var chainChanged = _CountChainChanged(viewModel, () => viewModel.AddAndSelect(nameList, "File Name List"));
+
+            Assert.Equal(2, viewModel.Count);
+            var step = viewModel.Steps[1];
+            Assert.Same(nameList, step.Filter);
+            Assert.Equal("File Name List", step.DisplayName);
+            Assert.Equal([step], viewModel.SelectedSteps);
+            Assert.Equal(1, chainChanged);
+        }
+
+        /// <summary>
+        /// Verifies AddAndSelect appends <c>*</c> until the display name is unique.
+        /// </summary>
+        [Fact]
+        public void AddAndSelect_appends_star_until_display_name_unique()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddAndSelect(
+                new NameListFilter(new FilePrefixTarget(), new NameListOptions(Entries: ["a"])),
+                "Title List"
+            );
+            viewModel.AddAndSelect(
+                new NameListFilter(new FilePrefixTarget(), new NameListOptions(Entries: ["b"])),
+                "Title List"
+            );
+            viewModel.AddAndSelect(
+                new NameListFilter(new FilePrefixTarget(), new NameListOptions(Entries: ["c"])),
+                "Title List"
+            );
+
+            Assert.Equal(
+                ["Title List", "Title List*", "Title List**"],
+                viewModel.Steps.Select(step => step.DisplayName)
+            );
         }
 
         /// <summary>

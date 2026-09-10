@@ -276,6 +276,35 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
+        /// Collects one display line per rename-list row for <paramref name="key"/> (Free Names / Export Name List).
+        /// </summary>
+        /// <param name="key">Original or preview field key whose column text is collected.</param>
+        /// <returns>
+        /// Lines in list order via <see cref="RenameListFieldCatalog.Resolve(RenameItem, RenameListFieldKey)"/>;
+        /// empty when the rename list has no rows.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// In-memory only — does not write a file. Shared by Free Names Edit (14c) and Export Name List (14b).
+        /// </para>
+        /// </remarks>
+        public IReadOnlyList<string> CollectNameList(RenameListFieldKey key)
+        {
+            if (_renameItems.Count == 0)
+            {
+                return [];
+            }
+
+            var lines = new string[_renameItems.Count];
+            for (var i = 0; i < _renameItems.Count; i++)
+            {
+                lines[i] = RenameListFieldCatalog.Resolve(_renameItems[i], key);
+            }
+
+            return lines;
+        }
+
+        /// <summary>
         /// Moves the given items one position by <paramref name="offset"/>.
         /// </summary>
         /// <param name="items">Items to move; entries not in the list are ignored.</param>

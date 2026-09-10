@@ -53,7 +53,7 @@ namespace Mfr.App.Ui.ViewModels
             Session = session;
             AppliedFiltersViewModel = new AppliedFiltersViewModel(filterDefaults ?? FilterDefaultsStore.CreateEmpty());
             FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
-            RenameListViewModel = new RenameListViewModel(FileListViewModel);
+            RenameListViewModel = new RenameListViewModel(FileListViewModel, appliedFilters: AppliedFiltersViewModel);
             FilterEditorViewModel = new FilterEditorViewModel();
             FilterEditorViewModel.ApplySession(session);
             FilterEditorViewModel.SetSampleRenameItemSource(

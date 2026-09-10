@@ -1,3 +1,4 @@
+using Mfr.Models.Filters;
 using Mfr.Models.Rename;
 using Mfr.Models.Tags;
 
@@ -12,11 +13,15 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// <param name="supportsPreview">
     /// When <see langword="true"/>, a preview column variant may be added (MFR7 <c>ReadWriteApply</c>).
     /// </param>
+    /// <param name="writeTarget">
+    /// Filter target for Free Names / Manual Rename, or <see langword="null"/> when not writable.
+    /// </param>
     internal abstract class AudioTagRenameListField(
         string propertyKey,
         string displayName,
         int? defaultWidth = 100,
-        bool supportsPreview = false
+        bool supportsPreview = false,
+        FilterTarget? writeTarget = null
     )
         : RenameListField(
             AudioTagRenameListFields.Group,
@@ -26,7 +31,8 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
             defaultWidth,
             isSortable: true,
             supportsPreview,
-            RenameListMetadataRequirement.TagLib
+            RenameListMetadataRequirement.TagLib,
+            writeTarget
         );
 
     /// <summary>
@@ -41,7 +47,14 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         string displayName,
         SemanticAudioField field,
         int? defaultWidth = 100
-    ) : AudioTagRenameListField(propertyKey, displayName, defaultWidth, supportsPreview: true)
+    )
+        : AudioTagRenameListField(
+            propertyKey,
+            displayName,
+            defaultWidth,
+            supportsPreview: true,
+            writeTarget: new SemanticAudioFieldTarget(field)
+        )
     {
         /// <summary>
         /// Gets the semantic audio field addressed by this column.

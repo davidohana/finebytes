@@ -1,8 +1,12 @@
 using Mfr.App.Ui.Services.FileList;
+using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Case;
+using Mfr.Filters.Formatting;
+using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -417,6 +421,103 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(["hello.txt", "other.txt"], _PreviewNames(renameListViewModel));
             Assert.Empty(renameListViewModel.SelectedEntries);
             Assert.Equal(1, membershipRaises);
+        }
+
+        /// <summary>
+        /// Verifies FreeNamesEdit adds a Name List filter with the column's target and lines, then selects it.
+        /// </summary>
+        [Fact]
+        public async Task FreeNamesEdit_adds_name_list_filter_with_target_and_lines()
+        {
+            var dir = _context.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.txt");
+            await File.WriteAllTextAsync(alphaPath, "x");
+            await File.WriteAllTextAsync(betaPath, "x");
+
+            var appliedFilters = new AppliedFiltersViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, appliedFilters: appliedFilters);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.FreeNamesEdit(nameKey);
+
+            var step = Assert.Single(appliedFilters.Steps);
+            Assert.Equal([step], appliedFilters.SelectedSteps);
+            Assert.Equal("File Name List", step.DisplayName);
+            var filter = Assert.IsType<NameListFilter>(step.Filter);
+            Assert.IsType<FilePrefixTarget>(filter.Target);
+            Assert.Equal(["alpha", "beta"], filter.Options.Entries);
+        }
+
+        /// <summary>
+        /// Verifies FreeNamesEdit on an Audio Tag semantic column uses a semantic audio target.
+        /// </summary>
+        [Fact]
+        public async Task FreeNamesEdit_audio_tag_uses_semantic_target()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "track.mp3");
+            await File.WriteAllTextAsync(path, "x");
+
+            var appliedFilters = new AppliedFiltersViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, appliedFilters: appliedFilters);
+            await renameListViewModel.AddPathsAsync([path]);
+
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+            renameListViewModel.FreeNamesEdit(titleKey);
+
+            var step = Assert.Single(appliedFilters.Steps);
+            Assert.Equal("Title List", step.DisplayName);
+            var filter = Assert.IsType<NameListFilter>(step.Filter);
+            var target = Assert.IsType<SemanticAudioFieldTarget>(filter.Target);
+            Assert.Equal(SemanticAudioField.Title, target.Field);
+            Assert.Single(filter.Options.Entries);
+        }
+
+        /// <summary>
+        /// Verifies FreeNamesEdit is a no-op for non-writable fields.
+        /// </summary>
+        [Fact]
+        public async Task FreeNamesEdit_non_writable_field_is_noop()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+
+            var appliedFilters = new AppliedFiltersViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, appliedFilters: appliedFilters);
+            await renameListViewModel.AddPathsAsync([path]);
+
+            var lengthKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FileNameLength
+            );
+            renameListViewModel.FreeNamesEdit(lengthKey);
+
+            Assert.Empty(appliedFilters.Steps);
+        }
+
+        /// <summary>
+        /// Verifies a second FreeNamesEdit on the same field appends <c>*</c> to the display name.
+        /// </summary>
+        [Fact]
+        public async Task FreeNamesEdit_second_call_appends_star_to_display_name()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+
+            var appliedFilters = new AppliedFiltersViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, appliedFilters: appliedFilters);
+            await renameListViewModel.AddPathsAsync([path]);
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.FreeNamesEdit(nameKey);
+            renameListViewModel.FreeNamesEdit(nameKey);
+
+            Assert.Equal(["File Name List", "File Name List*"], appliedFilters.Steps.Select(step => step.DisplayName));
+            Assert.Equal(appliedFilters.Steps[1], Assert.Single(appliedFilters.SelectedSteps));
         }
 
         /// <summary>

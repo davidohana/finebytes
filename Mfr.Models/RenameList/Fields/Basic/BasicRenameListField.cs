@@ -1,3 +1,5 @@
+using Mfr.Models.Filters;
+
 namespace Mfr.Models.RenameList.Fields.Basic
 {
     /// <summary>
@@ -10,13 +12,27 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// </param>
     /// <param name="isSortable">When <see langword="true"/>, the field may appear in Auto-Sort keys.</param>
     /// <param name="supportsPreview">When <see langword="true"/>, a preview column variant may be added.</param>
+    /// <param name="writeTarget">
+    /// Filter target for Free Names / Manual Rename, or <see langword="null"/> when not writable.
+    /// </param>
     public abstract class BasicRenameListField(
         string propertyKey,
         string displayName,
         int? defaultWidth = null,
         bool isSortable = true,
-        bool supportsPreview = true
-    ) : RenameListField(Group, GroupLabel, propertyKey, displayName, defaultWidth, isSortable, supportsPreview)
+        bool supportsPreview = true,
+        FilterTarget? writeTarget = null
+    )
+        : RenameListField(
+            Group,
+            GroupLabel,
+            propertyKey,
+            displayName,
+            defaultWidth,
+            isSortable,
+            supportsPreview,
+            writeTarget: writeTarget
+        )
     {
         /// <summary>
         /// MFR7 Basic property group id.
