@@ -72,36 +72,16 @@ namespace Mfr.Engine.Preview
         /// </remarks>
         private static void _RebaseItemAgainstAncestors(RenameItem item, IReadOnlyList<RenameItem> folderRenames)
         {
-            // Apply ancestor renames innermost-first so a chain "A/B/C" is rewritten via B before A.
-            var ancestorsInnermostFirst = folderRenames
-                .Where(ancestor => !ReferenceEquals(ancestor, item))
-                .Where(ancestor =>
-                    _IsPreviewDirectoryUnderAncestor(
-                        previewDirectoryPath: item.Preview.DirectoryPath,
-                        ancestorOriginalPath: ancestor.Original.FullPath
-                    )
-                )
-                .OrderByDescending(ancestor => ancestor.Original.FullPath.Length);
-
-            foreach (var ancestor in ancestorsInnermostFirst)
-            {
-                var rebased = PathRelations.ReplaceAncestor(
-                    fullPath: item.Preview.DirectoryPath,
-                    oldAncestor: ancestor.Original.FullPath,
-                    newAncestor: ancestor.Preview.FullPath
-                );
-                var pathChanged = !string.Equals(rebased, item.Preview.DirectoryPath, StringComparison.Ordinal);
-                if (pathChanged)
-                {
-                    item.Preview.DirectoryPath = rebased;
-                }
-            }
-        }
-
-        private static bool _IsPreviewDirectoryUnderAncestor(string previewDirectoryPath, string ancestorOriginalPath)
-        {
-            return PathRelations.IsSamePath(first: previewDirectoryPath, second: ancestorOriginalPath)
-                || PathRelations.IsDescendantOf(candidate: previewDirectoryPath, ancestor: ancestorOriginalPath);
+            // Inclusive dialect: preview DirectoryPath may equal the renamed folder's original path
+            // (file/folder living in that folder) or lie under it.
+            item.Preview.DirectoryPath = InnermostAncestorRewrites.Apply(
+                path: item.Preview.DirectoryPath,
+                folderRenames: folderRenames,
+                skipItem: item,
+                matchesAncestor: static (previewDirectoryPath, ancestorOriginalPath) =>
+                    PathRelations.IsSamePath(first: previewDirectoryPath, second: ancestorOriginalPath)
+                    || PathRelations.IsDescendantOf(candidate: previewDirectoryPath, ancestor: ancestorOriginalPath)
+            );
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Mfr.Engine.Preview
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Used by <see cref="PreviewConflictDetector"/> (occupancy) and <see cref="Commit.CommitPlanner"/>
+    /// Used by <see cref="PreviewConflictDetector"/> (occupancy) and <see cref="CommitPlanner"/>
     /// (ordering edges) so preview-ok and commit planning stay on the same vacate policy.
     /// </para>
     /// <para>

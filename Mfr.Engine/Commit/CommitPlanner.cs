@@ -501,30 +501,15 @@ namespace Mfr.Engine.Commit
                 return stashedTempPath;
             }
 
-            if (folderRenames.Count == 0)
-            {
-                return item.Original.FullPath;
-            }
-
-            // Apply ancestor renames innermost-first so chained ancestors compose correctly.
-            var ancestors = folderRenames
-                .Where(other => !ReferenceEquals(other, item))
-                .Where(other =>
-                    PathRelations.IsDescendantOf(candidate: item.Original.FullPath, ancestor: other.Original.FullPath)
-                )
-                .OrderByDescending(other => other.Original.FullPath.Length);
-
-            var actualSourcePath = item.Original.FullPath;
-            foreach (var ancestor in ancestors)
-            {
-                actualSourcePath = PathRelations.ReplaceAncestor(
-                    fullPath: actualSourcePath,
-                    oldAncestor: ancestor.Original.FullPath,
-                    newAncestor: ancestor.Preview.FullPath
-                );
-            }
-
-            return actualSourcePath;
+            // Strict-descendant dialect on Original.FullPath (the folder item itself is skipItem).
+            // Do not use the preview rebase inclusive IsSamePath dialect here.
+            return InnermostAncestorRewrites.Apply(
+                path: item.Original.FullPath,
+                folderRenames: folderRenames,
+                skipItem: item,
+                matchesAncestor: static (fullPath, ancestorOriginalPath) =>
+                    PathRelations.IsDescendantOf(candidate: fullPath, ancestor: ancestorOriginalPath)
+            );
         }
     }
 }

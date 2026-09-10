@@ -504,16 +504,9 @@ ______________________________________________________________________
 
 Ranked by **correctness mandate** (should it be done?), not effort. Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
-Suggested order if chasing correctness only: **#13 → #1 → #12 → #17 → #20**, then optionally #10 / #15 / #9.
+Suggested order if chasing correctness only: **#1 → #12 → #17 → #20**, then optionally #10 / #15 / #9.
 
 ### Open — do (correctness)
-
-1. **Shared innermost-ancestor rewrite helper** (was #13)
-   Sites: `RenamePreviewFolderRebaser` ↔ `CommitPlanner._ResolveActualSourcePath`
-   Target: one `ApplyInnermostAncestorRewrites` with call-site selectors
-   Value: closes compose-order / ReplaceAncestor drift between rebase and planner
-   Cost: medium — two match dialects must stay explicit
-   Rank: **do** — same class as vacate/path-shift; do when next touching rebase or planner
 
 1. **Collapse or rename `SameOnDisk` vs `IsSamePath`** (was #1)
    Sites: `PathRelations`; Engine / Ui callers
@@ -655,6 +648,8 @@ Suggested order if chasing correctness only: **#13 → #1 → #12 → #17 → #2
 
 ### Closed (history)
 
+1. **Shared innermost-ancestor rewrite helper** (was #13) — **done**
+   `InnermostAncestorRewrites.Apply` (Preview): innermost-first `ReplaceAncestor` with call-site `matchesAncestor` selectors; rebaser uses inclusive same-path|descendant on `Preview.DirectoryPath`, planner uses strict descendant on `Original.FullPath`; `InnermostAncestorRewritesTests` locks compose order + dialect split + rebase/planner prefix agreement
 1. **Vacate policy vs path-shift / containment edges** (was #14) — **done**
    Shared `BatchDestinationVacate` (exact move + folder-descendant); conflict detector uses it; planner adds folder-destination-vacate edges alongside path-shift / containment; `VacatePathShiftInvariantTests` locks preview-ok ↔ finalize order (path-shift, swap stash, folder vacate, containment)
 1. **TagLib open helper** (was #18) — **done**
