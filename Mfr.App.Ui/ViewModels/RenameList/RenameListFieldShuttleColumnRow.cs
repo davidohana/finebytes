@@ -22,7 +22,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the catalog field tooltip, or <see langword="null"/> when none.
         /// </summary>
-        public string? Description => Field.Description;
+        public string? Tip => Field.Tip;
 
         /// <summary>
         /// Gets whether the selected column shows preview values.

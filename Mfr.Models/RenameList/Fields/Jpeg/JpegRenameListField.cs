@@ -9,12 +9,12 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
     /// <param name="propertyKey">Property key within the Jpeg group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    /// <param name="description">Optional tooltip clarifying the field.</param>
+    /// <param name="tip">Optional tooltip clarifying the field.</param>
     internal abstract class JpegRenameListField(
         string propertyKey,
         string displayName,
         int? defaultWidth = 80,
-        string? description = null
+        string? tip = null
     )
         : OriginalOnlyRenameListField(
             JpegRenameListFields.Group,
@@ -23,7 +23,7 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
             displayName,
             defaultWidth,
             RenameListMetadataRequirement.ImageProperties,
-            description
+            tip
         );
 
     /// <summary>
@@ -33,14 +33,14 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="field">EXIF property to format.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    /// <param name="description">Optional tooltip clarifying the field.</param>
+    /// <param name="tip">Optional tooltip clarifying the field.</param>
     internal sealed class JpegExifRenameListField(
         string propertyKey,
         string displayName,
         JpegRenameListExifProperty field,
         int? defaultWidth = 80,
-        string? description = null
-    ) : JpegRenameListField(propertyKey, displayName, defaultWidth, description)
+        string? tip = null
+    ) : JpegRenameListField(propertyKey, displayName, defaultWidth, tip)
     {
         /// <summary>
         /// Gets the EXIF property addressed by this column.

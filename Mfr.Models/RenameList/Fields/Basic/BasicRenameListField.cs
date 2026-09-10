@@ -15,7 +15,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// <param name="writeTarget">
     /// Filter target for Edit as Name List / Manual Rename, or <see langword="null"/> when not writable.
     /// </param>
-    /// <param name="description">Optional tooltip clarifying the field.</param>
+    /// <param name="tip">Optional tooltip clarifying the field.</param>
     public abstract class BasicRenameListField(
         string propertyKey,
         string displayName,
@@ -23,7 +23,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
         bool isSortable = true,
         bool supportsPreview = true,
         FilterTarget? writeTarget = null,
-        string? description = null
+        string? tip = null
     )
         : RenameListField(
             Group,
@@ -34,7 +34,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
             isSortable,
             supportsPreview,
             writeTarget: writeTarget,
-            description: description
+            tip: tip
         )
     {
         /// <summary>

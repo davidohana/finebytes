@@ -38,7 +38,7 @@ namespace Mfr.Tests.Models
         /// Verifies clarifying tooltips land only on non-trivial Rename List columns.
         /// </summary>
         [Fact]
-        public void Non_trivial_fields_expose_descriptions()
+        public void Non_trivial_fields_expose_tips()
         {
             var artist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "Performers");
             var firstArtist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "FirstPerformer");
@@ -50,12 +50,12 @@ namespace Mfr.Tests.Models
             );
             var mpegCopyright = Assert.Single(MpegRenameListFields.All, f => f.PropertyKey == "Copyright");
 
-            Assert.Equal(SemanticAudioFieldTips.Artist, artist.Description);
-            Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Description);
-            Assert.Equal(SemanticAudioFieldTips.FirstSegment(SemanticAudioField.Performers), firstArtist.Description);
-            Assert.Null(title.Description);
-            Assert.Equal(PathFieldTips.ParentDirectory, parentDirectory.Description);
-            Assert.Equal(MpegRenameListFieldTips.Copyright, mpegCopyright.Description);
+            Assert.Equal(SemanticAudioFieldTips.Artist, artist.Tip);
+            Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
+            Assert.Equal(SemanticAudioFieldTips.FirstSegment(SemanticAudioField.Performers), firstArtist.Tip);
+            Assert.Null(title.Tip);
+            Assert.Equal(PathFieldTips.ParentDirectory, parentDirectory.Tip);
+            Assert.Equal(MpegRenameListFieldTips.Copyright, mpegCopyright.Tip);
         }
 
         [Fact]

@@ -148,9 +148,9 @@ namespace Mfr.App.Ui.Views.RenameList
 
             column.HeaderTemplate = canUserSort
                 ? new FuncDataTemplate<object>(
-                    (_, _) => _BuildSortableHeader(listViewModel, headerText, key, field.Description)
+                    (_, _) => _BuildSortableHeader(listViewModel, headerText, key, field.Tip)
                 )
-                : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key, field.Description));
+                : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key, field.Tip));
 
             column.PropertyChanged += (_, args) => _OnGridColumnPropertyChanged(column, args);
             return column;
@@ -236,11 +236,11 @@ namespace Mfr.App.Ui.Views.RenameList
             return catalogWidth is int catalogPixelWidth ? Math.Max(catalogPixelWidth, minHeaderWidth) : minHeaderWidth;
         }
 
-        private static Control _CreateHeaderContent(string headerText, RenameListFieldKey key, string? description)
+        private static Control _CreateHeaderContent(string headerText, RenameListFieldKey key, string? tip)
         {
             var root = RenameListPreviewGlyph.CreateLabelRow(headerText, key.IsPreview);
             RenameListGridColumns.StampHeaderFieldKey(root, key);
-            _ApplyFieldDescriptionTip(root, description);
+            _ApplyFieldTip(root, tip);
             return root;
         }
 
@@ -248,12 +248,12 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameListViewModel viewModel,
             string headerText,
             RenameListFieldKey fieldKey,
-            string? description
+            string? tip
         )
         {
             var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
             RenameListGridColumns.StampHeaderFieldKey(grid, fieldKey);
-            _ApplyFieldDescriptionTip(grid, description);
+            _ApplyFieldTip(grid, tip);
 
             var title = new TextBlock
             {
@@ -285,16 +285,16 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
-        /// Attaches a wrapping field description tooltip when <paramref name="description"/> is set.
+        /// Attaches a wrapping field tooltip when <paramref name="tip"/> is set.
         /// </summary>
-        private static void _ApplyFieldDescriptionTip(Control target, string? description)
+        private static void _ApplyFieldTip(Control target, string? tip)
         {
-            if (string.IsNullOrWhiteSpace(description))
+            if (string.IsNullOrWhiteSpace(tip))
             {
                 return;
             }
 
-            ToolTip.SetTip(target, RichToolTip.Wrap(description));
+            ToolTip.SetTip(target, RichToolTip.Wrap(tip));
         }
 
         private static void _WireSortGlyphUpdates(

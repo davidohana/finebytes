@@ -98,7 +98,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         : AudioTagRenameListField(
             "TagTypes",
             "Tag Types",
-            description: "Which embedded tag blocks are present (e.g. Id3v2;Xiph)."
+            tip: "Which embedded tag blocks are present (e.g. Id3v2;Xiph)."
         )
     {
         public override string Resolve(FileMeta meta)

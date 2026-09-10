@@ -22,7 +22,7 @@ namespace Mfr.Models.RenameList
     /// Filter target filters can write for Edit as Name List / Manual Rename (MFR7 <c>ReadWriteApply</c>);
     /// <see langword="null"/> when the field is not writable.
     /// </param>
-    /// <param name="description">
+    /// <param name="tip">
     /// Optional tooltip clarifying the field (e.g. Artist vs Album Artist, first-segment columns).
     /// </param>
     public abstract class RenameListField(
@@ -35,7 +35,7 @@ namespace Mfr.Models.RenameList
         bool supportsPreview = true,
         RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None,
         FilterTarget? writeTarget = null,
-        string? description = null
+        string? tip = null
     )
     {
         /// <summary>
@@ -87,7 +87,7 @@ namespace Mfr.Models.RenameList
         /// <summary>
         /// Gets an optional user-facing tooltip for this field, or <see langword="null"/> when none.
         /// </summary>
-        public string? Description { get; } = description;
+        public string? Tip { get; } = tip;
 
         /// <summary>
         /// Gets whether Edit as Name List and Manual Rename may target this field.

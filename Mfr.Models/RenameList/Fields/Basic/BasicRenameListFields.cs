@@ -84,7 +84,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
             displayName: PathFieldLabels.ParentDirectory,
             defaultWidth: 240,
             writeTarget: new ParentDirectoryTarget(),
-            description: PathFieldTips.ParentDirectory
+            tip: PathFieldTips.ParentDirectory
         )
     {
         public override string Resolve(FileMeta meta)
@@ -105,7 +105,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
             displayName: PathFieldLabels.FullFileName,
             defaultWidth: 180,
             writeTarget: new FileFullNameTarget(),
-            description: PathFieldTips.FullFileName
+            tip: PathFieldTips.FullFileName
         )
     {
         public override string Resolve(FileMeta meta)
@@ -146,7 +146,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
             displayName: PathFieldLabels.FileName,
             defaultWidth: 150,
             writeTarget: new FilePrefixTarget(),
-            description: PathFieldTips.FileName
+            tip: PathFieldTips.FileName
         )
     {
         public override string Resolve(FileMeta meta)
@@ -185,7 +185,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
             propertyKey: BasicRenameListFields.Key.FileNameNumeric,
             displayName: PathFieldLabels.FileNameNumericValue,
             supportsPreview: false,
-            description: PathFieldTips.FileNameNumericValue
+            tip: PathFieldTips.FileNameNumericValue
         )
     {
         public override string Resolve(FileMeta meta)

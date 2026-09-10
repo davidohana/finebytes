@@ -27,7 +27,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets the catalog field tooltip, or <see langword="null"/> when none.
         /// </summary>
-        public string? Description => Field.Description;
+        public string? Tip => Field.Tip;
 
         /// <summary>
         /// Gets the direction glyph for the row toggle.

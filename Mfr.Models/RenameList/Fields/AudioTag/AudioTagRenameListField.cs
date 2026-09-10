@@ -16,14 +16,14 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// <param name="writeTarget">
     /// Filter target for Edit as Name List / Manual Rename, or <see langword="null"/> when not writable.
     /// </param>
-    /// <param name="description">Optional tooltip clarifying the field.</param>
+    /// <param name="tip">Optional tooltip clarifying the field.</param>
     internal abstract class AudioTagRenameListField(
         string propertyKey,
         string displayName,
         int? defaultWidth = 100,
         bool supportsPreview = false,
         FilterTarget? writeTarget = null,
-        string? description = null
+        string? tip = null
     )
         : RenameListField(
             AudioTagRenameListFields.Group,
@@ -35,7 +35,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
             supportsPreview,
             RenameListMetadataRequirement.TagLib,
             writeTarget,
-            description
+            tip
         );
 
     /// <summary>
@@ -45,13 +45,13 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="field">Semantic field to format.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    /// <param name="description">Optional tooltip clarifying the field.</param>
+    /// <param name="tip">Optional tooltip clarifying the field.</param>
     internal sealed class AudioTagSemanticRenameListField(
         string propertyKey,
         string displayName,
         SemanticAudioField field,
         int? defaultWidth = 100,
-        string? description = null
+        string? tip = null
     )
         : AudioTagRenameListField(
             propertyKey,
@@ -59,7 +59,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
             defaultWidth,
             supportsPreview: true,
             writeTarget: new SemanticAudioFieldTarget(field),
-            description: description
+            tip: tip
         )
     {
         /// <summary>
@@ -102,13 +102,13 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// <param name="propertyKey">Property key within the Audio Tag group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="field">Semantic field whose first segment is shown.</param>
-    /// <param name="description">Optional tooltip clarifying the first-segment column.</param>
+    /// <param name="tip">Optional tooltip clarifying the first-segment column.</param>
     internal sealed class AudioTagFirstSegmentRenameListField(
         string propertyKey,
         string displayName,
         SemanticAudioField field,
-        string? description = null
-    ) : AudioTagRenameListField(propertyKey, displayName, description: description)
+        string? tip = null
+    ) : AudioTagRenameListField(propertyKey, displayName, tip: tip)
     {
         /// <inheritdoc />
         public override string Resolve(FileMeta meta)

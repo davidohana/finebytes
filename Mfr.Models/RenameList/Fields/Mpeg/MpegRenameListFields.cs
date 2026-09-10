@@ -26,40 +26,40 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
                 "Copyright",
                 MpegRenameListProperty.Copyright,
                 defaultWidth: 40,
-                description: MpegRenameListFieldTips.Copyright
+                tip: MpegRenameListFieldTips.Copyright
             ),
             new MpegPropertyRenameListField(
                 "Duration",
                 "Duration",
                 MpegRenameListProperty.Duration,
-                description: MpegRenameListFieldTips.Duration
+                tip: MpegRenameListFieldTips.Duration
             ),
             new MpegPropertyRenameListField(
                 "DurationSecs",
                 "Duration (Seconds)",
                 MpegRenameListProperty.DurationSecs,
-                description: MpegRenameListFieldTips.DurationSecs
+                tip: MpegRenameListFieldTips.DurationSecs
             ),
             new MpegPropertyRenameListField("VBR", "VBR", MpegRenameListProperty.Vbr, defaultWidth: 40),
             new MpegPropertyRenameListField(
                 "Frequency",
                 "Frequency",
                 MpegRenameListProperty.Frequency,
-                description: MpegRenameListFieldTips.Frequency
+                tip: MpegRenameListFieldTips.Frequency
             ),
             new MpegPropertyRenameListField(
                 "Layer",
                 "Layer",
                 MpegRenameListProperty.Layer,
                 defaultWidth: 40,
-                description: MpegRenameListFieldTips.Layer
+                tip: MpegRenameListFieldTips.Layer
             ),
             new MpegPropertyRenameListField(
                 "Level",
                 "Level",
                 MpegRenameListProperty.Level,
                 defaultWidth: 40,
-                description: MpegRenameListFieldTips.Level
+                tip: MpegRenameListFieldTips.Level
             ),
             new MpegPropertyRenameListField("Mode", "Mode", MpegRenameListProperty.Mode),
             new MpegPropertyRenameListField(
@@ -67,14 +67,14 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
                 "Original",
                 MpegRenameListProperty.Original,
                 defaultWidth: 40,
-                description: MpegRenameListFieldTips.Original
+                tip: MpegRenameListFieldTips.Original
             ),
             new MpegPropertyRenameListField(
                 "Protection",
                 "Protection",
                 MpegRenameListProperty.Protection,
                 defaultWidth: 40,
-                description: MpegRenameListFieldTips.Protection
+                tip: MpegRenameListFieldTips.Protection
             ),
         ];
     }
