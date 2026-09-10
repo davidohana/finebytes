@@ -100,11 +100,11 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
         /// <summary>Copyright bit.</summary>
         Copyright,
 
-        /// <summary>Duration in whole seconds.</summary>
-        DurationSecs,
-
         /// <summary>Header duration.</summary>
         Duration,
+
+        /// <summary>Duration in whole seconds.</summary>
+        DurationSecs,
 
         /// <summary>VBR vs CBR encoding.</summary>
         Vbr,
@@ -150,8 +150,8 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
             {
                 MpegRenameListProperty.Bitrate => _FormatBitrate(mpeg),
                 MpegRenameListProperty.Copyright => RenameListFieldDisplay.FormatYesNo(mpeg.IsCopyrighted),
-                MpegRenameListProperty.DurationSecs => RenameListFieldDisplay.FormatDurationSec(mpeg.Duration),
                 MpegRenameListProperty.Duration => RenameListFieldDisplay.FormatDuration(mpeg.Duration),
+                MpegRenameListProperty.DurationSecs => RenameListFieldDisplay.FormatDurationSec(mpeg.Duration),
                 MpegRenameListProperty.Vbr => mpeg.IsVbr ? "VBR" : "CBR",
                 MpegRenameListProperty.Frequency => RenameListFieldDisplay.FormatPositiveInt(mpeg.SampleRate),
                 MpegRenameListProperty.Layer => _FormatLayer(mpeg.Layer),

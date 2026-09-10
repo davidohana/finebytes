@@ -29,16 +29,16 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
                 description: MpegRenameListFieldTips.Copyright
             ),
             new MpegPropertyRenameListField(
-                "DurationSecs",
-                "Duration (Seconds)",
-                MpegRenameListProperty.DurationSecs,
-                description: MpegRenameListFieldTips.DurationSecs
-            ),
-            new MpegPropertyRenameListField(
                 "Duration",
                 "Duration",
                 MpegRenameListProperty.Duration,
                 description: MpegRenameListFieldTips.Duration
+            ),
+            new MpegPropertyRenameListField(
+                "DurationSecs",
+                "Duration (Seconds)",
+                MpegRenameListProperty.DurationSecs,
+                description: MpegRenameListFieldTips.DurationSecs
             ),
             new MpegPropertyRenameListField("VBR", "VBR", MpegRenameListProperty.Vbr, defaultWidth: 40),
             new MpegPropertyRenameListField(
