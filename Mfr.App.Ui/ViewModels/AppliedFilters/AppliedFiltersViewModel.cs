@@ -116,11 +116,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Appends a concrete filter instance and selects it (Free Names Edit and similar).
+        /// Appends a concrete filter instance and selects it (Edit as Name List and similar).
         /// </summary>
         /// <param name="filter">Fully configured filter to add (not a catalog default).</param>
         /// <param name="preferredDisplayName">
-        /// Desired list label; when already taken, appends <c>*</c> until unique (MFR7 Free Names).
+        /// Desired list label; when already taken, appends <c>*</c> until unique (MFR7 Free Names / Edit as Name List).
         /// </param>
         /// <exception cref="ArgumentNullException">
         /// <paramref name="filter"/> is null, or <paramref name="preferredDisplayName"/> is null.
@@ -448,7 +448,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
         /// <summary>
         /// Ensures <paramref name="preferredDisplayName"/> is unique among step labels by appending <c>*</c>
-        /// (MFR7 Free Names; distinct from palette <c>(n)</c> numbering).
+        /// (MFR7 Free Names / Edit as Name List; distinct from palette <c>(n)</c> numbering).
         /// </summary>
         private string _AppendStarsUntilDisplayNameUnique(string preferredDisplayName)
         {

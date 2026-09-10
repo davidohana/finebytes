@@ -424,10 +424,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies FreeNamesEdit adds a Name List filter with the column's target and lines, then selects it.
+        /// Verifies EditAsNameList adds a Name List filter with the column's target and lines, then selects it.
         /// </summary>
         [Fact]
-        public async Task FreeNamesEdit_adds_name_list_filter_with_target_and_lines()
+        public async Task EditAsNameList_adds_name_list_filter_with_target_and_lines()
         {
             var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
@@ -440,7 +440,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
-            renameListViewModel.FreeNamesEdit(nameKey);
+            renameListViewModel.EditAsNameList(nameKey);
 
             var step = Assert.Single(appliedFilters.Steps);
             Assert.Equal([step], appliedFilters.SelectedSteps);
@@ -451,10 +451,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies FreeNamesEdit on an Audio Tag semantic column uses a semantic audio target.
+        /// Verifies EditAsNameList on an Audio Tag semantic column uses a semantic audio target.
         /// </summary>
         [Fact]
-        public async Task FreeNamesEdit_audio_tag_uses_semantic_target()
+        public async Task EditAsNameList_audio_tag_uses_semantic_target()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "track.mp3");
@@ -465,7 +465,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]);
 
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
-            renameListViewModel.FreeNamesEdit(titleKey);
+            renameListViewModel.EditAsNameList(titleKey);
 
             var step = Assert.Single(appliedFilters.Steps);
             Assert.Equal("Title List", step.DisplayName);
@@ -476,10 +476,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies FreeNamesEdit is a no-op for non-writable fields.
+        /// Verifies EditAsNameList is a no-op for non-writable fields.
         /// </summary>
         [Fact]
-        public async Task FreeNamesEdit_non_writable_field_is_noop()
+        public async Task EditAsNameList_non_writable_field_is_noop()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "row.txt");
@@ -493,16 +493,16 @@ namespace Mfr.Tests.Ui.RenameList
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FileNameLength
             );
-            renameListViewModel.FreeNamesEdit(lengthKey);
+            renameListViewModel.EditAsNameList(lengthKey);
 
             Assert.Empty(appliedFilters.Steps);
         }
 
         /// <summary>
-        /// Verifies a second FreeNamesEdit on the same field appends <c>*</c> to the display name.
+        /// Verifies a second EditAsNameList on the same field appends <c>*</c> to the display name.
         /// </summary>
         [Fact]
-        public async Task FreeNamesEdit_second_call_appends_star_to_display_name()
+        public async Task EditAsNameList_second_call_appends_star_to_display_name()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "row.txt");
@@ -513,8 +513,8 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]);
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
-            renameListViewModel.FreeNamesEdit(nameKey);
-            renameListViewModel.FreeNamesEdit(nameKey);
+            renameListViewModel.EditAsNameList(nameKey);
+            renameListViewModel.EditAsNameList(nameKey);
 
             Assert.Equal(["File Name List", "File Name List*"], appliedFilters.Steps.Select(step => step.DisplayName));
             Assert.Equal(appliedFilters.Steps[1], Assert.Single(appliedFilters.SelectedSteps));

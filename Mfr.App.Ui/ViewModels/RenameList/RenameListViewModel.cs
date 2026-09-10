@@ -31,7 +31,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Opens paths with the OS shell, or <see langword="null"/> to use the OS default.
         /// </param>
         /// <param name="appliedFilters">
-        /// Applied Filters pane for Free Names Edit; when null, Free Names Edit is a no-op.
+        /// Applied Filters pane for Edit as Name List; when null, Edit as Name List is a no-op.
         /// </param>
         public RenameListViewModel(
             FileListViewModel fileListViewModel,

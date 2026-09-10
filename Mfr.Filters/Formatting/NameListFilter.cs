@@ -31,7 +31,7 @@ namespace Mfr.Filters.Formatting
     /// </summary>
     /// <remarks>
     /// Entry index <c>k</c> in the list applies to the rename item whose <see cref="FileMeta.RenameListIndex"/> is <c>k</c> (zero-based).
-    /// The Filter Configuration editor edits the embedded list as one name per line (Free Names Edit).
+    /// The Filter Configuration editor edits the embedded list as one name per line (Edit as Name List).
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="Options">Name list and optional prefix/suffix templates.</param>

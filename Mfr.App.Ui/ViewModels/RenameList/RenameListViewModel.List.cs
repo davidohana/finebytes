@@ -69,7 +69,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// new step so Filter Configuration shows the existing Name List editor.
         /// </para>
         /// </remarks>
-        public void FreeNamesEdit(RenameListFieldKey key)
+        public void EditAsNameList(RenameListFieldKey key)
         {
             if (IsBusy || _appliedFilters is null)
             {

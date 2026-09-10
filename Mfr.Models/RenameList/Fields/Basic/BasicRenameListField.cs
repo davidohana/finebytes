@@ -13,7 +13,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// <param name="isSortable">When <see langword="true"/>, the field may appear in Auto-Sort keys.</param>
     /// <param name="supportsPreview">When <see langword="true"/>, a preview column variant may be added.</param>
     /// <param name="writeTarget">
-    /// Filter target for Free Names / Manual Rename, or <see langword="null"/> when not writable.
+    /// Filter target for Edit as Name List / Manual Rename, or <see langword="null"/> when not writable.
     /// </param>
     public abstract class BasicRenameListField(
         string propertyKey,

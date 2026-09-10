@@ -115,9 +115,8 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <returns>A new context menu (caller opens it).</returns>
         /// <remarks>
         /// <para>
-        /// Order: title → Hide Field → (preview) Remove Unchanged → Export Name List (14b) →
-        /// Free Names Edit (14c, writable) → Select Visible Fields → Select Sort Fields.
-        /// Insert 14b Export before Free Names so order stays one place.
+        /// Order: title → Hide Field → (preview) Remove Unchanged → Export Name List →
+        /// Edit as Name List (writable) → Select Visible Fields → Select Sort Fields.
         /// </para>
         /// </remarks>
         private static ContextMenu _BuildColumnHeaderContextMenu(
@@ -145,15 +144,13 @@ namespace Mfr.App.Ui.Views.RenameList
                 );
             }
 
-            // 14b Export Name List — any column (insert here before Free Names Edit).
-
             if (field.SupportsWrite)
             {
                 menu.Items.Add(
                     _CreateTipMenuItem(
-                        "Free Names Edit",
-                        AppTips.FreeNamesEdit,
-                        () => viewModel.FreeNamesEdit(fieldKey)
+                        "Edit as Name List",
+                        AppTips.EditAsNameList,
+                        () => viewModel.EditAsNameList(fieldKey)
                     )
                 );
             }

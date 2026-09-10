@@ -249,7 +249,7 @@ namespace Mfr.Tests.Ui.RenameList
                 [
                     "(Parent Directory)",
                     "Hide Field",
-                    "Free Names Edit",
+                    "Edit as Name List",
                     "Select Visible Fields...",
                     "Select Sort Fields...",
                 ],
@@ -262,7 +262,7 @@ namespace Mfr.Tests.Ui.RenameList
                     "(Full File Name)",
                     "Hide Field",
                     "Remove Unchanged Items",
-                    "Free Names Edit",
+                    "Edit as Name List",
                     "Select Visible Fields...",
                     "Select Sort Fields...",
                 ],
@@ -273,10 +273,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies Free Names Edit is omitted on non-writable columns.
+        /// Verifies Edit as Name List is omitted on non-writable columns.
         /// </summary>
         [AvaloniaFact]
-        public async Task Header_menu_omits_free_names_edit_on_non_writable_column()
+        public async Task Header_menu_omits_edit_as_name_list_on_non_writable_column()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "row.txt");
@@ -310,8 +310,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ["(File Name Length)", "Hide Field", "Select Visible Fields...", "Select Sort Fields..."],
                 _MenuHeaders(lengthHeader.ContextMenu)
             );
-            Assert.DoesNotContain("Free Names Edit", _MenuHeaders(lengthHeader.ContextMenu));
-
+            Assert.DoesNotContain("Edit as Name List", _MenuHeaders(lengthHeader.ContextMenu));
             window.Close();
         }
 

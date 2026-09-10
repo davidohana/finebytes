@@ -140,7 +140,7 @@ namespace Mfr.Tests.Ui.RenameList
         /// Shell opener for Properties / Show in Explorer, or <see langword="null"/> for the null opener.
         /// </param>
         /// <param name="appliedFilters">
-        /// Applied Filters for Free Names Edit tests, or <see langword="null"/> when not needed.
+        /// Applied Filters for Edit as Name List tests, or <see langword="null"/> when not needed.
         /// </param>
         /// <returns>Rename List view model.</returns>
         public RenameListViewModel CreateRenameListViewModel(

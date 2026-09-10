@@ -276,7 +276,7 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Collects one display line per rename-list row for <paramref name="key"/> (Free Names / Export Name List).
+        /// Collects one display line per rename-list row for <paramref name="key"/> (Edit as Name List / Export Name List).
         /// </summary>
         /// <param name="key">Original or preview field key whose column text is collected.</param>
         /// <returns>
@@ -285,7 +285,7 @@ namespace Mfr.Engine.RenameList
         /// </returns>
         /// <remarks>
         /// <para>
-        /// In-memory only — does not write a file. Shared by Free Names Edit (14c) and Export Name List (14b).
+        /// In-memory only — does not write a file. Shared by Edit as Name List and Export Name List.
         /// </para>
         /// </remarks>
         public IReadOnlyList<string> CollectNameList(RenameListFieldKey key)

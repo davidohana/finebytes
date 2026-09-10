@@ -19,7 +19,7 @@ namespace Mfr.Models.RenameList
     /// </param>
     /// <param name="metadataRequirement">Lazy disk metadata required before resolving this field.</param>
     /// <param name="writeTarget">
-    /// Filter target filters can write for Free Names / Manual Rename (MFR7 <c>ReadWriteApply</c>);
+    /// Filter target filters can write for Edit as Name List / Manual Rename (MFR7 <c>ReadWriteApply</c>);
     /// <see langword="null"/> when the field is not writable.
     /// </param>
     /// <param name="description">
@@ -79,7 +79,7 @@ namespace Mfr.Models.RenameList
         public RenameListMetadataRequirement MetadataRequirement { get; } = metadataRequirement;
 
         /// <summary>
-        /// Gets the filter target filters can write for Free Names / Manual Rename, or
+        /// Gets the filter target filters can write for Edit as Name List / Manual Rename, or
         /// <see langword="null"/> when this field is not writable (MFR7 <c>ReadWriteApply</c> only).
         /// </summary>
         public FilterTarget? WriteTarget { get; } = writeTarget;
@@ -90,7 +90,7 @@ namespace Mfr.Models.RenameList
         public string? Description { get; } = description;
 
         /// <summary>
-        /// Gets whether Free Names Edit and Manual Rename may target this field.
+        /// Gets whether Edit as Name List and Manual Rename may target this field.
         /// </summary>
         public bool SupportsWrite => WriteTarget is not null;
 

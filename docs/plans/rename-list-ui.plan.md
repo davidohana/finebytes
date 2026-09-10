@@ -105,7 +105,7 @@ todos:
     content: "14b: Export Name List — GenerateNameList + save dialog (+ optional edit)"
     status: pending
   - id: phase-14c
-    content: "14c: Free Names Edit — embed generated names in NameListFilter on Applied Filters"
+    content: "14c: Edit as Name List — embed generated names in NameListFilter on Applied Filters"
     status: completed
   - id: phase-14d
     content: "14d: Manual Rename Field (F2) — overrides, blue cells, Cancel, F5 reset"
@@ -161,7 +161,7 @@ ______________________________________________________________________
 
 ## Shipped (1–13, 14a, 14c, 14e) — consolidated
 
-Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Free Names Edit, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
+Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
 
 | Block                    | What shipped                                                                                                                                                                           |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -176,7 +176,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 | **12** Preview metadata  | Extended dates/attrs + AudioTag semantic (`ReadWriteApply`) preview cols; First\* / Tag Types / Image / Jpeg / Media / Mpeg stay original-only; Size / Folder File Count original-only |
 | **13** Hygiene           | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                                                      |
 | **14a** Remove Unchanged | Preview-column header menu → `RenameList.RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                                                 |
-| **14c** Free Names Edit  | `SupportsWrite` + `WriteTarget`; `CollectNameList`; header Free Names → embedded `NameListFilter` via `AddAndSelect` (no file I/O); F5 Name List editor                                |
+| **14c** Edit as Name List  | `SupportsWrite` + `WriteTarget`; `CollectNameList`; header Edit as Name List → embedded `NameListFilter` via `AddAndSelect` (no file I/O); F5 Name List editor                                |
 | **14e** Properties       | Alt+Enter + row **Properties** → shell property sheet; **Show in Explorer** on Rename List; same Properties on File List (clears debts.md dialog bullet)                               |
 
 **Already reusable for remaining work (do not rebuild):**
@@ -184,7 +184,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 - `RenameList.CollectNameList` + UTF-8 file writer still needed for **14b** Export
 - Engine `RenameList.Preview` / `Commit` / `CommitExecutor` + `RenameItem.CommitError` + `RenameListCommitTests` — ready for **15** UI wiring
 - `RenameListRowErrorDialog` — reuse for Show Rename Error (**15**), not a third dialog
-- Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs) — insert **14b Export** before Free Names
+- Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs) — insert **14b Export** before Edit as Name List
 - Cell/row classes: red / gray / lavender in `RenameListView.axaml`; **blue** and **plum** still missing
 - `MainWindowViewModel.Go()` + `AppShortcuts.Go` / menu / toolbar — **stubs**; Ctrl+G labeled but no-op ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
 - `IFileShellOpener.ShowProperties` / `RevealInFileManager` — `Services/Shell`, shared by File List and Rename List
@@ -192,7 +192,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 
 **Write vs preview (important for 14d):**
 
-| MFR7 type        | Examples                                           | Preview col | Free Names / F2           |
+| MFR7 type        | Examples                                           | Preview col | Edit as Name List / F2           |
 | ---------------- | -------------------------------------------------- | ----------- | ------------------------- |
 | `ReadWriteApply` | Basic name/path fields; AudioTag semantic          | yes         | **yes** (`SupportsWrite`) |
 | `ReadWrite`      | Extended dates/attrs                               | yes (12)    | **no**                    |
@@ -216,11 +216,11 @@ ______________________________________________________________________
 
 MFR7: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) (`#export`, `#freeedit`, `#manualrename`, `#removeunchanged`, `#morefeats`), UI `RenameList.cs`, `RenameItemList.GenerateNameList`.
 
-**Do not conflate** Export (file) ≠ Free Names (filter) ≠ Manual Rename (F2 force/blue).
+**Do not conflate** Export (file) ≠ Edit as Name List (filter) ≠ Manual Rename (F2 force/blue).
 
 Header menu order ([`_BuildColumnHeaderContextMenu`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)):
 
-`(title)` → Hide Field → *(preview)* Remove Unchanged → **(14b) Export Name List** → **(14c writable) Free Names Edit** → Select Visible Fields → Select Sort Fields.
+`(title)` → Hide Field → *(preview)* Remove Unchanged → **(14b) Export Name List** → **(14c writable) Edit as Name List** → Select Visible Fields → Select Sort Fields.
 
 ### 14b — Export Name List
 
@@ -229,19 +229,19 @@ One line per rename-list row = display text of the clicked column (original or p
 **Work**
 
 - **Engine:** file writer on top of existing `RenameList.CollectNameList(key)` — UTF-8, one `WriteLine` per collected line (MFR7 `GenerateNameList`).
-- **UI:** Header menu on **any** column (insert before Free Names Edit). Avalonia save dialog (`Save Name List as`, `*.txt`). On success: `"Name list saved to {path}. Edit?"` → Yes opens with default editor (`UseShellExecute`). Cancel = no write.
+- **UI:** Header menu on **any** column (insert before Edit as Name List). Avalonia save dialog (`Save Name List as`, `*.txt`). On success: `"Name list saved to {path}. Edit?"` → Yes opens with default editor (`UseShellExecute`). Cancel = no write.
 - **Tests:** contents match row order and original vs preview values; cancel leaves disk alone.
 
 **Not in scope:** creating a Name List filter (14c — shipped).
 
-### 14c — Free Names Edit (done)
+### 14c — Edit as Name List (done)
 
 Header command on **writable** columns only (`SupportsWrite` / MFR7 `ReadWriteApply`). **No file I/O** — embeds lines in `NameListOptions.Entries`.
 
 **Work completed**
 
 - Catalog `SupportsWrite` + `WriteTarget` on Basic Name/Extension/FullName/Folder/FullPath + AudioTag semantic.
-- `RenameList.CollectNameList` + `AppliedFiltersViewModel.AddAndSelect` (`*` unique names) + `FreeNamesEdit` → select step for F5 Name List editor.
+- `RenameList.CollectNameList` + `AppliedFiltersViewModel.AddAndSelect` (`*` unique names) + `EditAsNameList` → select step for F5 Name List editor.
 - Header menu item on writable columns only.
 
 **Not in scope:** blue manual cells (14d); does not mutate Original/Preview directly.
@@ -295,7 +295,7 @@ Selected Rename List rows drag as filesystem paths.
 
 ### Phase 14 exit
 
-Header menu has Export + Free Names Edit; F2 manual rename + blue; Properties; Explorer drag-out. Then **15** → **16**.
+Header menu has Export + Edit as Name List; F2 manual rename + blue; Properties; Explorer drag-out. Then **15** → **16**.
 
 ______________________________________________________________________
 
