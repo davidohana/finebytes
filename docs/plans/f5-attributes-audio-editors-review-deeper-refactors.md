@@ -83,7 +83,7 @@ This doc lists **not done** work only.
 
 ### 9. Replace List Regex compile at Setup — **medium** (carried)
 
-- See `docs/plans/filter-editor-review-deeper-refactors.md`
+- Sites: Replace List matching builds regex per call; compile once in `_Setup` when touching Replace
 
 ### 10. `_NudgeBoundText` binding redesign — **low**
 

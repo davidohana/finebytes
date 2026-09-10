@@ -41,7 +41,7 @@ isProject: false
 
 - **Order:** architecture / layering first, then full [`mfr-code-review`](../../.agents/skills/mfr-code-review/SKILL.md) per slice.
 - **Per phase:** apply high-confidence fixes in-pass; report remaining findings + cost-to-value-ranked deeper refactors (skill default).
-- **Artifact:** this file — phase status + rolling **Deeper refactors backlog**. Do not re-open “already done” items in [`f5-…`](f5-attributes-audio-editors-review-deeper-refactors.md) / [`f6-…`](f6-formateditor-deep-refactors.md).
+- **Artifact:** this file — phase status + rolling **Deeper refactors backlog**. Do not re-open “already done” items in [`f5-…`](f5-attributes-audio-editors-review-deeper-refactors.md).
 
 ## Method (every content phase)
 
@@ -648,5 +648,5 @@ All phases **0–9 complete**. No further phase briefs. Open rename-list feature
 
 - Finishing open feature plan phases (rename-list 14b–16, etc.) unless a review fix is required for correctness.
 - Writing a full design doc into the empty stub unless asked separately.
-- Re-litigating completed f5/f6 “already done” items.
+- Re-litigating completed f5 “already done” items.
 - Inventing a Phase 10.

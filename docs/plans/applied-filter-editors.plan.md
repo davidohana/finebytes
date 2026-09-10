@@ -6,7 +6,7 @@ todos:
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
     status: completed
   - id: f6-formatter-format-editor
-    content: "F6 Formatter FormatEditor — complete on master; see formatter-formateditor-ux.plan.md"
+    content: "F6 Formatter FormatEditor — complete on master"
     status: completed
   - id: f7-presets-ui
     content: "F7 Presets UI — enable Presets / Save Preset; load/save chain via PresetManager"
@@ -15,7 +15,7 @@ todos:
     content: "F8 Session — persist + restore working Applied Filters chain (current schema only)"
     status: pending
   - id: f9-filter-chrome
-    content: "F9 Filter chrome — save-as-default (pin), reset-to-defaults (done), per-filter help ?"
+    content: "F9 Filter chrome — save-as-default (pin, done), reset-to-defaults (done), per-filter help ?"
     status: pending
   - id: f10-filter-options-polish
     content: "F10 Filter Options dialog — XAML/layout polish vs MFR7 (dialog already functional)"
@@ -27,7 +27,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-08):** **F1–F6 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` (catalog, param dialogs, syntax highlight, token picker pane) is wired across format-capable filters. **F9a save-as-default (pin)** landed — see [filter-save-as-default.plan.md](filter-save-as-default.plan.md). **Next:** F7 presets → F8 session chain → F9 help `?` → F10 Filter Options polish.
+**Status (2026-09-08):** **F1–F6 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` (catalog, param dialogs, syntax highlight, token picker pane) is wired across format-capable filters. **F9a save-as-default (pin)** landed. **Next:** F7 presets → F8 session chain → F9 help `?` → F10 Filter Options polish.
 
 ______________________________________________________________________
 
@@ -78,17 +78,16 @@ Ordered for product value. Do **not** mix these into a single “editor” pass 
 
 ### F6 — Formatter FormatEditor UX — **done**
 
-Detailed plan: [formatter-formateditor-ux.plan.md](formatter-formateditor-ux.plan.md). Deep follow-ups: [f6-formateditor-deep-refactors.md](f6-formateditor-deep-refactors.md).
-
 **Shipped on master:**
 
 1. Public `FormatTokenCatalog` + `FormatStringSyntax.TryValidate` (engine).
 1. Shared `FormatEditor` (searchable insert, caret insert, inline error + jump) wired to Formatter.
 1. Param dialogs for all arg-bearing tokens (`FormatTokenEditorRegistry` + Edit/right-click).
+1. Syntax highlight, capped auto-grow, token picker pane, token-editor Preview band + fieldsets.
 
-**Reuse done:** PathMover Sub-folder, Inserter, Name List Prefix/Suffix, Audio Tag Setter fields, ID3v2 Field Setter text — all use shared `FormatEditor` (`WhenLikelyTokens` where the filter gates compile). Genre stays an editable ComboBox. Syntax highlight: [`formateditor-syntax-highlight.plan.md`](formateditor-syntax-highlight.plan.md). Token picker pane (collapsible Insert+Edit, last-focused field): [`format-token-picker-pane.plan.md`](format-token-picker-pane.plan.md).
+**Reuse done:** PathMover Sub-folder, Inserter, Name List Prefix/Suffix, Audio Tag Setter fields, ID3v2 Field Setter text — all use shared `FormatEditor` (`WhenLikelyTokens` where the filter gates compile). Genre stays an editable ComboBox.
 
-**Landed as:** [A #35](https://github.com/davidohana/finebytes/pull/35) (merged) · [B #36](https://github.com/davidohana/finebytes/pull/36) (closed; work on master) · [C #37](https://github.com/davidohana/finebytes/pull/37) (merged). Optional polish still open: FormatEditor auto-grow / expand ([#38](https://github.com/davidohana/finebytes/pull/38)).
+**Landed as:** [A #35](https://github.com/davidohana/finebytes/pull/35) (merged) · [B #36](https://github.com/davidohana/finebytes/pull/36) (closed; work on master) · [C #37](https://github.com/davidohana/finebytes/pull/37) (merged).
 
 ### F7 — Presets UI
 
@@ -112,7 +111,7 @@ Rename List / other session fields already persist; Applied Filters chain does n
 
 MFR7 Applied / Filter Configuration chrome:
 
-1. **Save as default (pin)** — **done** (title-bar **📌**; `FilterDefaultsStore` / `filter-defaults.json`; applies on palette add only; reset stays factory). See [filter-save-as-default.plan.md](filter-save-as-default.plan.md).
+1. **Save as default (pin)** — **done** (title-bar **📌**; `FilterDefaultsStore` / `filter-defaults.json`; applies on palette add only; reset stays factory).
 1. **Reset to defaults** — **done** (single selection; options / Apply To / scope via `FilterCatalog.CreateDefault`; keeps display name + enabled; title-bar `↺`).
 1. **Help `?`** — open per-filter help (ported help pages or MFR7 `Help/*.html` mapping). Wire from Filter Configuration title bar and/or Filter Options.
 
