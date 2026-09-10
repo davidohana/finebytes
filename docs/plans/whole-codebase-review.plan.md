@@ -572,11 +572,10 @@ _(empty)_
 1. **Move or lazy-gate `FormatFolderFileCount` directory scan** (was #3) — docs Phase 7
    Rank: **skip** — perf; unless profiling shows FileCount column hot
 
-1. **Shared salmon drop-mark brush** (was #27)
-   Rank: **skip** — cosmetic; ride along if touching drop marks
-
 ### Closed (history)
 
+1. **Shared salmon drop-mark brush** (was #27) — **done**
+   `DropMarkBrush` in AppChrome (Light/Dark); `DropMarkBrushes` (DragAndDrop) owns color + Fallback + Resolve; Rename List / Applied Filters / Field Shuttle / ListBoxDropMark / column indicator use the shared key or Fallback
 1. **Shared AppData delete-if-exists helper** (was #21) — **done**
    `AppDataFile.DeleteFileIfExists(path, fileDescription)` (Utils); ConfigStore / SessionStore / FilterDefaultsStore delete paths call it; messages preserved (`configuration file` / `session file` / `filter defaults file`)
 1. **Unify soft-load / hard-fail documentation** (was #22) — **done**

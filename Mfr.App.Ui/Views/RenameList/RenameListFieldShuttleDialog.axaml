@@ -73,13 +73,13 @@
     </Style>
     <!-- Rename List salmon drop mark: insert before this row while dragging. -->
     <Style Selector="ListBox.field-shuttle-list ListBoxItem.drop-mark">
-      <Setter Property="Background" Value="{DynamicResource RenameListDropIndicatorBrush}" />
+      <Setter Property="Background" Value="{DynamicResource DropMarkBrush}" />
     </Style>
     <Style Selector="ListBox.field-shuttle-list ListBoxItem.drop-mark:selected">
-      <Setter Property="Background" Value="{DynamicResource RenameListDropIndicatorBrush}" />
+      <Setter Property="Background" Value="{DynamicResource DropMarkBrush}" />
     </Style>
     <Style Selector="ListBox.field-shuttle-list ListBoxItem.drop-mark:pointerover">
-      <Setter Property="Background" Value="{DynamicResource RenameListDropIndicatorBrush}" />
+      <Setter Property="Background" Value="{DynamicResource DropMarkBrush}" />
     </Style>
     <Style Selector="Button.field-shuttle-action">
       <Setter Property="Width" Value="36" />

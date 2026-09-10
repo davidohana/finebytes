@@ -2,7 +2,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
-using Avalonia.Media;
 
 namespace Mfr.App.Ui.Views.DragAndDrop
 {
@@ -11,30 +10,11 @@ namespace Mfr.App.Ui.Views.DragAndDrop
     /// </summary>
     internal sealed class ListBoxDropMark
     {
-        private const string _IndicatorBrushKey = "RenameListDropIndicatorBrush";
-        private static readonly IBrush _FallbackBrush = new SolidColorBrush(Color.Parse("#FA8072"));
-
         private ListBoxItem? _dropMarkItem;
         private ListBox? _dropMarkList;
         private int? _dropMarkInsertIndex;
         private Canvas? _appendMarkHost;
         private Rectangle? _appendMarkLine;
-
-        /// <summary>
-        /// Resolves the insert-marker brush from <paramref name="owner"/>'s theme, with a salmon fallback.
-        /// </summary>
-        private static IBrush _ResolveBrush(StyledElement owner)
-        {
-            if (
-                owner.TryGetResource(_IndicatorBrushKey, owner.ActualThemeVariant, out var resource)
-                && resource is IBrush brush
-            )
-            {
-                return brush;
-            }
-
-            return _FallbackBrush;
-        }
 
         /// <summary>
         /// Shows or moves the insert marker for a drop at <paramref name="position"/>.
@@ -113,7 +93,7 @@ namespace Mfr.App.Ui.Views.DragAndDrop
             {
                 Height = 3,
                 IsHitTestVisible = false,
-                Fill = _ResolveBrush(listBox),
+                Fill = DropMarkBrushes.Resolve(listBox),
             };
 
             if (_appendMarkLine.Parent is null)

@@ -769,15 +769,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private IBrush _DropMarkBrush()
         {
-            if (
-                TryGetResource("RenameListDropIndicatorBrush", ActualThemeVariant, out var resource)
-                && resource is IBrush brush
-            )
-            {
-                return brush;
-            }
-
-            return new SolidColorBrush(Color.Parse("#FA8072"));
+            return DropMarkBrushes.Resolve(this);
         }
 
         private void _ClearAppendMark()

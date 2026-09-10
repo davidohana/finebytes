@@ -19,6 +19,7 @@
       <SolidColorBrush x:Key="AppChromePreviewGlyphForegroundBrush" Color="#C00000" />
       <SolidColorBrush x:Key="AppChromePreviewGlyphBackgroundBrush" Color="#FFE8E8" />
       <SolidColorBrush x:Key="AppChromePreviewGlyphBorderBrush" Color="#F0A0A0" />
+      <SolidColorBrush x:Key="DropMarkBrush" Color="#FA8072" />
     </ResourceDictionary>
     <ResourceDictionary x:Key="Dark">
       <SolidColorBrush x:Key="AppChromeSurfaceBrush" Color="#202020" />
@@ -39,6 +40,7 @@
       <SolidColorBrush x:Key="AppChromePreviewGlyphForegroundBrush" Color="#FF8080" />
       <SolidColorBrush x:Key="AppChromePreviewGlyphBackgroundBrush" Color="#4A2828" />
       <SolidColorBrush x:Key="AppChromePreviewGlyphBorderBrush" Color="#804040" />
+      <SolidColorBrush x:Key="DropMarkBrush" Color="#FA8072" />
     </ResourceDictionary>
   </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

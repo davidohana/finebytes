@@ -103,7 +103,7 @@
       <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
       <Setter Property="DropLocationIndicatorTemplate">
         <Template>
-          <Rectangle Width="3" Fill="{DynamicResource RenameListDropIndicatorBrush}" />
+          <Rectangle Width="3" Fill="{DynamicResource DropMarkBrush}" />
         </Template>
       </Setter>
     </Style>
@@ -218,15 +218,15 @@
     </Style>
     <!-- MFR7 MarkedRow (Color.Salmon) while dragging over a row (files or internal reorder) -->
     <Style Selector="DataGrid.rename-list DataGridRow.drop-mark">
-      <Setter Property="Background" Value="#FA8072" />
+      <Setter Property="Background" Value="{DynamicResource DropMarkBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow.drop-mark /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="#FA8072" />
+      <Setter Property="Fill" Value="{DynamicResource DropMarkBrush}" />
       <Setter Property="Stroke" Value="Transparent" />
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow.drop-mark:selected /template/ Rectangle#BackgroundRectangle">
-      <Setter Property="Fill" Value="#FA8072" />
+      <Setter Property="Fill" Value="{DynamicResource DropMarkBrush}" />
       <Setter Property="Stroke" Value="Transparent" />
       <Setter Property="Opacity" Value="1" />
     </Style>

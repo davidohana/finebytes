@@ -4,6 +4,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Controls.Shapes;
 using Avalonia.Media;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.Views.DragAndDrop;
 using Path = Avalonia.Controls.Shapes.Path;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -13,7 +14,7 @@ namespace Mfr.App.Ui.Views.RenameList
     /// </summary>
     internal sealed class RenameListColumnDropIndicator : Panel
     {
-        private static readonly IBrush IndicatorBrush = new SolidColorBrush(Color.Parse("#FA8072"));
+        private static readonly IBrush IndicatorBrush = DropMarkBrushes.Fallback;
 
         private const double IndicatorWidth = 8;
         private const double LineWidth = 3;
