@@ -1,11 +1,18 @@
 using System.Globalization;
 using System.Text;
+using Mfr.Filters.Formatting.Tokens;
 
 namespace Mfr.App.Ui.ViewModels.FormatEditor
 {
     /// <summary>
-    /// Builds and parses comma-separated <c>key=value</c> format-token arguments (bracket-depth aware).
+    /// Builds named <c>key=value</c> format-token arguments and soft-parses them for dialog editors.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Split/parse rules live in <see cref="FormatOptionsParsing"/> so dialog OK and Compile cannot drift.
+    /// Soft <c>Get*</c> defaults stay here; Compile keeps throw-on-invalid behavior.
+    /// </para>
+    /// </remarks>
     public static class NamedFormatOptionsBuilder
     {
         /// <summary>
@@ -71,32 +78,16 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
                 return true;
             }
 
-            foreach (var segment in _SplitNamedArgumentSegments(args.Trim()))
+            try
             {
-                var trimmed = segment.Trim();
-                if (trimmed.Length == 0)
-                {
-                    keyToValue.Clear();
-                    return false;
-                }
-
-                var eq = trimmed.IndexOf('=');
-                if (eq <= 0)
-                {
-                    keyToValue.Clear();
-                    return false;
-                }
-
-                var key = trimmed[..eq].Trim();
-                var value = trimmed[(eq + 1)..].Trim();
-                if (key.Length == 0 || !keyToValue.TryAdd(key, value))
-                {
-                    keyToValue.Clear();
-                    return false;
-                }
+                keyToValue = FormatOptionsParsing.ParseNamedKeyValuePairs(args.Trim(), "<format-options>");
+                return true;
             }
-
-            return true;
+            catch (ArgumentException)
+            {
+                keyToValue = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+                return false;
+            }
         }
 
         /// <summary>
@@ -145,33 +136,6 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         public static string GetString(IReadOnlyDictionary<string, string> keyToValue, string key, string fallback)
         {
             return keyToValue.TryGetValue(key, out var raw) ? raw : fallback;
-        }
-
-        private static List<string> _SplitNamedArgumentSegments(string arg)
-        {
-            var segments = new List<string>();
-            var depth = 0;
-            var start = 0;
-            for (var i = 0; i < arg.Length; i++)
-            {
-                var c = arg[i];
-                if (c == '<')
-                {
-                    depth++;
-                }
-                else if (c == '>')
-                {
-                    depth = Math.Max(0, depth - 1);
-                }
-                else if (c == ',' && depth == 0)
-                {
-                    segments.Add(arg[start..i]);
-                    start = i + 1;
-                }
-            }
-
-            segments.Add(arg[start..]);
-            return segments;
         }
     }
 }

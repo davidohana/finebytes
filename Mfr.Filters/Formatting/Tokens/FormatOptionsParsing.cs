@@ -3,16 +3,23 @@ using Mfr.Utils;
 namespace Mfr.Filters.Formatting.Tokens
 {
     /// <summary>
-    /// Shared helpers used by multiple formatter tokens (display labels, keyword hints, named arguments, and common preconditions).
+    /// Shared helpers for formatter token options: named <c>key=value</c> parsing, display labels, and common preconditions.
     /// </summary>
-    internal static class FormatOptionsParsing
+    /// <remarks>
+    /// <para>
+    /// <see cref="SplitNamedArgumentSegments"/> and <see cref="ParseNamedKeyValuePairs"/> are the single owner for
+    /// depth-aware comma splits used by Compile and by Format Editor dialogs (UI wraps parse failures as
+    /// <see langword="false"/>). Soft dialog defaults stay in the UI layer.
+    /// </para>
+    /// </remarks>
+    public static class FormatOptionsParsing
     {
         /// <summary>
         /// Splits <paramref name="arg"/> on commas that are not inside balanced <c>&lt;…&gt;</c> segments (depth tracked per character).
         /// </summary>
         /// <param name="arg">Raw formatter token argument text.</param>
         /// <returns>Segments before trimming; callers typically trim each segment.</returns>
-        internal static List<string> SplitNamedArgumentSegments(string arg)
+        public static List<string> SplitNamedArgumentSegments(string arg)
         {
             var segments = new List<string>();
             var depth = 0;
@@ -46,7 +53,7 @@ namespace Mfr.Filters.Formatting.Tokens
         /// <param name="tokenDisplayName">Token label for errors (for example <c>&lt;counter&gt;</c>).</param>
         /// <returns>Case-insensitive keys mapped to trimmed values.</returns>
         /// <exception cref="ArgumentException">Thrown when a segment is empty, missing <c>=</c>, or duplicates a key.</exception>
-        internal static Dictionary<string, string> ParseNamedKeyValuePairs(string arg, string tokenDisplayName)
+        public static Dictionary<string, string> ParseNamedKeyValuePairs(string arg, string tokenDisplayName)
         {
             var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var segment in SplitNamedArgumentSegments(arg))
@@ -71,14 +78,6 @@ namespace Mfr.Filters.Formatting.Tokens
 
                 var key = trimmed[..eq].Trim();
                 var value = trimmed[(eq + 1)..].Trim();
-                if (key.Length == 0)
-                {
-                    throw new ArgumentException(
-                        $"{tokenDisplayName} segment '{trimmed}' is missing a key before '='.",
-                        nameof(arg)
-                    );
-                }
-
                 if (!map.TryAdd(key, value))
                 {
                     throw new ArgumentException(

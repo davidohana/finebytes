@@ -418,7 +418,7 @@ ______________________________________________________________________
 
 **Scope:** Format Editor (`ViewModels/Views/FormatEditor`, token editors) + `FilterEditors/<FilterGroup>/`; matching `Mfr.Tests/Ui/FilterEditors|FormatEditor`. Explore used for cross-file twins ([Format/Filter twins](68959676-c553-4061-8dfc-7917202273e2)). Respect f5/f6 already-done items (do not re-open Date/Time merge, Attributes radios, Tag Remover catalog UI, FormatStringScan walk, nested `source=` FormatEditor, etc.).
 
-**Verdict:** Format Editor + Filter Configuration editors are coherent — Views → ViewModels, live option replace via shared `LoadWithoutApplying` / `ApplyIfChanged`, convention ViewLocators, no second domain options resolver in Views. Applied factory/locator completeness (#11), dead drop wrappers, exhaustiveness, and stale dialog alignment test. Leftovers are structural (named-arg parse twin from f6, inclusive position helpers, ViewLocator merge).
+**Verdict:** Format Editor + Filter Configuration editors are coherent — Views → ViewModels, live option replace via shared `LoadWithoutApplying` / `ApplyIfChanged`, convention ViewLocators, no second domain options resolver in Views. Applied factory/locator completeness (#11), dead drop wrappers, exhaustiveness, and stale dialog alignment test. Leftovers are structural (inclusive position helpers, ViewLocator merge); named-arg parse twin closed later (backlog #29).
 
 ### Architecture (lightweight)
 
@@ -444,13 +444,12 @@ ______________________________________________________________________
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | Space Character Other + empty → `\0`                     | Intentional; filter setup throws (MFR7) — do not silently fall back to space (f5 follow-up superseded) |
 | `ReplaceList` `parseEntries: false` on match-flag change | Avoids lossy re-parse when search contains `=>`                                                        |
-| Named-arg parse twin still duplicated                    | Soft dialog vs Compile throw dialects — backlog **#29** (f6 #1)                                        |
 | Inclusive left/right index twins                         | TrimBetween `Side` ↔ ApplyScope `StringScopeAnchor`; Inserter insert-before stays separate — **#12**   |
 | Counter filter UI vs `<counter>` token UI                | Surfaces differ; `CounterPadding` already shared (Phase 3)                                             |
 
 ### Deeper refactors (promoted / updated)
 
-See backlog: **#11 done**; **#12** refined; **#27–#28** unchanged; **#29–#31** added from Phase 8 / f6 carry-in.
+See backlog: **#11 done**; **#12** refined; **#27–#28** unchanged; **#29–#31** added from Phase 8 / f6 carry-in; **#29** done (shared `FormatOptionsParsing`).
 
 ### Phase 8 exit
 
@@ -506,13 +505,6 @@ ______________________________________________________________________
 Ranked cost-to-value (best first among **open** items). Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
 ### Open (priority order)
-
-1. **Share named-arg parse with Filters** (was #29; f6 #1 carry-in)
-   Sites: `NamedFormatOptionsBuilder` ↔ `FormatOptionsParsing`
-   Target: one public owner in Filters; UI wraps throw→bool
-   Value: dialog OK and Compile cannot drift on nested `source=<…>` / `key=value`
-   Cost: medium — public API + Filters tests; soft dialog defaults stay separate
-   Rank: **high** — do when next touching FormatEditor tokens or named options
 
 1. **TagLib open helper** (was #18)
    Sites: AudioTagPersistence / TagLibFileReader / MediaPropertiesReader / AudioTagContainerDetector
@@ -671,6 +663,8 @@ Ranked cost-to-value (best first among **open** items). Closed items kept for hi
 
 ### Closed (history)
 
+1. **Share named-arg parse with Filters** (was #29; f6 #1) — **done**
+   `FormatOptionsParsing.SplitNamedArgumentSegments` / `ParseNamedKeyValuePairs` public; `NamedFormatOptionsBuilder.TryParse` wraps throw→bool; soft `Get*` / Join stay in UI; `FormatOptionsParsingTests`
 1. **`SessionStateRenameListSortField` vs `RenameListSortKey`** — **done Phase 5**
 1. **`FilterOptionsEditorFactory` completeness** — **done Phase 8**
 1. **Move Rename List internal drag format out of `RenameListView`** — **done Phase 7**

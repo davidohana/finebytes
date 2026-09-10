@@ -54,13 +54,10 @@ High-confidence autofixes landed in those review passes (see below). This doc li
 
 ## Ranked follow-ups (best cost-to-value first)
 
-### 1. Share named-arg parse with Filters — **high**
+### 1. Share named-arg parse with Filters — **done**
 
-- **Sites:** `NamedFormatOptionsBuilder` (`TryParse` / `_SplitNamedArgumentSegments`) ↔ `FormatOptionsParsing.SplitNamedArgumentSegments` / `ParseNamedKeyValuePairs` (identical depth-aware comma split + key=value rules; throw vs bool)
-- **Target:** one public owner in `Mfr.Filters` (or `Mfr.Utils`); UI wraps throw→bool (and keeps Join / FormatInt / FormatBool / soft Get helpers)
-- **Value:** Today the dialog layer and the rename engine each re-implement “split on commas unless inside `<…>`.” If those copies drift, a user can OK a token in the FormatEditor dialog that later fails at preview/Apply (or the reverse: Compile accepts something the dialog cannot round-trip). One owner means nested `source=<…>` and `key=value` rules stay identical forever, and the next named-option token only learns one API.
-- **Cost:** public API surface + Filters tests; medium churn; keep soft dialog defaults separate from Compile throws
-- **Rank:** high — first structural dedup after F6 merge
+- **Done:** `FormatOptionsParsing.SplitNamedArgumentSegments` / `ParseNamedKeyValuePairs` are the public owner; `NamedFormatOptionsBuilder.TryParse` wraps throw→bool; Join / FormatInt / FormatBool / soft Get helpers stay in UI; `FormatOptionsParsingTests`
+- **Value (why it mattered):** Dialog OK and Compile cannot drift on nested `source=<…>` / `key=value`; next named-option token learns one API.
 
 ### 2. One template-walk owner for Compile + TryValidate — **done**
 
