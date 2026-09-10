@@ -89,7 +89,7 @@ namespace Mfr.Tests.Metadata
         }
 
         /// <summary>
-        /// Verifies TagLibFileReader survives files TagLib opens without stream properties.
+        /// Verifies TagLibFileAccess survives files TagLib opens without stream properties.
         /// </summary>
         [Fact]
         public void Read_InvalidWavPayload_DoesNotThrowNullReference()
@@ -99,7 +99,7 @@ namespace Mfr.Tests.Metadata
             {
                 File.WriteAllText(path, "not audio");
 
-                var ex = Record.Exception(() => TagLibFileReader.Read(path));
+                var ex = Record.Exception(() => TagLibFileAccess.Read(path));
 
                 Assert.NotNull(ex);
                 Assert.IsNotType<NullReferenceException>(ex);

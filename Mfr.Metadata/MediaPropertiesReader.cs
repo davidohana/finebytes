@@ -21,9 +21,7 @@ namespace Mfr.Metadata
         /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
         public static MediaProperties Read(string absolutePath)
         {
-            absolutePath.RequireExistingRegularFile();
-
-            using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
+            using var file = TagLibFileAccess.OpenExisting(absolutePath);
             return ReadFrom(file);
         }
 

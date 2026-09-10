@@ -30,7 +30,7 @@ namespace Mfr.Filters
                 throw new InvalidOperationException("Cannot read TagLib metadata for a directory.");
             }
 
-            var snapshot = TagLibFileReader.Read(item.Original.FullPath);
+            var snapshot = TagLibFileAccess.Read(item.Original.FullPath);
             item.SetEmbeddedTagOverlay(snapshot.Overlay);
             item.SetMediaProperties(snapshot.Media);
         }

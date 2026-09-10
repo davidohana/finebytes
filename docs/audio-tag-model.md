@@ -60,7 +60,7 @@ flowchart TB
   - `Mfr.Models` — `SemanticAudioTag`, `AudioTagSemanticMerge`, `AudioTagOverlay.MergeSemantic`, `SemanticFields`,
     `AudioOverlayBlockFieldIo`, `AudioOverlayTargetIo`, capability `AudioTagContainerPolicy`
 - **TagLib I/O and patch**
-  - `Mfr.Metadata` — `TagLibFileReader` (one preview open → tags + media), `AudioTagPersistence` (orchestration /
+  - `Mfr.Metadata` — `TagLibFileAccess` (one preview open → tags + media), `AudioTagPersistence` (orchestration /
     Apply), `Mfr.Metadata.TagFields` (`*TagFields` per block, plus `TagFieldDiff`), `AudioTagContainerDetector`
 - **Shared text rules**
   - `Mfr.Utils` — `DelimitedText` (`;`-list split/join, trim), `OrdinalSequence` (value-array compare/equality),
@@ -70,7 +70,7 @@ flowchart TB
 - **Commit** — `Mfr.Engine` — `CommitExecutor` (move → strip-all flag → Apply)
 
 The first TagLib preview open (`EnsureTagLibLoaded`) maps both tag overlays and media properties from
-one `TagLibFileReader.Read`. Seeded unit-test rows mark `TagLibLoadAttempted` so Ensure is a no-op and
+one `TagLibFileAccess.Read`. Seeded unit-test rows mark `TagLibLoadAttempted` so Ensure is a no-op and
 overlays are not overwritten. Commit Apply / strip still opens again to write. Filters do not reopen the
 file mid-chain.
 

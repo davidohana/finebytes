@@ -1,5 +1,4 @@
 using Mfr.Models.Tags;
-using Mfr.Utils;
 using TagLib;
 
 namespace Mfr.Metadata
@@ -26,9 +25,7 @@ namespace Mfr.Metadata
         /// <exception cref="UnsupportedFormatException">Thrown by TagLib when the format cannot be loaded.</exception>
         public static AudioContainerFormat Detect(string absolutePath)
         {
-            absolutePath.RequireExistingRegularFile();
-
-            using var file = TagLib.File.Create(new TagLib.File.LocalFileAbstraction(absolutePath));
+            using var file = TagLibFileAccess.OpenExisting(absolutePath);
             return DetectFrom(file);
         }
 

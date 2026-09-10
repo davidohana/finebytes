@@ -165,7 +165,7 @@ ______________________________________________________________________
 
 **Scope:** `Mfr.Metadata/`, `Mfr.Models/Tags/`, docs `audio-tag-model.md` / `image-metadata-model.md`, `Mfr.Tests/Metadata/` + `Mfr.Tests/Models/Tags/`. Explore subagent used for cross-file twins ([Metadata Tags twins](4089d359-8272-4d95-8c6a-4fcf3322505e)).
 
-**Verdict:** Layering matches the design — TagLib/ME stay in Metadata; overlay/semantic/merge/policy stay in Models; field-patch Apply never dual-writes `file.Tag`. Image/EXIF lazy map is coherent and allowlist-gated. Applied numeric clear parity, shared row/frame comparers (killing `\0`-Join drift), detector path hardening, and empty-block prune on ASF/Apple reads. Leftovers are known-key catalogs for Ape/Riff (Xiph already has `XiphKnownKeys`) and optional TagLib open helper.
+**Verdict:** Layering matches the design — TagLib/ME stay in Metadata; overlay/semantic/merge/policy stay in Models; field-patch Apply never dual-writes `file.Tag`. Image/EXIF lazy map is coherent and allowlist-gated. Applied numeric clear parity, shared row/frame comparers (killing `\0`-Join drift), detector path hardening, and empty-block prune on ASF/Apple reads. Leftovers are known-key catalogs for Ape/Riff (Xiph already has `XiphKnownKeys`). TagLib open helper is done (`TagLibFileAccess.OpenExisting`).
 
 ### Applied (high confidence)
 
@@ -506,13 +506,6 @@ Ranked cost-to-value (best first among **open** items). Closed items kept for hi
 
 ### Open (priority order)
 
-1. **TagLib open helper** (was #18)
-   Sites: AudioTagPersistence / TagLibFileReader / MediaPropertiesReader / AudioTagContainerDetector
-   Target: internal `TagLibFileOpen.OpenExisting(path)` in Metadata
-   Value: one open/guard pattern
-   Cost: low churn, Metadata-only
-   Rank: **medium** — ride along when next editing persistence opens
-
 1. **Wire catalog maps to existing key constants** (was #20)
    Sites: `AudioCatalogFieldMaps` vs `XiphKnownKeys` / `AsfDescriptorNames`
    Target: reference constants from catalog rows
@@ -663,6 +656,8 @@ Ranked cost-to-value (best first among **open** items). Closed items kept for hi
 
 ### Closed (history)
 
+1. **TagLib open helper** (was #18) — **done**
+   `TagLibFileAccess.OpenExisting(path)` (internal) — `RequireExistingRegularFile` + `TagLib.File.Create(LocalFileAbstraction)`; public `Read` one-open snapshot on same type; call sites: AudioTagPersistence / MediaPropertiesReader / AudioTagContainerDetector
 1. **Share named-arg parse with Filters** (was #29; f6 #1) — **done**
    `FormatOptionsParsing.SplitNamedArgumentSegments` / `ParseNamedKeyValuePairs` public; `NamedFormatOptionsBuilder.TryParse` wraps throw→bool; soft `Get*` / Join stay in UI; `FormatOptionsParsingTests`
 1. **`SessionStateRenameListSortField` vs `RenameListSortKey`** — **done Phase 5**
