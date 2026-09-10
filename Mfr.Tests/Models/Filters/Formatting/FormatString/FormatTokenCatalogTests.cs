@@ -1,4 +1,5 @@
 using Mfr.Filters.Formatting.FormatString;
+using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Models.Filters.Formatting.FormatString
@@ -144,6 +145,23 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
                 );
                 Assert.Equal(SemanticAudioFieldLabels.For(field), entry.DisplayName);
             }
+        }
+
+        /// <summary>
+        /// Verifies <c>file-or-folder</c> uses the same display name as the Rename List File/Folder column.
+        /// </summary>
+        [Fact]
+        public void File_or_folder_display_name_matches_rename_list_item_type()
+        {
+            var renameListLabel = Assert
+                .Single(BasicRenameListFields.All, f => f.PropertyKey == BasicRenameListFields.Key.ItemType)
+                .DisplayName;
+            var entry = Assert.Single(
+                FormatTokenCatalog.Entries,
+                e => string.Equals(e.CanonicalName, "file-or-folder", StringComparison.Ordinal)
+            );
+            Assert.Equal(renameListLabel, entry.DisplayName);
+            Assert.Equal("File/Folder", entry.DisplayName);
         }
     }
 }
