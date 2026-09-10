@@ -145,12 +145,12 @@ ______________________________________________________________________
 
 ### Correctness (found, not changed)
 
-| Item                                                 | Notes                                                                                                                                                                           |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| “Parent Folder” label collision                      | **Done** — Parent Directory = absolute; Parent Folder = ancestor segment                                                                                                        |
-| Semantic audio Apply-To vs Rename List display names                                                   | **Done** — `SemanticAudioFieldLabels` (Picard A for MB)                                                     |
-| Prefix/extension writes skip Windows name validation | Ancestor segments validate; name parts rely on Cleaner / commit — product choice                                                                                                |
-| `FileMeta.Clone` shares Media/Image/Exif refs        | Safe while snapshots stay immutable                                                                                                                                             |
+| Item                                                 | Notes                                                                            |
+| ---------------------------------------------------- | -------------------------------------------------------------------------------- |
+| “Parent Folder” label collision                      | **Done** — Parent Directory = absolute; Parent Folder = ancestor segment         |
+| Semantic audio Apply-To vs Rename List display names | **Done** — `SemanticAudioFieldLabels` (Picard A for MB)                          |
+| Prefix/extension writes skip Windows name validation | Ancestor segments validate; name parts rely on Cleaner / commit — product choice |
+| `FileMeta.Clone` shares Media/Image/Exif refs        | Safe while snapshots stay immutable                                              |
 
 ### Deeper refactors (promoted to backlog)
 
@@ -378,14 +378,14 @@ ______________________________________________________________________
 
 ### Architecture (lightweight)
 
-| Check                                | Verdict                                                                                     |
-| ------------------------------------ | ------------------------------------------------------------------------------------------- |
-| Views → ViewModels → Services        | **Clean**                                                                                   |
-| Services → Views                     | **Clean**                                                                                   |
-| File List → Rename List Views import | **Was smell; fixed** — `RenameListDragFormats` under `Views/DragAndDrop`                    |
-| Domain policy in UI                  | **Clean** — add expansion stays in Engine; UI only maps rows→sources                        |
+| Check                                | Verdict                                                                                                  |
+| ------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| Views → ViewModels → Services        | **Clean**                                                                                                |
+| Services → Views                     | **Clean**                                                                                                |
+| File List → Rename List Views import | **Was smell; fixed** — `RenameListDragFormats` under `Views/DragAndDrop`                                 |
+| Domain policy in UI                  | **Clean** — add expansion stays in Engine; UI only maps rows→sources                                     |
 | Second resolver / label maps         | **Done** — `SemanticAudioFieldLabels` + `PathFieldLabels`; Format catalog resolves audio labels at build |
-| Open feature phases 14b–16           | **Untouched**                                                                               |
+| Open feature phases 14b–16           | **Untouched**                                                                                            |
 
 ### Applied (high confidence)
 
@@ -505,16 +505,9 @@ ______________________________________________________________________
 
 Ranked by **correctness mandate** (should it be done?), not effort. Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
-Suggested order if chasing correctness only: optionally #10 / #15 / #9 (Open — do correctness is empty).
+Suggested order if chasing correctness only: optionally #15 / #9 (Open — do correctness is empty).
 
 ### Open — should (weaker correctness / ownership)
-
-1. **Generate `PresetJsonOptions` derived types from `FilterCatalog`** (was #10)
-   Sites: FilterCatalog reflection vs `PresetJsonOptions.s_BaseFilterDerivedTypes`
-   Target: one registration owner (drift already gated by catalog tests)
-   Value: closes permanent dual-list surface
-   Cost: medium Engine/Filters wiring
-   Rank: **should** — dual registration should be one owner; correctness already guarded by tests
 
 1. **Preview progress phase naming** (was #15)
    Sites: `LoadMetadata` used for filter apply; UI remaps titles
@@ -609,12 +602,14 @@ Suggested order if chasing correctness only: optionally #10 / #15 / #9 (Open —
 
 ### Closed (history)
 
+1. **Generate `PresetJsonOptions` derived types from `FilterCatalog`** (was #10) — **done**
+   `PresetJsonOptions.BaseFilterDerivedTypes` built from `FilterCatalog.Entries` (FilterType + Type); manual dual list + group usings removed; implement-filter skill no longer requires editing PresetJsonOptions
 1. **Shared Apply-To / Rename List / Picard display labels** (was #5) — **done**
-   `SemanticAudioFieldLabels` (+ Picard TXXX from `AudioCatalogFieldMaps`); path trio: Parent Directory = absolute dir, Parent Folder = ancestor segment; File Name / File Extension / Full Path / Full Path Length; Artist/Album Artist/Composer/Genre/BPM; MusicBrainz Album* / ASIN / MusicIP PUID
+   `SemanticAudioFieldLabels` (+ Picard TXXX from `AudioCatalogFieldMaps`); path trio: Parent Directory = absolute dir, Parent Folder = ancestor segment; File Name / File Extension / Full Path / Full Path Length; Artist/Album Artist/Composer/Genre/BPM; MusicBrainz Album\* / ASIN / MusicIP PUID
 1. **Shared path-label constants** — **done**
    `PathFieldLabels` (Models) owns File Name / Extension / Full File Name / Full Path / Full Path Length / Parent Directory / Parent Folder / File/Folder / lengths / numeric; Apply-To + Rename List Basic + Format File Name tokens reference the consts
 1. **Runtime Format token display names for semantic audio** — **done**
-   `FormatTokenRegistry` resolves Audio\Tag picker labels via `SemanticAudioFieldLabels.For` on `SemanticAudioFieldTokenBase.Field`; `[FormatTokenInfo]` display name is `null` for those tokens (no duplicated literals)
+   `FormatTokenRegistry` resolves Audio\\Tag picker labels via `SemanticAudioFieldLabels.For` on `SemanticAudioFieldTokenBase.Field`; `[FormatTokenInfo]` display name is `null` for those tokens (no duplicated literals)
 1. **Sentence-initial uppercasing twin** (was #7) — **done**
    `SentenceInitialCasing.UppercaseInitials` shared by LettersCase sentence mode + CasingList; Unicode `IsLetter` + scan-past non-letters; sentence-end requires word separator (LettersCase rule)
 1. **Wire catalog maps to existing key constants** (was #20) — **done**

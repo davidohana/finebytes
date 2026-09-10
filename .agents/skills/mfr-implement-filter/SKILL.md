@@ -2,7 +2,7 @@
 name: mfr-implement-filter
 description: >-
   Implements Magic File Renamer preset filters in this repo: BaseFilter records,
-  JSON polymorphism registration, tests, and Mfr.Filters docs. Use when adding or
+  FilterPalette catalog attribute, tests, and Mfr.Filters docs. Use when adding or
   changing a filter in Mfr.Filters, preset deserialization, or filter documentation.
 ---
 
@@ -19,7 +19,7 @@ For Filter Configuration **option editors** (VM / AXAML / factory / tests), use 
    - **String-target filters (prefix/extension/full today):** `public sealed record YourFilter(...) : StringTargetFilter(Target)` in **`Mfr.Filters`** (same as most built-ins; `StringTargetFilter` is in the **`Mfr.Filters`** namespace).
    - **Other targets** (attributes, future ID3, etc.): `public sealed record YourFilter(...) : BaseFilter(Target)` and `protected internal override void ApplyCore(RenameItem item)`.
 
-1. **`Type`.** `public override string Type => "YourFilterType";` — string must match the JSON `type` discriminator and `JsonDerivedType` registration **exactly**.
+1. **`Type`.** `public override string Type => "YourFilterType";` — string must match the JSON `type` discriminator **exactly**. Preset polymorphism registers that string from `FilterCatalog` (no separate `PresetJsonOptions` edit).
 
 1. **Transform (`StringTargetFilter`).** Implement `protected override string _TransformValue(string value, RenameItem item)`. Use `RenameItem` / `item.WordSeparator` when behavior depends on pipeline state (e.g. word separator set by an earlier `SpaceCharacter` filter). Override `protected virtual void _Setup()` only for one-time setup before transforms. If `_Setup` caches instance fields, **always assign every cache** (including clear to null/default) — record `with` copies those fields while resetting setup-complete (see `BaseFilter` remarks).
 
@@ -40,9 +40,7 @@ For Filter Configuration **option editors** (VM / AXAML / factory / tests), use 
    | `Id3v2Frame`       | `frameId`, optional `language` / `description` | One modeled ID3v2 frame (MPEG only)                                                  |
    | `XiphField`        | `key`                                          | One Xiph / Vorbis comment key (FLAC/Ogg only)                                        |
 
-1. **JSON registration.** In `Mfr.Engine/Presets/PresetJsonOptions.cs`, add `using Mfr.Filters.<Group>;` if missing and append `new JsonDerivedType(typeof(YourFilter), "YourFilterType")` to `DerivedTypes` (follow the ordering style already used in that list).
-
-1. **Palette catalog.** Add `[FilterPalette(FilterGroup.<Group>, "Display Name")]` on the filter class (same group folder / `FilterGroup` value). Display names use spaces in PascalCase; keep MFR 7 exceptions (`TagRemover` → `Audio Tag Remover`, `FixLeadingZeros` → `Fix Leading 0's`, `Id3v2FieldSetter` → `ID3v2 Field Setter`). `PathMover` display is `Path Mover` (MFR7 name was Mover). `FilterCatalog` discovers entries by reflection; completeness is guarded by tests against `PresetJsonOptions`.
+1. **Palette catalog.** Add `[FilterPalette(FilterGroup.<Group>, "Display Name")]` on the filter class (same group folder / `FilterGroup` value). Display names use spaces in PascalCase; keep MFR 7 exceptions (`TagRemover` → `Audio Tag Remover`, `FixLeadingZeros` → `Fix Leading 0's`, `Id3v2FieldSetter` → `ID3v2 Field Setter`). `PathMover` display is `Path Mover` (MFR7 name was Mover). `FilterCatalog` discovers entries by reflection; `PresetJsonOptions` builds `JsonDerivedType` entries from those catalog rows (Type + FilterType). Completeness is guarded by catalog / polymorphism tests.
 
 ## Tests
 

@@ -7,7 +7,7 @@ namespace Mfr.Filters
     /// <summary>
     /// One row in the Available Filters palette catalog.
     /// </summary>
-    /// <param name="Type">JSON <c>type</c> discriminator (must match preset registration).</param>
+    /// <param name="Type">JSON <c>type</c> discriminator (source for preset polymorphism).</param>
     /// <param name="Group">Toolbar group that owns this filter.</param>
     /// <param name="DisplayName">Human-readable label shown in the list.</param>
     /// <param name="FilterType">Concrete filter CLR type (parameterless ctor supplies add-to-list defaults).</param>

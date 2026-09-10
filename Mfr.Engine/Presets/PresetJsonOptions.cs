@@ -1,14 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using Mfr.Filters.Attributes;
-using Mfr.Filters.Audio;
-using Mfr.Filters.Case;
-using Mfr.Filters.Formatting;
-using Mfr.Filters.Misc;
-using Mfr.Filters.Replace;
-using Mfr.Filters.Space;
-using Mfr.Filters.Trimming;
+using Mfr.Filters;
 
 namespace Mfr.Engine.Presets
 {
@@ -17,52 +10,17 @@ namespace Mfr.Engine.Presets
         /// <summary>
         /// Concrete <see cref="BaseFilter"/> types registered for preset JSON polymorphism.
         /// <para>
-        /// Must stay aligned with the palette <c>FilterCatalog</c>; drift is gated by catalog tests.
+        /// Built from <see cref="FilterCatalog.Entries"/> (CLR type + Type discriminator).
         /// </para>
         /// </summary>
-        internal static IReadOnlyList<JsonDerivedType> BaseFilterDerivedTypes => s_BaseFilterDerivedTypes;
-
-        private static readonly JsonDerivedType[] s_BaseFilterDerivedTypes =
-        [
-            new(typeof(LettersCaseFilter), "LettersCase"),
-            new(typeof(SpaceCharacterFilter), "SpaceCharacter"),
-            new(typeof(RemoveSpacesFilter), "RemoveSpaces"),
-            new(typeof(SeparateCapitalizedTextFilter), "SeparateCapitalizedText"),
-            new(typeof(ShrinkSpacesFilter), "ShrinkSpaces"),
-            new(typeof(SpaceAfterFilter), "SpaceAfter"),
-            new(typeof(SpaceAroundFilter), "SpaceAround"),
-            new(typeof(TrimLeftFilter), "TrimLeft"),
-            new(typeof(TrimRightFilter), "TrimRight"),
-            new(typeof(ExtractLeftFilter), "ExtractLeft"),
-            new(typeof(ExtractRightFilter), "ExtractRight"),
-            new(typeof(ReplacerFilter), "Replacer"),
-            new(typeof(ShrinkDuplicateCharactersFilter), "ShrinkDuplicateCharacters"),
-            new(typeof(FormatterFilter), "Formatter"),
-            new(typeof(CounterFilter), "Counter"),
-            new(typeof(InserterFilter), "Inserter"),
-            new(typeof(TokenMoverFilter), "TokenMover"),
-            new(typeof(NameListFilter), "NameList"),
-            new(typeof(CleanerFilter), "Cleaner"),
-            new(typeof(ReplaceListFilter), "ReplaceList"),
-            new(typeof(FixLeadingZerosFilter), "FixLeadingZeros"),
-            new(typeof(PathMoverFilter), "PathMover"),
-            new(typeof(StripParenthesesFilter), "StripParentheses"),
-            new(typeof(CapitalizeAfterFilter), "CapitalizeAfter"),
-            new(typeof(UppercaseInitialsFilter), "UppercaseInitials"),
-            new(typeof(CasingListFilter), "CasingList"),
-            new(typeof(SentenceEndCharactersFilter), "SentenceEndCharacters"),
-            new(typeof(StripSpacesLeftFilter), "StripSpacesLeft"),
-            new(typeof(StripSpacesRightFilter), "StripSpacesRight"),
-            new(typeof(TrimBetweenFilter), "TrimBetween"),
-            new(typeof(AttributesSetterFilter), "AttributesSetter"),
-            new(typeof(AudioTagSetterFilter), "AudioTagSetter"),
-            new(typeof(Id3v2FieldSetterFilter), "Id3v2FieldSetter"),
-            new(typeof(TagRemoverFilter), "TagRemover"),
-            new(typeof(DateTimeSetterFilter), "DateTimeSetter"),
-            new(typeof(TimeShifterFilter), "TimeShifter"),
-        ];
+        internal static IReadOnlyList<JsonDerivedType> BaseFilterDerivedTypes { get; } = _BuildBaseFilterDerivedTypes();
 
         internal static JsonSerializerOptions Default { get; } = _CreateOptions();
+
+        private static IReadOnlyList<JsonDerivedType> _BuildBaseFilterDerivedTypes()
+        {
+            return [.. FilterCatalog.Entries.Select(entry => new JsonDerivedType(entry.FilterType, entry.Type))];
+        }
 
         private static JsonSerializerOptions _CreateOptions()
         {
@@ -83,7 +41,7 @@ namespace Mfr.Engine.Presets
             }
 
             var poly = new JsonPolymorphismOptions { TypeDiscriminatorPropertyName = "type" };
-            foreach (var derived in s_BaseFilterDerivedTypes)
+            foreach (var derived in BaseFilterDerivedTypes)
             {
                 poly.DerivedTypes.Add(derived);
             }
