@@ -140,7 +140,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 );
             }
 
-            var displayName = _GenerateUniqueDisplayName(trimmedName);
+            var displayName = _AppendStarsUntilDisplayNameUnique(trimmedName);
             var step = new AppliedFilterStepViewModel(displayName, filter);
             _WithSingleChainChanged(() => Steps.Add(step));
             SetSelectedSteps([step]);
@@ -401,7 +401,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private AppliedFilterStepViewModel _CreateStep(FilterCatalogEntry entry)
         {
             var filter = _ResolveAddDefault(entry);
-            var displayName = _GenerateDisplayName(entry);
+            var displayName = _GenerateCatalogDisplayName(entry);
             return new AppliedFilterStepViewModel(displayName, filter);
         }
 
@@ -433,9 +433,9 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Builds a unique list label: catalog display name, then <c>(2)</c>, <c>(3)</c>, … for duplicates.
+        /// Builds a palette-add list label: catalog display name, then <c>(2)</c>, <c>(3)</c>, … by type count.
         /// </summary>
-        private string _GenerateDisplayName(FilterCatalogEntry entry)
+        private string _GenerateCatalogDisplayName(FilterCatalogEntry entry)
         {
             var sameTypeCount = Steps.Count(step => step.Filter.GetType() == entry.FilterType);
             if (sameTypeCount == 0)
@@ -447,9 +447,10 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Ensures <paramref name="preferredDisplayName"/> is unique among step labels by appending <c>*</c>.
+        /// Ensures <paramref name="preferredDisplayName"/> is unique among step labels by appending <c>*</c>
+        /// (MFR7 Free Names; distinct from palette <c>(n)</c> numbering).
         /// </summary>
-        private string _GenerateUniqueDisplayName(string preferredDisplayName)
+        private string _AppendStarsUntilDisplayNameUnique(string preferredDisplayName)
         {
             var displayName = preferredDisplayName;
             while (Steps.Any(step => string.Equals(step.DisplayName, displayName, StringComparison.Ordinal)))

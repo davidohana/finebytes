@@ -290,11 +290,6 @@ namespace Mfr.Engine.RenameList
         /// </remarks>
         public IReadOnlyList<string> CollectNameList(RenameListFieldKey key)
         {
-            if (_renameItems.Count == 0)
-            {
-                return [];
-            }
-
             var lines = new string[_renameItems.Count];
             for (var i = 0; i < _renameItems.Count; i++)
             {

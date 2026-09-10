@@ -77,13 +77,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var field = RenameListFieldCatalog.GetField(key);
-            if (field.WriteTarget is null)
+            if (field.WriteTarget is not { } writeTarget)
             {
                 return;
             }
 
             var lines = _renameList.CollectNameList(key);
-            var filter = new NameListFilter(field.WriteTarget, new NameListOptions(Entries: lines));
+            var filter = new NameListFilter(writeTarget, new NameListOptions(Entries: lines));
             _appliedFilters.AddAndSelect(filter, $"{field.DisplayName} List");
         }
 
