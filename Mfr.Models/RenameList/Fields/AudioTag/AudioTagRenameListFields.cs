@@ -9,7 +9,9 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// <remarks>
     /// Semantic fields are <c>ReadWriteApply</c> (previewable). First-segment and Tag Types stay
     /// original-only (<c>ReadOnly</c>), matching MFR7 <c>AudioTagPgInfo</c>.
-    /// Display names come from <see cref="SemanticAudioFieldLabels"/> (alphabetical by those labels).
+    /// Display names come from <see cref="SemanticAudioFieldLabels"/>. Catalog order keeps each
+    /// multi-value field next to its <c>(first)</c> column, then follows display-label order
+    /// (with Album Artist / Artist clustered at the top).
     /// </remarks>
     public static class AudioTagRenameListFields
     {
@@ -24,7 +26,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         public const string GroupLabel = "Audio Tag";
 
         /// <summary>
-        /// Audio Tag group fields in alphabetical display-name order.
+        /// Audio Tag group fields: parent + <c>(first)</c> clusters, then display-label order.
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [

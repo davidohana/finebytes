@@ -16,17 +16,17 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
         public const string GroupLabel = "MP3 Properties";
 
         /// <summary>
-        /// MP3 Properties group fields in MFR7 add order.
+        /// MP3 Properties group fields in catalog order (encoding, duration, stream, flags).
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
             new MpegPropertyRenameListField("Bitrate", "Bitrate", MpegRenameListProperty.Bitrate, defaultWidth: 40),
+            new MpegPropertyRenameListField("VBR", "VBR", MpegRenameListProperty.Vbr, defaultWidth: 40),
             new MpegPropertyRenameListField(
-                "Copyright",
-                "Copyright",
-                MpegRenameListProperty.Copyright,
-                defaultWidth: 40,
-                tip: MpegRenameListFieldTips.Copyright
+                "Frequency",
+                "Frequency",
+                MpegRenameListProperty.Frequency,
+                tip: MpegRenameListFieldTips.Frequency
             ),
             new MpegPropertyRenameListField(
                 "Duration",
@@ -39,13 +39,6 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
                 "Duration (Seconds)",
                 MpegRenameListProperty.DurationSecs,
                 tip: MpegRenameListFieldTips.DurationSecs
-            ),
-            new MpegPropertyRenameListField("VBR", "VBR", MpegRenameListProperty.Vbr, defaultWidth: 40),
-            new MpegPropertyRenameListField(
-                "Frequency",
-                "Frequency",
-                MpegRenameListProperty.Frequency,
-                tip: MpegRenameListFieldTips.Frequency
             ),
             new MpegPropertyRenameListField(
                 "Layer",
@@ -62,6 +55,13 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
                 tip: MpegRenameListFieldTips.Level
             ),
             new MpegPropertyRenameListField("Mode", "Mode", MpegRenameListProperty.Mode),
+            new MpegPropertyRenameListField(
+                "Copyright",
+                "Copyright",
+                MpegRenameListProperty.Copyright,
+                defaultWidth: 40,
+                tip: MpegRenameListFieldTips.Copyright
+            ),
             new MpegPropertyRenameListField(
                 "Original",
                 "Original",

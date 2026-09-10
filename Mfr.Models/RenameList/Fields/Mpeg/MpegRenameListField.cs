@@ -65,23 +65,23 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
                     leftMpeg?.Bitrate ?? 0,
                     rightMpeg?.Bitrate ?? 0
                 ),
+                MpegRenameListProperty.Frequency => RenameListFieldSortCompare.Int32(
+                    leftMpeg?.SampleRate ?? 0,
+                    rightMpeg?.SampleRate ?? 0
+                ),
                 MpegRenameListProperty.Duration or MpegRenameListProperty.DurationSecs =>
                     RenameListFieldSortCompare.TimeSpan(
                         leftMpeg?.Duration ?? TimeSpan.Zero,
                         rightMpeg?.Duration ?? TimeSpan.Zero
                     ),
-                MpegRenameListProperty.Frequency => RenameListFieldSortCompare.Int32(
-                    leftMpeg?.SampleRate ?? 0,
-                    rightMpeg?.SampleRate ?? 0
-                ),
                 MpegRenameListProperty.Layer => RenameListFieldSortCompare.Int32(
                     leftMpeg?.Layer ?? 0,
                     rightMpeg?.Layer ?? 0
                 ),
-                MpegRenameListProperty.Copyright
-                or MpegRenameListProperty.Vbr
+                MpegRenameListProperty.Vbr
                 or MpegRenameListProperty.Level
                 or MpegRenameListProperty.Mode
+                or MpegRenameListProperty.Copyright
                 or MpegRenameListProperty.Original
                 or MpegRenameListProperty.Protection => base.CompareForSort(left, right),
                 _ => base.CompareForSort(left, right),
@@ -97,20 +97,17 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
         /// <summary>Audio bitrate in kbps.</summary>
         Bitrate,
 
-        /// <summary>Copyright bit.</summary>
-        Copyright,
+        /// <summary>VBR vs CBR encoding.</summary>
+        Vbr,
+
+        /// <summary>Sample rate in Hz.</summary>
+        Frequency,
 
         /// <summary>Header duration.</summary>
         Duration,
 
         /// <summary>Duration in whole seconds.</summary>
         DurationSecs,
-
-        /// <summary>VBR vs CBR encoding.</summary>
-        Vbr,
-
-        /// <summary>Sample rate in Hz.</summary>
-        Frequency,
 
         /// <summary>MPEG audio layer.</summary>
         Layer,
@@ -120,6 +117,9 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
 
         /// <summary>Channel mode.</summary>
         Mode,
+
+        /// <summary>Copyright bit.</summary>
+        Copyright,
 
         /// <summary>Original bit.</summary>
         Original,
@@ -149,14 +149,14 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
             return field switch
             {
                 MpegRenameListProperty.Bitrate => _FormatBitrate(mpeg),
-                MpegRenameListProperty.Copyright => RenameListFieldDisplay.FormatYesNo(mpeg.IsCopyrighted),
-                MpegRenameListProperty.Duration => RenameListFieldDisplay.FormatDuration(mpeg.Duration),
-                MpegRenameListProperty.DurationSecs => RenameListFieldDisplay.FormatDurationSec(mpeg.Duration),
                 MpegRenameListProperty.Vbr => mpeg.IsVbr ? "VBR" : "CBR",
                 MpegRenameListProperty.Frequency => RenameListFieldDisplay.FormatPositiveInt(mpeg.SampleRate),
+                MpegRenameListProperty.Duration => RenameListFieldDisplay.FormatDuration(mpeg.Duration),
+                MpegRenameListProperty.DurationSecs => RenameListFieldDisplay.FormatDurationSec(mpeg.Duration),
                 MpegRenameListProperty.Layer => _FormatLayer(mpeg.Layer),
                 MpegRenameListProperty.Level => mpeg.MpegVersion,
                 MpegRenameListProperty.Mode => mpeg.ChannelMode,
+                MpegRenameListProperty.Copyright => RenameListFieldDisplay.FormatYesNo(mpeg.IsCopyrighted),
                 MpegRenameListProperty.Original => RenameListFieldDisplay.FormatYesNo(mpeg.IsOriginal),
                 MpegRenameListProperty.Protection => RenameListFieldDisplay.FormatYesNo(mpeg.IsProtected),
                 _ => string.Empty,
