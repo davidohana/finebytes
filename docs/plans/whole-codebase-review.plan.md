@@ -153,7 +153,7 @@ ______________________________________________________________________
 
 ### Deeper refactors (promoted to backlog)
 
-See backlog below (SameOnDisk collapse, FirstDelimitedSegment, folder-file-count I/O, session sort DTO, label maps).
+See backlog below (FirstDelimitedSegment, folder-file-count I/O, session sort DTO, label maps).
 
 ### Phase 1 exit
 
@@ -504,16 +504,9 @@ ______________________________________________________________________
 
 Ranked by **correctness mandate** (should it be done?), not effort. Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
-Suggested order if chasing correctness only: **#1 → #12 → #17 → #20**, then optionally #10 / #15 / #9.
+Suggested order if chasing correctness only: **#12 → #17 → #20**, then optionally #10 / #15 / #9.
 
 ### Open — do (correctness)
-
-1. **Collapse or rename `SameOnDisk` vs `IsSamePath`** (was #1)
-   Sites: `PathRelations`; Engine / Ui callers
-   Target: one equality API + explicit trim overload, or clearer names
-   Value: closes trailing-sep footgun (wrong equality pick)
-   Cost: medium churn
-   Rank: **do** — when next touching path equality call sites
 
 1. **Shared inclusive left/right string-position helper** (was #12)
    Sites: ApplyScope `_ResolveIndex` ↔ TrimBetween `_GetAbsoluteIndex`
@@ -648,6 +641,8 @@ Suggested order if chasing correctness only: **#1 → #12 → #17 → #20**, the
 
 ### Closed (history)
 
+1. **Collapse or rename `SameOnDisk` vs `IsSamePath`** (was #1) — **done**
+   Removed `SameOnDisk`; single `IsSamePath` API — default trims trailing separators; explicit `trimTrailingSeparators: false` for exact path text; `DiffersOnlyInCase` uses exact; Engine/UI callers unchanged; `PathRelationsTests` cover trim vs exact + trailing-sep case-only false
 1. **Shared innermost-ancestor rewrite helper** (was #13) — **done**
    `InnermostAncestorRewrites.Apply` (Preview): innermost-first `ReplaceAncestor` with call-site `matchesAncestor` selectors; rebaser uses inclusive same-path|descendant on `Preview.DirectoryPath`, planner uses strict descendant on `Original.FullPath`; `InnermostAncestorRewritesTests` locks compose order + dialect split + rebase/planner prefix agreement
 1. **Vacate policy vs path-shift / containment edges** (was #14) — **done**

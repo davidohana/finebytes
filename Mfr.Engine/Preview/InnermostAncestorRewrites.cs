@@ -13,7 +13,7 @@ namespace Mfr.Engine.Preview
     /// </para>
     /// <para>
     /// Call sites must pass an explicit match dialect: preview rebase treats the renamed folder
-    /// itself as a match (<see cref="PathRelations.IsSamePath"/> or descendant); commit planning
+    /// itself as a match (<see cref="PathRelations.IsSamePath(string, string)"/> or descendant); commit planning
     /// uses strict descendant matching on the item's original full path.
     /// Do not silently unify those dialects.
     /// </para>

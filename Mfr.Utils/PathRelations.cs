@@ -12,19 +12,46 @@ namespace Mfr.Utils
     public static class PathRelations
     {
         /// <summary>
-        /// Whether two path strings are equal under the host filesystem comparer (no trailing-separator trim).
+        /// Whether two paths refer to the same location under host filesystem comparison, ignoring trailing separators.
         /// </summary>
         /// <param name="first">First absolute path.</param>
         /// <param name="second">Second absolute path.</param>
-        /// <returns><c>true</c> when the comparer treats both strings as the same path text.</returns>
+        /// <returns>
+        /// <see langword="true"/> when both paths refer to the same location after trimming trailing separators.
+        /// </returns>
         /// <remarks>
         /// <para>
-        /// Does not trim trailing separators. Prefer <see cref="IsSamePath"/> when comparing directory paths
-        /// that may differ only by a trailing separator.
+        /// Prefer this overload for directory identity. Use
+        /// <see cref="IsSamePath(string, string, bool)"/> with <c>trimTrailingSeparators: false</c>
+        /// when comparing exact path text (for example case-only rename detection).
         /// </para>
         /// </remarks>
-        public static bool SameOnDisk(string first, string second)
+        public static bool IsSamePath(string first, string second)
         {
+            return IsSamePath(first: first, second: second, trimTrailingSeparators: true);
+        }
+
+        /// <summary>
+        /// Whether two paths are equal under host filesystem comparison, optionally trimming trailing separators.
+        /// </summary>
+        /// <param name="first">First absolute path.</param>
+        /// <param name="second">Second absolute path.</param>
+        /// <param name="trimTrailingSeparators">
+        /// When <see langword="true"/>, trailing directory separators are ignored before comparison.
+        /// When <see langword="false"/>, path text is compared as-is under the OS comparer.
+        /// </param>
+        /// <returns><see langword="true"/> when the comparer treats both paths as the same.</returns>
+        public static bool IsSamePath(string first, string second, bool trimTrailingSeparators)
+        {
+            ArgumentNullException.ThrowIfNull(first);
+            ArgumentNullException.ThrowIfNull(second);
+
+            if (trimTrailingSeparators)
+            {
+                first = first.TrimTrailingSeparator();
+                second = second.TrimTrailingSeparator();
+            }
+
             return PathComparers.Os.Equals(first, second);
         }
 
@@ -34,10 +61,16 @@ namespace Mfr.Utils
         /// <param name="first">First absolute path.</param>
         /// <param name="second">Second absolute path.</param>
         /// <returns><c>true</c> when only character casing differs.</returns>
+        /// <remarks>
+        /// <para>
+        /// Uses exact path-text equality (<c>trimTrailingSeparators: false</c>): a trailing-separator
+        /// difference is not a case-only rename.
+        /// </para>
+        /// </remarks>
         public static bool DiffersOnlyInCase(string first, string second)
         {
-            var sameOnDisk = SameOnDisk(first, second);
-            if (!sameOnDisk)
+            var samePathText = IsSamePath(first: first, second: second, trimTrailingSeparators: false);
+            if (!samePathText)
             {
                 return false;
             }
@@ -58,20 +91,6 @@ namespace Mfr.Utils
         public static bool IsDescendantOf(string candidate, string ancestor)
         {
             return IsDescendantOf(candidate: candidate, ancestor: ancestor, comparer: PathComparers.Os);
-        }
-
-        /// <summary>
-        /// Whether two paths are the same directory under host filesystem comparison rules.
-        /// </summary>
-        /// <param name="first">First absolute path.</param>
-        /// <param name="second">Second absolute path.</param>
-        /// <returns><c>true</c> when both paths refer to the same directory path after trimming trailing separators.</returns>
-        public static bool IsSamePath(string first, string second)
-        {
-            ArgumentNullException.ThrowIfNull(first);
-            ArgumentNullException.ThrowIfNull(second);
-
-            return PathComparers.Os.Equals(first.TrimTrailingSeparator(), second.TrimTrailingSeparator());
         }
 
         /// <summary>
@@ -148,7 +167,7 @@ namespace Mfr.Utils
             ArgumentNullException.ThrowIfNull(newAncestor);
 
             var trimmedOld = oldAncestor.TrimTrailingSeparator();
-            var pathIsAncestorItself = PathComparers.Os.Equals(fullPath.TrimTrailingSeparator(), trimmedOld);
+            var pathIsAncestorItself = IsSamePath(fullPath, oldAncestor);
             if (pathIsAncestorItself)
             {
                 return newAncestor;

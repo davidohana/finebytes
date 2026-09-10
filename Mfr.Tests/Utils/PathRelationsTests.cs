@@ -8,28 +8,40 @@ namespace Mfr.Tests.Utils
     public sealed class PathRelationsTests
     {
         private static string Root => TestPaths.VolumeRoot;
-        private static char Sep => Path.DirectorySeparatorChar;
 
         /// <summary>
-        /// Verifies SameOnDisk respects host case sensitivity for identical paths.
+        /// Verifies IsSamePath respects host case sensitivity for identical paths.
         /// </summary>
         [Fact]
-        public void SameOnDisk_identical_paths_returns_true()
+        public void IsSamePath_identical_paths_returns_true()
         {
-            var path = $"{Root}a{Sep}b{Sep}c.txt";
-            Assert.True(PathRelations.SameOnDisk(path, path));
+            var path = TestPaths.Absolute("a", "b", "c.txt");
+            Assert.True(PathRelations.IsSamePath(path, path));
         }
 
         /// <summary>
-        /// Verifies SameOnDisk treats case differences according to host filesystem.
+        /// Verifies IsSamePath treats case differences according to host filesystem.
         /// </summary>
         [Fact]
-        public void SameOnDisk_case_only_difference_matches_host_filesystem()
+        public void IsSamePath_case_only_difference_matches_host_filesystem()
         {
-            var lower = $"{Root}a{Sep}b{Sep}c.txt";
-            var upper = $"{Root}a{Sep}b{Sep}C.txt";
+            var lower = TestPaths.Absolute("a", "b", "c.txt");
+            var upper = TestPaths.Absolute("a", "b", "C.txt");
 
-            Assert.Equal(OperatingSystem.IsWindows(), PathRelations.SameOnDisk(lower, upper));
+            Assert.Equal(OperatingSystem.IsWindows(), PathRelations.IsSamePath(lower, upper));
+        }
+
+        /// <summary>
+        /// Verifies exact path-text comparison does not trim trailing separators.
+        /// </summary>
+        [Fact]
+        public void IsSamePath_exact_text_trailing_separator_difference_returns_false()
+        {
+            var without = TestPaths.Absolute("root", "folder");
+            var with = without + Path.DirectorySeparatorChar;
+
+            Assert.False(PathRelations.IsSamePath(first: without, second: with, trimTrailingSeparators: false));
+            Assert.True(PathRelations.IsSamePath(without, with));
         }
 
         /// <summary>
@@ -38,8 +50,8 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void DiffersOnlyInCase_case_only_diff_returns_true_on_windows_only()
         {
-            var lower = $"{Root}a{Sep}b{Sep}c.txt";
-            var upper = $"{Root}a{Sep}b{Sep}C.txt";
+            var lower = TestPaths.Absolute("a", "b", "c.txt");
+            var upper = TestPaths.Absolute("a", "b", "C.txt");
 
             Assert.Equal(OperatingSystem.IsWindows(), PathRelations.DiffersOnlyInCase(lower, upper));
         }
@@ -50,7 +62,7 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void DiffersOnlyInCase_identical_strings_returns_false()
         {
-            var path = $"{Root}a{Sep}b.txt";
+            var path = TestPaths.Absolute("a", "b.txt");
             Assert.False(PathRelations.DiffersOnlyInCase(path, path));
         }
 
@@ -60,10 +72,22 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void DiffersOnlyInCase_disjoint_paths_returns_false()
         {
-            var first = $"{Root}a{Sep}b.txt";
-            var second = $"{Root}a{Sep}c.txt";
+            var first = TestPaths.Absolute("a", "b.txt");
+            var second = TestPaths.Absolute("a", "c.txt");
 
             Assert.False(PathRelations.DiffersOnlyInCase(first, second));
+        }
+
+        /// <summary>
+        /// Verifies trailing-separator-only differences are not treated as case-only renames.
+        /// </summary>
+        [Fact]
+        public void DiffersOnlyInCase_trailing_separator_difference_returns_false()
+        {
+            var without = TestPaths.Absolute("root", "folder");
+            var with = without + Path.DirectorySeparatorChar;
+
+            Assert.False(PathRelations.DiffersOnlyInCase(without, with));
         }
 
         /// <summary>
@@ -72,8 +96,8 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void IsDescendantOf_strict_child_returns_true()
         {
-            var ancestor = $"{Root}root{Sep}folder";
-            var child = $"{Root}root{Sep}folder{Sep}file.txt";
+            var ancestor = TestPaths.Absolute("root", "folder");
+            var child = TestPaths.Absolute("root", "folder", "file.txt");
 
             Assert.True(PathRelations.IsDescendantOf(child, ancestor));
         }
@@ -84,7 +108,7 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void IsDescendantOf_same_path_returns_false()
         {
-            var ancestor = $"{Root}root{Sep}folder";
+            var ancestor = TestPaths.Absolute("root", "folder");
             Assert.False(PathRelations.IsDescendantOf(ancestor, ancestor));
         }
 
@@ -94,8 +118,8 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void IsDescendantOf_sibling_prefix_returns_false()
         {
-            var ancestor = $"{Root}foo";
-            var notDescendant = $"{Root}foobar";
+            var ancestor = TestPaths.Absolute("foo");
+            var notDescendant = TestPaths.Absolute("foobar");
 
             Assert.False(PathRelations.IsDescendantOf(notDescendant, ancestor));
         }
@@ -106,8 +130,8 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void IsDescendantOf_trailing_separator_on_ancestor_normalized()
         {
-            var ancestor = $"{Root}root{Sep}folder{Sep}";
-            var child = $"{Root}root{Sep}folder{Sep}file.txt";
+            var ancestor = TestPaths.Absolute("root", "folder") + Path.DirectorySeparatorChar;
+            var child = TestPaths.Absolute("root", "folder", "file.txt");
 
             Assert.True(PathRelations.IsDescendantOf(child, ancestor));
         }
@@ -118,13 +142,13 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void ReplaceAncestor_descendant_rewrites_prefix()
         {
-            var oldAncestor = $"{Root}root{Sep}old";
-            var newAncestor = $"{Root}root{Sep}new";
-            var path = $"{Root}root{Sep}old{Sep}sub{Sep}file.txt";
+            var oldAncestor = TestPaths.Absolute("root", "old");
+            var newAncestor = TestPaths.Absolute("root", "new");
+            var path = TestPaths.Absolute("root", "old", "sub", "file.txt");
 
             var result = PathRelations.ReplaceAncestor(path, oldAncestor, newAncestor);
 
-            Assert.Equal($"{Root}root{Sep}new{Sep}sub{Sep}file.txt", result);
+            Assert.Equal(TestPaths.Absolute("root", "new", "sub", "file.txt"), result);
         }
 
         /// <summary>
@@ -133,10 +157,25 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void ReplaceAncestor_same_path_returns_new_ancestor()
         {
-            var oldAncestor = $"{Root}root{Sep}old";
-            var newAncestor = $"{Root}root{Sep}new";
+            var oldAncestor = TestPaths.Absolute("root", "old");
+            var newAncestor = TestPaths.Absolute("root", "new");
 
             var result = PathRelations.ReplaceAncestor(oldAncestor, oldAncestor, newAncestor);
+
+            Assert.Equal(newAncestor, result);
+        }
+
+        /// <summary>
+        /// Verifies ReplaceAncestor treats trailing-separator-only differences as the same ancestor path.
+        /// </summary>
+        [Fact]
+        public void ReplaceAncestor_trailing_separator_on_path_returns_new_ancestor()
+        {
+            var oldAncestor = TestPaths.Absolute("root", "old");
+            var newAncestor = TestPaths.Absolute("root", "new");
+            var path = oldAncestor + Path.DirectorySeparatorChar;
+
+            var result = PathRelations.ReplaceAncestor(path, oldAncestor, newAncestor);
 
             Assert.Equal(newAncestor, result);
         }
@@ -147,9 +186,9 @@ namespace Mfr.Tests.Utils
         [Fact]
         public void ReplaceAncestor_unrelated_path_returns_unchanged()
         {
-            var oldAncestor = $"{Root}root{Sep}old";
-            var newAncestor = $"{Root}root{Sep}new";
-            var path = $"{Root}elsewhere{Sep}file.txt";
+            var oldAncestor = TestPaths.Absolute("root", "old");
+            var newAncestor = TestPaths.Absolute("root", "new");
+            var path = TestPaths.Absolute("elsewhere", "file.txt");
 
             var result = PathRelations.ReplaceAncestor(path, oldAncestor, newAncestor);
 
@@ -157,26 +196,25 @@ namespace Mfr.Tests.Utils
         }
 
         /// <summary>
-        /// Verifies IsSamePath trims trailing separators before comparing.
+        /// Verifies IsSamePath trims trailing separators before comparing by default.
         /// </summary>
         [Fact]
         public void IsSamePath_trailing_separator_difference_returns_true()
         {
-            var without = $"{Root}root{Sep}folder";
-            var with = without + Sep;
+            var without = TestPaths.Absolute("root", "folder");
+            var with = without + Path.DirectorySeparatorChar;
 
             Assert.True(PathRelations.IsSamePath(without, with));
-            Assert.False(PathRelations.SameOnDisk(without, with));
         }
 
         /// <summary>
-        /// Verifies IsSamePath treats case differences according to the host filesystem.
+        /// Verifies IsSamePath directory comparison treats case differences according to the host filesystem.
         /// </summary>
         [Fact]
-        public void IsSamePath_case_only_difference_matches_host_filesystem()
+        public void IsSamePath_directory_case_only_difference_matches_host_filesystem()
         {
-            var lower = $"{Root}a{Sep}b";
-            var upper = $"{Root}a{Sep}B";
+            var lower = TestPaths.Absolute("a", "b");
+            var upper = TestPaths.Absolute("a", "B");
 
             Assert.Equal(OperatingSystem.IsWindows(), PathRelations.IsSamePath(lower, upper));
         }
@@ -188,7 +226,7 @@ namespace Mfr.Tests.Utils
         public void IsFilesystemRoot_volume_root_true_nested_false()
         {
             Assert.True(PathRelations.IsFilesystemRoot(Root));
-            Assert.False(PathRelations.IsFilesystemRoot($"{Root}a{Sep}b"));
+            Assert.False(PathRelations.IsFilesystemRoot(TestPaths.Absolute("a", "b")));
         }
     }
 }
