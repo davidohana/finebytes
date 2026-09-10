@@ -2,7 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-namespace Mfr.App.Ui.Services.FileList
+namespace Mfr.App.Ui.Services.Shell
 {
     /// <summary>
     /// Opens paths via <c>Process.Start</c>, Windows Explorer, and shell verbs.

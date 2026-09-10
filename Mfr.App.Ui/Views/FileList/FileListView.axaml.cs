@@ -105,7 +105,10 @@ namespace Mfr.App.Ui.Views.FileList
         private void _OnListingShortcutKeyDown(object? sender, KeyEventArgs e)
         {
             // Tunnel so DataGrid / ListBox do not swallow Alt+Enter or Home/End first.
-            if (_TryHandleShowProperties(e))
+            if (
+                _viewModel is not null
+                && KeyGestureMatch.TryExecute(e, AppShortcuts.ShowProperties, _viewModel.ShowPropertiesCommand)
+            )
             {
                 return;
             }
@@ -769,28 +772,6 @@ namespace Mfr.App.Ui.Views.FileList
             }
 
             e.Handled = true;
-        }
-
-        private bool _TryHandleShowProperties(KeyEventArgs e)
-        {
-            if (_viewModel is null || e.Handled)
-            {
-                return false;
-            }
-
-            if (!KeyGestureMatch.Matches(e, AppShortcuts.ShowProperties))
-            {
-                return false;
-            }
-
-            if (!_viewModel.ShowPropertiesCommand.CanExecute(null))
-            {
-                return false;
-            }
-
-            _viewModel.ShowPropertiesCommand.Execute(null);
-            e.Handled = true;
-            return true;
         }
 
         private bool _TryHandleArrowNavigation(object? sender, KeyEventArgs e)

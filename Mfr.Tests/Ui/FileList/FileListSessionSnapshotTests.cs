@@ -1,4 +1,5 @@
 using Mfr.App.Ui.Services.FileList;
+using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.FileList;
 

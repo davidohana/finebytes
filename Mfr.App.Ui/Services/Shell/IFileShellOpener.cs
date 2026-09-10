@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.Services.FileList
+namespace Mfr.App.Ui.Services.Shell
 {
     /// <summary>
     /// Opens filesystem paths with the OS shell (default app or file manager).

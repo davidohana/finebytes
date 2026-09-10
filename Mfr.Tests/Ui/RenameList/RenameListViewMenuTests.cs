@@ -3,7 +3,6 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.Services.FileList;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -46,7 +45,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public async Task Grid_Alt_Enter_Shows_Properties()
         {
-            var shell = new RecordingShellOpener();
+            var shell = new RecordingFileShellOpener();
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "alpha.txt");
             File.WriteAllText(path, "x");
@@ -70,22 +69,6 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal([path], shell.ShownProperties);
             window.Close();
-        }
-
-        private sealed class RecordingShellOpener : IFileShellOpener
-        {
-            public List<string> ShownProperties { get; } = [];
-
-            public void OpenWithDefaultApp(string path) { }
-
-            public void RevealInFileManager(string path) { }
-
-            public void OpenFolderInFileManager(string folderPath) { }
-
-            public void ShowProperties(string path)
-            {
-                ShownProperties.Add(path);
-            }
         }
     }
 }

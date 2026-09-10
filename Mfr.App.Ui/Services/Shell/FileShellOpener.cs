@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.Services.FileList
+namespace Mfr.App.Ui.Services.Shell
 {
     /// <summary>
     /// Creates the default <see cref="IFileShellOpener"/> for the current OS.

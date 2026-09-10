@@ -328,7 +328,7 @@ ______________________________________________________________________
 
 **Scope:** `Mfr.App.Ui/ViewModels/FileList/`, `Views/FileList/`, `Services/FileList/`; matching `Mfr.Tests/Ui/FileList/` (+ Thumbnails / `RenameListAddSourceResolver` bridge). Explore used for cross-file twins ([File List twins](7aa8d555-fbca-4f79-bfc0-860f2f58892c)). `debts.md` shell ops: Cut/Copy/Paste/Delete still deferred; **Properties shipped** (shell verb via `IFileShellOpener`, see rename-list 14e).
 
-**Verdict:** File List is coherent — single browse resolver (`FileListCatalog.TryResolvePath`), breadcrumb policy in `FileListPath`, Views → VM → Services clean, no second catalog in UI. Applied sentinel/persistable-folder reuse, path-history cap, thumbnail CTS safety, decode-width ownership, and listing-host dedup. Leftovers are cross-pane DnD twins and optional root-gate / shell-opener unification (Phase 7+). Phase 0 `JpegExifThumbnailReader` L2 move: **skip** (see below).
+**Verdict:** File List is coherent — single browse resolver (`FileListCatalog.TryResolvePath`), breadcrumb policy in `FileListPath`, Views → VM → Services clean, no second catalog in UI. Applied sentinel/persistable-folder reuse, path-history cap, thumbnail CTS safety, decode-width ownership, and listing-host dedup. Leftovers are cross-pane DnD twins and optional root-gate unification (Phase 7+). Shell openers live in `Services/Shell` (shared with Rename List). Phase 0 `JpegExifThumbnailReader` L2 move: **skip** (see below).
 
 ### Architecture (lightweight)
 

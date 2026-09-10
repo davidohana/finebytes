@@ -186,7 +186,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 - Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs) — insert 14b/14c after Remove Unchanged
 - Cell/row classes: red / gray / lavender in `RenameListView.axaml`; **blue** and **plum** still missing
 - `MainWindowViewModel.Go()` + `AppShortcuts.Go` / menu / toolbar — **stubs**; Ctrl+G labeled but no-op ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
-- `IFileShellOpener.ShowProperties` / `RevealInFileManager` — shared by File List and Rename List
+- `IFileShellOpener.ShowProperties` / `RevealInFileManager` — `Services/Shell`, shared by File List and Rename List
 
 **Write vs preview (important for 14c/14d):**
 

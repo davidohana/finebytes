@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.Services.FileList
+namespace Mfr.App.Ui.Services.Shell
 {
     /// <summary>
     /// No-op shell opener for tests and platforms that do not launch a file manager.

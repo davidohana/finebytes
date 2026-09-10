@@ -46,7 +46,7 @@ namespace Mfr.Tests.Ui.FileList
             var parent = _tempDirectoryFixture.CreateTempDir();
             var deniedFolder = Directory.CreateDirectory(Path.Combine(parent, "Denied")).FullName;
             _DenyDirectoryTraverse(deniedFolder);
-            var shell = new RecordingShellOpener();
+            var shell = new RecordingFileShellOpener();
 
             try
             {
@@ -64,7 +64,7 @@ namespace Mfr.Tests.Ui.FileList
 
                 viewModel.ShowLogInExplorerCommand.Execute(null);
 
-                Assert.Equal([logFilePath], shell.RevealedPaths);
+                Assert.Equal([logFilePath], shell.RevealedInFileManager);
             }
             finally
             {
@@ -102,22 +102,6 @@ namespace Mfr.Tests.Ui.FileList
                 )
             );
             directoryInfo.SetAccessControl(security);
-        }
-
-        private sealed class RecordingShellOpener : IFileShellOpener
-        {
-            public List<string> RevealedPaths { get; } = [];
-
-            public void OpenWithDefaultApp(string path) { }
-
-            public void RevealInFileManager(string path)
-            {
-                RevealedPaths.Add(path);
-            }
-
-            public void OpenFolderInFileManager(string folderPath) { }
-
-            public void ShowProperties(string path) { }
         }
     }
 }

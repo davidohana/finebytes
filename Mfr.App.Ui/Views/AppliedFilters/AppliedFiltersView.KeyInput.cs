@@ -43,34 +43,21 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return false;
             }
 
-            if (KeyGestureMatch.Matches(e, AppShortcuts.RemoveSelectedFilterDelete))
+            if (
+                KeyGestureMatch.TryExecute(e, AppShortcuts.RemoveSelectedFilterDelete, _viewModel.RemoveSelectedCommand)
+            )
             {
-                if (_viewModel.RemoveSelectedCommand.CanExecute(null))
-                {
-                    _viewModel.RemoveSelectedCommand.Execute(null);
-                    e.Handled = true;
-                    return true;
-                }
+                return true;
             }
 
-            if (KeyGestureMatch.Matches(e, AppShortcuts.MoveFilterUp))
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.MoveFilterUp, _viewModel.MoveSelectedUpCommand))
             {
-                if (_viewModel.MoveSelectedUpCommand.CanExecute(null))
-                {
-                    _viewModel.MoveSelectedUpCommand.Execute(null);
-                    e.Handled = true;
-                    return true;
-                }
+                return true;
             }
 
-            if (KeyGestureMatch.Matches(e, AppShortcuts.MoveFilterDown))
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.MoveFilterDown, _viewModel.MoveSelectedDownCommand))
             {
-                if (_viewModel.MoveSelectedDownCommand.CanExecute(null))
-                {
-                    _viewModel.MoveSelectedDownCommand.Execute(null);
-                    e.Handled = true;
-                    return true;
-                }
+                return true;
             }
 
             return false;

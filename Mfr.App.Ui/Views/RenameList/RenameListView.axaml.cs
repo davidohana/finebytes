@@ -192,54 +192,29 @@ namespace Mfr.App.Ui.Views.RenameList
                 return false;
             }
 
-            if (KeyGestureMatch.Matches(e, AppShortcuts.RemoveSelectedDelete))
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.RemoveSelectedDelete, _viewModel.RemoveSelectedCommand))
             {
-                if (_viewModel.RemoveSelectedCommand.CanExecute(null))
-                {
-                    _viewModel.RemoveSelectedCommand.Execute(null);
-                    e.Handled = true;
-                    return true;
-                }
+                return true;
             }
 
-            if (KeyGestureMatch.Matches(e, AppShortcuts.LocateInFileList))
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.LocateInFileList, _viewModel.LocateInFileListCommand))
             {
-                if (_viewModel.LocateInFileListCommand.CanExecute(null))
-                {
-                    _viewModel.LocateInFileListCommand.Execute(null);
-                    e.Handled = true;
-                    return true;
-                }
+                return true;
             }
 
-            if (KeyGestureMatch.Matches(e, AppShortcuts.ShowProperties))
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.ShowProperties, _viewModel.ShowPropertiesCommand))
             {
-                if (_viewModel.ShowPropertiesCommand.CanExecute(null))
-                {
-                    _viewModel.ShowPropertiesCommand.Execute(null);
-                    e.Handled = true;
-                    return true;
-                }
+                return true;
             }
 
-            if (KeyGestureMatch.Matches(e, AppShortcuts.MoveSelectedUp))
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.MoveSelectedUp, _viewModel.MoveSelectedUpCommand))
             {
-                if (_viewModel.MoveSelectedUpCommand.CanExecute(null))
-                {
-                    _viewModel.MoveSelectedUpCommand.Execute(null);
-                    e.Handled = true;
-                    return true;
-                }
+                return true;
             }
 
-            if (KeyGestureMatch.Matches(e, AppShortcuts.MoveSelectedDown))
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.MoveSelectedDown, _viewModel.MoveSelectedDownCommand))
             {
-                if (_viewModel.MoveSelectedDownCommand.CanExecute(null))
-                {
-                    _viewModel.MoveSelectedDownCommand.Execute(null);
-                    e.Handled = true;
-                    return true;
-                }
+                return true;
             }
 
             if (e.Key is Key.Home or Key.End && e.KeyModifiers == KeyModifiers.None)

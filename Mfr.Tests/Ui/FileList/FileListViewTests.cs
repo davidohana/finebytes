@@ -9,6 +9,7 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
+using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.Views.FileList;
 using Mfr.App.Ui.Views.GridColumnSizing;
@@ -89,7 +90,7 @@ namespace Mfr.Tests.Ui.FileList
         [AvaloniaFact]
         public void Report_Grid_Alt_Enter_Shows_Properties()
         {
-            var shell = new RecordingShellOpener();
+            var shell = new RecordingFileShellOpener();
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, _CreateSampleDir(), shell);
             _viewModels.Add(viewModel);
 
@@ -981,22 +982,6 @@ namespace Mfr.Tests.Ui.FileList
                 .FirstOrDefault(item => item.Name == "ThumbnailSquare");
             Assert.NotNull(square);
             return square;
-        }
-
-        private sealed class RecordingShellOpener : IFileShellOpener
-        {
-            public List<string> ShownProperties { get; } = [];
-
-            public void OpenWithDefaultApp(string path) { }
-
-            public void RevealInFileManager(string path) { }
-
-            public void OpenFolderInFileManager(string folderPath) { }
-
-            public void ShowProperties(string path)
-            {
-                ShownProperties.Add(path);
-            }
         }
     }
 }

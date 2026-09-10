@@ -1,5 +1,6 @@
 using Avalonia.Media;
 using Mfr.App.Ui.Services.FileList;
+using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Utils;
 
@@ -1129,7 +1130,7 @@ namespace Mfr.Tests.Ui.FileList
         [Fact]
         public void OpenSelected_Opens_File_With_Shell()
         {
-            var shell = new RecordingShellOpener();
+            var shell = new RecordingFileShellOpener();
             var dir = _CreateTree();
             var viewModel = _CreateViewModel(dir, shell);
             var file = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
@@ -1177,7 +1178,7 @@ namespace Mfr.Tests.Ui.FileList
         [Fact]
         public void ShowInExplorer_Reveals_Selected_Entry()
         {
-            var shell = new RecordingShellOpener();
+            var shell = new RecordingFileShellOpener();
             var dir = _CreateTree();
             var viewModel = _CreateViewModel(dir, shell);
             var file = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
@@ -1195,7 +1196,7 @@ namespace Mfr.Tests.Ui.FileList
         [Fact]
         public void ShowInExplorer_Opens_Current_Folder_When_Selection_Empty()
         {
-            var shell = new RecordingShellOpener();
+            var shell = new RecordingFileShellOpener();
             var dir = _CreateTree();
             var viewModel = _CreateViewModel(dir, shell);
             viewModel.SetSelectedEntries([]);
@@ -1231,7 +1232,7 @@ namespace Mfr.Tests.Ui.FileList
         [Fact]
         public void ShowProperties_Shows_Selected_Entry()
         {
-            var shell = new RecordingShellOpener();
+            var shell = new RecordingFileShellOpener();
             var dir = _CreateTree();
             var viewModel = _CreateViewModel(dir, shell);
             var file = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
@@ -1341,34 +1342,6 @@ namespace Mfr.Tests.Ui.FileList
             {
                 RequestedSizes.Add(size);
                 return null;
-            }
-        }
-
-        private sealed class RecordingShellOpener : IFileShellOpener
-        {
-            public List<string> OpenedWithDefaultApp { get; } = [];
-            public List<string> RevealedInFileManager { get; } = [];
-            public List<string> OpenedFolders { get; } = [];
-            public List<string> ShownProperties { get; } = [];
-
-            public void OpenWithDefaultApp(string path)
-            {
-                OpenedWithDefaultApp.Add(path);
-            }
-
-            public void RevealInFileManager(string path)
-            {
-                RevealedInFileManager.Add(path);
-            }
-
-            public void OpenFolderInFileManager(string folderPath)
-            {
-                OpenedFolders.Add(folderPath);
-            }
-
-            public void ShowProperties(string path)
-            {
-                ShownProperties.Add(path);
             }
         }
 

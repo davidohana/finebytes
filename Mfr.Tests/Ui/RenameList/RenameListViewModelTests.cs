@@ -1159,7 +1159,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ShowInExplorer_Reveals_Focused_Entry()
         {
-            var shell = new RecordingShellOpener();
+            var shell = new RecordingFileShellOpener();
             var dir = _CreateSampleFolder();
             var renameListViewModel = _context.CreateRenameListViewModel(dir, shell);
             var alphaPath = Path.Combine(dir, "alpha.txt");
@@ -1190,7 +1190,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ShowProperties_Shows_Selected_Entry()
         {
-            var shell = new RecordingShellOpener();
+            var shell = new RecordingFileShellOpener();
             var dir = _CreateSampleFolder();
             var renameListViewModel = _context.CreateRenameListViewModel(dir, shell);
             var alphaPath = Path.Combine(dir, "alpha.txt");
@@ -1211,9 +1211,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var dir = _CreateSampleFolder();
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
-            await renameListViewModel.AddPathsAsync(
-                [Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]
-            );
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]);
 
             renameListViewModel.SetSelectedEntries([]);
             Assert.False(renameListViewModel.ShowPropertiesCommand.CanExecute(null));
@@ -1324,26 +1322,6 @@ namespace Mfr.Tests.Ui.RenameList
         private static IReadOnlyList<string> _PreviewNames(RenameListViewModel renameListViewModel)
         {
             return [.. renameListViewModel.Entries.Select(entry => entry.FullFileName)];
-        }
-
-        private sealed class RecordingShellOpener : IFileShellOpener
-        {
-            public List<string> RevealedInFileManager { get; } = [];
-            public List<string> ShownProperties { get; } = [];
-
-            public void OpenWithDefaultApp(string path) { }
-
-            public void RevealInFileManager(string path)
-            {
-                RevealedInFileManager.Add(path);
-            }
-
-            public void OpenFolderInFileManager(string folderPath) { }
-
-            public void ShowProperties(string path)
-            {
-                ShownProperties.Add(path);
-            }
         }
 
         /// <summary>
