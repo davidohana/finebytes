@@ -461,7 +461,7 @@ ______________________________________________________________________
 
 **Scope:** `Mfr.App.Cli/`, `Mfr.Tests/Architecture/`, `Mfr.Tests/Cli/`, backlog triage, `docs/debts.md`. Explore used for CLI/MFR7 flag parity ([CLI MFR7 parity](d82f788b-1bbf-4ba7-9fa1-47ad54224c66)).
 
-**Verdict:** CLI is small and coherent — Spectre parse → ConfigStore → Preview → Commit spine, Views→VM→Services project graph healthy. Applied parser/exit-path hygiene, package-ownership + VM↛Views arch gates, shared repo-root helper, and FilterPalette `#28` exhaustiveness. Leftovers stay in the open backlog (best cost-to-value first below). `docs/debts.md` File List shell ops still accurate — no invent. No Phase 10.
+**Verdict:** CLI is small and coherent — Spectre parse → ConfigStore → Preview → Commit spine, Views→VM→Services project graph healthy. Applied parser/exit-path hygiene, package-ownership + VM↛Views arch gates, shared repo-root helper, and FilterPalette `#28` exhaustiveness. Leftovers stay in the open backlog (correctness-mandate order below). `docs/debts.md` File List shell ops still accurate — no invent. No Phase 10.
 
 ### Architecture (lightweight)
 
@@ -492,7 +492,7 @@ ______________________________________________________________________
 
 ### Deeper refactors (promoted / updated)
 
-See backlog: **#28 done**; Phase 0 package + VM↛Views **done**; **#32** Views→Services allowlist deferred; remaining open items re-ranked below.
+See backlog: **#28 done**; Phase 0 package + VM↛Views **done**; **#32** Views→Services allowlist deferred; remaining open items re-ranked by correctness mandate (do / should / do not).
 
 ### Phase 9 exit
 
@@ -502,157 +502,163 @@ ______________________________________________________________________
 
 ## Deeper refactors backlog
 
-Ranked cost-to-value (best first among **open** items). Closed items kept for history. Do not duplicate f5/f6 “already done.”
+Ranked by **correctness mandate** (should it be done?), not effort. Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
-### Open (priority order)
+Suggested order if chasing correctness only: **#14 → #13 → #1 → #12 → #17 → #20**, then optionally #10 / #15 / #9.
 
-1. **Wire catalog maps to existing key constants** (was #20)
-   Sites: `AudioCatalogFieldMaps` vs `XiphKnownKeys` / `AsfDescriptorNames`
-   Target: reference constants from catalog rows
-   Value: string-literal drift closed for catalog IDs
-   Cost: low
-   Rank: **medium** — ride along with #17 or catalog edits
+### Open — do (correctness)
 
-1. **Cache compiled regex in Replacer / ReplaceList setup** (was #6)
-   Sites: `ReplacerMatching.ReplaceSegment` builds `new Regex` every call
-   Target: compile once in `_Setup`
-   Value: preview cost on large lists
-   Cost: medium — mode/flags/`with` invalidate; WholeWord wrapping
-   Rank: **medium** — do when profiling preview or touching Replace
+1. **Vacate policy vs path-shift / containment edges** (was #14)
+   Sites: conflict vacate ↔ CommitPlanner path-shift
+   Target: shared batch path graph helper, or invariant tests first
+   Value: prevents preview-ok / commit-fail drift (worst failure class)
+   Cost: medium–high behavior risk
+   Rank: **do** — highest correctness stake; invariant tests first if touching either side
+
+1. **Shared innermost-ancestor rewrite helper** (was #13)
+   Sites: `RenamePreviewFolderRebaser` ↔ `CommitPlanner._ResolveActualSourcePath`
+   Target: one `ApplyInnermostAncestorRewrites` with call-site selectors
+   Value: closes compose-order / ReplaceAncestor drift between rebase and planner
+   Cost: medium — two match dialects must stay explicit
+   Rank: **do** — same class as vacate/path-shift; do when next touching rebase or planner
+
+1. **Collapse or rename `SameOnDisk` vs `IsSamePath`** (was #1)
+   Sites: `PathRelations`; Engine / Ui callers
+   Target: one equality API + explicit trim overload, or clearer names
+   Value: closes trailing-sep footgun (wrong equality pick)
+   Cost: medium churn
+   Rank: **do** — when next touching path equality call sites
 
 1. **Shared inclusive left/right string-position helper** (was #12)
    Sites: ApplyScope `_ResolveIndex` ↔ TrimBetween `_GetAbsoluteIndex`
    Target: one helper for inclusive 1-based→0-based; do **not** merge Inserter insert-before
    Value: one place for clamp/anchor bugs
    Cost: medium behavior risk
-   Rank: **medium** — ride along when touching ApplyScope or Trim Between
+   Rank: **do** — ride along when touching ApplyScope or Trim Between
 
-1. **Shared innermost-ancestor rewrite helper** (was #13)
-   Sites: `RenamePreviewFolderRebaser` ↔ `CommitPlanner._ResolveActualSourcePath`
-   Target: one `ApplyInnermostAncestorRewrites` with call-site selectors
-   Value: closes compose-order / ReplaceAncestor drift
-   Cost: medium — two match dialects must stay explicit
-   Rank: **medium** — do when next touching rebase or planner
+1. **`ApeKnownKeys` / `RiffInfoKnownKeys`** (was #17)
+   Sites: Ape/Riff `_KnownKeys` + SemanticAudioTag / merge
+   Target: Models-owned known-key lists (mirror `XiphKnownKeys`)
+   Value: closes key-list drift (second source of truth)
+   Cost: medium — Metadata + Models (+ Apply-To if exposed)
+   Rank: **do** — when next touching Ape/Riff field IO
 
-1. **Vacate policy vs path-shift / containment edges** (was #14)
-   Sites: conflict vacate ↔ CommitPlanner path-shift
-   Target: shared batch path graph helper, or invariant tests first
-   Value: prevents preview-ok / commit-fail drift
-   Cost: medium–high behavior risk
-   Rank: **medium** — add invariant tests first if touching either side
+1. **Wire catalog maps to existing key constants** (was #20)
+   Sites: `AudioCatalogFieldMaps` vs `XiphKnownKeys` / `AsfDescriptorNames`
+   Target: reference constants from catalog rows
+   Value: string-literal drift closed for catalog IDs
+   Cost: low
+   Rank: **do** — ride along with known-keys work or catalog edits
+
+### Open — should (weaker correctness / ownership)
 
 1. **Generate `PresetJsonOptions` derived types from `FilterCatalog`** (was #10)
    Sites: FilterCatalog reflection vs `PresetJsonOptions.s_BaseFilterDerivedTypes`
    Target: one registration owner (drift already gated by catalog tests)
    Value: closes permanent dual-list surface
    Cost: medium Engine/Filters wiring
-   Rank: **medium** — when adding many filters (catalog tests already guard)
+   Rank: **should** — dual registration should be one owner; correctness already guarded by tests
+
+1. **Preview progress phase naming** (was #15)
+   Sites: `LoadMetadata` used for filter apply; UI remaps titles
+   Target: add `ApplyPreview` (or rename)
+   Value: removes papered-over phase lie (API honesty, not wrong results)
+   Cost: low–medium enum + UI/tests
+   Rank: **should** — do when next editing Engine progress tracker
 
 1. **`ListEntryLength` / max line length off `ConfigStore`** (was #9)
    Sites: list parsers; `MfrConfig.FilterConfig.MaxListFileLineLength`
    Target: inject max length at setup / Filters-owned snapshot
    Value: clearer L3 ownership; testability without process singleton
    Cost: medium — parser/filter + CLI override wiring
-   Rank: **medium** — next time touching list parsers or config reshape
+   Rank: **should** — layering/testability, not wrong-rename bugs; next config/parser reshape
 
-1. **`ApeKnownKeys` / `RiffInfoKnownKeys`** (was #17)
-   Sites: Ape/Riff `_KnownKeys` + SemanticAudioTag / merge
-   Target: Models-owned known-key lists (mirror `XiphKnownKeys`)
-   Value: closes key-list drift
-   Cost: medium — Metadata + Models (+ Apply-To if exposed)
-   Rank: **medium** — do when next touching Ape/Riff field IO
+### Open — do not (not a correctness mandate)
 
-1. **Collapse or rename `SameOnDisk` vs `IsSamePath`** (was #1)
-   Sites: `PathRelations`; Engine / Ui callers
-   Target: one equality API + explicit trim overload, or clearer names
-   Value: closes trailing-sep footgun
-   Cost: medium churn
-   Rank: **medium** — when next touching path equality call sites
+1. **Cache compiled regex in Replacer / ReplaceList setup** (was #6)
+   Sites: `ReplacerMatching.ReplaceSegment` builds `new Regex` every call
+   Target: compile once in `_Setup`
+   Value: preview cost on large lists
+   Cost: medium — mode/flags/`with` invalidate; WholeWord wrapping
+   Rank: **skip** — perf only; do when profiling preview or touching Replace
 
 1. **Sentence-initial uppercasing twin** (was #7)
    Sites: LettersCase vs CasingList sentence initials
    Target: one helper **only if** MFR7 parity allows unifying letter detection
    Value: one behavior for sentence starts
    Cost: medium behavior risk
-   Rank: **medium** — Case group only if product wants one rule
-
-1. **Preview progress phase naming** (was #15)
-   Sites: `LoadMetadata` used for filter apply; UI remaps titles
-   Target: add `ApplyPreview` (or rename)
-   Value: removes papered-over phase lie
-   Cost: low–medium enum + UI/tests
-   Rank: **medium** — do when next editing Engine progress tracker
+   Rank: **skip** — product/MFR7 gated; do not force one rule
 
 1. **DataGrid multi-select drag press/snapshot session** (was #26)
    Sites: FileListView + RenameListView vs ListBoxDragSession
    Target: optional DataGrid-aware session sibling
    Value: one gesture machine for grids
    Cost: medium–high — two large code-behinds + headless coverage
-   Rank: **medium** — when next editing either grid DnD; do not force for elegance
+   Rank: **skip** — gesture dedup; do not force for elegance
 
 1. **Merge convention ViewLocators** (was #30)
    Sites: FilterEditorViewLocator ↔ FormatTokenEditorViewLocator
    Target: one generic `ConventionViewLocator`
    Value: delete ~80 LOC twin
    Cost: low–medium Avalonia wiring + two test suites
-   Rank: **medium** — when adding another convention locator
+   Rank: **skip** — LOC dedup; when adding another convention locator only
 
 1. **Multiline list Entries fieldset control** (was #31; f5 #6)
    Sites: Name List + Replace List Entries AXAML
    Target: shared multiline Entries chrome where semantics match
    Value: less AXAML drift
    Cost: medium
-   Rank: **medium** — only if Entries layout keeps churning
+   Rank: **skip** — chrome only; only if Entries layout keeps churning
 
 1. **`FirstDelimitedSegment` → `DelimitedText`** (was #2)
    Sites: RenameListFieldDisplay vs DelimitedText.Split
    Target: shared first-part helper **only if** empty-first semantics match
    Value: small dedup
    Cost: low, but behavior risk
-   Rank: **medium** — if AudioTag display touched
+   Rank: **skip** — do not force unless semantics proven equal
 
 1. **Path split + preview-field reset helpers** (was #16)
    Sites: RenameItemSnapshotBuilder ↔ FileMetaPreviewExtensions; ResetState ↔ ClearPreview
    Target: shared path-dissection; private preview-field reset on RenameItem
    Value: small dedup
    Cost: low–medium Models churn
-   Rank: **low–medium** — ride along when editing add/refresh
+   Rank: **skip** — ride along when editing add/refresh; not a correctness mandate
 
 1. **`AudioTagSetterFilter` PascalCase private formatter fields** (was #8)
    Sites: `PerformersFormatter`, …
    Target: `_performersFormatter`-style names (or field→formatter map)
    Value: naming clarity
    Cost: medium churn in one large file
-   Rank: **low–medium** — rename anytime; map only if editing the filter again
+   Rank: **skip** — naming only
 
 1. **Views→Services DAG allowlist / gate** (new #32)
    Sites: MainWindow, PathMover editor, FileListView, FileListAddressBarView
    Target: document allowed Services usings from Views, or thin VM wrappers — **do not** blanket-forbid
    Value: clearer UI DAG story
    Cost: medium if forcing VM indirection for session/DnD glue
-   Rank: **low** — skip unless Views→Services sprawl grows
+   Rank: **skip** — unless Views→Services sprawl grows
 
 1. **Collapse `TagBlocksStructurallyEquals` onto `Equals`** (was #19)
    Sites: AudioTagOverlay; RenamePropertyChangeBuilder
    Target: keep `Equals` only, or obsolete the long alias
    Value: one public name
    Cost: low call-site rename
-   Rank: **low** — optional clarity pass
+   Rank: **skip** — alias clarity; same body already
 
 1. **Move or lazy-gate `FormatFolderFileCount` directory scan** (was #3) — docs Phase 7
-   Rank: **low** — skip unless profiling shows FileCount column hot
+   Rank: **skip** — perf; unless profiling shows FileCount column hot
 
 1. **Shared Apply-To / Rename List / Picard display labels** (was #5)
-   Rank: **low** — skip unless UI pass demands label convergence
+   Rank: **skip** — product vocabulary; unless UI pass demands label convergence
 
 1. **Shared AppData delete-if-exists helper** (was #21)
-   Rank: **low** — cosmetic; skip unless touching all three stores
+   Rank: **skip** — cosmetic; unless touching all three stores
 
 1. **Unify soft-load / hard-fail documentation** (was #22)
-   Rank: **low** — docs pass anytime; do **not** unify failure modes
+   Rank: **skip** — docs pass anytime; do **not** unify failure modes
 
 1. **Shared salmon drop-mark brush** (was #27)
-   Rank: **low** — cosmetic; ride along if touching drop marks
+   Rank: **skip** — cosmetic; ride along if touching drop marks
 
 ### Closed (history)
 
