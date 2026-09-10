@@ -63,23 +63,11 @@ namespace Mfr.Models.Filters
 
         private static int _ResolveIndex(int oneBasedPosition, StringScopeAnchor anchor, int length)
         {
-            var p = oneBasedPosition < 1 ? 1 : oneBasedPosition;
-            if (anchor == StringScopeAnchor.Left)
-            {
-                if (p > length)
-                {
-                    p = length;
-                }
-
-                return p - 1;
-            }
-
-            if (p > length)
-            {
-                p = length;
-            }
-
-            return length - p;
+            return InclusiveStringPositions.ToZeroBasedIndex(
+                oneBasedPosition,
+                fromLeft: anchor == StringScopeAnchor.Left,
+                length
+            );
         }
 
         private static string _ApplyToken(

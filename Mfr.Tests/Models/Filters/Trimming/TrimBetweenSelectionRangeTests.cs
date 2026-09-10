@@ -65,6 +65,26 @@ namespace Mfr.Tests.Models.Filters.Trimming
         }
 
         /// <summary>
+        /// Verifies right-anchored positions below 1 and past length clamp at the edges.
+        /// </summary>
+        [Fact]
+        public void TryGetSelectionRange_right_anchor_clamps()
+        {
+            Assert.True(
+                TrimBetweenFilter.TryGetSelectionRange(
+                    "abc",
+                    new Position(0, Side.Right),
+                    new Position(100, Side.Right),
+                    out var start,
+                    out var length
+                )
+            );
+            // Right 0 → last index; right 100 → first index; range swaps to whole string.
+            Assert.Equal(0, start);
+            Assert.Equal(3, length);
+        }
+
+        /// <summary>
         /// Verifies empty text cannot produce a selection.
         /// </summary>
         [Fact]

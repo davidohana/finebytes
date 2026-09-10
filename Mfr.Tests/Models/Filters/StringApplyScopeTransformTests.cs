@@ -74,6 +74,37 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
+        /// Verifies sub-1 left and oversized right positions clamp to the string edges.
+        /// </summary>
+        [Fact]
+        public void Substring_ClampBelowOneAndRightPastLength()
+        {
+            var belowOne = new LettersCaseFilter(
+                s_target,
+                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
+                new SubstringApplyScope(
+                    StartPosition: 0,
+                    StartAnchor: StringScopeAnchor.Left,
+                    EndPosition: 1,
+                    EndAnchor: StringScopeAnchor.Left
+                )
+            );
+            Assert.Equal("Ab", FilterTestHelpers.ApplyToPrefix(belowOne, "ab"));
+
+            var rightPast = new LettersCaseFilter(
+                s_target,
+                new LettersCaseOptions(LettersCaseMode.UpperCase, []),
+                new SubstringApplyScope(
+                    StartPosition: 99,
+                    StartAnchor: StringScopeAnchor.Right,
+                    EndPosition: 1,
+                    EndAnchor: StringScopeAnchor.Right
+                )
+            );
+            Assert.Equal("AB", FilterTestHelpers.ApplyToPrefix(rightPast, "ab"));
+        }
+
+        /// <summary>
         /// Verifies token scope transforms one part and preserves separators.
         /// </summary>
         [Fact]

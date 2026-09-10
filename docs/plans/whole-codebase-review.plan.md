@@ -444,7 +444,7 @@ ______________________________________________________________________
 | -------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | Space Character Other + empty → `\0`                     | Intentional; filter setup throws (MFR7) — do not silently fall back to space (f5 follow-up superseded) |
 | `ReplaceList` `parseEntries: false` on match-flag change | Avoids lossy re-parse when search contains `=>`                                                        |
-| Inclusive left/right index twins                         | TrimBetween `Side` ↔ ApplyScope `StringScopeAnchor`; Inserter insert-before stays separate — **#12**   |
+| Inclusive left/right index twins                         | **done** — `InclusiveStringPositions` (Utils); Inserter insert-before stays separate                   |
 | Counter filter UI vs `<counter>` token UI                | Surfaces differ; `CounterPadding` already shared (Phase 3)                                             |
 
 ### Deeper refactors (promoted / updated)
@@ -504,16 +504,9 @@ ______________________________________________________________________
 
 Ranked by **correctness mandate** (should it be done?), not effort. Closed items kept for history. Do not duplicate f5/f6 “already done.”
 
-Suggested order if chasing correctness only: **#12 → #17 → #20**, then optionally #10 / #15 / #9.
+Suggested order if chasing correctness only: **#17 → #20**, then optionally #10 / #15 / #9.
 
 ### Open — do (correctness)
-
-1. **Shared inclusive left/right string-position helper** (was #12)
-   Sites: ApplyScope `_ResolveIndex` ↔ TrimBetween `_GetAbsoluteIndex`
-   Target: one helper for inclusive 1-based→0-based; do **not** merge Inserter insert-before
-   Value: one place for clamp/anchor bugs
-   Cost: medium behavior risk
-   Rank: **do** — ride along when touching ApplyScope or Trim Between
 
 1. **`ApeKnownKeys` / `RiffInfoKnownKeys`** (was #17)
    Sites: Ape/Riff `_KnownKeys` + SemanticAudioTag / merge
@@ -641,6 +634,8 @@ Suggested order if chasing correctness only: **#12 → #17 → #20**, then optio
 
 ### Closed (history)
 
+1. **Shared inclusive left/right string-position helper** (was #12) — **done**
+   `InclusiveStringPositions.ToZeroBasedIndex` (Utils): inclusive 1-based left/right → clamped 0-based; ApplyScope `_ResolveIndex` + TrimBetween `_GetAbsoluteIndex` call it; Inserter insert-before left alone; `InclusiveStringPositionsTests` + ApplyScope/TrimBetween clamp edges
 1. **Collapse or rename `SameOnDisk` vs `IsSamePath`** (was #1) — **done**
    Removed `SameOnDisk`; single `IsSamePath` API — default trims trailing separators; explicit `trimTrailingSeparators: false` for exact path text; `DiffersOnlyInCase` uses exact; Engine/UI callers unchanged; `PathRelationsTests` cover trim vs exact + trailing-sep case-only false
 1. **Shared innermost-ancestor rewrite helper** (was #13) — **done**

@@ -1,3 +1,5 @@
+using Mfr.Utils;
+
 namespace Mfr.Filters.Trimming
 {
     /// <summary>
@@ -141,14 +143,11 @@ namespace Mfr.Filters.Trimming
         /// <returns>Index clamped to <c>0..length-1</c>.</returns>
         private static int _GetAbsoluteIndex(Position position, int length)
         {
-            var index = position.Anchor switch
-            {
-                Side.Left => position.Value - 1,
-                Side.Right => length - position.Value,
-                _ => throw new InvalidOperationException($"Unknown anchor side '{position.Anchor}'."),
-            };
-
-            return Math.Clamp(index, 0, length - 1);
+            return InclusiveStringPositions.ToZeroBasedIndex(
+                position.Value,
+                fromLeft: position.Anchor == Side.Left,
+                length
+            );
         }
     }
 }
