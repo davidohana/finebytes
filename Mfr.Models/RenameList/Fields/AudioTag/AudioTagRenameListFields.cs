@@ -63,7 +63,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         ];
 
         /// <summary>
-        /// Creates a semantic column with the shared display label and tooltip.
+        /// Creates a semantic column with the shared display label and optional clarifying tooltip.
         /// </summary>
         private static AudioTagSemanticRenameListField _Semantic(
             string propertyKey,

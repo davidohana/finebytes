@@ -16,7 +16,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     [FormatTokenInfo(
         PathFieldLabels.ParentFolder,
         PathFieldLabels.FileName,
-        "Use a parent folder name in which the file is located",
+        PathFieldTips.ParentFolder,
         "parent-folder"
     )]
     internal sealed class ParentFolderToken : IFormatToken

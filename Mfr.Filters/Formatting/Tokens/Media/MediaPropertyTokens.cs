@@ -1,3 +1,5 @@
+using Mfr.Models.RenameList.Fields.Media;
+
 namespace Mfr.Filters.Formatting.Tokens.Media
 {
     /// <summary>
@@ -31,12 +33,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo(
-        "Possibly Corrupt",
-        "Media",
-        "Whether TagLib reports the file as possibly corrupt",
-        "media-corrupt"
-    )]
+    [FormatTokenInfo("Possibly Corrupt", "Media", MediaRenameListFieldTips.PossiblyCorrupt, "media-corrupt")]
     internal sealed class MediaCorruptToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-corrupt&gt;</c>.</summary>
@@ -45,7 +42,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Duration", "Media", "Duration as h:mm:ss", "media-duration")]
+    [FormatTokenInfo("Duration", "Media", MediaRenameListFieldTips.Duration, "media-duration")]
     internal sealed class MediaDurationToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-duration&gt;</c>.</summary>
@@ -54,7 +51,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Duration Seconds", "Media", "Duration in whole seconds", "media-duration-sec")]
+    [FormatTokenInfo("Duration Seconds", "Media", MediaRenameListFieldTips.DurationSeconds, "media-duration-sec")]
     internal sealed class MediaDurationSecToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-duration-sec&gt;</c>.</summary>
@@ -117,7 +114,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Video Width", "Media", "Video width in pixels", "media-video-width")]
+    [FormatTokenInfo("Video Width", "Media", MediaRenameListFieldTips.VideoWidth, "media-video-width")]
     internal sealed class MediaVideoWidthToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-video-width&gt;</c>.</summary>
@@ -126,7 +123,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Video Height", "Media", "Video height in pixels", "media-video-height")]
+    [FormatTokenInfo("Video Height", "Media", MediaRenameListFieldTips.VideoHeight, "media-video-height")]
     internal sealed class MediaVideoHeightToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-video-height&gt;</c>.</summary>
@@ -135,7 +132,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Photo Width", "Media", "Photo width in pixels", "media-photo-width")]
+    [FormatTokenInfo("Photo Width", "Media", MediaRenameListFieldTips.PhotoWidth, "media-photo-width")]
     internal sealed class MediaPhotoWidthToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-photo-width&gt;</c>.</summary>
@@ -144,7 +141,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Photo Height", "Media", "Photo height in pixels", "media-photo-height")]
+    [FormatTokenInfo("Photo Height", "Media", MediaRenameListFieldTips.PhotoHeight, "media-photo-height")]
     internal sealed class MediaPhotoHeightToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-photo-height&gt;</c>.</summary>

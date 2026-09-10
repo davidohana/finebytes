@@ -163,21 +163,21 @@ ______________________________________________________________________
 
 Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
 
-| Block                    | What shipped                                                                                                                                                                           |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **1–4** Shell + order    | Multi-select File List → Add Selected/All; Del/F4/status hint; row menu; move up/down; insert-at-selection; File List/Explorer drop marker; internal reorder DnD                       |
-| **5** Columns            | `RenameListFieldKey` catalog, dynamic DataGrid columns, unified field shuttle (Visible \| Sort), session `visibleColumns` + widths, field-key cell hints                               |
-| **6** Catalog (original) | Extended, AudioTag, Image, Jpeg, Media Properties, Mpeg — originals in shuttle                                                                                                         |
-| **7** Auto-Sort          | Field-key sort on all non-preview catalog fields; header click / Shift+click                                                                                                           |
-| **8** Load errors        | Gray load-error cells, missing-on-disk gray, Show Load Errors, TagLib / image error surfacing                                                                                          |
-| **9** Refresh            | F5 `RefreshOriginals`, missing-on-disk gray, shuttle OrderedDraft + DnD                                                                                                                |
-| **10** Preview core      | Always-on `ToChain()` → `Preview()`; Auto-Preview toggle + persist; re-preview on membership / F5; status counts                                                                       |
-| **11** Preview highlight | Red changed cells (`rename-list-preview-changed`), lavender preview-error rows, Show Preview Error via shared error dialog                                                             |
-| **12** Preview metadata  | Extended dates/attrs + AudioTag semantic (`ReadWriteApply`) preview cols; First\* / Tag Types / Image / Jpeg / Media / Mpeg stay original-only; Size / Folder File Count original-only |
-| **13** Hygiene           | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                                                      |
-| **14a** Remove Unchanged | Preview-column header menu → `RenameList.RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                                                 |
-| **14c** Edit as Name List  | `SupportsWrite` + `WriteTarget`; `CollectNameList`; header Edit as Name List → embedded `NameListFilter` via `AddAndSelect` (no file I/O); F5 Name List editor                                |
-| **14e** Properties       | Alt+Enter + row **Properties** → shell property sheet; **Show in Explorer** on Rename List; same Properties on File List (clears debts.md dialog bullet)                               |
+| Block                     | What shipped                                                                                                                                                                           |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1–4** Shell + order     | Multi-select File List → Add Selected/All; Del/F4/status hint; row menu; move up/down; insert-at-selection; File List/Explorer drop marker; internal reorder DnD                       |
+| **5** Columns             | `RenameListFieldKey` catalog, dynamic DataGrid columns, unified field shuttle (Visible \| Sort), session `visibleColumns` + widths, field-key cell hints                               |
+| **6** Catalog (original)  | Extended, AudioTag, Image, Jpeg, Media Properties, Mpeg — originals in shuttle                                                                                                         |
+| **7** Auto-Sort           | Field-key sort on all non-preview catalog fields; header click / Shift+click                                                                                                           |
+| **8** Load errors         | Gray load-error cells, missing-on-disk gray, Show Load Errors, TagLib / image error surfacing                                                                                          |
+| **9** Refresh             | F5 `RefreshOriginals`, missing-on-disk gray, shuttle OrderedDraft + DnD                                                                                                                |
+| **10** Preview core       | Always-on `ToChain()` → `Preview()`; Auto-Preview toggle + persist; re-preview on membership / F5; status counts                                                                       |
+| **11** Preview highlight  | Red changed cells (`rename-list-preview-changed`), lavender preview-error rows, Show Preview Error via shared error dialog                                                             |
+| **12** Preview metadata   | Extended dates/attrs + AudioTag semantic (`ReadWriteApply`) preview cols; First\* / Tag Types / Image / Jpeg / Media / Mpeg stay original-only; Size / Folder File Count original-only |
+| **13** Hygiene            | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                                                      |
+| **14a** Remove Unchanged  | Preview-column header menu → `RenameList.RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                                                 |
+| **14c** Edit as Name List | `SupportsWrite` + `WriteTarget`; `CollectNameList`; header Edit as Name List → embedded `NameListFilter` via `AddAndSelect` (no file I/O); F5 Name List editor                         |
+| **14e** Properties        | Alt+Enter + row **Properties** → shell property sheet; **Show in Explorer** on Rename List; same Properties on File List (clears debts.md dialog bullet)                               |
 
 **Already reusable for remaining work (do not rebuild):**
 
@@ -192,7 +192,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 
 **Write vs preview (important for 14d):**
 
-| MFR7 type        | Examples                                           | Preview col | Edit as Name List / F2           |
+| MFR7 type        | Examples                                           | Preview col | Edit as Name List / F2    |
 | ---------------- | -------------------------------------------------- | ----------- | ------------------------- |
 | `ReadWriteApply` | Basic name/path fields; AudioTag semantic          | yes         | **yes** (`SupportsWrite`) |
 | `ReadWrite`      | Extended dates/attrs                               | yes (12)    | **no**                    |

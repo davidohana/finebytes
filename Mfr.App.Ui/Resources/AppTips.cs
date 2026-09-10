@@ -54,8 +54,7 @@ namespace Mfr.App.Ui.Resources
         public const string RemoveUnchangedItems = "Remove items whose preview for this field is unchanged";
 
         /// <summary>Rename List header: Edit as Name List (writable columns only).</summary>
-        public const string EditAsNameList =
-            "Create a Name List filter to edit the names in this column";
+        public const string EditAsNameList = "Create a Name List filter to edit the names in this column";
 
         /// <summary>Rename List field shuttle: visible columns (toolbar, context menu, main menu).</summary>
         public const string SelectRenameListFields = "Choose visible Rename List columns";

@@ -16,9 +16,13 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private static readonly FilterTargetGroupOption _fileNameGroup = new(
             PathFieldLabels.FileName,
             [
-                new FilterTargetOption(PathFieldLabels.FileName, new FilePrefixTarget()),
+                new FilterTargetOption(PathFieldLabels.FileName, new FilePrefixTarget(), PathFieldTips.FileName),
                 new FilterTargetOption(PathFieldLabels.FileExtension, new FileExtensionTarget()),
-                new FilterTargetOption(PathFieldLabels.FullFileName, new FileFullNameTarget()),
+                new FilterTargetOption(
+                    PathFieldLabels.FullFileName,
+                    new FileFullNameTarget(),
+                    PathFieldTips.FullFileName
+                ),
             ]
         );
 
@@ -26,8 +30,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             "Path",
             [
                 new FilterTargetOption(PathFieldLabels.FullPath, new FullPathTarget()),
-                new FilterTargetOption(PathFieldLabels.ParentDirectory, new ParentDirectoryTarget()),
-                new FilterTargetOption(PathFieldLabels.ParentFolder, new AncestorFolderTarget(1)),
+                new FilterTargetOption(
+                    PathFieldLabels.ParentDirectory,
+                    new ParentDirectoryTarget(),
+                    PathFieldTips.ParentDirectory
+                ),
+                new FilterTargetOption(
+                    PathFieldLabels.ParentFolder,
+                    new AncestorFolderTarget(1),
+                    PathFieldTips.ParentFolder
+                ),
             ]
         );
 
@@ -244,7 +256,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Optional Apply-To tip for a Xiph key when it maps to a shared semantic field tip.
+        /// Optional Apply-To tip for a Xiph key when it maps to a clarifying semantic field tip.
         /// </summary>
         private static string? _GetXiphKeyTip(string key)
         {
@@ -258,19 +270,10 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             return key.ToUpperInvariant() switch
             {
-                "TITLE" => SemanticAudioFieldTips.For(SemanticAudioField.Title),
-                "ALBUM" => SemanticAudioFieldTips.For(SemanticAudioField.Album),
-                "ARTIST" => SemanticAudioFieldTips.For(SemanticAudioField.Performers),
-                "ALBUMARTIST" => SemanticAudioFieldTips.For(SemanticAudioField.AlbumArtists),
-                "COMPOSER" => SemanticAudioFieldTips.For(SemanticAudioField.Composers),
-                "GENRE" => SemanticAudioFieldTips.For(SemanticAudioField.Genre),
-                "COMMENT" => SemanticAudioFieldTips.For(SemanticAudioField.Comment),
-                "LYRICS" => SemanticAudioFieldTips.For(SemanticAudioField.Lyrics),
-                "COPYRIGHT" => SemanticAudioFieldTips.For(SemanticAudioField.Copyright),
-                "GROUPING" => SemanticAudioFieldTips.For(SemanticAudioField.Grouping),
-                "YEAR" => SemanticAudioFieldTips.For(SemanticAudioField.Year),
-                "BPM" => SemanticAudioFieldTips.For(SemanticAudioField.BeatsPerMinute),
-                "CONDUCTOR" => SemanticAudioFieldTips.For(SemanticAudioField.Conductor),
+                "ARTIST" => SemanticAudioFieldTips.Artist,
+                "ALBUMARTIST" => SemanticAudioFieldTips.AlbumArtist,
+                "COMPOSER" => SemanticAudioFieldTips.Composer,
+                "GENRE" => SemanticAudioFieldTips.Genre,
                 _ => null,
             };
         }

@@ -10,14 +10,21 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
     /// <param name="propertyKey">Property key within the MP3 Properties group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    internal abstract class MpegRenameListField(string propertyKey, string displayName, int? defaultWidth = 60)
+    /// <param name="description">Optional tooltip clarifying the field.</param>
+    internal abstract class MpegRenameListField(
+        string propertyKey,
+        string displayName,
+        int? defaultWidth = 60,
+        string? description = null
+    )
         : OriginalOnlyRenameListField(
             MpegRenameListFields.Group,
             MpegRenameListFields.GroupLabel,
             propertyKey,
             displayName,
             defaultWidth,
-            RenameListMetadataRequirement.TagLib
+            RenameListMetadataRequirement.TagLib,
+            description
         );
 
     /// <summary>
@@ -27,12 +34,14 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="field">MPEG property to format.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
+    /// <param name="description">Optional tooltip clarifying the field.</param>
     internal sealed class MpegPropertyRenameListField(
         string propertyKey,
         string displayName,
         MpegRenameListProperty field,
-        int? defaultWidth = 60
-    ) : MpegRenameListField(propertyKey, displayName, defaultWidth)
+        int? defaultWidth = 60,
+        string? description = null
+    ) : MpegRenameListField(propertyKey, displayName, defaultWidth, description)
     {
         /// <summary>
         /// Gets the MPEG property addressed by this column.

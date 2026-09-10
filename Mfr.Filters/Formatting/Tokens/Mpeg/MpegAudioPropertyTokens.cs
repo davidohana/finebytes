@@ -1,3 +1,5 @@
+using Mfr.Models.RenameList.Fields.Mpeg;
+
 namespace Mfr.Filters.Formatting.Tokens.Mpeg
 {
     /// <summary>
@@ -32,7 +34,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Copyright", "Audio\\MP3", "Whether the MPEG audio is copyrighted", "mpeg-copyright")]
+    [FormatTokenInfo("Copyright", "Audio\\MP3", MpegRenameListFieldTips.Copyright, "mpeg-copyright")]
     internal sealed class MpegCopyrightToken : MpegAudioPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;mpeg-copyright&gt;</c>.</summary>
@@ -41,7 +43,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Duration", "Audio\\MP3", "MPEG header duration as h:mm:ss", "mpeg-duration")]
+    [FormatTokenInfo("Duration", "Audio\\MP3", MpegRenameListFieldTips.Duration, "mpeg-duration")]
     internal sealed class MpegDurationToken : MpegAudioPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;mpeg-duration&gt;</c>.</summary>
@@ -50,7 +52,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Duration Seconds", "Audio\\MP3", "MPEG header duration in whole seconds", "mpeg-duration-sec")]
+    [FormatTokenInfo("Duration Seconds", "Audio\\MP3", MpegRenameListFieldTips.DurationSecs, "mpeg-duration-sec")]
     internal sealed class MpegDurationSecToken : MpegAudioPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;mpeg-duration-sec&gt;</c>.</summary>
@@ -68,7 +70,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Frequency", "Audio\\MP3", "Sample rate (Hz) from MPEG header", "mpeg-frequency")]
+    [FormatTokenInfo("Frequency", "Audio\\MP3", MpegRenameListFieldTips.Frequency, "mpeg-frequency")]
     internal sealed class MpegFrequencyToken : MpegAudioPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;mpeg-frequency&gt;</c>.</summary>
@@ -77,7 +79,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Layer", "Audio\\MP3", "MPEG layer (I / II / III)", "mpeg-layer")]
+    [FormatTokenInfo("Layer", "Audio\\MP3", MpegRenameListFieldTips.Layer, "mpeg-layer")]
     internal sealed class MpegLayerToken : MpegAudioPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;mpeg-layer&gt;</c>.</summary>
@@ -86,7 +88,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Version", "Audio\\MP3", "MPEG version (1 / 2 / 2.5)", "mpeg-ver")]
+    [FormatTokenInfo("Version", "Audio\\MP3", MpegRenameListFieldTips.Level, "mpeg-ver")]
     internal sealed class MpegVerToken : MpegAudioPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;mpeg-ver&gt;</c>.</summary>
@@ -104,7 +106,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Original", "Audio\\MP3", "Whether the MPEG original bit is set", "mpeg-original")]
+    [FormatTokenInfo("Original", "Audio\\MP3", MpegRenameListFieldTips.Original, "mpeg-original")]
     internal sealed class MpegOriginalToken : MpegAudioPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;mpeg-original&gt;</c>.</summary>
@@ -113,7 +115,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Protection", "Audio\\MP3", "Whether CRC protection is set", "mpeg-protection")]
+    [FormatTokenInfo("Protection", "Audio\\MP3", MpegRenameListFieldTips.Protection, "mpeg-protection")]
     internal sealed class MpegProtectionToken : MpegAudioPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;mpeg-protection&gt;</c>.</summary>

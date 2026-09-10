@@ -116,7 +116,7 @@ namespace Mfr.Filters.Formatting.FormatString
         {
             if (token is SemanticAudioFieldTokenBase audio)
             {
-                return SemanticAudioFieldTips.For(audio.Field);
+                return SemanticAudioFieldTips.For(audio.Field) ?? info.ShortDescription;
             }
 
             return info.ShortDescription;

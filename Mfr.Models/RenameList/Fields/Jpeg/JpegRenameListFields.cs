@@ -36,7 +36,8 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 "ExifDirectory*40093",
                 "Author",
                 JpegRenameListExifProperty.Author,
-                defaultWidth: 100
+                defaultWidth: 100,
+                description: "Windows XP Author tag (distinct from EXIF Artist)."
             ),
             new JpegExifRenameListField(
                 "ExifDirectory*40094",
@@ -68,7 +69,8 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 "ExifDirectory*315",
                 "Artist",
                 JpegRenameListExifProperty.Artist,
-                defaultWidth: 60
+                defaultWidth: 60,
+                description: "EXIF IFD0 Artist (photographer). Not the audio-tag Artist field."
             ),
             new JpegExifRenameListField(
                 "ExifDirectory*37393",

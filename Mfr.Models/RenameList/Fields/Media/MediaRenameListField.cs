@@ -9,14 +9,21 @@ namespace Mfr.Models.RenameList.Fields.Media
     /// <param name="propertyKey">Property key within the Media Properties group.</param>
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
-    internal abstract class MediaRenameListField(string propertyKey, string displayName, int? defaultWidth = 60)
+    /// <param name="description">Optional tooltip clarifying the field.</param>
+    internal abstract class MediaRenameListField(
+        string propertyKey,
+        string displayName,
+        int? defaultWidth = 60,
+        string? description = null
+    )
         : OriginalOnlyRenameListField(
             MediaRenameListFields.Group,
             MediaRenameListFields.GroupLabel,
             propertyKey,
             displayName,
             defaultWidth,
-            RenameListMetadataRequirement.TagLib
+            RenameListMetadataRequirement.TagLib,
+            description
         );
 
     /// <summary>
@@ -26,12 +33,14 @@ namespace Mfr.Models.RenameList.Fields.Media
     /// <param name="displayName">User-visible column label.</param>
     /// <param name="field">Media property to format.</param>
     /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
+    /// <param name="description">Optional tooltip clarifying the field.</param>
     internal sealed class MediaPropertyRenameListField(
         string propertyKey,
         string displayName,
         MediaRenameListProperty field,
-        int? defaultWidth = 60
-    ) : MediaRenameListField(propertyKey, displayName, defaultWidth)
+        int? defaultWidth = 60,
+        string? description = null
+    ) : MediaRenameListField(propertyKey, displayName, defaultWidth, description)
     {
         /// <summary>
         /// Gets the media property addressed by this column.

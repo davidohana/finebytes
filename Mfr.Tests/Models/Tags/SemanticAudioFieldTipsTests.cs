@@ -8,15 +8,22 @@ namespace Mfr.Tests.Models.Tags
     public sealed class SemanticAudioFieldTipsTests
     {
         /// <summary>
-        /// Verifies every semantic field has a non-empty tooltip.
+        /// Verifies only multi-value / role-confused fields return tips.
         /// </summary>
         [Fact]
-        public void For_covers_every_semantic_field()
+        public void For_returns_tips_only_for_non_trivial_fields()
         {
-            foreach (var field in Enum.GetValues<SemanticAudioField>())
-            {
-                Assert.False(string.IsNullOrWhiteSpace(SemanticAudioFieldTips.For(field)));
-            }
+            Assert.Equal(SemanticAudioFieldTips.Artist, SemanticAudioFieldTips.For(SemanticAudioField.Performers));
+            Assert.Equal(
+                SemanticAudioFieldTips.AlbumArtist,
+                SemanticAudioFieldTips.For(SemanticAudioField.AlbumArtists)
+            );
+            Assert.Equal(SemanticAudioFieldTips.Composer, SemanticAudioFieldTips.For(SemanticAudioField.Composers));
+            Assert.Equal(SemanticAudioFieldTips.Genre, SemanticAudioFieldTips.For(SemanticAudioField.Genre));
+
+            Assert.Null(SemanticAudioFieldTips.For(SemanticAudioField.Title));
+            Assert.Null(SemanticAudioFieldTips.For(SemanticAudioField.Year));
+            Assert.Null(SemanticAudioFieldTips.For(SemanticAudioField.MusicBrainzArtistId));
         }
 
         /// <summary>
@@ -25,11 +32,6 @@ namespace Mfr.Tests.Models.Tags
         [Fact]
         public void For_artist_tips_clarify_role_and_multi_value()
         {
-            Assert.Equal(SemanticAudioFieldTips.Artist, SemanticAudioFieldTips.For(SemanticAudioField.Performers));
-            Assert.Equal(
-                SemanticAudioFieldTips.AlbumArtist,
-                SemanticAudioFieldTips.For(SemanticAudioField.AlbumArtists)
-            );
             Assert.Contains("Track performers", SemanticAudioFieldTips.Artist, StringComparison.Ordinal);
             Assert.Contains("Album-level", SemanticAudioFieldTips.AlbumArtist, StringComparison.Ordinal);
             Assert.Contains("`;`", SemanticAudioFieldTips.Artist, StringComparison.Ordinal);

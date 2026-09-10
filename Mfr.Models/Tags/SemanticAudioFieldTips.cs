@@ -3,12 +3,12 @@ using System.Diagnostics.CodeAnalysis;
 namespace Mfr.Models.Tags
 {
     /// <summary>
-    /// User-facing tooltips for <see cref="SemanticAudioField"/> (Rename List, Apply-To, Format Editor).
+    /// User-facing tooltips for <see cref="SemanticAudioField"/> when the label alone is ambiguous.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Clarifies roles that share similar labels (Artist vs Album Artist) and multi-value
-    /// <c>;</c>-joined fields vs first-segment Rename List columns.
+    /// Only multi-value / role-confused fields return tips. Trivial labels (Title, Year, …) return
+    /// <see langword="null"/> so UI surfaces stay quiet.
     /// </para>
     /// </remarks>
     public static class SemanticAudioFieldTips
@@ -27,11 +27,16 @@ namespace Mfr.Models.Tags
         public const string Genre = "Genre. Multiple values are joined with `;`.";
 
         /// <summary>
-        /// Returns the shared tooltip for <paramref name="field"/>.
+        /// Returns a clarifying tooltip for <paramref name="field"/>, or <see langword="null"/> when the label is enough.
         /// </summary>
         /// <param name="field">Semantic field.</param>
-        /// <returns>User-visible tooltip text.</returns>
-        public static string For(SemanticAudioField field)
+        /// <returns>User-visible tooltip text, or <see langword="null"/>.</returns>
+        [SuppressMessage(
+            "Style",
+            "IDE0072:Add missing cases",
+            Justification = "Only non-trivial fields return tips; others intentionally return null."
+        )]
+        public static string? For(SemanticAudioField field)
         {
             return field switch
             {
@@ -39,30 +44,7 @@ namespace Mfr.Models.Tags
                 SemanticAudioField.AlbumArtists => AlbumArtist,
                 SemanticAudioField.Composers => Composer,
                 SemanticAudioField.Genre => Genre,
-                SemanticAudioField.Title => "Track title.",
-                SemanticAudioField.Album => "Album name.",
-                SemanticAudioField.Comment => "Comment text.",
-                SemanticAudioField.Lyrics => "Lyrics text.",
-                SemanticAudioField.Copyright => "Copyright notice.",
-                SemanticAudioField.Grouping => "Content grouping.",
-                SemanticAudioField.Year => "Release year.",
-                SemanticAudioField.Track => "Track number.",
-                SemanticAudioField.TrackCount => "Total tracks on the disc or album.",
-                SemanticAudioField.Disc => "Disc number.",
-                SemanticAudioField.DiscCount => "Total discs in the set.",
-                SemanticAudioField.BeatsPerMinute => "Tempo in beats per minute.",
-                SemanticAudioField.Conductor => "Conductor or director.",
-                SemanticAudioField.MusicBrainzArtistId => "MusicBrainz artist ID.",
-                SemanticAudioField.MusicBrainzReleaseId => "MusicBrainz release (album) ID.",
-                SemanticAudioField.MusicBrainzReleaseArtistId => "MusicBrainz album artist ID.",
-                SemanticAudioField.MusicBrainzTrackId => "MusicBrainz track ID.",
-                SemanticAudioField.MusicBrainzDiscId => "MusicBrainz disc ID.",
-                SemanticAudioField.MusicBrainzReleaseStatus => "MusicBrainz release status.",
-                SemanticAudioField.MusicBrainzReleaseType => "MusicBrainz release type.",
-                SemanticAudioField.MusicBrainzReleaseCountry => "MusicBrainz release country.",
-                SemanticAudioField.MusicIpId => "MusicIP PUID.",
-                SemanticAudioField.AmazonId => "Amazon ASIN.",
-                _ => throw new ArgumentOutOfRangeException(nameof(field), field, "Unknown semantic audio field."),
+                _ => null,
             };
         }
 

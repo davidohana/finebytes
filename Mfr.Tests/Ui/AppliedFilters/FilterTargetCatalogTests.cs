@@ -167,9 +167,25 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var audioGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Audio Tag");
             var artist = Assert.Single(audioGroup.Targets, t => t.Label == "Artist");
             var albumArtist = Assert.Single(audioGroup.Targets, t => t.Label == "Album Artist");
+            var title = Assert.Single(audioGroup.Targets, t => t.Label == "Title");
 
             Assert.Equal(SemanticAudioFieldTips.Artist, artist.Tip);
             Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
+            Assert.Null(title.Tip);
+        }
+
+        /// <summary>
+        /// Verifies Path Apply-To options tip Parent Directory vs Parent Folder.
+        /// </summary>
+        [Fact]
+        public void Path_options_include_directory_vs_folder_tips()
+        {
+            var pathGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Path");
+            var directory = Assert.Single(pathGroup.Targets, t => t.Label == PathFieldLabels.ParentDirectory);
+            var folder = Assert.Single(pathGroup.Targets, t => t.Label == PathFieldLabels.ParentFolder);
+
+            Assert.Equal(PathFieldTips.ParentDirectory, directory.Tip);
+            Assert.Equal(PathFieldTips.ParentFolder, folder.Tip);
         }
 
         private sealed record UnknownFilterTarget : FilterTarget;

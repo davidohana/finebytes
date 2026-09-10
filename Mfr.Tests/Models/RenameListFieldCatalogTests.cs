@@ -35,18 +35,27 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies Audio Tag columns expose shared Artist / first-segment tooltips.
+        /// Verifies clarifying tooltips land only on non-trivial Rename List columns.
         /// </summary>
         [Fact]
-        public void Audio_tag_fields_expose_semantic_descriptions()
+        public void Non_trivial_fields_expose_descriptions()
         {
             var artist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "Performers");
             var firstArtist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "FirstPerformer");
             var albumArtist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "AlbumArtists");
+            var title = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "Title");
+            var parentDirectory = Assert.Single(
+                BasicRenameListFields.All,
+                f => f.PropertyKey == BasicRenameListFields.Key.Folder
+            );
+            var mpegCopyright = Assert.Single(MpegRenameListFields.All, f => f.PropertyKey == "Copyright");
 
             Assert.Equal(SemanticAudioFieldTips.Artist, artist.Description);
             Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Description);
             Assert.Equal(SemanticAudioFieldTips.FirstSegment(SemanticAudioField.Performers), firstArtist.Description);
+            Assert.Null(title.Description);
+            Assert.Equal(PathFieldTips.ParentDirectory, parentDirectory.Description);
+            Assert.Equal(MpegRenameListFieldTips.Copyright, mpegCopyright.Description);
         }
 
         [Fact]

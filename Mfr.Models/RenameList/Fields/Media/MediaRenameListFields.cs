@@ -25,13 +25,20 @@ namespace Mfr.Models.RenameList.Fields.Media
                 "PossiblyCorrupt",
                 "Possibly Corrupt",
                 MediaRenameListProperty.PossiblyCorrupt,
-                defaultWidth: 40
+                defaultWidth: 40,
+                description: MediaRenameListFieldTips.PossiblyCorrupt
             ),
-            new MediaPropertyRenameListField("Duration", "Duration", MediaRenameListProperty.Duration),
+            new MediaPropertyRenameListField(
+                "Duration",
+                "Duration",
+                MediaRenameListProperty.Duration,
+                description: MediaRenameListFieldTips.Duration
+            ),
             new MediaPropertyRenameListField(
                 "DurationSeconds",
                 "Duration (Seconds)",
-                MediaRenameListProperty.DurationSeconds
+                MediaRenameListProperty.DurationSeconds,
+                description: MediaRenameListFieldTips.DurationSeconds
             ),
             new MediaPropertyRenameListField("MediaTypes", "Media Types", MediaRenameListProperty.MediaTypes),
             new MediaPropertyRenameListField(
@@ -58,10 +65,30 @@ namespace Mfr.Models.RenameList.Fields.Media
                 MediaRenameListProperty.AudioSampleRate
             ),
             new MediaPropertyRenameListField("BitsPerSample", "Bits Per Sample", MediaRenameListProperty.BitsPerSample),
-            new MediaPropertyRenameListField("VideoWidth", "Video Width", MediaRenameListProperty.VideoWidth),
-            new MediaPropertyRenameListField("VideoHeight", "Video Height", MediaRenameListProperty.VideoHeight),
-            new MediaPropertyRenameListField("PhotoWidth", "Photo Width", MediaRenameListProperty.PhotoWidth),
-            new MediaPropertyRenameListField("PhotoHeight", "Photo Height", MediaRenameListProperty.PhotoHeight),
+            new MediaPropertyRenameListField(
+                "VideoWidth",
+                "Video Width",
+                MediaRenameListProperty.VideoWidth,
+                description: MediaRenameListFieldTips.VideoWidth
+            ),
+            new MediaPropertyRenameListField(
+                "VideoHeight",
+                "Video Height",
+                MediaRenameListProperty.VideoHeight,
+                description: MediaRenameListFieldTips.VideoHeight
+            ),
+            new MediaPropertyRenameListField(
+                "PhotoWidth",
+                "Photo Width",
+                MediaRenameListProperty.PhotoWidth,
+                description: MediaRenameListFieldTips.PhotoWidth
+            ),
+            new MediaPropertyRenameListField(
+                "PhotoHeight",
+                "Photo Height",
+                MediaRenameListProperty.PhotoHeight,
+                description: MediaRenameListFieldTips.PhotoHeight
+            ),
             new MediaPropertyRenameListField(
                 "PhotoQuality",
                 "Photo Quality",

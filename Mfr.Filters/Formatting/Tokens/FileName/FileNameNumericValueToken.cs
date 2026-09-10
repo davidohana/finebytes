@@ -15,7 +15,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     [FormatTokenInfo(
         PathFieldLabels.FileNameNumericValue,
         PathFieldLabels.FileName,
-        "First digit run in the full name (zeros stripped)",
+        PathFieldTips.FileNameNumericValue,
         "file-name-numeric-value"
     )]
     internal sealed class FileNameNumericValueToken : IFormatToken

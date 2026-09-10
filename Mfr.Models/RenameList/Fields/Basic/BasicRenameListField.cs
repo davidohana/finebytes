@@ -15,13 +15,15 @@ namespace Mfr.Models.RenameList.Fields.Basic
     /// <param name="writeTarget">
     /// Filter target for Edit as Name List / Manual Rename, or <see langword="null"/> when not writable.
     /// </param>
+    /// <param name="description">Optional tooltip clarifying the field.</param>
     public abstract class BasicRenameListField(
         string propertyKey,
         string displayName,
         int? defaultWidth = null,
         bool isSortable = true,
         bool supportsPreview = true,
-        FilterTarget? writeTarget = null
+        FilterTarget? writeTarget = null,
+        string? description = null
     )
         : RenameListField(
             Group,
@@ -31,7 +33,8 @@ namespace Mfr.Models.RenameList.Fields.Basic
             defaultWidth,
             isSortable,
             supportsPreview,
-            writeTarget: writeTarget
+            writeTarget: writeTarget,
+            description: description
         )
     {
         /// <summary>
