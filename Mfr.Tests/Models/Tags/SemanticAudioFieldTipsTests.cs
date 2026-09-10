@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Tags
     public sealed class SemanticAudioFieldTipsTests
     {
         /// <summary>
-        /// Verifies only multi-value / role-confused fields return tips.
+        /// Verifies only ambiguous labels (multi-value, role, or abbreviation) return tips.
         /// </summary>
         [Fact]
         public void For_returns_tips_only_for_non_trivial_fields()
@@ -20,6 +20,8 @@ namespace Mfr.Tests.Models.Tags
             );
             Assert.Equal(SemanticAudioFieldTips.Composer, SemanticAudioFieldTips.For(SemanticAudioField.Composers));
             Assert.Equal(SemanticAudioFieldTips.Genre, SemanticAudioFieldTips.For(SemanticAudioField.Genre));
+            Assert.Equal(SemanticAudioFieldTips.Asin, SemanticAudioFieldTips.For(SemanticAudioField.AmazonId));
+            Assert.Equal(SemanticAudioFieldTips.Bpm, SemanticAudioFieldTips.For(SemanticAudioField.BeatsPerMinute));
 
             Assert.Null(SemanticAudioFieldTips.For(SemanticAudioField.Title));
             Assert.Null(SemanticAudioFieldTips.For(SemanticAudioField.Year));

@@ -7,8 +7,8 @@ namespace Mfr.Models.Tags
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Only multi-value / role-confused fields return tips. Trivial labels (Title, Year, …) return
-    /// <see langword="null"/> so UI surfaces stay quiet.
+    /// Only ambiguous labels return tips (multi-value / role-confused fields, abbreviations).
+    /// Trivial labels (Title, Year, …) return <see langword="null"/> so UI surfaces stay quiet.
     /// </para>
     /// </remarks>
     public static class SemanticAudioFieldTips
@@ -25,6 +25,12 @@ namespace Mfr.Models.Tags
 
         /// <summary>Tooltip for <see cref="SemanticAudioField.Genre"/>.</summary>
         public const string Genre = "Genre. Multiple values are joined with `;`.";
+
+        /// <summary>Tooltip for <see cref="SemanticAudioField.AmazonId"/> (display label ASIN).</summary>
+        public const string Asin = "Amazon Standard Identification Number (product ASIN).";
+
+        /// <summary>Tooltip for <see cref="SemanticAudioField.BeatsPerMinute"/> (display label BPM).</summary>
+        public const string Bpm = "Tempo in beats per minute.";
 
         /// <summary>
         /// Returns a clarifying tooltip for <paramref name="field"/>, or <see langword="null"/> when the label is enough.
@@ -44,6 +50,8 @@ namespace Mfr.Models.Tags
                 SemanticAudioField.AlbumArtists => AlbumArtist,
                 SemanticAudioField.Composers => Composer,
                 SemanticAudioField.Genre => Genre,
+                SemanticAudioField.AmazonId => Asin,
+                SemanticAudioField.BeatsPerMinute => Bpm,
                 _ => null,
             };
         }

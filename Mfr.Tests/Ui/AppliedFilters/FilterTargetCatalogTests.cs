@@ -167,10 +167,14 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var audioGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Audio Tag");
             var artist = Assert.Single(audioGroup.Targets, t => t.Label == "Artist");
             var albumArtist = Assert.Single(audioGroup.Targets, t => t.Label == "Album Artist");
+            var asin = Assert.Single(audioGroup.Targets, t => t.Label == "ASIN");
+            var bpm = Assert.Single(audioGroup.Targets, t => t.Label == "BPM");
             var title = Assert.Single(audioGroup.Targets, t => t.Label == "Title");
 
             Assert.Equal(SemanticAudioFieldTips.Artist, artist.Tip);
             Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
+            Assert.Equal(SemanticAudioFieldTips.Asin, asin.Tip);
+            Assert.Equal(SemanticAudioFieldTips.Bpm, bpm.Tip);
             Assert.Null(title.Tip);
         }
 
@@ -189,7 +193,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Xiph ARTIST / ALBUMARTIST Apply-To options reuse semantic clarifying tips.
+        /// Verifies Xiph Apply-To options reuse semantic clarifying tips for role and abbreviation keys.
         /// </summary>
         [Fact]
         public void Xiph_artist_options_include_semantic_field_tips()
@@ -197,10 +201,14 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var xiphGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Xiph");
             var artist = Assert.Single(xiphGroup.Targets, t => t.Label == "Artist");
             var albumArtist = Assert.Single(xiphGroup.Targets, t => t.Label == "Album Artist");
+            var asin = Assert.Single(xiphGroup.Targets, t => t.Label == "ASIN");
+            var bpm = Assert.Single(xiphGroup.Targets, t => t.Label == "BPM");
             var title = Assert.Single(xiphGroup.Targets, t => t.Label == "Title");
 
             Assert.Equal(SemanticAudioFieldTips.Artist, artist.Tip);
             Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
+            Assert.Equal(SemanticAudioFieldTips.Asin, asin.Tip);
+            Assert.Equal(SemanticAudioFieldTips.Bpm, bpm.Tip);
             Assert.Null(title.Tip);
         }
 

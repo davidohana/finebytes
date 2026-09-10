@@ -260,8 +260,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Catalog-ID keys (<see cref="AudioCatalogFieldMaps"/>) intentionally stay quiet — their labels
-        /// are already specific. Only role / multi-value common keys get tips.
+        /// Most catalog-ID keys stay quiet — their labels are already specific. Abbreviation
+        /// keys (ASIN, BPM) and role / multi-value common keys get tips.
         /// </para>
         /// </remarks>
         private static string? _GetXiphKeyTip(string key)
@@ -272,6 +272,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 "ALBUMARTIST" => SemanticAudioFieldTips.AlbumArtist,
                 "COMPOSER" => SemanticAudioFieldTips.Composer,
                 "GENRE" => SemanticAudioFieldTips.Genre,
+                "ASIN" => SemanticAudioFieldTips.Asin,
+                "BPM" => SemanticAudioFieldTips.Bpm,
                 _ => null,
             };
         }

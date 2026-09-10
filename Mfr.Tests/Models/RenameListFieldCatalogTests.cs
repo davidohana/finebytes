@@ -43,6 +43,8 @@ namespace Mfr.Tests.Models
             var artist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "Performers");
             var firstArtist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "FirstPerformer");
             var albumArtist = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "AlbumArtists");
+            var asin = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "AmazonId");
+            var bpm = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "BeatsPerMinute");
             var title = Assert.Single(AudioTagRenameListFields.All, f => f.PropertyKey == "Title");
             var parentDirectory = Assert.Single(
                 BasicRenameListFields.All,
@@ -55,6 +57,8 @@ namespace Mfr.Tests.Models
             Assert.Equal(SemanticAudioFieldTips.Artist, artist.Tip);
             Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
             Assert.Equal(SemanticAudioFieldTips.FirstSegment(SemanticAudioField.Performers), firstArtist.Tip);
+            Assert.Equal(SemanticAudioFieldTips.Asin, asin.Tip);
+            Assert.Equal(SemanticAudioFieldTips.Bpm, bpm.Tip);
             Assert.Null(title.Tip);
             Assert.Equal(PathFieldTips.ParentDirectory, parentDirectory.Tip);
             Assert.Equal(MpegRenameListFieldTips.Copyright, mpegCopyright.Tip);

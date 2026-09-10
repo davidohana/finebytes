@@ -166,7 +166,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo(null, "Audio\\Tag", "BPM from the audio tag overlay", "audio-bpm")]
+    [FormatTokenInfo(null, "Audio\\Tag", SemanticAudioFieldTips.Bpm, "audio-bpm")]
     internal sealed class AudioBpmToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-bpm&gt;</c>.</summary>
@@ -265,7 +265,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo(null, "Audio\\Tag", "Amazon ASIN", "audio-amazon-id")]
+    [FormatTokenInfo(null, "Audio\\Tag", SemanticAudioFieldTips.Asin, "audio-amazon-id")]
     internal sealed class AudioAmazonIdToken : SemanticAudioFieldTokenBase
     {
         /// <summary>Registers <c>&lt;audio-amazon-id&gt;</c>.</summary>
