@@ -84,6 +84,37 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
+        /// Verifies Alt+Enter on the Report grid shows Properties for the focused entry.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_Grid_Alt_Enter_Shows_Properties()
+        {
+            var shell = new RecordingShellOpener();
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, _CreateSampleDir(), shell);
+            _viewModels.Add(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 560,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+            window.UpdateLayout();
+
+            var grid = view.FindControl<DataGrid>("ReportGrid");
+            Assert.NotNull(grid);
+            _RaiseKeyDown(grid, Key.Enter, KeyModifiers.Alt);
+
+            Assert.Equal([alpha.FullPath], shell.ShownProperties);
+        }
+
+        /// <summary>
         /// Verifies long tile names stay inside the cell instead of painting over neighbors.
         /// </summary>
         [AvaloniaFact]
@@ -950,6 +981,22 @@ namespace Mfr.Tests.Ui.FileList
                 .FirstOrDefault(item => item.Name == "ThumbnailSquare");
             Assert.NotNull(square);
             return square;
+        }
+
+        private sealed class RecordingShellOpener : IFileShellOpener
+        {
+            public List<string> ShownProperties { get; } = [];
+
+            public void OpenWithDefaultApp(string path) { }
+
+            public void RevealInFileManager(string path) { }
+
+            public void OpenFolderInFileManager(string folderPath) { }
+
+            public void ShowProperties(string path)
+            {
+                ShownProperties.Add(path);
+            }
         }
     }
 }

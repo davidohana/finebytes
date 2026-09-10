@@ -326,7 +326,7 @@ ______________________________________________________________________
 
 ## Phase 6 — File List services + UI (done)
 
-**Scope:** `Mfr.App.Ui/ViewModels/FileList/`, `Views/FileList/`, `Services/FileList/`; matching `Mfr.Tests/Ui/FileList/` (+ Thumbnails / `RenameListAddSourceResolver` bridge). Explore used for cross-file twins ([File List twins](7aa8d555-fbca-4f79-bfc0-860f2f58892c)). `debts.md` shell ops (Cut/Copy/Paste/Delete, Properties) — **still accurate**, not implemented.
+**Scope:** `Mfr.App.Ui/ViewModels/FileList/`, `Views/FileList/`, `Services/FileList/`; matching `Mfr.Tests/Ui/FileList/` (+ Thumbnails / `RenameListAddSourceResolver` bridge). Explore used for cross-file twins ([File List twins](7aa8d555-fbca-4f79-bfc0-860f2f58892c)). `debts.md` shell ops: Cut/Copy/Paste/Delete still deferred; **Properties shipped** (shell verb via `IFileShellOpener`, see rename-list 14e).
 
 **Verdict:** File List is coherent — single browse resolver (`FileListCatalog.TryResolvePath`), breadcrumb policy in `FileListPath`, Views → VM → Services clean, no second catalog in UI. Applied sentinel/persistable-folder reuse, path-history cap, thumbnail CTS safety, decode-width ownership, and listing-host dedup. Leftovers are cross-pane DnD twins and optional root-gate / shell-opener unification (Phase 7+). Phase 0 `JpegExifThumbnailReader` L2 move: **skip** (see below).
 
@@ -339,7 +339,7 @@ ______________________________________________________________________
 | Second resolver in UI                      | **None** — navigate / locate / start path all call `FileListCatalog.TryResolvePath`                                                                            |
 | `JpegExifThumbnailReader` vs Metadata EXIF | **Keep in UI** — binary IFD1 thumb for Avalonia decode; ME maps tag fields, does not own preview bytes. Optional L2 move is low value / Avalonia coupling risk |
 | Views → Views (`InternalReorderFormat`)    | **Smell retained** — backlog #23                                                                                                                               |
-| `debts.md` File List context menu          | **Still accurate** — Cut/Copy/Paste/Delete + Properties deferred; view-mode radios intentionally menu-only                                                     |
+| `debts.md` File List context menu          | **Partially shipped** — Properties done (shell); Cut/Copy/Paste/Delete still deferred; view-mode radios intentionally menu-only                                |
 
 ### Applied (high confidence)
 

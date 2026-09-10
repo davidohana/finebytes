@@ -88,22 +88,28 @@ namespace Mfr.App.Ui.Views.FileList
             _WireListBoxDrag(LargeIconsList);
             _WireListBoxDrag(TilesList);
             _WireListBoxDrag(ThumbnailsList);
-            _WireListingHomeEndKeyDown(ReportGrid);
-            _WireListingHomeEndKeyDown(ListViewList);
-            _WireListingHomeEndKeyDown(SmallIconsList);
-            _WireListingHomeEndKeyDown(LargeIconsList);
-            _WireListingHomeEndKeyDown(TilesList);
-            _WireListingHomeEndKeyDown(ThumbnailsList);
+            _WireListingShortcutKeyDown(ReportGrid);
+            _WireListingShortcutKeyDown(ListViewList);
+            _WireListingShortcutKeyDown(SmallIconsList);
+            _WireListingShortcutKeyDown(LargeIconsList);
+            _WireListingShortcutKeyDown(TilesList);
+            _WireListingShortcutKeyDown(ThumbnailsList);
             _WireRenameListDragBackDrop();
         }
 
-        private void _WireListingHomeEndKeyDown(Control host)
+        private void _WireListingShortcutKeyDown(Control host)
         {
-            host.AddHandler(KeyDownEvent, _OnListingHomeEndKeyDown, RoutingStrategies.Tunnel);
+            host.AddHandler(KeyDownEvent, _OnListingShortcutKeyDown, RoutingStrategies.Tunnel);
         }
 
-        private void _OnListingHomeEndKeyDown(object? sender, KeyEventArgs e)
+        private void _OnListingShortcutKeyDown(object? sender, KeyEventArgs e)
         {
+            // Tunnel so DataGrid / ListBox do not swallow Alt+Enter or Home/End first.
+            if (_TryHandleShowProperties(e))
+            {
+                return;
+            }
+
             _ = _TryHandleHomeEndNavigation(sender, e);
         }
 
@@ -743,11 +749,6 @@ namespace Mfr.App.Ui.Views.FileList
         private void _OnEntriesKeyDown(object? sender, KeyEventArgs e)
         {
             if (_TryHandleThumbnailZoomKeys(e))
-            {
-                return;
-            }
-
-            if (_TryHandleShowProperties(e))
             {
                 return;
             }

@@ -266,7 +266,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _shellOpener.ShowProperties(_selectedEntries[0].EngineItem.Original.FullPath);
+            var entry = _GetFocusedSelectedEntry();
+            if (entry is null)
+            {
+                return;
+            }
+
+            _shellOpener.ShowProperties(entry.EngineItem.Original.FullPath);
         }
     }
 }
