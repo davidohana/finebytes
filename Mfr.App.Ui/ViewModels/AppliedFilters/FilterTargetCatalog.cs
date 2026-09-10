@@ -1,5 +1,6 @@
 using Mfr.Filters;
 using Mfr.Models.Filters;
+using Mfr.Models.Rename;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
@@ -13,20 +14,20 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
     public static class FilterTargetCatalog
     {
         private static readonly FilterTargetGroupOption _fileNameGroup = new(
-            "File Name",
+            PathFieldLabels.FileName,
             [
-                new FilterTargetOption("File Name", new FilePrefixTarget()),
-                new FilterTargetOption("File Extension", new FileExtensionTarget()),
-                new FilterTargetOption("Full File Name", new FileFullNameTarget()),
+                new FilterTargetOption(PathFieldLabels.FileName, new FilePrefixTarget()),
+                new FilterTargetOption(PathFieldLabels.FileExtension, new FileExtensionTarget()),
+                new FilterTargetOption(PathFieldLabels.FullFileName, new FileFullNameTarget()),
             ]
         );
 
         private static readonly FilterTargetGroupOption _pathGroup = new(
             "Path",
             [
-                new FilterTargetOption("Full Path", new FullPathTarget()),
-                new FilterTargetOption("Parent Directory", new ParentDirectoryTarget()),
-                new FilterTargetOption("Parent Folder", new AncestorFolderTarget(1)),
+                new FilterTargetOption(PathFieldLabels.FullPath, new FullPathTarget()),
+                new FilterTargetOption(PathFieldLabels.ParentDirectory, new ParentDirectoryTarget()),
+                new FilterTargetOption(PathFieldLabels.ParentFolder, new AncestorFolderTarget(1)),
             ]
         );
 
@@ -104,7 +105,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             if (target is AncestorFolderTarget ancestor)
             {
-                return ancestor.Level == 1 ? "Parent Folder" : $"Ancestor Folder ({ancestor.Level})";
+                return ancestor.Level == 1 ? PathFieldLabels.ParentFolder : $"Ancestor Folder ({ancestor.Level})";
             }
 
             if (target is Id3v2FrameTarget frame)

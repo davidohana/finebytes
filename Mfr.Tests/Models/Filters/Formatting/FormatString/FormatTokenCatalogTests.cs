@@ -1,4 +1,5 @@
 using Mfr.Filters.Formatting.FormatString;
+using Mfr.Models.Rename;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.Tags;
 
@@ -95,7 +96,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
 
         /// <summary>
         /// Verifies every <c>Audio\\Tag</c> token maps to a semantic field and uses
-        /// <see cref="SemanticAudioFieldLabels"/>.
+        /// <see cref="SemanticAudioFieldLabels"/> (resolved at catalog build, not from attribute text).
         /// </summary>
         [Fact]
         public void Audio_tag_display_names_match_semantic_labels()
@@ -148,20 +149,45 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         }
 
         /// <summary>
-        /// Verifies <c>file-or-folder</c> uses the same display name as the Rename List File/Folder column.
+        /// Verifies File Name group tokens use <see cref="PathFieldLabels"/> (same as Rename List / Apply-To).
         /// </summary>
-        [Fact]
-        public void File_or_folder_display_name_matches_rename_list_item_type()
+        [Theory]
+        [InlineData("file-name", PathFieldLabels.FileName)]
+        [InlineData("file-extension", PathFieldLabels.FileExtension)]
+        [InlineData("full-name", PathFieldLabels.FullFileName)]
+        [InlineData("full-path", PathFieldLabels.FullPath)]
+        [InlineData("full-path-length", PathFieldLabels.FullPathLength)]
+        [InlineData("parent-folder", PathFieldLabels.ParentFolder)]
+        [InlineData("file-or-folder", PathFieldLabels.FileOrFolder)]
+        [InlineData("file-name-length", PathFieldLabels.FileNameLength)]
+        [InlineData("file-name-numeric-value", PathFieldLabels.FileNameNumericValue)]
+        public void File_name_token_display_names_match_path_field_labels(string canonicalName, string label)
         {
-            var renameListLabel = Assert
-                .Single(BasicRenameListFields.All, f => f.PropertyKey == BasicRenameListFields.Key.ItemType)
-                .DisplayName;
             var entry = Assert.Single(
                 FormatTokenCatalog.Entries,
-                e => string.Equals(e.CanonicalName, "file-or-folder", StringComparison.Ordinal)
+                e => string.Equals(e.CanonicalName, canonicalName, StringComparison.Ordinal)
             );
-            Assert.Equal(renameListLabel, entry.DisplayName);
-            Assert.Equal("File/Folder", entry.DisplayName);
+            Assert.Equal(label, entry.DisplayName);
+            Assert.Equal(PathFieldLabels.FileName, entry.GroupPath);
+        }
+
+        /// <summary>
+        /// Verifies overlapping Rename List basic columns use the same <see cref="PathFieldLabels"/> strings.
+        /// </summary>
+        [Theory]
+        [InlineData(BasicRenameListFields.Key.ItemType, PathFieldLabels.FileOrFolder)]
+        [InlineData(BasicRenameListFields.Key.Folder, PathFieldLabels.ParentDirectory)]
+        [InlineData(BasicRenameListFields.Key.FullName, PathFieldLabels.FullFileName)]
+        [InlineData(BasicRenameListFields.Key.FullPath, PathFieldLabels.FullPath)]
+        [InlineData(BasicRenameListFields.Key.Name, PathFieldLabels.FileName)]
+        [InlineData(BasicRenameListFields.Key.Extension, PathFieldLabels.FileExtension)]
+        [InlineData(BasicRenameListFields.Key.FileNameNumeric, PathFieldLabels.FileNameNumericValue)]
+        [InlineData(BasicRenameListFields.Key.FileNameLength, PathFieldLabels.FileNameLength)]
+        [InlineData(BasicRenameListFields.Key.FullPathLength, PathFieldLabels.FullPathLength)]
+        public void Basic_rename_list_display_names_use_path_field_labels(string propertyKey, string label)
+        {
+            var field = Assert.Single(BasicRenameListFields.All, f => f.PropertyKey == propertyKey);
+            Assert.Equal(label, field.DisplayName);
         }
     }
 }

@@ -1,5 +1,6 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
 {
@@ -13,7 +14,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors
         /// </summary>
         /// <param name="args">Optional level argument.</param>
         public ParentFolderFormatTokenEditorViewModel(string? args)
-            : base("Parent Folder", "parent-folder")
+            : base(PathFieldLabels.ParentFolder, "parent-folder")
         {
             if (
                 !string.IsNullOrWhiteSpace(args)

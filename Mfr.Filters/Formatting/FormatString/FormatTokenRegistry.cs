@@ -1,5 +1,7 @@
 using System.Reflection;
 using Mfr.Filters.Formatting.Tokens;
+using Mfr.Filters.Formatting.Tokens.Audio;
+using Mfr.Models.Tags;
 
 namespace Mfr.Filters.Formatting.FormatString
 {
@@ -56,7 +58,7 @@ namespace Mfr.Filters.Formatting.FormatString
                 var canonicalName = token.Names[0];
                 catalog.Add(
                     new FormatTokenCatalogEntry(
-                        DisplayName: info.DisplayName,
+                        DisplayName: _ResolveCatalogDisplayName(token, info, tokenType),
                         GroupPath: info.Group,
                         ShortDescription: info.ShortDescription,
                         InsertText: "<" + info.Initial + ">",
@@ -79,6 +81,31 @@ namespace Mfr.Filters.Formatting.FormatString
             );
 
             return new RegistryData(nameToToken, [.. catalog]);
+        }
+
+        /// <summary>
+        /// Resolves the picker label: semantic audio tokens use <see cref="SemanticAudioFieldLabels"/>;
+        /// others require a non-empty <see cref="FormatTokenInfoAttribute.DisplayName"/>.
+        /// </summary>
+        private static string _ResolveCatalogDisplayName(
+            IFormatToken token,
+            FormatTokenInfoAttribute info,
+            Type tokenType
+        )
+        {
+            if (token is SemanticAudioFieldTokenBase audio)
+            {
+                return SemanticAudioFieldLabels.For(audio.Field);
+            }
+
+            if (string.IsNullOrEmpty(info.DisplayName))
+            {
+                throw new InvalidOperationException(
+                    $"Format token type '{tokenType.FullName}' has no DisplayName and no shared label owner."
+                );
+            }
+
+            return info.DisplayName;
         }
 
         private sealed record RegistryData(

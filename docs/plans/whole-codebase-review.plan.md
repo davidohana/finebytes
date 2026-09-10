@@ -384,7 +384,7 @@ ______________________________________________________________________
 | Services → Views                     | **Clean**                                                                                   |
 | File List → Rename List Views import | **Was smell; fixed** — `RenameListDragFormats` under `Views/DragAndDrop`                    |
 | Domain policy in UI                  | **Clean** — add expansion stays in Engine; UI only maps rows→sources                        |
-| Second resolver / label maps         | **Done** — shared `SemanticAudioFieldLabels` + path label pass (#5)                         |
+| Second resolver / label maps         | **Done** — `SemanticAudioFieldLabels` + `PathFieldLabels`; Format catalog resolves audio labels at build |
 | Open feature phases 14b–16           | **Untouched**                                                                               |
 
 ### Applied (high confidence)
@@ -611,6 +611,10 @@ Suggested order if chasing correctness only: optionally #10 / #15 / #9 (Open —
 
 1. **Shared Apply-To / Rename List / Picard display labels** (was #5) — **done**
    `SemanticAudioFieldLabels` (+ Picard TXXX from `AudioCatalogFieldMaps`); path trio: Parent Directory = absolute dir, Parent Folder = ancestor segment; File Name / File Extension / Full Path / Full Path Length; Artist/Album Artist/Composer/Genre/BPM; MusicBrainz Album* / ASIN / MusicIP PUID
+1. **Shared path-label constants** — **done**
+   `PathFieldLabels` (Models) owns File Name / Extension / Full File Name / Full Path / Full Path Length / Parent Directory / Parent Folder / File/Folder / lengths / numeric; Apply-To + Rename List Basic + Format File Name tokens reference the consts
+1. **Runtime Format token display names for semantic audio** — **done**
+   `FormatTokenRegistry` resolves Audio\Tag picker labels via `SemanticAudioFieldLabels.For` on `SemanticAudioFieldTokenBase.Field`; `[FormatTokenInfo]` display name is `null` for those tokens (no duplicated literals)
 1. **Sentence-initial uppercasing twin** (was #7) — **done**
    `SentenceInitialCasing.UppercaseInitials` shared by LettersCase sentence mode + CasingList; Unicode `IsLetter` + scan-past non-letters; sentence-end requires word separator (LettersCase rule)
 1. **Wire catalog maps to existing key constants** (was #20) — **done**

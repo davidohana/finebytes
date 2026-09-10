@@ -61,7 +61,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     internal sealed class BasicItemTypeField()
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.ItemType,
-            displayName: "File/Folder",
+            displayName: PathFieldLabels.FileOrFolder,
             supportsPreview: false
         )
     {
@@ -80,7 +80,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     internal sealed class BasicFolderField()
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.Folder,
-            displayName: "Parent Directory",
+            displayName: PathFieldLabels.ParentDirectory,
             defaultWidth: 240
         )
     {
@@ -99,7 +99,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     internal sealed class BasicFullNameField()
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FullName,
-            displayName: "Full File Name",
+            displayName: PathFieldLabels.FullFileName,
             defaultWidth: 180
         )
     {
@@ -118,7 +118,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     internal sealed class BasicFullPathField()
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FullPath,
-            displayName: "Full Path",
+            displayName: PathFieldLabels.FullPath,
             defaultWidth: 180
         )
     {
@@ -135,7 +135,11 @@ namespace Mfr.Models.RenameList.Fields.Basic
     }
 
     internal sealed class BasicNameField()
-        : BasicRenameListField(propertyKey: BasicRenameListFields.Key.Name, displayName: "File Name", defaultWidth: 150)
+        : BasicRenameListField(
+            propertyKey: BasicRenameListFields.Key.Name,
+            displayName: PathFieldLabels.FileName,
+            defaultWidth: 150
+        )
     {
         public override string Resolve(FileMeta meta)
         {
@@ -150,7 +154,10 @@ namespace Mfr.Models.RenameList.Fields.Basic
     }
 
     internal sealed class BasicExtensionField()
-        : BasicRenameListField(propertyKey: BasicRenameListFields.Key.Extension, displayName: "File Extension")
+        : BasicRenameListField(
+            propertyKey: BasicRenameListFields.Key.Extension,
+            displayName: PathFieldLabels.FileExtension
+        )
     {
         public override string Resolve(FileMeta meta)
         {
@@ -167,7 +174,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     internal sealed class BasicFileNameNumericField()
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FileNameNumeric,
-            displayName: "File Name Numeric Value",
+            displayName: PathFieldLabels.FileNameNumericValue,
             supportsPreview: false
         )
     {
@@ -184,7 +191,10 @@ namespace Mfr.Models.RenameList.Fields.Basic
     }
 
     internal sealed class BasicFileNameLengthField()
-        : BasicRenameListField(propertyKey: BasicRenameListFields.Key.FileNameLength, displayName: "File Name Length")
+        : BasicRenameListField(
+            propertyKey: BasicRenameListFields.Key.FileNameLength,
+            displayName: PathFieldLabels.FileNameLength
+        )
     {
         public override string Resolve(FileMeta meta)
         {
@@ -201,7 +211,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
     internal sealed class BasicFullPathLengthField()
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FullPathLength,
-            displayName: "Full Path Length"
+            displayName: PathFieldLabels.FullPathLength
         )
     {
         public override string Resolve(FileMeta meta)

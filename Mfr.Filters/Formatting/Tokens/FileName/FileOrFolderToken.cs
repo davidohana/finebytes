@@ -5,7 +5,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// <summary>
     /// Resolves the <c>&lt;file-or-folder&gt;</c> token to <c>File</c> or <c>Folder</c> from original attributes.
     /// </summary>
-    [FormatTokenInfo("File/Folder", "File Name", "Whether the item is a file or a folder", "file-or-folder")]
+    [FormatTokenInfo(
+        PathFieldLabels.FileOrFolder,
+        PathFieldLabels.FileName,
+        "Whether the item is a file or a folder",
+        "file-or-folder"
+    )]
     internal sealed class FileOrFolderToken : IFormatToken
     {
         /// <inheritdoc />

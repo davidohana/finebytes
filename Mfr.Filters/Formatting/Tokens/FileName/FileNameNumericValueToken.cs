@@ -13,8 +13,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// </para>
     /// </remarks>
     [FormatTokenInfo(
-        "File Name Numeric Value",
-        "File Name",
+        PathFieldLabels.FileNameNumericValue,
+        PathFieldLabels.FileName,
         "First digit run in the full name (zeros stripped)",
         "file-name-numeric-value"
     )]

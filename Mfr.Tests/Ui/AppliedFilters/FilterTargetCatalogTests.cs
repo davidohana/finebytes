@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.Models.Rename;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
@@ -136,6 +137,26 @@ namespace Mfr.Tests.Ui.AppliedFilters
             );
             Assert.Equal("Description", FilterTargetCatalog.GetLabel(new XiphFieldTarget("DESCRIPTION")));
             Assert.Equal("Tempo", FilterTargetCatalog.GetLabel(new XiphFieldTarget("TEMPO")));
+        }
+
+        /// <summary>
+        /// Verifies Apply-To File Name / Path options use <see cref="PathFieldLabels"/>.
+        /// </summary>
+        [Fact]
+        public void File_name_and_path_options_use_path_field_labels()
+        {
+            var fileNameGroup = FilterTargetCatalog.Groups.First(g => g.Label == PathFieldLabels.FileName);
+            Assert.Equal(
+                [PathFieldLabels.FileName, PathFieldLabels.FileExtension, PathFieldLabels.FullFileName],
+                fileNameGroup.Targets.Select(t => t.Label)
+            );
+
+            var pathGroup = FilterTargetCatalog.Groups.First(g => g.Label == "Path");
+            Assert.Equal(
+                [PathFieldLabels.FullPath, PathFieldLabels.ParentDirectory, PathFieldLabels.ParentFolder],
+                pathGroup.Targets.Select(t => t.Label)
+            );
+            Assert.Equal(PathFieldLabels.ParentFolder, FilterTargetCatalog.GetLabel(new AncestorFolderTarget(1)));
         }
 
         private sealed record UnknownFilterTarget : FilterTarget;

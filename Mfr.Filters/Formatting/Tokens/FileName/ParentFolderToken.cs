@@ -14,8 +14,8 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// </para>
     /// </remarks>
     [FormatTokenInfo(
-        "Parent Folder",
-        "File Name",
+        PathFieldLabels.ParentFolder,
+        PathFieldLabels.FileName,
         "Use a parent folder name in which the file is located",
         "parent-folder"
     )]

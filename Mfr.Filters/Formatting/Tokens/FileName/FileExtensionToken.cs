@@ -3,7 +3,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
     /// <summary>
     /// Resolves the <c>&lt;file-extension&gt;</c> and <c>&lt;ext&gt;</c> tokens to the preview extension (without leading dot).
     /// </summary>
-    [FormatTokenInfo("File Extension", "File Name", "Use the filename extension", "file-extension")]
+    [FormatTokenInfo(
+        PathFieldLabels.FileExtension,
+        PathFieldLabels.FileName,
+        "Use the filename extension",
+        "file-extension"
+    )]
     internal sealed class FileExtensionToken : IFormatToken
     {
         /// <inheritdoc />
