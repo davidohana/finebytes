@@ -6,7 +6,12 @@ namespace Mfr.Tests.Architecture
     /// Verifies <c>Mfr.App.Ui/Services</c> does not depend on ViewModels or Views.
     /// </summary>
     /// <remarks>
-    /// Target flow inside the UI project: Views → ViewModels → Services → Engine / Models / Utils.
+    /// <para>Target flow inside the UI project: Views → ViewModels → Services → Engine / Models / Utils.</para>
+    /// <para>
+    /// Views→Services shortcuts (MainWindow session grids, PathMover folder picker, File List address-bar
+    /// segments, Rename List add-source checks) are intentional glue — see
+    /// <c>docs/mfr-folder-layering.md</c>. Do not add a blanket Views↛Services forbid without an allowlist.
+    /// </para>
     /// </remarks>
     public sealed class UiServicesLayerArchitectureTests
     {

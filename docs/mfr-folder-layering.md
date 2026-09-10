@@ -45,3 +45,20 @@ Inside [`Mfr.App.Ui/`](../Mfr.App.Ui), keep dependencies one-way:
 `Views → ViewModels → Services → Engine / Models / Utils`
 
 Do not import `ViewModels` (or Views) from `Services`. Session restore/save passes snapshot DTOs across that boundary (`FileListSessionSnapshot`); apply/capture lives on the File List view model. Guarded by `UiServicesLayerArchitectureTests`.
+
+ViewModels must not import Views. Guarded by `UiViewModelsLayerArchitectureTests`.
+
+### Views → Services (intentional glue)
+
+Views may call into `Services` for thin platform / session glue. That edge is **allowed** and is **not** gated by a blanket architecture forbid — forcing every call through a ViewModel wrapper would add indirection without clearer ownership. Do not add a Views↛Services forbid test without an explicit allowlist of the cases below (or a deliberate redesign).
+
+Current code-behind / AXAML consumers (verify with `using Mfr.App.Ui.Services` under `Views/`):
+
+| Site                                       | Service surface                                       | Why                                                                               |
+| ------------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `MainWindow`                               | `Services.Session` (`MainWindowPaneGrids`)            | Session splitter restore/capture needs named pane grids from the window           |
+| `PathMoverFilterEditorView`                | `Services.FolderPicker`                               | Folder picker needs a visual root; VM gets an injected async delegate             |
+| `FileListView`                             | `Services.RenameList` (`RenameListAddSourceResolver`) | DnD / Add-Selected path validation shared with Rename List add                    |
+| `FileListAddressBarView` (+ AXAML `xmlns`) | `Services.FileList` (`PathBreadcrumbSegment`)         | Breadcrumb overflow UI binds the same segment type as the File List service model |
+
+`Views/DragAndDrop/` helpers do not currently import Services; keep new DnD format / path helpers in Views or Services deliberately, and extend this table if a View starts using Services there.

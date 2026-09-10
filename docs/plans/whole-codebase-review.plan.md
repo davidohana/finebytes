@@ -114,13 +114,13 @@ Ui also refs Filters directly (catalog/editors). Cli does not. Engine + Filters 
 
 ### Deferred (later phases / backlog)
 
-| Item                                                                      | Why defer                                                                             |
-| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Models JSON/FS I/O (`ConfigStore`, `SessionStore`, `RenameResultSummary`) | Ownership smell, not a layer violation; **kept in Phase 5** (AppData/DTO co-location) |
-| `RenameListFieldDisplay` directory scan for folder file-count             | Domain field resolve; Phase 7 if touched                                              |
-| `JpegExifThumbnailReader` hand-rolled EXIF in UI Services                 | **Resolved Phase 6 — keep in UI** (ME does not own thumb bytes; L2 move low value)    |
-| Fuller UI DAG tests (Views↛Services shortcuts, VM↛Views)                  | **Partial Phase 9** — VM↛Views gated; Views→Services left open (intentional glue)     |
-| Forbidden-using / package-ownership arch tests for lower layers           | **Done Phase 9** — TagLibSharp/MetadataExtractor PackageReference ownership gated     |
+| Item                                                                      | Why defer                                                                                               |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Models JSON/FS I/O (`ConfigStore`, `SessionStore`, `RenameResultSummary`) | Ownership smell, not a layer violation; **kept in Phase 5** (AppData/DTO co-location)                   |
+| `RenameListFieldDisplay` directory scan for folder file-count             | Domain field resolve; Phase 7 if touched                                                                |
+| `JpegExifThumbnailReader` hand-rolled EXIF in UI Services                 | **Resolved Phase 6 — keep in UI** (ME does not own thumb bytes; L2 move low value)                      |
+| Fuller UI DAG tests (Views↛Services shortcuts, VM↛Views)                  | **Done** — VM↛Views gated (Phase 9); Views→Services documented intentional glue (no forbid; #32 closed) |
+| Forbidden-using / package-ownership arch tests for lower layers           | **Done Phase 9** — TagLibSharp/MetadataExtractor PackageReference ownership gated                       |
 
 ### Phase 0 exit
 
@@ -466,14 +466,14 @@ ______________________________________________________________________
 
 ### Architecture (lightweight)
 
-| Check                                     | Verdict                                                                                                                                                   |
-| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Project refs vs layering                  | **Healthy** — Cli → Engine/Models/Utils only; no Filters direct ref (catalog via Engine presets)                                                          |
-| TagLib / MetadataExtractor package owners | **Gated** — `PackageOwnershipArchitectureTests` (Metadata + Tests fixtures)                                                                               |
-| UI Services → ViewModels/Views            | **Clean** (existing)                                                                                                                                      |
-| UI ViewModels → Views                     | **Gated** — `UiViewModelsLayerArchitectureTests`                                                                                                          |
-| UI Views → Services shortcuts             | **Keep** — MainWindow session, PathMover folder picker, File List DnD formats are intentional view glue; do not forbid without an allowlist (backlog #32) |
-| Phase 0 deferred arch items               | Package ownership **done**; VM↛Views **done**; Views↛Services **deferred** as low-value strictness                                                        |
+| Check                                     | Verdict                                                                                                    |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| Project refs vs layering                  | **Healthy** — Cli → Engine/Models/Utils only; no Filters direct ref (catalog via Engine presets)           |
+| TagLib / MetadataExtractor package owners | **Gated** — `PackageOwnershipArchitectureTests` (Metadata + Tests fixtures)                                |
+| UI Services → ViewModels/Views            | **Clean** (existing)                                                                                       |
+| UI ViewModels → Views                     | **Gated** — `UiViewModelsLayerArchitectureTests`                                                           |
+| UI Views → Services shortcuts             | **Keep** — documented in `docs/mfr-folder-layering.md` + arch-test remarks; no blanket forbid (#32 closed) |
+| Phase 0 deferred arch items               | Package ownership **done**; VM↛Views **done**; Views→Services **documented** (#32 closed; no forbid)       |
 
 ### Applied (high confidence)
 
@@ -493,7 +493,7 @@ ______________________________________________________________________
 
 ### Deeper refactors (promoted / updated)
 
-See backlog: **#28 done**; Phase 0 package + VM↛Views **done**; **#32** Views→Services allowlist deferred; remaining open items re-ranked by correctness mandate (do / should / do not).
+See backlog: **#28 done**; Phase 0 package + VM↛Views **done**; **#32** Views→Services documented intentional glue (no forbid test); remaining open items re-ranked by correctness mandate (do / should / do not).
 
 ### Phase 9 exit
 
@@ -562,13 +562,6 @@ _(empty)_
    Cost: medium churn in one large file
    Rank: **skip** — naming only
 
-1. **Views→Services DAG allowlist / gate** (new #32)
-   Sites: MainWindow, PathMover editor, FileListView, FileListAddressBarView
-   Target: document allowed Services usings from Views, or thin VM wrappers — **do not** blanket-forbid
-   Value: clearer UI DAG story
-   Cost: medium if forcing VM indirection for session/DnD glue
-   Rank: **skip** — unless Views→Services sprawl grows
-
 1. **Collapse `TagBlocksStructurallyEquals` onto `Equals`** (was #19)
    Sites: AudioTagOverlay; RenamePropertyChangeBuilder
    Target: keep `Equals` only, or obsolete the long alias
@@ -628,6 +621,11 @@ _(empty)_
 1. **FilterPalette group toolbar vs `FilterGroup` exhaustiveness** — **done Phase 9**
 1. **TagLib/ME package-ownership arch test** — **done Phase 9**
 1. **ViewModels↛Views arch test** — **done Phase 9**
+1. **Views→Services DAG allowlist / gate** (was #32) — **done** (documented / deferred-closed)
+   Intentional glue recorded in `docs/mfr-folder-layering.md` (allowlist table) and remarks on
+   `UiServicesLayerArchitectureTests` / `UiViewModelsLayerArchitectureTests`; **no** blanket Views↛Services
+   forbid test. Sites: MainWindow session grids, PathMover `FolderPicker`, FileListView add-source resolver,
+   FileListAddressBar breadcrumb segments; DragAndDrop helpers do not import Services today.
 
 ______________________________________________________________________
 
