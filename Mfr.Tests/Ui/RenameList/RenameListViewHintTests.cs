@@ -37,7 +37,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Contains(
                 target.FullFileName,
-                renameListViewModel.CellStatusHintDisplay.ToPlainText(),
+                renameListViewModel.CellStatusHint.ToPlainText(),
                 StringComparison.Ordinal
             );
 
@@ -66,11 +66,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             _ClickFullFileNameCell(window, grid, renameListViewModel.Entries[deleteIndex]);
-            Assert.Contains(
-                deletedName,
-                renameListViewModel.CellStatusHintDisplay.ToPlainText(),
-                StringComparison.Ordinal
-            );
+            Assert.Contains(deletedName, renameListViewModel.CellStatusHint.ToPlainText(), StringComparison.Ordinal);
 
             grid.Focus();
             window.KeyPress(Key.Delete, RawInputModifiers.None, PhysicalKey.Delete, "\u007f");
@@ -84,7 +80,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(29, renameListViewModel.Entries.Count);
             Assert.Equal(expectedName, renameListViewModel.SelectedEntries[0].FullFileName);
-            var hint = renameListViewModel.CellStatusHintDisplay.ToPlainText();
+            var hint = renameListViewModel.CellStatusHint.ToPlainText();
             Assert.Contains(expectedName, hint, StringComparison.Ordinal);
             Assert.DoesNotContain(deletedName, hint, StringComparison.Ordinal);
 
@@ -104,14 +100,14 @@ namespace Mfr.Tests.Ui.RenameList
             _ClickFullFileNameCell(window, grid, selected);
             Assert.Contains(
                 selected.FullFileName,
-                renameListViewModel.CellStatusHintDisplay.ToPlainText(),
+                renameListViewModel.CellStatusHint.ToPlainText(),
                 StringComparison.Ordinal
             );
 
             _MoveOverFullFileNameCell(window, grid, other);
             Dispatcher.UIThread.RunJobs();
 
-            var hint = renameListViewModel.CellStatusHintDisplay.ToPlainText();
+            var hint = renameListViewModel.CellStatusHint.ToPlainText();
             Assert.Contains(selected.FullFileName, hint, StringComparison.Ordinal);
             Assert.DoesNotContain(other.FullFileName, hint, StringComparison.Ordinal);
 

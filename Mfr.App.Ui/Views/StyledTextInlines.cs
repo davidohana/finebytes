@@ -7,9 +7,9 @@ using Mfr.App.Ui.ViewModels;
 namespace Mfr.App.Ui.Views
 {
     /// <summary>
-    /// Applies <see cref="StatusHintDisplay"/> runs onto a <see cref="TextBlock"/>.
+    /// Applies <see cref="StyledTextDisplay"/> runs onto a <see cref="TextBlock"/>.
     /// </summary>
-    internal static class StatusHintInlines
+    internal static class StyledTextInlines
     {
         /// <summary>
         /// Clears <paramref name="target"/> and adds styled inlines for <paramref name="display"/>.
@@ -19,7 +19,7 @@ namespace Mfr.App.Ui.Views
         /// </param>
         /// <param name="target">Text block that receives the inlines.</param>
         /// <param name="display">Styled runs to render.</param>
-        public static void Apply(StyledElement resourceHost, TextBlock target, StatusHintDisplay display)
+        public static void Apply(StyledElement resourceHost, TextBlock target, StyledTextDisplay display)
         {
             ArgumentNullException.ThrowIfNull(resourceHost);
             ArgumentNullException.ThrowIfNull(target);

@@ -472,7 +472,7 @@ namespace Mfr.App.Ui.Views.RenameList
             if (entry is null || column is null)
             {
                 _viewModel.SetFocusedFieldKey(null);
-                _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
+                _viewModel.CellStatusHint = StyledTextDisplay.Empty;
                 return;
             }
 
@@ -480,7 +480,7 @@ namespace Mfr.App.Ui.Views.RenameList
             if (fieldKey is null)
             {
                 _viewModel.SetFocusedFieldKey(null);
-                _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
+                _viewModel.CellStatusHint = StyledTextDisplay.Empty;
                 return;
             }
 
@@ -488,7 +488,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (!RenameListFieldCatalog.TryGetField(fieldKey.Value, out var field))
             {
-                _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
+                _viewModel.CellStatusHint = StyledTextDisplay.Empty;
                 return;
             }
 
@@ -496,7 +496,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (entry.IsMissingFromDisk)
             {
-                _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatLoadError(
+                _viewModel.CellStatusHint = RenameListCellHint.FormatLoadError(
                     field.DisplayName,
                     RenameListDiskPaths.MissingUserExplanation
                 );
@@ -506,10 +506,7 @@ namespace Mfr.App.Ui.Views.RenameList
             if (entry.IsLoadError(fieldKey.Value))
             {
                 var userExplanation = RenameListFieldCatalog.DescribeLoadError(entry.EngineItem, fieldKey.Value);
-                _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatLoadError(
-                    field.DisplayName,
-                    userExplanation
-                );
+                _viewModel.CellStatusHint = RenameListCellHint.FormatLoadError(field.DisplayName, userExplanation);
                 return;
             }
 
@@ -519,7 +516,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 cellText = $"{RenameListCellHint.PreviewErrorMarker} {cellText}";
             }
 
-            _viewModel.CellStatusHintDisplay = RenameListCellHint.FormatParts(field.DisplayName, cellText);
+            _viewModel.CellStatusHint = RenameListCellHint.FormatParts(field.DisplayName, cellText);
         }
 
         private void _OnDragOver(object? sender, DragEventArgs e)

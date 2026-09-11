@@ -1,22 +1,22 @@
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// Rich-text hint content as one or more styled text runs (status bar, dialogs, and similar).
+    /// Rich text as one or more styled runs (status bar, dialogs, and similar).
     /// </summary>
-    public sealed class StatusHintDisplay
+    public sealed class StyledTextDisplay
     {
-        private static readonly StatusHintRun[] EmptyRuns = [];
+        private static readonly StyledTextRun[] EmptyRuns = [];
 
         /// <summary>
-        /// Gets an empty hint.
+        /// Gets empty content.
         /// </summary>
-        public static StatusHintDisplay Empty { get; } = new(EmptyRuns);
+        public static StyledTextDisplay Empty { get; } = new(EmptyRuns);
 
         /// <summary>
-        /// Initializes a hint from styled runs.
+        /// Initializes content from styled runs.
         /// </summary>
         /// <param name="runs">Ordered segments to render.</param>
-        public StatusHintDisplay(IReadOnlyList<StatusHintRun> runs)
+        public StyledTextDisplay(IReadOnlyList<StyledTextRun> runs)
         {
             ArgumentNullException.ThrowIfNull(runs);
             Runs = runs;
@@ -25,41 +25,41 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Gets the styled segments to render left-to-right.
         /// </summary>
-        public IReadOnlyList<StatusHintRun> Runs { get; }
+        public IReadOnlyList<StyledTextRun> Runs { get; }
 
         /// <summary>
-        /// Gets whether the hint has no visible content.
+        /// Gets whether there is no visible content.
         /// </summary>
         public bool IsEmpty => Runs.Count == 0;
 
         /// <summary>
-        /// Builds a single-run hint with default styling.
+        /// Builds single-run content with default styling.
         /// </summary>
         /// <param name="text">Message to show.</param>
-        /// <returns>Plain hint display.</returns>
-        public static StatusHintDisplay FromPlain(string text)
+        /// <returns>Plain styled text.</returns>
+        public static StyledTextDisplay FromPlain(string text)
         {
             if (string.IsNullOrEmpty(text))
             {
                 return Empty;
             }
 
-            return new StatusHintDisplay([new StatusHintRun(text)]);
+            return new StyledTextDisplay([new StyledTextRun(text)]);
         }
 
         /// <summary>
-        /// Builds a hint from explicit runs.
+        /// Builds content from explicit runs.
         /// </summary>
         /// <param name="runs">Ordered segments to render.</param>
-        /// <returns>Rich hint display.</returns>
-        public static StatusHintDisplay FromRuns(params StatusHintRun[] runs)
+        /// <returns>Rich styled text.</returns>
+        public static StyledTextDisplay FromRuns(params StyledTextRun[] runs)
         {
             if (runs.Length == 0)
             {
                 return Empty;
             }
 
-            return new StatusHintDisplay(runs);
+            return new StyledTextDisplay(runs);
         }
 
         /// <summary>

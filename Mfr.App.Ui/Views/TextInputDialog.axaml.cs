@@ -40,10 +40,10 @@ namespace Mfr.App.Ui.Views
             base.OnOpened(e);
             if (_prompt is not null)
             {
-                StatusHintInlines.Apply(this, PromptText, _prompt.Prompt);
+                StyledTextInlines.Apply(this, PromptText, _prompt.Prompt);
                 if (_prompt.Note is { IsEmpty: false } note)
                 {
-                    StatusHintInlines.Apply(this, NoteText, note);
+                    StyledTextInlines.Apply(this, NoteText, note);
                 }
             }
 

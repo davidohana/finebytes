@@ -70,34 +70,30 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var defaultValue = eligible[0].GetFieldText(key);
-            var sideLabel = key.IsPreview
-                ? "final value (after filters)"
-                : "initial value (before filters)";
+            var sideLabel = key.IsPreview ? "final value (after filters)" : "initial value (before filters)";
             var fieldLabel =
-                eligible.Count > 1
-                    ? $"'{field.DisplayName}' in {eligible.Count} items"
-                    : $"'{field.DisplayName}'";
+                eligible.Count > 1 ? $"'{field.DisplayName}' in {eligible.Count} items" : $"'{field.DisplayName}'";
             var prompt = new TextInputPrompt
             {
                 Title = "Manual Set Value",
                 DefaultValue = defaultValue,
-                Prompt = StatusHintDisplay.FromRuns(
-                    new StatusHintRun("Set the "),
-                    new StatusHintRun(sideLabel) { FontWeight = FontWeight.Bold },
-                    new StatusHintRun(" of the field "),
-                    new StatusHintRun(fieldLabel) { FontWeight = FontWeight.Bold },
-                    new StatusHintRun(" to:")
+                Prompt = StyledTextDisplay.FromRuns(
+                    new StyledTextRun("Set the "),
+                    new StyledTextRun(sideLabel) { FontWeight = FontWeight.Bold },
+                    new StyledTextRun(" of the field "),
+                    new StyledTextRun(fieldLabel) { FontWeight = FontWeight.Bold },
+                    new StyledTextRun(" to:")
                 ),
-                Note = StatusHintDisplay.FromRuns(
-                    new StatusHintRun("Takes effect in the Rename List now ("),
-                    new StatusHintRun("blue")
+                Note = StyledTextDisplay.FromRuns(
+                    new StyledTextRun("Takes effect in the Rename List now ("),
+                    new StyledTextRun("blue")
                     {
                         FontWeight = FontWeight.Bold,
                         ForegroundResourceKey = "RenameListManualOverrideForegroundBrush",
                     },
-                    new StatusHintRun("). Files are updated when you press "),
-                    new StatusHintRun("Go") { FontWeight = FontWeight.Bold },
-                    new StatusHintRun(".")
+                    new StyledTextRun("). Files are updated when you press "),
+                    new StyledTextRun("Go") { FontWeight = FontWeight.Bold },
+                    new StyledTextRun(".")
                 ),
             };
 

@@ -13,12 +13,12 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Gets the primary prompt above the text box.
         /// </summary>
-        public required StatusHintDisplay Prompt { get; init; }
+        public required StyledTextDisplay Prompt { get; init; }
 
         /// <summary>
         /// Gets an optional secondary note under the primary prompt.
         /// </summary>
-        public StatusHintDisplay? Note { get; init; }
+        public StyledTextDisplay? Note { get; init; }
 
         /// <summary>
         /// Gets the initial text box value.

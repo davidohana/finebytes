@@ -24,19 +24,19 @@ namespace Mfr.Tests.Ui
             {
                 Title = "Manual Set Value",
                 DefaultValue = "alpha.txt",
-                Prompt = StatusHintDisplay.FromRuns(
-                    new StatusHintRun("Set the "),
-                    new StatusHintRun("initial value (before filters)") { FontWeight = FontWeight.Bold },
-                    new StatusHintRun(" to:")
+                Prompt = StyledTextDisplay.FromRuns(
+                    new StyledTextRun("Set the "),
+                    new StyledTextRun("initial value (before filters)") { FontWeight = FontWeight.Bold },
+                    new StyledTextRun(" to:")
                 ),
-                Note = StatusHintDisplay.FromRuns(
-                    new StatusHintRun("Takes effect now ("),
-                    new StatusHintRun("blue")
+                Note = StyledTextDisplay.FromRuns(
+                    new StyledTextRun("Takes effect now ("),
+                    new StyledTextRun("blue")
                     {
                         FontWeight = FontWeight.Bold,
                         ForegroundResourceKey = "RenameListManualOverrideForegroundBrush",
                     },
-                    new StatusHintRun(").")
+                    new StyledTextRun(").")
                 ),
             };
 
@@ -92,7 +92,7 @@ namespace Mfr.Tests.Ui
             {
                 Title = "Prompt",
                 DefaultValue = string.Empty,
-                Prompt = StatusHintDisplay.FromPlain("Enter a value:"),
+                Prompt = StyledTextDisplay.FromPlain("Enter a value:"),
             };
 
             var dialog = new TextInputDialog(prompt);

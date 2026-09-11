@@ -5,33 +5,33 @@ using Mfr.App.Ui.ViewModels;
 namespace Mfr.App.Ui.Views
 {
     /// <summary>
-    /// Renders <see cref="StatusHintDisplay"/> as a single TextBlock with styled inlines.
+    /// Renders <see cref="StyledTextDisplay"/> as a single TextBlock with styled inlines.
     /// </summary>
-    public partial class StatusHintView : UserControl
+    public partial class StyledTextView : UserControl
     {
         /// <summary>
-        /// Defines the <see cref="Hint"/> property.
+        /// Defines the <see cref="Display"/> property.
         /// </summary>
-        public static readonly StyledProperty<StatusHintDisplay?> HintProperty = AvaloniaProperty.Register<
-            StatusHintView,
-            StatusHintDisplay?
-        >(nameof(Hint));
+        public static readonly StyledProperty<StyledTextDisplay?> DisplayProperty = AvaloniaProperty.Register<
+            StyledTextView,
+            StyledTextDisplay?
+        >(nameof(Display));
 
         /// <summary>
-        /// Initializes the status hint view.
+        /// Initializes the styled text view.
         /// </summary>
-        public StatusHintView()
+        public StyledTextView()
         {
             InitializeComponent();
         }
 
         /// <summary>
-        /// Gets or sets the hint to render.
+        /// Gets or sets the rich text to render.
         /// </summary>
-        public StatusHintDisplay? Hint
+        public StyledTextDisplay? Display
         {
-            get => GetValue(HintProperty);
-            set => SetValue(HintProperty, value);
+            get => GetValue(DisplayProperty);
+            set => SetValue(DisplayProperty, value);
         }
 
         /// <inheritdoc />
@@ -39,7 +39,7 @@ namespace Mfr.App.Ui.Views
         {
             base.OnPropertyChanged(change);
 
-            if (change.Property == HintProperty)
+            if (change.Property == DisplayProperty)
             {
                 _RebuildInlines();
             }
@@ -54,14 +54,14 @@ namespace Mfr.App.Ui.Views
 
         private void _RebuildInlines()
         {
-            var hint = Hint;
-            if (hint is null || hint.IsEmpty)
+            var display = Display;
+            if (display is null || display.IsEmpty)
             {
-                HintTextBlock.Inlines?.Clear();
+                DisplayTextBlock.Inlines?.Clear();
                 return;
             }
 
-            StatusHintInlines.Apply(this, HintTextBlock, hint);
+            StyledTextInlines.Apply(this, DisplayTextBlock, display);
         }
     }
 }

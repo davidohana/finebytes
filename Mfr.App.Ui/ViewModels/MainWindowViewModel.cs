@@ -25,7 +25,7 @@ namespace Mfr.App.Ui.ViewModels
 
         private CancellationTokenSource? _statusHintClearCts;
         private string _transientStatusHint = string.Empty;
-        private StatusHintDisplay _paneStatusHintDisplay = StatusHintDisplay.Empty;
+        private StyledTextDisplay _paneStatusHint = StyledTextDisplay.Empty;
         private bool _previewDirty;
         private bool _previewRunning;
         private Task _previewDrainTask = Task.CompletedTask;
@@ -123,7 +123,7 @@ namespace Mfr.App.Ui.ViewModels
         /// Status-bar hint content. Plain text or a rich Rename List cell hint.
         /// </summary>
         [ObservableProperty]
-        private StatusHintDisplay _statusHintDisplay = StatusHintDisplay.Empty;
+        private StyledTextDisplay _statusHint = StyledTextDisplay.Empty;
 
         /// <summary>
         /// Count of items in the rename list.
@@ -285,10 +285,10 @@ namespace Mfr.App.Ui.ViewModels
                 _ShowTransientStatusHint(RenameListViewModel.LastLocateError);
             }
 
-            if (e.PropertyName is nameof(RenameListViewModel.CellStatusHintDisplay))
+            if (e.PropertyName is nameof(RenameListViewModel.CellStatusHint))
             {
-                _paneStatusHintDisplay = RenameListViewModel.CellStatusHintDisplay;
-                _UpdateStatusHintDisplay();
+                _paneStatusHint = RenameListViewModel.CellStatusHint;
+                _UpdateStatusHint();
             }
         }
 
@@ -398,18 +398,18 @@ namespace Mfr.App.Ui.ViewModels
             _statusHintClearCts?.Cancel();
             _statusHintClearCts?.Dispose();
             _transientStatusHint = message;
-            _UpdateStatusHintDisplay();
+            _UpdateStatusHint();
 
             _statusHintClearCts = new CancellationTokenSource();
             var token = _statusHintClearCts.Token;
             _ = _ClearStatusHintAfterDelayAsync(message, token);
         }
 
-        private void _UpdateStatusHintDisplay()
+        private void _UpdateStatusHint()
         {
-            StatusHintDisplay = !string.IsNullOrEmpty(_transientStatusHint)
-                ? StatusHintDisplay.FromPlain(_transientStatusHint)
-                : _paneStatusHintDisplay;
+            StatusHint = !string.IsNullOrEmpty(_transientStatusHint)
+                ? StyledTextDisplay.FromPlain(_transientStatusHint)
+                : _paneStatusHint;
         }
 
         private async Task _ClearStatusHintAfterDelayAsync(string message, CancellationToken token)
@@ -420,7 +420,7 @@ namespace Mfr.App.Ui.ViewModels
                 if (string.Equals(_transientStatusHint, message, StringComparison.Ordinal))
                 {
                     _transientStatusHint = string.Empty;
-                    _UpdateStatusHintDisplay();
+                    _UpdateStatusHint();
                 }
             }
             catch (OperationCanceledException) { }

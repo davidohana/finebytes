@@ -3,13 +3,13 @@ using Avalonia.Media;
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// One styled segment in a rich-text hint (status bar, dialogs, and similar).
+    /// One styled segment in rich text (status bar, dialogs, and similar).
     /// </summary>
     /// <remarks>
     /// Initializes a text run with default styling.
     /// </remarks>
     /// <param name="text">Segment text.</param>
-    public sealed class StatusHintRun(string text)
+    public sealed class StyledTextRun(string text)
     {
         /// <summary>
         /// Gets the segment text.

@@ -192,7 +192,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Status-bar hint for the focused or selected Rename List cell.
         /// </summary>
         [ObservableProperty]
-        private StatusHintDisplay _cellStatusHintDisplay = StatusHintDisplay.Empty;
+        private StyledTextDisplay _cellStatusHint = StyledTextDisplay.Empty;
 
         /// <summary>
         /// Replaces the Rename List selection.

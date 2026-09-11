@@ -18,11 +18,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="columnHeader">Grid column header text.</param>
         /// <param name="cellText">Cell display value.</param>
         /// <returns>Hint shown in the main window status bar.</returns>
-        public static StatusHintDisplay FormatParts(string columnHeader, string cellText)
+        public static StyledTextDisplay FormatParts(string columnHeader, string cellText)
         {
-            return StatusHintDisplay.FromRuns(
-                new StatusHintRun(columnHeader) { FontWeight = FontWeight.Bold },
-                new StatusHintRun($": {cellText}")
+            return StyledTextDisplay.FromRuns(
+                new StyledTextRun(columnHeader) { FontWeight = FontWeight.Bold },
+                new StyledTextRun($": {cellText}")
             );
         }
 
@@ -32,11 +32,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="columnHeader">Grid column header text.</param>
         /// <param name="userExplanation">Plain-language load-failure explanation.</param>
         /// <returns>Hint shown in the main window status bar.</returns>
-        public static StatusHintDisplay FormatLoadError(string columnHeader, string userExplanation)
+        public static StyledTextDisplay FormatLoadError(string columnHeader, string userExplanation)
         {
-            return StatusHintDisplay.FromRuns(
-                new StatusHintRun(columnHeader) { FontWeight = FontWeight.Bold },
-                new StatusHintRun($": Could not read metadata: {userExplanation}")
+            return StyledTextDisplay.FromRuns(
+                new StyledTextRun(columnHeader) { FontWeight = FontWeight.Bold },
+                new StyledTextRun($": Could not read metadata: {userExplanation}")
             );
         }
     }
