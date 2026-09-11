@@ -58,14 +58,16 @@
           <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <TextBlock Text="Name:" VerticalAlignment="Center" Margin="0,0,10,0" />
-        <TextBox
+        <ComboBox
           x:Name="NameBox"
           Grid.Column="1"
-          Text="{Binding Name}"
+          Classes="filter-editor-field"
+          IsEditable="True"
+          HorizontalAlignment="Stretch"
           Height="26"
           MinHeight="26"
-          Padding="6,2"
-          VerticalContentAlignment="Center"
+          ItemsSource="{Binding ExistingNames}"
+          Text="{Binding Name, Mode=TwoWay}"
         />
       </Grid>
       <Grid>

@@ -8,6 +8,8 @@ namespace Mfr.App.Ui.ViewModels.Presets
     /// </summary>
     public sealed partial class SavePresetDialogViewModel : ViewModelBase
     {
+        private readonly IReadOnlyDictionary<string, FilterPreset> _nameToPreset;
+
         /// <summary>
         /// Initializes draft fields, optionally prefilled from the last-loaded preset.
         /// </summary>
@@ -18,12 +20,35 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// When <see langword="true"/> and <paramref name="lastLoaded"/> is set, Update is enabled;
         /// otherwise only Save as new is available.
         /// </param>
-        public SavePresetDialogViewModel(FilterPreset? lastLoaded = null, bool canUpdate = false)
+        /// <param name="existingPresets">
+        /// Current presets for the Name suggestions list; when <see langword="null"/>, suggestions are empty.
+        /// </param>
+        /// <param name="prefillFromLastLoaded">
+        /// When <see langword="true"/> and <paramref name="lastLoaded"/> is set, Name / description /
+        /// columns start from that preset. Pass <see langword="false"/> when Applied Filters is empty
+        /// so the Name field starts blank.
+        /// </param>
+        public SavePresetDialogViewModel(
+            FilterPreset? lastLoaded = null,
+            bool canUpdate = false,
+            IEnumerable<FilterPreset>? existingPresets = null,
+            bool prefillFromLastLoaded = true
+        )
         {
             CanUpdate = canUpdate && lastLoaded is not null;
             OriginalName = lastLoaded?.Name ?? string.Empty;
 
-            if (lastLoaded is null)
+            var presets = existingPresets?.ToList() ?? [];
+            _nameToPreset = presets.ToDictionary(preset => preset.Name, StringComparer.Ordinal);
+            ExistingNames =
+            [
+                .. presets
+                    .Select(preset => preset.Name)
+                    .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
+                    .ThenBy(name => name, StringComparer.Ordinal),
+            ];
+
+            if (lastLoaded is null || !prefillFromLastLoaded)
             {
                 return;
             }
@@ -42,6 +67,11 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// Gets the last-loaded preset name before any edits, or empty when Update is unavailable.
         /// </summary>
         public string OriginalName { get; }
+
+        /// <summary>
+        /// Gets sorted existing preset names for the Name suggestions list.
+        /// </summary>
+        public IReadOnlyList<string> ExistingNames { get; }
 
         /// <summary>
         /// Gets or sets the preset display name.
@@ -88,6 +118,18 @@ namespace Mfr.App.Ui.ViewModels.Presets
                 var trimmed = Description.Trim();
                 return trimmed.Length == 0 ? null : trimmed;
             }
+        }
+
+        partial void OnNameChanged(string value)
+        {
+            var trimmed = value.Trim();
+            if (trimmed.Length == 0 || !_nameToPreset.TryGetValue(trimmed, out var preset))
+            {
+                return;
+            }
+
+            Description = preset.Description ?? string.Empty;
+            SaveRenameListColumns = preset.VisibleColumns is not null;
         }
     }
 }

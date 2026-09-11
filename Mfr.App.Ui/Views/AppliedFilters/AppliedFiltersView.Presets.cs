@@ -187,7 +187,12 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            var dialogVm = new SavePresetDialogViewModel(_viewModel.LastLoaded, canUpdate: _viewModel.CanSavePreset);
+            var dialogVm = new SavePresetDialogViewModel(
+                _viewModel.LastLoaded,
+                canUpdate: _viewModel.CanSavePreset,
+                existingPresets: _viewModel.PresetManager.NameToPreset.Values,
+                prefillFromLastLoaded: _viewModel.Steps.Count > 0
+            );
             var dialog = new SavePresetDialog(dialogVm);
             var choice = await dialog.ShowDialog<SavePresetDialogMode?>(owner);
             if (choice is null)

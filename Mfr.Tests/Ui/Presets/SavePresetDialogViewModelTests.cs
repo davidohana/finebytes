@@ -137,5 +137,103 @@ namespace Mfr.Tests.Ui.Presets
 
             Assert.False(viewModel.SaveRenameListColumns);
         }
+
+        /// <summary>
+        /// Verifies clearing Applied Filters leaves the Name blank even when last-loaded remains.
+        /// </summary>
+        [Fact]
+        public void Empty_Chain_Skips_Prefill_From_LastLoaded()
+        {
+            var lastLoaded = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Rock",
+                Description = "Loud",
+                Chain = new FilterChain { Steps = [] },
+            };
+
+            var viewModel = new SavePresetDialogViewModel(
+                lastLoaded,
+                canUpdate: true,
+                existingPresets: [lastLoaded],
+                prefillFromLastLoaded: false
+            );
+
+            Assert.True(viewModel.CanUpdate);
+            Assert.Equal("Rock", viewModel.OriginalName);
+            Assert.Equal(string.Empty, viewModel.Name);
+            Assert.Equal(string.Empty, viewModel.Description);
+            Assert.False(viewModel.SaveRenameListColumns);
+            Assert.False(viewModel.CanUpdateAction);
+        }
+
+        /// <summary>
+        /// Verifies existing preset names are exposed sorted for the Name suggestions list.
+        /// </summary>
+        [Fact]
+        public void ExistingNames_Are_Sorted()
+        {
+            var presets = new[]
+            {
+                new FilterPreset
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "beta",
+                    Chain = new FilterChain { Steps = [] },
+                },
+                new FilterPreset
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Alpha",
+                    Chain = new FilterChain { Steps = [] },
+                },
+                new FilterPreset
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "alpha2",
+                    Chain = new FilterChain { Steps = [] },
+                },
+            };
+
+            var viewModel = new SavePresetDialogViewModel(existingPresets: presets);
+
+            Assert.Equal(["Alpha", "alpha2", "beta"], viewModel.ExistingNames);
+        }
+
+        /// <summary>
+        /// Verifies choosing an existing name prefills description and columns from that preset.
+        /// </summary>
+        [Fact]
+        public void Selecting_Existing_Name_Prefills_Description_And_Columns()
+        {
+            var other = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Other",
+                Description = "from other",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns =
+                [
+                    new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)),
+                ],
+            };
+            var lastLoaded = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Mine",
+                Description = "mine",
+                Chain = new FilterChain { Steps = [] },
+            };
+
+            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: true, existingPresets: [lastLoaded, other]);
+
+            Assert.Equal("mine", viewModel.Description);
+            Assert.False(viewModel.SaveRenameListColumns);
+
+            viewModel.Name = "Other";
+
+            Assert.Equal("from other", viewModel.Description);
+            Assert.True(viewModel.SaveRenameListColumns);
+        }
     }
 }
