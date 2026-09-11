@@ -1,5 +1,8 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.Views.DragAndDrop;
 
@@ -13,7 +16,47 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         private void _WireSelectionHandlers()
         {
             AppliedFiltersList.SelectionChanged += (_, _) => _OnListSelectionChanged();
+            AppliedFiltersList.AddHandler(ContextRequestedEvent, _OnListContextRequested, RoutingStrategies.Tunnel);
             Loaded += (_, _) => _QueueRestoreSelectionFromViewModel();
+        }
+
+        private void _OnListContextRequested(object? sender, ContextRequestedEventArgs e)
+        {
+            if (_viewModel is null || e.Source is not Visual source)
+            {
+                return;
+            }
+
+            var item = source.FindAncestorOfType<ListBoxItem>() ?? source as ListBoxItem;
+            if (item?.DataContext is not AppliedFilterStepViewModel hit)
+            {
+                return;
+            }
+
+            _SelectStepForContextMenu(hit);
+        }
+
+        private void _SelectStepForContextMenu(AppliedFilterStepViewModel hit)
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            var isOnlySelected = _viewModel.SelectedSteps.Count == 1 && _viewModel.SelectedSteps[0] == hit;
+            if (isOnlySelected)
+            {
+                return;
+            }
+
+            var keepMultiSelection = _viewModel.SelectedSteps.Count > 1 && _viewModel.SelectedSteps.Contains(hit);
+            if (keepMultiSelection)
+            {
+                return;
+            }
+
+            _viewModel.SetSelectedSteps([hit]);
+            _RestoreSelectionFromViewModel();
         }
 
         private void _OnDataContextAttached(AppliedFiltersViewModel viewModel)

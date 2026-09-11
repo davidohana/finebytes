@@ -18,9 +18,9 @@ Canonical plans: `docs/plans/*.plan.md` only (never `.cursor/plans/`).
 
 ## Modes
 
-| Mode | When | Scope |
-|------|------|-------|
-| **Phase** | “implement F7 P1”, “phase 3”, “PR B” | That plan section only |
+| Mode             | When                                         | Scope                     |
+| ---------------- | -------------------------------------------- | ------------------------- |
+| **Phase**        | “implement F7 P1”, “phase 3”, “PR B”         | That plan section only    |
 | **Backlog item** | “Open — do #N”, “tidy item”, “ONE item only” | Exactly one numbered item |
 
 Same loop for both; backlog = smaller phase.
@@ -65,9 +65,9 @@ Never paste full `SKILL.md` or AGENTS excerpts. Point at paths.
 ## Ship gate
 
 1. `just format` (or format touched paths if the recipe supports it)
-2. Targeted tests for the slice (`dotnet test --filter …` or the plan’s test hint)
-3. `just lint` when the slice touches shared surfaces (factories, session, engine)
-4. Commit message: why, matching recent `git log` style — only when commits are in scope
+1. Targeted tests for the slice (`dotnet test --filter …` or the plan’s test hint)
+1. `just lint` when the slice touches shared surfaces (factories, session, engine)
+1. Commit message: why, matching recent `git log` style — only when commits are in scope
 
 Style / persistence / naming: already in `AGENTS.md` — do not restate.
 

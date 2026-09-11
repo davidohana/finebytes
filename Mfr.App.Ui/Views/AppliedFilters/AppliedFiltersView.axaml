@@ -4,6 +4,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.AppliedFilters"
+  xmlns:input="using:Mfr.App.Ui.Input"
   xmlns:resources="using:Mfr.App.Ui.Resources"
   mc:Ignorable="d"
   d:DesignWidth="280"
@@ -12,6 +13,25 @@
   x:Name="AppliedFiltersRoot"
   x:DataType="vm:AppliedFiltersViewModel"
 >
+  <UserControl.Resources>
+    <ResourceDictionary>
+      <ContextMenu x:Key="AppliedFiltersContextMenu" x:Shared="False">
+        <MenuItem Header="Check All Filters" Command="{Binding CheckAllFiltersCommand}" />
+        <MenuItem Header="Uncheck All Filters" Command="{Binding UncheckAllFiltersCommand}" />
+        <MenuItem Header="Invert Check" Command="{Binding InvertCheckCommand}" />
+        <Separator />
+        <MenuItem
+          Header="Remove Selected Filter"
+          Command="{Binding RemoveSelectedCommand}"
+          InputGesture="{x:Static input:AppShortcuts.RemoveSelectedFilterDelete}"
+        />
+        <MenuItem Header="Remove All But Selected" Command="{Binding RemoveAllButSelectedCommand}" />
+        <MenuItem Header="Remove All Filters" Command="{Binding ClearCommand}" />
+        <Separator />
+        <MenuItem Header="Filter Options" Click="_OnFilterOptionsClick" IsEnabled="{Binding CanShowFilterOptions}" />
+      </ContextMenu>
+    </ResourceDictionary>
+  </UserControl.Resources>
   <UserControl.Styles>
     <Style Selector="Button.applied-filter-toolbar">
       <Setter Property="Height" Value="26" />
@@ -234,6 +254,7 @@
         Classes="applied-filters"
         ItemsSource="{Binding Steps}"
         SelectionMode="Multiple"
+        ContextMenu="{StaticResource AppliedFiltersContextMenu}"
       >
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:AppliedFilterStepViewModel">

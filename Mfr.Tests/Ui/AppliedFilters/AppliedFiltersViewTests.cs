@@ -85,6 +85,52 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies the Applied Filters list exposes the context menu with expected headers.
+        /// </summary>
+        [AvaloniaFact]
+        public void List_Has_ContextMenu_With_Expected_Items()
+        {
+            var (window, _, list, _) = AppliedFiltersTestUi.ShowSeededList();
+
+            Assert.NotNull(list.ContextMenu);
+            var headers = list.ContextMenu.Items.OfType<MenuItem>().Select(item => item.Header?.ToString()).ToList();
+            Assert.Equal(
+                [
+                    "Check All Filters",
+                    "Uncheck All Filters",
+                    "Invert Check",
+                    "Remove Selected Filter",
+                    "Remove All But Selected",
+                    "Remove All Filters",
+                    "Filter Options",
+                ],
+                headers
+            );
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies a context request on an unselected row selects that row (control + VM).
+        /// </summary>
+        [AvaloniaFact]
+        public void ContextRequest_On_Unselected_Row_Selects_That_Row()
+        {
+            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 1);
+            Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
+
+            var row = list.ContainerFromIndex(0) as ListBoxItem;
+            Assert.NotNull(row);
+            row.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
+            Assert.Equal([0], list.Selection.SelectedIndexes.ToList());
+
+            window.Close();
+        }
+
         private static string _RowDisplayName(ListBox list, int rowIndex)
         {
             return _RowTextBlock(list, rowIndex, blockIndex: 0);

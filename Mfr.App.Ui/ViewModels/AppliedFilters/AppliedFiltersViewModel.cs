@@ -386,6 +386,70 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
+        /// Removes every step that is not selected, keeping the current selection.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanRemoveAllButSelected))]
+        public void RemoveAllButSelected()
+        {
+            if (_selectedSteps.Count == 0 || _selectedSteps.Count >= Steps.Count)
+            {
+                return;
+            }
+
+            var selected = _selectedSteps.ToHashSet();
+            _WithSingleChainChanged(() =>
+            {
+                for (var index = Steps.Count - 1; index >= 0; index--)
+                {
+                    if (!selected.Contains(Steps[index]))
+                    {
+                        Steps.RemoveAt(index);
+                    }
+                }
+            });
+
+            SetSelectedSteps([.. Steps.Where(selected.Contains)]);
+        }
+
+        /// <summary>
+        /// Enables every applied filter step (MFR7 Check All Filters).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_HasSteps))]
+        public void CheckAllFilters()
+        {
+            _SetAllEnabled(enabled: true);
+        }
+
+        /// <summary>
+        /// Disables every applied filter step (MFR7 Uncheck All Filters).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_HasSteps))]
+        public void UncheckAllFilters()
+        {
+            _SetAllEnabled(enabled: false);
+        }
+
+        /// <summary>
+        /// Toggles <see cref="AppliedFilterStepViewModel.Enabled"/> on every step (MFR7 Invert Check).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_HasSteps))]
+        public void InvertCheck()
+        {
+            if (Steps.Count == 0)
+            {
+                return;
+            }
+
+            _WithSingleChainChanged(() =>
+            {
+                foreach (var step in Steps)
+                {
+                    step.Enabled = !step.Enabled;
+                }
+            });
+        }
+
+        /// <summary>
         /// Moves the selected steps one position up.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanMoveSelectedUp))]
@@ -605,6 +669,9 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             OnPropertyChanged(nameof(Count));
             ClearCommand.NotifyCanExecuteChanged();
+            CheckAllFiltersCommand.NotifyCanExecuteChanged();
+            UncheckAllFiltersCommand.NotifyCanExecuteChanged();
+            InvertCheckCommand.NotifyCanExecuteChanged();
             RemoveStepsAtIndicesCommand.NotifyCanExecuteChanged();
             _NotifySelectionCommandsChanged();
             _RaiseChainChanged();
@@ -818,6 +885,27 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             return Steps.Count > 0;
         }
 
+        private bool _CanRemoveAllButSelected()
+        {
+            return _selectedSteps.Count > 0 && _selectedSteps.Count < Steps.Count;
+        }
+
+        private void _SetAllEnabled(bool enabled)
+        {
+            if (Steps.Count == 0)
+            {
+                return;
+            }
+
+            _WithSingleChainChanged(() =>
+            {
+                foreach (var step in Steps)
+                {
+                    step.Enabled = enabled;
+                }
+            });
+        }
+
         private bool _CanRemoveStepsAtIndices(IReadOnlyList<int> indices)
         {
             if (indices is null || indices.Count == 0)
@@ -901,6 +989,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private void _NotifySelectionCommandsChanged()
         {
             RemoveSelectedCommand.NotifyCanExecuteChanged();
+            RemoveAllButSelectedCommand.NotifyCanExecuteChanged();
             RemoveStepsAtIndicesCommand.NotifyCanExecuteChanged();
             MoveSelectedUpCommand.NotifyCanExecuteChanged();
             MoveSelectedDownCommand.NotifyCanExecuteChanged();

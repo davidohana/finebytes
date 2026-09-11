@@ -156,6 +156,107 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies Check All enables every step and raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// </summary>
+        [Fact]
+        public void CheckAllFilters_Enables_All_With_Single_ChainChanged()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            viewModel.Steps[0].Enabled = false;
+            viewModel.Steps[1].Enabled = false;
+
+            var count = _CountChainChanged(viewModel, () => viewModel.CheckAllFiltersCommand.Execute(null));
+
+            Assert.Equal(1, count);
+            Assert.All(viewModel.Steps, step => Assert.True(step.Enabled));
+            Assert.All(viewModel.ToChain().Steps, step => Assert.True(step.Enabled));
+        }
+
+        /// <summary>
+        /// Verifies Uncheck All disables every step and raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// </summary>
+        [Fact]
+        public void UncheckAllFilters_Disables_All_With_Single_ChainChanged()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+
+            var count = _CountChainChanged(viewModel, () => viewModel.UncheckAllFiltersCommand.Execute(null));
+
+            Assert.Equal(1, count);
+            Assert.All(viewModel.Steps, step => Assert.False(step.Enabled));
+            Assert.All(viewModel.ToChain().Steps, step => Assert.False(step.Enabled));
+        }
+
+        /// <summary>
+        /// Verifies Invert Check flips each enabled flag and raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// </summary>
+        [Fact]
+        public void InvertCheck_Flips_Each_Enabled_With_Single_ChainChanged()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            viewModel.Steps[1].Enabled = false;
+
+            var count = _CountChainChanged(viewModel, () => viewModel.InvertCheckCommand.Execute(null));
+
+            Assert.Equal(1, count);
+            Assert.False(viewModel.Steps[0].Enabled);
+            Assert.True(viewModel.Steps[1].Enabled);
+        }
+
+        /// <summary>
+        /// Verifies Remove All But Selected keeps the selection and drops other steps.
+        /// </summary>
+        [Fact]
+        public void RemoveAllButSelected_Keeps_Selection()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("RemoveSpaces"));
+            viewModel.SetSelectedSteps([viewModel.Steps[1]]);
+
+            Assert.True(viewModel.RemoveAllButSelectedCommand.CanExecute(null));
+            viewModel.RemoveAllButSelectedCommand.Execute(null);
+
+            Assert.Single(viewModel.Steps);
+            Assert.Equal("Letters Case", viewModel.Steps[0].DisplayName);
+            Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
+        }
+
+        /// <summary>
+        /// Verifies Remove All But Selected is disabled when nothing or everything is selected.
+        /// </summary>
+        [Fact]
+        public void RemoveAllButSelected_CanExecute_Requires_Partial_Selection()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            Assert.False(viewModel.RemoveAllButSelectedCommand.CanExecute(null));
+
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            viewModel.SetSelectedSteps([viewModel.Steps[0], viewModel.Steps[1]]);
+            Assert.False(viewModel.RemoveAllButSelectedCommand.CanExecute(null));
+
+            viewModel.SetSelectedSteps([]);
+            Assert.False(viewModel.RemoveAllButSelectedCommand.CanExecute(null));
+
+            viewModel.SetSelectedSteps([viewModel.Steps[0]]);
+            Assert.True(viewModel.RemoveAllButSelectedCommand.CanExecute(null));
+        }
+
+        /// <summary>
         /// Verifies move commands reorder the stack and keep selection.
         /// </summary>
         [Fact]

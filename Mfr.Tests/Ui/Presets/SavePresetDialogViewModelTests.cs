@@ -210,11 +210,13 @@ namespace Mfr.Tests.Ui.Presets
                 Chain = new FilterChain { Steps = [] },
             };
 
-            var viewModel = new SavePresetDialogViewModel(lastLoaded, existingPresets: [lastLoaded, other]);
-            viewModel.Description = "keep my edits";
-            viewModel.SaveRenameListColumns = false;
+            var viewModel = new SavePresetDialogViewModel(lastLoaded, existingPresets: [lastLoaded, other])
+            {
+                Description = "keep my edits",
+                SaveRenameListColumns = false,
 
-            viewModel.Name = "Other";
+                Name = "Other"
+            };
 
             Assert.Equal("keep my edits", viewModel.Description);
             Assert.False(viewModel.SaveRenameListColumns);
