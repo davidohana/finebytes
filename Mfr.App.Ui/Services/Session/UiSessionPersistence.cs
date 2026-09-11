@@ -1,6 +1,8 @@
 using Avalonia.Controls;
 using Mfr.App.Ui.Services.FileList;
+using Mfr.Engine.Presets;
 using Mfr.Models.Config;
+using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.Services.Session
 {
@@ -42,7 +44,8 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Updates <c>session.json</c>: window/folder when their remember flags are on; masks and Rename List always.
+        /// Updates <c>session.json</c>: window/folder when their remember flags are on; masks, Rename List,
+        /// and Applied Filters chain always.
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
         /// <param name="panes">Pane grids for splitter capture.</param>
@@ -53,12 +56,20 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="renameList">
         /// Rename List session fields, or <see langword="null"/> to leave the saved section unchanged.
         /// </param>
+        /// <param name="appliedFilters">
+        /// Working Applied Filters chain, or <see langword="null"/> to leave the saved chain unchanged.
+        /// </param>
+        /// <param name="sessionFilePath">
+        /// Path to <c>session.json</c>. When <c>null</c> or whitespace, the default AppData file is used.
+        /// </param>
         public static void SaveOnClose(
             Window window,
             MainWindowPaneGrids panes,
             SessionState session,
             FileListSessionSnapshot? fileListSnapshot,
-            SessionStateRenameList? renameList = null
+            SessionStateRenameList? renameList = null,
+            FilterChain? appliedFilters = null,
+            string? sessionFilePath = null
         )
         {
             ArgumentNullException.ThrowIfNull(window);
@@ -106,7 +117,12 @@ namespace Mfr.App.Ui.Services.Session
                     session.RenameList = renameList;
                 }
 
-                SessionStore.Save(session);
+                if (appliedFilters is not null)
+                {
+                    session.AppliedFilters = appliedFilters;
+                }
+
+                SessionStore.Save(session, sessionFilePath, SessionJsonOptions.Default);
             }
             catch
             {

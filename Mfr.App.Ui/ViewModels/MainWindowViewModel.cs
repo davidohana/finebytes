@@ -22,13 +22,16 @@ namespace Mfr.App.Ui.ViewModels
     public partial class MainWindowViewModel : ViewModelBase
     {
         private const int StatusHintClearMilliseconds = 8_000;
+        private const int AppliedFiltersSessionSaveDebounceMilliseconds = 500;
 
         private CancellationTokenSource? _statusHintClearCts;
+        private CancellationTokenSource? _appliedFiltersSessionSaveCts;
         private string _transientStatusHint = string.Empty;
         private StyledTextDisplay _paneStatusHint = StyledTextDisplay.Empty;
         private bool _previewDirty;
         private bool _previewRunning;
         private Task _previewDrainTask = Task.CompletedTask;
+        private Task _appliedFiltersSessionSaveTask = Task.CompletedTask;
 
         /// <summary>
         /// Initializes pane view models for the 7.4 layout.
@@ -48,14 +51,21 @@ namespace Mfr.App.Ui.ViewModels
         /// Named presets store. When null, uses an empty manager that does not read AppData
         /// (production passes <see cref="PresetManager.OpenDefault"/>).
         /// </param>
+        /// <param name="sessionFilePath">
+        /// When set with a non-null <paramref name="session"/>, Applied Filters chain changes are debounced
+        /// to this file. When null, chain updates write through to the in-memory session only (flushed on
+        /// window close). Production passes <see cref="SessionStore.DefaultFilePath"/>.
+        /// </param>
         public MainWindowViewModel(
             string? initialFileListPath = null,
             SessionState? session = null,
             FilterDefaultsStore? filterDefaults = null,
-            PresetManager? presetManager = null
+            PresetManager? presetManager = null,
+            string? sessionFilePath = null
         )
         {
             Session = session;
+            SessionFilePath = sessionFilePath;
             AppliedFiltersViewModel = new AppliedFiltersViewModel(
                 filterDefaults ?? FilterDefaultsStore.CreateEmpty(),
                 presetManager ?? PresetManager.CreateEmpty()
@@ -75,6 +85,12 @@ namespace Mfr.App.Ui.ViewModels
             {
                 FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
                 RenameListViewModel.ApplySessionSection(session.RenameList);
+                if (session.AppliedFilters is not null)
+                {
+                    // ReplaceFromChain does not set LastLoaded — session restore is not a named preset.
+                    // ChainChanged handlers are subscribed below, so restore does not schedule a disk flush.
+                    AppliedFiltersViewModel.ReplaceFromChain(session.AppliedFilters);
+                }
             }
 
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
@@ -84,6 +100,7 @@ namespace Mfr.App.Ui.ViewModels
             AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
             AppliedFiltersViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
             AppliedFiltersViewModel.ChainChanged += _OnPreviewInputsChanged;
+            AppliedFiltersViewModel.ChainChanged += _OnAppliedFiltersChainChangedForSession;
             FilterPaletteViewModel.PropertyChanged += _OnFilterPalettePropertyChanged;
             ItemCount = RenameListViewModel.ItemCount;
             FilterCount = AppliedFiltersViewModel.Count;
@@ -96,6 +113,12 @@ namespace Mfr.App.Ui.ViewModels
         /// Loaded session document for this window, or <see langword="null"/> when the window was created without one.
         /// </summary>
         internal SessionState? Session { get; }
+
+        /// <summary>
+        /// Session JSON path for debounced Applied Filters flushes and close save, or <see langword="null"/>
+        /// for in-memory write-through only (tests) / default AppData on close when saving.
+        /// </summary>
+        internal string? SessionFilePath { get; }
 
         /// <summary>
         /// Gets the main window title, including the product version.
@@ -316,6 +339,91 @@ namespace Mfr.App.Ui.ViewModels
         private void _OnFilterOptionsApplied(object? sender, EventArgs e)
         {
             FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
+        }
+
+        /// <summary>
+        /// Writes the working chain into the live session document and schedules a debounced disk flush.
+        /// </summary>
+        private void _OnAppliedFiltersChainChangedForSession(object? sender, EventArgs e)
+        {
+            if (Session is null)
+            {
+                return;
+            }
+
+            Session.AppliedFilters = AppliedFiltersViewModel.ToChain();
+            if (SessionFilePath is not null)
+            {
+                _ScheduleAppliedFiltersSessionSave();
+            }
+        }
+
+        /// <summary>
+        /// Captures the current Applied Filters chain onto <see cref="Session"/> for shutdown save.
+        /// <para>Cancels any pending debounced flush; caller writes <c>session.json</c>.</para>
+        /// </summary>
+        internal void CaptureAppliedFiltersSession()
+        {
+            _CancelAppliedFiltersSessionSave();
+            if (Session is null)
+            {
+                return;
+            }
+
+            Session.AppliedFilters = AppliedFiltersViewModel.ToChain();
+        }
+
+        /// <summary>
+        /// Waits for any pending debounced Applied Filters session flush (tests).
+        /// </summary>
+        /// <returns>A task that completes when the scheduled save finishes or is canceled.</returns>
+        internal Task WaitForPendingAppliedFiltersSessionSaveAsync()
+        {
+            return _appliedFiltersSessionSaveTask;
+        }
+
+        /// <summary>
+        /// Cancels any in-flight debounce and starts a new delayed flush of <see cref="Session"/>.
+        /// </summary>
+        private void _ScheduleAppliedFiltersSessionSave()
+        {
+            _CancelAppliedFiltersSessionSave();
+            var cts = new CancellationTokenSource();
+            _appliedFiltersSessionSaveCts = cts;
+            _appliedFiltersSessionSaveTask = _FlushAppliedFiltersSessionAsync(cts.Token);
+        }
+
+        /// <summary>
+        /// Cancels and disposes the pending Applied Filters session-save CTS, if any.
+        /// </summary>
+        private void _CancelAppliedFiltersSessionSave()
+        {
+            _appliedFiltersSessionSaveCts?.Cancel();
+            _appliedFiltersSessionSaveCts?.Dispose();
+            _appliedFiltersSessionSaveCts = null;
+        }
+
+        /// <summary>
+        /// Debounces then soft-saves the live session document (including Applied Filters).
+        /// </summary>
+        /// <param name="token">Cancellation from a newer schedule or shutdown capture.</param>
+        private async Task _FlushAppliedFiltersSessionAsync(CancellationToken token)
+        {
+            try
+            {
+                await Task.Delay(AppliedFiltersSessionSaveDebounceMilliseconds, token).ConfigureAwait(true);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            if (token.IsCancellationRequested || Session is null)
+            {
+                return;
+            }
+
+            SessionStore.TrySave(Session, SessionFilePath, SessionJsonOptions.Default);
         }
 
         /// <summary>

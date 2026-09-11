@@ -9,10 +9,13 @@ namespace Mfr.Models.Filters
     /// </summary>
     /// <param name="Enabled">Whether this step participates when applying the chain.</param>
     /// <param name="Filter">The filter configuration for this step.</param>
-    public sealed record FilterChainStep(bool Enabled, [property: JsonPropertyName("filter")] BaseFilter Filter);
+    public sealed record FilterChainStep(
+        [property: JsonPropertyName("enabled")] bool Enabled,
+        [property: JsonPropertyName("filter")] BaseFilter Filter
+    );
 
     /// <summary>
-    /// Ordered filter stack for a preset: each step has an enabled flag and a <see cref="BaseFilter"/>.
+    /// Ordered filter stack for a preset or session: each step has an enabled flag and a <see cref="BaseFilter"/>.
     /// </summary>
     public sealed record FilterChain
     {

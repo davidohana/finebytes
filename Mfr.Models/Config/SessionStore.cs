@@ -13,6 +13,11 @@ namespace Mfr.Models.Config
     /// Same policy as <c>FilterDefaultsStore</c> (Engine); opposite of hard-fail
     /// <see cref="ConfigStore"/> and <c>PresetManager</c> (Engine).
     /// Do not unify these modes — the split is intentional product dialect.
+    /// <para>
+    /// When persisting <see cref="SessionState.AppliedFilters"/>, pass Engine <c>SessionJsonOptions.Default</c>
+    /// so <c>BaseFilter</c> polymorphism and per-step soft-skip apply. Default options alone cannot round-trip
+    /// the working chain.
+    /// </para>
     /// </remarks>
     public static class SessionStore
     {
@@ -27,9 +32,18 @@ namespace Mfr.Models.Config
         /// Default session file path (<see cref="AppDataPaths.RoamingRoot"/> + <c>session.json</c>).
         /// </summary>
         /// <returns>Absolute path to the default session JSON file.</returns>
-        private static string _DefaultSessionFilePath()
+        public static string DefaultFilePath()
         {
             return AppDataPaths.RoamingRoot().CombinePath("session.json");
+        }
+
+        /// <summary>
+        /// Default session file path (<see cref="DefaultFilePath"/>).
+        /// </summary>
+        /// <returns>Absolute path to the default session JSON file.</returns>
+        private static string _DefaultSessionFilePath()
+        {
+            return DefaultFilePath();
         }
 
         /// <summary>
@@ -38,10 +52,15 @@ namespace Mfr.Models.Config
         /// <param name="sessionFilePath">
         /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultSessionFilePath"/> is used.
         /// </param>
+        /// <param name="options">
+        /// Serializer options. When null, uses built-in session options (no filter polymorphism).
+        /// Pass Engine <c>SessionJsonOptions.Default</c> when the file may contain
+        /// <see cref="SessionState.AppliedFilters"/>.
+        /// </param>
         /// <returns>Deserialized state, or a new empty <see cref="SessionState"/> when missing or unreadable.</returns>
-        public static SessionState Load(string? sessionFilePath = null)
+        public static SessionState Load(string? sessionFilePath = null, JsonSerializerOptions? options = null)
         {
-            return _Read(_ResolvePath(sessionFilePath));
+            return _Read(_ResolvePath(sessionFilePath), options ?? s_JsonOptions);
         }
 
         /// <summary>
@@ -51,9 +70,17 @@ namespace Mfr.Models.Config
         /// <param name="sessionFilePath">
         /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultSessionFilePath"/> is used.
         /// </param>
+        /// <param name="options">
+        /// Serializer options. When null, uses built-in session options (no filter polymorphism).
+        /// Pass Engine <c>SessionJsonOptions.Default</c> when writing <see cref="SessionState.AppliedFilters"/>.
+        /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="state"/> is null.</exception>
         /// <exception cref="IOException">Thrown when the file cannot be written.</exception>
-        public static void Save(SessionState state, string? sessionFilePath = null)
+        public static void Save(
+            SessionState state,
+            string? sessionFilePath = null,
+            JsonSerializerOptions? options = null
+        )
         {
             ArgumentNullException.ThrowIfNull(state);
 
@@ -69,7 +96,7 @@ namespace Mfr.Models.Config
                 state.Version = 1;
             }
 
-            var json = JsonSerializer.Serialize(state, s_JsonOptions);
+            var json = JsonSerializer.Serialize(state, options ?? s_JsonOptions);
             File.WriteAllText(path, json);
         }
 
@@ -95,11 +122,19 @@ namespace Mfr.Models.Config
         /// <param name="sessionFilePath">
         /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultSessionFilePath"/> is used.
         /// </param>
-        public static void TrySave(SessionState state, string? sessionFilePath = null)
+        /// <param name="options">
+        /// Serializer options. When null, uses built-in session options. Pass Engine
+        /// <c>SessionJsonOptions.Default</c> when writing <see cref="SessionState.AppliedFilters"/>.
+        /// </param>
+        public static void TrySave(
+            SessionState state,
+            string? sessionFilePath = null,
+            JsonSerializerOptions? options = null
+        )
         {
             try
             {
-                Save(state, sessionFilePath);
+                Save(state, sessionFilePath, options);
             }
             catch
             {
@@ -121,8 +156,9 @@ namespace Mfr.Models.Config
         /// Reads session JSON, or an empty session when missing or unreadable.
         /// </summary>
         /// <param name="path">Absolute path to the session file.</param>
+        /// <param name="options">Serializer options for this read.</param>
         /// <returns>Deserialized state, or a new empty session.</returns>
-        private static SessionState _Read(string path)
+        private static SessionState _Read(string path, JsonSerializerOptions options)
         {
             if (!File.Exists(path))
             {
@@ -132,7 +168,7 @@ namespace Mfr.Models.Config
             try
             {
                 var json = File.ReadAllText(path);
-                var state = JsonSerializer.Deserialize<SessionState>(json, s_JsonOptions) ?? new SessionState();
+                var state = JsonSerializer.Deserialize<SessionState>(json, options) ?? new SessionState();
                 if (state.Version <= 0)
                 {
                     state.Version = 1;

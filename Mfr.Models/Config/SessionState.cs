@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Mfr.Models.Filters;
 using Mfr.Models.RenameList;
 
 namespace Mfr.Models.Config
@@ -36,6 +37,18 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("renameList")]
         public SessionStateRenameList? RenameList { get; set; }
+
+        /// <summary>
+        /// Working Applied Filters chain (same <see cref="FilterChain"/> shape as presets).
+        /// <para>
+        /// Null when omitted (first launch). Custom Filter Options display names are not persisted —
+        /// restore synthesizes catalog names via <c>ReplaceFromChain</c> (same as preset load).
+        /// Load/save of this property requires serializer options that register <see cref="BaseFilter"/>
+        /// polymorphism and soft-load unknown/invalid steps (Engine <c>SessionJsonOptions</c>).
+        /// </para>
+        /// </summary>
+        [JsonPropertyName("appliedFilters")]
+        public FilterChain? AppliedFilters { get; set; }
 
         /// <summary>
         /// Filter Configuration chrome (e.g. format-token picker collapse).

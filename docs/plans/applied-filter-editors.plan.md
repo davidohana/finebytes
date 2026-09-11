@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F6 + F7 + F9a/b done on master. Remaining: F8 session chain, F9c help ?, F10 Filter Options polish."
+overview: "F1–F8 + F9a/b done on master. Remaining: F9c help ?, F10 Filter Options polish."
 todos:
   - id: f1-f5-complete
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: f8-session-chain
     content: "F8 Session — persist + restore working Applied Filters chain (current schema only)"
-    status: pending
+    status: completed
   - id: f9a-save-as-default
     content: "F9a Save as default (📌) — FilterDefaultsStore / filter-defaults.json"
     status: completed
@@ -33,17 +33,16 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-11):** **F1–F7 + F9a/b complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌** and reset **↺** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, Save / Save As, toolbar ▾ quick-pick, and confirm-replace. Session has no Applied Filters chain fields yet. No help `?` button.
+**Status (2026-09-11):** **F1–F8 + F9a/b complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌** and reset **↺** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, Save / Save As, toolbar ▾ quick-pick, and confirm-replace. **F8** persists the working Applied Filters chain on `SessionState.AppliedFilters` (`FilterChain` shape; catalog names on restore). No help `?` button.
 
 ### Priority (what's left)
 
-| Order | Item                          | Why next                                                                                                                       |
-| ----- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **1** | **F8 Session chain**          | Same chain serialization lessons as F7; restores last working list on launch (`SessionState` — soft-load, current schema only) |
-| **2** | **F9c Help `?`**              | Remaining Filter Configuration chrome; needs help-host / MFR7 HTML mapping (no button yet)                                     |
-| **3** | **F10 Filter Options polish** | Dialog already works; cosmetic layout vs MFR7 only                                                                             |
+| Order | Item                          | Why next                                                                                   |
+| ----- | ----------------------------- | ------------------------------------------------------------------------------------------ |
+| **1** | **F9c Help `?`**              | Remaining Filter Configuration chrome; needs help-host / MFR7 HTML mapping (no button yet) |
+| **2** | **F10 Filter Options polish** | Dialog already works; cosmetic layout vs MFR7 only                                         |
 
-Do **not** mix F8–F10 into one pass. F7 before F8 so load/replace UX and error handling land once, then session reuses the chain DTO path.
+Do **not** mix F9c–F10 into one pass.
 
 ______________________________________________________________________
 
@@ -112,14 +111,14 @@ Detail: [presets-ui.plan.md](presets-ui.plan.md) (P1–P4). Engine `PresetManage
 1. Toolbar **▾** quick-pick (sorted names; disabled “No presets” when empty) sharing the host load path with Manager Load.
 1. Hard-fail corrupt `presets.json` with a clear dialog; no silent remap. Tests cover VM + headless load/save and ▾ last-loaded.
 
-### F8 — Session persist of working chain
+### F8 — Session persist of working chain — **done**
 
-Rename List / other session fields already persist; Applied Filters chain does **not** (`SessionState` has no chain fields).
+Rename List / other session fields already persist; Applied Filters chain now uses the same `FilterChain` / `FilterChainStep` shape as presets on `SessionState.AppliedFilters`.
 
-1. Add current-schema fields on `SessionState` for the working chain (steps: type, options, enabled, display name, Apply To / scope as already modeled). Prefer reuse of the same step shape F7 saves into presets.
-1. Save on change (debounced) / shutdown; restore on launch.
-1. Missing/unrecognized → defaults (first launch), **no** legacy converters (`AGENTS.md` persistence policy). Soft-load like other session fields.
-1. Tests: serialize/deserialize round-trip; unknown type drops to empty or skips that step with documented behavior.
+1. **Schema:** `appliedFilters: { steps: [ { enabled, filter } ] }` — identical step shape to preset `chain`. Custom Filter Options display names do **not** round-trip (same as presets); restore synthesizes catalog names via `ReplaceFromChain` and does **not** set `LastLoaded`.
+1. **Save:** write-through to the live `SessionState` on `ChainChanged`; debounced disk flush when `sessionFilePath` is set (production); always captured on main-window close via `SessionJsonOptions`.
+1. **Load:** soft-load — unknown/invalid steps are **dropped**, valid steps kept; missing section → null (empty stack). Entirely corrupt `session.json` still yields empty session. No legacy converters. Opposite of PresetManager hard-fail.
+1. **Tests:** `SessionAppliedFiltersTests` round-trip + unknown-step drop; MainWindow restore + debounced flush smoke; `ReplaceFromChain` asserts no `LastLoaded`.
 
 ### F9 — Filter chrome
 

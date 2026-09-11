@@ -604,7 +604,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
         /// <summary>
         /// Verifies <see cref="AppliedFiltersViewModel.ReplaceFromChain"/> rebuilds steps, copies enabled flags,
-        /// uses catalog display names, selects the first step, and raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// uses catalog display names, selects the first step, raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once,
+        /// and does not set <see cref="AppliedFiltersViewModel.LastLoaded"/> (session restore must stay unnamed).
         /// </summary>
         [Fact]
         public void ReplaceFromChain_Rebuilds_With_Catalog_Names_And_Single_ChainChanged()
@@ -637,6 +638,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal([viewModel.Steps[0]], viewModel.SelectedSteps);
             Assert.Same(letters, viewModel.Steps[0].Filter);
             Assert.Same(shrink, viewModel.Steps[1].Filter);
+            Assert.Null(viewModel.LastLoaded);
+            Assert.False(viewModel.CanSavePreset);
         }
 
         /// <summary>
