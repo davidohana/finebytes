@@ -2,6 +2,7 @@ using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Resources;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -143,6 +144,14 @@ namespace Mfr.App.Ui.Views.RenameList
                     )
                 );
             }
+
+            menu.Items.Add(
+                _CreateTipMenuItem(
+                    "Export Name List",
+                    AppTips.ExportNameList,
+                    () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportNameListAsync(fieldKey))
+                )
+            );
 
             if (field.SupportsWrite)
             {

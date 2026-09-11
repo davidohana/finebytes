@@ -249,6 +249,7 @@ namespace Mfr.Tests.Ui.RenameList
                 [
                     "(Parent Directory)",
                     "Hide Field",
+                    "Export Name List",
                     "Edit as Name List",
                     "Select Visible Fields...",
                     "Select Sort Fields...",
@@ -262,6 +263,7 @@ namespace Mfr.Tests.Ui.RenameList
                     "(Full File Name)",
                     "Hide Field",
                     "Remove Unchanged Items",
+                    "Export Name List",
                     "Edit as Name List",
                     "Select Visible Fields...",
                     "Select Sort Fields...",
@@ -307,7 +309,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             _RaiseHeaderContextMenu(lengthHeader);
             Assert.Equal(
-                ["(File Name Length)", "Hide Field", "Select Visible Fields...", "Select Sort Fields..."],
+                ["(File Name Length)", "Hide Field", "Export Name List", "Select Visible Fields...", "Select Sort Fields..."],
                 _MenuHeaders(lengthHeader.ContextMenu)
             );
             Assert.DoesNotContain("Edit as Name List", _MenuHeaders(lengthHeader.ContextMenu));

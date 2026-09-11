@@ -1,3 +1,4 @@
+using System.Text;
 using Mfr.Filters;
 using Mfr.Utils;
 using Serilog;
@@ -297,6 +298,25 @@ namespace Mfr.Engine.RenameList
             }
 
             return lines;
+        }
+
+        /// <summary>
+        /// Writes <see cref="CollectNameList"/> lines to <paramref name="path"/> as UTF-8 text (one line per row).
+        /// </summary>
+        /// <param name="path">Destination file path (created or overwritten).</param>
+        /// <param name="key">Original or preview field key whose column text is exported.</param>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is null or whitespace.</exception>
+        /// <exception cref="IOException">The file could not be written.</exception>
+        public void ExportNameList(string path, RenameListFieldKey key)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(path);
+
+            var lines = CollectNameList(key);
+            using var writer = new StreamWriter(path, append: false, Encoding.UTF8);
+            foreach (var line in lines)
+            {
+                writer.WriteLine(line);
+            }
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–13 + 14a + 14c + 14e done. Next: 14b → 14d → 14f → 15 → 16."
+overview: "Phases 1–13 + 14a + 14b + 14c + 14e done. Next: 14d → 14f → 15 → 16."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -103,7 +103,7 @@ todos:
     status: completed
   - id: phase-14b
     content: "14b: Export Name List — GenerateNameList + save dialog (+ optional edit)"
-    status: pending
+    status: completed
   - id: phase-14c
     content: "14c: Edit as Name List — embed generated names in NameListFilter on Applied Filters"
     status: completed
@@ -135,13 +135,11 @@ Canonical plan: this file under `docs/plans/`. Sources: [mfr7 help](d:/Devl/mfr7
 
 ```mermaid
 flowchart LR
-  Done[1–13 + 14a + 14c + 14e]
-  P14b[14b Export]
+  Done[1–13 + 14a + 14b + 14c + 14e]
   P14d[14d Manual F2]
   P14f[14f Drag-out]
   P15[15 GO]
   P16[16 Legend]
-  Done --> P14b
   Done --> P14d
   P14d --> P14f --> P15 --> P16
 ```
@@ -152,16 +150,16 @@ ______________________________________________________________________
 
 |                |                                                              |
 | -------------- | ------------------------------------------------------------ |
-| **Shipped**    | Phases **1–13**, **14a**, **14c**, and **14e**               |
-| **Next**       | **14b** Export Name List (reuses `CollectNameList`)          |
-| **Then**       | 14d → 14f → **15** GO → **16** color legend                  |
+| **Shipped**    | Phases **1–13**, **14a**, **14b**, **14c**, and **14e**      |
+| **Next**       | **14d** Manual Rename Field (F2)                             |
+| **Then**       | 14f → **15** GO → **16** color legend                        |
 | **Blocked on** | 16 needs 14d (blue) + 15 (plum); 15 must honor 14d overrides |
 
 ______________________________________________________________________
 
-## Shipped (1–13, 14a, 14c, 14e) — consolidated
+## Shipped (1–13, 14a, 14b, 14c, 14e) — consolidated
 
-Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
+Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Export Name List, Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
 
 | Block                     | What shipped                                                                                                                                                                           |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -176,18 +174,18 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 | **12** Preview metadata   | Extended dates/attrs + AudioTag semantic (`ReadWriteApply`) preview cols; First\* / Tag Types / Image / Jpeg / Media / Mpeg stay original-only; Size / Folder File Count original-only |
 | **13** Hygiene            | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                                                      |
 | **14a** Remove Unchanged  | Preview-column header menu → `RenameList.RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                                                 |
+| **14b** Export Name List  | `ExportNameList` UTF-8 writer on `CollectNameList`; header Export on any column; save dialog + Edit? via shell opener                                                                  |
 | **14c** Edit as Name List | `SupportsWrite` + `WriteTarget`; `CollectNameList`; header Edit as Name List → embedded `NameListFilter` via `AddAndSelect` (no file I/O); F5 Name List editor                         |
 | **14e** Properties        | Alt+Enter + row **Properties** → shell property sheet; **Show in Explorer** on Rename List; same Properties on File List (clears debts.md dialog bullet)                               |
 
 **Already reusable for remaining work (do not rebuild):**
 
-- `RenameList.CollectNameList` + UTF-8 file writer still needed for **14b** Export
 - Engine `RenameList.Preview` / `Commit` / `CommitExecutor` + `RenameItem.CommitError` + `RenameListCommitTests` — ready for **15** UI wiring
 - `RenameListRowErrorDialog` — reuse for Show Rename Error (**15**), not a third dialog
-- Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs) — insert **14b Export** before Edit as Name List
+- Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)
 - Cell/row classes: red / gray / lavender in `RenameListView.axaml`; **blue** and **plum** still missing
 - `MainWindowViewModel.Go()` + `AppShortcuts.Go` / menu / toolbar — **stubs**; Ctrl+G labeled but no-op ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
-- `IFileShellOpener.ShowProperties` / `RevealInFileManager` — `Services/Shell`, shared by File List and Rename List
+- `IFileShellOpener.ShowProperties` / `RevealInFileManager` / `OpenWithDefaultApp` — `Services/Shell`, shared by File List and Rename List
 - `SupportsWrite` / `WriteTarget` on catalog fields — ready for **14d** Manual Rename
 
 **Write vs preview (important for 14d):**
@@ -204,7 +202,6 @@ ______________________________________________________________________
 
 | Phase                      | What                                                        | Depends on                   |
 | -------------------------- | ----------------------------------------------------------- | ---------------------------- |
-| **14b** Export Name List   | Column → UTF-8 `.txt`; save dialog; optional open in editor | `CollectNameList`            |
 | **14d** Manual Rename (F2) | Force original/preview; blue cells; Cancel; F5 clears       | `SupportsWrite`              |
 | **14f** Drag-out           | Selected rows as FileDrop to Explorer                       | coexist with 4d reorder      |
 | **15** GO                  | `Ctrl+G` → Commit; plum apply errors; Show Rename Error     | 14d overrides in commit path |
@@ -222,15 +219,15 @@ Header menu order ([`_BuildColumnHeaderContextMenu`](../../Mfr.App.Ui/Views/Rena
 
 `(title)` → Hide Field → *(preview)* Remove Unchanged → **(14b) Export Name List** → **(14c writable) Edit as Name List** → Select Visible Fields → Select Sort Fields.
 
-### 14b — Export Name List
+### 14b — Export Name List (done)
 
 One line per rename-list row = display text of the clicked column (original or preview).
 
-**Work**
+**Work completed**
 
-- **Engine:** file writer on top of existing `RenameList.CollectNameList(key)` — UTF-8, one `WriteLine` per collected line (MFR7 `GenerateNameList`).
-- **UI:** Header menu on **any** column (insert before Edit as Name List). Avalonia save dialog (`Save Name List as`, `*.txt`). On success: `"Name list saved to {path}. Edit?"` → Yes opens with default editor (`UseShellExecute`). Cancel = no write.
-- **Tests:** contents match row order and original vs preview values; cancel leaves disk alone.
+- Engine `RenameList.ExportNameList(path, key)` — UTF-8 `WriteLine` over `CollectNameList`.
+- Header **Export Name List** on any column (before Edit as Name List); tip via `AppTips.ExportNameList`.
+- Avalonia save dialog (`Save Name List as`, `*.txt`); on success `"Name list saved to {path}. Edit?"` → Yes opens with default app (`IFileShellOpener.OpenWithDefaultApp`). Cancel = no write.
 
 **Not in scope:** creating a Name List filter (14c — shipped).
 
@@ -344,7 +341,6 @@ ______________________________________________________________________
 
 ## What to implement next
 
-1. **14b** — file writer on `CollectNameList` + header Export + save/Edit?
 1. **14d** — force model + F2/Cancel + blue + F5 clear
 1. **14f** drag-out
 1. **15** GO UI + plum → **16** legend

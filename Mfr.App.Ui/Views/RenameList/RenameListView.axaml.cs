@@ -10,6 +10,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
+using Mfr.App.Ui.Services;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.DragAndDrop;
@@ -149,6 +150,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 _viewModel.RowErrorDialogRequested -= _OnRowErrorDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.Progress.PropertyChanged -= _OnProgressPropertyChanged;
+                _ClearExportNameListUi(_viewModel);
             }
 
             _viewModel = DataContext as RenameListViewModel;
@@ -161,11 +163,51 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.RowErrorDialogRequested += _OnRowErrorDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.Progress.PropertyChanged += _OnProgressPropertyChanged;
+            _WireExportNameListUi(_viewModel);
             _RebuildColumns();
             _ApplyFixedWidthFontClass();
             _SyncSelectionToGrid();
             _ApplyDropMarkVisuals();
             _ClearSortDescriptions();
+        }
+
+        private void _WireExportNameListUi(RenameListViewModel viewModel)
+        {
+            viewModel.PickNameListSavePathAsync = () =>
+                FileSavePicker.PickSaveFileAsync(this, title: "Save Name List as", defaultExtension: "txt");
+            viewModel.ConfirmEditExportedNameListAsync = _ConfirmEditExportedNameListAsync;
+            viewModel.ShowExportNameListErrorAsync = _ShowExportNameListErrorAsync;
+        }
+
+        private static void _ClearExportNameListUi(RenameListViewModel viewModel)
+        {
+            viewModel.PickNameListSavePathAsync = null;
+            viewModel.ConfirmEditExportedNameListAsync = null;
+            viewModel.ShowExportNameListErrorAsync = null;
+        }
+
+        private async Task<bool> _ConfirmEditExportedNameListAsync(string path)
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return false;
+            }
+
+            var confirm = new ConfirmMessageDialog(
+                title: "Magic File Renamer",
+                message: $"Name list saved to {path}. Edit?"
+            );
+            return await confirm.ShowDialog<bool>(owner).ConfigureAwait(true);
+        }
+
+        private async Task _ShowExportNameListErrorAsync(string title, string message)
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            await new OkMessageDialog(title, message).ShowDialog(owner).ConfigureAwait(true);
         }
 
         /// <inheritdoc />

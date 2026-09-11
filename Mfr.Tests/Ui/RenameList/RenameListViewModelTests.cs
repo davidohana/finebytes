@@ -521,6 +521,74 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies ExportNameListAsync writes the column lines when a save path is chosen.
+        /// </summary>
+        [Fact]
+        public async Task ExportNameListAsync_writes_file_when_path_chosen()
+        {
+            var dir = _context.CreateTempDir();
+            var alphaPath = Path.Combine(dir, "alpha.txt");
+            var betaPath = Path.Combine(dir, "beta.txt");
+            await File.WriteAllTextAsync(alphaPath, "x");
+            await File.WriteAllTextAsync(betaPath, "x");
+            var outPath = Path.Combine(dir, "names.txt");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
+            renameListViewModel.PickNameListSavePathAsync = () => Task.FromResult<string?>(outPath);
+            renameListViewModel.ConfirmEditExportedNameListAsync = _ => Task.FromResult(false);
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            await renameListViewModel.ExportNameListAsync(nameKey);
+
+            Assert.Equal($"alpha{Environment.NewLine}beta{Environment.NewLine}", await File.ReadAllTextAsync(outPath));
+        }
+
+        /// <summary>
+        /// Verifies ExportNameListAsync leaves disk alone when the save dialog is cancelled.
+        /// </summary>
+        [Fact]
+        public async Task ExportNameListAsync_cancel_leaves_disk_alone()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+            var outPath = Path.Combine(dir, "names.txt");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]);
+            renameListViewModel.PickNameListSavePathAsync = () => Task.FromResult<string?>(null);
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            await renameListViewModel.ExportNameListAsync(nameKey);
+
+            Assert.False(File.Exists(outPath));
+        }
+
+        /// <summary>
+        /// Verifies ExportNameListAsync opens the file when the edit prompt returns yes.
+        /// </summary>
+        [Fact]
+        public async Task ExportNameListAsync_edit_yes_opens_with_default_app()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+            var outPath = Path.Combine(dir, "names.txt");
+            var shell = new RecordingFileShellOpener();
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, shellOpener: shell);
+            await renameListViewModel.AddPathsAsync([path]);
+            renameListViewModel.PickNameListSavePathAsync = () => Task.FromResult<string?>(outPath);
+            renameListViewModel.ConfirmEditExportedNameListAsync = _ => Task.FromResult(true);
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            await renameListViewModel.ExportNameListAsync(nameKey);
+
+            Assert.Equal([outPath], shell.OpenedWithDefaultApp);
+        }
+
+        /// <summary>
         /// Verifies RemoveUnchanged is a no-op for an empty list and does not raise MembershipChanged.
         /// </summary>
         [Fact]

@@ -88,6 +88,63 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Exports this column's display lines to a UTF-8 text file (MFR7 Export Name List).
+        /// </summary>
+        /// <param name="key">Original or preview field key from the header menu.</param>
+        /// <remarks>
+        /// <para>
+        /// Uses <see cref="PickNameListSavePathAsync"/> for the save dialog. On success, asks
+        /// <see cref="ConfirmEditExportedNameListAsync"/> and may open the file via the shell opener.
+        /// Cancelled pick leaves disk unchanged.
+        /// </para>
+        /// </remarks>
+        public async Task ExportNameListAsync(RenameListFieldKey key)
+        {
+            if (IsBusy || PickNameListSavePathAsync is null)
+            {
+                return;
+            }
+
+            var path = await PickNameListSavePathAsync().ConfigureAwait(true);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return;
+            }
+
+            try
+            {
+                _renameList.ExportNameList(path, key);
+            }
+            catch (Exception ex)
+            {
+                if (ShowExportNameListErrorAsync is not null)
+                {
+                    var fieldName = RenameListFieldCatalog.GetField(key).DisplayName;
+                    await ShowExportNameListErrorAsync(
+                            "Magic File Renamer",
+                            $"Failed to generate name list for field {fieldName}\n\n{path}\n\n{ex.Message}"
+                        )
+                        .ConfigureAwait(true);
+                }
+
+                return;
+            }
+
+            if (ConfirmEditExportedNameListAsync is null)
+            {
+                return;
+            }
+
+            var shouldEdit = await ConfirmEditExportedNameListAsync(path).ConfigureAwait(true);
+            if (!shouldEdit)
+            {
+                return;
+            }
+
+            _shellOpener.OpenWithDefaultApp(path);
+        }
+
+        /// <summary>
         /// Removes every Rename List row that is not selected, keeping the selection.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanRemoveAllButSelected))]

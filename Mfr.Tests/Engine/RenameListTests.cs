@@ -654,6 +654,55 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies ExportNameList writes CollectNameList lines as UTF-8 text in list order.
+        /// </summary>
+        [Fact]
+        public void ExportNameList_writes_utf8_lines_in_list_order()
+        {
+            var (helloPath, worldPath) = TestHelpers.CreateFiles(_tempRoot, "hello.txt", "world.txt");
+            var outPath = Path.Combine(_tempRoot, "names.txt");
+
+            var renameList = new RenameList();
+            renameList.AddSources([helloPath, worldPath]);
+            renameList.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ])
+            );
+
+            var originalKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+            renameList.ExportNameList(outPath, originalKey);
+            Assert.Equal($"hello.txt{Environment.NewLine}world.txt{Environment.NewLine}", File.ReadAllText(outPath));
+
+            renameList.ExportNameList(outPath, previewKey);
+            Assert.Equal($"HELLO.txt{Environment.NewLine}WORLD.txt{Environment.NewLine}", File.ReadAllText(outPath));
+        }
+
+        /// <summary>
+        /// Verifies ExportNameList creates an empty file when there are no rename items.
+        /// </summary>
+        [Fact]
+        public void ExportNameList_empty_list_writes_empty_file()
+        {
+            var outPath = Path.Combine(_tempRoot, "empty.txt");
+            var renameList = new RenameList();
+            var key = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+
+            renameList.ExportNameList(outPath, key);
+
+            Assert.True(File.Exists(outPath));
+            Assert.Empty(File.ReadAllText(outPath));
+        }
+
+        /// <summary>
         /// Verifies CollectNameList returns an empty list when there are no rename items.
         /// </summary>
         [Fact]
