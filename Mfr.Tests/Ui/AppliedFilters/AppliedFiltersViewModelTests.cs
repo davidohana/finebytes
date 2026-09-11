@@ -235,6 +235,26 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies Remove All But Selected raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// </summary>
+        [Fact]
+        public void RemoveAllButSelected_Raises_ChainChanged_Once()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            viewModel.SetSelectedSteps([]);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("RemoveSpaces"));
+            viewModel.SetSelectedSteps([viewModel.Steps[1]]);
+
+            var count = _CountChainChanged(viewModel, () => viewModel.RemoveAllButSelectedCommand.Execute(null));
+
+            Assert.Equal(1, count);
+            Assert.Single(viewModel.Steps);
+        }
+
+        /// <summary>
         /// Verifies Remove All But Selected is disabled when nothing or everything is selected.
         /// </summary>
         [Fact]

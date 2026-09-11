@@ -36,21 +36,14 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             _SelectStepForContextMenu(hit);
         }
 
+        /// <summary>
+        /// Selects <paramref name="hit"/> for the context menu unless it is already selected
+        /// (sole selection or part of a multi-selection).
+        /// </summary>
+        /// <param name="hit">Step under the pointer.</param>
         private void _SelectStepForContextMenu(AppliedFilterStepViewModel hit)
         {
-            if (_viewModel is null)
-            {
-                return;
-            }
-
-            var isOnlySelected = _viewModel.SelectedSteps.Count == 1 && _viewModel.SelectedSteps[0] == hit;
-            if (isOnlySelected)
-            {
-                return;
-            }
-
-            var keepMultiSelection = _viewModel.SelectedSteps.Count > 1 && _viewModel.SelectedSteps.Contains(hit);
-            if (keepMultiSelection)
+            if (_viewModel is null || _viewModel.SelectedSteps.Contains(hit))
             {
                 return;
             }

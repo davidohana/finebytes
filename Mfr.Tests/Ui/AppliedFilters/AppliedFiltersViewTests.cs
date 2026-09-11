@@ -131,6 +131,28 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies a context request on a row already in a multi-selection keeps that selection.
+        /// </summary>
+        [AvaloniaFact]
+        public void ContextRequest_On_Selected_Row_Keeps_MultiSelection()
+        {
+            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
+            viewModel.SetSelectedSteps([viewModel.Steps[0], viewModel.Steps[1]]);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal([0, 1], list.Selection.SelectedIndexes.OrderBy(i => i).ToList());
+
+            var row = list.ContainerFromIndex(1) as ListBoxItem;
+            Assert.NotNull(row);
+            row.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal([viewModel.Steps[0], viewModel.Steps[1]], viewModel.SelectedSteps);
+            Assert.Equal([0, 1], list.Selection.SelectedIndexes.OrderBy(i => i).ToList());
+
+            window.Close();
+        }
+
         private static string _RowDisplayName(ListBox list, int rowIndex)
         {
             return _RowTextBlock(list, rowIndex, blockIndex: 0);

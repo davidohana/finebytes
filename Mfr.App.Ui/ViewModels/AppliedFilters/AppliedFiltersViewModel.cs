@@ -397,16 +397,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             var selected = _selectedSteps.ToHashSet();
-            _WithSingleChainChanged(() =>
+            var removeIndices = new HashSet<int>();
+            for (var index = 0; index < Steps.Count; index++)
             {
-                for (var index = Steps.Count - 1; index >= 0; index--)
+                if (!selected.Contains(Steps[index]))
                 {
-                    if (!selected.Contains(Steps[index]))
-                    {
-                        Steps.RemoveAt(index);
-                    }
+                    removeIndices.Add(index);
                 }
-            });
+            }
+
+            _WithSingleChainChanged(() => _RemoveAtIndices(removeIndices));
 
             SetSelectedSteps([.. Steps.Where(selected.Contains)]);
         }
@@ -672,7 +672,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             CheckAllFiltersCommand.NotifyCanExecuteChanged();
             UncheckAllFiltersCommand.NotifyCanExecuteChanged();
             InvertCheckCommand.NotifyCanExecuteChanged();
-            RemoveStepsAtIndicesCommand.NotifyCanExecuteChanged();
             _NotifySelectionCommandsChanged();
             _RaiseChainChanged();
         }
@@ -890,6 +889,10 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             return _selectedSteps.Count > 0 && _selectedSteps.Count < Steps.Count;
         }
 
+        /// <summary>
+        /// Sets <see cref="AppliedFilterStepViewModel.Enabled"/> on every step with one <see cref="ChainChanged"/>.
+        /// </summary>
+        /// <param name="enabled">Value written to each step.</param>
         private void _SetAllEnabled(bool enabled)
         {
             if (Steps.Count == 0)
@@ -972,18 +975,24 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             var indexSet = sortedIndices.ToHashSet();
             var anchorIndex = sortedIndices[0];
 
-            _WithSingleChainChanged(() =>
-            {
-                for (var index = Steps.Count - 1; index >= 0; index--)
-                {
-                    if (indexSet.Contains(index))
-                    {
-                        Steps.RemoveAt(index);
-                    }
-                }
-            });
+            _WithSingleChainChanged(() => _RemoveAtIndices(indexSet));
 
             SetSelectedSteps(_SelectStepsAfterRemove(anchorIndex));
+        }
+
+        /// <summary>
+        /// Removes steps at the given indices, highest index first (safe while mutating the list).
+        /// </summary>
+        /// <param name="indexSet">Indices to remove.</param>
+        private void _RemoveAtIndices(HashSet<int> indexSet)
+        {
+            for (var index = Steps.Count - 1; index >= 0; index--)
+            {
+                if (indexSet.Contains(index))
+                {
+                    Steps.RemoveAt(index);
+                }
+            }
         }
 
         private void _NotifySelectionCommandsChanged()
