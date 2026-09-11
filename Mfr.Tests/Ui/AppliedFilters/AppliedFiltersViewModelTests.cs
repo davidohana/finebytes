@@ -945,6 +945,106 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies Load Preset applies visible columns when a Rename List column source is wired.
+        /// </summary>
+        [Fact]
+        public void LoadPreset_Applies_VisibleColumns_When_Source_Wired()
+        {
+            IReadOnlyList<RenameListVisibleColumnSpec>? applied = null;
+            var columns = new List<RenameListVisibleColumnSpec>
+            {
+                new(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    Width: 180
+                ),
+            };
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "WithCols",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns = columns,
+            };
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.SetRenameListColumnSource(capture: () => [], apply: specs => applied = specs);
+
+            viewModel.LoadPreset(preset);
+
+            Assert.Same(columns, applied);
+        }
+
+        /// <summary>
+        /// Verifies Load Preset leaves Rename List columns unchanged when the preset omits them.
+        /// </summary>
+        [Fact]
+        public void LoadPreset_Skips_Apply_When_VisibleColumns_Null()
+        {
+            var applyCount = 0;
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "NoCols",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns = null,
+            };
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.SetRenameListColumnSource(capture: () => [], apply: _ => applyCount++);
+
+            viewModel.LoadPreset(preset);
+
+            Assert.Equal(0, applyCount);
+        }
+
+        /// <summary>
+        /// Verifies Load Preset with columns is a no-op for Rename List when no source is wired.
+        /// </summary>
+        [Fact]
+        public void LoadPreset_Skips_Apply_When_Source_Unset()
+        {
+            var columns = new List<RenameListVisibleColumnSpec>
+            {
+                new(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    Width: 100
+                ),
+            };
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "ColsNoWire",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns = columns,
+            };
+            var viewModel = new AppliedFiltersViewModel();
+
+            // Pane-only hosts leave the source unset; must not throw.
+            viewModel.LoadPreset(preset);
+
+            Assert.Same(preset, viewModel.LastLoaded);
+        }
+
+        /// <summary>
+        /// Verifies CaptureRenameListColumns uses the wired source, or empty when unset.
+        /// </summary>
+        [Fact]
+        public void CaptureRenameListColumns_Uses_Wired_Source_Or_Empty()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            Assert.Empty(viewModel.CaptureRenameListColumns());
+
+            var columns = new List<RenameListVisibleColumnSpec>
+            {
+                new(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
+                    Width: null
+                ),
+            };
+            viewModel.SetRenameListColumnSource(capture: () => columns, apply: _ => { });
+
+            Assert.Same(columns, viewModel.CaptureRenameListColumns());
+        }
+
+        /// <summary>
         /// Verifies confirm-replace is required only when the flag is on and the stack is non-empty.
         /// </summary>
         [Fact]

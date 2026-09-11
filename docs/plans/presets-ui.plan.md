@@ -123,7 +123,7 @@ Reuse [`RenameListVisibleColumnSpec`](../../Mfr.Models/RenameList/RenameListVisi
 { "ui": { "presets": { "confirmReplaceAppliedFiltersOnLoad": "false" } } }
 ```
 
-Shared host helper `TryLoadPresetAsync` (confirm → `LoadPreset` → `ApplyIfPresent`) for Manager Load and ▾.
+Shared host helper `TryLoadPresetAsync` (confirm → `LoadPreset`, which applies optional columns via the wired Rename List source) for Manager Load and ▾.
 
 ### Engine
 

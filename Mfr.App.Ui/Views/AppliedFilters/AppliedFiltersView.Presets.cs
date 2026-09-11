@@ -124,10 +124,12 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Confirms replace when needed, loads <paramref name="preset"/>, and applies optional columns.
+        /// Confirms replace when needed, then loads the preset (chain and optional columns).
         /// <para>
-        /// Shared by Preset Manager Load and the toolbar ▾ quick-pick. On failure shows an error dialog
-        /// and returns <see langword="false"/>.
+        /// Shared by Preset Manager Load and the toolbar ▾ quick-pick. Column apply (when the preset
+        /// includes them) happens inside <see cref="ViewModels.AppliedFilters.AppliedFiltersViewModel.LoadPreset"/>
+        /// through the wired Rename List source. On failure shows an error dialog and returns
+        /// <see langword="false"/>.
         /// </para>
         /// </summary>
         /// <param name="preset">Preset to load.</param>
@@ -157,7 +159,6 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             try
             {
                 _viewModel.LoadPreset(preset);
-                PresetRenameListColumns.ApplyIfPresent(this, preset.VisibleColumns);
                 return true;
             }
             catch (Exception ex)
@@ -212,7 +213,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
             try
             {
-                var columns = dialogVm.SaveRenameListColumns ? PresetRenameListColumns.Capture(this) : null;
+                var columns = dialogVm.SaveRenameListColumns ? _viewModel.CaptureRenameListColumns() : null;
                 _viewModel.SavePreset(name, dialogVm.TrimmedDescriptionOrNull, columns);
             }
             catch (Exception ex)

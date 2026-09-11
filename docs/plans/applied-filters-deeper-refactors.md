@@ -13,33 +13,26 @@ ______________________________________________________________________
 
 ## Already done / obsolete (do not re-open)
 
-| Item                                                                                                 | Status                                                                 |
-| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Shared ordered-preset sort (Manager + ▾)                                                             | **Done** — `PresetNameOrder.ByName`                                    |
-| `FilterHelpMap` / HelpFileName attribute                                                             | **Done** — `{Type}.html` on `FilterCatalogEntry`                       |
-| Release-gate Help roots / ship Help beside exe                                                       | **Done** — `AppContext.BaseDirectory/help` only                        |
-| Share `SessionJsonOptions` ↔ `PresetJsonOptions`                                                     | **Obsolete** — F8 / session Applied Filters chain removed              |
-| Mid-session session flush / sibling section capture                                                  | **Obsolete** — no Applied Filters write-through                        |
-| Session debounce vs Auto-Preview helper                                                              | **Obsolete** — same                                                    |
-| `CountFilterOptions.ClampToLength`                                                                   | **Done** — already on the options type                                 |
-| Collapse dual `IFileShellOpener` trees                                                               | **Done** — single `Services.Shell`                                     |
-| Space Character empty-Other → `' '`                                                                  | **Superseded** — Other+empty → `'\0'`, rejected at setup               |
-| `CanSavePreset` notify / `PresetRenameListColumns` / `TryLoadPresetAsync` / `Refresh(preferredName)` | **Done** during F7 reviews                                             |
-| Rename `SessionStateRenameListColumn` → shared DTO                                                   | **Done** — `RenameListVisibleColumnSpec`                               |
-| Multiline Entries control / line-iteration helper                                                    | **Done** — `MultilineEntriesFieldset` + `MultilineText.EnumerateLines` |
-| Replace List / Replacer compile regex once in `_Setup`                                               | **Done** — `ReplacerMatching.CompileSearch` cached on both filters     |
+| Item                                                                                                 | Status                                                                                                                               |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Shared ordered-preset sort (Manager + ▾)                                                             | **Done** — `PresetNameOrder.ByName`                                                                                                  |
+| `FilterHelpMap` / HelpFileName attribute                                                             | **Done** — `{Type}.html` on `FilterCatalogEntry`                                                                                     |
+| Release-gate Help roots / ship Help beside exe                                                       | **Done** — `AppContext.BaseDirectory/help` only                                                                                      |
+| Share `SessionJsonOptions` ↔ `PresetJsonOptions`                                                     | **Obsolete** — F8 / session Applied Filters chain removed                                                                            |
+| Mid-session session flush / sibling section capture                                                  | **Obsolete** — no Applied Filters write-through                                                                                      |
+| Session debounce vs Auto-Preview helper                                                              | **Obsolete** — same                                                                                                                  |
+| `CountFilterOptions.ClampToLength`                                                                   | **Done** — already on the options type                                                                                               |
+| Collapse dual `IFileShellOpener` trees                                                               | **Done** — single `Services.Shell`                                                                                                   |
+| Space Character empty-Other → `' '`                                                                  | **Superseded** — Other+empty → `'\0'`, rejected at setup                                                                             |
+| `CanSavePreset` notify / `PresetRenameListColumns` / `TryLoadPresetAsync` / `Refresh(preferredName)` | **Done** during F7 reviews                                                                                                           |
+| Rename `SessionStateRenameListColumn` → shared DTO                                                   | **Done** — `RenameListVisibleColumnSpec`                                                                                             |
+| Multiline Entries control / line-iteration helper                                                    | **Done** — `MultilineEntriesFieldset` + `MultilineText.EnumerateLines`                                                               |
+| Replace List / Replacer compile regex once in `_Setup`                                               | **Done** — `ReplacerMatching.CompileSearch` cached on both filters                                                                   |
+| Inject column capture/apply into presets host                                                        | **Done** — `AppliedFiltersViewModel.SetRenameListColumnSource` from main window; deleted `PresetRenameListColumns` TopLevel reach-in |
 
 ______________________________________________________________________
 
 ## Still worth doing (best cost-to-value first)
-
-### 4. Inject column capture/apply (or `RenameListViewModel`) into presets host
-
-- **Sites:** `PresetRenameListColumns` → `TopLevel` → `MainWindowViewModel`
-- **Target:** inject capture/apply callbacks or Rename List VM from composition root
-- **Value:** no TopLevel reach-in; easier tests
-- **Cost:** low–medium wiring in App / MainWindow
-- **Rank:** medium — nicest remaining presets seam
 
 ### 5. Shared “position from the side” row control
 

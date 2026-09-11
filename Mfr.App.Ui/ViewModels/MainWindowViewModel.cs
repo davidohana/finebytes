@@ -68,6 +68,10 @@ namespace Mfr.App.Ui.ViewModels
             );
             FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
             RenameListViewModel = new RenameListViewModel(FileListViewModel, appliedFilters: AppliedFiltersViewModel);
+            AppliedFiltersViewModel.SetRenameListColumnSource(
+                RenameListViewModel.CaptureVisibleColumnSpecs,
+                RenameListViewModel.ApplyVisibleColumnSpecs
+            );
             FilterEditorViewModel = new FilterEditorViewModel();
             FilterEditorViewModel.ApplySession(session);
             FilterEditorViewModel.SetSampleRenameItemSource(

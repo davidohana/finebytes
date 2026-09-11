@@ -20,6 +20,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private readonly FilterDefaultsStore _filterDefaults;
         private readonly FilterHelpHost _filterHelp;
         private readonly List<AppliedFilterStepViewModel> _selectedSteps = [];
+        private Func<IReadOnlyList<RenameListVisibleColumnSpec>>? _captureRenameListColumns;
+        private Action<IReadOnlyList<RenameListVisibleColumnSpec>>? _applyRenameListColumns;
         private int _chainChangedBatchDepth;
         private bool _chainChangedQueued;
 
@@ -66,6 +68,38 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         internal void ClearFilterDefaultsCache()
         {
             _filterDefaults.Clear();
+        }
+
+        /// <summary>
+        /// Wires Rename List column capture/apply from the composition root (main window).
+        /// <para>
+        /// When unset, <see cref="CaptureRenameListColumns"/> returns an empty list and
+        /// <see cref="LoadPreset"/> skips applying columns (pane-only tests).
+        /// </para>
+        /// </summary>
+        /// <param name="capture">Returns the current Rename List visible column specs.</param>
+        /// <param name="apply">Applies non-null column specs to the Rename List.</param>
+        internal void SetRenameListColumnSource(
+            Func<IReadOnlyList<RenameListVisibleColumnSpec>> capture,
+            Action<IReadOnlyList<RenameListVisibleColumnSpec>> apply
+        )
+        {
+            ArgumentNullException.ThrowIfNull(capture);
+            ArgumentNullException.ThrowIfNull(apply);
+
+            _captureRenameListColumns = capture;
+            _applyRenameListColumns = apply;
+        }
+
+        /// <summary>
+        /// Captures current Rename List visible columns for Save Preset.
+        /// </summary>
+        /// <returns>
+        /// Current columns when a source is wired; otherwise an empty list.
+        /// </returns>
+        internal IReadOnlyList<RenameListVisibleColumnSpec> CaptureRenameListColumns()
+        {
+            return _captureRenameListColumns?.Invoke() ?? [];
         }
 
         /// <summary>
@@ -141,8 +175,9 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Replaces the Applied Filters stack from <paramref name="preset"/> and records it as last-loaded.
         /// <para>
-        /// Caller applies optional <see cref="FilterPreset.VisibleColumns"/> and owns confirm-replace /
-        /// corrupt-open UI. Empty chains are allowed.
+        /// When <see cref="FilterPreset.VisibleColumns"/> is present and a Rename List column source is
+        /// wired, applies those columns. Caller owns confirm-replace / corrupt-open UI. Empty chains are
+        /// allowed. Omitted/<see langword="null"/> columns leave the Rename List unchanged.
         /// </para>
         /// </summary>
         /// <param name="preset">Preset to load (uses its <see cref="FilterPreset.Chain"/>).</param>
@@ -152,6 +187,10 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             ReplaceFromChain(preset.Chain);
             SetLastLoaded(preset);
+            if (preset.VisibleColumns is not null)
+            {
+                _applyRenameListColumns?.Invoke(preset.VisibleColumns);
+            }
         }
 
         /// <summary>
