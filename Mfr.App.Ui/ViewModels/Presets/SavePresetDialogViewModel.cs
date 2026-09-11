@@ -8,7 +8,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
     /// </summary>
     public sealed partial class SavePresetDialogViewModel : ViewModelBase
     {
-        private readonly IReadOnlyDictionary<string, FilterPreset> _nameToPreset;
+        private readonly Dictionary<string, FilterPreset> _nameToPreset;
 
         /// <summary>
         /// Initializes draft fields, optionally prefilled from the last-loaded preset.
@@ -32,13 +32,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         {
             var presets = existingPresets?.ToList() ?? [];
             _nameToPreset = presets.ToDictionary(preset => preset.Name, StringComparer.Ordinal);
-            ExistingNames =
-            [
-                .. presets
-                    .Select(preset => preset.Name)
-                    .OrderBy(name => name, StringComparer.OrdinalIgnoreCase)
-                    .ThenBy(name => name, StringComparer.Ordinal),
-            ];
+            ExistingNames = [.. PresetNameOrder.ByName(presets).Select(preset => preset.Name)];
 
             if (lastLoaded is null || !prefillFromLastLoaded)
             {
@@ -96,9 +90,22 @@ namespace Mfr.App.Ui.ViewModels.Presets
             }
         }
 
-        partial void OnNameChanged(string value)
+        /// <summary>
+        /// Prefills description and columns from an existing preset chosen in the Name suggestions list.
+        /// <para>
+        /// Call only on ComboBox selection — not on free-typed Name changes — so typing an existing
+        /// name does not wipe a description the user already edited.
+        /// </para>
+        /// </summary>
+        /// <param name="selectedName">Selected suggestion name, or <see langword="null"/> when cleared.</param>
+        public void ApplySuggestion(string? selectedName)
         {
-            var trimmed = value.Trim();
+            if (selectedName is null)
+            {
+                return;
+            }
+
+            var trimmed = selectedName.Trim();
             if (trimmed.Length == 0 || !_nameToPreset.TryGetValue(trimmed, out var preset))
             {
                 return;

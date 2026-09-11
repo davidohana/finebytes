@@ -18,6 +18,7 @@ namespace Mfr.App.Ui.Views.Presets
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
+            NameBox.SelectionChanged += _OnNameSuggestionSelected;
         }
 
         /// <summary>
@@ -44,6 +45,24 @@ namespace Mfr.App.Ui.Views.Presets
             }
 
             NameBox.Focus();
+        }
+
+        /// <summary>
+        /// Prefills description/columns only when the user picks a Name suggestion (not free typing).
+        /// </summary>
+        private void _OnNameSuggestionSelected(object? sender, SelectionChangedEventArgs e)
+        {
+            if (DataContext is not SavePresetDialogViewModel viewModel)
+            {
+                return;
+            }
+
+            if (e.AddedItems.Count == 0)
+            {
+                return;
+            }
+
+            viewModel.ApplySuggestion(e.AddedItems[0] as string);
         }
 
         private void _OnSaveClick(object? sender, RoutedEventArgs e)

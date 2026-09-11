@@ -38,7 +38,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         private FilterPreset? _selectedPreset;
 
         /// <summary>
-        /// Gets whether a preset is selected (enables Load / Delete / Edit / Rename).
+        /// Gets whether a preset is selected (enables Load / Delete / Rename).
         /// </summary>
         public bool HasSelection => SelectedPreset is not null;
 
@@ -58,11 +58,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         {
             var selectedName = preferredName ?? SelectedPreset?.Name;
             Presets.Clear();
-            foreach (
-                var preset in _appliedFilters
-                    .PresetManager.NameToPreset.Values.OrderBy(preset => preset.Name, StringComparer.OrdinalIgnoreCase)
-                    .ThenBy(preset => preset.Name, StringComparer.Ordinal)
-            )
+            foreach (var preset in PresetNameOrder.ByName(_appliedFilters.PresetManager.NameToPreset.Values))
             {
                 Presets.Add(preset);
             }

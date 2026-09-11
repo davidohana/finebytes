@@ -149,10 +149,10 @@ namespace Mfr.Tests.Ui.Presets
         }
 
         /// <summary>
-        /// Verifies choosing an existing name prefills description and columns from that preset.
+        /// Verifies choosing an existing suggestion prefills description and columns from that preset.
         /// </summary>
         [Fact]
-        public void Selecting_Existing_Name_Prefills_Description_And_Columns()
+        public void ApplySuggestion_Prefills_Description_And_Columns()
         {
             var other = new FilterPreset
             {
@@ -179,9 +179,45 @@ namespace Mfr.Tests.Ui.Presets
             Assert.False(viewModel.SaveRenameListColumns);
 
             viewModel.Name = "Other";
+            viewModel.ApplySuggestion("Other");
 
             Assert.Equal("from other", viewModel.Description);
             Assert.True(viewModel.SaveRenameListColumns);
+        }
+
+        /// <summary>
+        /// Verifies typing an existing name does not wipe description/columns (selection-only prefill).
+        /// </summary>
+        [Fact]
+        public void Typing_Existing_Name_Does_Not_Prefill()
+        {
+            var other = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Other",
+                Description = "from other",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns =
+                [
+                    new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)),
+                ],
+            };
+            var lastLoaded = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Mine",
+                Description = "mine",
+                Chain = new FilterChain { Steps = [] },
+            };
+
+            var viewModel = new SavePresetDialogViewModel(lastLoaded, existingPresets: [lastLoaded, other]);
+            viewModel.Description = "keep my edits";
+            viewModel.SaveRenameListColumns = false;
+
+            viewModel.Name = "Other";
+
+            Assert.Equal("keep my edits", viewModel.Description);
+            Assert.False(viewModel.SaveRenameListColumns);
         }
     }
 }

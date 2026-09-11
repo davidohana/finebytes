@@ -4,6 +4,7 @@ using Avalonia.Layout;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.App.Ui.Views.Presets;
+using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Tests.Ui.Presets
 {
@@ -47,6 +48,48 @@ namespace Mfr.Tests.Ui.Presets
             var footer = dialog.FindControl<StackPanel>("Footer");
             Assert.NotNull(footer);
             Assert.Equal(HorizontalAlignment.Center, footer.HorizontalAlignment);
+
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies picking a Name suggestion prefills description/columns via SelectionChanged.
+        /// </summary>
+        [AvaloniaFact]
+        public void Name_Suggestion_Selection_Prefills_Description_And_Columns()
+        {
+            var mine = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Mine",
+                Description = "mine",
+                Chain = new FilterChain { Steps = [] },
+            };
+            var other = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Other",
+                Description = "from other",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns =
+                [
+                    new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)),
+                ],
+            };
+            var viewModel = new SavePresetDialogViewModel(mine, existingPresets: [mine, other]);
+            var dialog = new SavePresetDialog(viewModel);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var nameBox = dialog.FindControl<ComboBox>("NameBox");
+            Assert.NotNull(nameBox);
+            nameBox.SelectedItem = "Other";
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal("Other", viewModel.Name);
+            Assert.Equal("from other", viewModel.Description);
+            Assert.True(viewModel.SaveRenameListColumns);
 
             dialog.Close();
         }

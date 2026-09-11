@@ -62,10 +62,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            var presets = _viewModel
-                .PresetManager.NameToPreset.Values.OrderBy(preset => preset.Name, StringComparer.OrdinalIgnoreCase)
-                .ThenBy(preset => preset.Name, StringComparer.Ordinal)
-                .ToList();
+            var presets = PresetNameOrder.ByName(_viewModel.PresetManager.NameToPreset.Values).ToList();
             if (presets.Count == 0)
             {
                 _AddNoPresetsPlaceholder(flyout);
