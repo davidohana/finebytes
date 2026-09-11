@@ -117,7 +117,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <remarks>
         /// <para>
         /// Order: title → Hide Field → (preview) Remove Unchanged → Select Visible Fields →
-        /// Select Sort Fields → Edit as Name List (writable) → Export Name List.
+        /// Select Sort Fields → separator → Edit as Name List (writable) → Export Name List.
         /// </para>
         /// </remarks>
         private static ContextMenu _BuildColumnHeaderContextMenu(
@@ -159,6 +159,7 @@ namespace Mfr.App.Ui.Views.RenameList
                     viewModel.OpenEditSortFieldsCommand
                 )
             );
+            menu.Items.Add(new Separator());
 
             if (field.SupportsWrite)
             {
