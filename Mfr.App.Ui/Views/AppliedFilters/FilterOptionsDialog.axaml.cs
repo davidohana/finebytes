@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
     /// </summary>
     /// <remarks>
     /// Opens height-to-content, then locks height so only width remains resizable. Relocks when
-    /// Apply-on scope panels show or hide.
+    /// Apply-on scope panels show or hide. Focuses the Name box on first open (MFR7 parity).
     /// </remarks>
     public partial class FilterOptionsDialog : Window
     {
@@ -39,6 +39,14 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             : this()
         {
             DataContext = viewModel;
+        }
+
+        /// <inheritdoc />
+        protected override void OnOpened(EventArgs e)
+        {
+            base.OnOpened(e);
+            NameBox.Focus();
+            NameBox.SelectAll();
         }
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)

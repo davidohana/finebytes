@@ -1,5 +1,5 @@
 <Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <!-- Shared OK / Cancel footer chrome for OkMessageDialog and ConfirmMessageDialog. -->
+  <!-- Shared OK / Cancel footer chrome for message dialogs, Filter Options, Save Preset, etc. -->
   <Style Selector="Button.message-dialog-footer">
     <Setter Property="MinHeight" Value="24" />
     <Setter Property="MinWidth" Value="72" />

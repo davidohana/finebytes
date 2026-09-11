@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F8 + F9a/b/c done on master. Remaining: F10 Filter Options polish."
+overview: "F1–F10 complete on master. Applied Filters / Filter Configuration backlog empty."
 todos:
   - id: f1-f5-complete
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
@@ -25,7 +25,7 @@ todos:
     status: completed
   - id: f10-filter-options-polish
     content: "F10 Filter Options dialog — XAML/layout polish vs MFR7 (dialog already functional)"
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -33,13 +33,13 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-11):** **F1–F8 + F9a/b/c complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌**, reset **↺**, and help **?** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, Save / Save As, toolbar ▾ quick-pick, and confirm-replace. **F8** persists the working Applied Filters chain on `SessionState.AppliedFilters` (`FilterChain` shape; catalog names on restore).
+**Status (2026-09-11):** **F1–F10 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌**, reset **↺**, and help **?** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, Save / Save As, toolbar ▾ quick-pick, and confirm-replace. **F8** persists the working Applied Filters chain on `SessionState.AppliedFilters` (`FilterChain` shape; catalog names on restore). **F10** polishes Filter Options layout (shared label rows, MFR7 copy/spacing, blank-name OK gate).
 
 ### Priority (what's left)
 
-| Order | Item                          | Why next                                           |
-| ----- | ----------------------------- | -------------------------------------------------- |
-| **1** | **F10 Filter Options polish** | Dialog already works; cosmetic layout vs MFR7 only |
+| Order | Item                     | Why next |
+| ----- | ------------------------ | -------- |
+| —     | *(none — backlog empty)* | —        |
 
 Do **not** mix remaining polish into unrelated passes.
 
@@ -71,7 +71,7 @@ Editors live under `ViewModels/FilterEditors/<FilterGroup>/` ↔ `Views/FilterEd
 | **Audio**      | Tag Remover; Audio Tag Setter; ID3v2 Field Setter                                               |
 | **Misc**       | Fix Leading 0's; Strip Parentheses; Mover (`PathMover`)                                         |
 
-**Optionless (title only, intentional):** Shrink/Remove/Strip Spaces, Separate Capitalized Text, Uppercase Initials.
+**Optionless (title only, intentional):** Shrink/Remove/Strip Spaces, Separate Capitalized Words, Uppercase Initials.
 
 ### Implementation pattern (reference)
 
@@ -127,13 +127,13 @@ Rename List / other session fields already persist; Applied Filters chain now us
 | **F9b Reset to defaults (↺)** | **done** | Single selection; options / Apply To / scope via `FilterCatalog.CreateDefault`; keeps display name + enabled.                                                                          |
 | **F9c Help `?`**              | **done** | Title-bar **?** (MFR7 `FilterTitle`); `FilterHelpMap` → MFR7 HTML; `FilterHelpHost` opens from install/source Help roots or missing-help dialog. Not on Filter Options (MFR7 parity).  |
 
-### F10 — Filter Options dialog polish
+### F10 — Filter Options dialog polish — **done**
 
-Dialog already edits name, Apply To, and scope. Polish only:
+Dialog already edited name, Apply To, and scope. Polish shipped:
 
-1. Layout / spacing / control sizing vs MFR7 Filter Options.
-1. Shared label column alignment (same `SharedSizeGroup` pattern as filter editors where it still drifts).
-1. Any remaining Apply To / scope edge cases discovered in use — fix with tests, not a full rewrite.
+1. Layout / spacing / control sizing vs MFR7 Filter Options (outer frame, denser footer gap, shared dialog footer chrome).
+1. Shared label column alignment via `FilterEditorLabeledRow` / `FilterEditorLabel` (nested scopes inside Token / Substring fieldsets).
+1. Blank-name OK gate (`Name required`) with tooltip on disabled OK; Name focuses on open; MFR7 label copy (`Apply To:`, `Token separator string:`, colonized substring positions, right-aligned substring labels).
 
 ______________________________________________________________________
 

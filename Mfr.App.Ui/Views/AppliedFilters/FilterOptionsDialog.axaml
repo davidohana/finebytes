@@ -19,16 +19,6 @@
   Foreground="{DynamicResource AppChromeForegroundBrush}"
 >
   <Window.Styles>
-    <Style Selector="TextBlock.filter-options-label">
-      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
-      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
-      <Setter Property="Margin" Value="0,0,10,0" />
-      <Setter Property="HorizontalAlignment" Value="Stretch" />
-      <Setter Property="TextAlignment" Value="Left" />
-      <Setter Property="VerticalAlignment" Value="Center" />
-      <Setter Property="TextWrapping" Value="NoWrap" />
-    </Style>
     <Style Selector="TextBlock.filter-options-suffix">
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
       <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
@@ -80,23 +70,6 @@
     <Style Selector="RadioButton.filter-options-radio">
       <Setter Property="Margin" Value="0,0,16,0" />
     </Style>
-    <Style Selector="Button.filter-options-footer">
-      <Setter Property="MinHeight" Value="24" />
-      <Setter Property="MinWidth" Value="72" />
-      <Setter Property="Padding" Value="12,2" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
-      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
-    <Style Selector="Button.filter-options-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
-    </Style>
   </Window.Styles>
   <DockPanel Margin="12">
     <StackPanel
@@ -104,11 +77,11 @@
       Orientation="Horizontal"
       HorizontalAlignment="Center"
       Spacing="8"
-      Margin="0,14,0,0"
+      Margin="0,12,0,0"
     >
       <Button
         x:Name="OkButton"
-        Classes="filter-options-footer"
+        Classes="message-dialog-footer"
         Content="OK"
         IsDefault="True"
         IsEnabled="{Binding CanConfirm}"
@@ -116,76 +89,70 @@
         ToolTip.ShowOnDisabled="True"
         Click="_OnOkClick"
       />
-      <Button Classes="filter-options-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
+      <Button Classes="message-dialog-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
     </StackPanel>
 
-    <StackPanel Spacing="8" Grid.IsSharedSizeScope="True">
-      <Grid>
-        <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
-          <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <TextBlock Classes="filter-options-label" Text="Name:" />
-        <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding Name}" />
-      </Grid>
+    <!-- Outer frame matches MFR7 untitled GroupBox around form body (buttons stay outside). -->
+    <Border
+      Padding="10,12,10,10"
+      Background="{DynamicResource AppChromeSurfaceBrush}"
+      BorderBrush="{DynamicResource AppChromeBorderBrush}"
+      BorderThickness="1"
+    >
+      <StackPanel Spacing="8" Grid.IsSharedSizeScope="True">
+        <controls:FilterEditorLabeledRow Label="Name:">
+          <TextBox x:Name="NameBox" Classes="filter-options-field" MaxLength="100" Text="{Binding Name}" />
+        </controls:FilterEditorLabeledRow>
 
-      <StackPanel Spacing="8" IsVisible="{Binding HasApplyTo}">
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="6" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <TextBlock
-            Classes="filter-options-label"
-            Text="Apply to:"
+        <StackPanel Spacing="8" IsVisible="{Binding HasApplyTo}">
+          <controls:FilterEditorLabeledRow
+            Label="Apply To:"
             ToolTip.Tip="Which part of the path or metadata this filter transforms (name, extension, folder, tags, …)."
-          />
-          <ComboBox
-            Grid.Column="1"
-            Classes="filter-options-field"
-            HorizontalAlignment="Stretch"
-            ItemsSource="{Binding TargetGroups}"
-            SelectedItem="{Binding SelectedTargetGroup}"
-            ToolTip.Tip="Target category (file name parts, folders, audio fields, …)."
           >
-            <ComboBox.ItemTemplate>
-              <DataTemplate x:DataType="vm:FilterTargetGroupOption">
-                <TextBlock Text="{Binding Label}" />
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-          <ComboBox
-            Grid.Column="3"
-            Classes="filter-options-field"
-            HorizontalAlignment="Stretch"
-            ItemsSource="{Binding TargetOptions}"
-            SelectedItem="{Binding SelectedTargetOption}"
-            ToolTip.Tip="{Binding SelectedTargetToolTip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
-          >
-            <ComboBox.ItemTemplate>
-              <DataTemplate x:DataType="vm:FilterTargetOption">
-                <TextBlock
-                  Text="{Binding Label}"
-                  ToolTip.Tip="{Binding Tip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
-                />
-              </DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-        </Grid>
+            <Grid ColumnDefinitions="*,6,*">
+              <ComboBox
+                Classes="filter-options-field"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{Binding TargetGroups}"
+                SelectedItem="{Binding SelectedTargetGroup}"
+                ToolTip.Tip="Target category (file name parts, folders, audio fields, …)."
+              >
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:FilterTargetGroupOption">
+                    <TextBlock Text="{Binding Label}" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <ComboBox
+                Grid.Column="2"
+                Classes="filter-options-field"
+                HorizontalAlignment="Stretch"
+                ItemsSource="{Binding TargetOptions}"
+                SelectedItem="{Binding SelectedTargetOption}"
+                ToolTip.Tip="{Binding SelectedTargetToolTip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+              >
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:FilterTargetOption">
+                    <TextBlock
+                      Text="{Binding Label}"
+                      ToolTip.Tip="{Binding Tip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+                    />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+            </Grid>
+          </controls:FilterEditorLabeledRow>
 
-        <StackPanel
-          x:Name="Id3v2MultiInstanceFieldsPanel"
-          Spacing="8"
-          IsVisible="{Binding HasId3v2MultiInstanceFields}"
-        >
-          <Grid x:Name="Id3v2LanguageGrid" IsVisible="{Binding HasId3v2Language}">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
-              <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Classes="filter-options-label" Text="Language:">
+          <StackPanel
+            x:Name="Id3v2MultiInstanceFieldsPanel"
+            Spacing="8"
+            IsVisible="{Binding HasId3v2MultiInstanceFields}"
+          >
+            <controls:FilterEditorLabeledRow
+              x:Name="Id3v2LanguageRow"
+              Label="Language:"
+              IsVisible="{Binding HasId3v2Language}"
+            >
               <ToolTip.Tip>
                 <controls:RichToolTip>
                   <TextBlock Classes="rich-tip-body" Text="Optional ID3v2 language code." />
@@ -195,15 +162,9 @@
                   />
                 </controls:RichToolTip>
               </ToolTip.Tip>
-            </TextBlock>
-            <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Language}" />
-          </Grid>
-          <Grid x:Name="Id3v2DescriptionGrid">
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
-              <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <TextBlock Classes="filter-options-label" Text="Description:">
+              <TextBox Classes="filter-options-field" Text="{Binding Id3v2Language}" />
+            </controls:FilterEditorLabeledRow>
+            <controls:FilterEditorLabeledRow x:Name="Id3v2DescriptionRow" Label="Description:">
               <ToolTip.Tip>
                 <controls:RichToolTip>
                   <TextBlock Classes="rich-tip-body" Text="Optional ID3v2 description." />
@@ -213,31 +174,14 @@
                   />
                 </controls:RichToolTip>
               </ToolTip.Tip>
-            </TextBlock>
-            <TextBox Grid.Column="1" Classes="filter-options-field" Text="{Binding Id3v2Description}" />
-          </Grid>
-        </StackPanel>
+              <TextBox Classes="filter-options-field" Text="{Binding Id3v2Description}" />
+            </controls:FilterEditorLabeledRow>
+          </StackPanel>
 
-        <Grid x:Name="AncestorFolderLevelGrid" IsVisible="{Binding HasAncestorFolderLevel}">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
-            <ColumnDefinition Width="Auto" />
-          </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-options-label" Text="Level:">
-            <ToolTip.Tip>
-              <controls:RichToolTip>
-                <TextBlock Classes="rich-tip-bullet" Text="• 1 is the immediate parent folder name." />
-                <TextBlock Classes="rich-tip-bullet" Text="• Higher values walk toward the drive root." />
-              </controls:RichToolTip>
-            </ToolTip.Tip>
-          </TextBlock>
-          <controls:CompactNumericUpDown
-            x:Name="AncestorFolderLevelSpinner"
-            Grid.Column="1"
-            Minimum="1"
-            Maximum="99"
-            FormatString="0"
-            Value="{Binding AncestorFolderLevel}"
+          <controls:FilterEditorLabeledRow
+            x:Name="AncestorFolderLevelRow"
+            Label="Level:"
+            IsVisible="{Binding HasAncestorFolderLevel}"
           >
             <ToolTip.Tip>
               <controls:RichToolTip>
@@ -245,15 +189,17 @@
                 <TextBlock Classes="rich-tip-bullet" Text="• Higher values walk toward the drive root." />
               </controls:RichToolTip>
             </ToolTip.Tip>
-          </controls:CompactNumericUpDown>
-        </Grid>
+            <controls:CompactNumericUpDown
+              x:Name="AncestorFolderLevelSpinner"
+              Minimum="1"
+              Maximum="99"
+              FormatString="0"
+              Value="{Binding AncestorFolderLevel}"
+              HorizontalAlignment="Left"
+            />
+          </controls:FilterEditorLabeledRow>
 
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsLabel" />
-            <ColumnDefinition Width="*" />
-          </Grid.ColumnDefinitions>
-          <TextBlock Classes="filter-options-label" Text="Apply on:">
+          <controls:FilterEditorLabeledRow Label="Apply on:">
             <ToolTip.Tip>
               <controls:RichToolTip>
                 <TextBlock Classes="rich-tip-title" Text="Limit where the filter runs." />
@@ -262,163 +208,161 @@
                 <TextBlock Classes="rich-tip-bullet" Text="• Token: one piece after splitting." />
               </controls:RichToolTip>
             </ToolTip.Tip>
-          </TextBlock>
-          <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-            <controls:CompactRadioButton
-              x:Name="WholeScopeRadio"
-              Classes="filter-options-radio"
-              GroupName="ApplyScope"
-              Content="Whole"
-              ToolTip.Tip="Apply the filter to the entire Apply-to value."
-              IsChecked="{Binding ScopeMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:FilterApplyScopeMode.Whole}, Mode=TwoWay}"
-            />
-            <controls:CompactRadioButton
-              x:Name="SubstringScopeRadio"
-              Classes="filter-options-radio"
-              GroupName="ApplyScope"
-              Content="Substring"
-              ToolTip.Tip="Apply only to an inclusive character range within the value."
-              IsChecked="{Binding ScopeMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:FilterApplyScopeMode.Substring}, Mode=TwoWay}"
-            />
-            <controls:CompactRadioButton
-              x:Name="TokenScopeRadio"
-              Classes="filter-options-radio"
-              GroupName="ApplyScope"
-              Content="Token"
-              ToolTip.Tip="Split the value by a separator and apply only to one numbered piece."
-              IsChecked="{Binding ScopeMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:FilterApplyScopeMode.Token}, Mode=TwoWay}"
-            />
-          </StackPanel>
-        </Grid>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+              <controls:CompactRadioButton
+                x:Name="WholeScopeRadio"
+                Classes="filter-options-radio"
+                GroupName="ApplyScope"
+                Content="Whole"
+                ToolTip.Tip="Apply the filter to the entire Apply-to value."
+                IsChecked="{Binding ScopeMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:FilterApplyScopeMode.Whole}, Mode=TwoWay}"
+              />
+              <controls:CompactRadioButton
+                x:Name="SubstringScopeRadio"
+                Classes="filter-options-radio"
+                GroupName="ApplyScope"
+                Content="Substring"
+                ToolTip.Tip="Apply only to an inclusive character range within the value."
+                IsChecked="{Binding ScopeMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:FilterApplyScopeMode.Substring}, Mode=TwoWay}"
+              />
+              <controls:CompactRadioButton
+                x:Name="TokenScopeRadio"
+                Classes="filter-options-radio"
+                GroupName="ApplyScope"
+                Content="Token"
+                ToolTip.Tip="Split the value by a separator and apply only to one numbered piece."
+                IsChecked="{Binding ScopeMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:FilterApplyScopeMode.Token}, Mode=TwoWay}"
+              />
+            </StackPanel>
+          </controls:FilterEditorLabeledRow>
 
-        <controls:FieldsetGroup Header="Substring" IsVisible="{Binding ShowSubstringOptions}">
-          <Grid>
-            <ToolTip.Tip>
-              <controls:RichToolTip>
-                <TextBlock Classes="rich-tip-title" Text="Inclusive 1-based range." />
-                <TextBlock Classes="rich-tip-bullet" Text="• Left counts from the start." />
-                <TextBlock Classes="rich-tip-bullet" Text="• Right counts from the end." />
-              </controls:RichToolTip>
-            </ToolTip.Tip>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-              <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-              <RowDefinition Height="Auto" />
-              <RowDefinition Height="8" />
-              <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <TextBlock Classes="filter-options-label" Text="Start at position" />
-            <controls:CompactNumericUpDown
-              x:Name="SubstringStartSpinner"
-              Grid.Column="1"
-              Minimum="1"
-              Maximum="9999"
-              FormatString="0"
-              Value="{Binding SubstringStartPosition}"
-            />
-            <TextBlock Grid.Column="2" Classes="filter-options-from-the" Text="from the" />
-            <ComboBox
-              Grid.Column="3"
-              Classes="filter-options-field filter-options-anchor"
-              ItemsSource="{Binding ScopeAnchorOptions}"
-              SelectedItem="{Binding SubstringStartAnchorOption}"
-            >
+          <controls:FieldsetGroup Header="Substring" IsVisible="{Binding ShowSubstringOptions}">
+            <Grid Grid.IsSharedSizeScope="True">
               <ToolTip.Tip>
                 <controls:RichToolTip>
-                  <TextBlock Classes="rich-tip-bullet" Text="• Left: position 1 is the first character." />
-                  <TextBlock Classes="rich-tip-bullet" Text="• Right: position 1 is the last character." />
+                  <TextBlock Classes="rich-tip-title" Text="Inclusive 1-based range." />
+                  <TextBlock Classes="rich-tip-bullet" Text="• Left counts from the start." />
+                  <TextBlock Classes="rich-tip-bullet" Text="• Right counts from the end." />
                 </controls:RichToolTip>
               </ToolTip.Tip>
-              <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:StringScopeAnchorOption">
-                  <TextBlock Text="{Binding Label}" />
-                </DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-            <TextBlock Grid.Column="4" Classes="filter-options-suffix" Text="side (incl.)" />
-
-            <TextBlock Grid.Row="2" Classes="filter-options-label" Text="End at position" />
-            <controls:CompactNumericUpDown
-              x:Name="SubstringEndSpinner"
-              Grid.Row="2"
-              Grid.Column="1"
-              Minimum="1"
-              Maximum="9999"
-              FormatString="0"
-              Value="{Binding SubstringEndPosition}"
-            />
-            <TextBlock Grid.Row="2" Grid.Column="2" Classes="filter-options-from-the" Text="from the" />
-            <ComboBox
-              Grid.Row="2"
-              Grid.Column="3"
-              Classes="filter-options-field filter-options-anchor"
-              ItemsSource="{Binding ScopeAnchorOptions}"
-              SelectedItem="{Binding SubstringEndAnchorOption}"
-            >
-              <ToolTip.Tip>
-                <controls:RichToolTip>
-                  <TextBlock Classes="rich-tip-bullet" Text="• Left: position 1 is the first character." />
-                  <TextBlock Classes="rich-tip-bullet" Text="• Right: position 1 is the last character." />
-                </controls:RichToolTip>
-              </ToolTip.Tip>
-              <ComboBox.ItemTemplate>
-                <DataTemplate x:DataType="vm:StringScopeAnchorOption">
-                  <TextBlock Text="{Binding Label}" />
-                </DataTemplate>
-              </ComboBox.ItemTemplate>
-            </ComboBox>
-            <TextBlock Grid.Row="2" Grid.Column="4" Classes="filter-options-suffix" Text="side (incl.)" />
-          </Grid>
-        </controls:FieldsetGroup>
-
-        <controls:FieldsetGroup Header="Token" IsVisible="{Binding ShowTokenOptions}">
-          <StackPanel Spacing="8">
-            <Grid>
               <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
-                <ColumnDefinition Width="*" />
-              </Grid.ColumnDefinitions>
-              <TextBlock
-                Classes="filter-options-label"
-                Text="Separator:"
-                ToolTip.Tip="Characters that split the value into tokens (e.g. - or space)."
-              />
-              <TextBox
-                x:Name="TokenSeparatorBox"
-                Grid.Column="1"
-                Classes="filter-options-field"
-                Text="{Binding TokenSeparator}"
-                ToolTip.Tip="Characters that split the value into tokens (e.g. - or space)."
-              />
-            </Grid>
-            <Grid>
-              <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsGroupLabel" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="FilterOptionsSubstringLabel" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
               </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="8" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
               <TextBlock
-                Classes="filter-options-label"
-                Text="Token number:"
-                ToolTip.Tip="1-based index of the token to transform (1 = first piece)."
+                Classes="filter-editor-label"
+                VerticalAlignment="Center"
+                TextAlignment="Right"
+                Text="Start at position:"
               />
               <controls:CompactNumericUpDown
-                x:Name="TokenNumberSpinner"
-                Grid.Column="1"
+                x:Name="SubstringStartSpinner"
+                Grid.Column="2"
                 Minimum="1"
                 Maximum="9999"
                 FormatString="0"
-                Value="{Binding TokenNumber}"
-                ToolTip.Tip="1-based index of the token to transform (1 = first piece)."
+                Value="{Binding SubstringStartPosition}"
               />
+              <TextBlock Grid.Column="3" Classes="filter-options-from-the" Text="from the" />
+              <ComboBox
+                Grid.Column="4"
+                Classes="filter-options-field filter-options-anchor"
+                ItemsSource="{Binding ScopeAnchorOptions}"
+                SelectedItem="{Binding SubstringStartAnchorOption}"
+              >
+                <ToolTip.Tip>
+                  <controls:RichToolTip>
+                    <TextBlock Classes="rich-tip-bullet" Text="• Left: position 1 is the first character." />
+                    <TextBlock Classes="rich-tip-bullet" Text="• Right: position 1 is the last character." />
+                  </controls:RichToolTip>
+                </ToolTip.Tip>
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:StringScopeAnchorOption">
+                    <TextBlock Text="{Binding Label}" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <TextBlock Grid.Column="5" Classes="filter-options-suffix" Text="side (incl.)" />
+
+              <TextBlock
+                Grid.Row="2"
+                Classes="filter-editor-label"
+                VerticalAlignment="Center"
+                TextAlignment="Right"
+                Text="End at position:"
+              />
+              <controls:CompactNumericUpDown
+                x:Name="SubstringEndSpinner"
+                Grid.Row="2"
+                Grid.Column="2"
+                Minimum="1"
+                Maximum="9999"
+                FormatString="0"
+                Value="{Binding SubstringEndPosition}"
+              />
+              <TextBlock Grid.Row="2" Grid.Column="3" Classes="filter-options-from-the" Text="from the" />
+              <ComboBox
+                Grid.Row="2"
+                Grid.Column="4"
+                Classes="filter-options-field filter-options-anchor"
+                ItemsSource="{Binding ScopeAnchorOptions}"
+                SelectedItem="{Binding SubstringEndAnchorOption}"
+              >
+                <ToolTip.Tip>
+                  <controls:RichToolTip>
+                    <TextBlock Classes="rich-tip-bullet" Text="• Left: position 1 is the first character." />
+                    <TextBlock Classes="rich-tip-bullet" Text="• Right: position 1 is the last character." />
+                  </controls:RichToolTip>
+                </ToolTip.Tip>
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:StringScopeAnchorOption">
+                    <TextBlock Text="{Binding Label}" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <TextBlock Grid.Row="2" Grid.Column="5" Classes="filter-options-suffix" Text="side (incl.)" />
             </Grid>
-          </StackPanel>
-        </controls:FieldsetGroup>
+          </controls:FieldsetGroup>
+
+          <controls:FieldsetGroup Header="Token" IsVisible="{Binding ShowTokenOptions}">
+            <StackPanel Spacing="8" Grid.IsSharedSizeScope="True">
+              <controls:FilterEditorLabeledRow
+                Label="Token separator string:"
+                ToolTip.Tip="Characters that split the value into tokens (e.g. - or space)."
+              >
+                <TextBox
+                  x:Name="TokenSeparatorBox"
+                  Classes="filter-options-field"
+                  MaxLength="100"
+                  Text="{Binding TokenSeparator}"
+                />
+              </controls:FilterEditorLabeledRow>
+              <controls:FilterEditorLabeledRow
+                Label="Token number:"
+                ToolTip.Tip="1-based index of the token to transform (1 = first piece)."
+              >
+                <controls:CompactNumericUpDown
+                  x:Name="TokenNumberSpinner"
+                  Minimum="1"
+                  Maximum="9999"
+                  FormatString="0"
+                  Value="{Binding TokenNumber}"
+                  HorizontalAlignment="Left"
+                />
+              </controls:FilterEditorLabeledRow>
+            </StackPanel>
+          </controls:FieldsetGroup>
+        </StackPanel>
       </StackPanel>
-    </StackPanel>
+    </Border>
   </DockPanel>
 </Window>

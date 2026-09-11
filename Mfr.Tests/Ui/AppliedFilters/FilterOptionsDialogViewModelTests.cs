@@ -492,6 +492,27 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies OK is blocked while the filter name is blank or whitespace (MFR7 parity).
+        /// </summary>
+        [Theory]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void CanConfirm_is_false_when_name_blank(string blankName)
+        {
+            var applied = new AppliedFiltersViewModel();
+            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+
+            var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]) { Name = blankName };
+
+            Assert.False(dialog.CanConfirm);
+            Assert.Equal("Name required", dialog.ConfirmDisabledReason);
+
+            dialog.Name = "My Filter";
+            Assert.True(dialog.CanConfirm);
+            Assert.Null(dialog.ConfirmDisabledReason);
+        }
+
+        /// <summary>
         /// Verifies ancestor-folder level 1 uses the Parent Folder list subtitle.
         /// </summary>
         [Fact]

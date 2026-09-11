@@ -180,12 +180,26 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Gets a short reason OK is disabled, or <see langword="null"/> when OK is allowed.
         /// </summary>
         /// <remarks>
-        /// Token scope requires a non-empty separator (same rule as <see cref="StringApplyScopeTransform"/>).
+        /// Blank names are blocked (MFR7 parity). Token scope requires a non-empty separator (same rule
+        /// as <see cref="StringApplyScopeTransform"/>).
         /// </remarks>
-        public string? ConfirmDisabledReason =>
-            ScopeMode == FilterApplyScopeMode.Token && string.IsNullOrEmpty(TokenSeparator)
-                ? "Token Separator required"
-                : null;
+        public string? ConfirmDisabledReason
+        {
+            get
+            {
+                if (string.IsNullOrWhiteSpace(Name))
+                {
+                    return "Name required";
+                }
+
+                if (ScopeMode == FilterApplyScopeMode.Token && string.IsNullOrEmpty(TokenSeparator))
+                {
+                    return "Token Separator required";
+                }
+
+                return null;
+            }
+        }
 
         /// <summary>
         /// Gets whether OK can accept the current draft.
@@ -263,14 +277,23 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             HasId3v2Language = false;
         }
 
+        partial void OnNameChanged(string value)
+        {
+            _NotifyConfirmChanged();
+        }
+
         partial void OnScopeModeChanged(FilterApplyScopeMode value)
         {
             _UpdateScopeVisibility(value);
-            OnPropertyChanged(nameof(ConfirmDisabledReason));
-            OnPropertyChanged(nameof(CanConfirm));
+            _NotifyConfirmChanged();
         }
 
         partial void OnTokenSeparatorChanged(string value)
+        {
+            _NotifyConfirmChanged();
+        }
+
+        private void _NotifyConfirmChanged()
         {
             OnPropertyChanged(nameof(ConfirmDisabledReason));
             OnPropertyChanged(nameof(CanConfirm));

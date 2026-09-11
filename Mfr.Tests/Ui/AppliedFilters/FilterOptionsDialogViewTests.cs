@@ -19,6 +19,53 @@ namespace Mfr.Tests.Ui.AppliedFilters
     public sealed class FilterOptionsDialogViewTests
     {
         /// <summary>
+        /// Verifies Name is focused and selected when the dialog opens (MFR7 parity).
+        /// </summary>
+        [AvaloniaFact]
+        public void Name_box_is_focused_and_selected_on_open()
+        {
+            var dialog = _Show(FilterApplyScopeMode.Whole);
+
+            try
+            {
+                var nameBox = dialog.FindControl<TextBox>("NameBox");
+                Assert.NotNull(nameBox);
+                Assert.True(nameBox.IsFocused);
+                Assert.Equal(0, nameBox.SelectionStart);
+                Assert.Equal(nameBox.Text?.Length ?? 0, nameBox.SelectionEnd);
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        /// <summary>
+        /// Verifies outer labeled rows share one label column width via <c>FilterEditorLabel</c>.
+        /// </summary>
+        [AvaloniaFact]
+        public void Outer_labeled_rows_share_label_column_width()
+        {
+            var dialog = _Show(FilterApplyScopeMode.Whole);
+
+            try
+            {
+                var rows = dialog.GetVisualDescendants().OfType<FilterEditorLabeledRow>().ToList();
+                var nameRow = rows.Single(row => row.Label == "Name:");
+                var applyToRow = rows.Single(row => row.Label == "Apply To:");
+                var nameLabel = _LabelText(nameRow);
+                var applyToLabel = _LabelText(applyToRow);
+
+                Assert.True(nameLabel.Bounds.Width > 1 && applyToLabel.Bounds.Width > 1);
+                Assert.Equal(applyToLabel.Bounds.Width, nameLabel.Bounds.Width, precision: 0);
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        /// <summary>
         /// Verifies substring rows show values, spinner buttons, and MFR7 "from the" copy.
         /// </summary>
         [AvaloniaFact]
@@ -104,14 +151,14 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 var separatorLabel = dialog
                     .GetVisualDescendants()
                     .OfType<TextBlock>()
-                    .Single(block => block.IsVisible && block.Text == "Separator:");
+                    .Single(block => block.IsVisible && block.Text == "Token separator string:");
                 var tokenNumberLabel = dialog
                     .GetVisualDescendants()
                     .OfType<TextBlock>()
                     .Single(block => block.IsVisible && block.Text == "Token number:");
 
-                Assert.Equal(TextAlignment.Left, separatorLabel.TextAlignment);
-                Assert.Equal(TextAlignment.Left, tokenNumberLabel.TextAlignment);
+                Assert.True(separatorLabel.TextAlignment is TextAlignment.Left or TextAlignment.Start);
+                Assert.True(tokenNumberLabel.TextAlignment is TextAlignment.Left or TextAlignment.Start);
 
                 var separatorLabelX = separatorLabel.TranslatePoint(new Point(), dialog)!.Value.X;
                 var tokenNumberLabelX = tokenNumberLabel.TranslatePoint(new Point(), dialog)!.Value.X;
@@ -147,13 +194,13 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             try
             {
-                var levelGrid = dialog.FindControl<Grid>("AncestorFolderLevelGrid");
+                var levelRow = dialog.FindControl<FilterEditorLabeledRow>("AncestorFolderLevelRow");
                 var id3v2Panel = dialog.FindControl<StackPanel>("Id3v2MultiInstanceFieldsPanel");
                 var levelSpinner = dialog.FindControl<CompactNumericUpDown>("AncestorFolderLevelSpinner");
-                Assert.NotNull(levelGrid);
+                Assert.NotNull(levelRow);
                 Assert.NotNull(id3v2Panel);
                 Assert.NotNull(levelSpinner);
-                Assert.True(levelGrid.IsVisible);
+                Assert.True(levelRow.IsVisible);
                 Assert.True(levelSpinner.IsVisible);
                 Assert.False(id3v2Panel.IsVisible);
 
@@ -166,7 +213,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 dialog.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
-                Assert.False(levelGrid.IsVisible);
+                Assert.False(levelRow.IsVisible);
                 Assert.False(id3v2Panel.IsVisible);
 
                 var commentOption = id3v2Group.Targets.First(option =>
@@ -176,7 +223,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 dialog.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
-                Assert.False(levelGrid.IsVisible);
+                Assert.False(levelRow.IsVisible);
                 Assert.True(id3v2Panel.IsVisible);
                 Assert.True(viewModel.HasId3v2Language);
 
@@ -189,9 +236,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
                 Assert.True(id3v2Panel.IsVisible);
                 Assert.False(viewModel.HasId3v2Language);
-                var languageGrid = dialog.FindControl<Grid>("Id3v2LanguageGrid");
-                Assert.NotNull(languageGrid);
-                Assert.False(languageGrid.IsVisible);
+                var languageRow = dialog.FindControl<FilterEditorLabeledRow>("Id3v2LanguageRow");
+                Assert.NotNull(languageRow);
+                Assert.False(languageRow.IsVisible);
             }
             finally
             {
@@ -312,6 +359,15 @@ namespace Mfr.Tests.Ui.AppliedFilters
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
             return dialog;
+        }
+
+        private static TextBlock _LabelText(FilterEditorLabeledRow row)
+        {
+            var label = row.GetVisualDescendants()
+                .OfType<TextBlock>()
+                .FirstOrDefault(block => block.Classes.Contains("filter-editor-label"));
+            Assert.NotNull(label);
+            return label;
         }
 
         /// <summary>
