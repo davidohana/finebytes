@@ -8,7 +8,6 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
-using Mfr.Models.RenameList;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -51,9 +50,7 @@ namespace Mfr.Tests.Ui.RenameList
         private static ISolidColorBrush _FocusedCellBrush(Window window)
         {
             var app = Assert.IsAssignableFrom<Application>(Application.Current);
-            Assert.True(
-                app.TryGetResource("RenameListFocusedCellBrush", window.ActualThemeVariant, out var resource)
-            );
+            Assert.True(app.TryGetResource("RenameListFocusedCellBrush", window.ActualThemeVariant, out var resource));
             return Assert.IsAssignableFrom<ISolidColorBrush>(resource);
         }
 

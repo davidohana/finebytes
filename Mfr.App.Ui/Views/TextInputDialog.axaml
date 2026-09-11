@@ -33,11 +33,7 @@
     </StackPanel>
     <StackPanel Spacing="10">
       <TextBlock x:Name="PromptText" TextWrapping="Wrap" />
-      <TextBlock
-        x:Name="NoteText"
-        TextWrapping="Wrap"
-        Foreground="{DynamicResource AppChromeMutedForegroundBrush}"
-      />
+      <TextBlock x:Name="NoteText" TextWrapping="Wrap" Foreground="{DynamicResource AppChromeMutedForegroundBrush}" />
       <TextBox x:Name="ValueBox" Margin="0,2,0,0" />
     </StackPanel>
   </DockPanel>
