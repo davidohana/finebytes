@@ -47,6 +47,12 @@
       Margin="0,14,0,0"
     >
       <Button
+        x:Name="ImportSamplesButton"
+        Classes="message-dialog-footer"
+        Content="Import samples…"
+        Click="_OnImportSamplesClick"
+      />
+      <Button
         x:Name="LoadButton"
         Classes="message-dialog-footer"
         Content="Load"

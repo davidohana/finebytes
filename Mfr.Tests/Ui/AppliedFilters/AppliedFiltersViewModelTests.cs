@@ -881,6 +881,32 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies sample import adds missing names, preserves an exact-name collision, and persists the batch.
+        /// </summary>
+        [Fact]
+        public void ImportSamplePresets_Adds_Missing_And_Skips_Exact_Name()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var sampleNames = SamplePresetCatalog.Presets.Take(2).Select(preset => preset.Name).ToList();
+            var existing = SamplePresetCatalog.Presets[0] with { Id = Guid.NewGuid(), Description = "user-owned" };
+            manager.NameToPreset[existing.Name] = existing;
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+
+            var (AddedCount, SkippedCount) = viewModel.ImportSamplePresets(sampleNames);
+
+            Assert.Equal(1, AddedCount);
+            Assert.Equal(1, SkippedCount);
+            Assert.Same(existing, manager.NameToPreset[existing.Name]);
+            Assert.Equal("user-owned", manager.NameToPreset[existing.Name].Description);
+            Assert.True(manager.NameToPreset.ContainsKey(sampleNames[1]));
+
+            var reloaded = new PresetManager(manager.PresetsFilePath);
+            reloaded.LoadPresets();
+            Assert.Equal(2, reloaded.NameToPreset.Count);
+            Assert.Equal("user-owned", reloaded.NameToPreset[existing.Name].Description);
+        }
+
+        /// <summary>
         /// Verifies Save Preset overwrite with null columns clears previously stored columns.
         /// </summary>
         [Fact]

@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-import-dialog
     content: P2 — ImportSamplePresets API, checklist dialog with skip note, Preset Manager button, result feedback, UI/VM tests
-    status: pending
+    status: completed
 isProject: false
 ---
 

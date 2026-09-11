@@ -1,0 +1,78 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.Presets"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  x:Class="Mfr.App.Ui.Views.Presets.ImportSamplePresetsDialog"
+  x:DataType="vm:ImportSamplePresetsDialogViewModel"
+  Title="Import Sample Presets"
+  Icon="/Assets/mfr.ico"
+  Width="560"
+  Height="520"
+  MinWidth="460"
+  MinHeight="360"
+  WindowStartupLocation="CenterOwner"
+  ShowInTaskbar="False"
+  CanResize="True"
+  FontFamily="{StaticResource AppChromeFont}"
+  FontSize="{StaticResource AppChromeFontSize}"
+  Foreground="{DynamicResource AppChromeForegroundBrush}"
+>
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Margin="0,12,0,0" Spacing="10">
+      <TextBlock
+        Text="Presets that already exist under the same name will be skipped."
+        TextWrapping="Wrap"
+        HorizontalAlignment="Center"
+      />
+      <StackPanel x:Name="Footer" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+        <Button
+          x:Name="ImportButton"
+          Classes="message-dialog-footer"
+          Content="Import"
+          IsDefault="True"
+          IsEnabled="{Binding CanImport}"
+          Click="_OnImportClick"
+        />
+        <Button
+          x:Name="CancelButton"
+          Classes="message-dialog-footer"
+          Content="Cancel"
+          IsCancel="True"
+          Click="_OnCancelClick"
+        />
+      </StackPanel>
+    </StackPanel>
+
+    <Grid RowDefinitions="Auto,*">
+      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+        <TextBlock Text="Choose sample presets to import:" VerticalAlignment="Center" />
+        <Button x:Name="SelectAllButton" Content="Select all" Click="_OnSelectAllClick" />
+        <Button x:Name="SelectNoneButton" Content="Select none" Click="_OnSelectNoneClick" />
+      </StackPanel>
+      <Border
+        Grid.Row="1"
+        Background="{DynamicResource AppChromeSurfaceBrush}"
+        BorderBrush="{DynamicResource AppChromeBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="3"
+        Padding="6"
+      >
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+          <ItemsControl ItemsSource="{Binding Items}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:SamplePresetSelectionViewModel">
+                <controls:CompactCheckBox IsChecked="{Binding IsSelected}" Margin="2,4">
+                  <StackPanel>
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Opacity="0.78" Margin="0,2,0,0" />
+                  </StackPanel>
+                </controls:CompactCheckBox>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+  </DockPanel>
+</Window>

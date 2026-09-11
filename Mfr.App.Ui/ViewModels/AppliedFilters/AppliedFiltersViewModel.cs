@@ -159,6 +159,44 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
+        /// Imports selected sample presets without replacing presets that have the same exact name.
+        /// </summary>
+        /// <param name="names">Exact sample names to import.</param>
+        /// <returns>The number of presets added and skipped because their names already exist.</returns>
+        public (int AddedCount, int SkippedCount) ImportSamplePresets(IReadOnlyList<string> names)
+        {
+            ArgumentNullException.ThrowIfNull(names);
+
+            var nameToSample = SamplePresetCatalog.Presets.ToDictionary(preset => preset.Name, StringComparer.Ordinal);
+            var addedCount = 0;
+            var skippedCount = 0;
+
+            foreach (var name in names)
+            {
+                if (!nameToSample.TryGetValue(name, out var sample))
+                {
+                    continue;
+                }
+
+                if (PresetManager.NameToPreset.ContainsKey(name))
+                {
+                    skippedCount++;
+                    continue;
+                }
+
+                PresetManager.NameToPreset[name] = sample;
+                addedCount++;
+            }
+
+            if (addedCount > 0)
+            {
+                PresetManager.SavePresets();
+            }
+
+            return (addedCount, skippedCount);
+        }
+
+        /// <summary>
         /// Gets whether loading a preset should confirm before replacing the current Applied Filters chain.
         /// </summary>
         /// <param name="confirmReplaceOnLoad">

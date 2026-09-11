@@ -151,7 +151,8 @@ Do **not** retest JSON polymorphism (`PresetJsonPolymorphismTests`).
 ## Out of scope (explicit)
 
 - F8 session persistence of working Applied Filters chain
-- Shipping default seed presets
+- Shipping default seed presets (curated sample import is covered by
+  [sample-presets-import.plan.md](sample-presets-import.plan.md))
 - Import MFR7 `.mps`
 - Packing Rename List **sort** (or other session fields) into presets
 - Soft-load of corrupt `presets.json`

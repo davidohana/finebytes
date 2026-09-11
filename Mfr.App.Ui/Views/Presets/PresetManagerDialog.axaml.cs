@@ -19,6 +19,7 @@ namespace Mfr.App.Ui.Views.Presets
     public partial class PresetManagerDialog : Window
     {
         private readonly AppliedFiltersViewModel? _appliedFilters;
+        private readonly Func<Task>? _importSamplesAsync;
         private readonly Func<FilterPreset, Task<bool>>? _tryLoadAsync;
 
         /// <summary>
@@ -38,10 +39,14 @@ namespace Mfr.App.Ui.Views.Presets
         /// <param name="tryLoadAsync">
         /// Shared load path (confirm → replace → optional columns). Returns <see langword="true"/> on success.
         /// </param>
+        /// <param name="importSamplesAsync">
+        /// Optional import-dialog host override for headless tests.
+        /// </param>
         public PresetManagerDialog(
             PresetManagerDialogViewModel viewModel,
             AppliedFiltersViewModel appliedFilters,
-            Func<FilterPreset, Task<bool>> tryLoadAsync
+            Func<FilterPreset, Task<bool>> tryLoadAsync,
+            Func<Task>? importSamplesAsync = null
         )
             : this()
         {
@@ -52,6 +57,7 @@ namespace Mfr.App.Ui.Views.Presets
             DataContext = viewModel;
             _appliedFilters = appliedFilters;
             _tryLoadAsync = tryLoadAsync;
+            _importSamplesAsync = importSamplesAsync ?? _ShowImportSamplesAsync;
         }
 
         /// <inheritdoc />
@@ -66,6 +72,47 @@ namespace Mfr.App.Ui.Views.Presets
         private async void _OnLoadClick(object? sender, RoutedEventArgs e)
         {
             await _TryLoadSelectedAsync();
+        }
+
+        private async void _OnImportSamplesClick(object? sender, RoutedEventArgs e)
+        {
+            if (_importSamplesAsync is not null)
+            {
+                await _importSamplesAsync();
+            }
+        }
+
+        /// <summary>
+        /// Shows the sample checklist, imports the accepted names, refreshes the manager, and reports counts.
+        /// </summary>
+        /// <returns>A task that completes after the import flow closes.</returns>
+        private async Task _ShowImportSamplesAsync()
+        {
+            if (_ViewModel is null || _appliedFilters is null)
+            {
+                return;
+            }
+
+            var dialogViewModel = new ImportSamplePresetsDialogViewModel();
+            var accepted = await new ImportSamplePresetsDialog(dialogViewModel).ShowDialog<bool?>(this);
+            if (accepted != true || !dialogViewModel.CanImport)
+            {
+                return;
+            }
+
+            try
+            {
+                var (AddedCount, SkippedCount) = _appliedFilters.ImportSamplePresets(dialogViewModel.SelectedNames());
+                _ViewModel.Refresh();
+                await new OkMessageDialog(
+                    "Import Sample Presets",
+                    $"Added {AddedCount}. Skipped {SkippedCount} (name already exists)."
+                ).ShowDialog(this);
+            }
+            catch (Exception ex)
+            {
+                await _ShowErrorAsync("Import Sample Presets", ex);
+            }
         }
 
         private async void _OnPresetsListDoubleTapped(object? sender, TappedEventArgs e)
