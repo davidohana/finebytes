@@ -9,26 +9,25 @@ namespace Mfr.Tests.Ui.Presets
     public sealed class SavePresetDialogViewModelTests
     {
         /// <summary>
-        /// Verifies an empty dialog starts with blank fields and only Save as new gated off.
+        /// Verifies an empty dialog starts with blank fields and disabled Save.
         /// </summary>
         [Fact]
-        public void Default_Starts_Empty_With_Actions_Disabled()
+        public void Default_Starts_Empty_And_Cannot_Save()
         {
             var viewModel = new SavePresetDialogViewModel();
 
-            Assert.False(viewModel.CanUpdate);
-            Assert.False(viewModel.CanUpdateAction);
-            Assert.False(viewModel.CanSaveAsAction);
+            Assert.False(viewModel.CanSave);
             Assert.Equal(string.Empty, viewModel.Name);
             Assert.Equal(string.Empty, viewModel.Description);
             Assert.False(viewModel.SaveRenameListColumns);
+            Assert.Empty(viewModel.ExistingNames);
         }
 
         /// <summary>
-        /// Verifies can-update prefills fields and enables Update when the name is present.
+        /// Verifies last-loaded prefills name, description, and columns checkbox.
         /// </summary>
         [Fact]
-        public void Prefills_From_LastLoaded_And_Enables_Update()
+        public void Prefills_From_LastLoaded()
         {
             var lastLoaded = new FilterPreset
             {
@@ -42,82 +41,34 @@ namespace Mfr.Tests.Ui.Presets
                 ],
             };
 
-            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: true);
+            var viewModel = new SavePresetDialogViewModel(lastLoaded, existingPresets: [lastLoaded]);
 
-            Assert.True(viewModel.CanUpdate);
-            Assert.True(viewModel.CanUpdateAction);
-            Assert.True(viewModel.CanSaveAsAction);
-            Assert.Equal("Rock", viewModel.OriginalName);
             Assert.Equal("Rock", viewModel.Name);
             Assert.Equal("Loud", viewModel.Description);
             Assert.True(viewModel.SaveRenameListColumns);
+            Assert.True(viewModel.CanSave);
             Assert.Equal("Rock", viewModel.TrimmedName);
             Assert.Equal("Loud", viewModel.TrimmedDescriptionOrNull);
         }
 
         /// <summary>
-        /// Verifies last-loaded without can-update still prefills but keeps Update disabled.
+        /// Verifies blank description becomes null and whitespace-only name cannot save.
         /// </summary>
         [Fact]
-        public void LastLoaded_Without_CanUpdate_Disables_Update()
-        {
-            var lastLoaded = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "Gone",
-                Chain = new FilterChain { Steps = [] },
-            };
-
-            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: false);
-
-            Assert.False(viewModel.CanUpdate);
-            Assert.False(viewModel.CanUpdateAction);
-            Assert.True(viewModel.CanSaveAsAction);
-            Assert.Equal("Gone", viewModel.Name);
-        }
-
-        /// <summary>
-        /// Verifies blank description becomes null and whitespace-only name disables both actions.
-        /// </summary>
-        [Fact]
-        public void Trimmed_Helpers_And_Actions_Track_Whitespace()
+        public void Trimmed_Helpers_And_CanSave_Track_Whitespace()
         {
             var viewModel = new SavePresetDialogViewModel { Name = "  ", Description = "  " };
 
-            Assert.False(viewModel.CanSaveAsAction);
-            Assert.False(viewModel.CanUpdateAction);
+            Assert.False(viewModel.CanSave);
             Assert.Equal(string.Empty, viewModel.TrimmedName);
             Assert.Null(viewModel.TrimmedDescriptionOrNull);
 
             viewModel.Name = "  Demo  ";
             viewModel.Description = "  Notes  ";
 
-            Assert.True(viewModel.CanSaveAsAction);
+            Assert.True(viewModel.CanSave);
             Assert.Equal("Demo", viewModel.TrimmedName);
             Assert.Equal("Notes", viewModel.TrimmedDescriptionOrNull);
-        }
-
-        /// <summary>
-        /// Verifies Update stays disabled when can-update is true but the name is cleared.
-        /// </summary>
-        [Fact]
-        public void Update_Requires_NonBlank_Name()
-        {
-            var lastLoaded = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "Live",
-                Chain = new FilterChain { Steps = [] },
-            };
-            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: true) { Name = "   " };
-
-            Assert.True(viewModel.CanUpdate);
-            Assert.False(viewModel.CanUpdateAction);
-            Assert.False(viewModel.CanSaveAsAction);
-
-            viewModel.Name = "Renamed";
-            Assert.True(viewModel.CanUpdateAction);
-            Assert.True(viewModel.CanSaveAsAction);
         }
 
         /// <summary>
@@ -133,7 +84,7 @@ namespace Mfr.Tests.Ui.Presets
                 Chain = new FilterChain { Steps = [] },
             };
 
-            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: true);
+            var viewModel = new SavePresetDialogViewModel(lastLoaded);
 
             Assert.False(viewModel.SaveRenameListColumns);
         }
@@ -154,17 +105,14 @@ namespace Mfr.Tests.Ui.Presets
 
             var viewModel = new SavePresetDialogViewModel(
                 lastLoaded,
-                canUpdate: true,
                 existingPresets: [lastLoaded],
                 prefillFromLastLoaded: false
             );
 
-            Assert.True(viewModel.CanUpdate);
-            Assert.Equal("Rock", viewModel.OriginalName);
             Assert.Equal(string.Empty, viewModel.Name);
             Assert.Equal(string.Empty, viewModel.Description);
             Assert.False(viewModel.SaveRenameListColumns);
-            Assert.False(viewModel.CanUpdateAction);
+            Assert.False(viewModel.CanSave);
         }
 
         /// <summary>
@@ -225,7 +173,7 @@ namespace Mfr.Tests.Ui.Presets
                 Chain = new FilterChain { Steps = [] },
             };
 
-            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: true, existingPresets: [lastLoaded, other]);
+            var viewModel = new SavePresetDialogViewModel(lastLoaded, existingPresets: [lastLoaded, other]);
 
             Assert.Equal("mine", viewModel.Description);
             Assert.False(viewModel.SaveRenameListColumns);

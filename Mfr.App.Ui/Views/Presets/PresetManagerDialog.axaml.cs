@@ -10,7 +10,7 @@ using Mfr.Models.Filters;
 namespace Mfr.App.Ui.Views.Presets
 {
     /// <summary>
-    /// Modal Preset Manager: load, delete, edit description, and rename named presets.
+    /// Modal Preset Manager: load, delete, and rename named presets.
     /// <para>
     /// Closes with <see langword="true"/> after a successful Load; <see langword="false"/> when closed
     /// without loading.
@@ -127,37 +127,6 @@ namespace Mfr.App.Ui.Views.Presets
             catch (Exception ex)
             {
                 await _ShowErrorAsync("Delete Preset", ex);
-            }
-        }
-
-        private async void _OnEditDescriptionClick(object? sender, RoutedEventArgs e)
-        {
-            if (_ViewModel?.SelectedPreset is not { } preset || _appliedFilters is null)
-            {
-                return;
-            }
-
-            var prompt = new TextInputPrompt
-            {
-                Title = "Edit Description",
-                Prompt = StyledTextDisplay.FromPlain($"Description for '{preset.Name}':"),
-                DefaultValue = preset.Description ?? string.Empty,
-                Multiline = true,
-            };
-            var result = await new TextInputDialog(prompt).ShowDialog<string?>(this);
-            if (result is null)
-            {
-                return;
-            }
-
-            try
-            {
-                _appliedFilters.SetPresetDescription(preset.Name, result);
-                _ViewModel.Refresh();
-            }
-            catch (Exception ex)
-            {
-                await _ShowErrorAsync("Edit Description", ex);
             }
         }
 

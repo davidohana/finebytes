@@ -26,7 +26,7 @@ namespace Mfr.App.Ui.ViewModels
         public required string DefaultValue { get; init; }
 
         /// <summary>
-        /// Gets whether the value box accepts multiple lines (Edit Description).
+        /// Gets whether the value box accepts multiple lines.
         /// </summary>
         public bool Multiline { get; init; }
 

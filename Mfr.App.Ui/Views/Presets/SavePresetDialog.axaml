@@ -27,20 +27,12 @@
       Margin="0,14,0,0"
     >
       <Button
-        x:Name="UpdateButton"
+        x:Name="SaveButton"
         Classes="message-dialog-footer"
-        Content="Update"
-        IsEnabled="{Binding CanUpdateAction}"
-        IsDefault="{Binding CanUpdate}"
-        Click="_OnUpdateClick"
-      />
-      <Button
-        x:Name="SaveAsNewButton"
-        Classes="message-dialog-footer"
-        Content="Save as new"
-        IsEnabled="{Binding CanSaveAsAction}"
-        IsDefault="{Binding !CanUpdate}"
-        Click="_OnSaveAsNewClick"
+        Content="Save"
+        IsDefault="True"
+        IsEnabled="{Binding CanSave}"
+        Click="_OnSaveClick"
       />
       <Button
         x:Name="CancelButton"

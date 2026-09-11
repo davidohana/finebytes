@@ -1175,36 +1175,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies editing a preset description persists and updates last-loaded when matched.
-        /// </summary>
-        [Fact]
-        public void SetPresetDescription_Updates_Description_And_LastLoaded()
-        {
-            var manager = PresetManager.CreateEmpty();
-            var preset = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "Desc",
-                Description = "old",
-                Chain = new FilterChain { Steps = [] },
-            };
-            manager.NameToPreset[preset.Name] = preset;
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
-            viewModel.SetLastLoaded(preset);
-
-            var updated = viewModel.SetPresetDescription("Desc", "  new notes  ");
-
-            Assert.NotNull(updated);
-            Assert.Equal("new notes", updated.Description);
-            Assert.Same(updated, viewModel.LastLoaded);
-            Assert.Equal("new notes", manager.NameToPreset["Desc"].Description);
-
-            var cleared = viewModel.SetPresetDescription("Desc", "   ");
-            Assert.NotNull(cleared);
-            Assert.Null(cleared.Description);
-        }
-
-        /// <summary>
         /// Counts <see cref="AppliedFiltersViewModel.ChainChanged"/> raises during <paramref name="action"/>.
         /// </summary>
         private static int _CountChainChanged(AppliedFiltersViewModel viewModel, Action action)

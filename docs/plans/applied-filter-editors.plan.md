@@ -33,7 +33,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-11):** **F1–F10 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌**, reset **↺**, and help **?** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, a single Save Preset dialog (Update / Save as new), toolbar ▾ quick-pick, and confirm-replace. **F8** persists the working Applied Filters chain on `SessionState.AppliedFilters` (`FilterChain` shape; catalog names on restore). **F10** polishes Filter Options layout (shared label rows, MFR7 copy/spacing, blank-name OK gate).
+**Status (2026-09-11):** **F1–F10 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌**, reset **↺**, and help **?** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, a single Save Preset dialog (upsert + overwrite warn), toolbar ▾ quick-pick, and confirm-replace. **F8** persists the working Applied Filters chain on `SessionState.AppliedFilters` (`FilterChain` shape; catalog names on restore). **F10** polishes Filter Options layout (shared label rows, MFR7 copy/spacing, blank-name OK gate).
 
 ### Priority (what's left)
 
@@ -105,8 +105,8 @@ ______________________________________________________________________
 
 Detail: [presets-ui.plan.md](presets-ui.plan.md) (P1–P4). Engine `PresetManager` + JSON preset shape; UI ships:
 
-1. **Presets** Manager — Load / Delete / Edit Description / Rename; confirm-replace when configured; optional Rename List columns on load.
-1. **Save Preset** — dialog with name/description/columns and footer **Update** / **Save as new** (Update may rename).
+1. **Presets** Manager — Load / Delete / Rename; confirm-replace when configured; optional Rename List columns on load.
+1. **Save Preset** — dialog with name/description/columns; single Save upserts and warns on overwrite.
 1. Toolbar **▾** quick-pick (sorted names; disabled “No presets” when empty) sharing the host load path with Manager Load.
 1. Hard-fail corrupt `presets.json` with a clear dialog; no silent remap. Tests cover VM + headless load/save and ▾ last-loaded.
 

@@ -61,13 +61,6 @@
         Click="_OnDeleteClick"
       />
       <Button
-        x:Name="EditDescriptionButton"
-        Classes="message-dialog-footer"
-        Content="Edit Description"
-        IsEnabled="{Binding HasSelection}"
-        Click="_OnEditDescriptionClick"
-      />
-      <Button
         x:Name="RenameButton"
         Classes="message-dialog-footer"
         Content="Rename"

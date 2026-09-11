@@ -6,11 +6,8 @@ using Mfr.App.Ui.ViewModels.Presets;
 namespace Mfr.App.Ui.Views.Presets
 {
     /// <summary>
-    /// Modal dialog for Save Preset (Update last-loaded or Save as new).
-    /// <para>
-    /// Closes with <see cref="SavePresetDialogMode.Update"/>, <see cref="SavePresetDialogMode.SaveAs"/>,
-    /// or <see langword="null"/> for Cancel / Escape.
-    /// </para>
+    /// Modal dialog for Save Preset (name, description, optional Rename List columns).
+    /// <para>Closes with <see langword="true"/> for Save and <see langword="false"/> for Cancel or Escape.</para>
     /// </summary>
     public partial class SavePresetDialog : Window
     {
@@ -49,29 +46,19 @@ namespace Mfr.App.Ui.Views.Presets
             NameBox.Focus();
         }
 
-        private void _OnUpdateClick(object? sender, RoutedEventArgs e)
+        private void _OnSaveClick(object? sender, RoutedEventArgs e)
         {
-            if (DataContext is SavePresetDialogViewModel { CanUpdateAction: false })
+            if (DataContext is SavePresetDialogViewModel { CanSave: false })
             {
                 return;
             }
 
-            Close(SavePresetDialogMode.Update);
-        }
-
-        private void _OnSaveAsNewClick(object? sender, RoutedEventArgs e)
-        {
-            if (DataContext is SavePresetDialogViewModel { CanSaveAsAction: false })
-            {
-                return;
-            }
-
-            Close(SavePresetDialogMode.SaveAs);
+            Close(true);
         }
 
         private void _OnCancelClick(object? sender, RoutedEventArgs e)
         {
-            Close(null);
+            Close(false);
         }
     }
 }

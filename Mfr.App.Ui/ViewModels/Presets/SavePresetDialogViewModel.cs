@@ -16,10 +16,6 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// <param name="lastLoaded">
         /// Preset to prefill from when present; when <see langword="null"/>, fields start empty.
         /// </param>
-        /// <param name="canUpdate">
-        /// When <see langword="true"/> and <paramref name="lastLoaded"/> is set, Update is enabled;
-        /// otherwise only Save as new is available.
-        /// </param>
         /// <param name="existingPresets">
         /// Current presets for the Name suggestions list; when <see langword="null"/>, suggestions are empty.
         /// </param>
@@ -30,14 +26,10 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// </param>
         public SavePresetDialogViewModel(
             FilterPreset? lastLoaded = null,
-            bool canUpdate = false,
             IEnumerable<FilterPreset>? existingPresets = null,
             bool prefillFromLastLoaded = true
         )
         {
-            CanUpdate = canUpdate && lastLoaded is not null;
-            OriginalName = lastLoaded?.Name ?? string.Empty;
-
             var presets = existingPresets?.ToList() ?? [];
             _nameToPreset = presets.ToDictionary(preset => preset.Name, StringComparer.Ordinal);
             ExistingNames =
@@ -59,16 +51,6 @@ namespace Mfr.App.Ui.ViewModels.Presets
         }
 
         /// <summary>
-        /// Gets whether Update is available (last-loaded still present in the store).
-        /// </summary>
-        public bool CanUpdate { get; }
-
-        /// <summary>
-        /// Gets the last-loaded preset name before any edits, or empty when Update is unavailable.
-        /// </summary>
-        public string OriginalName { get; }
-
-        /// <summary>
         /// Gets sorted existing preset names for the Name suggestions list.
         /// </summary>
         public IReadOnlyList<string> ExistingNames { get; }
@@ -77,8 +59,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// Gets or sets the preset display name.
         /// </summary>
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(CanUpdateAction))]
-        [NotifyPropertyChangedFor(nameof(CanSaveAsAction))]
+        [NotifyPropertyChangedFor(nameof(CanSave))]
         private string _name = string.Empty;
 
         /// <summary>
@@ -94,14 +75,9 @@ namespace Mfr.App.Ui.ViewModels.Presets
         private bool _saveRenameListColumns;
 
         /// <summary>
-        /// Gets whether Update is enabled (available and non-blank name).
+        /// Gets whether Save is enabled (non-blank name).
         /// </summary>
-        public bool CanUpdateAction => CanUpdate && !string.IsNullOrWhiteSpace(Name);
-
-        /// <summary>
-        /// Gets whether Save as new is enabled (non-blank name).
-        /// </summary>
-        public bool CanSaveAsAction => !string.IsNullOrWhiteSpace(Name);
+        public bool CanSave => !string.IsNullOrWhiteSpace(Name);
 
         /// <summary>
         /// Gets the trimmed preset name for save.

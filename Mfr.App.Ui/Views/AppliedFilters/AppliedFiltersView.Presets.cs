@@ -106,7 +106,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Opens the Preset Manager (Load / Delete / Edit Description / Rename).
+        /// Opens the Preset Manager (Load / Delete / Rename).
         /// </summary>
         /// <returns>A task that completes when the dialog closes.</returns>
         public async Task ShowPresetManagerAsync()
@@ -172,7 +172,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Opens Save Preset (Update or Save as new), confirms overwrite when needed, then saves.
+        /// Opens Save Preset, confirms overwrite when the name exists, then upserts.
         /// </summary>
         /// <returns>A task that completes when the dialog flow finishes.</returns>
         public async Task ShowSavePresetAsync()
@@ -189,47 +189,17 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
             var dialogVm = new SavePresetDialogViewModel(
                 _viewModel.LastLoaded,
-                canUpdate: _viewModel.CanSavePreset,
                 existingPresets: _viewModel.PresetManager.NameToPreset.Values,
                 prefillFromLastLoaded: _viewModel.Steps.Count > 0
             );
             var dialog = new SavePresetDialog(dialogVm);
-            var choice = await dialog.ShowDialog<SavePresetDialogMode?>(owner);
-            if (choice is null)
+            var accepted = await dialog.ShowDialog<bool?>(owner);
+            if (accepted != true || !dialogVm.CanSave)
             {
                 return;
             }
 
             var name = dialogVm.TrimmedName;
-            if (name.Length == 0)
-            {
-                return;
-            }
-
-            var description = dialogVm.TrimmedDescriptionOrNull;
-            var columns = dialogVm.SaveRenameListColumns ? PresetRenameListColumns.Capture(this) : null;
-
-            if (choice == SavePresetDialogMode.Update)
-            {
-                if (!_viewModel.CanSavePreset)
-                {
-                    return;
-                }
-
-                var currentName = _viewModel.LastLoaded!.Name;
-                var isRename = !string.Equals(currentName, name, StringComparison.Ordinal);
-                if (isRename && _viewModel.PresetManager.NameToPreset.ContainsKey(name))
-                {
-                    await new OkMessageDialog("Rename Preset", $"A preset named '{name}' already exists.").ShowDialog(
-                        owner
-                    );
-                    return;
-                }
-
-                _viewModel.SavePreset(name, description, columns);
-                return;
-            }
-
             if (_viewModel.PresetManager.NameToPreset.ContainsKey(name))
             {
                 var confirm = new ConfirmMessageDialog(
@@ -243,7 +213,8 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 }
             }
 
-            _viewModel.SavePresetAs(name, description, columns);
+            var columns = dialogVm.SaveRenameListColumns ? PresetRenameListColumns.Capture(this) : null;
+            _viewModel.SavePresetAs(name, dialogVm.TrimmedDescriptionOrNull, columns);
         }
 
         /// <summary>

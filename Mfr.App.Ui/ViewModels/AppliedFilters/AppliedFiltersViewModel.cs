@@ -262,32 +262,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Updates a preset’s description and persists.
-        /// </summary>
-        /// <param name="name">Exact preset name key.</param>
-        /// <param name="description">New description; blank becomes <see langword="null"/>.</param>
-        /// <returns>The updated preset, or <see langword="null"/> when <paramref name="name"/> is missing.</returns>
-        public FilterPreset? SetPresetDescription(string name, string? description)
-        {
-            ArgumentNullException.ThrowIfNull(name);
-
-            if (!PresetManager.NameToPreset.TryGetValue(name, out var existing))
-            {
-                return null;
-            }
-
-            var updated = existing with { Description = _TrimDescriptionOrNull(description) };
-            PresetManager.NameToPreset[name] = updated;
-            PresetManager.SavePresets();
-            if (LastLoaded is not null && string.Equals(LastLoaded.Name, name, StringComparison.Ordinal))
-            {
-                SetLastLoaded(updated);
-            }
-
-            return updated;
-        }
-
-        /// <summary>
         /// Renames a preset in place (same <see cref="FilterPreset.Id"/>, chain, description, columns).
         /// <para>
         /// Blank names are rejected. Exact same name is a no-op. Names already used by another preset
@@ -338,7 +312,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Trims a description and maps blank / whitespace-only to <see langword="null"/>.
         /// </summary>
-        /// <param name="description">Raw description from Save As or Edit Description.</param>
+        /// <param name="description">Raw description from Save Preset.</param>
         /// <returns>Trimmed text, or <see langword="null"/> when empty.</returns>
         private static string? _TrimDescriptionOrNull(string? description)
         {
