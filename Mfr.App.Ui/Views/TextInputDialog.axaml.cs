@@ -1,5 +1,8 @@
 using Avalonia.Controls;
+using Avalonia.Controls.Documents;
 using Avalonia.Interactivity;
+using Avalonia.Media;
+using Mfr.App.Ui.ViewModels;
 
 namespace Mfr.App.Ui.Views
 {
@@ -8,6 +11,8 @@ namespace Mfr.App.Ui.Views
     /// </summary>
     public partial class TextInputDialog : Window
     {
+        private readonly TextInputPrompt? _prompt;
+
         /// <summary>
         /// Initializes an empty dialog (designer / XAML loader).
         /// </summary>
@@ -18,25 +23,63 @@ namespace Mfr.App.Ui.Views
         }
 
         /// <summary>
-        /// Initializes the dialog with title, prompt, and default text.
+        /// Initializes the dialog with styled prompt content and default text.
         /// </summary>
-        /// <param name="title">Window title.</param>
-        /// <param name="prompt">Prompt above the text box.</param>
-        /// <param name="defaultValue">Initial text box contents.</param>
-        public TextInputDialog(string title, string prompt, string defaultValue)
+        /// <param name="prompt">Title, prompt/note runs, and default text box value.</param>
+        public TextInputDialog(TextInputPrompt prompt)
             : this()
         {
-            Title = title;
-            PromptText.Text = prompt;
-            ValueBox.Text = defaultValue;
+            ArgumentNullException.ThrowIfNull(prompt);
+            _prompt = prompt;
+            Title = prompt.Title;
+            ValueBox.Text = prompt.DefaultValue;
+            NoteText.IsVisible = prompt.Note is { IsEmpty: false };
         }
 
         /// <inheritdoc />
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
+            if (_prompt is not null)
+            {
+                _ApplyRuns(PromptText, _prompt.Prompt);
+                if (_prompt.Note is { IsEmpty: false } note)
+                {
+                    _ApplyRuns(NoteText, note);
+                }
+            }
+
             ValueBox.Focus();
             ValueBox.SelectAll();
+        }
+
+        private void _ApplyRuns(TextBlock target, StatusHintDisplay display)
+        {
+            target.Inlines?.Clear();
+            if (display.IsEmpty)
+            {
+                return;
+            }
+
+            foreach (var run in display.Runs)
+            {
+                var inline = new Run { Text = run.Text };
+                if (run.FontWeight.HasValue)
+                {
+                    inline.FontWeight = run.FontWeight.Value;
+                }
+
+                if (
+                    !string.IsNullOrEmpty(run.ForegroundResourceKey)
+                    && TryGetResource(run.ForegroundResourceKey, ActualThemeVariant, out var resource)
+                    && resource is IBrush brush
+                )
+                {
+                    inline.Foreground = brush;
+                }
+
+                target.Inlines!.Add(inline);
+            }
         }
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)

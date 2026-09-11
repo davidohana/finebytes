@@ -1513,7 +1513,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([.. renameListViewModel.Entries]);
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PromptAsync = (_, _, _) => Task.FromResult<string?>("forced"),
+                PromptAsync = _ => Task.FromResult<string?>("forced"),
             };
 
             Assert.True(renameListViewModel.ManualOverrideFieldCommand.CanExecute(null));
@@ -1548,7 +1548,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetFocusedFieldKey(itemTypeKey);
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PromptAsync = (_, _, _) => Task.FromResult<string?>("x"),
+                PromptAsync = _ => Task.FromResult<string?>("x"),
             };
 
             Assert.False(renameListViewModel.ManualOverrideFieldCommand.CanExecute(null));
@@ -1636,9 +1636,9 @@ namespace Mfr.Tests.Ui.RenameList
             string? capturedPrompt = null;
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PromptAsync = (_, prompt, _) =>
+                PromptAsync = prompt =>
                 {
-                    capturedPrompt = prompt;
+                    capturedPrompt = prompt.ToPlainText();
                     return Task.FromResult<string?>(null);
                 },
             };

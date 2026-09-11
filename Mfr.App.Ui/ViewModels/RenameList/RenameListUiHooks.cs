@@ -26,11 +26,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public Func<string, string, Task>? ShowErrorAsync { get; init; }
 
         /// <summary>
-        /// Text prompt for Manual Override; arguments are dialog title, prompt line, and default value.
+        /// Text prompt for Manual Override; argument is the styled dialog content.
         /// </summary>
         /// <remarks>
         /// <para>Returns the entered string, or <see langword="null"/> when cancelled.</para>
         /// </remarks>
-        public Func<string, string, string, Task<string?>>? PromptAsync { get; init; }
+        public Func<TextInputPrompt, Task<string?>>? PromptAsync { get; init; }
     }
 }

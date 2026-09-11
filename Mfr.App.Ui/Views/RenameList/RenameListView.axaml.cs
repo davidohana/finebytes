@@ -192,16 +192,14 @@ namespace Mfr.App.Ui.Views.RenameList
             viewModel.UiHooks = null;
         }
 
-        private async Task<string?> _PromptOverrideAsync(string title, string prompt, string defaultValue)
+        private async Task<string?> _PromptOverrideAsync(TextInputPrompt prompt)
         {
             if (TopLevel.GetTopLevel(this) is not Window owner)
             {
                 return null;
             }
 
-            return await new TextInputDialog(title, prompt, defaultValue)
-                .ShowDialog<string?>(owner)
-                .ConfigureAwait(true);
+            return await new TextInputDialog(prompt).ShowDialog<string?>(owner).ConfigureAwait(true);
         }
 
         private async Task _ShowExportErrorAsync(string title, string message)

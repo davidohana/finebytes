@@ -1,3 +1,4 @@
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Models.RenameList;
 
@@ -69,15 +70,38 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var defaultValue = eligible[0].GetFieldText(key);
-            var side = key.IsPreview
+            var sideLabel = key.IsPreview
                 ? "final value (after filters)"
                 : "initial value (before filters)";
-            var countSuffix = eligible.Count > 1 ? $"' in {eligible.Count} items" : "'";
-            var prompt =
-                $"Set the {side} of the field '{field.DisplayName}{countSuffix} to:\n\n"
-                + "Takes effect in the Rename List now (blue). Files are updated when you press Go.";
+            var fieldLabel =
+                eligible.Count > 1
+                    ? $"'{field.DisplayName}' in {eligible.Count} items"
+                    : $"'{field.DisplayName}'";
+            var prompt = new TextInputPrompt
+            {
+                Title = "Manual Set Value",
+                DefaultValue = defaultValue,
+                Prompt = StatusHintDisplay.FromRuns(
+                    new StatusHintRun("Set the "),
+                    new StatusHintRun(sideLabel) { FontWeight = FontWeight.Bold },
+                    new StatusHintRun(" of the field "),
+                    new StatusHintRun(fieldLabel) { FontWeight = FontWeight.Bold },
+                    new StatusHintRun(" to:")
+                ),
+                Note = StatusHintDisplay.FromRuns(
+                    new StatusHintRun("Takes effect in the Rename List now ("),
+                    new StatusHintRun("blue")
+                    {
+                        FontWeight = FontWeight.Bold,
+                        ForegroundResourceKey = "RenameListManualOverrideForegroundBrush",
+                    },
+                    new StatusHintRun("). Files are updated when you press "),
+                    new StatusHintRun("Go") { FontWeight = FontWeight.Bold },
+                    new StatusHintRun(".")
+                ),
+            };
 
-            var value = await promptHooks("Manual Set Value", prompt, defaultValue).ConfigureAwait(true);
+            var value = await promptHooks(prompt).ConfigureAwait(true);
             if (value is null || IsBusy)
             {
                 return;
