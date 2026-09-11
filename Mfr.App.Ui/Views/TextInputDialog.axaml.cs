@@ -1,7 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
 using Avalonia.Interactivity;
-using Avalonia.Media;
 using Mfr.App.Ui.ViewModels;
 
 namespace Mfr.App.Ui.Views
@@ -42,44 +40,15 @@ namespace Mfr.App.Ui.Views
             base.OnOpened(e);
             if (_prompt is not null)
             {
-                _ApplyRuns(PromptText, _prompt.Prompt);
+                StatusHintInlines.Apply(this, PromptText, _prompt.Prompt);
                 if (_prompt.Note is { IsEmpty: false } note)
                 {
-                    _ApplyRuns(NoteText, note);
+                    StatusHintInlines.Apply(this, NoteText, note);
                 }
             }
 
             ValueBox.Focus();
             ValueBox.SelectAll();
-        }
-
-        private void _ApplyRuns(TextBlock target, StatusHintDisplay display)
-        {
-            target.Inlines?.Clear();
-            if (display.IsEmpty)
-            {
-                return;
-            }
-
-            foreach (var run in display.Runs)
-            {
-                var inline = new Run { Text = run.Text };
-                if (run.FontWeight.HasValue)
-                {
-                    inline.FontWeight = run.FontWeight.Value;
-                }
-
-                if (
-                    !string.IsNullOrEmpty(run.ForegroundResourceKey)
-                    && TryGetResource(run.ForegroundResourceKey, ActualThemeVariant, out var resource)
-                    && resource is IBrush brush
-                )
-                {
-                    inline.Foreground = brush;
-                }
-
-                target.Inlines!.Add(inline);
-            }
         }
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)

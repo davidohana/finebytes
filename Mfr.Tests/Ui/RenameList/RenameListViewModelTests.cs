@@ -1546,10 +1546,7 @@ namespace Mfr.Tests.Ui.RenameList
                 BasicRenameListFields.Key.ItemType
             );
             renameListViewModel.SetFocusedFieldKey(itemTypeKey);
-            renameListViewModel.UiHooks = new RenameListUiHooks
-            {
-                PromptAsync = _ => Task.FromResult<string?>("x"),
-            };
+            renameListViewModel.UiHooks = new RenameListUiHooks { PromptAsync = _ => Task.FromResult<string?>("x") };
 
             Assert.False(renameListViewModel.ManualOverrideFieldCommand.CanExecute(null));
         }
@@ -1647,13 +1644,21 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetFocusedFieldKey(originalKey);
             await renameListViewModel.ManualOverrideFieldAsync();
             Assert.Contains("initial value (before filters)", capturedPrompt, StringComparison.Ordinal);
-            Assert.Contains("Go", capturedPrompt, StringComparison.Ordinal);
+            Assert.Contains(
+                "Takes effect in the Rename List now (blue). Files are updated when you press Go.",
+                capturedPrompt,
+                StringComparison.Ordinal
+            );
 
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.SetFocusedFieldKey(previewKey);
             await renameListViewModel.ManualOverrideFieldAsync();
             Assert.Contains("final value (after filters)", capturedPrompt, StringComparison.Ordinal);
-            Assert.Contains("Go", capturedPrompt, StringComparison.Ordinal);
+            Assert.Contains(
+                "Takes effect in the Rename List now (blue). Files are updated when you press Go.",
+                capturedPrompt,
+                StringComparison.Ordinal
+            );
         }
 
         /// <summary>

@@ -1,7 +1,7 @@
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// Status-bar hint content as one or more styled text runs.
+    /// Rich-text hint content as one or more styled text runs (status bar, dialogs, and similar).
     /// </summary>
     public sealed class StatusHintDisplay
     {
@@ -65,7 +65,7 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Concatenates all run text (accessibility, tests, logging).
         /// </summary>
-        /// <returns>Single-line hint text without styling.</returns>
+        /// <returns>Plain text without styling.</returns>
         public string ToPlainText()
         {
             if (IsEmpty)

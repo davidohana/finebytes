@@ -3,7 +3,7 @@ using Avalonia.Media;
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// One styled segment in a status-bar rich-text hint.
+    /// One styled segment in a rich-text hint (status bar, dialogs, and similar).
     /// </summary>
     /// <remarks>
     /// Initializes a text run with default styling.
@@ -17,7 +17,7 @@ namespace Mfr.App.Ui.ViewModels
         public string Text { get; } = text;
 
         /// <summary>
-        /// Gets an optional font weight. When null, the status bar default is used.
+        /// Gets an optional font weight. When null, the host control default is used.
         /// </summary>
         public FontWeight? FontWeight { get; init; }
 

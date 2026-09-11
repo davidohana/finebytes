@@ -1,7 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Documents;
-using Avalonia.Media;
 using Mfr.App.Ui.ViewModels;
 
 namespace Mfr.App.Ui.Views
@@ -56,33 +54,14 @@ namespace Mfr.App.Ui.Views
 
         private void _RebuildInlines()
         {
-            HintTextBlock.Inlines?.Clear();
-
             var hint = Hint;
             if (hint is null || hint.IsEmpty)
             {
+                HintTextBlock.Inlines?.Clear();
                 return;
             }
 
-            foreach (var run in hint.Runs)
-            {
-                var inline = new Run { Text = run.Text };
-                if (run.FontWeight.HasValue)
-                {
-                    inline.FontWeight = run.FontWeight.Value;
-                }
-
-                if (
-                    !string.IsNullOrEmpty(run.ForegroundResourceKey)
-                    && TryGetResource(run.ForegroundResourceKey, ActualThemeVariant, out var resource)
-                    && resource is IBrush brush
-                )
-                {
-                    inline.Foreground = brush;
-                }
-
-                HintTextBlock.Inlines!.Add(inline);
-            }
+            StatusHintInlines.Apply(this, HintTextBlock, hint);
         }
     }
 }
