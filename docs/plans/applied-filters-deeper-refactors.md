@@ -29,6 +29,8 @@ ______________________________________________________________________
 | Multiline Entries control / line-iteration helper                                                    | **Done** — `MultilineEntriesFieldset` + `MultilineText.EnumerateLines`                                                               |
 | Replace List / Replacer compile regex once in `_Setup`                                               | **Done** — `ReplacerMatching.CompileSearch` cached on both filters                                                                   |
 | Inject column capture/apply into presets host                                                        | **Done** — `AppliedFiltersViewModel.SetRenameListColumnSource` from main window; deleted `PresetRenameListColumns` TopLevel reach-in |
+| Modal focus-and-select-all helper                                                                    | **Done** — `ModalDialogTextFocus.FocusAndSelectAll`                                                                                  |
+| Attributes Setter On/Off/Keep radio-row                                                              | **Done** — `AttributeTriStateRow`                                                                                                    |
 
 ______________________________________________________________________
 
@@ -42,30 +44,13 @@ ______________________________________________________________________
 - **Cost:** medium AXAML + headless layout tests
 - **Rank:** medium / later — wait for a third caller
 
-### 6. Modal focus-and-select-all helper
-
-- **Sites:** `FilterOptionsDialog.OnOpened`, `SavePresetDialog.OnOpened`, `TextInputDialog.OnOpened`
-- **Target:** tiny attach helper (`FocusAndSelectAll(TextBox)`) or shared base
-- **Value:** ~6–9 duplicated lines; one place for focus quirks
-- **Cost:** low LOC; three dialogs + optional tests
-- **Rank:** medium-low — only if another dialog needs the same pattern
-
 ### 7. AudioTagBlockKind UI display names
-8
+
 - **Sites:** `AudioTagBlockKindChoice` vs `AudioTagContainerPolicy` describe helpers
 - **Target:** one label source when a second block UI appears
 - **Value:** no label drift across block UIs
 - **Cost:** low once a second consumer exists
 - **Rank:** medium — **wait** for a second consumer
-- **Also in:** F5 deeper-refactors doc
-
-### 8. Attributes Setter On/Off/Keep radio-row control
-
-- **Sites:** four near-identical stacks in `AttributesSetterFilterEditorView.axaml`
-- **Target:** small UserControl with Label + GroupName + two-way `AttributeTriState`
-- **Value:** ~80 AXAML lines → one template
-- **Cost:** new control + headless names; **single caller today**
-- **Rank:** medium-low — only if layout keeps churning or a second On/Off/Keep editor appears
 - **Also in:** F5 deeper-refactors doc
 
 ______________________________________________________________________

@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.Presets;
 
 namespace Mfr.App.Ui.Views.Presets
@@ -36,15 +35,7 @@ namespace Mfr.App.Ui.Views.Presets
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
-            var editable = NameBox.GetVisualDescendants().OfType<TextBox>().FirstOrDefault();
-            if (editable is not null)
-            {
-                editable.Focus();
-                editable.SelectAll();
-                return;
-            }
-
-            NameBox.Focus();
+            ModalDialogTextFocus.FocusAndSelectAll(NameBox);
         }
 
         /// <summary>

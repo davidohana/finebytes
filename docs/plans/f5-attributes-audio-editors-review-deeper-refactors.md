@@ -54,13 +54,9 @@ This doc lists **not done** work only.
 - **Cost:** low once a second consumer appears
 - **Rank:** medium — wait for a second consumer
 
-### 5. Attributes Setter radio-row control — **medium / low**
+### 5. Attributes Setter radio-row control — **done**
 
-- **Sites:** four near-identical On/Off/Keep stacks in `AttributesSetterFilterEditorView.axaml`
-- **Target:** small UserControl with Label + GroupName + two-way `AttributeTriState`
-- **Value:** ~80 AXAML lines → one template; spacing/tip drift closed
-- **Cost:** new control + headless name reachability; **single caller today**
-- **Rank:** medium/low — only if layout keeps churning or a second On/Off/Keep editor appears
+- Shipped: `AttributeTriStateRow` (Label + GroupName + two-way `AttributeTriState`) used by Attributes Setter.
 
 ### 6. Multiline list editor / line-iteration helper — **done**
 

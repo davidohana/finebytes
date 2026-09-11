@@ -55,8 +55,7 @@ namespace Mfr.App.Ui.Views
                 }
             }
 
-            ValueBox.Focus();
-            ValueBox.SelectAll();
+            ModalDialogTextFocus.FocusAndSelectAll(ValueBox);
         }
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)

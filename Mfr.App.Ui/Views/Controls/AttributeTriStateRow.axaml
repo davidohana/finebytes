@@ -1,0 +1,35 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:attrFilters="using:Mfr.Filters.Attributes"
+  mc:Ignorable="d"
+  d:DesignWidth="420"
+  d:DesignHeight="28"
+  x:Class="Mfr.App.Ui.Views.Controls.AttributeTriStateRow"
+  x:Name="Root"
+  x:CompileBindings="False"
+>
+  <controls:FilterEditorLabeledRow Label="{Binding Label, ElementName=Root}">
+    <StackPanel Margin="16,0,0,0" Orientation="Horizontal" Spacing="16" HorizontalAlignment="Left">
+      <controls:CompactRadioButton
+        x:Name="OnRadio"
+        Content="On"
+        IsChecked="{Binding Value, ElementName=Root, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Set}, Mode=TwoWay}"
+      />
+      <controls:CompactRadioButton
+        x:Name="OffRadio"
+        Content="Off"
+        IsChecked="{Binding Value, ElementName=Root, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Clear}, Mode=TwoWay}"
+      />
+      <controls:CompactRadioButton
+        x:Name="KeepRadio"
+        Content="Keep"
+        IsChecked="{Binding Value, ElementName=Root, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static attrFilters:AttributeTriState.Keep}, Mode=TwoWay}"
+      />
+    </StackPanel>
+  </controls:FilterEditorLabeledRow>
+</UserControl>

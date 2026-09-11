@@ -45,8 +45,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         protected override void OnOpened(EventArgs e)
         {
             base.OnOpened(e);
-            NameBox.Focus();
-            NameBox.SelectAll();
+            ModalDialogTextFocus.FocusAndSelectAll(NameBox);
         }
 
         private void _OnOkClick(object? sender, RoutedEventArgs e)
