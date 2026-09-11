@@ -1,0 +1,35 @@
+<ResourceDictionary
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="clr-namespace:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Avalonia.Data.Converters"
+>
+  <ControlTheme x:Key="{x:Type controls:MultilineEntriesFieldset}" TargetType="controls:MultilineEntriesFieldset">
+    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+    <Setter Property="Template">
+      <ControlTemplate TargetType="controls:MultilineEntriesFieldset">
+        <controls:FieldsetGroup Header="{TemplateBinding Header}">
+          <StackPanel Spacing="4" ToolTip.Tip="{TemplateBinding Tip}">
+            <TextBlock
+              Classes="filter-editor-label"
+              Text="{TemplateBinding Label}"
+              IsVisible="{TemplateBinding Label, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}"
+            />
+            <ContentPresenter
+              Name="PART_ContentPresenter"
+              HorizontalAlignment="Stretch"
+              Content="{TemplateBinding Content}"
+              ContentTemplate="{TemplateBinding ContentTemplate}"
+              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+            />
+            <controls:FilterEditorHint
+              Text="{TemplateBinding Hint}"
+              IsVisible="{TemplateBinding Hint, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}"
+            />
+          </StackPanel>
+        </controls:FieldsetGroup>
+      </ControlTemplate>
+    </Setter>
+  </ControlTheme>
+</ResourceDictionary>

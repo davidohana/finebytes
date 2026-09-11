@@ -10,6 +10,7 @@
         <ResourceInclude Source="/Themes/AppChrome.axaml" />
         <ResourceInclude Source="/Themes/FieldsetGroup.axaml" />
         <ResourceInclude Source="/Themes/FilterEditorLabeledRow.axaml" />
+        <ResourceInclude Source="/Themes/MultilineEntriesFieldset.axaml" />
         <ResourceInclude Source="/Themes/FilterEditorHint.axaml" />
         <ResourceInclude Source="/Themes/FormatTokenPickerPane.axaml" />
         <ResourceInclude Source="/Assets/Icons.axaml" />

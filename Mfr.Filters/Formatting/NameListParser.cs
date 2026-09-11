@@ -1,3 +1,5 @@
+using Mfr.Utils;
+
 namespace Mfr.Filters.Formatting
 {
     /// <summary>
@@ -41,19 +43,7 @@ namespace Mfr.Filters.Formatting
         /// <returns>Parsed names in line order.</returns>
         public static IReadOnlyList<string> ParseEditorText(string? text)
         {
-            if (string.IsNullOrEmpty(text))
-            {
-                return [];
-            }
-
-            var entries = new List<string>();
-            using var reader = new StringReader(text);
-            while (reader.ReadLine() is { } line)
-            {
-                entries.Add(line);
-            }
-
-            return entries;
+            return [.. MultilineText.EnumerateLines(text)];
         }
 
         /// <summary>

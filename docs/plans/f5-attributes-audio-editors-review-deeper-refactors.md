@@ -62,13 +62,9 @@ This doc lists **not done** work only.
 - **Cost:** new control + headless name reachability; **single caller today**
 - **Rank:** medium/low — only if layout keeps churning or a second On/Off/Keep editor appears
 
-### 6. Multiline list editor / line-iteration helper — **medium** (carried from prior review doc)
+### 6. Multiline list editor / line-iteration helper — **done**
 
-- **Sites:** Name List + Replace List Entries fieldsets; Format/Parse line loops
-- **Target:** shared multiline Entries control; optional shared `EnumerateLines` where semantics match
-- **Value:** less AXAML drift
-- **Cost:** medium
-- **Rank:** medium — unchanged from prior pass
+- Shipped: `MultilineEntriesFieldset` (Name List + Replace List); `MultilineText.EnumerateLines` in Name/Replace list parsers.
 
 ### 7. Space Character MFR7 empty-Other validation — **medium** (carried)
 

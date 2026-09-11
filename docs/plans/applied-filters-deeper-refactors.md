@@ -13,32 +13,24 @@ ______________________________________________________________________
 
 ## Already done / obsolete (do not re-open)
 
-| Item                                                                                                 | Status                                                    |
-| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
-| Shared ordered-preset sort (Manager + ▾)                                                             | **Done** — `PresetNameOrder.ByName`                       |
-| `FilterHelpMap` / HelpFileName attribute                                                             | **Done** — `{Type}.html` on `FilterCatalogEntry`          |
-| Release-gate Help roots / ship Help beside exe                                                       | **Done** — `AppContext.BaseDirectory/help` only           |
-| Share `SessionJsonOptions` ↔ `PresetJsonOptions`                                                     | **Obsolete** — F8 / session Applied Filters chain removed |
-| Mid-session session flush / sibling section capture                                                  | **Obsolete** — no Applied Filters write-through           |
-| Session debounce vs Auto-Preview helper                                                              | **Obsolete** — same                                       |
-| `CountFilterOptions.ClampToLength`                                                                   | **Done** — already on the options type                    |
-| Collapse dual `IFileShellOpener` trees                                                               | **Done** — single `Services.Shell`                        |
-| Space Character empty-Other → `' '`                                                                  | **Superseded** — Other+empty → `'\0'`, rejected at setup  |
-| `CanSavePreset` notify / `PresetRenameListColumns` / `TryLoadPresetAsync` / `Refresh(preferredName)` | **Done** during F7 reviews                                |
-| Rename `SessionStateRenameListColumn` → shared DTO                                                   | **Done** — `RenameListVisibleColumnSpec`                  |
+| Item                                                                                                 | Status                                                                 |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Shared ordered-preset sort (Manager + ▾)                                                             | **Done** — `PresetNameOrder.ByName`                                    |
+| `FilterHelpMap` / HelpFileName attribute                                                             | **Done** — `{Type}.html` on `FilterCatalogEntry`                       |
+| Release-gate Help roots / ship Help beside exe                                                       | **Done** — `AppContext.BaseDirectory/help` only                        |
+| Share `SessionJsonOptions` ↔ `PresetJsonOptions`                                                     | **Obsolete** — F8 / session Applied Filters chain removed              |
+| Mid-session session flush / sibling section capture                                                  | **Obsolete** — no Applied Filters write-through                        |
+| Session debounce vs Auto-Preview helper                                                              | **Obsolete** — same                                                    |
+| `CountFilterOptions.ClampToLength`                                                                   | **Done** — already on the options type                                 |
+| Collapse dual `IFileShellOpener` trees                                                               | **Done** — single `Services.Shell`                                     |
+| Space Character empty-Other → `' '`                                                                  | **Superseded** — Other+empty → `'\0'`, rejected at setup               |
+| `CanSavePreset` notify / `PresetRenameListColumns` / `TryLoadPresetAsync` / `Refresh(preferredName)` | **Done** during F7 reviews                                             |
+| Rename `SessionStateRenameListColumn` → shared DTO                                                   | **Done** — `RenameListVisibleColumnSpec`                               |
+| Multiline Entries control / line-iteration helper                                                    | **Done** — `MultilineEntriesFieldset` + `MultilineText.EnumerateLines` |
 
 ______________________________________________________________________
 
 ## Still worth doing (best cost-to-value first)
-
-### 2. Multiline Entries control / line-iteration helper
-
-- **Sites:** Name List + Replace List Entries fieldsets; Format/Parse line loops
-- **Target:** shared multiline Entries control; optional shared `EnumerateLines` where semantics match
-- **Value:** less AXAML drift
-- **Cost:** medium
-- **Rank:** medium — do when either list editor churns
-- **Also in:** [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md)
 
 ### 3. Replace List / Replacer — compile regex once in `_Setup`
 

@@ -118,10 +118,11 @@ namespace Mfr.Tests.Models.Filters.Replace
         /// Verifies empty editor text parses to no entries.
         /// </summary>
         [Theory]
+        [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
         [InlineData("\n\n")]
-        public void ParseEditorText_Empty_ReturnsEmpty(string text)
+        public void ParseEditorText_Empty_ReturnsEmpty(string? text)
         {
             Assert.Empty(ReplaceListParser.ParseEditorText(text));
         }

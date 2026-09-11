@@ -1,3 +1,5 @@
+using Mfr.Utils;
+
 namespace Mfr.Filters.Replace
 {
     /// <summary>
@@ -42,15 +44,10 @@ namespace Mfr.Filters.Replace
         /// </remarks>
         /// <param name="text">Multiline editor text.</param>
         /// <returns>Parsed pairs in line order.</returns>
-        public static IReadOnlyList<ReplaceListEntry> ParseEditorText(string text)
+        public static IReadOnlyList<ReplaceListEntry> ParseEditorText(string? text)
         {
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                return [];
-            }
-
             var entries = new List<ReplaceListEntry>();
-            foreach (var line in text.Split(['\r', '\n']))
+            foreach (var line in MultilineText.EnumerateLines(text))
             {
                 if (string.IsNullOrWhiteSpace(line))
                 {

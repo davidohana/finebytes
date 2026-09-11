@@ -16,38 +16,38 @@
   <fe:FormatTokenPickerPane IsExpanded="{Binding FormatTokenPickerExpanded, Mode=TwoWay}">
     <StackPanel Spacing="8">
       <controls:ReplacerModeFieldset x:Name="ModeFieldset" GroupName="ReplaceListMode" DataContext="{Binding Match}" />
-      <controls:FieldsetGroup Header="Replace List">
-        <StackPanel Spacing="4">
-          <ToolTip.Tip>
-            <controls:RichToolTip>
-              <TextBlock Classes="rich-tip-title" Text="One search/replace pair per line." />
-              <TextBlock
-                Classes="rich-tip-body"
-                Text="Separate search and replacement with =&gt;. A lone search line strips matches. Spaces are allowed. The replacement may include formatter tokens such as &lt;counter:…&gt;."
-              />
-              <TextBlock Classes="rich-tip-bullet" Text="• Example: a =&gt; b" />
-              <TextBlock Classes="rich-tip-bullet" Text="• Example: Blue Train =&gt; Blue_Train" />
-              <TextBlock Classes="rich-tip-bullet" Text="• Example: x  (removes x)" />
-              <TextBlock
-                Classes="rich-tip-bullet"
-                Text="• Example: [0-9]+ =&gt; &lt;counter:initial=1,step=1,padding=none,length=2,resetScope=global&gt;"
-              />
-            </controls:RichToolTip>
-          </ToolTip.Tip>
-          <fe:FormatEditor
-            x:Name="EntriesEditor"
-            MinWidth="240"
-            MinHeight="88"
-            HorizontalAlignment="Stretch"
-            AcceptsReturn="True"
-            ShowRightClickHint="False"
-            ValidationMode="{x:Static formatString:FormatStringValidationMode.WhenLikelyTokens}"
-            Watermark="{Binding EntriesWatermark}"
-            Text="{Binding EntriesText}"
-          />
-          <controls:FilterEditorHint Text="One pair per line: search => replacement (tokens on replacement; lone search removes)." />
-        </StackPanel>
-      </controls:FieldsetGroup>
+      <controls:MultilineEntriesFieldset
+        Header="Replace List"
+        Hint="One pair per line: search => replacement (tokens on replacement; lone search removes)."
+      >
+        <controls:MultilineEntriesFieldset.Tip>
+          <controls:RichToolTip>
+            <TextBlock Classes="rich-tip-title" Text="One search/replace pair per line." />
+            <TextBlock
+              Classes="rich-tip-body"
+              Text="Separate search and replacement with =&gt;. A lone search line strips matches. Spaces are allowed. The replacement may include formatter tokens such as &lt;counter:…&gt;."
+            />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: a =&gt; b" />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: Blue Train =&gt; Blue_Train" />
+            <TextBlock Classes="rich-tip-bullet" Text="• Example: x  (removes x)" />
+            <TextBlock
+              Classes="rich-tip-bullet"
+              Text="• Example: [0-9]+ =&gt; &lt;counter:initial=1,step=1,padding=none,length=2,resetScope=global&gt;"
+            />
+          </controls:RichToolTip>
+        </controls:MultilineEntriesFieldset.Tip>
+        <fe:FormatEditor
+          x:Name="EntriesEditor"
+          MinWidth="240"
+          MinHeight="88"
+          HorizontalAlignment="Stretch"
+          AcceptsReturn="True"
+          ShowRightClickHint="False"
+          ValidationMode="{x:Static formatString:FormatStringValidationMode.WhenLikelyTokens}"
+          Watermark="{Binding EntriesWatermark}"
+          Text="{Binding EntriesText}"
+        />
+      </controls:MultilineEntriesFieldset>
       <controls:ReplacerMatchOptionsFieldset x:Name="MatchOptionsFieldset" DataContext="{Binding Match}" />
     </StackPanel>
   </fe:FormatTokenPickerPane>
