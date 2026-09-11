@@ -66,6 +66,14 @@ These pages document **per-filter `options`** (and behavior). Common preset fiel
 
 ## Preset shape
 
+Top-level object for `presets.json`: a `presets` array; each item has:
+
+- `id` — GUID string.
+- `name` — unique display name (exact-match uniqueness in the file).
+- `description` — optional.
+- `chain` — ordered steps (see below).
+- `visibleColumns` — optional Rename List column list (`key` + optional `width`), same shape as session `renameList.visibleColumns`. When omitted/`null`, loading leaves current Rename List columns unchanged. Sort fields are **not** stored on presets.
+
 Each filter in a preset has:
 
 - `type` — discriminator string (same name as the filter, e.g. `LettersCase`).
@@ -88,7 +96,7 @@ Each filter page uses an **Examples** section: prefer a four-column table (**Opt
 
 ### Sample full preset
 
-Top-level object for `presets.json`: a `presets` array; each item has `id`, `name`, optional `description`, and `chain`. Each `chain.steps[]` entry has `enabled` and `filter` (the same JSON shape as on each filter page, wrapped in a step).
+Each `chain.steps[]` entry has `enabled` and `filter` (the same JSON shape as on each filter page, wrapped in a step).
 
 ```json
 {
@@ -97,6 +105,15 @@ Top-level object for `presets.json`: a `presets` array; each item has `id`, `nam
       "id": "00000000-0000-4000-8000-000000000001",
       "name": "Word boundary then capitalize",
       "description": "Underscore as separator, then capitalize the prefix.",
+      "visibleColumns": [
+        {
+          "key": { "group": "Basic", "property": "FullName", "preview": false },
+          "width": 220
+        },
+        {
+          "key": { "group": "Basic", "property": "Name", "preview": true }
+        }
+      ],
       "chain": {
         "steps": [
           {

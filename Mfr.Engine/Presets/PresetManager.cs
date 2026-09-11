@@ -8,8 +8,9 @@ namespace Mfr.Engine.Presets
     /// Creates a preset manager that reads and caches presets from a single JSON file.
     /// </summary>
     /// <remarks>
-    /// Hard-fail dialect: missing or invalid <c>presets.json</c> → <see cref="LoadPresets"/> throws
-    /// (<see cref="UserException"/> / wrapped IO) and aborts load. Same family as
+    /// Hard-fail dialect: invalid <c>presets.json</c> → <see cref="LoadPresets"/> throws
+    /// (<see cref="UserException"/> / wrapped IO) and aborts load. Missing AppData file is created
+    /// empty by <see cref="OpenDefault"/> then loaded. Same family as
     /// <see cref="Models.Config.ConfigStore"/>; opposite of soft-load
     /// <see cref="Models.Config.SessionStore"/> and <see cref="FilterDefaultsStore"/>.
     /// Do not unify these modes — the split is intentional product dialect.
@@ -37,8 +38,52 @@ namespace Mfr.Engine.Presets
         }
 
         /// <summary>
+        /// Opens the AppData presets file, creating an empty container when the file is missing.
+        /// </summary>
+        /// <returns>A manager with presets loaded from disk.</returns>
+        /// <exception cref="UserException">
+        /// Thrown when the file exists but cannot be read or is not a valid presets document.
+        /// </exception>
+        public static PresetManager OpenDefault()
+        {
+            return OpenOrCreate(DefaultPresetsFilePath());
+        }
+
+        /// <summary>
+        /// Creates an empty manager that does not read AppData (tests and isolated UI hosts).
+        /// </summary>
+        /// <returns>A manager with no presets loaded.</returns>
+        public static PresetManager CreateEmpty()
+        {
+            return new PresetManager(Path.Combine(Path.GetTempPath(), $"mfr-empty-presets-{Guid.NewGuid():N}.json"));
+        }
+
+        /// <summary>
+        /// Opens <paramref name="presetsFilePath"/>, writing an empty container when the file is missing.
+        /// </summary>
+        /// <param name="presetsFilePath">Path to the presets JSON file.</param>
+        /// <returns>A manager with presets loaded from disk.</returns>
+        /// <exception cref="UserException">
+        /// Thrown when the file exists but cannot be read or is not a valid presets document.
+        /// </exception>
+        internal static PresetManager OpenOrCreate(string presetsFilePath)
+        {
+            var manager = new PresetManager(presetsFilePath);
+            if (!File.Exists(manager.PresetsFilePath))
+            {
+                manager.SavePresets();
+            }
+
+            manager.LoadPresets();
+            return manager;
+        }
+
+        /// <summary>
         /// Loads and caches all presets from the configured presets file.
         /// </summary>
+        /// <exception cref="UserException">
+        /// Thrown when the file is missing, unreadable, or not a valid presets document.
+        /// </exception>
         public void LoadPresets()
         {
             if (!File.Exists(PresetsFilePath))

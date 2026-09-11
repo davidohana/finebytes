@@ -44,14 +44,22 @@ namespace Mfr.App.Ui.ViewModels
         /// Per-type filter add defaults. When null, uses an empty store that does not read AppData
         /// (production passes <see cref="FilterDefaultsStore.OpenDefault"/>).
         /// </param>
+        /// <param name="presetManager">
+        /// Named presets store. When null, uses an empty manager that does not read AppData
+        /// (production passes <see cref="PresetManager.OpenDefault"/>).
+        /// </param>
         public MainWindowViewModel(
             string? initialFileListPath = null,
             SessionState? session = null,
-            FilterDefaultsStore? filterDefaults = null
+            FilterDefaultsStore? filterDefaults = null,
+            PresetManager? presetManager = null
         )
         {
             Session = session;
-            AppliedFiltersViewModel = new AppliedFiltersViewModel(filterDefaults ?? FilterDefaultsStore.CreateEmpty());
+            AppliedFiltersViewModel = new AppliedFiltersViewModel(
+                filterDefaults ?? FilterDefaultsStore.CreateEmpty(),
+                presetManager ?? PresetManager.CreateEmpty()
+            );
             FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
             RenameListViewModel = new RenameListViewModel(FileListViewModel, appliedFilters: AppliedFiltersViewModel);
             FilterEditorViewModel = new FilterEditorViewModel();

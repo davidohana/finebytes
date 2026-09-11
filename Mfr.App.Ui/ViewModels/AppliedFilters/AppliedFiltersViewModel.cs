@@ -26,12 +26,32 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Per-type add defaults store. When null, uses an empty store that does not read AppData
         /// (production passes <see cref="FilterDefaultsStore.OpenDefault"/>).
         /// </param>
-        public AppliedFiltersViewModel(FilterDefaultsStore? filterDefaults = null)
+        /// <param name="presetManager">
+        /// Named presets store. When null, uses an empty manager that does not read AppData
+        /// (production passes <see cref="PresetManager.OpenDefault"/>).
+        /// </param>
+        public AppliedFiltersViewModel(FilterDefaultsStore? filterDefaults = null, PresetManager? presetManager = null)
         {
             _filterDefaults = filterDefaults ?? FilterDefaultsStore.CreateEmpty();
+            PresetManager = presetManager ?? PresetManager.CreateEmpty();
             Steps = [];
             Steps.CollectionChanged += _OnStepsCollectionChanged;
         }
+
+        /// <summary>
+        /// Gets the named presets manager for this pane.
+        /// </summary>
+        public PresetManager PresetManager { get; }
+
+        /// <summary>
+        /// Gets the last preset loaded into this pane, or <see langword="null"/> when none.
+        /// </summary>
+        public FilterPreset? LastLoaded { get; private set; }
+
+        /// <summary>
+        /// Gets whether in-place Save Preset is available (a last-loaded preset still present in the manager).
+        /// </summary>
+        public bool CanSavePreset => LastLoaded is not null && PresetManager.NameToPreset.ContainsKey(LastLoaded.Name);
 
         /// <summary>
         /// Clears in-memory per-type add defaults after Reset Configuration deletes the file.
@@ -39,6 +59,17 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         internal void ClearFilterDefaultsCache()
         {
             _filterDefaults.Clear();
+        }
+
+        /// <summary>
+        /// Records the last loaded preset (enables in-place Save when the name remains in the manager).
+        /// </summary>
+        /// <param name="preset">Preset that was just loaded, or <see langword="null"/> to clear.</param>
+        internal void SetLastLoaded(FilterPreset? preset)
+        {
+            LastLoaded = preset;
+            OnPropertyChanged(nameof(LastLoaded));
+            OnPropertyChanged(nameof(CanSavePreset));
         }
 
         /// <summary>
@@ -172,12 +203,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 return;
             }
 
-            foreach (var step in Steps)
-            {
-                step.PropertyChanged -= _OnStepPropertyChanged;
-            }
-
-            Steps.Clear();
+            _DetachAndClearSteps();
             SetSelectedSteps([]);
         }
 
@@ -253,7 +279,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             var step = _selectedSteps[0];
-            var entry = FilterCatalog.Entries.Single(catalogEntry => catalogEntry.FilterType == step.Filter.GetType());
+            var entry = _CatalogEntryFor(step.Filter);
             var defaults = FilterCatalog.CreateDefault(entry);
             if (Equals(step.Filter, defaults))
             {
@@ -280,7 +306,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             var step = _selectedSteps[0];
-            var entry = FilterCatalog.Entries.Single(catalogEntry => catalogEntry.FilterType == step.Filter.GetType());
+            var entry = _CatalogEntryFor(step.Filter);
             _filterDefaults.SetDefault(step.Filter);
             FilterDefaultSaved?.Invoke(this, entry.DisplayName);
         }
@@ -295,6 +321,67 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             {
                 Steps = [.. Steps.Select(step => new FilterChainStep(step.Enabled, step.Filter))],
             };
+        }
+
+        /// <summary>
+        /// Replaces the Applied Filters stack from a preset or session chain.
+        /// <para>
+        /// Clears existing steps, rebuilds from <paramref name="chain"/>, synthesizes catalog display names
+        /// (custom Filter Options names do not round-trip), copies each step’s <c>Enabled</c> flag, raises
+        /// <see cref="ChainChanged"/> once, and selects the first step when any exist.
+        /// </para>
+        /// </summary>
+        /// <param name="chain">Source chain (always replaces; never merges).</param>
+        public void ReplaceFromChain(FilterChain chain)
+        {
+            ArgumentNullException.ThrowIfNull(chain);
+
+            if (chain.Steps.Count == 0 && Steps.Count == 0)
+            {
+                SetSelectedSteps([]);
+                return;
+            }
+
+            _WithSingleChainChanged(() =>
+            {
+                _DetachAndClearSteps();
+                foreach (var chainStep in chain.Steps)
+                {
+                    var entry = _CatalogEntryFor(chainStep.Filter);
+                    var displayName = _GenerateCatalogDisplayName(entry);
+                    var step = new AppliedFilterStepViewModel(displayName, chainStep.Filter)
+                    {
+                        Enabled = chainStep.Enabled,
+                    };
+                    Steps.Add(step);
+                }
+            });
+
+            if (Steps.Count == 0)
+            {
+                SetSelectedSteps([]);
+                return;
+            }
+
+            SetSelectedSteps([Steps[0]]);
+        }
+
+        /// <summary>
+        /// Unsubscribes step change handlers then clears the stack.
+        /// <para>
+        /// Required before <c>Steps.Clear()</c>: that raises
+        /// <see cref="NotifyCollectionChangedAction.Reset"/> without <c>OldItems</c>, so the
+        /// collection-changed handler cannot detach.
+        /// </para>
+        /// </summary>
+        private void _DetachAndClearSteps()
+        {
+            foreach (var step in Steps)
+            {
+                step.PropertyChanged -= _OnStepPropertyChanged;
+            }
+
+            Steps.Clear();
         }
 
         private void _OnStepsCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -403,6 +490,14 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             var filter = _ResolveAddDefault(entry);
             var displayName = _GenerateCatalogDisplayName(entry);
             return new AppliedFilterStepViewModel(displayName, filter);
+        }
+
+        /// <summary>
+        /// Resolves the catalog row for an applied filter instance.
+        /// </summary>
+        private static FilterCatalogEntry _CatalogEntryFor(BaseFilter filter)
+        {
+            return FilterCatalog.Entries.Single(catalogEntry => catalogEntry.FilterType == filter.GetType());
         }
 
         /// <summary>

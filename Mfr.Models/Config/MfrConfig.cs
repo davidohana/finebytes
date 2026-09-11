@@ -18,6 +18,30 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
+    /// UI-related config loaded from the <c>ui</c> section of the config file.
+    /// </summary>
+    public sealed class UiConfig
+    {
+        /// <summary>
+        /// Presets UI options (hand-edit <c>config.json</c>; Options dialog not wired yet).
+        /// </summary>
+        [ConfigSection]
+        public PresetsUiConfig Presets = new();
+    }
+
+    /// <summary>
+    /// Presets UI options under <c>ui.presets</c>.
+    /// </summary>
+    public sealed class PresetsUiConfig
+    {
+        /// <summary>
+        /// When <see langword="true"/>, confirm before replacing a non-empty Applied Filters chain on preset load.
+        /// <para>Default <see langword="false"/> (MFR7 parity: replace immediately).</para>
+        /// </summary>
+        public bool ConfirmReplaceAppliedFiltersOnLoad;
+    }
+
+    /// <summary>
     /// Diagnostic session-log config loaded from the <c>log</c> section of the config file.
     /// <para>Used by both the CLI and the UI. The console template applies to CLI console output only.</para>
     /// </summary>
@@ -80,5 +104,11 @@ namespace Mfr.Models.Config
         /// </summary>
         [ConfigSection]
         public LogConfig Log = new();
+
+        /// <summary>
+        /// UI options (presets confirm-replace and related hand-edit settings).
+        /// </summary>
+        [ConfigSection]
+        public UiConfig Ui = new();
     }
 }

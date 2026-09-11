@@ -390,6 +390,67 @@ namespace Mfr.Tests.Engine
             Assert.Contains("Token", serialized, StringComparison.Ordinal);
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies a preset JSON without <c>visibleColumns</c> deserializes with a null column list.
+        /// </summary>
+        public void FilterPreset_omitted_visibleColumns_is_null()
+        {
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "id": "11111111-1111-1111-1111-111111111111",
+                  "name": "NoColumns",
+                  "chain": { "steps": [] }
+                }
+                """;
+
+            var preset = JsonSerializer.Deserialize<FilterPreset>(json, PresetJsonOptions.Default);
+            Assert.NotNull(preset);
+            Assert.Null(preset.VisibleColumns);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies a preset JSON with <c>visibleColumns</c> round-trips keys and widths.
+        /// </summary>
+        public void FilterPreset_visibleColumns_roundtrips()
+        {
+            var json = /*lang=json,strict*/
+                """
+                {
+                  "id": "22222222-2222-2222-2222-222222222222",
+                  "name": "WithColumns",
+                  "chain": { "steps": [] },
+                  "visibleColumns": [
+                    {
+                      "key": { "group": "Basic", "property": "FullName", "preview": false },
+                      "width": 220
+                    },
+                    {
+                      "key": { "group": "Basic", "property": "Name", "preview": true }
+                    }
+                  ]
+                }
+                """;
+
+            var preset = JsonSerializer.Deserialize<FilterPreset>(json, PresetJsonOptions.Default);
+            Assert.NotNull(preset);
+            Assert.NotNull(preset.VisibleColumns);
+            Assert.Equal(2, preset.VisibleColumns.Count);
+            Assert.Equal("Basic", preset.VisibleColumns[0].Key.GroupId);
+            Assert.Equal("FullName", preset.VisibleColumns[0].Key.PropertyKey);
+            Assert.False(preset.VisibleColumns[0].Key.IsPreview);
+            Assert.Equal(220, preset.VisibleColumns[0].Width);
+            Assert.Equal("Name", preset.VisibleColumns[1].Key.PropertyKey);
+            Assert.True(preset.VisibleColumns[1].Key.IsPreview);
+            Assert.Null(preset.VisibleColumns[1].Width);
+
+            var serialized = JsonSerializer.Serialize(preset, PresetJsonOptions.Default);
+            Assert.Contains("visibleColumns", serialized, StringComparison.Ordinal);
+            Assert.Contains("FullName", serialized, StringComparison.Ordinal);
+        }
+
         private sealed record PresetContainerWrapper(
             [property: JsonPropertyName("presets")] IReadOnlyList<FilterPreset> Presets
         );

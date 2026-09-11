@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Mfr.Models.Config;
 
 namespace Mfr.Models.Filters
 {
@@ -30,5 +31,14 @@ namespace Mfr.Models.Filters
         /// </summary>
         [JsonPropertyName("chain")]
         public required FilterChain Chain { get; init; }
+
+        /// <summary>
+        /// Gets optional Rename List visible columns to apply when this preset is loaded.
+        /// <para>
+        /// When <see langword="null"/> or omitted, loading leaves the current Rename List columns unchanged.
+        /// </para>
+        /// </summary>
+        [JsonPropertyName("visibleColumns")]
+        public IReadOnlyList<SessionStateRenameListColumn>? VisibleColumns { get; init; }
     }
 }

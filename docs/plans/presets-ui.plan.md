@@ -4,7 +4,7 @@ overview: "F7 Presets UI in four phases: foundation, Save + Save As, Preset Mana
 todos:
   - id: p1-foundation
     content: "P1 Foundation — OpenDefault/CreateEmpty, FilterPreset.visibleColumns, confirm-replace config, ReplaceFromChain + inject + App composition"
-    status: pending
+    status: completed
   - id: p2-save-preset
     content: "P2 Save + Save As — in-place Save when last-loaded; SavePresetDialog for Save As; enable menu/toolbar stubs"
     status: pending
@@ -25,22 +25,22 @@ Canonical product backlog: [applied-filter-editors.plan.md](applied-filter-edito
 
 ## Product decisions (locked)
 
-| Topic | Choice |
-| --- | --- |
-| Load semantics | **Always replace** Applied Filters (clear + rebuild). No merge. |
+| Topic                  | Choice                                                                                                                                                                                                                                                                                               |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Load semantics         | **Always replace** Applied Filters (clear + rebuild). No merge.                                                                                                                                                                                                                                      |
 | Confirm before replace | **Optional via config.** When `ConfirmReplaceAppliedFiltersOnLoad` is `true` and `Steps.Count > 0`, show `ConfirmMessageDialog` before replace (Cancel leaves chain unchanged). When `false` (default), replace immediately (MFR7 parity). Applies to Manager **Load** and toolbar **▾** quick-pick. |
-| **Save vs Save As** | **Save Preset** updates the **last-loaded** preset in place (same name + `Id`, no name dialog, no overwrite confirm). **Save Preset As** opens the name/description/columns dialog (overwrite confirm if name exists). |
-| Save enabled | **Save** enabled only when last-loaded name is still present in `NameToPreset` (cleared if that preset was deleted; updated if renamed). If none → Save disabled; use Save As. |
-| Save payload | **Chain always** (`ToChain()`). Columns: **Save** keeps prior policy (if last-loaded had `visibleColumns`, re-capture; if it was `null`, stay `null`). **Save As** uses the checkbox. Description: **Save** keeps existing description; **Save As** uses dialog field. |
-| RL columns on load | If preset has `visibleColumns`, apply via `ApplyVisibleColumnsFromSession`. If omitted/`null`, leave current columns unchanged. |
-| Description | Optional on Save As + read-only pane + **Edit Description** in Manager. |
-| Rename preset | **In Manager** — keep `Id`; refuse if another preset already has that exact name; update last-loaded name if it matched. |
-| Overwrite / delete | Overwrite confirm only on **Save As** when name exists; **confirm delete**. **Save** (update) is silent. |
-| Quick load | Toolbar **Presets** + **▾**; Filters menu: Presets / Save Preset / Save Preset As. |
-| First-run file | `OpenDefault()` creates empty file when missing; corrupt hard-fails. |
-| Display names | Catalog-synthesized on load; custom Filter Options names do not round-trip. |
-| `.mps` / migration | None. |
-| Shortcuts | None. `AppTips` only. |
+| **Save vs Save As**    | **Save Preset** updates the **last-loaded** preset in place (same name + `Id`, no name dialog, no overwrite confirm). **Save Preset As** opens the name/description/columns dialog (overwrite confirm if name exists).                                                                               |
+| Save enabled           | **Save** enabled only when last-loaded name is still present in `NameToPreset` (cleared if that preset was deleted; updated if renamed). If none → Save disabled; use Save As.                                                                                                                       |
+| Save payload           | **Chain always** (`ToChain()`). Columns: **Save** keeps prior policy (if last-loaded had `visibleColumns`, re-capture; if it was `null`, stay `null`). **Save As** uses the checkbox. Description: **Save** keeps existing description; **Save As** uses dialog field.                               |
+| RL columns on load     | If preset has `visibleColumns`, apply via `ApplyVisibleColumnsFromSession`. If omitted/`null`, leave current columns unchanged.                                                                                                                                                                      |
+| Description            | Optional on Save As + read-only pane + **Edit Description** in Manager.                                                                                                                                                                                                                              |
+| Rename preset          | **In Manager** — keep `Id`; refuse if another preset already has that exact name; update last-loaded name if it matched.                                                                                                                                                                             |
+| Overwrite / delete     | Overwrite confirm only on **Save As** when name exists; **confirm delete**. **Save** (update) is silent.                                                                                                                                                                                             |
+| Quick load             | Toolbar **Presets** + **▾**; Filters menu: Presets / Save Preset / Save Preset As.                                                                                                                                                                                                                   |
+| First-run file         | `OpenDefault()` creates empty file when missing; corrupt hard-fails.                                                                                                                                                                                                                                 |
+| Display names          | Catalog-synthesized on load; custom Filter Options names do not round-trip.                                                                                                                                                                                                                          |
+| `.mps` / migration     | None.                                                                                                                                                                                                                                                                                                |
+| Shortcuts              | None. `AppTips` only.                                                                                                                                                                                                                                                                                |
 
 ```mermaid
 flowchart LR
@@ -143,12 +143,12 @@ Open Manager / Save / Save As from Applied Filters code-behind + MainWindow Filt
 
 ## Tests by phase
 
-| Phase | Coverage |
-| --- | --- |
-| P1 | `OpenDefault` missing vs corrupt; `visibleColumns` JSON; config bool bind; `ReplaceFromChain` + `ChainChanged` + display names; `CanSavePreset` false initially |
-| P2 | Save As upsert / overwrite keeps Id; columns checkbox; **Save** updates chain in place and keeps Id/name/description; Save disabled without last-loaded; Save As sets last-loaded so Save enables |
-| P3 | Load sets last-loaded; delete clears it; rename updates it; confirm-replace cancel; edit description |
-| P4 | ▾ load sets last-loaded; tips smoke; mark F7 done |
+| Phase | Coverage                                                                                                                                                                                          |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| P1    | `OpenDefault` missing vs corrupt; `visibleColumns` JSON; config bool bind; `ReplaceFromChain` + `ChainChanged` + display names; `CanSavePreset` false initially                                   |
+| P2    | Save As upsert / overwrite keeps Id; columns checkbox; **Save** updates chain in place and keeps Id/name/description; Save disabled without last-loaded; Save As sets last-loaded so Save enables |
+| P3    | Load sets last-loaded; delete clears it; rename updates it; confirm-replace cancel; edit description                                                                                              |
+| P4    | ▾ load sets last-loaded; tips smoke; mark F7 done                                                                                                                                                 |
 
 Do **not** retest JSON polymorphism (`PresetJsonPolymorphismTests`).
 

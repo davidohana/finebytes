@@ -28,6 +28,13 @@ namespace Mfr.Tests.Models
                 Assert.Equal("100", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
                 Assert.Equal(string.Empty, doc.RootElement.GetProperty("log").GetProperty("directoryPath").GetString());
                 Assert.Equal("session-", doc.RootElement.GetProperty("log").GetProperty("filePrefix").GetString());
+                Assert.Equal(
+                    "false",
+                    doc.RootElement.GetProperty("ui")
+                        .GetProperty("presets")
+                        .GetProperty("confirmReplaceAppliedFiltersOnLoad")
+                        .GetString()
+                );
             }
             finally
             {

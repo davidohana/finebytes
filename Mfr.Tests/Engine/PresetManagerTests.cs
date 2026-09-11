@@ -171,6 +171,50 @@ namespace Mfr.Tests.Engine
             Assert.Equal(["A", "a", "z"], names);
         }
 
+        [Fact]
+        /// <summary>
+        /// Verifies <see cref="PresetManager.OpenOrCreate"/> writes an empty file when missing, then loads.
+        /// </summary>
+        public void OpenOrCreate_Creates_Empty_File_When_Missing()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var presetsPath = dir.CombinePath("presets.json");
+            Assert.False(File.Exists(presetsPath));
+
+            var manager = PresetManager.OpenOrCreate(presetsPath);
+
+            Assert.True(File.Exists(presetsPath));
+            Assert.Empty(manager.NameToPreset);
+            using var doc = JsonDocument.Parse(File.ReadAllText(presetsPath));
+            Assert.Equal(JsonValueKind.Array, doc.RootElement.GetProperty("presets").ValueKind);
+            Assert.Empty(doc.RootElement.GetProperty("presets").EnumerateArray());
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies <see cref="PresetManager.OpenOrCreate"/> still hard-fails on a corrupt presets file.
+        /// </summary>
+        public void OpenOrCreate_Corrupt_File_Throws_UserException()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var presetsPath = dir.CombinePath("presets.json");
+            File.WriteAllText(presetsPath, "{ not valid presets json");
+
+            var ex = Assert.Throws<UserException>(() => PresetManager.OpenOrCreate(presetsPath));
+            Assert.Contains("Failed to read presets file", ex.Message, StringComparison.Ordinal);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies <see cref="PresetManager.CreateEmpty"/> starts with no presets and does not require a file.
+        /// </summary>
+        public void CreateEmpty_Has_No_Presets()
+        {
+            var manager = PresetManager.CreateEmpty();
+            Assert.Empty(manager.NameToPreset);
+            Assert.False(File.Exists(manager.PresetsFilePath));
+        }
+
         private static void _WritePresetsJson(string path, string content)
         {
             File.WriteAllText(path, content);

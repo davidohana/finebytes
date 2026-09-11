@@ -562,6 +562,127 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
+        /// Verifies a fresh pane has no last-loaded preset and cannot Save in place.
+        /// </summary>
+        [Fact]
+        public void CanSavePreset_Is_False_Initially()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            Assert.Null(viewModel.LastLoaded);
+            Assert.False(viewModel.CanSavePreset);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="AppliedFiltersViewModel.SetLastLoaded"/> enables Save only while the name remains in the manager.
+        /// </summary>
+        [Fact]
+        public void SetLastLoaded_Enables_CanSavePreset_While_Name_Present()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Demo",
+                Chain = new FilterChain { Steps = [] },
+            };
+            manager.NameToPreset[preset.Name] = preset;
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+
+            viewModel.SetLastLoaded(preset);
+            Assert.Same(preset, viewModel.LastLoaded);
+            Assert.True(viewModel.CanSavePreset);
+
+            manager.NameToPreset.Remove(preset.Name);
+            Assert.False(viewModel.CanSavePreset);
+
+            viewModel.SetLastLoaded(null);
+            Assert.Null(viewModel.LastLoaded);
+            Assert.False(viewModel.CanSavePreset);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="AppliedFiltersViewModel.ReplaceFromChain"/> rebuilds steps, copies enabled flags,
+        /// uses catalog display names, selects the first step, and raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// </summary>
+        [Fact]
+        public void ReplaceFromChain_Rebuilds_With_Catalog_Names_And_Single_ChainChanged()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.Steps[0].SetDisplayName("Custom Label");
+
+            var letters = new LettersCaseFilter();
+            var shrink = new ShrinkSpacesFilter();
+            var chain = new FilterChain
+            {
+                Steps =
+                [
+                    new FilterChainStep(Enabled: false, Filter: letters),
+                    new FilterChainStep(Enabled: true, Filter: shrink),
+                    new FilterChainStep(Enabled: true, Filter: new LettersCaseFilter()),
+                ],
+            };
+
+            var count = _CountChainChanged(viewModel, () => viewModel.ReplaceFromChain(chain));
+
+            Assert.Equal(1, count);
+            Assert.Equal(3, viewModel.Count);
+            Assert.Equal("Letters Case", viewModel.Steps[0].DisplayName);
+            Assert.False(viewModel.Steps[0].Enabled);
+            Assert.Equal("Shrink Spaces", viewModel.Steps[1].DisplayName);
+            Assert.True(viewModel.Steps[1].Enabled);
+            Assert.Equal("Letters Case (2)", viewModel.Steps[2].DisplayName);
+            Assert.Equal([viewModel.Steps[0]], viewModel.SelectedSteps);
+            Assert.Same(letters, viewModel.Steps[0].Filter);
+            Assert.Same(shrink, viewModel.Steps[1].Filter);
+        }
+
+        /// <summary>
+        /// Verifies replacing with an empty chain clears selection and raises one change when steps existed.
+        /// </summary>
+        [Fact]
+        public void ReplaceFromChain_Empty_Clears_Stack()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+
+            var count = _CountChainChanged(viewModel, () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] }));
+
+            Assert.Equal(1, count);
+            Assert.Equal(0, viewModel.Count);
+            Assert.Empty(viewModel.SelectedSteps);
+        }
+
+        /// <summary>
+        /// Verifies empty-to-empty replace is a no-op for <see cref="AppliedFiltersViewModel.ChainChanged"/>.
+        /// </summary>
+        [Fact]
+        public void ReplaceFromChain_Empty_When_Already_Empty_Raises_No_ChainChanged()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            var count = _CountChainChanged(viewModel, () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] }));
+            Assert.Equal(0, count);
+        }
+
+        /// <summary>
+        /// Verifies replaced steps no longer raise <see cref="AppliedFiltersViewModel.ChainChanged"/> after detach.
+        /// </summary>
+        [Fact]
+        public void ReplaceFromChain_Detaches_Old_Step_Handlers()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            var oldStep = viewModel.Steps[0];
+
+            viewModel.ReplaceFromChain(
+                new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: new LettersCaseFilter())] }
+            );
+
+            var count = _CountChainChanged(viewModel, () => oldStep.Enabled = false);
+            Assert.Equal(0, count);
+        }
+
+        /// <summary>
         /// Counts <see cref="AppliedFiltersViewModel.ChainChanged"/> raises during <paramref name="action"/>.
         /// </summary>
         private static int _CountChainChanged(AppliedFiltersViewModel viewModel, Action action)
