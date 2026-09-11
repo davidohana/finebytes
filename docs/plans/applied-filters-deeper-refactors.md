@@ -51,7 +51,7 @@ ______________________________________________________________________
 - **Rank:** medium-low — only if another dialog needs the same pattern
 
 ### 7. AudioTagBlockKind UI display names
-
+8
 - **Sites:** `AudioTagBlockKindChoice` vs `AudioTagContainerPolicy` describe helpers
 - **Target:** one label source when a second block UI appears
 - **Value:** no label drift across block UIs
