@@ -69,9 +69,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var defaultValue = eligible[0].GetFieldText(key);
-            var side = key.IsPreview ? "preview" : "original";
+            var side = key.IsPreview
+                ? "final value (after filters)"
+                : "initial value (before filters)";
             var countSuffix = eligible.Count > 1 ? $"' in {eligible.Count} items" : "'";
-            var prompt = $"Set the {side} value of the field '{field.DisplayName}{countSuffix} to: ";
+            var prompt =
+                $"Set the {side} of the field '{field.DisplayName}{countSuffix} to:\n\n"
+                + "Takes effect in the Rename List now (blue). Files are updated when you press Go.";
 
             var value = await promptHooks("Manual Set Value", prompt, defaultValue).ConfigureAwait(true);
             if (value is null || IsBusy)

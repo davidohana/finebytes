@@ -1623,7 +1623,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies the override prompt uses original vs preview wording from the focused key.
+        /// Verifies the override prompt uses before-filters vs after-filters wording from the focused key.
         /// </summary>
         [Fact]
         public async Task ManualOverrideField_prompt_uses_original_or_preview_wording()
@@ -1646,12 +1646,14 @@ namespace Mfr.Tests.Ui.RenameList
             var originalKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.SetFocusedFieldKey(originalKey);
             await renameListViewModel.ManualOverrideFieldAsync();
-            Assert.Contains("original", capturedPrompt, StringComparison.Ordinal);
+            Assert.Contains("initial value (before filters)", capturedPrompt, StringComparison.Ordinal);
+            Assert.Contains("Go", capturedPrompt, StringComparison.Ordinal);
 
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.SetFocusedFieldKey(previewKey);
             await renameListViewModel.ManualOverrideFieldAsync();
-            Assert.Contains("preview", capturedPrompt, StringComparison.Ordinal);
+            Assert.Contains("final value (after filters)", capturedPrompt, StringComparison.Ordinal);
+            Assert.Contains("Go", capturedPrompt, StringComparison.Ordinal);
         }
 
         /// <summary>

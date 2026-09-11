@@ -45,7 +45,8 @@ namespace Mfr.App.Ui.Resources
         public const string LocateInFileList = "Locate in File List (F4)";
 
         /// <summary>Rename List Manual Override Field menu tip.</summary>
-        public const string ManualOverrideField = "Manually override the focused field value (F2)";
+        public const string ManualOverrideField =
+            "Override the focused field in the Rename List (F2). Files update on Go.";
 
         /// <summary>Rename List column header: clear overrides for this column on every row.</summary>
         public const string CancelManualOverrideColumn =

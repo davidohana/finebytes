@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F6 complete on master: Applied list + Filter Configuration + FormatEditor (reuse, highlight, token picker pane). Next: F7 presets, F8 session chain, F9 filter chrome, F10 Filter Options polish."
+overview: "F1–F6 + F9a/b done on master. Remaining: F7 presets (next), F8 session chain, F9c help ?, F10 Filter Options polish."
 todos:
   - id: f1-f5-complete
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
@@ -14,8 +14,14 @@ todos:
   - id: f8-session-chain
     content: "F8 Session — persist + restore working Applied Filters chain (current schema only)"
     status: pending
-  - id: f9-filter-chrome
-    content: "F9 Filter chrome — save-as-default (pin, done), reset-to-defaults (done), per-filter help ?"
+  - id: f9a-save-as-default
+    content: "F9a Save as default (📌) — FilterDefaultsStore / filter-defaults.json"
+    status: completed
+  - id: f9b-reset-to-defaults
+    content: "F9b Reset to defaults (↺) — FilterCatalog.CreateDefault"
+    status: completed
+  - id: f9c-help
+    content: "F9c Help ? — per-filter help from Filter Configuration title bar / Filter Options"
     status: pending
   - id: f10-filter-options-polish
     content: "F10 Filter Options dialog — XAML/layout polish vs MFR7 (dialog already functional)"
@@ -27,7 +33,18 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-08):** **F1–F6 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` (catalog, param dialogs, syntax highlight, token picker pane) is wired across format-capable filters. **F9a save-as-default (pin)** landed. **Next:** F7 presets → F8 session chain → F9 help `?` → F10 Filter Options polish.
+**Status (2026-09-11):** **F1–F6 + F9a/b complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌** and reset **↺** ship in Filter Configuration. **Presets / Save Preset remain disabled stubs.** Session has no Applied Filters chain fields yet. No help `?` button.
+
+### Priority (what's left)
+
+| Order | Item | Why next |
+| ----- | ---- | -------- |
+| **1** | **F7 Presets UI** | Highest product value; `PresetManager` + JSON shape already exist; menu/toolbar stubs only need enabling + dialogs + `ToChain()` replace/save |
+| **2** | **F8 Session chain** | Same chain serialization lessons as F7; restores last working list on launch (`SessionState` — soft-load, current schema only) |
+| **3** | **F9c Help `?`** | Remaining Filter Configuration chrome; needs help-host / MFR7 HTML mapping (no button yet) |
+| **4** | **F10 Filter Options polish** | Dialog already works; cosmetic layout vs MFR7 only |
+
+Do **not** mix F7–F10 into one pass. F7 before F8 so load/replace UX and error handling land once, then session reuses the chain DTO path.
 
 ______________________________________________________________________
 
@@ -68,13 +85,11 @@ Agent checklist: [mfr-implement-filter-editor](../../.agents/skills/mfr-implemen
 1. VM + headless tests under `Mfr.Tests/Ui/FilterEditors/<Group>/`.
 1. Compact controls + `SharedSizeGroup="FilterEditorLabel"` for multi-row label+field forms.
 
-Non-product cleanup (shared controls, clamp helpers, etc.): [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md) — optional, not blocking F6+.
+Non-product cleanup (shared controls, clamp helpers, etc.): [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md) — optional, not blocking F7+.
 
 ______________________________________________________________________
 
 ## Remaining backlog (F7+)
-
-Ordered for product value. Do **not** mix these into a single “editor” pass — each is its own feature slice.
 
 ### F6 — Formatter FormatEditor UX — **done**
 
@@ -89,31 +104,31 @@ Ordered for product value. Do **not** mix these into a single “editor” pass 
 
 **Landed as:** [A #35](https://github.com/davidohana/finebytes/pull/35) (merged) · [B #36](https://github.com/davidohana/finebytes/pull/36) (closed; work on master) · [C #37](https://github.com/davidohana/finebytes/pull/37) (merged).
 
-### F7 — Presets UI
+### F7 — Presets UI — **next**
 
-Engine already has `PresetManager` + JSON preset shape (`Mfr.Filters` docs). UI stubs exist (`Presets` / `Save Preset` menu items, disabled).
+Engine already has `PresetManager` + JSON preset shape (`Mfr.Filters` docs). UI stubs exist (`Presets` / `Save Preset` in Filters menu + Applied Filters toolbar) — all `IsEnabled="False"`.
 
-1. Enable **Presets** menu: list named presets → replace (or confirm-replace) Applied Filters chain from preset steps.
+1. Enable **Presets**: list named presets → replace (or confirm-replace) Applied Filters chain from preset steps.
 1. Enable **Save Preset**: name prompt → serialize current `ToChain()` into presets store.
-1. Edge cases: empty chain, overwrite same name, load errors (bad JSON / unknown filter type → clear message, no silent remap).
+1. Edge cases: empty chain, overwrite same name, load errors (bad JSON / unknown filter type → clear message, no silent remap). Hard-fail dialect of `PresetManager` stays.
 1. Tests: VM + headless for load/save round-trip of a small chain.
 
 ### F8 — Session persist of working chain
 
-Rename List / other session fields already persist; Applied Filters chain does not yet.
+Rename List / other session fields already persist; Applied Filters chain does **not** (`SessionState` has no chain fields).
 
-1. Add current-schema fields on `SessionState` for the working chain (steps: type, options, enabled, display name, Apply To / scope as already modeled).
+1. Add current-schema fields on `SessionState` for the working chain (steps: type, options, enabled, display name, Apply To / scope as already modeled). Prefer reuse of the same step shape F7 saves into presets.
 1. Save on change (debounced) / shutdown; restore on launch.
-1. Missing/unrecognized → defaults (first launch), **no** legacy converters (`AGENTS.md` persistence policy).
+1. Missing/unrecognized → defaults (first launch), **no** legacy converters (`AGENTS.md` persistence policy). Soft-load like other session fields.
 1. Tests: serialize/deserialize round-trip; unknown type drops to empty or skips that step with documented behavior.
 
-### F9 — Filter chrome (save-as-default / reset / help)
+### F9 — Filter chrome
 
-MFR7 Applied / Filter Configuration chrome:
-
-1. **Save as default (pin)** — **done** (title-bar **📌**; `FilterDefaultsStore` / `filter-defaults.json`; applies on palette add only; reset stays factory).
-1. **Reset to defaults** — **done** (single selection; options / Apply To / scope via `FilterCatalog.CreateDefault`; keeps display name + enabled; title-bar `↺`).
-1. **Help `?`** — open per-filter help (ported help pages or MFR7 `Help/*.html` mapping). Wire from Filter Configuration title bar and/or Filter Options.
+| Sub | Status | Notes |
+| --- | ------ | ----- |
+| **F9a Save as default (📌)** | **done** | Title-bar pin; `FilterDefaultsStore` / `filter-defaults.json`; applies on palette add only; reset stays factory. See [filter-save-as-default.plan.md](filter-save-as-default.plan.md). |
+| **F9b Reset to defaults (↺)** | **done** | Single selection; options / Apply To / scope via `FilterCatalog.CreateDefault`; keeps display name + enabled. |
+| **F9c Help `?`** | **todo** | No button yet. Open per-filter help (ported pages or MFR7 `Help/*.html` mapping). Wire from Filter Configuration title bar and/or Filter Options. |
 
 ### F10 — Filter Options dialog polish
 
@@ -133,6 +148,8 @@ ______________________________________________________________________
 - Filter Options: `Views/AppliedFilters/FilterOptionsDialog*`
 - Wiring: factory + ViewLocator; `MainWindowViewModel` already selects the editor
 - Preview: already hooked — do not re-wire for F7+ product chrome
+- Presets engine: `Mfr.Engine/Presets/PresetManager` (UI still stubbed)
+- Per-type add defaults: `FilterDefaultsStore` (F9a done)
 
 ## References
 
@@ -141,4 +158,5 @@ ______________________________________________________________________
 - Formatter tokens: [formatter-tokens.md](../../.agents/skills/mfr7-reference/formatter-tokens.md)
 - Optional cleanup: [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md)
 - Rename List preview: [rename-list-ui.plan.md](rename-list-ui.plan.md) Phase 10–11
+- F9a detail: [filter-save-as-default.plan.md](filter-save-as-default.plan.md)
 - Prior slice history: Cursor plan `applied_filter_editors_c4a4260f.plan.md` (F1–F4)
