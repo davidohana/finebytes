@@ -225,7 +225,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies preview-column header menu order (MFR7) and that original columns omit Remove Unchanged.
+        /// Verifies preview-column header menu order and that original columns omit Remove Unchanged.
         /// </summary>
         [AvaloniaFact]
         public async Task Header_menu_offers_remove_unchanged_on_preview_column_only()
@@ -249,10 +249,10 @@ namespace Mfr.Tests.Ui.RenameList
                 [
                     "(Parent Directory)",
                     "Hide Field",
-                    "Export Name List",
-                    "Edit as Name List",
                     "Select Visible Fields...",
                     "Select Sort Fields...",
+                    "Edit as Name List",
+                    "Export Name List",
                 ],
                 _MenuHeaders(originalHeader.ContextMenu)
             );
@@ -263,10 +263,10 @@ namespace Mfr.Tests.Ui.RenameList
                     "(Full File Name)",
                     "Hide Field",
                     "Remove Unchanged Items",
-                    "Export Name List",
-                    "Edit as Name List",
                     "Select Visible Fields...",
                     "Select Sort Fields...",
+                    "Edit as Name List",
+                    "Export Name List",
                 ],
                 _MenuHeaders(previewHeader.ContextMenu)
             );
@@ -309,7 +309,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             _RaiseHeaderContextMenu(lengthHeader);
             Assert.Equal(
-                ["(File Name Length)", "Hide Field", "Export Name List", "Select Visible Fields...", "Select Sort Fields..."],
+                ["(File Name Length)", "Hide Field", "Select Visible Fields...", "Select Sort Fields...", "Export Name List"],
                 _MenuHeaders(lengthHeader.ContextMenu)
             );
             Assert.DoesNotContain("Edit as Name List", _MenuHeaders(lengthHeader.ContextMenu));

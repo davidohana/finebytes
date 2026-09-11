@@ -217,7 +217,7 @@ MFR7: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) (`
 
 Header menu order ([`_BuildColumnHeaderContextMenu`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)):
 
-`(title)` → Hide Field → *(preview)* Remove Unchanged → **(14b) Export Name List** → **(14c writable) Edit as Name List** → Select Visible Fields → Select Sort Fields.
+`(title)` → Hide Field → *(preview)* Remove Unchanged → Select Visible Fields → Select Sort Fields → **(14c writable) Edit as Name List** → **(14b) Export Name List**.
 
 ### 14b — Export Name List (done)
 
@@ -226,7 +226,7 @@ One line per rename-list row = display text of the clicked column (original or p
 **Work completed**
 
 - Engine `RenameList.ExportNameList(path, key)` — UTF-8 `File.WriteAllLines` over `CollectNameList`.
-- Header **Export Name List** on any column (before Edit as Name List); tip via `AppTips.ExportNameList`.
+- Header **Export Name List** on any column (after Edit as Name List); tip via `AppTips.ExportNameList`.
 - Avalonia save dialog (`Save Name List as`, `*.txt`); on success `"Name list saved to {path}. Edit?"` → Yes opens with default app (`IFileShellOpener.OpenWithDefaultApp`). Cancel = no write.
 
 **Not in scope:** creating a Name List filter (14c — shipped).

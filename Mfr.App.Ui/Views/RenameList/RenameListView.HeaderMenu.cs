@@ -109,15 +109,15 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
-        /// Builds the column header menu in MFR7 order for the given field.
+        /// Builds the column header menu for the given field.
         /// </summary>
         /// <param name="viewModel">Bound Rename List view model.</param>
         /// <param name="fieldKey">Field for the clicked header.</param>
         /// <returns>A new context menu (caller opens it).</returns>
         /// <remarks>
         /// <para>
-        /// Order: title → Hide Field → (preview) Remove Unchanged → Export Name List →
-        /// Edit as Name List (writable) → Select Visible Fields → Select Sort Fields.
+        /// Order: title → Hide Field → (preview) Remove Unchanged → Select Visible Fields →
+        /// Select Sort Fields → Edit as Name List (writable) → Export Name List.
         /// </para>
         /// </remarks>
         private static ContextMenu _BuildColumnHeaderContextMenu(
@@ -146,10 +146,17 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             menu.Items.Add(
-                _CreateTipMenuItem(
-                    "Export Name List",
-                    AppTips.ExportNameList,
-                    () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportNameListAsync(fieldKey))
+                _CreateCommandMenuItem(
+                    "Select Visible Fields...",
+                    AppTips.SelectRenameListFields,
+                    viewModel.OpenFieldShuttleCommand
+                )
+            );
+            menu.Items.Add(
+                _CreateCommandMenuItem(
+                    "Select Sort Fields...",
+                    AppTips.EditRenameListSortFields,
+                    viewModel.OpenEditSortFieldsCommand
                 )
             );
 
@@ -165,17 +172,10 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             menu.Items.Add(
-                _CreateCommandMenuItem(
-                    "Select Visible Fields...",
-                    AppTips.SelectRenameListFields,
-                    viewModel.OpenFieldShuttleCommand
-                )
-            );
-            menu.Items.Add(
-                _CreateCommandMenuItem(
-                    "Select Sort Fields...",
-                    AppTips.EditRenameListSortFields,
-                    viewModel.OpenEditSortFieldsCommand
+                _CreateTipMenuItem(
+                    "Export Name List",
+                    AppTips.ExportNameList,
+                    () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportNameListAsync(fieldKey))
                 )
             );
 
