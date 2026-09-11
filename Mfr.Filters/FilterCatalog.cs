@@ -12,14 +12,14 @@ namespace Mfr.Filters
     /// <param name="DisplayName">Human-readable label shown in the list.</param>
     /// <param name="FilterType">Concrete filter CLR type (parameterless ctor supplies add-to-list defaults).</param>
     /// <param name="HelpFileName">
-    /// MFR7 Help HTML file name when known (e.g. <c>spacecharfilter.html</c>), otherwise <see langword="null"/>.
+    /// Shipped Help HTML basename by convention: <c>{Type}.html</c> (e.g. <c>SpaceCharacter.html</c>).
     /// </param>
     public sealed record FilterCatalogEntry(
         string Type,
         FilterGroup Group,
         string DisplayName,
         Type FilterType,
-        string? HelpFileName = null
+        string HelpFileName
     );
 
     /// <summary>
@@ -62,8 +62,13 @@ namespace Mfr.Filters
             );
 
             var typeName = _ReadTypeDiscriminator(filterType);
-            var helpFileName = FilterHelpMap.TryGetHelpFileName(typeName, out var mapped) ? mapped : null;
-            return new FilterCatalogEntry(typeName, catalog.Group, catalog.DisplayName, filterType, helpFileName);
+            return new FilterCatalogEntry(
+                typeName,
+                catalog.Group,
+                catalog.DisplayName,
+                filterType,
+                HelpFileName: $"{typeName}.html"
+            );
         }
 
         private static string _ReadTypeDiscriminator(Type filterType)

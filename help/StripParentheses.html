@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Strip Parentheses</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="filters.html">Filters</a>
+      &gt; <a href="filters.html#misc">Misc</a>
+      &gt; <strong>Strip Parentheses</strong>
+    </nav>
+    <hr />
+    <h1>Strip Parentheses</h1>
+    <figure class="screenshot">
+      <img src="images/StripParentheses.png" alt="Strip Parentheses options" width="480" height="120" />
+      <figcaption>Filter options (screenshot optional — capture to images/StripParentheses.png).</figcaption>
+    </figure>
+        <p>Removes one kind of bracket pair: round (), square [], curly {}, or angle &amp;lt;&amp;gt;. You can delete only the delimiters or the whole bracketed region.</p>
+        <p>Matched pairs are stripped innermost-first; unmatched brackets are left alone.</p>
+    <h2>Options</h2>
+        <ul class="options">
+          <li><span class="quote">Bracket type</span> — Round, square, curly, or angle brackets.</li>
+          <li><span class="quote">Remove contents</span> — When checked, delete delimiters and text inside; otherwise delete only the bracket characters.</li>
+        </ul>
+    <h2>Examples</h2>
+    <div class="examples">
+          <code>Song (Live) >>> Song </code>
+          <code>Song (Live) >>> Song Live</code>
+          <code>Track [Remastered] >>> Track </code>
+    </div>
+        <p class="note">First example removes contents of round parentheses; second removes only the parentheses.</p>
+  </body>
+</html>

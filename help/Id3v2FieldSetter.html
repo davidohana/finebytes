@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>ID3v2 Field Setter</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="filters.html">Filters</a>
+      &gt; <a href="filters.html#audio">Audio</a>
+      &gt; <strong>ID3v2 Field Setter</strong>
+    </nav>
+    <hr />
+    <h1>ID3v2 Field Setter</h1>
+    <figure class="screenshot">
+      <img src="images/Id3v2FieldSetter.png" alt="ID3v2 Field Setter options" width="480" height="120" />
+      <figcaption>Filter options (screenshot optional — capture to images/Id3v2FieldSetter.png).</figcaption>
+    </figure>
+        <p>Sets one modeled ID3v2 text frame on each MPEG/MP3 file. Creates an ID3v2.3 tag when missing; existing tag versions are preserved.</p>
+        <p>Add multiple instances of this filter to set several frames. Non-MPEG containers show a preview error.</p>
+    <h2>Options</h2>
+        <ul class="options">
+          <li><span class="quote">Field</span> — Which ID3v2 frame to write (Frame ID shown in parentheses).</li>
+          <li><span class="quote">Text</span> — Value written to the frame. Empty clears the frame. May use formatter tokens.</li>
+          <li><span class="quote">Language / Description</span> — Identity for COMM / USLT / TXXX; leave empty for the primary instance.</li>
+          <li><span class="quote">Set only if current value is empty</span> — When checked, skip frames that already have a value.</li>
+        </ul>
+    <h2>Examples</h2>
+    <div class="examples">
+          <code>(empty TIT2) >>> Blue Moon Revisited</code>
+          <code>(Year frame) >>> 1990</code>
+    </div>
+
+  </body>
+</html>

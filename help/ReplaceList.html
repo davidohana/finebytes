@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Replace List</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="filters.html">Filters</a>
+      &gt; <a href="filters.html#replace">Replace</a>
+      &gt; <strong>Replace List</strong>
+    </nav>
+    <hr />
+    <h1>Replace List</h1>
+    <figure class="screenshot">
+      <img src="images/ReplaceList.png" alt="Replace List options" width="480" height="120" />
+      <figcaption>Filter options (screenshot optional — capture to images/ReplaceList.png).</figcaption>
+    </figure>
+        <p>Applies several search/replace pairs in order, sharing one match mode and flags. Each replacement may include formatter tokens such as &amp;lt;counter:…&amp;gt;.</p>
+    <h2>Options</h2>
+        <ul class="options">
+          <li><span class="quote">Entries</span> — One pair per line: search =&gt; replacement. A lone search line removes matches.</li>
+          <li><span class="quote">Mode / match flags</span> — Same matching rules as Replacer (literal, wildcards, or regular expression).</li>
+        </ul>
+    <h2>Examples</h2>
+    <div class="examples">
+          <code>a.a >>> b_b</code>
+          <code>01.-.Blue.Train >>> 10_-_Blue_Train</code>
+    </div>
+
+  </body>
+</html>

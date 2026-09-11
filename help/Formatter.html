@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Formatter</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="filters.html">Filters</a>
+      &gt; <a href="filters.html#formatting">Formatting</a>
+      &gt; <strong>Formatter</strong>
+    </nav>
+    <hr />
+    <h1>Formatter</h1>
+    <figure class="screenshot">
+      <img src="images/Formatter.png" alt="Formatter options" width="480" height="120" />
+      <figcaption>Filter options (screenshot optional — capture to images/Formatter.png).</figcaption>
+    </figure>
+        <p>Replaces the entire selected field with the result of a format string. Mix literals and tokens such as &amp;lt;file-name&amp;gt; or &amp;lt;counter:…&amp;gt;. An empty format string clears the field.</p>
+    <h2>Options</h2>
+        <ul class="options">
+          <li><span class="quote">Format string</span> — Pattern that replaces the target field. Tokens resolve from the current file/folder context.</li>
+        </ul>
+    <h2>Examples</h2>
+    <div class="examples">
+          <code>(any previous name) >>> 01.1920x1080</code>
+          <code>report >>> report_backup</code>
+    </div>
+        <p class="note">First example uses a format string like &amp;lt;counter:…&amp;gt;.&amp;lt;image-width&amp;gt;x&amp;lt;image-height&amp;gt;.</p>
+  </body>
+</html>

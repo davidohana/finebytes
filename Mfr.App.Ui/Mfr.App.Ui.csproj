@@ -31,6 +31,16 @@
     <AvaloniaResource Include="Assets\RenameList\*.png" />
   </ItemGroup>
 
+  <!-- Ship filter Help HTML beside the exe (repo-root help/). Exclude capture notes. -->
+  <ItemGroup>
+    <Content
+      Include="..\help\**\*"
+      Exclude="..\help\SCREENSHOTS.md"
+      LinkBase="help"
+      CopyToOutputDirectory="PreserveNewest"
+    />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.3.20" />
     <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.3.0" />

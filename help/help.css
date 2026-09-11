@@ -1,0 +1,92 @@
+body {
+  font-family: Verdana, Geneva, sans-serif;
+  font-size: 90%;
+  line-height: 1.45;
+  margin: 1.25rem;
+  color: #222;
+}
+
+h1 {
+  font-size: 1.35rem;
+  margin: 0.4rem 0 0.8rem;
+}
+
+h2 {
+  font-size: 1.05rem;
+  margin: 1.2rem 0 0.5rem;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid #ccc;
+  margin: 0.75rem 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: bold;
+  font-size: 1.15rem;
+}
+
+.breadcrumb {
+  margin: 0.75rem 0;
+}
+
+.quote {
+  color: #b00b0b;
+}
+
+figure.screenshot {
+  margin: 1rem 0;
+}
+
+figure.screenshot img {
+  max-width: min(100%, 520px);
+  border: 1px solid #888;
+  background:
+    linear-gradient(45deg, #eee 25%, transparent 25%),
+    linear-gradient(-45deg, #eee 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #eee 75%),
+    linear-gradient(-45deg, transparent 75%, #eee 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  min-height: 48px;
+}
+
+figure.screenshot figcaption {
+  color: #666;
+  font-size: 0.85em;
+  margin-top: 0.35rem;
+}
+
+ul.options {
+  padding-left: 1.2rem;
+}
+
+ul.options li {
+  margin: 0.35rem 0;
+}
+
+.examples code {
+  display: block;
+  margin: 0.35rem 0 0.85rem;
+  white-space: pre-wrap;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.95em;
+}
+
+.note {
+  margin-top: 1rem;
+  color: #444;
+}
+
+.group-list {
+  margin: 0 0 1.25rem;
+  padding-left: 1.1rem;
+}
+
+.group-list li {
+  margin: 0.2rem 0;
+}

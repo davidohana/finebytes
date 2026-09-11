@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Fix Leading 0&#x27;s</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="filters.html">Filters</a>
+      &gt; <a href="filters.html#misc">Misc</a>
+      &gt; <strong>Fix Leading 0&#x27;s</strong>
+    </nav>
+    <hr />
+    <h1>Fix Leading 0&#x27;s</h1>
+    <figure class="screenshot">
+      <img src="images/FixLeadingZeros.png" alt="Fix Leading 0&#x27;s options" width="480" height="120" />
+      <figcaption>Filter options (screenshot optional — capture to images/FixLeadingZeros.png).</figcaption>
+    </figure>
+        <p>Finds runs of digits and rewrites them so their length matches the target width by adjusting leading zeros. Longer numbers stay unchanged unless surplus zeros are stripped.</p>
+    <h2>Options</h2>
+        <ul class="options">
+          <li><span class="quote">Number of digits</span> — Target digit count for each number run.</li>
+          <li><span class="quote">Strip surplus leading zeros</span> — When checked, trim extra leading zeros from longer runs down toward the target width when safe.</li>
+        </ul>
+    <h2>Examples</h2>
+    <div class="examples">
+          <code>track9 >>> track0009</code>
+          <code>doc1_12 >>> doc1_012</code>
+          <code>x0007 >>> x007</code>
+    </div>
+
+  </body>
+</html>

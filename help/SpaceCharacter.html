@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Space Character</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="filters.html">Filters</a>
+      &gt; <a href="filters.html#space">Space</a>
+      &gt; <strong>Space Character</strong>
+    </nav>
+    <hr />
+    <h1>Space Character</h1>
+    <figure class="screenshot">
+      <img src="images/SpaceCharacter.png" alt="Space Character options" width="480" height="120" />
+      <figcaption>Filter options (screenshot optional — capture to images/SpaceCharacter.png).</figcaption>
+    </figure>
+        <p>Defines which character is used as the word separator for filters that follow it, and optionally replaces common stand-ins with that character.</p>
+        <p>Later filters such as Shrink Spaces, Remove Spaces, Separate Capitalized Text, strip-space filters, and Capitalize use this separator. Until this filter runs, the default is ordinary space.</p>
+    <h2>Options</h2>
+        <ul class="options">
+          <li><span class="quote">Use the following character to separate between words</span> — Space, Underscore ( _ ), or Other (any single character).</li>
+          <li><span class="quote">Replace … Spaces / Underscores / %20&#x27;s / Custom text</span> — Rewrite checked forms to the defined space character.</li>
+        </ul>
+    <h2>Examples</h2>
+    <div class="examples">
+          <code>Gone%20With%20The%20Wind >>> Gone_With_The_Wind</code>
+          <code>a_b c%20d >>> a b c d</code>
+          <code>a++b >>> a-b</code>
+    </div>
+        <p class="note">Put Space Character before any filter that should use a non-space word boundary.</p>
+  </body>
+</html>

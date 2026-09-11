@@ -4,10 +4,10 @@ using Mfr.App.Ui.Services.Shell;
 namespace Mfr.App.Ui.Services.Help
 {
     /// <summary>
-    /// Resolves and opens per-filter Help HTML from an MFR7 Help folder.
+    /// Resolves and opens per-filter Help HTML shipped beside the application.
     /// <para>
-    /// finebytes does not ship Help pages yet. Looks under the installed MFR7 Help directory, then the
-    /// MFR7 source-tree copy. Opens the file with the OS default app (typically the browser).
+    /// Looks under <c>help/</c> next to the exe (<see cref="AppContext.BaseDirectory"/>).
+    /// Opens the file with the OS default app (typically the browser).
     /// </para>
     /// </summary>
     /// <param name="shellOpener">
@@ -22,60 +22,33 @@ namespace Mfr.App.Ui.Services.Help
         /// <summary>
         /// Default Help root directories. First existing <c>helpFileName</c> under these roots wins.
         /// </summary>
-        public static IReadOnlyList<string> DefaultHelpRoots { get; } = _BuildDefaultHelpRoots();
+        public static IReadOnlyList<string> DefaultHelpRoots { get; } =
+        [Path.Combine(AppContext.BaseDirectory, "help")];
 
         private readonly IReadOnlyList<string> _helpRoots = helpRoots is null ? DefaultHelpRoots : [.. helpRoots];
         private readonly IFileShellOpener _shellOpener = shellOpener ?? FileShellOpener.CreateDefault();
 
         /// <summary>
-        /// Builds the missing-help dialog text listing <see cref="DefaultHelpRoots"/>.
+        /// Builds the missing-help dialog text for a file expected under the app <c>help/</c> folder.
         /// </summary>
-        /// <param name="helpFileName">Expected Help HTML basename (e.g. <c>spacecharfilter.html</c>).</param>
+        /// <param name="helpFileName">Expected Help HTML basename (e.g. <c>SpaceCharacter.html</c>).</param>
         /// <returns>User-facing message.</returns>
         public static string FormatMissingHelpMessage(string helpFileName)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(helpFileName);
 
-            var roots = string.Join(
-                "\nor\n",
-                DefaultHelpRoots.Select(static root =>
-                {
-                    var trimmed = root.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-                    return trimmed + Path.DirectorySeparatorChar;
-                })
-            );
+            var root = DefaultHelpRoots[0].TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var folder = root + Path.DirectorySeparatorChar;
 
-            return $"Help file '{helpFileName}' was not found.\n\n"
-                + "Install Magic File Renamer 7, or place Help HTML under:\n"
-                + roots;
-        }
-
-        private static IReadOnlyList<string> _BuildDefaultHelpRoots()
-        {
-            string[] candidates =
-            [
-                Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                    "FineBytes",
-                    "MFR7",
-                    "Help"
-                ),
-                Path.Combine(@"C:\Program Files", "FineBytes", "MFR7", "Help"),
-                Path.Combine(@"D:\Devl\mfr7\Site\finebytes\mfr", "Help"),
-            ];
-
-            return
-            [
-                .. candidates
-                    .Where(static root => !string.IsNullOrWhiteSpace(root))
-                    .Distinct(StringComparer.OrdinalIgnoreCase),
-            ];
+            return $"Help file '{helpFileName}' was not found in the application folder.\n\n"
+                + "Expected location:\n"
+                + folder;
         }
 
         /// <summary>
         /// Finds an existing Help HTML file under the configured roots.
         /// </summary>
-        /// <param name="helpFileName">File name only (e.g. <c>spacecharfilter.html</c>).</param>
+        /// <param name="helpFileName">File name only (e.g. <c>SpaceCharacter.html</c>).</param>
         /// <param name="fullPath">Absolute path when found.</param>
         /// <returns><see langword="true"/> when a readable file exists.</returns>
         public bool TryResolve(string helpFileName, [NotNullWhen(true)] out string? fullPath)
@@ -111,7 +84,7 @@ namespace Mfr.App.Ui.Services.Help
         /// <summary>
         /// Resolves <paramref name="helpFileName"/> and opens it with the default application.
         /// </summary>
-        /// <param name="helpFileName">File name only (e.g. <c>spacecharfilter.html</c>).</param>
+        /// <param name="helpFileName">File name only (e.g. <c>SpaceCharacter.html</c>).</param>
         /// <param name="fullPath">Absolute path when opened.</param>
         /// <returns><see langword="true"/> when the file was found and open was requested.</returns>
         public bool TryOpen(string helpFileName, [NotNullWhen(true)] out string? fullPath)

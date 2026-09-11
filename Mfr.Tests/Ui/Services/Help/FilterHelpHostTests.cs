@@ -20,12 +20,12 @@ namespace Mfr.Tests.Ui.Services.Help
             Directory.CreateDirectory(helpDir);
             try
             {
-                var helpFile = Path.Combine(helpDir, "spacecharfilter.html");
+                var helpFile = Path.Combine(helpDir, "SpaceCharacter.html");
                 File.WriteAllText(helpFile, "<html></html>");
                 var opener = new RecordingShellOpener();
                 var host = new FilterHelpHost(opener, [helpDir]);
 
-                Assert.True(host.TryOpen("spacecharfilter.html", out var fullPath));
+                Assert.True(host.TryOpen("SpaceCharacter.html", out var fullPath));
                 Assert.Equal(helpFile, fullPath);
                 Assert.Equal([helpFile], opener.OpenedPaths);
             }
@@ -48,7 +48,7 @@ namespace Mfr.Tests.Ui.Services.Help
                 var opener = new RecordingShellOpener();
                 var host = new FilterHelpHost(opener, [helpDir]);
 
-                Assert.False(host.TryOpen("spacecharfilter.html", out var fullPath));
+                Assert.False(host.TryOpen("SpaceCharacter.html", out var fullPath));
                 Assert.Null(fullPath);
                 Assert.Empty(opener.OpenedPaths);
             }
@@ -65,22 +65,32 @@ namespace Mfr.Tests.Ui.Services.Help
         public void TryResolve_rejects_path_segments()
         {
             var host = new FilterHelpHost(NullFileShellOpener.Instance, [@"C:\nowhere"]);
-            Assert.False(host.TryResolve(@"..\spacecharfilter.html", out _));
-            Assert.False(host.TryResolve(@"sub\spacecharfilter.html", out _));
+            Assert.False(host.TryResolve(@"..\SpaceCharacter.html", out _));
+            Assert.False(host.TryResolve(@"sub\SpaceCharacter.html", out _));
         }
 
         /// <summary>
-        /// Verifies the missing-help message lists default roots (single source of truth).
+        /// Verifies the missing-help message points at the app help folder.
         /// </summary>
         [Fact]
         public void FormatMissingHelpMessage_lists_default_roots()
         {
-            var message = FilterHelpHost.FormatMissingHelpMessage("spacecharfilter.html");
-            Assert.Contains("spacecharfilter.html", message, StringComparison.Ordinal);
+            var message = FilterHelpHost.FormatMissingHelpMessage("SpaceCharacter.html");
+            Assert.Contains("SpaceCharacter.html", message, StringComparison.Ordinal);
+            Assert.Contains("application folder", message, StringComparison.OrdinalIgnoreCase);
             foreach (var root in FilterHelpHost.DefaultHelpRoots)
             {
                 Assert.Contains(root, message, StringComparison.OrdinalIgnoreCase);
             }
+        }
+
+        /// <summary>
+        /// Verifies default roots are only the app-local <c>help/</c> folder.
+        /// </summary>
+        [Fact]
+        public void DefaultHelpRoots_is_app_base_help_only()
+        {
+            Assert.Equal([Path.Combine(AppContext.BaseDirectory, "help")], FilterHelpHost.DefaultHelpRoots);
         }
     }
 
@@ -99,7 +109,7 @@ namespace Mfr.Tests.Ui.Services.Help
             Directory.CreateDirectory(helpDir);
             try
             {
-                var helpFile = Path.Combine(helpDir, "letterscasefilter.html");
+                var helpFile = Path.Combine(helpDir, "LettersCase.html");
                 File.WriteAllText(helpFile, "<html></html>");
                 var opener = new RecordingShellOpener();
                 var viewModel = new AppliedFiltersViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
@@ -138,7 +148,7 @@ namespace Mfr.Tests.Ui.Services.Help
 
                 viewModel.OpenSelectedFilterHelpCommand.Execute(null);
 
-                Assert.Equal("spacecharfilter.html", missing);
+                Assert.Equal("SpaceCharacter.html", missing);
                 Assert.Empty(opener.OpenedPaths);
             }
             finally

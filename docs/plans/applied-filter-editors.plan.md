@@ -121,11 +121,11 @@ Rename List / other session fields already persist; Applied Filters chain now us
 
 ### F9 — Filter chrome
 
-| Sub                           | Status   | Notes                                                                                                                                                                                  |
-| ----------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **F9a Save as default (📌)**  | **done** | Title-bar pin; `FilterDefaultsStore` / `filter-defaults.json`; applies on palette add only; reset stays factory. See [filter-save-as-default.plan.md](filter-save-as-default.plan.md). |
-| **F9b Reset to defaults (↺)** | **done** | Single selection; options / Apply To / scope via `FilterCatalog.CreateDefault`; keeps display name + enabled.                                                                          |
-| **F9c Help `?`**              | **done** | Title-bar **?** (MFR7 `FilterTitle`); `FilterHelpMap` → MFR7 HTML; `FilterHelpHost` opens from install/source Help roots or missing-help dialog. Not on Filter Options (MFR7 parity).  |
+| Sub                           | Status   | Notes                                                                                                                                                                                                                                                           |
+| ----------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **F9a Save as default (📌)**  | **done** | Title-bar pin; `FilterDefaultsStore` / `filter-defaults.json`; applies on palette add only; reset stays factory. See [filter-save-as-default.plan.md](filter-save-as-default.plan.md).                                                                          |
+| **F9b Reset to defaults (↺)** | **done** | Single selection; options / Apply To / scope via `FilterCatalog.CreateDefault`; keeps display name + enabled.                                                                                                                                                   |
+| **F9c Help `?`**              | **done** | Title-bar **?** (MFR7 `FilterTitle`); Help basename `{Type}.html` by convention; `FilterHelpHost` opens shipped `help/` beside the exe (or missing-help dialog). See [filter-html-help.plan.md](filter-html-help.plan.md). Not on Filter Options (MFR7 parity). |
 
 ### F10 — Filter Options dialog polish — **done**
 
@@ -140,7 +140,7 @@ ______________________________________________________________________
 ## Layering / files
 
 - Defaults: parameterless ctor; `FilterCatalog.CreateDefault`
-- Help: `FilterHelpMap` (type → MFR7 HTML); `FilterHelpHost` opens from install/source Help roots
+- Help: `{Type}.html` convention on `FilterCatalogEntry.HelpFileName`; `FilterHelpHost` opens shipped app `help/` (see [filter-html-help.plan.md](filter-html-help.plan.md))
 - UI editors: `Views/FilterEditors/<FilterGroup>/…`, `ViewModels/FilterEditors/<FilterGroup>/…`
 - Host: `FilterEditorView` / factory / base VMs / ViewLocator at `FilterEditors/` root
 - Filter Options: `Views/AppliedFilters/FilterOptionsDialog*`

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Audio Tag Remover</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="filters.html">Filters</a>
+      &gt; <a href="filters.html#audio">Audio</a>
+      &gt; <strong>Audio Tag Remover</strong>
+    </nav>
+    <hr />
+    <h1>Audio Tag Remover</h1>
+    <figure class="screenshot">
+      <img src="images/TagRemover.png" alt="Audio Tag Remover options" width="480" height="120" />
+      <figcaption>Filter options (screenshot optional — capture to images/TagRemover.png).</figcaption>
+    </figure>
+        <p>Removes embedded tag blocks—either selected types, or every TagLib-controlled tag when Remove all embedded tags is checked.</p>
+        <p>Tag removal cannot be undone with the app Undo control.</p>
+    <h2>Options</h2>
+        <ul class="options">
+          <li><span class="quote">Remove all embedded tags</span> — Nuclear strip of every TagLib tag type.</li>
+          <li><span class="quote">Tag types to remove</span> — When not removing all, select which modeled blocks to delete.</li>
+        </ul>
+    <h2>Examples</h2>
+    <div class="examples">
+          <code>song.mp3 (with ID3 tags) >>> song.mp3 (no embedded tags left)</code>
+          <code>song.flac (remove ID3v2 only) >>> (preview error — wrong tag type for container)</code>
+    </div>
+
+  </body>
+</html>

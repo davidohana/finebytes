@@ -35,7 +35,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// (production passes <see cref="PresetManager.OpenDefault"/>).
         /// </param>
         /// <param name="filterHelp">
-        /// Opens per-filter Help HTML. When null, uses a host with default MFR7 Help roots.
+        /// Opens per-filter Help HTML. When null, uses a host with default app <c>help/</c> roots.
         /// </param>
         public AppliedFiltersViewModel(
             FilterDefaultsStore? filterDefaults = null,
@@ -277,7 +277,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
         /// <summary>
         /// Raised when Help was requested but the HTML file was not found under configured Help roots.
-        /// <para>Payload is the expected help file name (e.g. <c>spacecharfilter.html</c>).</para>
+        /// <para>Payload is the expected help file name (e.g. <c>SpaceCharacter.html</c>).</para>
         /// </summary>
         public event EventHandler<string>? FilterHelpMissing;
 
@@ -556,7 +556,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Opens Help HTML for the sole selected filter type (MFR7 Filter Configuration <c>?</c>).
         /// <para>
-        /// Requires exactly one selected step with a known <see cref="FilterCatalogEntry.HelpFileName"/>.
+        /// Requires exactly one selected step (Help file is <c>{Type}.html</c> by convention).
         /// Opens via <see cref="FilterHelpHost"/> when the file exists; otherwise raises
         /// <see cref="FilterHelpMissing"/>.
         /// </para>
@@ -1009,7 +1009,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// True when exactly one step is selected and its catalog type has a Help HTML mapping.
+        /// True when exactly one step is selected (Help basename is always <c>{Type}.html</c>).
         /// </summary>
         private bool _CanOpenSelectedFilterHelp()
         {
@@ -1017,7 +1017,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Resolves the Help HTML basename for the sole selected step when mapped.
+        /// Resolves the Help HTML basename for the sole selected step.
         /// </summary>
         private bool _TryGetSelectedHelpFileName(out string helpFileName)
         {
@@ -1027,13 +1027,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 return false;
             }
 
-            var entry = _CatalogEntryFor(_selectedSteps[0].Filter);
-            if (string.IsNullOrEmpty(entry.HelpFileName))
-            {
-                return false;
-            }
-
-            helpFileName = entry.HelpFileName;
+            helpFileName = _CatalogEntryFor(_selectedSteps[0].Filter).HelpFileName;
             return true;
         }
     }

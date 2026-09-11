@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Token Mover</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="filters.html">Filters</a>
+      &gt; <a href="filters.html#formatting">Formatting</a>
+      &gt; <strong>Token Mover</strong>
+    </nav>
+    <hr />
+    <h1>Token Mover</h1>
+    <figure class="screenshot">
+      <img src="images/TokenMover.png" alt="Token Mover options" width="480" height="120" />
+      <figcaption>Filter options (screenshot optional — capture to images/TokenMover.png).</figcaption>
+    </figure>
+        <p>Splits the selected text into tokens using a delimiter, then moves one token left or right by a number of positions—useful for swapping artist and title segments.</p>
+    <h2>Options</h2>
+        <ul class="options">
+          <li><span class="quote">Token separator string</span> — Substring that splits the name into tokens.</li>
+          <li><span class="quote">Token number</span> — One-based index of the token to move.</li>
+          <li><span class="quote">Positions to move</span> — Positive moves toward the end; negative toward the start.</li>
+        </ul>
+    <h2>Examples</h2>
+    <div class="examples">
+          <code>a-b-c >>> b-a-c</code>
+          <code>milk,sugar,bread,potatoes >>> milk,bread,potatoes,sugar</code>
+    </div>
+
+  </body>
+</html>

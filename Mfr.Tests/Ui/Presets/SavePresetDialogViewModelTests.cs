@@ -215,7 +215,7 @@ namespace Mfr.Tests.Ui.Presets
                 Description = "keep my edits",
                 SaveRenameListColumns = false,
 
-                Name = "Other"
+                Name = "Other",
             };
 
             Assert.Equal("keep my edits", viewModel.Description);

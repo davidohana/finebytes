@@ -50,6 +50,16 @@ Add `Mfr.Tests/Models/Filters/<Group>/YourFilterTests.cs`. Use `FilterTestHelper
 
 Add `Mfr.Filters/docs/<Group>/YourFilterType.md` (examples table per `Mfr.Filters/docs/README.md`) and link it from `Mfr.Filters/docs/README.md` in the right group section.
 
+## User Help HTML
+
+When adding a filter, also ship Help next to the exe (see `docs/plans/filter-html-help.plan.md`):
+
+1. Add `help/{Type}.html` (flat under repo-root `help/`; display name = `FilterPalette` label; options use Filter Configuration UI labels). Help basename is convention: `{Type}.html` (no map).
+1. Link the page from `help/filters.html` under the right group.
+1. Add a checklist row in `help/SCREENSHOTS.md` for `images/{Type}.png` (screenshot optional).
+
+`Mfr.App.Ui.csproj` already copies `..\help\**\*` (except `SCREENSHOTS.md`) to output.
+
 ## Deeper context
 
 Architecture and preset shape: `docs/magic-file-renamer-design.md`. Existing filters (`SeparateCapitalizedTextFilter`, `SpaceCharacterFilter`, `TokenMoverFilter`) are good references for “no options”, “mutates `RenameItem` + options”, and “rich options”.

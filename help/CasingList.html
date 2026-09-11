@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Casing List</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="filters.html">Filters</a>
+      &gt; <a href="filters.html#case">Case</a>
+      &gt; <strong>Casing List</strong>
+    </nav>
+    <hr />
+    <h1>Casing List</h1>
+    <figure class="screenshot">
+      <img src="images/CasingList.png" alt="Casing List options" width="480" height="120" />
+      <figcaption>Filter options (screenshot optional — capture to images/CasingList.png).</figcaption>
+    </figure>
+        <p>Rewrites whole words to the exact spelling from a casing list. Words are split by the current word separator (see Space Character).</p>
+        <p>Words not in the list stay unchanged. You can also uppercase sentence initials using Sentence End Characters.</p>
+    <h2>Options</h2>
+        <ul class="options">
+          <li><span class="quote">Words</span> — One word per line (or comma-separated). Matching is case-insensitive; replacement keeps the list spelling.</li>
+          <li><span class="quote">Uppercase sentence initials</span> — When checked, capitalizes the first letter of each sentence.</li>
+        </ul>
+    <h2>Examples</h2>
+    <div class="examples">
+          <code>03 - WiTH Or Without You Rmx >>> 03 - with or Without You RMX</code>
+          <code>US_AND_THEM >>> Us_and_them</code>
+    </div>
+        <p class="note">Place Sentence End Characters before this filter when sentence-initial uppercasing should use a custom end set.</p>
+  </body>
+</html>

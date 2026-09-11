@@ -74,7 +74,7 @@ rg -l "Space Character" "D:\Devl\mfr7\Core\MfrFilters"
 rg "\[FilterInfo" "D:\Devl\mfr7\Core\MfrFilters\Filters" -g "*Filter.cs"
 ```
 
-Each filter declares `[FilterInfo(name, group, shortDesc, helpFileName, innerGroupOrder)]`. The `helpFileName` (e.g. `spacecharfilter.html`) is the help page and usually matches a screenshot `Help/Images/<stem>.gif`.
+Each filter declares `[FilterInfo(name, group, shortDesc, helpFileName, innerGroupOrder)]`. The MFR7 `helpFileName` (e.g. `spacecharfilter.html`) is the legacy help page and usually matches a screenshot `Help/Images/<stem>.gif`. finebytes ships its own pages as `help/{Type}.html` by convention (see [filter-map.md](filter-map.md) and `docs/plans/filter-html-help.plan.md`) — do not copy MFR7 basenames.
 
 **Help index:** open `Help/filters.html` (filter catalog by group) or `Help/fp.html` (formatter parameters). `Help/index.html` links the full tree.
 
