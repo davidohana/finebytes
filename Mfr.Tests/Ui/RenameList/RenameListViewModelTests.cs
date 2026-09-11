@@ -1577,6 +1577,31 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies Cancel Manual Override leaves overrides on unselected rows.
+        /// </summary>
+        [Fact]
+        public async Task CancelManualOverride_leaves_unselected_rows()
+        {
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync(
+                [Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]
+            );
+
+            var nameKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.Entries[0].EngineItem.SetOverride(nameKey, "first");
+            renameListViewModel.Entries[1].EngineItem.SetOverride(nameKey, "second");
+            renameListViewModel.SetFocusedFieldKey(nameKey);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            renameListViewModel.CancelManualOverride();
+
+            Assert.False(renameListViewModel.Entries[0].IsOverridden(nameKey));
+            Assert.True(renameListViewModel.Entries[1].IsOverridden(nameKey));
+            Assert.Equal("second", renameListViewModel.Entries[1].GetFieldText(nameKey));
+        }
+
+        /// <summary>
         /// Verifies Cancel Manual Override For Column clears that side on every row.
         /// </summary>
         [Fact]

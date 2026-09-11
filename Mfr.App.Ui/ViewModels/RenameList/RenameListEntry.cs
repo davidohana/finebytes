@@ -82,7 +82,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <returns><see langword="true"/> when that side is overridden.</returns>
         public bool IsOverridden(RenameListFieldKey key)
         {
-            return RenameListFieldCatalog.IsOverridden(EngineItem, key);
+            return EngineItem.IsOverridden(key);
         }
 
         /// <summary>

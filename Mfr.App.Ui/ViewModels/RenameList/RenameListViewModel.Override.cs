@@ -120,7 +120,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            return Entries.Any(entry => entry.EngineItem.IsOverridden(key));
+            return Entries.Any(entry => entry.IsOverridden(key));
         }
 
         /// <summary>
@@ -137,12 +137,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _ClearOverridesForColumn(key, Entries);
         }
 
+        /// <summary>
+        /// Clears <paramref name="key"/> overrides for <paramref name="entries"/>, then refreshes and notifies.
+        /// </summary>
+        /// <param name="key">Field side to clear.</param>
+        /// <param name="entries">Rows to clear (selection or full list).</param>
         private void _ClearOverridesForColumn(RenameListFieldKey key, IEnumerable<RenameListEntry> entries)
         {
             var cleared = false;
             foreach (var entry in entries)
             {
-                if (!entry.EngineItem.IsOverridden(key))
+                if (!entry.IsOverridden(key))
                 {
                     continue;
                 }
@@ -184,9 +189,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            return _selectedEntries.Any(entry => entry.EngineItem.IsOverridden(key));
+            return _selectedEntries.Any(entry => entry.IsOverridden(key));
         }
 
+        /// <summary>
+        /// Rows with a preview error or load-error cell are skipped for Manual Override defaults/apply.
+        /// </summary>
         private static bool _IsOverrideEligible(RenameListEntry entry, RenameListFieldKey key)
         {
             if (entry.HasPreviewError)

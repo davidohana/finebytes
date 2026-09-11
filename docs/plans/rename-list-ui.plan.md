@@ -109,7 +109,7 @@ todos:
     status: completed
   - id: phase-14d
     content: "14d: Manual Override Field (F2) — overrides, blue cells, Cancel, F5 reset"
-    status: pending
+    status: completed
   - id: phase-14e
     content: "14e: Properties — Alt+Enter + row menu → Windows property sheet (+ File List + Show in Explorer)"
     status: completed
@@ -150,14 +150,14 @@ ______________________________________________________________________
 
 |                |                                                              |
 | -------------- | ------------------------------------------------------------ |
-| **Shipped**    | Phases **1–13**, **14a**, **14b**, **14c**, and **14e**      |
-| **Next**       | **14d** Manual Override Field (F2)                           |
-| **Then**       | 14f → **15** GO → **16** color legend                        |
-| **Blocked on** | 16 needs 14d (blue) + 15 (plum); 15 must honor 14d overrides |
+| **Shipped**    | Phases **1–13**, **14a–14e** (except **14f**)                |
+| **Next**       | **14f** Drag-out FileDrop                                    |
+| **Then**       | **15** GO → **16** color legend                              |
+| **Blocked on** | 16 needs 14d blue (done) + 15 plum; 15 must honor 14d overrides |
 
 ______________________________________________________________________
 
-## Shipped (1–13, 14a, 14b, 14c, 14e) — consolidated
+## Shipped (1–13, 14a–14e except 14f) — consolidated
 
 Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Export (header submenu txt/csv + main-menu CSV), Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
 
@@ -177,6 +177,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 | **14b** Export            | Header **Export** → This Column (UTF-8 `.txt`) / Visible Columns (UTF-8 CSV); reveal in Explorer (no Edit? prompt)                                                                     |
 | **14c** Edit as Name List | `SupportsWrite` + `WriteTarget`; `CollectNameList`; header Edit as Name List → embedded `NameListFilter` via `AddAndSelect` (no file I/O); F5 Name List editor                         |
 | **14e** Properties        | Alt+Enter + row **Properties** → shell property sheet; **Show in Explorer** on Rename List; same Properties on File List (clears debts.md dialog bullet)                               |
+| **14d** Manual Override   | F2 dual-side overrides; PreviewStart/End; blue cells; Cancel (selection + header column-wide); F5 clears                                                                               |
 
 **Already reusable for remaining work (do not rebuild):**
 
@@ -244,7 +245,7 @@ Header command on **writable** columns only (`SupportsWrite` / MFR7 `ReadWriteAp
 
 **Not in scope:** blue manual cells (14d); does not mutate Original/Preview directly.
 
-### 14d — Manual Override Field (F2)
+### 14d — Manual Override Field (F2) (done)
 
 Largest substep — model + blue highlight (required before Phase 16). Prefer **override** in UI/APIs/docs (MFR7 still says “Manual Rename”).
 
@@ -252,18 +253,18 @@ Largest substep — model + blue highlight (required before Phase 16). Prefer **
 
 - Focused writable column + selection → InputBox “Set the original|preview value of field …” with first non-error cell as default → same string on all selected non-error rows.
 - Changes apply on **GO** (15), not immediately to disk.
-- **Cancel Manual Override:** enabled if any selected row is overridden on the focused field; clears that side on **all selected** rows (vs MFR7 focused-row-only).
-- F5 `RefreshOriginals` clears **all** manual overrides (and later apply errors).
+- **Cancel Manual Override:** enabled if any selected row is overridden on the focused field; clears that side on **all selected** rows (vs MFR7 focused-row-only). Header menu clears that column on **all** rows when any row is overridden.
+- F5 `RefreshOriginals` clears **all** manual overrides (and later apply errors). Overrides survive preview cycles and commit until Cancel/F5 (MFR7 `PropStatus` until Reload).
 
-**Work**
+**Work completed**
 
 - **Model:** per-item override for `(fieldKey)` on original and/or preview (MFR7 `PropStatus.ForceValue`). Catalog / `GetFieldText` prefer overridden text; `IsPreviewChanged` / red still correct when overridden preview ≠ original; `IsOverridden` for blue.
-- **Pipeline (MFR7):** overridden **original** before filters; overridden **preview** after filters. Phase 15 commit must see the same.
-- **UI:** enable F2 ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md) still lists it under “not implemented”); row menu **Manual Override Field** + **Cancel Manual Override** before Locate (F4) / Refresh (F5) so F-key items stay in F2→F4→F5 order; enable only for `SupportsWrite` and non-error default cell.
+- **Pipeline (MFR7):** overridden **original** before filters (`FilterChain.ApplyFilters` PreviewStart); overridden **preview** after filters (`RenameList` PreviewEnd). Phase 15 commit must see the same.
+- **UI:** F2 (`AppShortcuts.ManualOverride`; [keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md)); row menu **Manual Override Field** + **Cancel Manual Override** before Locate (F4) / Refresh (F5) so F-key items stay in F2→F4→F5 order; header **Cancel Manual Override** clears the column on all rows; enable only for `SupportsWrite` and non-error default cell.
 - **Styling:** `rename-list-manual-override` blue foreground; blue wins over red for overridden cells (document precedence in Themes / view styles).
-- **Tests:** override original vs preview; multi-select identical value; multi-select Cancel; F5 clears; non-writable / error no-op; blue class applied.
+- **Tests:** override original vs preview; multi-select identical value; multi-select Cancel; column Cancel; F5 clears; non-writable / error no-op; blue class / menu order.
 
-**Out of scope here:** disk commit (15).
+**Out of scope here:** disk commit UI (15).
 
 ### 14e — Properties (done)
 
@@ -342,6 +343,5 @@ ______________________________________________________________________
 
 ## What to implement next
 
-1. **14d** — override model + F2/Cancel + blue + F5 clear
 1. **14f** drag-out
 1. **15** GO UI + plum → **16** legend

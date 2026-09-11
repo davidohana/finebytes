@@ -80,7 +80,7 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal("forced", item.Preview.Prefix);
             Assert.Equal("forced", RenameListFieldCatalog.Resolve(item, previewName));
-            Assert.True(RenameListFieldCatalog.IsOverridden(item, previewName));
+            Assert.True(item.IsOverridden(previewName));
             Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, previewName));
         }
 

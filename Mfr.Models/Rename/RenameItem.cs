@@ -289,9 +289,10 @@ namespace Mfr.Models.Rename
         /// <param name="value">Override text, or <see langword="null"/> to clear that side.</param>
         /// <remarks>
         /// <para>
-        /// Survives <see cref="ResetState"/> / preview cycles. Cleared by Cancel, F5
-        /// <c>RefreshOriginals</c>, or <see cref="ClearAllOverrides"/>. Does not mutate
-        /// <see cref="Original"/> — original overrides are display overlay plus PreviewStart seed.
+        /// Survives <see cref="ResetState"/> / preview cycles and commit (MFR7 keeps forces until
+        /// Reload). Cleared by Cancel, F5 <c>RefreshOriginals</c>, or <see cref="ClearAllOverrides"/>.
+        /// Does not mutate <see cref="Original"/> — original overrides are display overlay plus
+        /// PreviewStart seed.
         /// </para>
         /// </remarks>
         public void SetOverride(RenameListFieldKey key, string? value)

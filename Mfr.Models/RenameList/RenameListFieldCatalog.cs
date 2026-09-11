@@ -229,18 +229,6 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Returns whether a cell has a manual field override (MFR7 blue text).
-        /// </summary>
-        /// <param name="item">Engine rename item.</param>
-        /// <param name="key">Field key (original or preview side).</param>
-        /// <returns><see langword="true"/> when that side is overridden.</returns>
-        public static bool IsOverridden(RenameItem item, RenameListFieldKey key)
-        {
-            ArgumentNullException.ThrowIfNull(item);
-            return item.IsOverridden(key);
-        }
-
-        /// <summary>
         /// Returns whether the row has any issue for Show Load Errors (missing on disk or metadata load failure).
         /// </summary>
         /// <param name="item">Engine rename item.</param>
