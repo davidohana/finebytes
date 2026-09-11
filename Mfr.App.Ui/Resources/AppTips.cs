@@ -59,11 +59,8 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List header: Export This Column (text file).</summary>
         public const string ExportThisColumn = "Export this column's values to a text file";
 
-        /// <summary>Rename List header: Export Visible Columns (CSV).</summary>
+        /// <summary>Rename List header / main menu: Export Visible Columns (CSV).</summary>
         public const string ExportVisibleColumns = "Export all visible columns to a CSV file";
-
-        /// <summary>Rename List main menu: Export Rename List (visible columns CSV).</summary>
-        public const string ExportRenameList = "Export all visible Rename List columns to a CSV file";
 
         /// <summary>Rename List field shuttle: visible columns (toolbar, context menu, main menu).</summary>
         public const string SelectRenameListFields = "Choose visible Rename List columns";

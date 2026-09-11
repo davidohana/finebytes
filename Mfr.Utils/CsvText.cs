@@ -41,17 +41,6 @@ namespace Mfr.Utils
         public static string FormatRow(IReadOnlyList<string> fields)
         {
             ArgumentNullException.ThrowIfNull(fields);
-
-            if (fields.Count == 0)
-            {
-                return string.Empty;
-            }
-
-            if (fields.Count == 1)
-            {
-                return EscapeField(fields[0]);
-            }
-
             return string.Join(',', fields.Select(EscapeField));
         }
     }

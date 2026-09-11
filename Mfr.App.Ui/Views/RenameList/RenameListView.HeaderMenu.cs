@@ -118,7 +118,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <para>
         /// Order: title → Hide Field → (preview) Remove Unchanged → Select Visible Fields →
         /// Select Sort Fields → Edit as Name List (writable) → Export submenu
-        /// (This Column / Visible Columns).
+        /// (This Column txt / Visible Columns csv).
         /// </para>
         /// </remarks>
         private static ContextMenu _BuildColumnHeaderContextMenu(

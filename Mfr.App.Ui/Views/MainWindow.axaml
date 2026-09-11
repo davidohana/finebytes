@@ -295,7 +295,7 @@
         <MenuItem
           Header="Export Rename List (csv)..."
           Command="{Binding RenameListViewModel.ExportVisibleColumnsCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.ExportRenameList}"
+          ToolTip.Tip="{x:Static resources:AppTips.ExportVisibleColumns}"
         />
         <Separator />
         <MenuItem

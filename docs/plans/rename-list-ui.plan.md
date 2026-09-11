@@ -102,7 +102,7 @@ todos:
     content: "14a: Remove Unchanged Items — engine + preview-column header menu"
     status: completed
   - id: phase-14b
-    content: "14b: Export Name List — GenerateNameList + save dialog (+ optional edit)"
+    content: "14b: Export — This Column (.txt) / Visible Columns (CSV); reveal in Explorer"
     status: completed
   - id: phase-14c
     content: "14c: Edit as Name List — embed generated names in NameListFilter on Applied Filters"
@@ -159,7 +159,7 @@ ______________________________________________________________________
 
 ## Shipped (1–13, 14a, 14b, 14c, 14e) — consolidated
 
-Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, CSV Export (header submenu), Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
+Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Export (header submenu txt/csv + main-menu CSV), Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
 
 | Block                     | What shipped                                                                                                                                                                           |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -227,6 +227,7 @@ Header **Export** submenu. **Edit as Name List** still uses in-memory `CollectNa
 
 - **Export This Column** — `ExportNameList` UTF-8 `.txt` (one display line per row, no header); save dialog `Save Name List as` / `*.txt`.
 - **Export Visible Columns** — `ExportCsv` UTF-8 CSV (header = field display names; RFC 4180 quoting); empty list → header only; save dialog `Export as CSV` / `*.csv`.
+- **Rename List → Export Rename List (csv)...** — same as Export Visible Columns (`ExportVisibleColumnsCommand`).
 - On success, reveal the file in Explorer (`RevealInFileManager`). No Edit? prompt.
 
 **Not in scope:** creating a Name List filter (14c — shipped).
