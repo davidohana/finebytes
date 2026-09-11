@@ -25,18 +25,11 @@ ______________________________________________________________________
 | Collapse dual `IFileShellOpener` trees                                                               | **Done** — single `Services.Shell`                        |
 | Space Character empty-Other → `' '`                                                                  | **Superseded** — Other+empty → `'\0'`, rejected at setup  |
 | `CanSavePreset` notify / `PresetRenameListColumns` / `TryLoadPresetAsync` / `Refresh(preferredName)` | **Done** during F7 reviews                                |
+| Rename `SessionStateRenameListColumn` → shared DTO                                                   | **Done** — `RenameListVisibleColumnSpec`                  |
 
 ______________________________________________________________________
 
 ## Still worth doing (best cost-to-value first)
-
-### 1. Rename `SessionStateRenameListColumn` to a shared DTO
-
-- **Sites:** `SessionState` Rename List columns; `FilterPreset.VisibleColumns`
-- **Target:** shared type (e.g. under Rename List / Models) not named as “session”
-- **Value:** clearer ownership; presets do not lean on session naming
-- **Cost:** rename/move + test/doc churn; no behavior change
-- **Rank:** medium — hygiene when next touching presets or session columns
 
 ### 2. Multiline Entries control / line-iteration helper
 

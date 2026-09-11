@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Mfr.Models.Config;
+using Mfr.Models.RenameList;
 
 namespace Mfr.Models.Filters
 {
@@ -39,6 +39,6 @@ namespace Mfr.Models.Filters
         /// </para>
         /// </summary>
         [JsonPropertyName("visibleColumns")]
-        public IReadOnlyList<SessionStateRenameListColumn>? VisibleColumns { get; init; }
+        public IReadOnlyList<RenameListVisibleColumnSpec>? VisibleColumns { get; init; }
     }
 }

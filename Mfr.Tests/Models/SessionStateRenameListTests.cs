@@ -53,7 +53,7 @@ namespace Mfr.Tests.Models
         public void Visible_columns_round_trip_keys_and_widths()
         {
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
-            var sessionColumns = new List<SessionStateRenameListColumn>
+            var sessionColumns = new List<RenameListVisibleColumnSpec>
             {
                 new(
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath),

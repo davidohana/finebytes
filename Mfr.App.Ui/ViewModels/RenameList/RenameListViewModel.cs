@@ -73,7 +73,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             var section = renameList ?? new SessionStateRenameList();
             ApplySession(renameList?.SortFields);
-            ApplyVisibleColumnsFromSession(renameList?.VisibleColumns);
+            ApplyVisibleColumnSpecs(renameList?.VisibleColumns);
             AddMode = section.AddMode;
             AddFolderContents = section.AddFolderContents;
             UseFixedWidthFont = section.UseFixedWidthFont;
@@ -89,7 +89,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return new SessionStateRenameList
             {
                 SortFields = [.. CaptureSortFields()],
-                VisibleColumns = [.. CaptureVisibleColumnsForSession()],
+                VisibleColumns = [.. CaptureVisibleColumnSpecs()],
                 AddMode = AddMode,
                 AddFolderContents = AddFolderContents,
                 UseFixedWidthFont = UseFixedWidthFont,

@@ -203,7 +203,7 @@ namespace Mfr.Models.Config
         /// <para>Null means unset (first launch uses MFR7 defaults).</para>
         /// </summary>
         [JsonPropertyName("visibleColumns")]
-        public List<SessionStateRenameListColumn>? VisibleColumns { get; set; }
+        public List<RenameListVisibleColumnSpec>? VisibleColumns { get; set; }
 
         /// <summary>
         /// Which path kinds become Rename List rows when adding from the File List.
@@ -230,18 +230,6 @@ namespace Mfr.Models.Config
         [JsonPropertyName("previewEnabled")]
         public bool PreviewEnabled { get; set; } = true;
     }
-
-    /// <summary>
-    /// One persisted Rename List visible grid column: field identity plus optional width override.
-    /// </summary>
-    /// <param name="Key">Field key (original or preview).</param>
-    /// <param name="Width">
-    /// Column width in pixels, or <see langword="null"/> to use catalog/header defaults on restore.
-    /// </param>
-    public sealed record SessionStateRenameListColumn(
-        [property: JsonPropertyName("key")] RenameListFieldKey Key,
-        [property: JsonPropertyName("width")] int? Width = null
-    );
 
     /// <summary>
     /// Saved main-window pane splitter positions as star ratios of the first pane in each pair.

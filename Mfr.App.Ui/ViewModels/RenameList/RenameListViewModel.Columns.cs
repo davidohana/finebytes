@@ -1,5 +1,4 @@
 using CommunityToolkit.Mvvm.Input;
-using Mfr.Models.Config;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -192,12 +191,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Restores visible columns from persisted session fields.
+        /// Restores visible columns from persisted column specs (session or preset).
         /// </summary>
         /// <param name="columns">
         /// Saved columns in grid order, or <see langword="null"/> for MFR7 defaults.
         /// </param>
-        internal void ApplyVisibleColumnsFromSession(IReadOnlyList<SessionStateRenameListColumn>? columns)
+        internal void ApplyVisibleColumnSpecs(IReadOnlyList<RenameListVisibleColumnSpec>? columns)
         {
             if (columns is null)
             {
@@ -214,14 +213,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Captures the current visible columns for session save.
+        /// Captures the current visible columns as persisted specs (session or preset).
         /// </summary>
-        /// <returns>Session column fields in grid order.</returns>
-        internal IReadOnlyList<SessionStateRenameListColumn> CaptureVisibleColumnsForSession()
+        /// <returns>Column specs in grid order.</returns>
+        internal IReadOnlyList<RenameListVisibleColumnSpec> CaptureVisibleColumnSpecs()
         {
             return
             [
-                .. _visibleColumns.Select(column => new SessionStateRenameListColumn(
+                .. _visibleColumns.Select(column => new RenameListVisibleColumnSpec(
                     column.Key,
                     column.Width == RenameListVisibleColumn.UseCatalogDefaultWidth ? null : column.Width
                 )),

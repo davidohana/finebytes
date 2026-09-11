@@ -6,8 +6,8 @@ using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.Engine.Presets;
 using Mfr.Filters;
-using Mfr.Models.Config;
 using Mfr.Models.Filters;
+using Mfr.Models.RenameList;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels.AppliedFilters
@@ -96,7 +96,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         public FilterPreset? SavePreset(
             string name,
             string? description,
-            IReadOnlyList<SessionStateRenameListColumn>? visibleColumns
+            IReadOnlyList<RenameListVisibleColumnSpec>? visibleColumns
         )
         {
             ArgumentNullException.ThrowIfNull(name);

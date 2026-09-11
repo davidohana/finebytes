@@ -32,7 +32,7 @@ Canonical product backlog: [applied-filter-editors.plan.md](applied-filter-edito
 | **Save Preset**        | One **Save Preset** dialog (name/description/columns; Name suggests existing presets). Single **Save** upserts by name and **warns before overwrite**. Prefill from last-loaded when Applied Filters is non-empty.                                                                                   |
 | Save enabled           | **Save** enabled when the name is non-blank.                                                                                                                                                                                                                                                         |
 | Save payload           | **Chain always** (`ToChain()`). Description and columns come from the dialog (checkbox off → `null` columns).                                                                                                                                                                                        |
-| RL columns on load     | If preset has `visibleColumns`, apply via `ApplyVisibleColumnsFromSession`. If omitted/`null`, leave current columns unchanged.                                                                                                                                                                      |
+| RL columns on load     | If preset has `visibleColumns`, apply via `ApplyVisibleColumnSpecs`. If omitted/`null`, leave current columns unchanged.                                                                                                                                                                      |
 | Description            | Optional on Save dialog + read-only pane in Manager (edit via Save + overwrite).                                                                                                                                                                                                                     |
 | Rename preset          | **In Manager** — keep `Id`; refuse if another preset already has that exact name; update last-loaded name if it matched.                                                                                                                                                                             |
 | Overwrite / delete     | Overwrite confirm when Save targets an existing name; **confirm delete**.                                                                                                                                                                                                                            |
@@ -68,7 +68,7 @@ ______________________________________________________________________
 Engine / models / Applied Filters plumbing. Menu/toolbar stay disabled.
 
 1. **`PresetManager.OpenDefault()` / `CreateEmpty()`** — missing file → write empty container then load; corrupt → still throw. Tests for both.
-1. **`FilterPreset.VisibleColumns`** — optional `IReadOnlyList<SessionStateRenameListColumn>?` (`key` + `width`). Docs in [Mfr.Filters/docs/README.md](../../Mfr.Filters/docs/README.md); JSON probe with columns present/absent.
+1. **`FilterPreset.VisibleColumns`** — optional `IReadOnlyList<RenameListVisibleColumnSpec>?` (`key` + `width`). Docs in [Mfr.Filters/docs/README.md](../../Mfr.Filters/docs/README.md); JSON probe with columns present/absent.
 1. **`MfrConfig.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad`** — default `false`; JSON string `"true"`/`"false"`; hand-edit only (Options UI stubbed). Binding coverage.
 1. **`AppliedFiltersViewModel.ReplaceFromChain`** — one `ChainChanged`; catalog display names; `Enabled` from steps; select first step if any. Inject `PresetManager` (+ **`LastLoaded`**). Wire `PresetManager.OpenDefault()` in [`App.axaml.cs`](../../Mfr.App.Ui/App.axaml.cs) → `MainWindowViewModel`.
 
@@ -112,10 +112,10 @@ ______________________________________________________________________
 
 ```csharp
 [JsonPropertyName("visibleColumns")]
-public IReadOnlyList<SessionStateRenameListColumn>? VisibleColumns { get; init; }
+public IReadOnlyList<RenameListVisibleColumnSpec>? VisibleColumns { get; init; }
 ```
 
-Reuse [`SessionStateRenameListColumn`](../../Mfr.Models/Config/SessionState.cs). No `sortFields` on presets. Invalid keys: reuse existing `ApplyVisibleColumns` filtering.
+Reuse [`RenameListVisibleColumnSpec`](../../Mfr.Models/RenameList/RenameListVisibleColumnSpec.cs). No `sortFields` on presets. Invalid keys: reuse existing `ApplyVisibleColumns` filtering.
 
 ### Config flag
 

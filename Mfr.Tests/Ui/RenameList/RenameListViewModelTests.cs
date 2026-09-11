@@ -565,9 +565,9 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([path]);
-            renameListViewModel.ApplyVisibleColumnsFromSession([
-                new SessionStateRenameListColumn(fullNameKey),
-                new SessionStateRenameListColumn(nameKey),
+            renameListViewModel.ApplyVisibleColumnSpecs([
+                new RenameListVisibleColumnSpec(fullNameKey),
+                new RenameListVisibleColumnSpec(nameKey),
             ]);
             renameListViewModel.UiHooks = new RenameListUiHooks
             {

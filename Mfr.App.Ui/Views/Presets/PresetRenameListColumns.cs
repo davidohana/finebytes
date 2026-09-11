@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 using Mfr.App.Ui.ViewModels;
-using Mfr.Models.Config;
+using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.Presets
 {
@@ -17,13 +17,13 @@ namespace Mfr.App.Ui.Views.Presets
         /// </summary>
         /// <param name="host">Any control under the main window (e.g. Applied Filters pane).</param>
         /// <returns>Current columns, or an empty list when the main window is unavailable.</returns>
-        public static IReadOnlyList<SessionStateRenameListColumn> Capture(Control host)
+        public static IReadOnlyList<RenameListVisibleColumnSpec> Capture(Control host)
         {
             ArgumentNullException.ThrowIfNull(host);
 
             if (TopLevel.GetTopLevel(host) is Window { DataContext: MainWindowViewModel main })
             {
-                return main.RenameListViewModel.CaptureVisibleColumnsForSession();
+                return main.RenameListViewModel.CaptureVisibleColumnSpecs();
             }
 
             return [];
@@ -36,7 +36,7 @@ namespace Mfr.App.Ui.Views.Presets
         /// <param name="columns">
         /// Columns from the preset, or <see langword="null"/> to leave the current Rename List unchanged.
         /// </param>
-        public static void ApplyIfPresent(Control host, IReadOnlyList<SessionStateRenameListColumn>? columns)
+        public static void ApplyIfPresent(Control host, IReadOnlyList<RenameListVisibleColumnSpec>? columns)
         {
             ArgumentNullException.ThrowIfNull(host);
 
@@ -47,7 +47,7 @@ namespace Mfr.App.Ui.Views.Presets
 
             if (TopLevel.GetTopLevel(host) is Window { DataContext: MainWindowViewModel main })
             {
-                main.RenameListViewModel.ApplyVisibleColumnsFromSession(columns);
+                main.RenameListViewModel.ApplyVisibleColumnSpecs(columns);
             }
         }
     }

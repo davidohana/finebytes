@@ -200,7 +200,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void ApplyVisibleColumnsFromSession_null_restores_defaults()
+        public void ApplyVisibleColumnSpecs_null_restores_defaults()
         {
             var renameListViewModel = _context.CreateRenameListViewModel();
             renameListViewModel.SetVisibleColumns([
@@ -209,13 +209,13 @@ namespace Mfr.Tests.Ui.RenameList
                 ),
             ]);
 
-            renameListViewModel.ApplyVisibleColumnsFromSession(null);
+            renameListViewModel.ApplyVisibleColumnSpecs(null);
 
             Assert.Equal(RenameListVisibleColumn.CreateDefaults(), renameListViewModel.VisibleColumns);
         }
 
         [Fact]
-        public void CaptureVisibleColumnsForSession_omits_catalog_default_widths()
+        public void CaptureVisibleColumnSpecs_omits_catalog_default_widths()
         {
             var renameListViewModel = _context.CreateRenameListViewModel();
             renameListViewModel.SetVisibleColumns([
@@ -228,28 +228,28 @@ namespace Mfr.Tests.Ui.RenameList
                 ),
             ]);
 
-            var sessionColumns = renameListViewModel.CaptureVisibleColumnsForSession();
+            var columnSpecs = renameListViewModel.CaptureVisibleColumnSpecs();
 
-            Assert.Equal(2, sessionColumns.Count);
-            Assert.Null(sessionColumns[0].Width);
-            Assert.Equal(120, sessionColumns[1].Width);
+            Assert.Equal(2, columnSpecs.Count);
+            Assert.Null(columnSpecs[0].Width);
+            Assert.Equal(120, columnSpecs[1].Width);
         }
 
         [Fact]
-        public void Visible_columns_session_round_trips_layout_and_widths()
+        public void Visible_columns_spec_round_trips_layout_and_widths()
         {
             var renameListViewModel = _context.CreateRenameListViewModel();
-            var sessionColumns = new[]
+            var columnSpecs = new[]
             {
-                new SessionStateRenameListColumn(
+                new RenameListVisibleColumnSpec(
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
                     Width: 150
                 ),
-                new SessionStateRenameListColumn(
+                new RenameListVisibleColumnSpec(
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Extension)
                 ),
             };
-            renameListViewModel.ApplyVisibleColumnsFromSession(sessionColumns);
+            renameListViewModel.ApplyVisibleColumnSpecs(columnSpecs);
 
             Assert.Equal(
                 [
@@ -263,7 +263,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ],
                 renameListViewModel.VisibleColumns
             );
-            Assert.Equal(sessionColumns, renameListViewModel.CaptureVisibleColumnsForSession());
+            Assert.Equal(columnSpecs, renameListViewModel.CaptureVisibleColumnSpecs());
         }
 
         [Fact]

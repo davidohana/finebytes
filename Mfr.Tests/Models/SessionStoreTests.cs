@@ -98,14 +98,14 @@ namespace Mfr.Tests.Models
                         SortFields = [new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true)],
                         VisibleColumns =
                         [
-                            new SessionStateRenameListColumn(
+                            new RenameListVisibleColumnSpec(
                                 RenameListFieldKey.Original(
                                     BasicRenameListField.Group,
                                     BasicRenameListFields.Key.FullPath
                                 ),
                                 Width: 220
                             ),
-                            new SessionStateRenameListColumn(
+                            new RenameListVisibleColumnSpec(
                                 RenameListFieldKey.Preview(
                                     BasicRenameListField.Group,
                                     BasicRenameListFields.Key.FullName

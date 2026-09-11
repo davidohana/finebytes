@@ -336,11 +336,11 @@ namespace Mfr.Tests.Ui.RenameList
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FileNameLength
             );
-            renameListViewModel.ApplyVisibleColumnsFromSession([
-                new SessionStateRenameListColumn(
+            renameListViewModel.ApplyVisibleColumnSpecs([
+                new RenameListVisibleColumnSpec(
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
                 ),
-                new SessionStateRenameListColumn(lengthKey),
+                new RenameListVisibleColumnSpec(lengthKey),
             ]);
 
             var (view, window) = _context.Show(renameListViewModel);
@@ -380,8 +380,8 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([path]);
-            renameListViewModel.ApplyVisibleColumnsFromSession([
-                new SessionStateRenameListColumn(folderKey, Width: savedWidth),
+            renameListViewModel.ApplyVisibleColumnSpecs([
+                new RenameListVisibleColumnSpec(folderKey, Width: savedWidth),
             ]);
 
             var view = new RenameListView { DataContext = renameListViewModel };

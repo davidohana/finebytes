@@ -845,7 +845,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
-            var columns = new List<SessionStateRenameListColumn>
+            var columns = new List<RenameListVisibleColumnSpec>
             {
                 new(
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
