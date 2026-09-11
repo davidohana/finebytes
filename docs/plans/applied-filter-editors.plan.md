@@ -82,7 +82,7 @@ Agent checklist: [mfr-implement-filter-editor](../../.agents/skills/mfr-implemen
 1. VM + headless tests under `Mfr.Tests/Ui/FilterEditors/<Group>/`.
 1. Compact controls + `SharedSizeGroup="FilterEditorLabel"` for multi-row label+field forms.
 
-Non-product cleanup (shared controls, clamp helpers, etc.): [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md) — optional, not blocking F7+.
+Non-product cleanup: [applied-filters-deeper-refactors.md](applied-filters-deeper-refactors.md) (current ranked list); older F5-only notes in [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md).
 
 ______________________________________________________________________
 
@@ -151,7 +151,7 @@ ______________________________________________________________________
 - Agent skill: [mfr-implement-filter-editor](../../.agents/skills/mfr-implement-filter-editor/SKILL.md)
 - MFR7: `FilterEdit.cs`, per-filter `*FilterEditor.cs`, FormatEditor help / images; help under `mfr7/Site/finebytes/mfr/Help/`
 - Formatter tokens: [formatter-tokens.md](../../.agents/skills/mfr7-reference/formatter-tokens.md)
-- Optional cleanup: [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md)
+- Optional cleanup: [applied-filters-deeper-refactors.md](applied-filters-deeper-refactors.md) (F5 notes: [f5-attributes-audio-editors-review-deeper-refactors.md](f5-attributes-audio-editors-review-deeper-refactors.md))
 - Rename List preview: [rename-list-ui.plan.md](rename-list-ui.plan.md) Phase 10–11
 - F9a detail: [filter-save-as-default.plan.md](filter-save-as-default.plan.md)
 - F7 detail: [presets-ui.plan.md](presets-ui.plan.md)
