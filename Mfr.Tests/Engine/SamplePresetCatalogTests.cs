@@ -54,6 +54,36 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies every enabled portable sample filter accepts its shipped options and formatter templates.
+        /// </summary>
+        [Fact]
+        public void Catalog_enabled_portable_filters_complete_setup()
+        {
+            var filters = SamplePresetCatalog
+                .Presets.SelectMany(preset => preset.Chain.Steps)
+                .Where(step => step.Enabled)
+                .Select(step => step.Filter)
+                .Where(filter => filter is not PathMoverFilter);
+
+            Assert.All(filters, filter => filter.Setup());
+        }
+
+        /// <summary>
+        /// Verifies every enabled Path Mover accepts its shipped Windows destination and formatter template.
+        /// </summary>
+        [WindowsFact]
+        public void Catalog_enabled_path_movers_complete_setup()
+        {
+            var pathMovers = SamplePresetCatalog
+                .Presets.SelectMany(preset => preset.Chain.Steps)
+                .Where(step => step.Enabled)
+                .Select(step => step.Filter)
+                .OfType<PathMoverFilter>();
+
+            Assert.All(pathMovers, pathMover => pathMover.Setup());
+        }
+
+        /// <summary>
         /// Verifies the Beautify Names sample keeps its ordered cleanup and casing workflow.
         /// </summary>
         [Fact]
