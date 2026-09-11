@@ -2,7 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.App.Ui.Views.Presets;
+using Mfr.Models;
 using Mfr.Models.Config;
+using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.Views.AppliedFilters
 {
@@ -31,6 +33,68 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
+        /// Rebuilds the ▾ quick-pick menu with sorted preset names (or a disabled empty placeholder).
+        /// </summary>
+        /// <param name="sender">The <see cref="MenuFlyout"/> opening.</param>
+        /// <param name="e">Event args.</param>
+        private void _OnPresetsQuickPickOpening(object? sender, EventArgs e)
+        {
+            if (sender is not MenuFlyout flyout)
+            {
+                return;
+            }
+
+            flyout.Items.Clear();
+            if (_viewModel is null)
+            {
+                _AddNoPresetsPlaceholder(flyout);
+                return;
+            }
+
+            var presets = _viewModel
+                .PresetManager.NameToPreset.Values.OrderBy(preset => preset.Name, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(preset => preset.Name, StringComparer.Ordinal)
+                .ToList();
+            if (presets.Count == 0)
+            {
+                _AddNoPresetsPlaceholder(flyout);
+                return;
+            }
+
+            foreach (var preset in presets)
+            {
+                var item = new MenuItem { Header = preset.Name, Tag = preset };
+                item.Click += _OnPresetsQuickPickItemClick;
+                flyout.Items.Add(item);
+            }
+        }
+
+        /// <summary>
+        /// Loads the preset tagged on the clicked ▾ menu item (same path as Manager Load).
+        /// </summary>
+        /// <param name="sender">The clicked <see cref="MenuItem"/>.</param>
+        /// <param name="e">Event args.</param>
+        private async void _OnPresetsQuickPickItemClick(object? sender, RoutedEventArgs e)
+        {
+            if (sender is not MenuItem { Tag: FilterPreset preset })
+            {
+                return;
+            }
+
+            PresetsQuickPickButton.Flyout?.Hide();
+            await TryLoadPresetAsync(preset);
+        }
+
+        /// <summary>
+        /// Adds the disabled empty-state row used when no presets are available.
+        /// </summary>
+        /// <param name="flyout">Quick-pick flyout being rebuilt.</param>
+        private static void _AddNoPresetsPlaceholder(MenuFlyout flyout)
+        {
+            flyout.Items.Add(new MenuItem { Header = "No presets", IsEnabled = false });
+        }
+
+        /// <summary>
         /// Opens the Preset Manager (Load / Delete / Edit Description / Rename).
         /// </summary>
         /// <returns>A task that completes when the dialog closes.</returns>
@@ -47,13 +111,53 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             }
 
             var dialogVm = new PresetManagerDialogViewModel(_viewModel);
-            var dialog = new PresetManagerDialog(
-                dialogVm,
-                _viewModel,
-                confirmReplaceAsync: () => _TryConfirmReplaceAsync(owner),
-                applyColumns: preset => PresetRenameListColumns.ApplyIfPresent(this, preset.VisibleColumns)
-            );
+            var dialog = new PresetManagerDialog(dialogVm, _viewModel, tryLoadAsync: TryLoadPresetAsync);
             await dialog.ShowDialog<bool?>(owner);
+        }
+
+        /// <summary>
+        /// Confirms replace when needed, loads <paramref name="preset"/>, and applies optional columns.
+        /// <para>
+        /// Shared by Preset Manager Load and the toolbar ▾ quick-pick. On failure shows an error dialog
+        /// and returns <see langword="false"/>.
+        /// </para>
+        /// </summary>
+        /// <param name="preset">Preset to load.</param>
+        /// <returns>
+        /// <see langword="true"/> when the preset was loaded; <see langword="false"/> when cancelled,
+        /// unavailable, or load failed after the error dialog.
+        /// </returns>
+        public async Task<bool> TryLoadPresetAsync(FilterPreset preset)
+        {
+            ArgumentNullException.ThrowIfNull(preset);
+
+            if (_viewModel is null)
+            {
+                return false;
+            }
+
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return false;
+            }
+
+            if (!await _TryConfirmReplaceAsync(owner))
+            {
+                return false;
+            }
+
+            try
+            {
+                _viewModel.LoadPreset(preset);
+                PresetRenameListColumns.ApplyIfPresent(this, preset.VisibleColumns);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                var message = ex is UserException userEx ? userEx.Message : ex.Message;
+                await new OkMessageDialog("Load Preset", message).ShowDialog(owner);
+                return false;
+            }
         }
 
         /// <summary>

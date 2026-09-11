@@ -50,9 +50,13 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// <summary>
         /// Rebuilds <see cref="Presets"/> from the manager, preserving selection by name when possible.
         /// </summary>
-        public void Refresh()
+        /// <param name="preferredName">
+        /// Optional name to select after rebuild (e.g. after rename). When null, keeps the current
+        /// selection name when still present.
+        /// </param>
+        public void Refresh(string? preferredName = null)
         {
-            var selectedName = SelectedPreset?.Name;
+            var selectedName = preferredName ?? SelectedPreset?.Name;
             Presets.Clear();
             foreach (
                 var preset in _appliedFilters

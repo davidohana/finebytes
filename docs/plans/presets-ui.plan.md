@@ -13,13 +13,13 @@ todos:
     status: completed
   - id: p4-quickpick-polish
     content: "P4 Quick-pick + polish — toolbar ▾, AppTips, headless coverage, docs, mark F7 done in applied-filter-editors.plan.md"
-    status: pending
+    status: completed
 isProject: false
 ---
 
 # F7 Presets UI
 
-Canonical product backlog: [applied-filter-editors.plan.md](applied-filter-editors.plan.md) (F7 next). This file is the detailed implementation plan for that slice only. **Do not** fold in F8 session chain, F9c help, or F10 polish.
+Canonical product backlog: [applied-filter-editors.plan.md](applied-filter-editors.plan.md) (F7 done; F8 next). This file is the detailed implementation plan for that slice only. **Do not** fold in F8 session chain, F9c help, or F10 polish.
 
 **Phased:** yes — four PR-sized phases below. Ship each phase with its tests before starting the next.
 
@@ -127,7 +127,7 @@ Reuse [`SessionStateRenameListColumn`](../../Mfr.Models/Config/SessionState.cs).
 { "ui": { "presets": { "confirmReplaceAppliedFiltersOnLoad": "false" } } }
 ```
 
-Shared host helper `_TryConfirmReplaceAsync` for Load and ▾.
+Shared host helper `TryLoadPresetAsync` (confirm → `LoadPreset` → `ApplyIfPresent`) for Manager Load and ▾.
 
 ### Engine
 

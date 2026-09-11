@@ -19,8 +19,7 @@ namespace Mfr.App.Ui.Views.Presets
     public partial class PresetManagerDialog : Window
     {
         private readonly AppliedFiltersViewModel? _appliedFilters;
-        private readonly Func<Task<bool>>? _confirmReplaceAsync;
-        private readonly Action<FilterPreset>? _applyColumns;
+        private readonly Func<FilterPreset, Task<bool>>? _tryLoadAsync;
 
         /// <summary>
         /// Initializes an empty dialog (designer / XAML loader).
@@ -32,31 +31,27 @@ namespace Mfr.App.Ui.Views.Presets
         }
 
         /// <summary>
-        /// Initializes the dialog with list state and load-side host callbacks.
+        /// Initializes the dialog with list state and the shared host load path.
         /// </summary>
         /// <param name="viewModel">Sorted preset list and selection.</param>
         /// <param name="appliedFilters">Pane that mutates presets and the Applied Filters chain.</param>
-        /// <param name="confirmReplaceAsync">
-        /// Returns <see langword="true"/> when Load may replace the current chain (after optional confirm).
+        /// <param name="tryLoadAsync">
+        /// Shared load path (confirm → replace → optional columns). Returns <see langword="true"/> on success.
         /// </param>
-        /// <param name="applyColumns">Applies optional Rename List columns after a successful load.</param>
         public PresetManagerDialog(
             PresetManagerDialogViewModel viewModel,
             AppliedFiltersViewModel appliedFilters,
-            Func<Task<bool>> confirmReplaceAsync,
-            Action<FilterPreset> applyColumns
+            Func<FilterPreset, Task<bool>> tryLoadAsync
         )
             : this()
         {
             ArgumentNullException.ThrowIfNull(viewModel);
             ArgumentNullException.ThrowIfNull(appliedFilters);
-            ArgumentNullException.ThrowIfNull(confirmReplaceAsync);
-            ArgumentNullException.ThrowIfNull(applyColumns);
+            ArgumentNullException.ThrowIfNull(tryLoadAsync);
 
             DataContext = viewModel;
             _appliedFilters = appliedFilters;
-            _confirmReplaceAsync = confirmReplaceAsync;
-            _applyColumns = applyColumns;
+            _tryLoadAsync = tryLoadAsync;
         }
 
         /// <inheritdoc />
@@ -90,31 +85,22 @@ namespace Mfr.App.Ui.Views.Presets
         }
 
         /// <summary>
-        /// Confirms replace when needed, loads the selection, applies columns, and closes OK.
+        /// Runs the shared host load path for the selection and closes OK on success.
         /// </summary>
         /// <returns>A task that completes when load UI finishes (success, cancel, or error dialog).</returns>
         private async Task _TryLoadSelectedAsync()
         {
-            if (_ViewModel?.SelectedPreset is not { } preset || _appliedFilters is null)
+            if (_ViewModel?.SelectedPreset is not { } preset || _tryLoadAsync is null)
             {
                 return;
             }
 
-            if (_confirmReplaceAsync is not null && !await _confirmReplaceAsync())
+            if (!await _tryLoadAsync(preset))
             {
                 return;
             }
 
-            try
-            {
-                _appliedFilters.LoadPreset(preset);
-                _applyColumns?.Invoke(preset);
-                Close(true);
-            }
-            catch (Exception ex)
-            {
-                await _ShowErrorAsync("Load Preset", ex);
-            }
+            Close(true);
         }
 
         private async void _OnDeleteClick(object? sender, RoutedEventArgs e)
@@ -218,12 +204,7 @@ namespace Mfr.App.Ui.Views.Presets
                         _ViewModel.Refresh();
                         return;
                     case PresetRenameStatus.Success:
-                        if (rename.Preset is not null)
-                        {
-                            _ViewModel.SelectedPreset = rename.Preset;
-                        }
-
-                        _ViewModel.Refresh();
+                        _ViewModel.Refresh(preferredName: rename.Preset?.Name);
                         return;
                     default:
                         return;

@@ -69,8 +69,7 @@ namespace Mfr.Tests.Ui.Presets
             var renamed = manager.NameToPreset["B"] with { Name = "B2", Description = "b2" };
             manager.NameToPreset.Remove("B");
             manager.NameToPreset["B2"] = renamed;
-            viewModel.SelectedPreset = renamed;
-            viewModel.Refresh();
+            viewModel.Refresh(preferredName: "B2");
 
             Assert.Equal("B2", viewModel.SelectedPreset?.Name);
             Assert.Equal("b2", viewModel.SelectedDescription);

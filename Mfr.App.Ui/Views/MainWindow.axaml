@@ -344,13 +344,18 @@
           InputGesture="{x:Static input:AppShortcuts.MoveFilterDown}"
         />
         <Separator />
-        <MenuItem Header="Presets" Click="_OnPresetsMenuClick" />
+        <MenuItem Header="Presets" Click="_OnPresetsMenuClick" ToolTip.Tip="{x:Static resources:AppTips.Presets}" />
         <MenuItem
           Header="Save Preset"
           Click="_OnSavePresetMenuClick"
+          ToolTip.Tip="{x:Static resources:AppTips.SavePreset}"
           IsEnabled="{Binding AppliedFiltersViewModel.CanSavePreset}"
         />
-        <MenuItem Header="Save Preset As" Click="_OnSavePresetAsMenuClick" />
+        <MenuItem
+          Header="Save Preset As"
+          Click="_OnSavePresetAsMenuClick"
+          ToolTip.Tip="{x:Static resources:AppTips.SavePresetAs}"
+        />
         <MenuItem
           Header="Filter Options"
           Click="_OnFilterOptionsMenuClick"
