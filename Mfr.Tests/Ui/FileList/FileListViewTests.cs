@@ -6,6 +6,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
@@ -82,6 +83,91 @@ namespace Mfr.Tests.Ui.FileList
                 Assert.Contains("Refresh", headers);
                 Assert.Contains("Go Up", headers);
             }
+        }
+
+        /// <summary>
+        /// Verifies a context request on an unselected List row selects that entry.
+        /// </summary>
+        [AvaloniaFact]
+        public void ContextRequest_On_Unselected_Row_Selects_That_Row()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
+            File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
+
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
+            _viewModels.Add(viewModel);
+            viewModel.SetViewMode(FileListViewMode.List);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 420,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var list = view.FindControl<ListBox>("ListViewList");
+            Assert.NotNull(list);
+            Assert.True(list.IsVisible);
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([beta], beta);
+            Dispatcher.UIThread.RunJobs();
+
+            var content = _ListContainer(list, alpha).GetVisualDescendants().OfType<TextBlock>().First();
+            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal([alpha], viewModel.SelectedEntries);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies a context request on a row already in a multi-selection keeps that selection.
+        /// </summary>
+        [AvaloniaFact]
+        public void ContextRequest_On_Selected_Row_Keeps_MultiSelection()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            File.WriteAllText(Path.Combine(dir, "alpha.txt"), "a");
+            File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
+
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
+            _viewModels.Add(viewModel);
+            viewModel.SetViewMode(FileListViewMode.List);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 420,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var list = view.FindControl<ListBox>("ListViewList");
+            Assert.NotNull(list);
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([alpha, beta], beta);
+            Dispatcher.UIThread.RunJobs();
+
+            var content = _ListContainer(list, beta).GetVisualDescendants().OfType<TextBlock>().First();
+            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(2, viewModel.SelectedEntries.Count);
+            Assert.Contains(viewModel.SelectedEntries, entry => entry.FullPath == alpha.FullPath);
+            Assert.Contains(viewModel.SelectedEntries, entry => entry.FullPath == beta.FullPath);
+            window.Close();
         }
 
         /// <summary>

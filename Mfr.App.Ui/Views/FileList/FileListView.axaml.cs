@@ -94,12 +94,27 @@ namespace Mfr.App.Ui.Views.FileList
             _WireListingShortcutKeyDown(LargeIconsList);
             _WireListingShortcutKeyDown(TilesList);
             _WireListingShortcutKeyDown(ThumbnailsList);
+            _WireListingContextRequested(ReportGrid);
+            _WireListingContextRequested(ListViewList);
+            _WireListingContextRequested(SmallIconsList);
+            _WireListingContextRequested(LargeIconsList);
+            _WireListingContextRequested(TilesList);
+            _WireListingContextRequested(ThumbnailsList);
             _WireRenameListDragBackDrop();
         }
 
         private void _WireListingShortcutKeyDown(Control host)
         {
             host.AddHandler(KeyDownEvent, _OnListingShortcutKeyDown, RoutingStrategies.Tunnel);
+        }
+
+        /// <summary>
+        /// Tunnels context requests so hit-row selection runs before the listing opens its menu.
+        /// </summary>
+        /// <param name="host">Active listing control.</param>
+        private void _WireListingContextRequested(Control host)
+        {
+            host.AddHandler(ContextRequestedEvent, _OnEntriesContextRequested, RoutingStrategies.Tunnel);
         }
 
         private void _OnListingShortcutKeyDown(object? sender, KeyEventArgs e)
@@ -436,33 +451,33 @@ namespace Mfr.App.Ui.Views.FileList
                 return;
             }
 
-            var alreadySelected = _viewModel.SelectedEntries.Any(entry =>
-                PathComparers.Os.Equals(entry.FullPath, hit.FullPath)
+            ContextMenuHitSelection.SelectHitIfNeeded(
+                _viewModel.SelectedEntries,
+                hit,
+                () =>
+                {
+                    _selectionChangeFromView = true;
+                    try
+                    {
+                        _viewModel.SetSelectedEntries([hit], hit);
+                    }
+                    finally
+                    {
+                        _selectionChangeFromView = false;
+                    }
+
+                    _isSyncingSelection = true;
+                    try
+                    {
+                        _ApplySelectionToSender(sender, force: true);
+                    }
+                    finally
+                    {
+                        _isSyncingSelection = false;
+                    }
+                },
+                (a, b) => PathComparers.Os.Equals(a.FullPath, b.FullPath)
             );
-            if (alreadySelected)
-            {
-                return;
-            }
-
-            _selectionChangeFromView = true;
-            try
-            {
-                _viewModel.SetSelectedEntries([hit], hit);
-            }
-            finally
-            {
-                _selectionChangeFromView = false;
-            }
-
-            _isSyncingSelection = true;
-            try
-            {
-                _ApplySelectionToSender(sender, force: true);
-            }
-            finally
-            {
-                _isSyncingSelection = false;
-            }
         }
 
         private static FileListEntry? _FindEntryFromSource(object? source)

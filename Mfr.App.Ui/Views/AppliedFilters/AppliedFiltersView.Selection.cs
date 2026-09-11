@@ -43,13 +43,20 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         /// <param name="hit">Step under the pointer.</param>
         private void _SelectStepForContextMenu(AppliedFilterStepViewModel hit)
         {
-            if (_viewModel is null || _viewModel.SelectedSteps.Contains(hit))
+            if (_viewModel is null)
             {
                 return;
             }
 
-            _viewModel.SetSelectedSteps([hit]);
-            _RestoreSelectionFromViewModel();
+            ContextMenuHitSelection.SelectHitIfNeeded(
+                _viewModel.SelectedSteps,
+                hit,
+                () =>
+                {
+                    _viewModel.SetSelectedSteps([hit]);
+                    _RestoreSelectionFromViewModel();
+                }
+            );
         }
 
         private void _OnDataContextAttached(AppliedFiltersViewModel viewModel)

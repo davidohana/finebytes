@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.Models.RenameList.Fields.Basic;
@@ -55,6 +56,44 @@ namespace Mfr.Tests.Ui.RenameList
             viewModel.SetFocusedFieldKey(nameKey);
             Assert.True(viewModel.CanShowCancelManualOverride);
 
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies a context request on an unselected row selects that row.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task ContextRequest_On_Unselected_Row_Selects_That_Row()
+        {
+            var (viewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
+            viewModel.SetSelectedEntries([viewModel.Entries[1]]);
+            Dispatcher.UIThread.RunJobs();
+
+            var row = grid.GetVisualDescendants().OfType<DataGridRow>().First(r => r.Index == 0);
+            var content = row.GetVisualDescendants().OfType<TextBlock>().First();
+            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal([viewModel.Entries[0]], viewModel.SelectedEntries);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies a context request on a row already in a multi-selection keeps that selection.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task ContextRequest_On_Selected_Row_Keeps_MultiSelection()
+        {
+            var (viewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
+            viewModel.SetSelectedEntries([viewModel.Entries[0], viewModel.Entries[1]]);
+            Dispatcher.UIThread.RunJobs();
+
+            var row = grid.GetVisualDescendants().OfType<DataGridRow>().First(r => r.Index == 1);
+            var content = row.GetVisualDescendants().OfType<TextBlock>().First();
+            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal([viewModel.Entries[0], viewModel.Entries[1]], viewModel.SelectedEntries);
             window.Close();
         }
 
