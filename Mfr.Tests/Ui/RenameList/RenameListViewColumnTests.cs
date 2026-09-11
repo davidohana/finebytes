@@ -283,6 +283,44 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies Cancel Manual Override appears on the column header only when any row is overridden.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Header_menu_offers_cancel_manual_override_when_column_overridden()
+        {
+            var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var previewHeader = grid.GetVisualDescendants()
+                .OfType<DataGridColumnHeader>()
+                .First(header => RenameListGridColumns.TryResolveFieldKey(header) == previewKey);
+
+            _RaiseHeaderContextMenu(previewHeader);
+            Assert.DoesNotContain("Cancel Manual Override", _MenuHeaders(previewHeader.ContextMenu));
+
+            renameListViewModel.Entries[1].EngineItem.SetOverride(previewKey, "forced");
+            _RaiseHeaderContextMenu(previewHeader);
+            Assert.Contains("Cancel Manual Override", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.Equal(
+                [
+                    "(Full File Name)",
+                    "Hide Field",
+                    "Remove Unchanged Items",
+                    "Select Visible Fields...",
+                    "Select Sort Fields...",
+                    "Edit as Name List",
+                    "Cancel Manual Override",
+                    "Export",
+                ],
+                _MenuHeaders(previewHeader.ContextMenu)
+            );
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies Edit as Name List is omitted on non-writable columns.
         /// </summary>
         [AvaloniaFact]

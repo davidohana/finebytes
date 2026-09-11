@@ -33,6 +33,17 @@
         />
         <Separator IsVisible="{Binding CanShowRowErrorMenu}" />
         <MenuItem
+          Header="Manual Override Field"
+          Command="{Binding ManualOverrideFieldCommand}"
+          InputGesture="{x:Static input:AppShortcuts.ManualOverride}"
+          ToolTip.Tip="{x:Static resources:AppTips.ManualOverrideField}"
+        />
+        <MenuItem
+          Header="Cancel Manual Override"
+          Command="{Binding CancelManualOverrideCommand}"
+          IsVisible="{Binding CanShowCancelManualOverride}"
+        />
+        <MenuItem
           Header="Locate in File List"
           Command="{Binding LocateInFileListCommand}"
           InputGesture="{x:Static input:AppShortcuts.LocateInFileList}"
@@ -164,11 +175,18 @@
       <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
       <Setter Property="FontStyle" Value="Italic" />
     </Style>
+    <!-- Manual override (blue) wins over preview-changed (red). -->
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-preview-changed">
       <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-preview-changed">
       <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-manual-override">
+      <Setter Property="Foreground" Value="{DynamicResource RenameListManualOverrideForegroundBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-manual-override">
+      <Setter Property="Foreground" Value="{DynamicResource RenameListManualOverrideForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-missing-on-disk">
       <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />

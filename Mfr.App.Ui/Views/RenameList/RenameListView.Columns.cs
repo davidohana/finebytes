@@ -222,9 +222,12 @@ namespace Mfr.App.Ui.Views.RenameList
             textBlock.Text = entry?.GetFieldText(key) ?? string.Empty;
             var isMissing = entry?.IsMissingFromDisk == true;
             var isLoadError = !isMissing && entry?.IsLoadError(key) == true;
-            var isPreviewChanged = !isMissing && !isLoadError && entry?.IsPreviewChanged(key) == true;
+            var isOverridden = !isMissing && !isLoadError && entry?.IsOverridden(key) == true;
+            // Blue manual override wins over red preview-changed (MFR7 ForcedOrgColor before ChangedColor).
+            var isPreviewChanged = !isMissing && !isLoadError && !isOverridden && entry?.IsPreviewChanged(key) == true;
             textBlock.Classes.Set("rename-list-missing-on-disk", isMissing);
             textBlock.Classes.Set("rename-list-load-error", isLoadError);
+            textBlock.Classes.Set("rename-list-manual-override", isOverridden);
             textBlock.Classes.Set("rename-list-preview-changed", isPreviewChanged);
             textBlock.ClearValue(TextBlock.ForegroundProperty);
             textBlock.ClearValue(TextBlock.FontStyleProperty);

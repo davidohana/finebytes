@@ -29,6 +29,9 @@ namespace Mfr.App.Ui.Input
         /// <summary>Exits the application. Bound by the OS on Windows, not as a window key binding.</summary>
         public static KeyGesture Exit { get; } = new(Key.F4, KeyModifiers.Alt);
 
+        /// <summary>Manual override of the focused Rename List field.</summary>
+        public static KeyGesture ManualOverride { get; } = new(Key.F2);
+
         /// <summary>Reloads the File List folder listing.</summary>
         public static KeyGesture Refresh { get; } = new(Key.F5);
 

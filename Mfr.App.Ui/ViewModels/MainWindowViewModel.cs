@@ -72,6 +72,7 @@ namespace Mfr.App.Ui.ViewModels
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
             RenameListViewModel.MembershipChanged += _OnPreviewInputsChanged;
             RenameListViewModel.OriginalsRefreshed += _OnPreviewInputsChanged;
+            RenameListViewModel.ManualOverridesChanged += _OnPreviewInputsChanged;
             AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
             AppliedFiltersViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
             AppliedFiltersViewModel.ChainChanged += _OnPreviewInputsChanged;

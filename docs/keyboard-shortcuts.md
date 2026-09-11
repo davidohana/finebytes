@@ -58,6 +58,7 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 | Remove all but selected | Ctrl+Shift+B | Main window               |
 | Remove selected rows    | Del          | Rename List grid focused  |
 | Clear                   | Ctrl+Shift+C | Main window               |
+| Manual override         | F2           | Rename List grid focused  |
 | Locate in File List     | F4           | Rename List grid focused  |
 | Properties              | Alt+Enter    | Rename List grid focused  |
 | Refresh                 | F5           | Rename List grid focused  |
@@ -94,9 +95,8 @@ Click the **Select Fields** toolbar button on the Rename List, or choose **Selec
 
 These shortcuts match MFR 7.4 and are already labeled on disabled menu items.
 
-| Action        | Shortcut | Notes                        |
-| ------------- | -------- | ---------------------------- |
-| Help          | F1       | Help UI is not in this build |
-| Manual rename | F2       | Rename List                  |
+| Action | Shortcut | Notes                        |
+| ------ | -------- | ---------------------------- |
+| Help   | F1       | Help UI is not in this build |
 
-F5 reloads the File List from the main window and address bar, or the Rename List when its grid has focus (MFR 7.4 shared the same key in both panes). Rename List refresh re-reads original fields from disk, then re-runs preview when Auto-Preview is on.
+F5 reloads the File List from the main window and address bar, or the Rename List when its grid has focus (MFR 7.4 shared the same key in both panes). Rename List refresh re-reads original fields from disk (and clears manual field overrides), then re-runs preview when Auto-Preview is on.

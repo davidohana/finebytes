@@ -14,7 +14,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     /// When <see langword="true"/>, a preview column variant may be added (MFR7 <c>ReadWriteApply</c>).
     /// </param>
     /// <param name="writeTarget">
-    /// Filter target for Edit as Name List / Manual Rename, or <see langword="null"/> when not writable.
+    /// Filter target for Edit as Name List / Manual Override, or <see langword="null"/> when not writable.
     /// </param>
     /// <param name="tip">Optional tooltip clarifying the field.</param>
     internal abstract class AudioTagRenameListField(

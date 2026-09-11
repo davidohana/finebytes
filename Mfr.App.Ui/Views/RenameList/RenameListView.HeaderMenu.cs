@@ -117,8 +117,8 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <remarks>
         /// <para>
         /// Order: title → Hide Field → (preview) Remove Unchanged → Select Visible Fields →
-        /// Select Sort Fields → Edit as Name List (writable) → Export submenu
-        /// (This Column txt / Visible Columns csv).
+        /// Select Sort Fields → Edit as Name List (writable) → Cancel Manual Override (when any row
+        /// overridden) → Export submenu (This Column txt / Visible Columns csv).
         /// </para>
         /// </remarks>
         private static ContextMenu _BuildColumnHeaderContextMenu(
@@ -169,6 +169,17 @@ namespace Mfr.App.Ui.Views.RenameList
                         "Edit as Name List",
                         AppTips.EditAsNameList,
                         () => viewModel.EditAsNameList(fieldKey)
+                    )
+                );
+            }
+
+            if (viewModel.HasColumnOverride(fieldKey))
+            {
+                menu.Items.Add(
+                    _CreateTipMenuItem(
+                        "Cancel Manual Override",
+                        AppTips.CancelManualOverrideColumn,
+                        () => viewModel.CancelManualOverrideForColumn(fieldKey)
                     )
                 );
             }

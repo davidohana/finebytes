@@ -76,6 +76,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Returns whether this cell has a manual field override (MFR7 blue text).
+        /// </summary>
+        /// <param name="key">Field key (original or preview).</param>
+        /// <returns><see langword="true"/> when that side is overridden.</returns>
+        public bool IsOverridden(RenameListFieldKey key)
+        {
+            return RenameListFieldCatalog.IsOverridden(EngineItem, key);
+        }
+
+        /// <summary>
         /// Returns whether this preview cell differs from the original (MFR7 red text).
         /// </summary>
         /// <param name="key">Field key (original or preview).</param>

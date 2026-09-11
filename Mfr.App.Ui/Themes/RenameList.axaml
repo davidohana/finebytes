@@ -6,12 +6,14 @@
           <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#808080" />
           <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#C00000" />
           <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF0000" />
+          <SolidColorBrush x:Key="RenameListManualOverrideForegroundBrush" Color="#0000FF" />
           <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#FFF0F5" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#909090" />
           <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#FF8080" />
           <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF8080" />
+          <SolidColorBrush x:Key="RenameListManualOverrideForegroundBrush" Color="#8090FF" />
           <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#4A3038" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>

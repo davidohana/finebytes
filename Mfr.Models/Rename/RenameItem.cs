@@ -1,4 +1,5 @@
 using Mfr.Models.Media;
+using Mfr.Models.RenameList;
 using Mfr.Models.Tags;
 
 namespace Mfr.Models.Rename
@@ -52,6 +53,10 @@ namespace Mfr.Models.Rename
     /// <param name="original">Original immutable file snapshot.</param>
     public sealed class RenameItem(FileMeta original)
     {
+        private readonly Dictionary<(string GroupId, string PropertyKey), string> _originalOverrides = [];
+
+        private readonly Dictionary<(string GroupId, string PropertyKey), string> _previewOverrides = [];
+
         /// <summary>
         /// Gets the original immutable file snapshot.
         /// </summary>
@@ -278,8 +283,94 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Sets or clears a manual field override for the original or preview side (MFR7 <c>ForceValue</c>).
+        /// </summary>
+        /// <param name="key">Field key; <see cref="RenameListFieldKey.IsPreview"/> selects the side.</param>
+        /// <param name="value">Override text, or <see langword="null"/> to clear that side.</param>
+        /// <remarks>
+        /// <para>
+        /// Survives <see cref="ResetState"/> / preview cycles. Cleared by Cancel, F5
+        /// <c>RefreshOriginals</c>, or <see cref="ClearAllOverrides"/>. Does not mutate
+        /// <see cref="Original"/> — original overrides are display overlay plus PreviewStart seed.
+        /// </para>
+        /// </remarks>
+        public void SetOverride(RenameListFieldKey key, string? value)
+        {
+            var map = _OverrideMap(key.IsPreview);
+            var id = (key.GroupId, key.PropertyKey);
+            if (value is null)
+            {
+                map.Remove(id);
+                return;
+            }
+
+            map[id] = value;
+        }
+
+        /// <summary>
+        /// Clears every manual original and preview field override on this item.
+        /// </summary>
+        public void ClearAllOverrides()
+        {
+            _originalOverrides.Clear();
+            _previewOverrides.Clear();
+        }
+
+        /// <summary>
+        /// Returns whether this item has a manual override on the side identified by <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">Field key; <see cref="RenameListFieldKey.IsPreview"/> selects the side.</param>
+        /// <returns><see langword="true"/> when that side is overridden.</returns>
+        public bool IsOverridden(RenameListFieldKey key)
+        {
+            return _OverrideMap(key.IsPreview).ContainsKey((key.GroupId, key.PropertyKey));
+        }
+
+        /// <summary>
+        /// Tries to read a manual override for the side identified by <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">Field key; <see cref="RenameListFieldKey.IsPreview"/> selects the side.</param>
+        /// <param name="value">Override text when present.</param>
+        /// <returns><see langword="true"/> when that side is overridden.</returns>
+        public bool TryGetOverride(RenameListFieldKey key, out string value)
+        {
+            if (_OverrideMap(key.IsPreview).TryGetValue((key.GroupId, key.PropertyKey), out var found))
+            {
+                value = found;
+                return true;
+            }
+
+            value = string.Empty;
+            return false;
+        }
+
+        /// <summary>
+        /// Enumerates manual overrides for one side (group/property keys as original-form field keys).
+        /// </summary>
+        /// <param name="isPreview">When <see langword="true"/>, preview-side overrides; otherwise original-side.</param>
+        /// <returns>Field keys (with matching <see cref="RenameListFieldKey.IsPreview"/>) and override text.</returns>
+        internal IEnumerable<(RenameListFieldKey Key, string Value)> EnumerateOverrides(bool isPreview)
+        {
+            foreach (var ((groupId, propertyKey), value) in _OverrideMap(isPreview))
+            {
+                var key = isPreview
+                    ? RenameListFieldKey.Preview(groupId, propertyKey)
+                    : RenameListFieldKey.Original(groupId, propertyKey);
+                yield return (key, value);
+            }
+        }
+
+        private Dictionary<(string GroupId, string PropertyKey), string> _OverrideMap(bool isPreview)
+        {
+            return isPreview ? _previewOverrides : _originalOverrides;
+        }
+
+        /// <summary>
         /// Resets transient preview/commit state for a fresh processing cycle.
         /// </summary>
+        /// <remarks>
+        /// <para>Does not clear manual field overrides.</para>
+        /// </remarks>
         public void ResetState()
         {
             Preview = Original.Clone();

@@ -200,12 +200,12 @@ ______________________________________________________________________
 
 ## Remaining — execution order
 
-| Phase                      | What                                                    | Depends on                   |
-| -------------------------- | ------------------------------------------------------- | ---------------------------- |
-| **14d** Manual Override (F2) | Override original/preview; blue cells; Cancel; F5 clears | `SupportsWrite`            |
-| **14f** Drag-out           | Selected rows as FileDrop to Explorer                   | coexist with 4d reorder      |
-| **15** GO                  | `Ctrl+G` → Commit; plum apply errors; Show Rename Error | 14d overrides in commit path |
-| **16** Color legend        | Toolbar toggle + side panel                             | 14d blue + 15 plum           |
+| Phase                        | What                                                     | Depends on                   |
+| ---------------------------- | -------------------------------------------------------- | ---------------------------- |
+| **14d** Manual Override (F2) | Override original/preview; blue cells; Cancel; F5 clears | `SupportsWrite`              |
+| **14f** Drag-out             | Selected rows as FileDrop to Explorer                    | coexist with 4d reorder      |
+| **15** GO                    | `Ctrl+G` → Commit; plum apply errors; Show Rename Error  | 14d overrides in commit path |
+| **16** Color legend          | Toolbar toggle + side panel                              | 14d blue + 15 plum           |
 
 ______________________________________________________________________
 
@@ -217,7 +217,7 @@ MFR7: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) (`
 
 Header menu order ([`_BuildColumnHeaderContextMenu`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)):
 
-`(title)` → Hide Field → *(preview)* Remove Unchanged → Select Visible Fields → Select Sort Fields → **(14c writable) Edit as Name List** → **Export** (This Column / Visible Columns).
+`(title)` → Hide Field → *(preview)* Remove Unchanged → Select Visible Fields → Select Sort Fields → **(14c writable) Edit as Name List** → **(14d) Cancel Manual Override** (when any row overridden for that column) → **Export** (This Column / Visible Columns).
 
 ### 14b — Export (This Column `.txt` / Visible Columns CSV)
 
@@ -325,14 +325,14 @@ After **14d** and **15** so the panel documents the full set.
 
 MFR7: toolbar CheckOnClick + right-dock legend (~112–120px) — [Legend.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/Legend.cs), help Highlighting section.
 
-| Swatch      | Meaning                | Finebytes status |
-| ----------- | ---------------------- | ---------------- |
-| Black       | Original / unchanged   | default          |
-| Red fg      | Value changed          | shipped (11)     |
-| Blue fg     | Forced / manual override | **14d**        |
-| Gray fg     | Load / missing error   | shipped (8/9)    |
-| Lavender bg | Preview error          | shipped (11)     |
-| Plum bg     | Rename / apply error   | **15**           |
+| Swatch      | Meaning                  | Finebytes status |
+| ----------- | ------------------------ | ---------------- |
+| Black       | Original / unchanged     | default          |
+| Red fg      | Value changed            | shipped (11)     |
+| Blue fg     | Forced / manual override | **14d**          |
+| Gray fg     | Load / missing error     | shipped (8/9)    |
+| Lavender bg | Preview error            | shipped (11)     |
+| Plum bg     | Rename / apply error     | **15**           |
 
 Footer hint: right-click cell/row for error details. Toggle shrinks grid width (mirror other `rename-list-action` toggles). Persist toggle in session if cheap; otherwise default off like MFR7.
 

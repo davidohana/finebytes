@@ -3,6 +3,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -34,8 +35,26 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Contains("Locate in File List", headers);
             Assert.Contains("Show in Explorer", headers);
             Assert.Contains("Properties", headers);
+            Assert.Contains("Manual Override Field", headers);
+            Assert.Contains("Cancel Manual Override", headers);
 
-            _ = viewModel;
+            var overrideIndex = headers.IndexOf("Manual Override Field");
+            var cancelIndex = headers.IndexOf("Cancel Manual Override");
+            var locateIndex = headers.IndexOf("Locate in File List");
+            var refreshIndex = headers.IndexOf("Refresh");
+            Assert.True(overrideIndex < cancelIndex);
+            Assert.True(cancelIndex < locateIndex);
+            Assert.True(locateIndex < refreshIndex);
+
+            Assert.False(viewModel.CanShowCancelManualOverride);
+
+            var nameKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            viewModel.SetSelectedEntries([viewModel.Entries[0]]);
+            Dispatcher.UIThread.RunJobs();
+            viewModel.Entries[0].EngineItem.SetOverride(nameKey, "x");
+            viewModel.SetFocusedFieldKey(nameKey);
+            Assert.True(viewModel.CanShowCancelManualOverride);
+
             window.Close();
         }
 

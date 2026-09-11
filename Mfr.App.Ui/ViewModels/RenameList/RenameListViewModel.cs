@@ -220,6 +220,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             LocateInFileListCommand.NotifyCanExecuteChanged();
             ShowInExplorerCommand.NotifyCanExecuteChanged();
             ShowPropertiesCommand.NotifyCanExecuteChanged();
+            _NotifyManualOverrideCommandsChanged();
             _NotifyShowLoadErrorsChanged();
             _NotifyShowPreviewErrorChanged();
         }
@@ -375,6 +376,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             LocateInFileListCommand.NotifyCanExecuteChanged();
             ShowInExplorerCommand.NotifyCanExecuteChanged();
             ShowPropertiesCommand.NotifyCanExecuteChanged();
+            _NotifyManualOverrideCommandsChanged();
             _NotifyShowLoadErrorsChanged();
             _NotifyShowPreviewErrorChanged();
             _NotifyRefreshChanged();

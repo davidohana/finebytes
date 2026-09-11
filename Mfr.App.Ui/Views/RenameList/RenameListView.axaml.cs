@@ -151,6 +151,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.Progress.PropertyChanged -= _OnProgressPropertyChanged;
                 _ClearExportUi(_viewModel);
+                _ClearOverrideUi(_viewModel);
             }
 
             _viewModel = DataContext as RenameListViewModel;
@@ -164,6 +165,7 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.Progress.PropertyChanged += _OnProgressPropertyChanged;
             _WireExportUi(_viewModel);
+            _WireOverrideUi(_viewModel);
             _RebuildColumns();
             _ApplyFixedWidthFontClass();
             _SyncSelectionToGrid();
@@ -189,6 +191,28 @@ namespace Mfr.App.Ui.Views.RenameList
         private static void _ClearExportUi(RenameListViewModel viewModel)
         {
             viewModel.ExportHooks = null;
+        }
+
+        private void _WireOverrideUi(RenameListViewModel viewModel)
+        {
+            viewModel.OverrideHooks = new RenameListOverrideHooks { PromptAsync = _PromptOverrideAsync };
+        }
+
+        private static void _ClearOverrideUi(RenameListViewModel viewModel)
+        {
+            viewModel.OverrideHooks = null;
+        }
+
+        private async Task<string?> _PromptOverrideAsync(string title, string prompt, string defaultValue)
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return null;
+            }
+
+            return await new TextInputDialog(title, prompt, defaultValue)
+                .ShowDialog<string?>(owner)
+                .ConfigureAwait(true);
         }
 
         private async Task _ShowExportErrorAsync(string title, string message)
@@ -223,6 +247,11 @@ namespace Mfr.App.Ui.Views.RenameList
             if (_viewModel is null || _viewModel.IsBusy || e.Handled)
             {
                 return false;
+            }
+
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.ManualOverride, _viewModel.ManualOverrideFieldCommand))
+            {
+                return true;
             }
 
             if (KeyGestureMatch.TryExecute(e, AppShortcuts.RemoveSelectedDelete, _viewModel.RemoveSelectedCommand))
@@ -455,6 +484,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (entry is null || column is null)
             {
+                _viewModel.SetFocusedFieldKey(null);
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
@@ -462,9 +492,12 @@ namespace Mfr.App.Ui.Views.RenameList
             var fieldKey = RenameListGridColumns.GetFieldKey(column);
             if (fieldKey is null)
             {
+                _viewModel.SetFocusedFieldKey(null);
                 _viewModel.CellStatusHintDisplay = StatusHintDisplay.Empty;
                 return;
             }
+
+            _viewModel.SetFocusedFieldKey(fieldKey);
 
             if (!RenameListFieldCatalog.TryGetField(fieldKey.Value, out var field))
             {

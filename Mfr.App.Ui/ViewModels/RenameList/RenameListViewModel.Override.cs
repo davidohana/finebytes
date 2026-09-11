@@ -1,0 +1,212 @@
+using CommunityToolkit.Mvvm.Input;
+using Mfr.Models.RenameList;
+
+namespace Mfr.App.Ui.ViewModels.RenameList
+{
+    /// <summary>
+    /// Manual Override Field (F2) for <see cref="RenameListViewModel"/>.
+    /// </summary>
+    public sealed partial class RenameListViewModel
+    {
+        /// <summary>
+        /// Optional UI hooks for the override text prompt; when null, Manual Override is a no-op.
+        /// </summary>
+        public RenameListOverrideHooks? OverrideHooks { get; set; }
+
+        /// <summary>
+        /// Raised after manual overrides are set or cleared so the shell can re-preview when Auto-Preview is on.
+        /// </summary>
+        public event EventHandler? ManualOverridesChanged;
+
+        /// <summary>
+        /// Gets whether Cancel Manual Override should appear on the row context menu.
+        /// </summary>
+        public bool CanShowCancelManualOverride => _CanCancelManualOverride();
+
+        /// <summary>
+        /// Gets the field key for the focused Rename List grid cell, or <see langword="null"/> when none.
+        /// </summary>
+        public RenameListFieldKey? FocusedFieldKey { get; private set; }
+
+        /// <summary>
+        /// Updates the focused cell field key used by Manual Override / Cancel.
+        /// </summary>
+        /// <param name="key">Focused column field key, or <see langword="null"/> when cleared.</param>
+        internal void SetFocusedFieldKey(RenameListFieldKey? key)
+        {
+            if (FocusedFieldKey == key)
+            {
+                return;
+            }
+
+            FocusedFieldKey = key;
+            OnPropertyChanged(nameof(FocusedFieldKey));
+            _NotifyManualOverrideCommandsChanged();
+        }
+
+        /// <summary>
+        /// Prompts for a value and applies the same manual override to all selected non-error rows.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanManualOverrideField))]
+        public async Task ManualOverrideFieldAsync()
+        {
+            if (!_CanManualOverrideField() || FocusedFieldKey is not { } key)
+            {
+                return;
+            }
+
+            var field = RenameListFieldCatalog.GetField(key);
+            if (!field.SupportsWrite)
+            {
+                return;
+            }
+
+            var eligible = _selectedEntries.Where(entry => _IsOverrideEligible(entry, key)).ToList();
+            if (eligible.Count == 0)
+            {
+                return;
+            }
+
+            var promptHooks = OverrideHooks?.PromptAsync;
+            if (promptHooks is null)
+            {
+                return;
+            }
+
+            var defaultValue = eligible[0].GetFieldText(key);
+            var side = key.IsPreview ? "preview" : "original";
+            var countSuffix = eligible.Count > 1 ? $"' in {eligible.Count} items" : "'";
+            var prompt = $"Set the {side} value of the field '{field.DisplayName}{countSuffix} to: ";
+
+            var value = await promptHooks("Manual Set Value", prompt, defaultValue).ConfigureAwait(true);
+            if (value is null || IsBusy)
+            {
+                return;
+            }
+
+            foreach (var entry in eligible)
+            {
+                entry.EngineItem.SetOverride(key, value);
+            }
+
+            _RefreshFieldDisplay();
+            _NotifyManualOverrideCommandsChanged();
+            ManualOverridesChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Clears the focused field's override on every selected row that has one.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanCancelManualOverride))]
+        public void CancelManualOverride()
+        {
+            if (!_CanCancelManualOverride() || FocusedFieldKey is not { } key)
+            {
+                return;
+            }
+
+            _ClearOverridesForColumn(key, _selectedEntries);
+        }
+
+        /// <summary>
+        /// Returns whether any row has a manual override on <paramref name="key"/> (header Cancel visibility).
+        /// </summary>
+        /// <param name="key">Column field key (original or preview side).</param>
+        /// <returns><see langword="true"/> when at least one list row is overridden on that side.</returns>
+        public bool HasColumnOverride(RenameListFieldKey key)
+        {
+            if (IsBusy || Entries.Count == 0)
+            {
+                return false;
+            }
+
+            return Entries.Any(entry => entry.EngineItem.IsOverridden(key));
+        }
+
+        /// <summary>
+        /// Clears the override for <paramref name="key"/> on every row in the list.
+        /// </summary>
+        /// <param name="key">Column field key (original or preview side).</param>
+        public void CancelManualOverrideForColumn(RenameListFieldKey key)
+        {
+            if (IsBusy || Entries.Count == 0)
+            {
+                return;
+            }
+
+            _ClearOverridesForColumn(key, Entries);
+        }
+
+        private void _ClearOverridesForColumn(RenameListFieldKey key, IEnumerable<RenameListEntry> entries)
+        {
+            var cleared = false;
+            foreach (var entry in entries)
+            {
+                if (!entry.EngineItem.IsOverridden(key))
+                {
+                    continue;
+                }
+
+                entry.EngineItem.SetOverride(key, null);
+                cleared = true;
+            }
+
+            if (!cleared)
+            {
+                return;
+            }
+
+            _RefreshFieldDisplay();
+            _NotifyManualOverrideCommandsChanged();
+            ManualOverridesChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private bool _CanManualOverrideField()
+        {
+            if (IsBusy || FocusedFieldKey is not { } key || _selectedEntries.Count == 0)
+            {
+                return false;
+            }
+
+            var field = RenameListFieldCatalog.GetField(key);
+            if (!field.SupportsWrite)
+            {
+                return false;
+            }
+
+            return _selectedEntries.Any(entry => _IsOverrideEligible(entry, key));
+        }
+
+        private bool _CanCancelManualOverride()
+        {
+            if (IsBusy || FocusedFieldKey is not { } key || _selectedEntries.Count == 0)
+            {
+                return false;
+            }
+
+            return _selectedEntries.Any(entry => entry.EngineItem.IsOverridden(key));
+        }
+
+        private static bool _IsOverrideEligible(RenameListEntry entry, RenameListFieldKey key)
+        {
+            if (entry.HasPreviewError)
+            {
+                return false;
+            }
+
+            if (entry.IsLoadError(key))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private void _NotifyManualOverrideCommandsChanged()
+        {
+            OnPropertyChanged(nameof(CanShowCancelManualOverride));
+            ManualOverrideFieldCommand.NotifyCanExecuteChanged();
+            CancelManualOverrideCommand.NotifyCanExecuteChanged();
+        }
+    }
+}

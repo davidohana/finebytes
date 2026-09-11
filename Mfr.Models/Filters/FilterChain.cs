@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Mfr.Models.Rename;
+using Mfr.Models.RenameList;
 
 namespace Mfr.Models.Filters
 {
@@ -72,11 +73,20 @@ namespace Mfr.Models.Filters
         /// </summary>
         /// <param name="item">The rename item receiving transformed preview metadata.</param>
         /// <remarks>
+        /// <para>
         /// Call <see cref="SetupFilters"/> once before the first apply; this method does not run setup.
+        /// After clearing preview, applies original-side manual overrides (MFR7 <c>PreviewStart</c>)
+        /// so filters seed from overridden originals.
+        /// </para>
         /// </remarks>
         public void ApplyFilters(RenameItem item)
         {
             item.ClearPreview();
+            if (!RenameListFieldOverrides.TryApplyToPreview(item, isPreview: false))
+            {
+                return;
+            }
+
             foreach (var step in Steps)
             {
                 if (!step.Enabled)

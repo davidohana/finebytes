@@ -1499,6 +1499,141 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies Manual Override stores the same value on selected rows for the focused field.
+        /// </summary>
+        [Fact]
+        public async Task ManualOverrideField_sets_override_on_selected_rows()
+        {
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]);
+
+            var nameKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.SetFocusedFieldKey(nameKey);
+            renameListViewModel.SetSelectedEntries([.. renameListViewModel.Entries]);
+            renameListViewModel.OverrideHooks = new RenameListOverrideHooks
+            {
+                PromptAsync = (_, _, _) => Task.FromResult<string?>("forced"),
+            };
+
+            Assert.True(renameListViewModel.ManualOverrideFieldCommand.CanExecute(null));
+            await renameListViewModel.ManualOverrideFieldAsync();
+
+            Assert.All(
+                renameListViewModel.Entries,
+                entry =>
+                {
+                    Assert.True(entry.IsOverridden(nameKey));
+                    Assert.Equal("forced", entry.GetFieldText(nameKey));
+                }
+            );
+            Assert.True(renameListViewModel.CancelManualOverrideCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Manual Override is disabled for non-writable fields.
+        /// </summary>
+        [Fact]
+        public async Task ManualOverrideField_disabled_for_non_writable_field()
+        {
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt")]);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            var itemTypeKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.ItemType
+            );
+            renameListViewModel.SetFocusedFieldKey(itemTypeKey);
+            renameListViewModel.OverrideHooks = new RenameListOverrideHooks
+            {
+                PromptAsync = (_, _, _) => Task.FromResult<string?>("x"),
+            };
+
+            Assert.False(renameListViewModel.ManualOverrideFieldCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Cancel Manual Override clears the focused side for the whole selection when any row is overridden.
+        /// </summary>
+        [Fact]
+        public async Task CancelManualOverride_clears_focused_side_for_selection()
+        {
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]);
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.Entries[0].EngineItem.SetOverride(nameKey, "only-first");
+            renameListViewModel.SetFocusedFieldKey(nameKey);
+            renameListViewModel.SetSelectedEntries([.. renameListViewModel.Entries]);
+
+            Assert.True(renameListViewModel.CancelManualOverrideCommand.CanExecute(null));
+            renameListViewModel.CancelManualOverride();
+
+            Assert.All(renameListViewModel.Entries, entry => Assert.False(entry.IsOverridden(nameKey)));
+            Assert.False(renameListViewModel.CancelManualOverrideCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Cancel Manual Override For Column clears that side on every row.
+        /// </summary>
+        [Fact]
+        public async Task CancelManualOverrideForColumn_clears_all_rows()
+        {
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync(
+                [Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]
+            );
+
+            var nameKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            foreach (var entry in renameListViewModel.Entries)
+            {
+                entry.EngineItem.SetOverride(nameKey, "x");
+            }
+
+            Assert.True(renameListViewModel.HasColumnOverride(nameKey));
+            renameListViewModel.CancelManualOverrideForColumn(nameKey);
+
+            Assert.False(renameListViewModel.HasColumnOverride(nameKey));
+            Assert.All(renameListViewModel.Entries, entry => Assert.False(entry.IsOverridden(nameKey)));
+        }
+
+        /// <summary>
+        /// Verifies the override prompt uses original vs preview wording from the focused key.
+        /// </summary>
+        [Fact]
+        public async Task ManualOverrideField_prompt_uses_original_or_preview_wording()
+        {
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt")]);
+            renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
+
+            string? capturedPrompt = null;
+            renameListViewModel.OverrideHooks = new RenameListOverrideHooks
+            {
+                PromptAsync = (_, prompt, _) =>
+                {
+                    capturedPrompt = prompt;
+                    return Task.FromResult<string?>(null);
+                },
+            };
+
+            var originalKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.SetFocusedFieldKey(originalKey);
+            await renameListViewModel.ManualOverrideFieldAsync();
+            Assert.Contains("original", capturedPrompt, StringComparison.Ordinal);
+
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.SetFocusedFieldKey(previewKey);
+            await renameListViewModel.ManualOverrideFieldAsync();
+            Assert.Contains("preview", capturedPrompt, StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// Verifies canceling a long add discards the in-progress batch and leaves add commands enabled.
         /// </summary>
         [Fact]

@@ -493,7 +493,7 @@ namespace Mfr.Engine.RenameList
         /// <remarks>
         /// <para>
         /// Does not run preview. Missing paths keep the stored path; field-load errors clear with the cache
-        /// so a later hydrate can succeed.
+        /// so a later hydrate can succeed. Clears all manual field overrides (MFR7 F5).
         /// </para>
         /// </remarks>
         public void RefreshOriginals(
@@ -504,6 +504,11 @@ namespace Mfr.Engine.RenameList
             if (_renameItems.Count == 0)
             {
                 return;
+            }
+
+            foreach (var item in _renameItems)
+            {
+                item.ClearAllOverrides();
             }
 
             var tracker = new RenameListProgressTracker(progress, cancellationToken);
@@ -609,6 +614,13 @@ namespace Mfr.Engine.RenameList
         /// </summary>
         /// <param name="chain">The already-set-up filter chain.</param>
         /// <param name="tracker">Cancel flag and per-item progress.</param>
+        /// <remarks>
+        /// <para>
+        /// MFR7 <c>PreviewStart</c> (original overrides) runs inside <see cref="FilterChain.ApplyFilters"/>
+        /// after <see cref="RenameItem.ClearPreview"/>. MFR7 <c>PreviewEnd</c> (preview overrides) runs here
+        /// after filters succeed.
+        /// </para>
+        /// </remarks>
         private void _ApplyPreviewFilters(FilterChain chain, RenameListProgressTracker tracker)
         {
             _PopulateRenameListCounterContext();
@@ -623,6 +635,11 @@ namespace Mfr.Engine.RenameList
                 try
                 {
                     chain.ApplyFilters(renameItem);
+
+                    if (renameItem.PreviewError is null)
+                    {
+                        RenameListFieldOverrides.TryApplyToPreview(renameItem, isPreview: true);
+                    }
 
                     if (renameItem.PreviewError is null)
                     {

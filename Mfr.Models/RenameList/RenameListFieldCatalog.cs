@@ -207,6 +207,11 @@ namespace Mfr.Models.RenameList
         /// <returns>
         /// <see langword="true"/> only for preview keys whose display text differs from the original.
         /// </returns>
+        /// <remarks>
+        /// <para>
+        /// Compares display text including manual overrides on either side.
+        /// </para>
+        /// </remarks>
         public static bool IsPreviewChanged(RenameItem item, RenameListFieldKey key)
         {
             ArgumentNullException.ThrowIfNull(item);
@@ -216,7 +221,23 @@ namespace Mfr.Models.RenameList
             }
 
             var field = GetField(key);
-            return !string.Equals(field.Resolve(item.Original), field.Resolve(item.Preview), StringComparison.Ordinal);
+            return !string.Equals(
+                field.Resolve(item, isPreview: false),
+                field.Resolve(item, isPreview: true),
+                StringComparison.Ordinal
+            );
+        }
+
+        /// <summary>
+        /// Returns whether a cell has a manual field override (MFR7 blue text).
+        /// </summary>
+        /// <param name="item">Engine rename item.</param>
+        /// <param name="key">Field key (original or preview side).</param>
+        /// <returns><see langword="true"/> when that side is overridden.</returns>
+        public static bool IsOverridden(RenameItem item, RenameListFieldKey key)
+        {
+            ArgumentNullException.ThrowIfNull(item);
+            return item.IsOverridden(key);
         }
 
         /// <summary>
