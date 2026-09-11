@@ -117,7 +117,8 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <remarks>
         /// <para>
         /// Order: title → Hide Field → (preview) Remove Unchanged → Select Visible Fields →
-        /// Select Sort Fields → separator → Edit as Name List (writable) → Export Name List.
+        /// Select Sort Fields → Edit as Name List (writable) → Export submenu
+        /// (This Column / Visible Columns).
         /// </para>
         /// </remarks>
         private static ContextMenu _BuildColumnHeaderContextMenu(
@@ -172,13 +173,22 @@ namespace Mfr.App.Ui.Views.RenameList
                 );
             }
 
-            menu.Items.Add(
+            var exportMenu = new MenuItem { Header = "Export" };
+            exportMenu.Items.Add(
                 _CreateTipMenuItem(
-                    "Export Name List",
-                    AppTips.ExportNameList,
-                    () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportNameListAsync(fieldKey))
+                    "Export This Column",
+                    AppTips.ExportThisColumn,
+                    () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportThisColumnAsync(fieldKey))
                 )
             );
+            exportMenu.Items.Add(
+                _CreateTipMenuItem(
+                    "Export Visible Columns",
+                    AppTips.ExportVisibleColumns,
+                    () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportVisibleColumnsAsync())
+                )
+            );
+            menu.Items.Add(exportMenu);
 
             return menu;
         }

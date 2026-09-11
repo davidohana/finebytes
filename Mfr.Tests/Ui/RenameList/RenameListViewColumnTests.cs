@@ -252,9 +252,13 @@ namespace Mfr.Tests.Ui.RenameList
                     "Select Visible Fields...",
                     "Select Sort Fields...",
                     "Edit as Name List",
-                    "Export Name List",
+                    "Export",
                 ],
                 _MenuHeaders(originalHeader.ContextMenu)
+            );
+            Assert.Equal(
+                ["Export This Column", "Export Visible Columns"],
+                _SubmenuHeaders(originalHeader.ContextMenu, "Export")
             );
 
             _RaiseHeaderContextMenu(previewHeader);
@@ -266,9 +270,13 @@ namespace Mfr.Tests.Ui.RenameList
                     "Select Visible Fields...",
                     "Select Sort Fields...",
                     "Edit as Name List",
-                    "Export Name List",
+                    "Export",
                 ],
                 _MenuHeaders(previewHeader.ContextMenu)
+            );
+            Assert.Equal(
+                ["Export This Column", "Export Visible Columns"],
+                _SubmenuHeaders(previewHeader.ContextMenu, "Export")
             );
 
             window.Close();
@@ -309,10 +317,14 @@ namespace Mfr.Tests.Ui.RenameList
 
             _RaiseHeaderContextMenu(lengthHeader);
             Assert.Equal(
-                ["(File Name Length)", "Hide Field", "Select Visible Fields...", "Select Sort Fields...", "Export Name List"],
+                ["(File Name Length)", "Hide Field", "Select Visible Fields...", "Select Sort Fields...", "Export"],
                 _MenuHeaders(lengthHeader.ContextMenu)
             );
             Assert.DoesNotContain("Edit as Name List", _MenuHeaders(lengthHeader.ContextMenu));
+            Assert.Equal(
+                ["Export This Column", "Export Visible Columns"],
+                _SubmenuHeaders(lengthHeader.ContextMenu, "Export")
+            );
             window.Close();
         }
 
@@ -1232,6 +1244,13 @@ namespace Mfr.Tests.Ui.RenameList
         {
             Assert.NotNull(menu);
             return [.. menu.Items.OfType<MenuItem>().Select(item => item.Header?.ToString() ?? string.Empty)];
+        }
+
+        private static IReadOnlyList<string> _SubmenuHeaders(ContextMenu? menu, string parentHeader)
+        {
+            Assert.NotNull(menu);
+            var parent = menu.Items.OfType<MenuItem>().Single(item => item.Header?.ToString() == parentHeader);
+            return [.. parent.Items.OfType<MenuItem>().Select(item => item.Header?.ToString() ?? string.Empty)];
         }
 
         private static void _AssertRowErrorGlyphVisible(DataGridRow row, bool shouldBeVisible)

@@ -1,7 +1,7 @@
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Optional UI hooks for Export Name List (wired by the view; set in tests).
+    /// Optional UI hooks for Rename List export (wired by the view; set in tests).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -12,17 +12,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed class RenameListExportHooks
     {
         /// <summary>
-        /// Save-path picker; when null, export is a no-op.
-        /// </summary>
-        public Func<Task<string?>>? PickSavePathAsync { get; init; }
-
-        /// <summary>
-        /// Post-save prompt for opening the exported file; argument is the saved path.
+        /// Save-path picker; arguments are dialog title, extension without dot, and primary filter label.
         /// </summary>
         /// <remarks>
-        /// <para>Return <see langword="true"/> to open with the default app.</para>
+        /// <para>When null, export is a no-op.</para>
         /// </remarks>
-        public Func<string, Task<bool>>? ConfirmEditAsync { get; init; }
+        public Func<string, string, string, Task<string?>>? PickSavePathAsync { get; init; }
 
         /// <summary>
         /// Error UI when the write fails; arguments are dialog title and message body.

@@ -24,7 +24,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private List<RenameListSortKey> _sortKeys = [];
 
         /// <summary>
-        /// Optional UI hooks for <see cref="ExportNameListAsync"/>; when null, export is a no-op.
+        /// Optional UI hooks for CSV export; when null, export is a no-op.
         /// </summary>
         public RenameListExportHooks? ExportHooks { get; set; }
 

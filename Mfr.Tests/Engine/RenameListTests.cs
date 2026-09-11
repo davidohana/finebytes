@@ -654,6 +654,45 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies ExportCsv writes a header and catalog display text in list order.
+        /// </summary>
+        [Fact]
+        public void ExportCsv_writes_header_and_rows_in_list_order()
+        {
+            var (helloPath, worldPath) = TestHelpers.CreateFiles(_tempRoot, "hello.txt", "world.txt");
+            var outPath = Path.Combine(_tempRoot, "export.csv");
+
+            var renameList = new RenameList();
+            renameList.AddSources([helloPath, worldPath]);
+            renameList.Preview(
+                FilterChain.CreateAllEnabled([
+                    new LettersCaseFilter(
+                        new FilePrefixTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
+                    ),
+                ])
+            );
+
+            var originalKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+            renameList.ExportCsv(outPath, [originalKey]);
+            Assert.Equal(
+                $"Full File Name{Environment.NewLine}hello.txt{Environment.NewLine}world.txt{Environment.NewLine}",
+                File.ReadAllText(outPath)
+            );
+
+            renameList.ExportCsv(outPath, [previewKey]);
+            Assert.Equal(
+                $"Full File Name{Environment.NewLine}HELLO.txt{Environment.NewLine}WORLD.txt{Environment.NewLine}",
+                File.ReadAllText(outPath)
+            );
+        }
+
+        /// <summary>
         /// Verifies ExportNameList writes CollectNameList lines as UTF-8 text in list order.
         /// </summary>
         [Fact]
@@ -687,19 +726,54 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies ExportNameList creates an empty file when there are no rename items.
+        /// Verifies ExportCsv writes multiple columns in key order and quotes special characters.
         /// </summary>
         [Fact]
-        public void ExportNameList_empty_list_writes_empty_file()
+        public void ExportCsv_writes_multi_column_and_quotes_special_chars()
         {
-            var outPath = Path.Combine(_tempRoot, "empty.txt");
+            var (commaPath, _) = TestHelpers.CreateFiles(_tempRoot, "a,b.txt", "plain.txt");
+            var outPath = Path.Combine(_tempRoot, "multi.csv");
+
+            var renameList = new RenameList();
+            renameList.AddSources([commaPath]);
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+
+            renameList.ExportCsv(outPath, [nameKey, fullNameKey]);
+
+            Assert.Equal(
+                $"File Name,Full File Name{Environment.NewLine}\"a,b\",\"a,b.txt\"{Environment.NewLine}",
+                File.ReadAllText(outPath)
+            );
+        }
+
+        /// <summary>
+        /// Verifies ExportCsv writes only the header when there are no rename items.
+        /// </summary>
+        [Fact]
+        public void ExportCsv_empty_list_writes_header_only()
+        {
+            var outPath = Path.Combine(_tempRoot, "empty.csv");
             var renameList = new RenameList();
             var key = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
 
-            renameList.ExportNameList(outPath, key);
+            renameList.ExportCsv(outPath, [key]);
 
-            Assert.True(File.Exists(outPath));
-            Assert.Empty(File.ReadAllText(outPath));
+            Assert.Equal($"File Name{Environment.NewLine}", File.ReadAllText(outPath));
+        }
+
+        /// <summary>
+        /// Verifies ExportCsv rejects an empty key list.
+        /// </summary>
+        [Fact]
+        public void ExportCsv_empty_keys_throws()
+        {
+            var renameList = new RenameList();
+            Assert.Throws<ArgumentException>(() => renameList.ExportCsv(Path.Combine(_tempRoot, "x.csv"), []));
         }
 
         /// <summary>

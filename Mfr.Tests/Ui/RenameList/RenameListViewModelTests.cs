@@ -521,10 +521,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies ExportNameListAsync writes the column lines when a save path is chosen.
+        /// Verifies ExportThisColumnAsync writes a UTF-8 text file when a save path is chosen.
         /// </summary>
         [Fact]
-        public async Task ExportNameListAsync_writes_file_when_path_chosen()
+        public async Task ExportThisColumnAsync_writes_txt_when_path_chosen()
         {
             var dir = _context.CreateTempDir();
             var alphaPath = Path.Combine(dir, "alpha.txt");
@@ -537,21 +537,56 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
             renameListViewModel.ExportHooks = new RenameListExportHooks
             {
-                PickSavePathAsync = () => Task.FromResult<string?>(outPath),
-                ConfirmEditAsync = _ => Task.FromResult(false),
+                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
             };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
-            await renameListViewModel.ExportNameListAsync(nameKey);
+            await renameListViewModel.ExportThisColumnAsync(nameKey);
 
             Assert.Equal($"alpha{Environment.NewLine}beta{Environment.NewLine}", await File.ReadAllTextAsync(outPath));
         }
 
         /// <summary>
-        /// Verifies ExportNameListAsync leaves disk alone when the save dialog is cancelled.
+        /// Verifies ExportVisibleColumnsAsync writes columns in VisibleColumns order.
         /// </summary>
         [Fact]
-        public async Task ExportNameListAsync_cancel_leaves_disk_alone()
+        public async Task ExportVisibleColumnsAsync_writes_visible_columns_in_order()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+            var outPath = Path.Combine(dir, "visible.csv");
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]);
+            renameListViewModel.ApplyVisibleColumnsFromSession([
+                new SessionStateRenameListColumn(fullNameKey),
+                new SessionStateRenameListColumn(nameKey),
+            ]);
+            renameListViewModel.ExportHooks = new RenameListExportHooks
+            {
+                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
+            };
+
+            await renameListViewModel.ExportVisibleColumnsAsync();
+
+            Assert.Equal(
+                $"Full File Name,File Name{Environment.NewLine}row.txt,row{Environment.NewLine}",
+                await File.ReadAllTextAsync(outPath)
+            );
+        }
+
+        /// <summary>
+        /// Verifies ExportThisColumnAsync leaves disk alone when the save dialog is cancelled.
+        /// </summary>
+        [Fact]
+        public async Task ExportThisColumnAsync_cancel_leaves_disk_alone()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "row.txt");
@@ -562,20 +597,20 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]);
             renameListViewModel.ExportHooks = new RenameListExportHooks
             {
-                PickSavePathAsync = () => Task.FromResult<string?>(null),
+                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(null),
             };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
-            await renameListViewModel.ExportNameListAsync(nameKey);
+            await renameListViewModel.ExportThisColumnAsync(nameKey);
 
             Assert.False(File.Exists(outPath));
         }
 
         /// <summary>
-        /// Verifies ExportNameListAsync opens the file when the edit prompt returns yes.
+        /// Verifies ExportThisColumnAsync reveals the file in Explorer after a successful write.
         /// </summary>
         [Fact]
-        public async Task ExportNameListAsync_edit_yes_opens_with_default_app()
+        public async Task ExportThisColumnAsync_success_reveals_in_explorer()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "row.txt");
@@ -587,21 +622,46 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]);
             renameListViewModel.ExportHooks = new RenameListExportHooks
             {
-                PickSavePathAsync = () => Task.FromResult<string?>(outPath),
-                ConfirmEditAsync = _ => Task.FromResult(true),
+                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
             };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
-            await renameListViewModel.ExportNameListAsync(nameKey);
+            await renameListViewModel.ExportThisColumnAsync(nameKey);
 
-            Assert.Equal([outPath], shell.OpenedWithDefaultApp);
+            Assert.Equal([outPath], shell.RevealedInFileManager);
+            Assert.Empty(shell.OpenedWithDefaultApp);
         }
 
         /// <summary>
-        /// Verifies ExportNameListAsync shows the error UI and skips the edit prompt when the write fails.
+        /// Verifies ExportVisibleColumnsAsync reveals the CSV in Explorer after a successful write.
         /// </summary>
         [Fact]
-        public async Task ExportNameListAsync_write_failure_shows_error_and_skips_edit()
+        public async Task ExportVisibleColumnsAsync_success_reveals_in_explorer()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+            var outPath = Path.Combine(dir, "visible.csv");
+            var shell = new RecordingFileShellOpener();
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, shellOpener: shell);
+            await renameListViewModel.AddPathsAsync([path]);
+            renameListViewModel.ExportHooks = new RenameListExportHooks
+            {
+                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
+            };
+
+            await renameListViewModel.ExportVisibleColumnsAsync();
+
+            Assert.Equal([outPath], shell.RevealedInFileManager);
+            Assert.Empty(shell.OpenedWithDefaultApp);
+        }
+
+        /// <summary>
+        /// Verifies ExportThisColumnAsync shows the error UI and does not reveal when the write fails.
+        /// </summary>
+        [Fact]
+        public async Task ExportThisColumnAsync_write_failure_shows_error_and_skips_reveal()
         {
             var dir = _context.CreateTempDir();
             var path = Path.Combine(dir, "row.txt");
@@ -609,33 +669,28 @@ namespace Mfr.Tests.Ui.RenameList
             var missingDir = Path.Combine(dir, "missing", "names.txt");
             string? errorTitle = null;
             string? errorMessage = null;
-            var editPromptCalls = 0;
+            var shell = new RecordingFileShellOpener();
 
-            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, shellOpener: shell);
             await renameListViewModel.AddPathsAsync([path]);
             renameListViewModel.ExportHooks = new RenameListExportHooks
             {
-                PickSavePathAsync = () => Task.FromResult<string?>(missingDir),
+                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(missingDir),
                 ShowErrorAsync = (title, message) =>
                 {
                     errorTitle = title;
                     errorMessage = message;
                     return Task.CompletedTask;
                 },
-                ConfirmEditAsync = _ =>
-                {
-                    editPromptCalls++;
-                    return Task.FromResult(true);
-                },
             };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
-            await renameListViewModel.ExportNameListAsync(nameKey);
+            await renameListViewModel.ExportThisColumnAsync(nameKey);
 
             Assert.Equal("Magic File Renamer", errorTitle);
-            Assert.Contains("Failed to generate name list for field File Name", errorMessage);
+            Assert.Contains("Failed to export column File Name", errorMessage);
             Assert.Contains(missingDir, errorMessage);
-            Assert.Equal(0, editPromptCalls);
+            Assert.Empty(shell.RevealedInFileManager);
             Assert.False(File.Exists(missingDir));
         }
 

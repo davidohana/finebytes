@@ -16,6 +16,7 @@ namespace Mfr.App.Ui.Services
         /// <param name="title">Dialog title.</param>
         /// <param name="defaultExtension">Extension without dot (e.g. <c>txt</c>).</param>
         /// <param name="suggestedFileName">Optional suggested file name.</param>
+        /// <param name="fileTypeName">Primary filter label (e.g. <c>Text files</c> or <c>CSV files</c>).</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
         public static Task<string?> PickSaveFileAsync(
@@ -23,6 +24,7 @@ namespace Mfr.App.Ui.Services
             string title = "Save as",
             string defaultExtension = "txt",
             string? suggestedFileName = null,
+            string fileTypeName = "Text files",
             CancellationToken cancellationToken = default
         )
         {
@@ -33,7 +35,14 @@ namespace Mfr.App.Ui.Services
                 return Task.FromResult<string?>(null);
             }
 
-            return PickSaveFileAsync(storage, title, defaultExtension, suggestedFileName, cancellationToken);
+            return PickSaveFileAsync(
+                storage,
+                title,
+                defaultExtension,
+                suggestedFileName,
+                fileTypeName,
+                cancellationToken
+            );
         }
 
         /// <summary>
@@ -43,6 +52,7 @@ namespace Mfr.App.Ui.Services
         /// <param name="title">Dialog title.</param>
         /// <param name="defaultExtension">Extension without dot (e.g. <c>txt</c>).</param>
         /// <param name="suggestedFileName">Optional suggested file name.</param>
+        /// <param name="fileTypeName">Primary filter label (e.g. <c>Text files</c> or <c>CSV files</c>).</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
         public static async Task<string?> PickSaveFileAsync(
@@ -50,12 +60,14 @@ namespace Mfr.App.Ui.Services
             string title = "Save as",
             string defaultExtension = "txt",
             string? suggestedFileName = null,
+            string fileTypeName = "Text files",
             CancellationToken cancellationToken = default
         )
         {
             ArgumentNullException.ThrowIfNull(storage);
             ArgumentException.ThrowIfNullOrWhiteSpace(title);
             ArgumentException.ThrowIfNullOrWhiteSpace(defaultExtension);
+            ArgumentException.ThrowIfNullOrWhiteSpace(fileTypeName);
 
             if (cancellationToken.IsCancellationRequested)
             {
@@ -71,7 +83,7 @@ namespace Mfr.App.Ui.Services
                         SuggestedFileName = suggestedFileName,
                         FileTypeChoices =
                         [
-                            new FilePickerFileType("Text files") { Patterns = [$"*.{defaultExtension}"] },
+                            new FilePickerFileType(fileTypeName) { Patterns = [$"*.{defaultExtension}"] },
                             new FilePickerFileType("All files") { Patterns = ["*.*"] },
                         ],
                     }

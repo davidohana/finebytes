@@ -292,6 +292,11 @@
           Command="{Binding RenameListViewModel.OpenEditSortFieldsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"
         />
+        <MenuItem
+          Header="Export Rename List..."
+          Command="{Binding RenameListViewModel.ExportVisibleColumnsCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.ExportRenameList}"
+        />
         <Separator />
         <MenuItem
           Header="Use Fixed-Width Font"

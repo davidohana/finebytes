@@ -1,4 +1,6 @@
+using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FileList;
@@ -115,6 +117,27 @@ namespace Mfr.Tests.Ui.MainWindow
 
             renameListViewModel.ClearCommand.Execute(null);
             Assert.Equal(0, viewModel.ItemCount);
+        }
+
+        /// <summary>
+        /// Verifies Rename List → Export Rename List is bound to visible-columns CSV export.
+        /// </summary>
+        [AvaloniaFact]
+        public void MainWindow_RenameList_menu_includes_export_rename_list()
+        {
+            var viewModel = new MainWindowViewModel();
+            var window = new AppMainWindow { DataContext = viewModel };
+            window.Show();
+
+            var renameListMenu = window
+                .GetVisualDescendants()
+                .OfType<MenuItem>()
+                .Single(item => item.Header?.ToString() == "_Rename List");
+            var exportItem = renameListMenu
+                .Items.OfType<MenuItem>()
+                .Single(item => item.Header?.ToString() == "Export Rename List...");
+
+            Assert.Same(viewModel.RenameListViewModel.ExportVisibleColumnsCommand, exportItem.Command);
         }
     }
 }

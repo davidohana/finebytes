@@ -277,7 +277,7 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Collects one display line per rename-list row for <paramref name="key"/> (Edit as Name List / Export Name List).
+        /// Collects one display line per rename-list row for <paramref name="key"/> (Edit as Name List / Export This Column).
         /// </summary>
         /// <param name="key">Original or preview field key whose column text is collected.</param>
         /// <returns>
@@ -286,7 +286,7 @@ namespace Mfr.Engine.RenameList
         /// </returns>
         /// <remarks>
         /// <para>
-        /// In-memory only — does not write a file. Shared by Edit as Name List and Export Name List.
+        /// In-memory only — does not write a file. Shared by Edit as Name List and Export This Column.
         /// </para>
         /// </remarks>
         public IReadOnlyList<string> CollectNameList(RenameListFieldKey key)
@@ -311,6 +311,52 @@ namespace Mfr.Engine.RenameList
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(path);
             File.WriteAllLines(path, CollectNameList(key), Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// Writes a UTF-8 CSV of catalog display text for <paramref name="keys"/> (header + one row per rename item).
+        /// </summary>
+        /// <param name="path">Destination file path (created or overwritten).</param>
+        /// <param name="keys">Column field keys in export order; must be non-empty.</param>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is null or whitespace.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="keys"/> is <see langword="null"/>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="keys"/> is empty.</exception>
+        /// <exception cref="IOException">The file could not be written.</exception>
+        /// <remarks>
+        /// <para>
+        /// Header cells are field <see cref="RenameListField.DisplayName"/> values. Data cells use
+        /// <see cref="RenameListFieldCatalog.Resolve(RenameItem, RenameListFieldKey)"/>. Empty list writes the header only.
+        /// </para>
+        /// </remarks>
+        public void ExportCsv(string path, IReadOnlyList<RenameListFieldKey> keys)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(path);
+            ArgumentNullException.ThrowIfNull(keys);
+            if (keys.Count == 0)
+            {
+                throw new ArgumentException("At least one column key is required.", nameof(keys));
+            }
+
+            var header = new string[keys.Count];
+            for (var c = 0; c < keys.Count; c++)
+            {
+                header[c] = RenameListFieldCatalog.GetField(keys[c]).DisplayName;
+            }
+
+            var lines = new List<string>(_renameItems.Count + 1) { CsvText.FormatRow(header) };
+            var row = new string[keys.Count];
+            for (var i = 0; i < _renameItems.Count; i++)
+            {
+                var item = _renameItems[i];
+                for (var c = 0; c < keys.Count; c++)
+                {
+                    row[c] = RenameListFieldCatalog.Resolve(item, keys[c]);
+                }
+
+                lines.Add(CsvText.FormatRow(row));
+            }
+
+            File.WriteAllLines(path, lines, Encoding.UTF8);
         }
 
         /// <summary>

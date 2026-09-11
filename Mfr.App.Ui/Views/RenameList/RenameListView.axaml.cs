@@ -150,7 +150,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 _viewModel.RowErrorDialogRequested -= _OnRowErrorDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.Progress.PropertyChanged -= _OnProgressPropertyChanged;
-                _ClearExportNameListUi(_viewModel);
+                _ClearExportUi(_viewModel);
             }
 
             _viewModel = DataContext as RenameListViewModel;
@@ -163,7 +163,7 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.RowErrorDialogRequested += _OnRowErrorDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.Progress.PropertyChanged += _OnProgressPropertyChanged;
-            _WireExportNameListUi(_viewModel);
+            _WireExportUi(_viewModel);
             _RebuildColumns();
             _ApplyFixedWidthFontClass();
             _SyncSelectionToGrid();
@@ -171,37 +171,27 @@ namespace Mfr.App.Ui.Views.RenameList
             _ClearSortDescriptions();
         }
 
-        private void _WireExportNameListUi(RenameListViewModel viewModel)
+        private void _WireExportUi(RenameListViewModel viewModel)
         {
             viewModel.ExportHooks = new RenameListExportHooks
             {
-                PickSavePathAsync = () =>
-                    FileSavePicker.PickSaveFileAsync(this, title: "Save Name List as", defaultExtension: "txt"),
-                ConfirmEditAsync = _ConfirmEditExportedNameListAsync,
-                ShowErrorAsync = _ShowExportNameListErrorAsync,
+                PickSavePathAsync = (title, defaultExtension, fileTypeName) =>
+                    FileSavePicker.PickSaveFileAsync(
+                        this,
+                        title: title,
+                        defaultExtension: defaultExtension,
+                        fileTypeName: fileTypeName
+                    ),
+                ShowErrorAsync = _ShowExportErrorAsync,
             };
         }
 
-        private static void _ClearExportNameListUi(RenameListViewModel viewModel)
+        private static void _ClearExportUi(RenameListViewModel viewModel)
         {
             viewModel.ExportHooks = null;
         }
 
-        private async Task<bool> _ConfirmEditExportedNameListAsync(string path)
-        {
-            if (TopLevel.GetTopLevel(this) is not Window owner)
-            {
-                return false;
-            }
-
-            var confirm = new ConfirmMessageDialog(
-                title: "Magic File Renamer",
-                message: $"Name list saved to {path}. Edit?"
-            );
-            return await confirm.ShowDialog<bool>(owner).ConfigureAwait(true);
-        }
-
-        private async Task _ShowExportNameListErrorAsync(string title, string message)
+        private async Task _ShowExportErrorAsync(string title, string message)
         {
             if (TopLevel.GetTopLevel(this) is not Window owner)
             {

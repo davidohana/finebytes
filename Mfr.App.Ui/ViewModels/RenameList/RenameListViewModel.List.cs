@@ -88,16 +88,63 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Exports this column's display lines to a UTF-8 text file (MFR7 Export Name List).
+        /// Exports this column's display lines to a UTF-8 text file (one line per row).
         /// </summary>
         /// <param name="key">Original or preview field key from the header menu.</param>
         /// <remarks>
         /// <para>
-        /// Uses <see cref="ExportHooks"/> for the save dialog, error UI, and optional edit prompt.
-        /// After a path is chosen, aborts if the list became busy. Cancelled pick leaves disk unchanged.
+        /// Uses <see cref="ExportHooks"/> for the save dialog and error UI. On success, reveals the file
+        /// in Explorer. After a path is chosen, aborts if the list became busy. Cancelled pick leaves disk unchanged.
         /// </para>
         /// </remarks>
-        public async Task ExportNameListAsync(RenameListFieldKey key)
+        public Task ExportThisColumnAsync(RenameListFieldKey key)
+        {
+            return _ExportAsync(
+                title: "Save Name List as",
+                defaultExtension: "txt",
+                fileTypeName: "Text files",
+                write: path => _renameList.ExportNameList(path, key),
+                errorLeadIn: $"Failed to export column {RenameListFieldCatalog.GetField(key).DisplayName}"
+            );
+        }
+
+        /// <summary>
+        /// Exports all visible columns' display text to a UTF-8 CSV file.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Column order matches <see cref="VisibleColumns"/>. No-op when there are no visible columns.
+        /// Uses <see cref="ExportHooks"/> for the save dialog and error UI. On success, reveals the file in Explorer.
+        /// </para>
+        /// </remarks>
+        [RelayCommand]
+        public Task ExportVisibleColumnsAsync()
+        {
+            if (VisibleColumns.Count == 0)
+            {
+                return Task.CompletedTask;
+            }
+
+            var keys = VisibleColumns.Select(column => column.Key).ToArray();
+            return _ExportAsync(
+                title: "Export as CSV",
+                defaultExtension: "csv",
+                fileTypeName: "CSV files",
+                write: path => _renameList.ExportCsv(path, keys),
+                errorLeadIn: "Failed to export visible columns"
+            );
+        }
+
+        /// <summary>
+        /// Shared export: pick path, write, error UI, then reveal in Explorer.
+        /// </summary>
+        private async Task _ExportAsync(
+            string title,
+            string defaultExtension,
+            string fileTypeName,
+            Action<string> write,
+            string errorLeadIn
+        )
         {
             var hooks = ExportHooks;
             if (IsBusy || hooks?.PickSavePathAsync is null)
@@ -105,7 +152,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var path = await hooks.PickSavePathAsync().ConfigureAwait(true);
+            var path = await hooks.PickSavePathAsync(title, defaultExtension, fileTypeName).ConfigureAwait(true);
             if (string.IsNullOrWhiteSpace(path) || IsBusy)
             {
                 return;
@@ -113,36 +160,21 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             try
             {
-                _renameList.ExportNameList(path, key);
+                write(path);
             }
             catch (Exception ex)
             {
                 if (hooks.ShowErrorAsync is not null)
                 {
-                    var fieldName = RenameListFieldCatalog.GetField(key).DisplayName;
                     await hooks
-                        .ShowErrorAsync(
-                            "Magic File Renamer",
-                            $"Failed to generate name list for field {fieldName}\n\n{path}\n\n{ex.Message}"
-                        )
+                        .ShowErrorAsync("Magic File Renamer", $"{errorLeadIn}\n\n{path}\n\n{ex.Message}")
                         .ConfigureAwait(true);
                 }
 
                 return;
             }
 
-            if (hooks.ConfirmEditAsync is null)
-            {
-                return;
-            }
-
-            var shouldEdit = await hooks.ConfirmEditAsync(path).ConfigureAwait(true);
-            if (!shouldEdit)
-            {
-                return;
-            }
-
-            _shellOpener.OpenWithDefaultApp(path);
+            _shellOpener.RevealInFileManager(path);
         }
 
         /// <summary>

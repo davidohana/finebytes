@@ -159,7 +159,7 @@ ______________________________________________________________________
 
 ## Shipped (1–13, 14a, 14b, 14c, 14e) — consolidated
 
-Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Export Name List, Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
+Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, CSV Export (header submenu), Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
 
 | Block                     | What shipped                                                                                                                                                                           |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -174,7 +174,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 | **12** Preview metadata   | Extended dates/attrs + AudioTag semantic (`ReadWriteApply`) preview cols; First\* / Tag Types / Image / Jpeg / Media / Mpeg stay original-only; Size / Folder File Count original-only |
 | **13** Hygiene            | Glyph styles in Themes; `RenameListUiTestContext`                                                                                                                                      |
 | **14a** Remove Unchanged  | Preview-column header menu → `RenameList.RemoveUnchanged`; clear selection; `MembershipChanged` only when rows dropped                                                                 |
-| **14b** Export Name List  | `ExportNameList` UTF-8 writer on `CollectNameList`; header Export on any column; save dialog + Edit? via shell opener                                                                  |
+| **14b** Export            | Header **Export** → This Column (UTF-8 `.txt`) / Visible Columns (UTF-8 CSV); reveal in Explorer (no Edit? prompt)                                                                     |
 | **14c** Edit as Name List | `SupportsWrite` + `WriteTarget`; `CollectNameList`; header Edit as Name List → embedded `NameListFilter` via `AddAndSelect` (no file I/O); F5 Name List editor                         |
 | **14e** Properties        | Alt+Enter + row **Properties** → shell property sheet; **Show in Explorer** on Rename List; same Properties on File List (clears debts.md dialog bullet)                               |
 
@@ -200,12 +200,12 @@ ______________________________________________________________________
 
 ## Remaining — execution order
 
-| Phase                      | What                                                        | Depends on                   |
-| -------------------------- | ----------------------------------------------------------- | ---------------------------- |
-| **14d** Manual Rename (F2) | Force original/preview; blue cells; Cancel; F5 clears       | `SupportsWrite`              |
-| **14f** Drag-out           | Selected rows as FileDrop to Explorer                       | coexist with 4d reorder      |
-| **15** GO                  | `Ctrl+G` → Commit; plum apply errors; Show Rename Error     | 14d overrides in commit path |
-| **16** Color legend        | Toolbar toggle + side panel                                 | 14d blue + 15 plum           |
+| Phase                      | What                                                    | Depends on                   |
+| -------------------------- | ------------------------------------------------------- | ---------------------------- |
+| **14d** Manual Rename (F2) | Force original/preview; blue cells; Cancel; F5 clears   | `SupportsWrite`              |
+| **14f** Drag-out           | Selected rows as FileDrop to Explorer                   | coexist with 4d reorder      |
+| **15** GO                  | `Ctrl+G` → Commit; plum apply errors; Show Rename Error | 14d overrides in commit path |
+| **16** Color legend        | Toolbar toggle + side panel                             | 14d blue + 15 plum           |
 
 ______________________________________________________________________
 
@@ -217,17 +217,17 @@ MFR7: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) (`
 
 Header menu order ([`_BuildColumnHeaderContextMenu`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)):
 
-`(title)` → Hide Field → *(preview)* Remove Unchanged → Select Visible Fields → Select Sort Fields → **(14c writable) Edit as Name List** → **(14b) Export Name List**.
+`(title)` → Hide Field → *(preview)* Remove Unchanged → Select Visible Fields → Select Sort Fields → **(14c writable) Edit as Name List** → **Export** (This Column / Visible Columns).
 
-### 14b — Export Name List (done)
+### 14b — Export (This Column `.txt` / Visible Columns CSV)
 
-One line per rename-list row = display text of the clicked column (original or preview).
+Header **Export** submenu. **Edit as Name List** still uses in-memory `CollectNameList` only.
 
-**Work completed**
+**Current behavior**
 
-- Engine `RenameList.ExportNameList(path, key)` — UTF-8 `File.WriteAllLines` over `CollectNameList`.
-- Header **Export Name List** on any column (after Edit as Name List); tip via `AppTips.ExportNameList`.
-- Avalonia save dialog (`Save Name List as`, `*.txt`); on success `"Name list saved to {path}. Edit?"` → Yes opens with default app (`IFileShellOpener.OpenWithDefaultApp`). Cancel = no write.
+- **Export This Column** — `ExportNameList` UTF-8 `.txt` (one display line per row, no header); save dialog `Save Name List as` / `*.txt`.
+- **Export Visible Columns** — `ExportCsv` UTF-8 CSV (header = field display names; RFC 4180 quoting); empty list → header only; save dialog `Export as CSV` / `*.csv`.
+- On success, reveal the file in Explorer (`RevealInFileManager`). No Edit? prompt.
 
 **Not in scope:** creating a Name List filter (14c — shipped).
 
