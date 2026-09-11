@@ -30,6 +30,22 @@
     <Style Selector="Button.applied-filter-toolbar:disabled">
       <Setter Property="Opacity" Value="0.55" />
     </Style>
+    <Style Selector="Button.applied-filter-toolbar:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+    </Style>
+    <!-- Flush split after Presets (MFR7 16×24 dropdown abutting the Presets button). -->
+    <Style Selector="Button.applied-filter-toolbar-split">
+      <Setter Property="Width" Value="16" />
+      <Setter Property="MinWidth" Value="16" />
+      <Setter Property="MaxWidth" Value="16" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="Margin" Value="-1,0,4,0" />
+    </Style>
+    <Style Selector="Button.applied-filter-toolbar-split:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Padding" Value="0" />
+    </Style>
     <Style Selector="Border.applied-filter-shuttle-rail">
       <Setter Property="Background" Value="{DynamicResource AppChromeHeaderBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
@@ -163,6 +179,7 @@
           Grid.Column="0"
           x:Name="PresetsButton"
           Classes="applied-filter-toolbar"
+          Margin="0"
           ToolTip.Tip="{x:Static resources:AppTips.Presets}"
         >
           <StackPanel Orientation="Horizontal" Spacing="6">
@@ -179,12 +196,19 @@
         <Button
           Grid.Column="1"
           x:Name="PresetsQuickPickButton"
-          Classes="applied-filter-toolbar"
-          Content="▾"
-          Padding="8,4"
-          MinWidth="22"
+          Classes="applied-filter-toolbar applied-filter-toolbar-split"
           ToolTip.Tip="{x:Static resources:AppTips.PresetsQuickPick}"
-        />
+        >
+          <Path
+            Width="7"
+            Height="4"
+            Stretch="Uniform"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Fill="{DynamicResource AppChromeForegroundBrush}"
+            Data="M 0,0 L 7,0 L 3.5,4 Z"
+          />
+        </Button>
         <Button
           Grid.Column="2"
           x:Name="SavePresetButton"
