@@ -4,6 +4,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Engine.Presets;
 using Mfr.Filters;
+using Mfr.Models.Config;
 using Mfr.Models.Filters;
 using Mfr.Utils;
 
@@ -69,7 +70,103 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             LastLoaded = preset;
             OnPropertyChanged(nameof(LastLoaded));
+            NotifyCanSavePresetChanged();
+        }
+
+        /// <summary>
+        /// Raises <see cref="CanSavePreset"/> after a dictionary mutation that may change enablement.
+        /// </summary>
+        internal void NotifyCanSavePresetChanged()
+        {
             OnPropertyChanged(nameof(CanSavePreset));
+        }
+
+        /// <summary>
+        /// Updates the last-loaded preset in place (Save Preset).
+        /// <para>
+        /// Writes the current <see cref="ToChain"/> result. When the prior preset had
+        /// <see cref="FilterPreset.VisibleColumns"/>, stores <paramref name="currentVisibleColumns"/>;
+        /// when prior columns were <see langword="null"/>, columns stay <see langword="null"/>.
+        /// Same <see cref="FilterPreset.Id"/>, name, and description. Silent (no dialog).
+        /// </para>
+        /// </summary>
+        /// <param name="currentVisibleColumns">
+        /// Current Rename List visible columns (used only when the prior preset stored columns).
+        /// </param>
+        /// <returns>The updated preset, or <see langword="null"/> when Save is not available.</returns>
+        public FilterPreset? SavePreset(IReadOnlyList<SessionStateRenameListColumn> currentVisibleColumns)
+        {
+            ArgumentNullException.ThrowIfNull(currentVisibleColumns);
+
+            if (LastLoaded is null)
+            {
+                return null;
+            }
+
+            if (!PresetManager.NameToPreset.TryGetValue(LastLoaded.Name, out var existing))
+            {
+                NotifyCanSavePresetChanged();
+                return null;
+            }
+
+            var visibleColumns = existing.VisibleColumns is null ? null : currentVisibleColumns;
+            var updated = existing with { Chain = ToChain(), VisibleColumns = visibleColumns };
+            PresetManager.NameToPreset[existing.Name] = updated;
+            PresetManager.SavePresets();
+            SetLastLoaded(updated);
+            return updated;
+        }
+
+        /// <summary>
+        /// Upserts a named preset from the current chain (Save Preset As).
+        /// <para>
+        /// Keeps <see cref="FilterPreset.Id"/> when overwriting an existing name; otherwise assigns a new
+        /// id. Sets last-loaded to the saved preset (enables in-place Save). Caller is responsible for
+        /// overwrite confirmation when the name already exists.
+        /// </para>
+        /// </summary>
+        /// <param name="name">Preset display name (trimmed; blank is rejected).</param>
+        /// <param name="description">Optional description; blank becomes <see langword="null"/>.</param>
+        /// <param name="visibleColumns">
+        /// Columns to store when the Save Rename List columns checkbox is checked; otherwise
+        /// <see langword="null"/>.
+        /// </param>
+        /// <returns>The saved preset, or <see langword="null"/> when <paramref name="name"/> is blank.</returns>
+        public FilterPreset? SavePresetAs(
+            string name,
+            string? description,
+            IReadOnlyList<SessionStateRenameListColumn>? visibleColumns
+        )
+        {
+            ArgumentNullException.ThrowIfNull(name);
+
+            var trimmedName = name.Trim();
+            if (trimmedName.Length == 0)
+            {
+                return null;
+            }
+
+            var trimmedDescription = description?.Trim();
+            if (string.IsNullOrEmpty(trimmedDescription))
+            {
+                trimmedDescription = null;
+            }
+
+            var id = PresetManager.NameToPreset.TryGetValue(trimmedName, out var existing)
+                ? existing.Id
+                : Guid.NewGuid();
+            var saved = new FilterPreset
+            {
+                Id = id,
+                Name = trimmedName,
+                Description = trimmedDescription,
+                Chain = ToChain(),
+                VisibleColumns = visibleColumns,
+            };
+            PresetManager.NameToPreset[trimmedName] = saved;
+            PresetManager.SavePresets();
+            SetLastLoaded(saved);
+            return saved;
         }
 
         /// <summary>

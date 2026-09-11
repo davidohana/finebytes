@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-save-preset
     content: "P2 Save + Save As — in-place Save when last-loaded; SavePresetDialog for Save As; enable menu/toolbar stubs"
-    status: pending
+    status: completed
   - id: p3-preset-manager
     content: "P3 Preset Manager — Load/Delete/Edit Description/Rename; confirm-replace gate; apply optional columns; enable Presets stubs"
     status: pending

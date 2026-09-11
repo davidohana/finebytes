@@ -345,7 +345,12 @@
         />
         <Separator />
         <MenuItem Header="Presets" IsEnabled="False" />
-        <MenuItem Header="Save Preset" IsEnabled="False" />
+        <MenuItem
+          Header="Save Preset"
+          Click="_OnSavePresetMenuClick"
+          IsEnabled="{Binding AppliedFiltersViewModel.CanSavePreset}"
+        />
+        <MenuItem Header="Save Preset As" Click="_OnSavePresetAsMenuClick" />
         <MenuItem
           Header="Filter Options"
           Click="_OnFilterOptionsMenuClick"

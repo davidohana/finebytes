@@ -2,6 +2,7 @@ using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
+using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -680,6 +681,270 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             var count = _CountChainChanged(viewModel, () => oldStep.Enabled = false);
             Assert.Equal(0, count);
+        }
+
+        /// <summary>
+        /// Verifies Save Preset As upserts a new preset, sets last-loaded, and enables in-place Save.
+        /// </summary>
+        [Fact]
+        public void SavePresetAs_Creates_Preset_And_Enables_Save()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+
+            Assert.False(viewModel.CanSavePreset);
+
+            var saved = viewModel.SavePresetAs("My Preset", "A demo", visibleColumns: null);
+
+            Assert.NotNull(saved);
+            Assert.Equal("My Preset", saved.Name);
+            Assert.Equal("A demo", saved.Description);
+            Assert.Null(saved.VisibleColumns);
+            Assert.Single(saved.Chain.Steps);
+            Assert.True(manager.NameToPreset.ContainsKey("My Preset"));
+            Assert.Same(saved, viewModel.LastLoaded);
+            Assert.True(viewModel.CanSavePreset);
+            Assert.True(File.Exists(manager.PresetsFilePath));
+        }
+
+        /// <summary>
+        /// Verifies Save Preset As overwrite keeps the existing Id and can store columns when requested.
+        /// </summary>
+        [Fact]
+        public void SavePresetAs_Overwrite_Keeps_Id_And_Stores_Columns_When_Provided()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var existingId = Guid.NewGuid();
+            var existing = new FilterPreset
+            {
+                Id = existingId,
+                Name = "KeepMe",
+                Description = "old",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns = null,
+            };
+            manager.NameToPreset[existing.Name] = existing;
+
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            var columns = new List<SessionStateRenameListColumn>
+            {
+                new(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    Width: 220
+                ),
+            };
+
+            var saved = viewModel.SavePresetAs("KeepMe", "new desc", columns);
+
+            Assert.NotNull(saved);
+            Assert.Equal(existingId, saved.Id);
+            Assert.Equal("KeepMe", saved.Name);
+            Assert.Equal("new desc", saved.Description);
+            Assert.NotNull(saved.VisibleColumns);
+            Assert.Single(saved.VisibleColumns);
+            Assert.Equal(220, saved.VisibleColumns[0].Width);
+            Assert.Single(saved.Chain.Steps);
+            Assert.Same(saved, viewModel.LastLoaded);
+            Assert.True(viewModel.CanSavePreset);
+        }
+
+        /// <summary>
+        /// Verifies in-place Save updates the chain, keeps Id/name/description, and refreshes last-loaded.
+        /// </summary>
+        [Fact]
+        public void SavePreset_Updates_Chain_In_Place_Keeping_Identity()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var id = Guid.NewGuid();
+            var original = new FilterPreset
+            {
+                Id = id,
+                Name = "InPlace",
+                Description = "keep me",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns = null,
+            };
+            manager.NameToPreset[original.Name] = original;
+
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.SetLastLoaded(original);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+
+            var updated = viewModel.SavePreset([]);
+
+            Assert.NotNull(updated);
+            Assert.Equal(id, updated.Id);
+            Assert.Equal("InPlace", updated.Name);
+            Assert.Equal("keep me", updated.Description);
+            Assert.Null(updated.VisibleColumns);
+            Assert.Single(updated.Chain.Steps);
+            Assert.Same(updated, viewModel.LastLoaded);
+            Assert.Same(updated, manager.NameToPreset["InPlace"]);
+        }
+
+        /// <summary>
+        /// Verifies in-place Save re-captures columns when the prior preset stored them.
+        /// </summary>
+        [Fact]
+        public void SavePreset_Recaptures_Columns_When_Prior_Had_Columns()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var priorColumns = new List<SessionStateRenameListColumn>
+            {
+                new(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    Width: 100
+                ),
+            };
+            var original = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "WithCols",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns = priorColumns,
+            };
+            manager.NameToPreset[original.Name] = original;
+
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.SetLastLoaded(original);
+            var freshColumns = new List<SessionStateRenameListColumn>
+            {
+                new(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                    Width: 180
+                ),
+            };
+
+            var updated = viewModel.SavePreset(freshColumns);
+
+            Assert.NotNull(updated);
+            Assert.NotNull(updated.VisibleColumns);
+            Assert.Single(updated.VisibleColumns);
+            Assert.Equal("Name", updated.VisibleColumns[0].Key.PropertyKey);
+            Assert.Equal(180, updated.VisibleColumns[0].Width);
+        }
+
+        /// <summary>
+        /// Verifies in-place Save leaves columns null when the prior preset omitted them.
+        /// </summary>
+        [Fact]
+        public void SavePreset_Keeps_Null_Columns_When_Prior_Had_None()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var original = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "NoCols",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns = null,
+            };
+            manager.NameToPreset[original.Name] = original;
+
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.SetLastLoaded(original);
+            var currentColumns = new List<SessionStateRenameListColumn>
+            {
+                new(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                    Width: 120
+                ),
+            };
+
+            var updated = viewModel.SavePreset(currentColumns);
+
+            Assert.NotNull(updated);
+            Assert.Null(updated.VisibleColumns);
+        }
+
+        /// <summary>
+        /// Verifies Save is a no-op when there is no last-loaded preset.
+        /// </summary>
+        [Fact]
+        public void SavePreset_NoOps_Without_LastLoaded()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+
+            Assert.Null(viewModel.SavePreset([]));
+            Assert.Empty(manager.NameToPreset);
+            Assert.False(viewModel.CanSavePreset);
+        }
+
+        /// <summary>
+        /// Verifies Save no-ops and refreshes enablement when the last-loaded name was removed from the manager.
+        /// </summary>
+        [Fact]
+        public void SavePreset_NoOps_When_LastLoaded_Name_Missing()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var original = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Gone",
+                Chain = new FilterChain { Steps = [] },
+            };
+            manager.NameToPreset[original.Name] = original;
+
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.SetLastLoaded(original);
+            manager.NameToPreset.Remove(original.Name);
+
+            Assert.Null(viewModel.SavePreset([]));
+            Assert.Empty(manager.NameToPreset);
+            Assert.False(viewModel.CanSavePreset);
+        }
+
+        /// <summary>
+        /// Verifies Save Preset As rejects a blank name.
+        /// </summary>
+        [Fact]
+        public void SavePresetAs_Rejects_Blank_Name()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+
+            Assert.Null(viewModel.SavePresetAs("   ", description: null, visibleColumns: null));
+            Assert.Empty(manager.NameToPreset);
+            Assert.False(viewModel.CanSavePreset);
+        }
+
+        /// <summary>
+        /// Verifies Save Preset As overwrite with null columns clears previously stored columns.
+        /// </summary>
+        [Fact]
+        public void SavePresetAs_Overwrite_With_Null_Columns_Clears_Prior()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var existingId = Guid.NewGuid();
+            var existing = new FilterPreset
+            {
+                Id = existingId,
+                Name = "ClearCols",
+                Description = "old",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns =
+                [
+                    new(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                        Width: 90
+                    ),
+                ],
+            };
+            manager.NameToPreset[existing.Name] = existing;
+
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+
+            var saved = viewModel.SavePresetAs("ClearCols", "new desc", visibleColumns: null);
+
+            Assert.NotNull(saved);
+            Assert.Equal(existingId, saved.Id);
+            Assert.Equal("new desc", saved.Description);
+            Assert.Null(saved.VisibleColumns);
+            Assert.Single(saved.Chain.Steps);
         }
 
         /// <summary>

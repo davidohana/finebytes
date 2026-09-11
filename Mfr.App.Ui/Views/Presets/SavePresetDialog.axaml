@@ -1,0 +1,86 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.Presets"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  x:Class="Mfr.App.Ui.Views.Presets.SavePresetDialog"
+  x:DataType="vm:SavePresetDialogViewModel"
+  Title="Save Preset As"
+  Icon="/Assets/mfr.ico"
+  Width="420"
+  MinWidth="360"
+  SizeToContent="Height"
+  WindowStartupLocation="CenterOwner"
+  ShowInTaskbar="False"
+  CanResize="False"
+  FontFamily="{StaticResource AppChromeFont}"
+  FontSize="{StaticResource AppChromeFontSize}"
+  Foreground="{DynamicResource AppChromeForegroundBrush}"
+>
+  <DockPanel Margin="12">
+    <StackPanel
+      x:Name="Footer"
+      DockPanel.Dock="Bottom"
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      Spacing="8"
+      Margin="0,14,0,0"
+    >
+      <Button
+        x:Name="OkButton"
+        Classes="message-dialog-footer"
+        Content="OK"
+        IsDefault="True"
+        IsEnabled="{Binding CanConfirm}"
+        Click="_OnOkClick"
+      />
+      <Button
+        x:Name="CancelButton"
+        Classes="message-dialog-footer"
+        Content="Cancel"
+        IsCancel="True"
+        Click="_OnCancelClick"
+      />
+    </StackPanel>
+
+    <StackPanel Spacing="10" Grid.IsSharedSizeScope="True">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" SharedSizeGroup="SavePresetLabel" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="Name:" VerticalAlignment="Center" Margin="0,0,10,0" />
+        <TextBox
+          x:Name="NameBox"
+          Grid.Column="1"
+          Text="{Binding Name}"
+          Height="26"
+          MinHeight="26"
+          Padding="6,2"
+          VerticalContentAlignment="Center"
+        />
+      </Grid>
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" SharedSizeGroup="SavePresetLabel" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <TextBlock Text="Description:" VerticalAlignment="Top" Margin="0,4,10,0" />
+        <TextBox
+          x:Name="DescriptionBox"
+          Grid.Column="1"
+          Text="{Binding Description}"
+          AcceptsReturn="True"
+          TextWrapping="Wrap"
+          MinHeight="60"
+          Height="60"
+        />
+      </Grid>
+      <controls:CompactCheckBox
+        x:Name="SaveColumnsCheckBox"
+        Content="Save Rename List columns"
+        IsChecked="{Binding SaveRenameListColumns}"
+      />
+    </StackPanel>
+  </DockPanel>
+</Window>
