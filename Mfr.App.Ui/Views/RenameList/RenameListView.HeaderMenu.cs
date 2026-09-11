@@ -176,14 +176,14 @@ namespace Mfr.App.Ui.Views.RenameList
             var exportMenu = new MenuItem { Header = "Export" };
             exportMenu.Items.Add(
                 _CreateTipMenuItem(
-                    "Export This Column",
+                    "Export This Column (txt)",
                     AppTips.ExportThisColumn,
                     () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportThisColumnAsync(fieldKey))
                 )
             );
             exportMenu.Items.Add(
                 _CreateTipMenuItem(
-                    "Export Visible Columns",
+                    "Export Visible Columns (csv)",
                     AppTips.ExportVisibleColumns,
                     () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportVisibleColumnsAsync())
                 )

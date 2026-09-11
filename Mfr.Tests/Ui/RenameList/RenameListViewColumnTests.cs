@@ -257,7 +257,7 @@ namespace Mfr.Tests.Ui.RenameList
                 _MenuHeaders(originalHeader.ContextMenu)
             );
             Assert.Equal(
-                ["Export This Column", "Export Visible Columns"],
+                ["Export This Column (txt)", "Export Visible Columns (csv)"],
                 _SubmenuHeaders(originalHeader.ContextMenu, "Export")
             );
 
@@ -275,7 +275,7 @@ namespace Mfr.Tests.Ui.RenameList
                 _MenuHeaders(previewHeader.ContextMenu)
             );
             Assert.Equal(
-                ["Export This Column", "Export Visible Columns"],
+                ["Export This Column (txt)", "Export Visible Columns (csv)"],
                 _SubmenuHeaders(previewHeader.ContextMenu, "Export")
             );
 
@@ -322,7 +322,7 @@ namespace Mfr.Tests.Ui.RenameList
             );
             Assert.DoesNotContain("Edit as Name List", _MenuHeaders(lengthHeader.ContextMenu));
             Assert.Equal(
-                ["Export This Column", "Export Visible Columns"],
+                ["Export This Column (txt)", "Export Visible Columns (csv)"],
                 _SubmenuHeaders(lengthHeader.ContextMenu, "Export")
             );
             window.Close();

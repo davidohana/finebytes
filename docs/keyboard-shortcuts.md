@@ -71,7 +71,7 @@ Selecting or focusing a Rename List cell shows the full cell value in the status
 
 Shift+click a column header to append a sort key, toggle its direction, or remove it from the sort list. A plain header click replaces the sort list with that column only. Any **original** (non-preview) catalog column supports header sort; preview columns do not.
 
-Click the **Select Fields** toolbar button on the Rename List, or choose **Select Visible Fields...** or **Select Sort Fields...** from the **Rename List** menu, the grid right-click menu, or a column-header right-click menu, to open the field shuttle (visible columns and Auto-Sort tabs). Right-click a column header and choose **Hide Field** to hide that column. **Export Rename List...** on the **Rename List** menu (or **Export → Export Visible Columns** on a column header) writes a CSV of all visible columns.
+Click the **Select Fields** toolbar button on the Rename List, or choose **Select Visible Fields...** or **Select Sort Fields...** from the **Rename List** menu, the grid right-click menu, or a column-header right-click menu, to open the field shuttle (visible columns and Auto-Sort tabs). Right-click a column header and choose **Hide Field** to hide that column. **Export Rename List (csv)...** on the **Rename List** menu (or **Export → Export Visible Columns (csv)** on a column header) writes a CSV of all visible columns.
 
 ### Applied Filters
 

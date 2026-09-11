@@ -293,7 +293,7 @@
           ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"
         />
         <MenuItem
-          Header="Export Rename List..."
+          Header="Export Rename List (csv)..."
           Command="{Binding RenameListViewModel.ExportVisibleColumnsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.ExportRenameList}"
         />

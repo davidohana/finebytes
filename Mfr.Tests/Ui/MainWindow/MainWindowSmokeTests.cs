@@ -135,7 +135,7 @@ namespace Mfr.Tests.Ui.MainWindow
                 .Single(item => item.Header?.ToString() == "_Rename List");
             var exportItem = renameListMenu
                 .Items.OfType<MenuItem>()
-                .Single(item => item.Header?.ToString() == "Export Rename List...");
+                .Single(item => item.Header?.ToString() == "Export Rename List (csv)...");
 
             Assert.Same(viewModel.RenameListViewModel.ExportVisibleColumnsCommand, exportItem.Command);
         }
