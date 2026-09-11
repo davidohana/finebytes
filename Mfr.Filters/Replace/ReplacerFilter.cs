@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.FormatString;
 
@@ -54,6 +55,7 @@ namespace Mfr.Filters.Replace
     ) : StringTargetFilter(Target, ApplyScope)
     {
         private Formatter _compiledReplacement = FormatStringCompiler.EmptyFormatter;
+        private Regex? _compiledSearch;
 
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty find/replace, replace all).
@@ -72,22 +74,15 @@ namespace Mfr.Filters.Replace
         /// <inheritdoc />
         protected override void _Setup()
         {
-            // Unconditional assign (BaseFilter._Setup): `with` copies this field; clear/plain text must reset it.
+            // Unconditional assign (BaseFilter._Setup): `with` copies these fields; clear/plain text must reset them.
             _compiledReplacement = FormatStringCompiler.Compile(Options.Replacement);
-
-            if (Options.Match.Mode != ReplacerMode.Regex)
-            {
-                return;
-            }
-
-            ReplacerMatching.ValidateRegexPattern(Options.Find, nameof(Options));
+            _compiledSearch = ReplacerMatching.CompileSearch(Options.Find, Options.Match, nameof(Options));
         }
 
         protected override string _TransformValue(string value, RenameItem item)
         {
             var replacement = _compiledReplacement(item);
-            var options = Options with { Replacement = replacement };
-            return ReplacerMatching.ReplaceSegment(value, options);
+            return ReplacerMatching.ReplaceSegment(value, _compiledSearch, replacement, Options.Match);
         }
     }
 }

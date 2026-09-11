@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.FormatString;
 
@@ -35,7 +36,7 @@ namespace Mfr.Filters.Replace
         StringApplyScope? ApplyScope = null
     ) : StringTargetFilter(Target, ApplyScope)
     {
-        private List<(string Search, Formatter CompiledReplacement)> _compiledEntries = [];
+        private List<(Regex? Search, Formatter CompiledReplacement)> _compiledEntries = [];
 
         /// <summary>
         /// Creates a filter with add-to-list defaults (file prefix, empty list, replace all, whole word).
@@ -55,17 +56,15 @@ namespace Mfr.Filters.Replace
         {
             var entries = ReplaceListParser.Validate(Options.Entries);
             // Unconditional assign (BaseFilter._Setup): `with` copies this field; empty list must clear prior entries.
-            _compiledEntries = [.. entries.Select(e => (e.Search, FormatStringCompiler.Compile(e.Replacement)))];
-
-            if (Options.Match.Mode != ReplacerMode.Regex)
-            {
-                return;
-            }
-
-            foreach (var entry in entries)
-            {
-                ReplacerMatching.ValidateRegexPattern(entry.Search, nameof(Options));
-            }
+            _compiledEntries =
+            [
+                .. entries.Select(e =>
+                    (
+                        ReplacerMatching.CompileSearch(e.Search, Options.Match, nameof(Options)),
+                        FormatStringCompiler.Compile(e.Replacement)
+                    )
+                ),
+            ];
         }
 
         protected override string _TransformValue(string value, RenameItem item)
@@ -79,8 +78,7 @@ namespace Mfr.Filters.Replace
             foreach (var (search, compiledReplacement) in _compiledEntries)
             {
                 var replacement = compiledReplacement(item);
-                var replacerOptions = new ReplacerOptions(Find: search, Replacement: replacement, Match: Options.Match);
-                transformed = ReplacerMatching.ReplaceSegment(transformed, replacerOptions);
+                transformed = ReplacerMatching.ReplaceSegment(transformed, search, replacement, Options.Match);
             }
 
             return transformed;

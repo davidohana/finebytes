@@ -77,9 +77,9 @@ This doc lists **not done** work only.
 - **Sites:** identical clamp + slice in four Count filters
 - **Rank:** medium
 
-### 9. Replace List Regex compile at Setup — **medium** (carried)
+### 9. Replace List Regex compile at Setup — **done**
 
-- Sites: Replace List matching builds regex per call; compile once in `_Setup` when touching Replace
+- Shipped: `ReplacerMatching.CompileSearch` in `_Setup` for Replacer + Replace List
 
 ### 10. `_NudgeBoundText` binding redesign — **low**
 

@@ -513,12 +513,8 @@ _(empty)_
 
 ### Open — do not (not a correctness mandate)
 
-1. **Cache compiled regex in Replacer / ReplaceList setup** (was #6)
-   Sites: `ReplacerMatching.ReplaceSegment` builds `new Regex` every call
-   Target: compile once in `_Setup`
-   Value: preview cost on large lists
-   Cost: medium — mode/flags/`with` invalidate; WholeWord wrapping
-   Rank: **skip** — perf only; do when profiling preview or touching Replace
+1. **Cache compiled regex in Replacer / ReplaceList setup** — **done**
+   Shipped: `ReplacerMatching.CompileSearch` in `_Setup` for both filters
 
 1. **DataGrid multi-select drag press/snapshot session** (was #26)
    Sites: FileListView + RenameListView vs ListBoxDragSession

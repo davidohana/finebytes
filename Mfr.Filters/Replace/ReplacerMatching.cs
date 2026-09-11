@@ -9,49 +9,28 @@ namespace Mfr.Filters.Replace
     internal static class ReplacerMatching
     {
         /// <summary>
-        /// Compiles <paramref name="pattern"/> when non-empty so invalid regex fails at Setup.
+        /// Builds the search regex once for a find pattern and match policy (call from filter <c>_Setup</c>).
         /// </summary>
-        /// <param name="pattern">Regular expression text (empty is a no-op).</param>
+        /// <param name="find">Search pattern text; empty yields <see langword="null"/> (no-op apply).</param>
+        /// <param name="match">Mode and match flags fixed for the run.</param>
         /// <param name="paramName">Optional argument name for <see cref="ArgumentException"/>.</param>
-        /// <exception cref="ArgumentException">When <paramref name="pattern"/> is not a valid regular expression.</exception>
-        internal static void ValidateRegexPattern(string pattern, string? paramName = null)
+        /// <returns>Compiled search regex, or <see langword="null"/> when <paramref name="find"/> is empty.</returns>
+        /// <exception cref="ArgumentException">When <paramref name="find"/> is not a valid regular expression in Regex mode.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">When <paramref name="match"/> has an unknown mode.</exception>
+        internal static Regex? CompileSearch(string find, ReplacerMatchOptions match, string? paramName = null)
         {
-            if (pattern.Length == 0)
+            if (find.Length == 0)
             {
-                return;
+                return null;
             }
 
-            try
-            {
-                _ = new Regex(pattern);
-            }
-            catch (ArgumentException ex)
-            {
-                throw new ArgumentException($"Invalid regular expression: {ex.Message}", paramName, ex);
-            }
-        }
-
-        /// <summary>
-        /// Applies one find/replace pass to <paramref name="segment"/>.
-        /// </summary>
-        /// <param name="segment">Text to transform.</param>
-        /// <param name="options">Find/replace options for this pass.</param>
-        /// <returns>Transformed text; unchanged when <see cref="ReplacerOptions.Find"/> is empty.</returns>
-        internal static string ReplaceSegment(string segment, ReplacerOptions options)
-        {
-            if (options.Find.Length == 0)
-            {
-                return segment;
-            }
-
-            var match = options.Match;
             var regexOptions = match.CaseSensitive ? RegexOptions.None : RegexOptions.IgnoreCase;
             var pattern = match.Mode switch
             {
-                ReplacerMode.Literal => Regex.Escape(options.Find),
-                ReplacerMode.Wildcard => _WildcardToRegex(options.Find),
-                ReplacerMode.Regex => options.Find,
-                _ => throw new ArgumentOutOfRangeException(nameof(options), match.Mode, null),
+                ReplacerMode.Literal => Regex.Escape(find),
+                ReplacerMode.Wildcard => _WildcardToRegex(find),
+                ReplacerMode.Regex => find,
+                _ => throw new ArgumentOutOfRangeException(nameof(match), match.Mode, null),
             };
 
             if (match.WholeWord)
@@ -59,17 +38,46 @@ namespace Mfr.Filters.Replace
                 pattern = $@"\b(?:{pattern})\b";
             }
 
-            var regex = new Regex(pattern, regexOptions);
+            try
+            {
+                return new Regex(pattern, regexOptions);
+            }
+            catch (ArgumentException ex) when (match.Mode == ReplacerMode.Regex)
+            {
+                throw new ArgumentException($"Invalid regular expression: {ex.Message}", paramName, ex);
+            }
+        }
+
+        /// <summary>
+        /// Applies one find/replace pass to <paramref name="segment"/> using a setup-compiled search.
+        /// </summary>
+        /// <param name="segment">Text to transform.</param>
+        /// <param name="search">Regex from <see cref="CompileSearch"/>; <see langword="null"/> leaves <paramref name="segment"/> unchanged.</param>
+        /// <param name="replacement">Replacement text for this pass (may already have format tokens expanded).</param>
+        /// <param name="match">Mode and replace-all flag (must match the options used to compile <paramref name="search"/>).</param>
+        /// <returns>Transformed text; unchanged when <paramref name="search"/> is <see langword="null"/>.</returns>
+        internal static string ReplaceSegment(
+            string segment,
+            Regex? search,
+            string replacement,
+            ReplacerMatchOptions match
+        )
+        {
+            if (search is null)
+            {
+                return segment;
+            }
+
             var count = match.ReplaceAll ? int.MaxValue : 1;
 
             // Literal/Wildcard must insert Replacement as plain text. Regex.Replace's string overload
             // treats $0/$1/$$ as substitutions (MFR7 uses MatchEvaluator / String.Replace for the same reason).
             if (match.Mode == ReplacerMode.Regex)
             {
-                return regex.Replace(segment, options.Replacement, count);
+                return search.Replace(segment, replacement, count);
             }
 
-            return regex.Replace(segment, _ => options.Replacement, count);
+            return search.Replace(segment, _ => replacement, count);
         }
 
         /// <summary>

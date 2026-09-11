@@ -27,18 +27,11 @@ ______________________________________________________________________
 | `CanSavePreset` notify / `PresetRenameListColumns` / `TryLoadPresetAsync` / `Refresh(preferredName)` | **Done** during F7 reviews                                             |
 | Rename `SessionStateRenameListColumn` → shared DTO                                                   | **Done** — `RenameListVisibleColumnSpec`                               |
 | Multiline Entries control / line-iteration helper                                                    | **Done** — `MultilineEntriesFieldset` + `MultilineText.EnumerateLines` |
+| Replace List / Replacer compile regex once in `_Setup`                                               | **Done** — `ReplacerMatching.CompileSearch` cached on both filters     |
 
 ______________________________________________________________________
 
 ## Still worth doing (best cost-to-value first)
-
-### 3. Replace List / Replacer — compile regex once in `_Setup`
-
-- **Sites:** `ReplacerMatching` still builds `new Regex(...)` on the apply path
-- **Target:** compile once in `_Setup` when mode/pattern/options are fixed for the run
-- **Value:** avoid per-item regex construction
-- **Cost:** medium; touch Replace carefully with existing matching tests
-- **Rank:** medium — when next touching Replace
 
 ### 4. Inject column capture/apply (or `RenameListViewModel`) into presets host
 
