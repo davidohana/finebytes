@@ -36,7 +36,7 @@ MFR7 reference:
 - [ ] 4. Read help page + screenshot for UX and examples
 - [ ] 5. Read source: filter class, editor, Apply/transform logic
 - [ ] 6. Note options, defaults, edge cases, target fields
-- [ ] 7. Write capability brief (template below)
+- [ ] 7. Write capability brief (template below); paste into docs/plans when planning
 - [ ] 8. Implement in finebytes; add tests mirroring MFR7 examples
 ```
 
@@ -138,6 +138,11 @@ Produce this before coding:
 - ...
 ```
 
+**Cache the brief in the feature plan.** Paste it into `docs/plans/<feature>.plan.md`
+(or the parent plan section) once. Follow-up agents and phases must **reuse that
+section** — do not re-crawl Help/GIFs/source for the same pane unless the user
+asks to refresh parity or the brief is missing/stale.
+
 ### Step 8 — Implement in finebytes
 
 - Filters: follow [mfr-implement-filter/SKILL.md](../mfr-implement-filter/SKILL.md).
@@ -180,6 +185,8 @@ Use `Help/Images/hotspots.gif` for labeled shell regions.
 
 ## Related finebytes skills and docs
 
+- Feature plans: [mfr-feature-plan](../mfr-feature-plan/SKILL.md)
+- Phase / backlog orchestration: [mfr-plan-phase](../mfr-plan-phase/SKILL.md)
 - Implement filters: [mfr-implement-filter](../mfr-implement-filter/SKILL.md)
 - Implement filter editors: [mfr-implement-filter-editor](../mfr-implement-filter-editor/SKILL.md)
 - Filter name / group map: [filter-map.md](filter-map.md)
