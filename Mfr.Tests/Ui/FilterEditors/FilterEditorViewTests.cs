@@ -103,6 +103,26 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
+        /// Verifies the title-bar help button is present and wired for a single selection.
+        /// </summary>
+        [AvaloniaFact]
+        public void Help_button_present_and_enabled_for_single_selection()
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var helpButton = editorView.FindControl<Button>("ShowFilterHelpButton");
+            Assert.NotNull(helpButton);
+            Assert.True(helpButton.IsVisible);
+            Assert.Equal("?", helpButton.Content);
+            Assert.True(helpButton.Command!.CanExecute(null));
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies the title-bar reset button restores catalog defaults and refreshes the options editor.
         /// </summary>
         [AvaloniaFact]

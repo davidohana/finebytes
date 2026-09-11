@@ -40,6 +40,7 @@ namespace Mfr.Tests.Ui.FilterEditors
                 DataContext = mainViewModel.FilterEditorViewModel,
                 ResetSelectedToDefaultsCommand = mainViewModel.AppliedFiltersViewModel.ResetSelectedToDefaultsCommand,
                 SaveSelectedAsDefaultCommand = mainViewModel.AppliedFiltersViewModel.SaveSelectedAsDefaultCommand,
+                OpenSelectedFilterHelpCommand = mainViewModel.AppliedFiltersViewModel.OpenSelectedFilterHelpCommand,
             };
 
             var grid = new Grid { RowDefinitions = new RowDefinitions("*,*"), Children = { appliedView, editorView } };

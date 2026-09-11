@@ -11,7 +11,16 @@ namespace Mfr.Filters
     /// <param name="Group">Toolbar group that owns this filter.</param>
     /// <param name="DisplayName">Human-readable label shown in the list.</param>
     /// <param name="FilterType">Concrete filter CLR type (parameterless ctor supplies add-to-list defaults).</param>
-    public sealed record FilterCatalogEntry(string Type, FilterGroup Group, string DisplayName, Type FilterType);
+    /// <param name="HelpFileName">
+    /// MFR7 Help HTML file name when known (e.g. <c>spacecharfilter.html</c>), otherwise <see langword="null"/>.
+    /// </param>
+    public sealed record FilterCatalogEntry(
+        string Type,
+        FilterGroup Group,
+        string DisplayName,
+        Type FilterType,
+        string? HelpFileName = null
+    );
 
     /// <summary>
     /// Product catalog of preset filters for the Available Filters palette.
@@ -53,7 +62,8 @@ namespace Mfr.Filters
             );
 
             var typeName = _ReadTypeDiscriminator(filterType);
-            return new FilterCatalogEntry(typeName, catalog.Group, catalog.DisplayName, filterType);
+            var helpFileName = FilterHelpMap.TryGetHelpFileName(typeName, out var mapped) ? mapped : null;
+            return new FilterCatalogEntry(typeName, catalog.Group, catalog.DisplayName, filterType, helpFileName);
         }
 
         private static string _ReadTypeDiscriminator(Type filterType)

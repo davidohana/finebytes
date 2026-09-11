@@ -130,5 +130,8 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Filter Configuration title-bar save-as-default tip (MFR7 save current settings as default).</summary>
         public const string SaveFilterAsDefault = "Save current settings for this filter as default";
+
+        /// <summary>Filter Configuration title-bar help tip (MFR7 Show help for this filter).</summary>
+        public const string ShowFilterHelp = "Show help for this filter";
     }
 }

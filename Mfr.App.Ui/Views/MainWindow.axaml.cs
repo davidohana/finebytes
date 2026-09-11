@@ -2,6 +2,7 @@ using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
+using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels;
 using Mfr.Engine.Config;
@@ -51,6 +52,7 @@ namespace Mfr.App.Ui.Views
             if (_boundViewModel is not null)
             {
                 _boundViewModel.AppliedFiltersViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
+                _boundViewModel.AppliedFiltersViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
                 _boundViewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
                 _boundViewModel = null;
             }
@@ -62,12 +64,18 @@ namespace Mfr.App.Ui.Views
 
             _boundViewModel = viewModel;
             viewModel.AppliedFiltersViewModel.FilterDefaultSaved += _OnFilterDefaultSaved;
+            viewModel.AppliedFiltersViewModel.FilterHelpMissing += _OnFilterHelpMissing;
             viewModel.ResetConfigurationRequested += _OnResetConfigurationRequested;
         }
 
         private void _OnFilterDefaultSaved(object? sender, string catalogDisplayName)
         {
             Dispatcher.UIThread.Post(() => _ = _ShowFilterDefaultSavedAsync(catalogDisplayName));
+        }
+
+        private void _OnFilterHelpMissing(object? sender, string helpFileName)
+        {
+            Dispatcher.UIThread.Post(() => _ = _ShowFilterHelpMissingAsync(helpFileName));
         }
 
         private void _OnResetConfigurationRequested(object? sender, EventArgs e)
@@ -80,6 +88,15 @@ namespace Mfr.App.Ui.Views
             var dialog = new OkMessageDialog(
                 title: "Magic File Renamer",
                 message: $"Filter settings for the filter '{catalogDisplayName}' saved as default."
+            );
+            await dialog.ShowDialog(this);
+        }
+
+        private async Task _ShowFilterHelpMissingAsync(string helpFileName)
+        {
+            var dialog = new OkMessageDialog(
+                title: "Help",
+                message: FilterHelpHost.FormatMissingHelpMessage(helpFileName)
             );
             await dialog.ShowDialog(this);
         }
@@ -218,6 +235,7 @@ namespace Mfr.App.Ui.Views
             }
 
             viewModel.AppliedFiltersViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
+            viewModel.AppliedFiltersViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
             viewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
 
             if (viewModel.SuppressSessionSaveOnClose)

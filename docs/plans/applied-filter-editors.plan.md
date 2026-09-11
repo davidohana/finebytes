@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F8 + F9a/b done on master. Remaining: F9c help ?, F10 Filter Options polish."
+overview: "F1–F8 + F9a/b/c done on master. Remaining: F10 Filter Options polish."
 todos:
   - id: f1-f5-complete
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
@@ -21,8 +21,8 @@ todos:
     content: "F9b Reset to defaults (↺) — FilterCatalog.CreateDefault"
     status: completed
   - id: f9c-help
-    content: "F9c Help ? — per-filter help from Filter Configuration title bar / Filter Options"
-    status: pending
+    content: "F9c Help ? — per-filter help from Filter Configuration title bar (not Filter Options)"
+    status: completed
   - id: f10-filter-options-polish
     content: "F10 Filter Options dialog — XAML/layout polish vs MFR7 (dialog already functional)"
     status: pending
@@ -33,16 +33,15 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-11):** **F1–F8 + F9a/b complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌** and reset **↺** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, Save / Save As, toolbar ▾ quick-pick, and confirm-replace. **F8** persists the working Applied Filters chain on `SessionState.AppliedFilters` (`FilterChain` shape; catalog names on restore). No help `?` button.
+**Status (2026-09-11):** **F1–F8 + F9a/b/c complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌**, reset **↺**, and help **?** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, Save / Save As, toolbar ▾ quick-pick, and confirm-replace. **F8** persists the working Applied Filters chain on `SessionState.AppliedFilters` (`FilterChain` shape; catalog names on restore).
 
 ### Priority (what's left)
 
-| Order | Item                          | Why next                                                                                   |
-| ----- | ----------------------------- | ------------------------------------------------------------------------------------------ |
-| **1** | **F9c Help `?`**              | Remaining Filter Configuration chrome; needs help-host / MFR7 HTML mapping (no button yet) |
-| **2** | **F10 Filter Options polish** | Dialog already works; cosmetic layout vs MFR7 only                                         |
+| Order | Item                          | Why next                                           |
+| ----- | ----------------------------- | -------------------------------------------------- |
+| **1** | **F10 Filter Options polish** | Dialog already works; cosmetic layout vs MFR7 only |
 
-Do **not** mix F9c–F10 into one pass.
+Do **not** mix remaining polish into unrelated passes.
 
 ______________________________________________________________________
 
@@ -126,7 +125,7 @@ Rename List / other session fields already persist; Applied Filters chain now us
 | ----------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **F9a Save as default (📌)**  | **done** | Title-bar pin; `FilterDefaultsStore` / `filter-defaults.json`; applies on palette add only; reset stays factory. See [filter-save-as-default.plan.md](filter-save-as-default.plan.md). |
 | **F9b Reset to defaults (↺)** | **done** | Single selection; options / Apply To / scope via `FilterCatalog.CreateDefault`; keeps display name + enabled.                                                                          |
-| **F9c Help `?`**              | **todo** | No button yet. Open per-filter help (ported pages or MFR7 `Help/*.html` mapping). Wire from Filter Configuration title bar and/or Filter Options.                                      |
+| **F9c Help `?`**              | **done** | Title-bar **?** (MFR7 `FilterTitle`); `FilterHelpMap` → MFR7 HTML; `FilterHelpHost` opens from install/source Help roots or missing-help dialog. Not on Filter Options (MFR7 parity).  |
 
 ### F10 — Filter Options dialog polish
 
@@ -141,6 +140,7 @@ ______________________________________________________________________
 ## Layering / files
 
 - Defaults: parameterless ctor; `FilterCatalog.CreateDefault`
+- Help: `FilterHelpMap` (type → MFR7 HTML); `FilterHelpHost` opens from install/source Help roots
 - UI editors: `Views/FilterEditors/<FilterGroup>/…`, `ViewModels/FilterEditors/<FilterGroup>/…`
 - Host: `FilterEditorView` / factory / base VMs / ViewLocator at `FilterEditors/` root
 - Filter Options: `Views/AppliedFilters/FilterOptionsDialog*`

@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.Engine.Presets;
 using Mfr.Filters;
@@ -17,6 +18,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
     public sealed partial class AppliedFiltersViewModel : ViewModelBase
     {
         private readonly FilterDefaultsStore _filterDefaults;
+        private readonly FilterHelpHost _filterHelp;
         private readonly List<AppliedFilterStepViewModel> _selectedSteps = [];
         private int _chainChangedBatchDepth;
         private bool _chainChangedQueued;
@@ -32,10 +34,18 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Named presets store. When null, uses an empty manager that does not read AppData
         /// (production passes <see cref="PresetManager.OpenDefault"/>).
         /// </param>
-        public AppliedFiltersViewModel(FilterDefaultsStore? filterDefaults = null, PresetManager? presetManager = null)
+        /// <param name="filterHelp">
+        /// Opens per-filter Help HTML. When null, uses a host with default MFR7 Help roots.
+        /// </param>
+        public AppliedFiltersViewModel(
+            FilterDefaultsStore? filterDefaults = null,
+            PresetManager? presetManager = null,
+            FilterHelpHost? filterHelp = null
+        )
         {
             _filterDefaults = filterDefaults ?? FilterDefaultsStore.CreateEmpty();
             PresetManager = presetManager ?? PresetManager.CreateEmpty();
+            _filterHelp = filterHelp ?? new FilterHelpHost();
             Steps = [];
             Steps.CollectionChanged += _OnStepsCollectionChanged;
         }
@@ -342,6 +352,12 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         public event EventHandler<string>? FilterDefaultSaved;
 
         /// <summary>
+        /// Raised when Help was requested but the HTML file was not found under configured Help roots.
+        /// <para>Payload is the expected help file name (e.g. <c>spacecharfilter.html</c>).</para>
+        /// </summary>
+        public event EventHandler<string>? FilterHelpMissing;
+
+        /// <summary>
         /// Replaces the current multi-selection.
         /// </summary>
         /// <param name="steps">Selected steps in list order.</param>
@@ -547,6 +563,30 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             var entry = _CatalogEntryFor(step.Filter);
             _filterDefaults.SetDefault(step.Filter);
             FilterDefaultSaved?.Invoke(this, entry.DisplayName);
+        }
+
+        /// <summary>
+        /// Opens Help HTML for the sole selected filter type (MFR7 Filter Configuration <c>?</c>).
+        /// <para>
+        /// Requires exactly one selected step with a known <see cref="FilterCatalogEntry.HelpFileName"/>.
+        /// Opens via <see cref="FilterHelpHost"/> when the file exists; otherwise raises
+        /// <see cref="FilterHelpMissing"/>.
+        /// </para>
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanOpenSelectedFilterHelp))]
+        public void OpenSelectedFilterHelp()
+        {
+            if (!_TryGetSelectedHelpFileName(out var helpFileName))
+            {
+                return;
+            }
+
+            if (_filterHelp.TryOpen(helpFileName, out _))
+            {
+                return;
+            }
+
+            FilterHelpMissing?.Invoke(this, helpFileName);
         }
 
         /// <summary>
@@ -942,7 +982,37 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             MoveSelectedDownCommand.NotifyCanExecuteChanged();
             ResetSelectedToDefaultsCommand.NotifyCanExecuteChanged();
             SaveSelectedAsDefaultCommand.NotifyCanExecuteChanged();
+            OpenSelectedFilterHelpCommand.NotifyCanExecuteChanged();
             OnPropertyChanged(nameof(CanShowFilterOptions));
+        }
+
+        /// <summary>
+        /// True when exactly one step is selected and its catalog type has a Help HTML mapping.
+        /// </summary>
+        private bool _CanOpenSelectedFilterHelp()
+        {
+            return _TryGetSelectedHelpFileName(out _);
+        }
+
+        /// <summary>
+        /// Resolves the Help HTML basename for the sole selected step when mapped.
+        /// </summary>
+        private bool _TryGetSelectedHelpFileName(out string helpFileName)
+        {
+            helpFileName = string.Empty;
+            if (_selectedSteps.Count != 1)
+            {
+                return false;
+            }
+
+            var entry = _CatalogEntryFor(_selectedSteps[0].Filter);
+            if (string.IsNullOrEmpty(entry.HelpFileName))
+            {
+                return false;
+            }
+
+            helpFileName = entry.HelpFileName;
+            return true;
         }
     }
 }

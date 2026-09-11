@@ -21,6 +21,15 @@
       <Border DockPanel.Dock="Top" Classes="filter-editor-title-bar">
         <DockPanel>
           <Button
+            x:Name="ShowFilterHelpButton"
+            DockPanel.Dock="Right"
+            Classes="filter-editor-title-bar-button"
+            Content="?"
+            ToolTip.Tip="{x:Static resources:AppTips.ShowFilterHelp}"
+            IsVisible="{Binding HasSelectedStep}"
+            Command="{Binding OpenSelectedFilterHelpCommand, ElementName=FilterEditorRoot}"
+          />
+          <Button
             x:Name="ResetFilterDefaultsButton"
             DockPanel.Dock="Right"
             Classes="filter-editor-title-bar-button"
