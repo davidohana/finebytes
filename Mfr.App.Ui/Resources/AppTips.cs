@@ -110,17 +110,14 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Applied Filters move-down shuttle tip.</summary>
         public const string MoveFilterDown = "Move selected filter down in the apply list (to apply it later)";
 
-        /// <summary>Applied Filters Filter Options toolbar tip.</summary>
-        public const string FilterOptions = "Edit filter name and Apply To options";
+        /// <summary>Applied Filters Filter Options shuttle tip.</summary>
+        public const string FilterOptions = "Filter Options — Edit filter name and Apply To options";
 
         /// <summary>Applied Filters / Filters menu: open Preset Manager (MFR7 PresetManager).</summary>
         public const string Presets = "Show Preset Manager window";
 
-        /// <summary>Applied Filters / Filters menu: in-place update of the last-loaded preset.</summary>
-        public const string SavePreset = "Update the last-loaded preset with the current Applied Filters";
-
-        /// <summary>Applied Filters / Filters menu: Save Preset As dialog (MFR7 SavePreset).</summary>
-        public const string SavePresetAs = "Save applied filters as a preset";
+        /// <summary>Applied Filters / Filters menu: Save Preset dialog (update or save as new).</summary>
+        public const string SavePreset = "Save applied filters as a preset";
 
         /// <summary>Applied Filters toolbar ▾ quick-pick tip.</summary>
         public const string PresetsQuickPick = "Load a preset";

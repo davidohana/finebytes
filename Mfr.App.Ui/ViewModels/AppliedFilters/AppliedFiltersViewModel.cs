@@ -93,21 +93,30 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Updates the last-loaded preset in place (Save Preset).
+        /// Updates the last-loaded preset (same <see cref="FilterPreset.Id"/>).
         /// <para>
-        /// Writes the current <see cref="ToChain"/> result. When the prior preset had
-        /// <see cref="FilterPreset.VisibleColumns"/>, stores <paramref name="currentVisibleColumns"/>;
-        /// when prior columns were <see langword="null"/>, columns stay <see langword="null"/>.
-        /// Same <see cref="FilterPreset.Id"/>, name, and description. Silent (no dialog).
+        /// Writes the current <see cref="ToChain"/> result plus the dialog description and columns.
+        /// When <paramref name="name"/> differs from the current name, renames the preset (refuses when
+        /// another preset already uses that name).
         /// </para>
         /// </summary>
-        /// <param name="currentVisibleColumns">
-        /// Current Rename List visible columns (used only when the prior preset stored columns).
+        /// <param name="name">Desired display name (trimmed; blank is rejected).</param>
+        /// <param name="description">Optional description; blank becomes <see langword="null"/>.</param>
+        /// <param name="visibleColumns">
+        /// Columns to store when the Save Rename List columns checkbox is checked; otherwise
+        /// <see langword="null"/>.
         /// </param>
-        /// <returns>The updated preset, or <see langword="null"/> when Save is not available.</returns>
-        public FilterPreset? SavePreset(IReadOnlyList<SessionStateRenameListColumn> currentVisibleColumns)
+        /// <returns>
+        /// The updated preset, or <see langword="null"/> when Update is unavailable, the name is blank,
+        /// or the new name is taken by another preset.
+        /// </returns>
+        public FilterPreset? SavePreset(
+            string name,
+            string? description,
+            IReadOnlyList<SessionStateRenameListColumn>? visibleColumns
+        )
         {
-            ArgumentNullException.ThrowIfNull(currentVisibleColumns);
+            ArgumentNullException.ThrowIfNull(name);
 
             if (LastLoaded is null)
             {
@@ -120,16 +129,38 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 return null;
             }
 
-            var visibleColumns = existing.VisibleColumns is null ? null : currentVisibleColumns;
-            var updated = existing with { Chain = ToChain(), VisibleColumns = visibleColumns };
-            PresetManager.NameToPreset[existing.Name] = updated;
+            var trimmedName = name.Trim();
+            if (trimmedName.Length == 0)
+            {
+                return null;
+            }
+
+            var isRename = !string.Equals(existing.Name, trimmedName, StringComparison.Ordinal);
+            if (isRename && PresetManager.NameToPreset.ContainsKey(trimmedName))
+            {
+                return null;
+            }
+
+            if (isRename)
+            {
+                PresetManager.NameToPreset.Remove(existing.Name);
+            }
+
+            var updated = existing with
+            {
+                Name = trimmedName,
+                Description = _TrimDescriptionOrNull(description),
+                Chain = ToChain(),
+                VisibleColumns = visibleColumns,
+            };
+            PresetManager.NameToPreset[trimmedName] = updated;
             PresetManager.SavePresets();
             SetLastLoaded(updated);
             return updated;
         }
 
         /// <summary>
-        /// Upserts a named preset from the current chain (Save Preset As).
+        /// Upserts a named preset from the current chain (Save as new).
         /// <para>
         /// Keeps <see cref="FilterPreset.Id"/> when overwriting an existing name; otherwise assigns a new
         /// id. Sets last-loaded to the saved preset (enables in-place Save). Caller is responsible for

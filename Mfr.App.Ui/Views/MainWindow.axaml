@@ -349,12 +349,6 @@
           Header="Save Preset"
           Click="_OnSavePresetMenuClick"
           ToolTip.Tip="{x:Static resources:AppTips.SavePreset}"
-          IsEnabled="{Binding AppliedFiltersViewModel.CanSavePreset}"
-        />
-        <MenuItem
-          Header="Save Preset As"
-          Click="_OnSavePresetAsMenuClick"
-          ToolTip.Tip="{x:Static resources:AppTips.SavePresetAs}"
         />
         <MenuItem
           Header="Filter Options"

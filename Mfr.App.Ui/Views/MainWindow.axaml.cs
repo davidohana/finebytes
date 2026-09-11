@@ -271,14 +271,9 @@ namespace Mfr.App.Ui.Views
             await AppliedFiltersPane.ShowPresetManagerAsync();
         }
 
-        private void _OnSavePresetMenuClick(object? sender, RoutedEventArgs e)
+        private async void _OnSavePresetMenuClick(object? sender, RoutedEventArgs e)
         {
-            AppliedFiltersPane.SavePreset();
-        }
-
-        private async void _OnSavePresetAsMenuClick(object? sender, RoutedEventArgs e)
-        {
-            await AppliedFiltersPane.ShowSavePresetAsAsync();
+            await AppliedFiltersPane.ShowSavePresetAsync();
         }
     }
 }

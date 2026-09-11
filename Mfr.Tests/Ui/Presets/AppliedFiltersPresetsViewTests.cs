@@ -18,7 +18,7 @@ namespace Mfr.Tests.Ui.Presets
     public sealed class AppliedFiltersPresetsViewTests
     {
         /// <summary>
-        /// Verifies Presets / ▾ / Save / Save As toolbar tips bind to <see cref="AppTips"/>.
+        /// Verifies Presets / ▾ / Save toolbar tips bind to <see cref="AppTips"/>.
         /// </summary>
         [AvaloniaFact]
         public void Preset_Toolbar_Tips_Bind()
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Ui.Presets
             Assert.Equal(AppTips.Presets, ToolTip.GetTip(view.FindControl<Button>("PresetsButton")!));
             Assert.Equal(AppTips.PresetsQuickPick, ToolTip.GetTip(view.FindControl<Button>("PresetsQuickPickButton")!));
             Assert.Equal(AppTips.SavePreset, ToolTip.GetTip(view.FindControl<Button>("SavePresetButton")!));
-            Assert.Equal(AppTips.SavePresetAs, ToolTip.GetTip(view.FindControl<Button>("SavePresetAsButton")!));
+            Assert.Null(view.FindControl<Button>("SavePresetAsButton"));
 
             window.Close();
         }

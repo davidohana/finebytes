@@ -9,24 +9,26 @@ namespace Mfr.Tests.Ui.Presets
     public sealed class SavePresetDialogViewModelTests
     {
         /// <summary>
-        /// Verifies an empty dialog starts with blank fields and disabled OK.
+        /// Verifies an empty dialog starts with blank fields and only Save as new gated off.
         /// </summary>
         [Fact]
-        public void Default_Starts_Empty_And_Cannot_Confirm()
+        public void Default_Starts_Empty_With_Actions_Disabled()
         {
             var viewModel = new SavePresetDialogViewModel();
 
+            Assert.False(viewModel.CanUpdate);
+            Assert.False(viewModel.CanUpdateAction);
+            Assert.False(viewModel.CanSaveAsAction);
             Assert.Equal(string.Empty, viewModel.Name);
             Assert.Equal(string.Empty, viewModel.Description);
             Assert.False(viewModel.SaveRenameListColumns);
-            Assert.False(viewModel.CanConfirm);
         }
 
         /// <summary>
-        /// Verifies last-loaded prefills name, description, and columns checkbox.
+        /// Verifies can-update prefills fields and enables Update when the name is present.
         /// </summary>
         [Fact]
-        public void Prefills_From_LastLoaded()
+        public void Prefills_From_LastLoaded_And_Enables_Update()
         {
             var lastLoaded = new FilterPreset
             {
@@ -40,34 +42,82 @@ namespace Mfr.Tests.Ui.Presets
                 ],
             };
 
-            var viewModel = new SavePresetDialogViewModel(lastLoaded);
+            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: true);
 
+            Assert.True(viewModel.CanUpdate);
+            Assert.True(viewModel.CanUpdateAction);
+            Assert.True(viewModel.CanSaveAsAction);
+            Assert.Equal("Rock", viewModel.OriginalName);
             Assert.Equal("Rock", viewModel.Name);
             Assert.Equal("Loud", viewModel.Description);
             Assert.True(viewModel.SaveRenameListColumns);
-            Assert.True(viewModel.CanConfirm);
             Assert.Equal("Rock", viewModel.TrimmedName);
             Assert.Equal("Loud", viewModel.TrimmedDescriptionOrNull);
         }
 
         /// <summary>
-        /// Verifies blank description becomes null and whitespace-only name cannot confirm.
+        /// Verifies last-loaded without can-update still prefills but keeps Update disabled.
         /// </summary>
         [Fact]
-        public void Trimmed_Helpers_And_CanConfirm_Track_Whitespace()
+        public void LastLoaded_Without_CanUpdate_Disables_Update()
+        {
+            var lastLoaded = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Gone",
+                Chain = new FilterChain { Steps = [] },
+            };
+
+            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: false);
+
+            Assert.False(viewModel.CanUpdate);
+            Assert.False(viewModel.CanUpdateAction);
+            Assert.True(viewModel.CanSaveAsAction);
+            Assert.Equal("Gone", viewModel.Name);
+        }
+
+        /// <summary>
+        /// Verifies blank description becomes null and whitespace-only name disables both actions.
+        /// </summary>
+        [Fact]
+        public void Trimmed_Helpers_And_Actions_Track_Whitespace()
         {
             var viewModel = new SavePresetDialogViewModel { Name = "  ", Description = "  " };
 
-            Assert.False(viewModel.CanConfirm);
+            Assert.False(viewModel.CanSaveAsAction);
+            Assert.False(viewModel.CanUpdateAction);
             Assert.Equal(string.Empty, viewModel.TrimmedName);
             Assert.Null(viewModel.TrimmedDescriptionOrNull);
 
             viewModel.Name = "  Demo  ";
             viewModel.Description = "  Notes  ";
 
-            Assert.True(viewModel.CanConfirm);
+            Assert.True(viewModel.CanSaveAsAction);
             Assert.Equal("Demo", viewModel.TrimmedName);
             Assert.Equal("Notes", viewModel.TrimmedDescriptionOrNull);
+        }
+
+        /// <summary>
+        /// Verifies Update stays disabled when can-update is true but the name is cleared.
+        /// </summary>
+        [Fact]
+        public void Update_Requires_NonBlank_Name()
+        {
+            var lastLoaded = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Live",
+                Chain = new FilterChain { Steps = [] },
+            };
+            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: true) { Name = "   " };
+
+            Assert.True(viewModel.CanUpdate);
+            Assert.False(viewModel.CanUpdateAction);
+            Assert.False(viewModel.CanSaveAsAction);
+
+            viewModel.Name = "Renamed";
+            Assert.True(viewModel.CanUpdateAction);
+            Assert.True(viewModel.CanSaveAsAction);
         }
 
         /// <summary>
@@ -83,7 +133,7 @@ namespace Mfr.Tests.Ui.Presets
                 Chain = new FilterChain { Steps = [] },
             };
 
-            var viewModel = new SavePresetDialogViewModel(lastLoaded);
+            var viewModel = new SavePresetDialogViewModel(lastLoaded, canUpdate: true);
 
             Assert.False(viewModel.SaveRenameListColumns);
         }

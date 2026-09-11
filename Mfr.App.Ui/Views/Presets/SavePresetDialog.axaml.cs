@@ -5,8 +5,11 @@ using Mfr.App.Ui.ViewModels.Presets;
 namespace Mfr.App.Ui.Views.Presets
 {
     /// <summary>
-    /// Modal dialog for Save Preset As (name, description, optional Rename List columns).
-    /// <para>Closes with <see langword="true"/> for OK and <see langword="false"/> for Cancel or Escape.</para>
+    /// Modal dialog for Save Preset (Update last-loaded or Save as new).
+    /// <para>
+    /// Closes with <see cref="SavePresetDialogMode.Update"/>, <see cref="SavePresetDialogMode.SaveAs"/>,
+    /// or <see langword="null"/> for Cancel / Escape.
+    /// </para>
     /// </summary>
     public partial class SavePresetDialog : Window
     {
@@ -38,19 +41,29 @@ namespace Mfr.App.Ui.Views.Presets
             NameBox.SelectAll();
         }
 
-        private void _OnOkClick(object? sender, RoutedEventArgs e)
+        private void _OnUpdateClick(object? sender, RoutedEventArgs e)
         {
-            if (DataContext is SavePresetDialogViewModel { CanConfirm: false })
+            if (DataContext is SavePresetDialogViewModel { CanUpdateAction: false })
             {
                 return;
             }
 
-            Close(true);
+            Close(SavePresetDialogMode.Update);
+        }
+
+        private void _OnSaveAsNewClick(object? sender, RoutedEventArgs e)
+        {
+            if (DataContext is SavePresetDialogViewModel { CanSaveAsAction: false })
+            {
+                return;
+            }
+
+            Close(SavePresetDialogMode.SaveAs);
         }
 
         private void _OnCancelClick(object? sender, RoutedEventArgs e)
         {
-            Close(false);
+            Close(null);
         }
     }
 }

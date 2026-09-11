@@ -13,15 +13,13 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         /// <summary>
         /// Gets the ▾ quick-pick flyout (tests).
         /// </summary>
-        internal MenuFlyout PresetsQuickPickFlyout { get; } =
-            new() { Placement = PlacementMode.BottomEdgeAlignedLeft };
+        internal MenuFlyout PresetsQuickPickFlyout { get; } = new() { Placement = PlacementMode.BottomEdgeAlignedLeft };
 
         private void _WirePresetHandlers()
         {
             PresetsButton.Click += _OnPresetsClick;
             PresetsQuickPickButton.Click += _OnPresetsQuickPickClick;
             SavePresetButton.Click += _OnSavePresetClick;
-            SavePresetAsButton.Click += _OnSavePresetAsClick;
         }
 
         private async void _OnPresetsClick(object? sender, RoutedEventArgs e)
@@ -29,14 +27,9 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             await ShowPresetManagerAsync();
         }
 
-        private void _OnSavePresetClick(object? sender, RoutedEventArgs e)
+        private async void _OnSavePresetClick(object? sender, RoutedEventArgs e)
         {
-            SavePreset();
-        }
-
-        private async void _OnSavePresetAsClick(object? sender, RoutedEventArgs e)
-        {
-            await ShowSavePresetAsAsync();
+            await ShowSavePresetAsync();
         }
 
         /// <summary>
@@ -179,23 +172,10 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Saves the last-loaded preset in place when available (no dialog).
-        /// </summary>
-        public void SavePreset()
-        {
-            if (_viewModel is null || !_viewModel.CanSavePreset)
-            {
-                return;
-            }
-
-            _viewModel.SavePreset(PresetRenameListColumns.Capture(this));
-        }
-
-        /// <summary>
-        /// Opens Save Preset As, confirms overwrite when the name exists, then upserts.
+        /// Opens Save Preset (Update or Save as new), confirms overwrite when needed, then saves.
         /// </summary>
         /// <returns>A task that completes when the dialog flow finishes.</returns>
-        public async Task ShowSavePresetAsAsync()
+        public async Task ShowSavePresetAsync()
         {
             if (_viewModel is null)
             {
@@ -207,15 +187,44 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            var dialogVm = new SavePresetDialogViewModel(_viewModel.LastLoaded);
+            var dialogVm = new SavePresetDialogViewModel(_viewModel.LastLoaded, canUpdate: _viewModel.CanSavePreset);
             var dialog = new SavePresetDialog(dialogVm);
-            var accepted = await dialog.ShowDialog<bool?>(owner);
-            if (accepted != true || !dialogVm.CanConfirm)
+            var choice = await dialog.ShowDialog<SavePresetDialogMode?>(owner);
+            if (choice is null)
             {
                 return;
             }
 
             var name = dialogVm.TrimmedName;
+            if (name.Length == 0)
+            {
+                return;
+            }
+
+            var description = dialogVm.TrimmedDescriptionOrNull;
+            var columns = dialogVm.SaveRenameListColumns ? PresetRenameListColumns.Capture(this) : null;
+
+            if (choice == SavePresetDialogMode.Update)
+            {
+                if (!_viewModel.CanSavePreset)
+                {
+                    return;
+                }
+
+                var currentName = _viewModel.LastLoaded!.Name;
+                var isRename = !string.Equals(currentName, name, StringComparison.Ordinal);
+                if (isRename && _viewModel.PresetManager.NameToPreset.ContainsKey(name))
+                {
+                    await new OkMessageDialog("Rename Preset", $"A preset named '{name}' already exists.").ShowDialog(
+                        owner
+                    );
+                    return;
+                }
+
+                _viewModel.SavePreset(name, description, columns);
+                return;
+            }
+
             if (_viewModel.PresetManager.NameToPreset.ContainsKey(name))
             {
                 var confirm = new ConfirmMessageDialog(
@@ -229,8 +238,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 }
             }
 
-            var columns = dialogVm.SaveRenameListColumns ? PresetRenameListColumns.Capture(this) : null;
-            _viewModel.SavePresetAs(name, dialogVm.TrimmedDescriptionOrNull, columns);
+            _viewModel.SavePresetAs(name, description, columns);
         }
 
         /// <summary>

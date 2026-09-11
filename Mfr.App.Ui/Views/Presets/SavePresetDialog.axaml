@@ -5,7 +5,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   x:Class="Mfr.App.Ui.Views.Presets.SavePresetDialog"
   x:DataType="vm:SavePresetDialogViewModel"
-  Title="Save Preset As"
+  Title="Save Preset"
   Icon="/Assets/mfr.ico"
   Width="420"
   MinWidth="360"
@@ -27,12 +27,20 @@
       Margin="0,14,0,0"
     >
       <Button
-        x:Name="OkButton"
+        x:Name="UpdateButton"
         Classes="message-dialog-footer"
-        Content="OK"
-        IsDefault="True"
-        IsEnabled="{Binding CanConfirm}"
-        Click="_OnOkClick"
+        Content="Update"
+        IsEnabled="{Binding CanUpdateAction}"
+        IsDefault="{Binding CanUpdate}"
+        Click="_OnUpdateClick"
+      />
+      <Button
+        x:Name="SaveAsNewButton"
+        Classes="message-dialog-footer"
+        Content="Save as new"
+        IsEnabled="{Binding CanSaveAsAction}"
+        IsDefault="{Binding !CanUpdate}"
+        Click="_OnSaveAsNewClick"
       />
       <Button
         x:Name="CancelButton"
