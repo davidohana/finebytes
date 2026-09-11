@@ -197,6 +197,10 @@
     <Style Selector="DataGrid.rename-list DataGridCell:focus /template/ Grid#FocusVisual">
       <Setter Property="IsVisible" Value="False" />
     </Style>
+    <!-- MFR7 focused cell (light blue); sits above row selection fill. -->
+    <Style Selector="DataGrid.rename-list DataGridCell:current">
+      <Setter Property="Background" Value="{DynamicResource RenameListFocusedCellBrush}" />
+    </Style>
     <Style Selector="DataGrid.rename-list DataGridRow /template/ Rectangle#BackgroundRectangle">
       <Setter Property="Fill" Value="Transparent" />
       <Setter Property="Stroke" Value="Transparent" />
