@@ -24,22 +24,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private List<RenameListSortKey> _sortKeys = [];
 
         /// <summary>
-        /// Optional save-path picker for <see cref="ExportNameListAsync"/>; when null, export is a no-op.
+        /// Optional UI hooks for <see cref="ExportNameListAsync"/>; when null, export is a no-op.
         /// </summary>
-        public Func<Task<string?>>? PickNameListSavePathAsync { get; set; }
-
-        /// <summary>
-        /// Optional post-save prompt for opening the exported file; when null, the file is not opened.
-        /// </summary>
-        /// <remarks>
-        /// <para>Argument is the saved path. Return <see langword="true"/> to open with the default app.</para>
-        /// </remarks>
-        public Func<string, Task<bool>>? ConfirmEditExportedNameListAsync { get; set; }
-
-        /// <summary>
-        /// Optional error UI when export write fails; arguments are dialog title and message body.
-        /// </summary>
-        public Func<string, string, Task>? ShowExportNameListErrorAsync { get; set; }
+        public RenameListExportHooks? ExportHooks { get; set; }
 
         /// <summary>
         /// Initializes the Rename List and listens for File List changes that affect add commands.

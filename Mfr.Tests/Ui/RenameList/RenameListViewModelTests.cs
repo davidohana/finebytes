@@ -535,8 +535,11 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
-            renameListViewModel.PickNameListSavePathAsync = () => Task.FromResult<string?>(outPath);
-            renameListViewModel.ConfirmEditExportedNameListAsync = _ => Task.FromResult(false);
+            renameListViewModel.ExportHooks = new RenameListExportHooks
+            {
+                PickSavePathAsync = () => Task.FromResult<string?>(outPath),
+                ConfirmEditAsync = _ => Task.FromResult(false),
+            };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             await renameListViewModel.ExportNameListAsync(nameKey);
@@ -557,7 +560,10 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([path]);
-            renameListViewModel.PickNameListSavePathAsync = () => Task.FromResult<string?>(null);
+            renameListViewModel.ExportHooks = new RenameListExportHooks
+            {
+                PickSavePathAsync = () => Task.FromResult<string?>(null),
+            };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             await renameListViewModel.ExportNameListAsync(nameKey);
@@ -579,8 +585,11 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir, shellOpener: shell);
             await renameListViewModel.AddPathsAsync([path]);
-            renameListViewModel.PickNameListSavePathAsync = () => Task.FromResult<string?>(outPath);
-            renameListViewModel.ConfirmEditExportedNameListAsync = _ => Task.FromResult(true);
+            renameListViewModel.ExportHooks = new RenameListExportHooks
+            {
+                PickSavePathAsync = () => Task.FromResult<string?>(outPath),
+                ConfirmEditAsync = _ => Task.FromResult(true),
+            };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             await renameListViewModel.ExportNameListAsync(nameKey);
@@ -604,17 +613,20 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([path]);
-            renameListViewModel.PickNameListSavePathAsync = () => Task.FromResult<string?>(missingDir);
-            renameListViewModel.ShowExportNameListErrorAsync = (title, message) =>
+            renameListViewModel.ExportHooks = new RenameListExportHooks
             {
-                errorTitle = title;
-                errorMessage = message;
-                return Task.CompletedTask;
-            };
-            renameListViewModel.ConfirmEditExportedNameListAsync = _ =>
-            {
-                editPromptCalls++;
-                return Task.FromResult(true);
+                PickSavePathAsync = () => Task.FromResult<string?>(missingDir),
+                ShowErrorAsync = (title, message) =>
+                {
+                    errorTitle = title;
+                    errorMessage = message;
+                    return Task.CompletedTask;
+                },
+                ConfirmEditAsync = _ =>
+                {
+                    editPromptCalls++;
+                    return Task.FromResult(true);
+                },
             };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);

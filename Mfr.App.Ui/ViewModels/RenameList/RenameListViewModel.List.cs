@@ -93,19 +93,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="key">Original or preview field key from the header menu.</param>
         /// <remarks>
         /// <para>
-        /// Uses <see cref="PickNameListSavePathAsync"/> for the save dialog. After a path is chosen,
-        /// aborts if the list became busy. On success, asks <see cref="ConfirmEditExportedNameListAsync"/>
-        /// and may open the file via the shell opener. Cancelled pick leaves disk unchanged.
+        /// Uses <see cref="ExportHooks"/> for the save dialog, error UI, and optional edit prompt.
+        /// After a path is chosen, aborts if the list became busy. Cancelled pick leaves disk unchanged.
         /// </para>
         /// </remarks>
         public async Task ExportNameListAsync(RenameListFieldKey key)
         {
-            if (IsBusy || PickNameListSavePathAsync is null)
+            var hooks = ExportHooks;
+            if (IsBusy || hooks?.PickSavePathAsync is null)
             {
                 return;
             }
 
-            var path = await PickNameListSavePathAsync().ConfigureAwait(true);
+            var path = await hooks.PickSavePathAsync().ConfigureAwait(true);
             if (string.IsNullOrWhiteSpace(path) || IsBusy)
             {
                 return;
@@ -117,10 +117,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
             catch (Exception ex)
             {
-                if (ShowExportNameListErrorAsync is not null)
+                if (hooks.ShowErrorAsync is not null)
                 {
                     var fieldName = RenameListFieldCatalog.GetField(key).DisplayName;
-                    await ShowExportNameListErrorAsync(
+                    await hooks
+                        .ShowErrorAsync(
                             "Magic File Renamer",
                             $"Failed to generate name list for field {fieldName}\n\n{path}\n\n{ex.Message}"
                         )
@@ -130,12 +131,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            if (ConfirmEditExportedNameListAsync is null)
+            if (hooks.ConfirmEditAsync is null)
             {
                 return;
             }
 
-            var shouldEdit = await ConfirmEditExportedNameListAsync(path).ConfigureAwait(true);
+            var shouldEdit = await hooks.ConfirmEditAsync(path).ConfigureAwait(true);
             if (!shouldEdit)
             {
                 return;

@@ -173,17 +173,18 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _WireExportNameListUi(RenameListViewModel viewModel)
         {
-            viewModel.PickNameListSavePathAsync = () =>
-                FileSavePicker.PickSaveFileAsync(this, title: "Save Name List as", defaultExtension: "txt");
-            viewModel.ConfirmEditExportedNameListAsync = _ConfirmEditExportedNameListAsync;
-            viewModel.ShowExportNameListErrorAsync = _ShowExportNameListErrorAsync;
+            viewModel.ExportHooks = new RenameListExportHooks
+            {
+                PickSavePathAsync = () =>
+                    FileSavePicker.PickSaveFileAsync(this, title: "Save Name List as", defaultExtension: "txt"),
+                ConfirmEditAsync = _ConfirmEditExportedNameListAsync,
+                ShowErrorAsync = _ShowExportNameListErrorAsync,
+            };
         }
 
         private static void _ClearExportNameListUi(RenameListViewModel viewModel)
         {
-            viewModel.PickNameListSavePathAsync = null;
-            viewModel.ConfirmEditExportedNameListAsync = null;
-            viewModel.ShowExportNameListErrorAsync = null;
+            viewModel.ExportHooks = null;
         }
 
         private async Task<bool> _ConfirmEditExportedNameListAsync(string path)
