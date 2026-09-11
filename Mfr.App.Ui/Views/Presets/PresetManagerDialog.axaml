@@ -1,0 +1,112 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.Presets"
+  xmlns:models="using:Mfr.Models.Filters"
+  x:Class="Mfr.App.Ui.Views.Presets.PresetManagerDialog"
+  x:DataType="vm:PresetManagerDialogViewModel"
+  Title="Presets"
+  Icon="/Assets/mfr.ico"
+  Width="560"
+  Height="380"
+  MinWidth="480"
+  MinHeight="300"
+  WindowStartupLocation="CenterOwner"
+  ShowInTaskbar="False"
+  CanResize="True"
+  FontFamily="{StaticResource AppChromeFont}"
+  FontSize="{StaticResource AppChromeFontSize}"
+  Foreground="{DynamicResource AppChromeForegroundBrush}"
+>
+  <Window.Styles>
+    <Style Selector="ListBox.preset-manager-list">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+    </Style>
+    <Style Selector="ListBox.preset-manager-list ListBoxItem">
+      <Setter Property="Padding" Value="6,2" />
+      <Setter Property="MinHeight" Value="22" />
+    </Style>
+    <Style Selector="Border.preset-manager-description">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
+      <Setter Property="Padding" Value="8" />
+    </Style>
+  </Window.Styles>
+  <DockPanel Margin="12">
+    <StackPanel
+      x:Name="Footer"
+      DockPanel.Dock="Bottom"
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      Spacing="8"
+      Margin="0,14,0,0"
+    >
+      <Button
+        x:Name="LoadButton"
+        Classes="message-dialog-footer"
+        Content="Load"
+        IsEnabled="{Binding HasSelection}"
+        Click="_OnLoadClick"
+      />
+      <Button
+        x:Name="DeleteButton"
+        Classes="message-dialog-footer"
+        Content="Delete"
+        IsEnabled="{Binding HasSelection}"
+        Click="_OnDeleteClick"
+      />
+      <Button
+        x:Name="EditDescriptionButton"
+        Classes="message-dialog-footer"
+        Content="Edit Description"
+        IsEnabled="{Binding HasSelection}"
+        Click="_OnEditDescriptionClick"
+      />
+      <Button
+        x:Name="RenameButton"
+        Classes="message-dialog-footer"
+        Content="Rename"
+        IsEnabled="{Binding HasSelection}"
+        Click="_OnRenameClick"
+      />
+      <Button
+        x:Name="CloseButton"
+        Classes="message-dialog-footer"
+        Content="Close"
+        IsCancel="True"
+        Click="_OnCloseClick"
+      />
+    </StackPanel>
+
+    <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto,*">
+      <TextBlock Grid.Row="0" Grid.Column="0" Text="Presets:" Margin="0,0,0,6" />
+      <TextBlock Grid.Row="0" Grid.Column="2" Text="Description:" Margin="0,0,0,6" />
+      <ListBox
+        x:Name="PresetsList"
+        Grid.Row="1"
+        Grid.Column="0"
+        Classes="preset-manager-list"
+        ItemsSource="{Binding Presets}"
+        SelectedItem="{Binding SelectedPreset}"
+        DoubleTapped="_OnPresetsListDoubleTapped"
+        KeyDown="_OnPresetsListKeyDown"
+      >
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="models:FilterPreset">
+            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <Border Grid.Row="1" Grid.Column="2" Classes="preset-manager-description">
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+          <TextBlock Text="{Binding SelectedDescription}" TextWrapping="Wrap" />
+        </ScrollViewer>
+      </Border>
+    </Grid>
+  </DockPanel>
+</Window>

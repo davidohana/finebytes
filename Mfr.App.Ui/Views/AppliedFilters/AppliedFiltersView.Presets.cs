@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.App.Ui.Views.Presets;
 using Mfr.Models.Config;
@@ -11,8 +10,14 @@ namespace Mfr.App.Ui.Views.AppliedFilters
     {
         private void _WirePresetHandlers()
         {
+            PresetsButton.Click += _OnPresetsClick;
             SavePresetButton.Click += _OnSavePresetClick;
             SavePresetAsButton.Click += _OnSavePresetAsClick;
+        }
+
+        private async void _OnPresetsClick(object? sender, RoutedEventArgs e)
+        {
+            await ShowPresetManagerAsync();
         }
 
         private void _OnSavePresetClick(object? sender, RoutedEventArgs e)
@@ -26,6 +31,32 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
+        /// Opens the Preset Manager (Load / Delete / Edit Description / Rename).
+        /// </summary>
+        /// <returns>A task that completes when the dialog closes.</returns>
+        public async Task ShowPresetManagerAsync()
+        {
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            var dialogVm = new PresetManagerDialogViewModel(_viewModel);
+            var dialog = new PresetManagerDialog(
+                dialogVm,
+                _viewModel,
+                confirmReplaceAsync: () => _TryConfirmReplaceAsync(owner),
+                applyColumns: preset => PresetRenameListColumns.ApplyIfPresent(this, preset.VisibleColumns)
+            );
+            await dialog.ShowDialog<bool?>(owner);
+        }
+
+        /// <summary>
         /// Saves the last-loaded preset in place when available (no dialog).
         /// </summary>
         public void SavePreset()
@@ -35,7 +66,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            _viewModel.SavePreset(_CaptureRenameListColumns());
+            _viewModel.SavePreset(PresetRenameListColumns.Capture(this));
         }
 
         /// <summary>
@@ -76,22 +107,34 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 }
             }
 
-            var columns = dialogVm.SaveRenameListColumns ? _CaptureRenameListColumns() : null;
+            var columns = dialogVm.SaveRenameListColumns ? PresetRenameListColumns.Capture(this) : null;
             _viewModel.SavePresetAs(name, dialogVm.TrimmedDescriptionOrNull, columns);
         }
 
         /// <summary>
-        /// Captures Rename List visible columns from the owning main window, or an empty list when unavailable.
+        /// Confirms replacing a non-empty Applied Filters chain when the config flag is enabled.
         /// </summary>
-        /// <returns>Current visible columns for preset storage.</returns>
-        private IReadOnlyList<SessionStateRenameListColumn> _CaptureRenameListColumns()
+        /// <param name="owner">Owner window for the confirm dialog.</param>
+        /// <returns>
+        /// <see langword="true"/> when load may proceed; <see langword="false"/> when the user cancels.
+        /// </returns>
+        private async Task<bool> _TryConfirmReplaceAsync(Window owner)
         {
-            if (TopLevel.GetTopLevel(this) is Window { DataContext: MainWindowViewModel main })
+            if (_viewModel is null)
             {
-                return main.RenameListViewModel.CaptureVisibleColumnsForSession();
+                return false;
             }
 
-            return [];
+            if (!_viewModel.NeedsConfirmReplaceOnLoad(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad))
+            {
+                return true;
+            }
+
+            var confirm = new ConfirmMessageDialog(
+                "Replace Applied Filters",
+                "Loading this preset will replace the current Applied Filters list. Continue?"
+            );
+            return await confirm.ShowDialog<bool?>(owner) == true;
         }
     }
 }

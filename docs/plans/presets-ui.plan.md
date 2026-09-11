@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: p3-preset-manager
     content: "P3 Preset Manager — Load/Delete/Edit Description/Rename; confirm-replace gate; apply optional columns; enable Presets stubs"
-    status: pending
+    status: completed
   - id: p4-quickpick-polish
     content: "P4 Quick-pick + polish — toolbar ▾, AppTips, headless coverage, docs, mark F7 done in applied-filter-editors.plan.md"
     status: pending

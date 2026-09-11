@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
@@ -945,6 +946,206 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal("new desc", saved.Description);
             Assert.Null(saved.VisibleColumns);
             Assert.Single(saved.Chain.Steps);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="AppliedFiltersViewModel.LoadPreset"/> replaces the chain and sets last-loaded.
+        /// </summary>
+        [Fact]
+        public void LoadPreset_Replaces_Chain_And_Sets_LastLoaded()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var letters = new LettersCaseFilter();
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "LoadMe",
+                Description = "demo",
+                Chain = new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
+            };
+            manager.NameToPreset[preset.Name] = preset;
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            Assert.False(viewModel.CanSavePreset);
+
+            viewModel.LoadPreset(preset);
+
+            Assert.Same(preset, viewModel.LastLoaded);
+            Assert.True(viewModel.CanSavePreset);
+            Assert.Single(viewModel.Steps);
+            Assert.Equal("Letters Case", viewModel.Steps[0].DisplayName);
+            Assert.Same(letters, viewModel.Steps[0].Filter);
+        }
+
+        /// <summary>
+        /// Verifies confirm-replace is required only when the flag is on and the stack is non-empty.
+        /// </summary>
+        [Fact]
+        public void NeedsConfirmReplaceOnLoad_Requires_Flag_And_NonEmpty_Stack()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(confirmReplaceOnLoad: true));
+            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(confirmReplaceOnLoad: false));
+
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            Assert.True(viewModel.NeedsConfirmReplaceOnLoad(confirmReplaceOnLoad: true));
+            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(confirmReplaceOnLoad: false));
+        }
+
+        /// <summary>
+        /// Verifies deleting the last-loaded preset clears Save enablement.
+        /// </summary>
+        [Fact]
+        public void DeletePreset_Clears_LastLoaded_When_Deleted()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Gone",
+                Chain = new FilterChain { Steps = [] },
+            };
+            manager.NameToPreset[preset.Name] = preset;
+            var other = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Keep",
+                Chain = new FilterChain { Steps = [] },
+            };
+            manager.NameToPreset[other.Name] = other;
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.SetLastLoaded(preset);
+            Assert.True(viewModel.CanSavePreset);
+
+            Assert.True(viewModel.DeletePreset("Gone"));
+
+            Assert.Null(viewModel.LastLoaded);
+            Assert.False(viewModel.CanSavePreset);
+            Assert.False(manager.NameToPreset.ContainsKey("Gone"));
+            Assert.True(manager.NameToPreset.ContainsKey("Keep"));
+        }
+
+        /// <summary>
+        /// Verifies renaming the last-loaded preset updates its name and keeps Save enabled.
+        /// </summary>
+        [Fact]
+        public void RenamePreset_Updates_LastLoaded_Name()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var id = Guid.NewGuid();
+            var preset = new FilterPreset
+            {
+                Id = id,
+                Name = "Old",
+                Description = "keep",
+                Chain = new FilterChain { Steps = [] },
+            };
+            manager.NameToPreset[preset.Name] = preset;
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.SetLastLoaded(preset);
+
+            var result = viewModel.RenamePreset("Old", "New");
+
+            Assert.Equal(PresetRenameStatus.Success, result.Status);
+            Assert.NotNull(result.Preset);
+            Assert.Equal(id, result.Preset.Id);
+            Assert.Equal("New", result.Preset.Name);
+            Assert.Equal("keep", result.Preset.Description);
+            Assert.Same(result.Preset, viewModel.LastLoaded);
+            Assert.True(viewModel.CanSavePreset);
+            Assert.False(manager.NameToPreset.ContainsKey("Old"));
+            Assert.True(manager.NameToPreset.ContainsKey("New"));
+        }
+
+        /// <summary>
+        /// Verifies rename validation: blank, same name, and name taken.
+        /// </summary>
+        [Fact]
+        public void RenamePreset_Validates_Blank_Unchanged_And_Taken()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var alpha = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Alpha",
+                Chain = new FilterChain { Steps = [] },
+            };
+            var beta = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Beta",
+                Chain = new FilterChain { Steps = [] },
+            };
+            manager.NameToPreset[alpha.Name] = alpha;
+            manager.NameToPreset[beta.Name] = beta;
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+
+            Assert.Equal(PresetRenameStatus.BlankName, viewModel.RenamePreset("Alpha", "   ").Status);
+            Assert.Equal(PresetRenameStatus.Unchanged, viewModel.RenamePreset("Alpha", "Alpha").Status);
+            Assert.Equal(PresetRenameStatus.NameTaken, viewModel.RenamePreset("Alpha", "Beta").Status);
+            Assert.Equal(PresetRenameStatus.NotFound, viewModel.RenamePreset("Missing", "Other").Status);
+            Assert.True(manager.NameToPreset.ContainsKey("Alpha"));
+        }
+
+        /// <summary>
+        /// Verifies deleting a preset that is not last-loaded leaves Save enablement unchanged.
+        /// </summary>
+        [Fact]
+        public void DeletePreset_Leaves_LastLoaded_When_Other_Deleted()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var keep = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Keep",
+                Chain = new FilterChain { Steps = [] },
+            };
+            var gone = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Gone",
+                Chain = new FilterChain { Steps = [] },
+            };
+            manager.NameToPreset[keep.Name] = keep;
+            manager.NameToPreset[gone.Name] = gone;
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.SetLastLoaded(keep);
+
+            Assert.True(viewModel.DeletePreset("Gone"));
+
+            Assert.Same(keep, viewModel.LastLoaded);
+            Assert.True(viewModel.CanSavePreset);
+            Assert.False(manager.NameToPreset.ContainsKey("Gone"));
+        }
+
+        /// <summary>
+        /// Verifies editing a preset description persists and updates last-loaded when matched.
+        /// </summary>
+        [Fact]
+        public void SetPresetDescription_Updates_Description_And_LastLoaded()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Desc",
+                Description = "old",
+                Chain = new FilterChain { Steps = [] },
+            };
+            manager.NameToPreset[preset.Name] = preset;
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.SetLastLoaded(preset);
+
+            var updated = viewModel.SetPresetDescription("Desc", "  new notes  ");
+
+            Assert.NotNull(updated);
+            Assert.Equal("new notes", updated.Description);
+            Assert.Same(updated, viewModel.LastLoaded);
+            Assert.Equal("new notes", manager.NameToPreset["Desc"].Description);
+
+            var cleared = viewModel.SetPresetDescription("Desc", "   ");
+            Assert.NotNull(cleared);
+            Assert.Null(cleared.Description);
         }
 
         /// <summary>

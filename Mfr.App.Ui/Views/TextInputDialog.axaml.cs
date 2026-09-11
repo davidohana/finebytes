@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Media;
 using Mfr.App.Ui.ViewModels;
 
 namespace Mfr.App.Ui.Views
@@ -32,6 +33,13 @@ namespace Mfr.App.Ui.Views
             Title = prompt.Title;
             ValueBox.Text = prompt.DefaultValue;
             NoteText.IsVisible = prompt.Note is { IsEmpty: false };
+            if (prompt.Multiline)
+            {
+                ValueBox.AcceptsReturn = true;
+                ValueBox.TextWrapping = TextWrapping.Wrap;
+                ValueBox.MinHeight = 80;
+                ValueBox.Height = 80;
+            }
         }
 
         /// <inheritdoc />

@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.Engine.Presets;
 using Mfr.Filters;
 using Mfr.Models.Config;
@@ -146,12 +147,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 return null;
             }
 
-            var trimmedDescription = description?.Trim();
-            if (string.IsNullOrEmpty(trimmedDescription))
-            {
-                trimmedDescription = null;
-            }
-
             var id = PresetManager.NameToPreset.TryGetValue(trimmedName, out var existing)
                 ? existing.Id
                 : Guid.NewGuid();
@@ -159,7 +154,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             {
                 Id = id,
                 Name = trimmedName,
-                Description = trimmedDescription,
+                Description = _TrimDescriptionOrNull(description),
                 Chain = ToChain(),
                 VisibleColumns = visibleColumns,
             };
@@ -167,6 +162,152 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             PresetManager.SavePresets();
             SetLastLoaded(saved);
             return saved;
+        }
+
+        /// <summary>
+        /// Gets whether loading a preset should confirm before replacing the current Applied Filters chain.
+        /// </summary>
+        /// <param name="confirmReplaceOnLoad">
+        /// Value of <c>ui.presets.confirmReplaceAppliedFiltersOnLoad</c> (or a test override).
+        /// </param>
+        /// <returns>
+        /// <see langword="true"/> when confirmation is enabled and the stack is non-empty.
+        /// </returns>
+        public bool NeedsConfirmReplaceOnLoad(bool confirmReplaceOnLoad)
+        {
+            return confirmReplaceOnLoad && Steps.Count > 0;
+        }
+
+        /// <summary>
+        /// Replaces the Applied Filters stack from <paramref name="preset"/> and records it as last-loaded.
+        /// <para>
+        /// Caller applies optional <see cref="FilterPreset.VisibleColumns"/> and owns confirm-replace /
+        /// corrupt-open UI. Empty chains are allowed.
+        /// </para>
+        /// </summary>
+        /// <param name="preset">Preset to load (uses its <see cref="FilterPreset.Chain"/>).</param>
+        public void LoadPreset(FilterPreset preset)
+        {
+            ArgumentNullException.ThrowIfNull(preset);
+
+            ReplaceFromChain(preset.Chain);
+            SetLastLoaded(preset);
+        }
+
+        /// <summary>
+        /// Deletes a named preset from the manager and persists.
+        /// <para>
+        /// When the deleted preset was last-loaded, clears last-loaded so Save disables.
+        /// </para>
+        /// </summary>
+        /// <param name="name">Exact preset name key in <see cref="PresetManager.NameToPreset"/>.</param>
+        /// <returns><see langword="true"/> when a preset was removed; otherwise <see langword="false"/>.</returns>
+        public bool DeletePreset(string name)
+        {
+            ArgumentNullException.ThrowIfNull(name);
+
+            if (!PresetManager.NameToPreset.Remove(name))
+            {
+                return false;
+            }
+
+            PresetManager.SavePresets();
+            if (LastLoaded is not null && string.Equals(LastLoaded.Name, name, StringComparison.Ordinal))
+            {
+                SetLastLoaded(null);
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Updates a preset’s description and persists.
+        /// </summary>
+        /// <param name="name">Exact preset name key.</param>
+        /// <param name="description">New description; blank becomes <see langword="null"/>.</param>
+        /// <returns>The updated preset, or <see langword="null"/> when <paramref name="name"/> is missing.</returns>
+        public FilterPreset? SetPresetDescription(string name, string? description)
+        {
+            ArgumentNullException.ThrowIfNull(name);
+
+            if (!PresetManager.NameToPreset.TryGetValue(name, out var existing))
+            {
+                return null;
+            }
+
+            var updated = existing with { Description = _TrimDescriptionOrNull(description) };
+            PresetManager.NameToPreset[name] = updated;
+            PresetManager.SavePresets();
+            if (LastLoaded is not null && string.Equals(LastLoaded.Name, name, StringComparison.Ordinal))
+            {
+                SetLastLoaded(updated);
+            }
+
+            return updated;
+        }
+
+        /// <summary>
+        /// Renames a preset in place (same <see cref="FilterPreset.Id"/>, chain, description, columns).
+        /// <para>
+        /// Blank names are rejected. Exact same name is a no-op. Names already used by another preset
+        /// are refused (no overwrite). When the renamed preset was last-loaded, updates last-loaded.
+        /// </para>
+        /// </summary>
+        /// <param name="currentName">Exact current name key.</param>
+        /// <param name="newName">Desired display name (trimmed).</param>
+        /// <returns>Outcome and the resulting preset when unchanged or renamed.</returns>
+        public PresetRenameResult RenamePreset(string currentName, string newName)
+        {
+            ArgumentNullException.ThrowIfNull(currentName);
+            ArgumentNullException.ThrowIfNull(newName);
+
+            var trimmedName = newName.Trim();
+            if (trimmedName.Length == 0)
+            {
+                return new PresetRenameResult(PresetRenameStatus.BlankName, Preset: null);
+            }
+
+            if (!PresetManager.NameToPreset.TryGetValue(currentName, out var existing))
+            {
+                return new PresetRenameResult(PresetRenameStatus.NotFound, Preset: null);
+            }
+
+            if (string.Equals(currentName, trimmedName, StringComparison.Ordinal))
+            {
+                return new PresetRenameResult(PresetRenameStatus.Unchanged, existing);
+            }
+
+            if (PresetManager.NameToPreset.ContainsKey(trimmedName))
+            {
+                return new PresetRenameResult(PresetRenameStatus.NameTaken, Preset: null);
+            }
+
+            var renamed = existing with { Name = trimmedName };
+            PresetManager.NameToPreset.Remove(currentName);
+            PresetManager.NameToPreset[trimmedName] = renamed;
+            PresetManager.SavePresets();
+            if (LastLoaded is not null && string.Equals(LastLoaded.Name, currentName, StringComparison.Ordinal))
+            {
+                SetLastLoaded(renamed);
+            }
+
+            return new PresetRenameResult(PresetRenameStatus.Success, renamed);
+        }
+
+        /// <summary>
+        /// Trims a description and maps blank / whitespace-only to <see langword="null"/>.
+        /// </summary>
+        /// <param name="description">Raw description from Save As or Edit Description.</param>
+        /// <returns>Trimmed text, or <see langword="null"/> when empty.</returns>
+        private static string? _TrimDescriptionOrNull(string? description)
+        {
+            var trimmed = description?.Trim();
+            if (string.IsNullOrEmpty(trimmed))
+            {
+                return null;
+            }
+
+            return trimmed;
         }
 
         /// <summary>

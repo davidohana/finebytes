@@ -1,7 +1,7 @@
 namespace Mfr.App.Ui.ViewModels
 {
     /// <summary>
-    /// Content for a single-line text input dialog (title, styled prompt, optional note).
+    /// Content for a text input dialog (title, styled prompt, optional note, optional multiline).
     /// </summary>
     public sealed class TextInputPrompt
     {
@@ -24,6 +24,11 @@ namespace Mfr.App.Ui.ViewModels
         /// Gets the initial text box value.
         /// </summary>
         public required string DefaultValue { get; init; }
+
+        /// <summary>
+        /// Gets whether the value box accepts multiple lines (Edit Description).
+        /// </summary>
+        public bool Multiline { get; init; }
 
         /// <summary>
         /// Concatenates prompt and note text for tests and logging.

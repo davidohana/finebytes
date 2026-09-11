@@ -344,7 +344,7 @@
           InputGesture="{x:Static input:AppShortcuts.MoveFilterDown}"
         />
         <Separator />
-        <MenuItem Header="Presets" IsEnabled="False" />
+        <MenuItem Header="Presets" Click="_OnPresetsMenuClick" />
         <MenuItem
           Header="Save Preset"
           Click="_OnSavePresetMenuClick"
