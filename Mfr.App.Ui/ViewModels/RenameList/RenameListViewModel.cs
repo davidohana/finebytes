@@ -24,9 +24,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private List<RenameListSortKey> _sortKeys = [];
 
         /// <summary>
-        /// Optional UI hooks for CSV export; when null, export is a no-op.
+        /// Optional UI hooks for export and Manual Override; when null, those features are no-ops.
         /// </summary>
-        public RenameListExportHooks? ExportHooks { get; set; }
+        public RenameListUiHooks? UiHooks { get; set; }
 
         /// <summary>
         /// Initializes the Rename List and listens for File List changes that affect add commands.

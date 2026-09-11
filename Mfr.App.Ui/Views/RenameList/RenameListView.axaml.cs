@@ -150,8 +150,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 _viewModel.RowErrorDialogRequested -= _OnRowErrorDialogRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.Progress.PropertyChanged -= _OnProgressPropertyChanged;
-                _ClearExportUi(_viewModel);
-                _ClearOverrideUi(_viewModel);
+                _ClearUiHooks(_viewModel);
             }
 
             _viewModel = DataContext as RenameListViewModel;
@@ -164,8 +163,7 @@ namespace Mfr.App.Ui.Views.RenameList
             _viewModel.RowErrorDialogRequested += _OnRowErrorDialogRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.Progress.PropertyChanged += _OnProgressPropertyChanged;
-            _WireExportUi(_viewModel);
-            _WireOverrideUi(_viewModel);
+            _WireUiHooks(_viewModel);
             _RebuildColumns();
             _ApplyFixedWidthFontClass();
             _SyncSelectionToGrid();
@@ -173,9 +171,9 @@ namespace Mfr.App.Ui.Views.RenameList
             _ClearSortDescriptions();
         }
 
-        private void _WireExportUi(RenameListViewModel viewModel)
+        private void _WireUiHooks(RenameListViewModel viewModel)
         {
-            viewModel.ExportHooks = new RenameListExportHooks
+            viewModel.UiHooks = new RenameListUiHooks
             {
                 PickSavePathAsync = (title, defaultExtension, fileTypeName) =>
                     FileSavePicker.PickSaveFileAsync(
@@ -185,22 +183,13 @@ namespace Mfr.App.Ui.Views.RenameList
                         fileTypeName: fileTypeName
                     ),
                 ShowErrorAsync = _ShowExportErrorAsync,
+                PromptAsync = _PromptOverrideAsync,
             };
         }
 
-        private static void _ClearExportUi(RenameListViewModel viewModel)
+        private static void _ClearUiHooks(RenameListViewModel viewModel)
         {
-            viewModel.ExportHooks = null;
-        }
-
-        private void _WireOverrideUi(RenameListViewModel viewModel)
-        {
-            viewModel.OverrideHooks = new RenameListOverrideHooks { PromptAsync = _PromptOverrideAsync };
-        }
-
-        private static void _ClearOverrideUi(RenameListViewModel viewModel)
-        {
-            viewModel.OverrideHooks = null;
+            viewModel.UiHooks = null;
         }
 
         private async Task<string?> _PromptOverrideAsync(string title, string prompt, string defaultValue)

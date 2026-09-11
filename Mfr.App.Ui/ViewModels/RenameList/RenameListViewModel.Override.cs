@@ -9,11 +9,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Optional UI hooks for the override text prompt; when null, Manual Override is a no-op.
-        /// </summary>
-        public RenameListOverrideHooks? OverrideHooks { get; set; }
-
-        /// <summary>
         /// Raised after manual overrides are set or cleared so the shell can re-preview when Auto-Preview is on.
         /// </summary>
         public event EventHandler? ManualOverridesChanged;
@@ -67,7 +62,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var promptHooks = OverrideHooks?.PromptAsync;
+            var promptHooks = UiHooks?.PromptAsync;
             if (promptHooks is null)
             {
                 return;

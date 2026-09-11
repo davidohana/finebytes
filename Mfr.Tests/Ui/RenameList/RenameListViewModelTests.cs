@@ -535,7 +535,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
-            renameListViewModel.ExportHooks = new RenameListExportHooks
+            renameListViewModel.UiHooks = new RenameListUiHooks
             {
                 PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
             };
@@ -569,7 +569,7 @@ namespace Mfr.Tests.Ui.RenameList
                 new SessionStateRenameListColumn(fullNameKey),
                 new SessionStateRenameListColumn(nameKey),
             ]);
-            renameListViewModel.ExportHooks = new RenameListExportHooks
+            renameListViewModel.UiHooks = new RenameListUiHooks
             {
                 PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
             };
@@ -595,7 +595,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([path]);
-            renameListViewModel.ExportHooks = new RenameListExportHooks
+            renameListViewModel.UiHooks = new RenameListUiHooks
             {
                 PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(null),
             };
@@ -620,7 +620,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir, shellOpener: shell);
             await renameListViewModel.AddPathsAsync([path]);
-            renameListViewModel.ExportHooks = new RenameListExportHooks
+            renameListViewModel.UiHooks = new RenameListUiHooks
             {
                 PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
             };
@@ -646,7 +646,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir, shellOpener: shell);
             await renameListViewModel.AddPathsAsync([path]);
-            renameListViewModel.ExportHooks = new RenameListExportHooks
+            renameListViewModel.UiHooks = new RenameListUiHooks
             {
                 PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
             };
@@ -673,7 +673,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var renameListViewModel = _context.CreateRenameListViewModel(dir, shellOpener: shell);
             await renameListViewModel.AddPathsAsync([path]);
-            renameListViewModel.ExportHooks = new RenameListExportHooks
+            renameListViewModel.UiHooks = new RenameListUiHooks
             {
                 PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(missingDir),
                 ShowErrorAsync = (title, message) =>
@@ -1511,7 +1511,7 @@ namespace Mfr.Tests.Ui.RenameList
             var nameKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.SetFocusedFieldKey(nameKey);
             renameListViewModel.SetSelectedEntries([.. renameListViewModel.Entries]);
-            renameListViewModel.OverrideHooks = new RenameListOverrideHooks
+            renameListViewModel.UiHooks = new RenameListUiHooks
             {
                 PromptAsync = (_, _, _) => Task.FromResult<string?>("forced"),
             };
@@ -1546,7 +1546,7 @@ namespace Mfr.Tests.Ui.RenameList
                 BasicRenameListFields.Key.ItemType
             );
             renameListViewModel.SetFocusedFieldKey(itemTypeKey);
-            renameListViewModel.OverrideHooks = new RenameListOverrideHooks
+            renameListViewModel.UiHooks = new RenameListUiHooks
             {
                 PromptAsync = (_, _, _) => Task.FromResult<string?>("x"),
             };
@@ -1584,9 +1584,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var dir = _CreateSampleFolder();
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
-            await renameListViewModel.AddPathsAsync(
-                [Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]
-            );
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]);
 
             var nameKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.Entries[0].EngineItem.SetOverride(nameKey, "first");
@@ -1609,9 +1607,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var dir = _CreateSampleFolder();
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
-            await renameListViewModel.AddPathsAsync(
-                [Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]
-            );
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt"), Path.Combine(dir, "beta.md")]);
 
             var nameKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             foreach (var entry in renameListViewModel.Entries)
@@ -1638,7 +1634,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
 
             string? capturedPrompt = null;
-            renameListViewModel.OverrideHooks = new RenameListOverrideHooks
+            renameListViewModel.UiHooks = new RenameListUiHooks
             {
                 PromptAsync = (_, prompt, _) =>
                 {

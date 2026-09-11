@@ -93,7 +93,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="key">Original or preview field key from the header menu.</param>
         /// <remarks>
         /// <para>
-        /// Uses <see cref="ExportHooks"/> for the save dialog and error UI. On success, reveals the file
+        /// Uses <see cref="UiHooks"/> for the save dialog and error UI. On success, reveals the file
         /// in Explorer. After a path is chosen, aborts if the list became busy. Cancelled pick leaves disk unchanged.
         /// </para>
         /// </remarks>
@@ -114,7 +114,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <remarks>
         /// <para>
         /// Column order matches <see cref="VisibleColumns"/>. No-op when there are no visible columns.
-        /// Uses <see cref="ExportHooks"/> for the save dialog and error UI. On success, reveals the file in Explorer.
+        /// Uses <see cref="UiHooks"/> for the save dialog and error UI. On success, reveals the file in Explorer.
         /// </para>
         /// </remarks>
         [RelayCommand]
@@ -146,7 +146,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             string errorLeadIn
         )
         {
-            var hooks = ExportHooks;
+            var hooks = UiHooks;
             if (IsBusy || hooks?.PickSavePathAsync is null)
             {
                 return;
