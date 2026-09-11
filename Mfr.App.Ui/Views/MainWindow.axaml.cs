@@ -249,8 +249,6 @@ namespace Mfr.App.Ui.Views
                 return;
             }
 
-            // Cancels any pending debounced flush and writes the chain onto the live session document.
-            viewModel.CaptureAppliedFiltersSession();
             UiSessionPersistence.SaveOnClose(
                 this,
                 GetPaneGrids(),

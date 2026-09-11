@@ -1,6 +1,6 @@
 ---
 name: Applied Filter Editors
-overview: "F1–F10 complete on master. Applied Filters / Filter Configuration backlog empty."
+overview: "F1–F7 and F9–F10 complete on master. F8 session chain persist removed. Applied Filters / Filter Configuration backlog empty."
 todos:
   - id: f1-f5-complete
     content: "F1–F5 complete — Applied list, Filter Options host, folder reorg, all option editors + live preview"
@@ -12,8 +12,8 @@ todos:
     content: "F7 Presets UI — enable Presets / Save Preset; load/save chain via PresetManager"
     status: completed
   - id: f8-session-chain
-    content: "F8 Session — persist + restore working Applied Filters chain (current schema only)"
-    status: completed
+    content: "F8 Session — persist + restore working Applied Filters chain — removed (not wanted)"
+    status: cancelled
   - id: f9a-save-as-default
     content: "F9a Save as default (📌) — FilterDefaultsStore / filter-defaults.json"
     status: completed
@@ -33,7 +33,7 @@ isProject: false
 
 Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical for Applied Filters / Filter Configuration work.
 
-**Status (2026-09-11):** **F1–F10 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌**, reset **↺**, and help **?** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, a single Save Preset dialog (upsert + overwrite warn), toolbar ▾ quick-pick, and confirm-replace. **F8** persists the working Applied Filters chain on `SessionState.AppliedFilters` (`FilterChain` shape; catalog names on restore). **F10** polishes Filter Options layout (shared label rows, MFR7 copy/spacing, blank-name OK gate).
+**Status (2026-09-12):** **F1–F7 and F9–F10 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌**, reset **↺**, and help **?** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, a single Save Preset dialog (upsert + overwrite warn), toolbar ▾ quick-pick, and confirm-replace. **F8** (session persist of the working Applied Filters chain) was **removed**. **F10** polishes Filter Options layout (shared label rows, MFR7 copy/spacing, blank-name OK gate).
 
 ### Priority (what's left)
 
@@ -110,14 +110,11 @@ Detail: [presets-ui.plan.md](presets-ui.plan.md) (P1–P4). Engine `PresetManage
 1. Toolbar **▾** quick-pick (sorted names; disabled “No presets” when empty) sharing the host load path with Manager Load.
 1. Hard-fail corrupt `presets.json` with a clear dialog; no silent remap. Tests cover VM + headless load/save and ▾ last-loaded.
 
-### F8 — Session persist of working chain — **done**
+### F8 — Session persist of working chain — **removed**
 
-Rename List / other session fields already persist; Applied Filters chain now uses the same `FilterChain` / `FilterChainStep` shape as presets on `SessionState.AppliedFilters`.
+Not a product feature. The working Applied Filters chain is not written to `session.json`. Rename List / window / File List session fields still persist. Named presets remain the way to save and restore a chain.
 
-1. **Schema:** `appliedFilters: { steps: [ { enabled, filter } ] }` — identical step shape to preset `chain`. Custom Filter Options display names do **not** round-trip (same as presets); restore synthesizes catalog names via `ReplaceFromChain` and does **not** set `LastLoaded`.
-1. **Save:** write-through to the live `SessionState` on `ChainChanged`; debounced disk flush when `sessionFilePath` is set (production); always captured on main-window close via `SessionJsonOptions`.
-1. **Load:** soft-load — unknown/invalid steps are **dropped**, valid steps kept; missing section → null (empty stack). Entirely corrupt `session.json` still yields empty session. No legacy converters. Opposite of PresetManager hard-fail.
-1. **Tests:** `SessionAppliedFiltersTests` round-trip + unknown-step drop; MainWindow restore + debounced flush smoke; `ReplaceFromChain` asserts no `LastLoaded`.
+Removed with this cleanup: `SessionState.AppliedFilters`, `SessionJsonOptions`, `SoftLoadFilterChainJsonConverter`, write-through on `ChainChanged`, launch `ReplaceFromChain` restore, and the F8 tests. Leftover `appliedFilters` in existing `session.json` files is ignored (unknown property) and dropped on the next save.
 
 ### F9 — Filter chrome
 

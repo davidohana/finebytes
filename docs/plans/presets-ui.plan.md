@@ -19,7 +19,7 @@ isProject: false
 
 # F7 Presets UI
 
-Canonical product backlog: [applied-filter-editors.plan.md](applied-filter-editors.plan.md) (F7 done; F8 next). This file is the detailed implementation plan for that slice only. **Do not** fold in F8 session chain, F9c help, or F10 polish.
+Canonical product backlog: [applied-filter-editors.plan.md](applied-filter-editors.plan.md) (F7 done; F8 session chain persist was removed). This file is the detailed implementation plan for that slice only. **Do not** fold in F8 session chain, F9c help, or F10 polish.
 
 **Phased:** yes — four PR-sized phases below. Ship each phase with its tests before starting the next.
 

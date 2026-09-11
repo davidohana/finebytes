@@ -720,7 +720,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         /// <summary>
         /// Verifies <see cref="AppliedFiltersViewModel.ReplaceFromChain"/> rebuilds steps, copies enabled flags,
         /// uses catalog display names, selects the first step, raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once,
-        /// and does not set <see cref="AppliedFiltersViewModel.LastLoaded"/> (session restore must stay unnamed).
+        /// and does not set <see cref="AppliedFiltersViewModel.LastLoaded"/> (preset load sets last-loaded after replace).
         /// </summary>
         [Fact]
         public void ReplaceFromChain_Rebuilds_With_Catalog_Names_And_Single_ChainChanged()

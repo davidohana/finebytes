@@ -17,7 +17,6 @@ namespace Mfr.Tests.Models
             Assert.Null(session.MainWindow);
             Assert.Null(session.FileList);
             Assert.Null(session.RenameList);
-            Assert.Null(session.AppliedFilters);
             Assert.Null(session.FilterEditor);
         }
 
@@ -32,7 +31,6 @@ namespace Mfr.Tests.Models
                 Assert.Null(session.MainWindow);
                 Assert.Null(session.FileList);
                 Assert.Null(session.RenameList);
-                Assert.Null(session.AppliedFilters);
                 Assert.Null(session.FilterEditor);
             }
             finally

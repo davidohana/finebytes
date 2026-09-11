@@ -106,7 +106,7 @@ Follow `mfr-ui-headless-tests` for gesture/control rules. Put per-editor facts i
 
 ## Out of scope (do not do in an editor pass)
 
-- Preset load/save UI; session persist of the working chain
+- Preset load/save UI; persisting the working chain on session
 - Filter Options dialog XAML polish / Apply To / instance rename
 - Filter help `?` button
 - Creating the underlying `BaseFilter` / options record (separate pass + `mfr-implement-filter`)
