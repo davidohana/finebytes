@@ -1,0 +1,157 @@
+using Mfr.Filters;
+using Mfr.Filters.Audio;
+using Mfr.Filters.Case;
+using Mfr.Filters.Formatting;
+using Mfr.Filters.Misc;
+using Mfr.Filters.Replace;
+using Mfr.Models.Tags;
+
+namespace Mfr.Tests.Engine
+{
+    /// <summary>
+    /// Verifies the embedded sample-preset catalog and its curated filter chains.
+    /// </summary>
+    public sealed class SamplePresetCatalogTests
+    {
+        /// <summary>
+        /// Verifies the embedded JSON deserializes to the complete locked catalog.
+        /// </summary>
+        [Fact]
+        public void Catalog_deserializes_all_13_samples()
+        {
+            Assert.Equal(13, SamplePresetCatalog.Presets.Count);
+            Assert.All(SamplePresetCatalog.Presets, preset => Assert.NotEmpty(preset.Chain.Steps));
+        }
+
+        /// <summary>
+        /// Verifies sample names and identifiers are unique.
+        /// </summary>
+        [Fact]
+        public void Catalog_names_and_ids_are_unique()
+        {
+            Assert.Equal(
+                SamplePresetCatalog.Presets.Count,
+                SamplePresetCatalog.Presets.Select(preset => preset.Name).Distinct(StringComparer.Ordinal).Count()
+            );
+            Assert.Equal(
+                SamplePresetCatalog.Presets.Count,
+                SamplePresetCatalog.Presets.Select(preset => preset.Id).Distinct().Count()
+            );
+        }
+
+        /// <summary>
+        /// Verifies every filter discriminator in the sample JSON is currently shipped.
+        /// </summary>
+        [Fact]
+        public void Catalog_filter_types_are_known()
+        {
+            var knownTypes = FilterCatalog.Entries.Select(entry => entry.Type).ToHashSet(StringComparer.Ordinal);
+            var sampleFilters = SamplePresetCatalog.Presets.SelectMany(preset =>
+                preset.Chain.Steps.Select(step => step.Filter)
+            );
+
+            Assert.All(sampleFilters, filter => Assert.Contains(filter.Type, knownTypes));
+        }
+
+        /// <summary>
+        /// Verifies the Beautify Names sample keeps its ordered cleanup and casing workflow.
+        /// </summary>
+        [Fact]
+        public void Beautify_Names_has_locked_chain_and_common_words()
+        {
+            var preset = _Preset("Beautify Names");
+            string[] expectedTypes =
+            [
+                "SpaceCharacter",
+                "SpaceAround",
+                "SpaceAfter",
+                "ShrinkSpaces",
+                "StripSpacesRight",
+                "StripSpacesLeft",
+                "LettersCase",
+                "CapitalizeAfter",
+                "UppercaseInitials",
+                "CasingList",
+            ];
+
+            Assert.Equal(expectedTypes, preset.Chain.Steps.Select(step => step.Filter.Type));
+            var casingList = Assert.IsType<CasingListFilter>(preset.Chain.Steps[^1].Filter);
+            string[] expectedWords = ["a", "an", "the", "and", "or", "of", "to", "in", "on", "for", "with"];
+            Assert.Equal(expectedWords, casingList.Options.Words);
+            Assert.True(casingList.Options.UppercaseSentenceInitial);
+        }
+
+        /// <summary>
+        /// Verifies the Date Taken Folders sample uses the editable photo root and date hierarchy.
+        /// </summary>
+        [Fact]
+        public void Date_Taken_Folders_has_locked_path_mover()
+        {
+            var step = Assert.Single(_Preset("Date Taken Folders").Chain.Steps);
+            Assert.True(step.Enabled);
+            var pathMover = Assert.IsType<PathMoverFilter>(step.Filter);
+            Assert.Equal(@"C:\Photos", pathMover.Options.RootFolder);
+            Assert.Equal(@"<exif-date:yyyy>\<exif-date:MM>\<exif-date:dd>", pathMover.Options.SubFolder);
+        }
+
+        /// <summary>
+        /// Verifies the Swap Around Hyphen sample moves the second spaced-hyphen token left.
+        /// </summary>
+        [Fact]
+        public void Swap_Around_Hyphen_has_locked_token_move()
+        {
+            var step = Assert.Single(_Preset("Swap Around Hyphen").Chain.Steps);
+            var tokenMover = Assert.IsType<TokenMoverFilter>(step.Filter);
+            Assert.Equal(" - ", tokenMover.Options.Delimiter);
+            Assert.Equal(2, tokenMover.Options.TokenNumber);
+            Assert.Equal(-1, tokenMover.Options.MoveBy);
+        }
+
+        /// <summary>
+        /// Verifies the Safe Filename sample replaces every illegal Windows name character.
+        /// </summary>
+        [Fact]
+        public void Safe_Filename_has_locked_regex_replacer()
+        {
+            var step = Assert.Single(_Preset("Safe Filename").Chain.Steps);
+            var replacer = Assert.IsType<ReplacerFilter>(step.Filter);
+            Assert.Equal(@"[\\/:*?""<>|]", replacer.Options.Find);
+            Assert.Equal("-", replacer.Options.Replacement);
+            Assert.Equal(ReplacerMode.Regex, replacer.Options.Match.Mode);
+            Assert.True(replacer.Options.Match.ReplaceAll);
+            replacer.Setup();
+        }
+
+        /// <summary>
+        /// Verifies the Tags from Filename sample wipes ID3 blocks, maps named tokens, and writes track count.
+        /// </summary>
+        [Fact]
+        public void Tags_from_Filename_has_locked_audio_chain()
+        {
+            var preset = _Preset("Tags from Filename");
+            Assert.Equal(
+                ["TagRemover", "AudioTagSetter", "Id3v2FieldSetter"],
+                preset.Chain.Steps.Select(s => s.Filter.Type)
+            );
+
+            var remover = Assert.IsType<TagRemoverFilter>(preset.Chain.Steps[0].Filter);
+            Assert.Equal([AudioTagBlockKind.Id3v1, AudioTagBlockKind.Id3v2], remover.Options.Blocks);
+
+            var setter = Assert.IsType<AudioTagSetterFilter>(preset.Chain.Steps[1].Filter);
+            Assert.Contains("tokenNumber=2", setter.Options.Title!.Text, StringComparison.Ordinal);
+            Assert.Contains("source=<file-name>", setter.Options.Title.Text, StringComparison.Ordinal);
+            Assert.Contains("source=<parent-folder:1>", setter.Options.Performers!.Text, StringComparison.Ordinal);
+            setter.Setup();
+
+            var trackCount = Assert.IsType<Id3v2FieldSetterFilter>(preset.Chain.Steps[2].Filter);
+            Assert.Equal("TRCK", trackCount.Options.FrameId);
+            Assert.Equal("<audio-track>/<item-count>", trackCount.Options.Text);
+            trackCount.Setup();
+        }
+
+        private static FilterPreset _Preset(string name)
+        {
+            return Assert.Single(SamplePresetCatalog.Presets, preset => preset.Name == name);
+        }
+    }
+}
