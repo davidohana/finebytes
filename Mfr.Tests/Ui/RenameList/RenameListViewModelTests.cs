@@ -589,6 +589,45 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies ExportNameListAsync shows the error UI and skips the edit prompt when the write fails.
+        /// </summary>
+        [Fact]
+        public async Task ExportNameListAsync_write_failure_shows_error_and_skips_edit()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+            var missingDir = Path.Combine(dir, "missing", "names.txt");
+            string? errorTitle = null;
+            string? errorMessage = null;
+            var editPromptCalls = 0;
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]);
+            renameListViewModel.PickNameListSavePathAsync = () => Task.FromResult<string?>(missingDir);
+            renameListViewModel.ShowExportNameListErrorAsync = (title, message) =>
+            {
+                errorTitle = title;
+                errorMessage = message;
+                return Task.CompletedTask;
+            };
+            renameListViewModel.ConfirmEditExportedNameListAsync = _ =>
+            {
+                editPromptCalls++;
+                return Task.FromResult(true);
+            };
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            await renameListViewModel.ExportNameListAsync(nameKey);
+
+            Assert.Equal("Magic File Renamer", errorTitle);
+            Assert.Contains("Failed to generate name list for field File Name", errorMessage);
+            Assert.Contains(missingDir, errorMessage);
+            Assert.Equal(0, editPromptCalls);
+            Assert.False(File.Exists(missingDir));
+        }
+
+        /// <summary>
         /// Verifies RemoveUnchanged is a no-op for an empty list and does not raise MembershipChanged.
         /// </summary>
         [Fact]

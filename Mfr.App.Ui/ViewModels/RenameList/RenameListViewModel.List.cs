@@ -93,9 +93,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="key">Original or preview field key from the header menu.</param>
         /// <remarks>
         /// <para>
-        /// Uses <see cref="PickNameListSavePathAsync"/> for the save dialog. On success, asks
-        /// <see cref="ConfirmEditExportedNameListAsync"/> and may open the file via the shell opener.
-        /// Cancelled pick leaves disk unchanged.
+        /// Uses <see cref="PickNameListSavePathAsync"/> for the save dialog. After a path is chosen,
+        /// aborts if the list became busy. On success, asks <see cref="ConfirmEditExportedNameListAsync"/>
+        /// and may open the file via the shell opener. Cancelled pick leaves disk unchanged.
         /// </para>
         /// </remarks>
         public async Task ExportNameListAsync(RenameListFieldKey key)
@@ -106,7 +106,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var path = await PickNameListSavePathAsync().ConfigureAwait(true);
-            if (string.IsNullOrWhiteSpace(path))
+            if (string.IsNullOrWhiteSpace(path) || IsBusy)
             {
                 return;
             }

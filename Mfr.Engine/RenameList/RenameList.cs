@@ -310,13 +310,7 @@ namespace Mfr.Engine.RenameList
         public void ExportNameList(string path, RenameListFieldKey key)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(path);
-
-            var lines = CollectNameList(key);
-            using var writer = new StreamWriter(path, append: false, Encoding.UTF8);
-            foreach (var line in lines)
-            {
-                writer.WriteLine(line);
-            }
+            File.WriteAllLines(path, CollectNameList(key), Encoding.UTF8);
         }
 
         /// <summary>

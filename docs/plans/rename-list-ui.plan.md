@@ -225,7 +225,7 @@ One line per rename-list row = display text of the clicked column (original or p
 
 **Work completed**
 
-- Engine `RenameList.ExportNameList(path, key)` — UTF-8 `WriteLine` over `CollectNameList`.
+- Engine `RenameList.ExportNameList(path, key)` — UTF-8 `File.WriteAllLines` over `CollectNameList`.
 - Header **Export Name List** on any column (before Edit as Name List); tip via `AppTips.ExportNameList`.
 - Avalonia save dialog (`Save Name List as`, `*.txt`); on success `"Name list saved to {path}. Edit?"` → Yes opens with default app (`IFileShellOpener.OpenWithDefaultApp`). Cancel = no write.
 
