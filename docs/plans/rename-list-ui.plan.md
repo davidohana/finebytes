@@ -108,7 +108,7 @@ todos:
     content: "14c: Edit as Name List — embed generated names in NameListFilter on Applied Filters"
     status: completed
   - id: phase-14d
-    content: "14d: Manual Rename Field (F2) — overrides, blue cells, Cancel, F5 reset"
+    content: "14d: Manual Override Field (F2) — overrides, blue cells, Cancel, F5 reset"
     status: pending
   - id: phase-14e
     content: "14e: Properties — Alt+Enter + row menu → Windows property sheet (+ File List + Show in Explorer)"
@@ -136,7 +136,7 @@ Canonical plan: this file under `docs/plans/`. Sources: [mfr7 help](d:/Devl/mfr7
 ```mermaid
 flowchart LR
   Done[1–13 + 14a + 14b + 14c + 14e]
-  P14d[14d Manual F2]
+  P14d[14d Override F2]
   P14f[14f Drag-out]
   P15[15 GO]
   P16[16 Legend]
@@ -151,7 +151,7 @@ ______________________________________________________________________
 |                |                                                              |
 | -------------- | ------------------------------------------------------------ |
 | **Shipped**    | Phases **1–13**, **14a**, **14b**, **14c**, and **14e**      |
-| **Next**       | **14d** Manual Rename Field (F2)                             |
+| **Next**       | **14d** Manual Override Field (F2)                           |
 | **Then**       | 14f → **15** GO → **16** color legend                        |
 | **Blocked on** | 16 needs 14d (blue) + 15 (plum); 15 must honor 14d overrides |
 
@@ -186,7 +186,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 - Cell/row classes: red / gray / lavender in `RenameListView.axaml`; **blue** and **plum** still missing
 - `MainWindowViewModel.Go()` + `AppShortcuts.Go` / menu / toolbar — **stubs**; Ctrl+G labeled but no-op ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
 - `IFileShellOpener.ShowProperties` / `RevealInFileManager` / `OpenWithDefaultApp` — `Services/Shell`, shared by File List and Rename List
-- `SupportsWrite` / `WriteTarget` on catalog fields — ready for **14d** Manual Rename
+- `SupportsWrite` / `WriteTarget` on catalog fields — ready for **14d** Manual Override
 
 **Write vs preview (important for 14d):**
 
@@ -202,7 +202,7 @@ ______________________________________________________________________
 
 | Phase                      | What                                                    | Depends on                   |
 | -------------------------- | ------------------------------------------------------- | ---------------------------- |
-| **14d** Manual Rename (F2) | Force original/preview; blue cells; Cancel; F5 clears   | `SupportsWrite`              |
+| **14d** Manual Override (F2) | Override original/preview; blue cells; Cancel; F5 clears | `SupportsWrite`            |
 | **14f** Drag-out           | Selected rows as FileDrop to Explorer                   | coexist with 4d reorder      |
 | **15** GO                  | `Ctrl+G` → Commit; plum apply errors; Show Rename Error | 14d overrides in commit path |
 | **16** Color legend        | Toolbar toggle + side panel                             | 14d blue + 15 plum           |
@@ -213,7 +213,7 @@ ______________________________________________________________________
 
 MFR7: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) (`#export`, `#freeedit`, `#manualrename`, `#removeunchanged`, `#morefeats`), UI `RenameList.cs`, `RenameItemList.GenerateNameList`.
 
-**Do not conflate** Export (file) ≠ Edit as Name List (filter) ≠ Manual Rename (F2 force/blue).
+**Do not conflate** Export (file) ≠ Edit as Name List (filter) ≠ Manual Override (F2 override/blue).
 
 Header menu order ([`_BuildColumnHeaderContextMenu`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)):
 
@@ -244,24 +244,24 @@ Header command on **writable** columns only (`SupportsWrite` / MFR7 `ReadWriteAp
 
 **Not in scope:** blue manual cells (14d); does not mutate Original/Preview directly.
 
-### 14d — Manual Rename Field (F2)
+### 14d — Manual Override Field (F2)
 
-Largest substep — model + blue highlight (required before Phase 16).
+Largest substep — model + blue highlight (required before Phase 16). Prefer **override** in UI/APIs/docs (MFR7 still says “Manual Rename”).
 
-**Behavior (MFR7)**
+**Behavior (MFR7 + finebytes)**
 
 - Focused writable column + selection → InputBox “Set the original|preview value of field …” with first non-error cell as default → same string on all selected non-error rows.
 - Changes apply on **GO** (15), not immediately to disk.
-- **Cancel Manual Rename** clears force on focused cell only.
+- **Cancel Manual Override:** enabled if any selected row is overridden on the focused field; clears that side on **all selected** rows (vs MFR7 focused-row-only).
 - F5 `RefreshOriginals` clears **all** manual overrides (and later apply errors).
 
 **Work**
 
-- **Model:** per-item forced value for `(fieldKey)` on original and/or preview (MFR7 `PropStatus.ForceValue`). Catalog / `GetFieldText` prefer forced text; `IsPreviewChanged` / red still correct when forced preview ≠ original; `IsManuallyRenamed` for blue.
-- **Pipeline (MFR7):** forced **original** before filters; forced **preview** after filters. Phase 15 commit must see the same.
-- **UI:** enable F2 ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md) still lists it under “not implemented”); row menu Manual Rename Field + Cancel; enable only for `SupportsWrite` and non-error focused cell.
-- **Styling:** `rename-list-manual-rename` blue foreground; blue wins over red for forced cells (document precedence in Themes / view styles).
-- **Tests:** force original vs preview; multi-select identical value; Cancel one cell; F5 clears; non-writable / error no-op; blue class applied.
+- **Model:** per-item override for `(fieldKey)` on original and/or preview (MFR7 `PropStatus.ForceValue`). Catalog / `GetFieldText` prefer overridden text; `IsPreviewChanged` / red still correct when overridden preview ≠ original; `IsOverridden` for blue.
+- **Pipeline (MFR7):** overridden **original** before filters; overridden **preview** after filters. Phase 15 commit must see the same.
+- **UI:** enable F2 ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md) still lists it under “not implemented”); row menu **Manual Override Field** + **Cancel Manual Override** before Locate (F4) / Refresh (F5) so F-key items stay in F2→F4→F5 order; enable only for `SupportsWrite` and non-error default cell.
+- **Styling:** `rename-list-manual-override` blue foreground; blue wins over red for overridden cells (document precedence in Themes / view styles).
+- **Tests:** override original vs preview; multi-select identical value; multi-select Cancel; F5 clears; non-writable / error no-op; blue class applied.
 
 **Out of scope here:** disk commit (15).
 
@@ -293,7 +293,7 @@ Selected Rename List rows drag as filesystem paths.
 
 ### Phase 14 exit
 
-Header menu has Export + Edit as Name List; F2 manual rename + blue; Properties; Explorer drag-out. Then **15** → **16**.
+Header menu has Export + Edit as Name List; F2 manual override + blue; Properties; Explorer drag-out. Then **15** → **16**.
 
 ______________________________________________________________________
 
@@ -329,7 +329,7 @@ MFR7: toolbar CheckOnClick + right-dock legend (~112–120px) — [Legend.cs](d:
 | ----------- | ---------------------- | ---------------- |
 | Black       | Original / unchanged   | default          |
 | Red fg      | Value changed          | shipped (11)     |
-| Blue fg     | Forced / manual rename | **14d**          |
+| Blue fg     | Forced / manual override | **14d**        |
 | Gray fg     | Load / missing error   | shipped (8/9)    |
 | Lavender bg | Preview error          | shipped (11)     |
 | Plum bg     | Rename / apply error   | **15**           |
@@ -342,6 +342,6 @@ ______________________________________________________________________
 
 ## What to implement next
 
-1. **14d** — force model + F2/Cancel + blue + F5 clear
+1. **14d** — override model + F2/Cancel + blue + F5 clear
 1. **14f** drag-out
 1. **15** GO UI + plum → **16** legend
