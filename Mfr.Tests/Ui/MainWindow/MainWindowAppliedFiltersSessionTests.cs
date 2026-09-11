@@ -44,7 +44,6 @@ namespace Mfr.Tests.Ui.MainWindow
             var viewModel = new MainWindowViewModel(session: session);
 
             Assert.Null(viewModel.AppliedFiltersViewModel.LastLoaded);
-            Assert.False(viewModel.AppliedFiltersViewModel.CanSavePreset);
             Assert.Equal(2, viewModel.AppliedFiltersViewModel.Count);
             Assert.Equal("Letters Case", viewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
             Assert.False(viewModel.AppliedFiltersViewModel.Steps[0].Enabled);

@@ -120,7 +120,6 @@ namespace Mfr.Tests.Ui.Presets
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal("Demo", viewModel.LastLoaded?.Name);
-            Assert.True(viewModel.CanSavePreset);
             Assert.Equal("Letters Case", viewModel.Steps[0].DisplayName);
 
             window.Close();

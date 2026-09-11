@@ -56,14 +56,9 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         public PresetManager PresetManager { get; }
 
         /// <summary>
-        /// Gets the last preset loaded into this pane, or <see langword="null"/> when none.
+        /// Gets the last preset loaded or saved into this pane, or <see langword="null"/> when none.
         /// </summary>
         public FilterPreset? LastLoaded { get; private set; }
-
-        /// <summary>
-        /// Gets whether in-place Save Preset is available (a last-loaded preset still present in the manager).
-        /// </summary>
-        public bool CanSavePreset => LastLoaded is not null && PresetManager.NameToPreset.ContainsKey(LastLoaded.Name);
 
         /// <summary>
         /// Clears in-memory per-type add defaults after Reset Configuration deletes the file.
@@ -74,97 +69,21 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Records the last loaded preset (enables in-place Save when the name remains in the manager).
+        /// Records the last loaded or saved preset (used to prefill Save Preset).
         /// </summary>
-        /// <param name="preset">Preset that was just loaded, or <see langword="null"/> to clear.</param>
+        /// <param name="preset">Preset that was just loaded or saved, or <see langword="null"/> to clear.</param>
         internal void SetLastLoaded(FilterPreset? preset)
         {
             LastLoaded = preset;
             OnPropertyChanged(nameof(LastLoaded));
-            NotifyCanSavePresetChanged();
         }
 
         /// <summary>
-        /// Raises <see cref="CanSavePreset"/> after a dictionary mutation that may change enablement.
-        /// </summary>
-        internal void NotifyCanSavePresetChanged()
-        {
-            OnPropertyChanged(nameof(CanSavePreset));
-        }
-
-        /// <summary>
-        /// Updates the last-loaded preset (same <see cref="FilterPreset.Id"/>).
-        /// <para>
-        /// Writes the current <see cref="ToChain"/> result plus the dialog description and columns.
-        /// When <paramref name="name"/> differs from the current name, renames the preset (refuses when
-        /// another preset already uses that name).
-        /// </para>
-        /// </summary>
-        /// <param name="name">Desired display name (trimmed; blank is rejected).</param>
-        /// <param name="description">Optional description; blank becomes <see langword="null"/>.</param>
-        /// <param name="visibleColumns">
-        /// Columns to store when the Save Rename List columns checkbox is checked; otherwise
-        /// <see langword="null"/>.
-        /// </param>
-        /// <returns>
-        /// The updated preset, or <see langword="null"/> when Update is unavailable, the name is blank,
-        /// or the new name is taken by another preset.
-        /// </returns>
-        public FilterPreset? SavePreset(
-            string name,
-            string? description,
-            IReadOnlyList<SessionStateRenameListColumn>? visibleColumns
-        )
-        {
-            ArgumentNullException.ThrowIfNull(name);
-
-            if (LastLoaded is null)
-            {
-                return null;
-            }
-
-            if (!PresetManager.NameToPreset.TryGetValue(LastLoaded.Name, out var existing))
-            {
-                NotifyCanSavePresetChanged();
-                return null;
-            }
-
-            var trimmedName = name.Trim();
-            if (trimmedName.Length == 0)
-            {
-                return null;
-            }
-
-            var isRename = !string.Equals(existing.Name, trimmedName, StringComparison.Ordinal);
-            if (isRename && PresetManager.NameToPreset.ContainsKey(trimmedName))
-            {
-                return null;
-            }
-
-            if (isRename)
-            {
-                PresetManager.NameToPreset.Remove(existing.Name);
-            }
-
-            var updated = existing with
-            {
-                Name = trimmedName,
-                Description = _TrimDescriptionOrNull(description),
-                Chain = ToChain(),
-                VisibleColumns = visibleColumns,
-            };
-            PresetManager.NameToPreset[trimmedName] = updated;
-            PresetManager.SavePresets();
-            SetLastLoaded(updated);
-            return updated;
-        }
-
-        /// <summary>
-        /// Upserts a named preset from the current chain (Save as new).
+        /// Upserts a named preset from the current chain.
         /// <para>
         /// Keeps <see cref="FilterPreset.Id"/> when overwriting an existing name; otherwise assigns a new
-        /// id. Sets last-loaded to the saved preset (enables in-place Save). Caller is responsible for
-        /// overwrite confirmation when the name already exists.
+        /// id. Sets last-loaded to the saved preset. Caller is responsible for overwrite confirmation when
+        /// the name already exists.
         /// </para>
         /// </summary>
         /// <param name="name">Preset display name (trimmed; blank is rejected).</param>
@@ -174,7 +93,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <see langword="null"/>.
         /// </param>
         /// <returns>The saved preset, or <see langword="null"/> when <paramref name="name"/> is blank.</returns>
-        public FilterPreset? SavePresetAs(
+        public FilterPreset? SavePreset(
             string name,
             string? description,
             IReadOnlyList<SessionStateRenameListColumn>? visibleColumns
@@ -238,7 +157,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Deletes a named preset from the manager and persists.
         /// <para>
-        /// When the deleted preset was last-loaded, clears last-loaded so Save disables.
+        /// When the deleted preset was last-loaded, clears last-loaded.
         /// </para>
         /// </summary>
         /// <param name="name">Exact preset name key in <see cref="PresetManager.NameToPreset"/>.</param>

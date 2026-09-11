@@ -116,7 +116,7 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Applied Filters / Filters menu: open Preset Manager (MFR7 PresetManager).</summary>
         public const string Presets = "Show Preset Manager window";
 
-        /// <summary>Applied Filters / Filters menu: Save Preset dialog (update or save as new).</summary>
+        /// <summary>Applied Filters / Filters menu: Save Preset dialog (upsert by name).</summary>
         public const string SavePreset = "Save applied filters as a preset";
 
         /// <summary>Applied Filters toolbar ▾ quick-pick tip.</summary>

@@ -213,8 +213,16 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 }
             }
 
-            var columns = dialogVm.SaveRenameListColumns ? PresetRenameListColumns.Capture(this) : null;
-            _viewModel.SavePresetAs(name, dialogVm.TrimmedDescriptionOrNull, columns);
+            try
+            {
+                var columns = dialogVm.SaveRenameListColumns ? PresetRenameListColumns.Capture(this) : null;
+                _viewModel.SavePreset(name, dialogVm.TrimmedDescriptionOrNull, columns);
+            }
+            catch (Exception ex)
+            {
+                var message = ex is UserException userEx ? userEx.Message : ex.Message;
+                await new OkMessageDialog("Save Preset", message).ShowDialog(owner);
+            }
         }
 
         /// <summary>
