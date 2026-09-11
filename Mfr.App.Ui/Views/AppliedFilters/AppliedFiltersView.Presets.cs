@@ -10,9 +10,16 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 {
     public partial class AppliedFiltersView
     {
+        /// <summary>
+        /// Gets the ▾ quick-pick flyout (tests).
+        /// </summary>
+        internal MenuFlyout PresetsQuickPickFlyout { get; } =
+            new() { Placement = PlacementMode.BottomEdgeAlignedLeft };
+
         private void _WirePresetHandlers()
         {
             PresetsButton.Click += _OnPresetsClick;
+            PresetsQuickPickButton.Click += _OnPresetsQuickPickClick;
             SavePresetButton.Click += _OnSavePresetClick;
             SavePresetAsButton.Click += _OnSavePresetAsClick;
         }
@@ -33,17 +40,28 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Rebuilds the ▾ quick-pick menu with sorted preset names (or a disabled empty placeholder).
+        /// Rebuilds ▾ items then shows the menu (items must exist before the presenter is created).
         /// </summary>
-        /// <param name="sender">The <see cref="MenuFlyout"/> opening.</param>
+        /// <param name="sender">The ▾ button.</param>
         /// <param name="e">Event args.</param>
-        private void _OnPresetsQuickPickOpening(object? sender, EventArgs e)
+        private void _OnPresetsQuickPickClick(object? sender, RoutedEventArgs e)
         {
-            if (sender is not MenuFlyout flyout)
+            if (PresetsQuickPickFlyout.IsOpen)
             {
+                PresetsQuickPickFlyout.Hide();
                 return;
             }
 
+            _RebuildPresetsQuickPick(PresetsQuickPickFlyout);
+            PresetsQuickPickFlyout.ShowAt(PresetsQuickPickButton);
+        }
+
+        /// <summary>
+        /// Rebuilds the ▾ quick-pick menu with sorted preset names (or a disabled empty placeholder).
+        /// </summary>
+        /// <param name="flyout">Quick-pick flyout to refill.</param>
+        private void _RebuildPresetsQuickPick(MenuFlyout flyout)
+        {
             flyout.Items.Clear();
             if (_viewModel is null)
             {
@@ -81,7 +99,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            PresetsQuickPickButton.Flyout?.Hide();
+            PresetsQuickPickFlyout.Hide();
             await TryLoadPresetAsync(preset);
         }
 

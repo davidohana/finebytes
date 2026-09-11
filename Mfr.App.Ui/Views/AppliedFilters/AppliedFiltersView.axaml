@@ -111,9 +111,19 @@
           Grid.Column="0"
           x:Name="PresetsButton"
           Classes="applied-filter-toolbar"
-          Content="Presets"
           ToolTip.Tip="{x:Static resources:AppTips.Presets}"
-        />
+        >
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Image
+              Width="22"
+              Height="16"
+              VerticalAlignment="Center"
+              Stretch="None"
+              Source="/Assets/AppliedFilters/Presets.png"
+            />
+            <TextBlock Text="Presets" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
         <Button
           Grid.Column="1"
           x:Name="PresetsQuickPickButton"
@@ -122,34 +132,59 @@
           Padding="6,2"
           MinWidth="22"
           ToolTip.Tip="{x:Static resources:AppTips.PresetsQuickPick}"
-        >
-          <Button.Flyout>
-            <MenuFlyout Placement="BottomEdgeAlignedLeft" Opening="_OnPresetsQuickPickOpening" />
-          </Button.Flyout>
-        </Button>
+        />
         <Button
           Grid.Column="2"
           x:Name="SavePresetButton"
           Classes="applied-filter-toolbar"
-          Content="Save Preset"
           ToolTip.Tip="{x:Static resources:AppTips.SavePreset}"
           IsEnabled="{Binding CanSavePreset}"
-        />
+        >
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Image
+              Width="22"
+              Height="16"
+              VerticalAlignment="Center"
+              Stretch="None"
+              Source="/Assets/AppliedFilters/SavePreset.png"
+            />
+            <TextBlock Text="Save Preset" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
         <Button
           Grid.Column="3"
           x:Name="SavePresetAsButton"
           Classes="applied-filter-toolbar"
-          Content="Save Preset As"
           ToolTip.Tip="{x:Static resources:AppTips.SavePresetAs}"
-        />
+        >
+          <StackPanel Orientation="Horizontal" Spacing="4">
+            <Image
+              Width="22"
+              Height="16"
+              VerticalAlignment="Center"
+              Stretch="None"
+              Source="/Assets/AppliedFilters/SavePreset.png"
+            />
+            <TextBlock Text="Save Preset As" VerticalAlignment="Center" />
+          </StackPanel>
+        </Button>
         <Button
           Grid.Column="5"
           x:Name="FilterOptionsButton"
           Classes="applied-filter-toolbar"
-          Content="Filter Options"
+          Padding="4,2"
+          MinWidth="24"
           ToolTip.Tip="{x:Static resources:AppTips.FilterOptions}"
           IsEnabled="{Binding CanShowFilterOptions}"
-        />
+        >
+          <Image
+            Width="22"
+            Height="16"
+            VerticalAlignment="Center"
+            Stretch="None"
+            Source="/Assets/AppliedFilters/FilterOptions.png"
+          />
+        </Button>
       </Grid>
       <Grid ColumnDefinitions="Auto,*">
         <Border Grid.Column="0" Classes="applied-filter-shuttle-rail">

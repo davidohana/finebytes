@@ -1,5 +1,8 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.Resources;
@@ -40,11 +43,12 @@ namespace Mfr.Tests.Ui.Presets
             var (window, view) = _Show(viewModel);
             var button = view.FindControl<Button>("PresetsQuickPickButton");
             Assert.NotNull(button);
-            var flyout = Assert.IsType<MenuFlyout>(button.Flyout);
+            var flyout = view.PresetsQuickPickFlyout;
 
-            flyout.ShowAt(button);
+            button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
 
+            Assert.True(flyout.IsOpen);
             var item = Assert.Single(flyout.Items.OfType<MenuItem>());
             Assert.Equal("No presets", item.Header);
             Assert.False(item.IsEnabled);
@@ -54,10 +58,10 @@ namespace Mfr.Tests.Ui.Presets
         }
 
         /// <summary>
-        /// Verifies ▾ lists preset names sorted ordinal-ignore-case then ordinal.
+        /// Verifies clicking ▾ opens the flyout with sorted preset names.
         /// </summary>
         [AvaloniaFact]
-        public void QuickPick_Items_Are_Sorted()
+        public void QuickPick_Click_Opens_Sorted_Items()
         {
             var manager = PresetManager.CreateEmpty();
             foreach (var name in new[] { "beta", "Alpha", "alpha2" })
@@ -73,11 +77,17 @@ namespace Mfr.Tests.Ui.Presets
             var (window, view) = _Show(new AppliedFiltersViewModel(presetManager: manager));
             var button = view.FindControl<Button>("PresetsQuickPickButton");
             Assert.NotNull(button);
-            var flyout = Assert.IsType<MenuFlyout>(button.Flyout);
+            var flyout = view.PresetsQuickPickFlyout;
 
-            flyout.ShowAt(button);
+            var local = new Point(Math.Max(2, button.Bounds.Width / 2), Math.Max(2, button.Bounds.Height / 2));
+            var windowPoint = button.TranslatePoint(local, window);
+            Assert.True(windowPoint.HasValue);
+            window.MouseMove(windowPoint.Value);
+            window.MouseDown(windowPoint.Value, MouseButton.Left);
+            window.MouseUp(windowPoint.Value, MouseButton.Left);
             Dispatcher.UIThread.RunJobs();
 
+            Assert.True(flyout.IsOpen);
             Assert.Equal(
                 ["Alpha", "alpha2", "beta"],
                 flyout.Items.OfType<MenuItem>().Select(item => item.Header?.ToString()).ToList()
@@ -96,11 +106,12 @@ namespace Mfr.Tests.Ui.Presets
             var (window, viewModel, view) = _ShowWithPresets();
             var button = view.FindControl<Button>("PresetsQuickPickButton");
             Assert.NotNull(button);
-            var flyout = Assert.IsType<MenuFlyout>(button.Flyout);
+            var flyout = view.PresetsQuickPickFlyout;
 
-            flyout.ShowAt(button);
+            button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
 
+            Assert.True(flyout.IsOpen);
             var item = Assert.Single(flyout.Items.OfType<MenuItem>());
             Assert.Equal("Demo", item.Header);
             Assert.True(item.IsEnabled);
