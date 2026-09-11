@@ -324,7 +324,8 @@ namespace Mfr.Engine.RenameList
         /// <exception cref="IOException">The file could not be written.</exception>
         /// <remarks>
         /// <para>
-        /// Header cells are field <see cref="RenameListField.DisplayName"/> values. Data cells use
+        /// Header cells are field <see cref="RenameListField.DisplayName"/> values, with
+        /// <c> (Preview)</c> appended for preview keys. Data cells use
         /// <see cref="RenameListFieldCatalog.Resolve(RenameItem, RenameListFieldKey)"/>. Empty list writes the header only.
         /// </para>
         /// </remarks>
@@ -340,7 +341,9 @@ namespace Mfr.Engine.RenameList
             var header = new string[keys.Count];
             for (var c = 0; c < keys.Count; c++)
             {
-                header[c] = RenameListFieldCatalog.GetField(keys[c]).DisplayName;
+                var key = keys[c];
+                var displayName = RenameListFieldCatalog.GetField(key).DisplayName;
+                header[c] = key.IsPreview ? $"{displayName} (Preview)" : displayName;
             }
 
             var lines = new List<string>(_renameItems.Count + 1) { CsvText.FormatRow(header) };

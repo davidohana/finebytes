@@ -687,7 +687,7 @@ namespace Mfr.Tests.Engine
 
             renameList.ExportCsv(outPath, [previewKey]);
             Assert.Equal(
-                $"Full File Name{Environment.NewLine}HELLO.txt{Environment.NewLine}WORLD.txt{Environment.NewLine}",
+                $"Full File Name (Preview){Environment.NewLine}HELLO.txt{Environment.NewLine}WORLD.txt{Environment.NewLine}",
                 File.ReadAllText(outPath)
             );
         }
