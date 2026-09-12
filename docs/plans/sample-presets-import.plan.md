@@ -170,7 +170,7 @@ Descriptions for MFR7-derived samples are copied from MFR7 where present. Additi
 - No FreeDB / contents-uppercase samples.
 - No `.mps` import.
 - Casing list words embedded (not external file).
-- Every sample ships `visibleColumns`: Basic defaults plus domain fields (`MediaTag`, `Jpeg`, `Image`, Folder/FullPath preview for movers); omit widths (catalog defaults) and sort fields (presets never store sort).
+- Every sample ships `visibleColumns`: Basic defaults plus domain fields (`MediaTag`, `Jpeg`, `Image`, Folder/FullPath preview for movers); widths sized for typical content (MFR7-inspired); sort fields omitted (presets never store sort).
 - Folder samples ship with placeholder Path Mover roots the user is expected to edit.
 
 ## Non-goals

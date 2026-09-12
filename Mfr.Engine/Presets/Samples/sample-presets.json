@@ -156,28 +156,32 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 200
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 220
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 320
         }
       ]
     },
@@ -213,28 +217,32 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 200
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 200
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 360
         }
       ]
     },
@@ -296,63 +304,72 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 180
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 220
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 280
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Performers",
             "preview": true
-          }
+          },
+          "width": 120
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Album",
             "preview": true
-          }
+          },
+          "width": 140
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Title",
             "preview": true
-          }
+          },
+          "width": 160
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Track",
             "preview": true
-          }
+          },
+          "width": 45
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "TrackCount",
             "preview": true
-          }
+          },
+          "width": 50
         }
       ]
     },
@@ -427,49 +444,56 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 160
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 200
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 340
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Performers",
             "preview": false
-          }
+          },
+          "width": 120
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Track",
             "preview": false
-          }
+          },
+          "width": 45
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Title",
             "preview": false
-          }
+          },
+          "width": 160
         }
       ]
     },
@@ -499,35 +523,40 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 180
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 160
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 300
         },
         {
           "key": {
             "group": "Jpeg",
             "property": "ExifDirectory*36867",
             "preview": false
-          }
+          },
+          "width": 140
         }
       ]
     },
@@ -557,63 +586,72 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 180
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 160
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 300
         },
         {
           "key": {
             "group": "Image",
             "property": "Format",
             "preview": false
-          }
+          },
+          "width": 60
         },
         {
           "key": {
             "group": "Image",
             "property": "Width",
             "preview": false
-          }
+          },
+          "width": 55
         },
         {
           "key": {
             "group": "Image",
             "property": "Height",
             "preview": false
-          }
+          },
+          "width": 55
         },
         {
           "key": {
             "group": "Image",
             "property": "BitDepth",
             "preview": false
-          }
+          },
+          "width": 60
         },
         {
           "key": {
             "group": "Image",
             "property": "HorzRes",
             "preview": false
-          }
+          },
+          "width": 70
         }
       ]
     },
@@ -653,35 +691,40 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 220
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 180
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 320
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullPath",
             "preview": true
-          }
+          },
+          "width": 300
         }
       ]
     },
@@ -709,35 +752,40 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 180
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": true
-          }
+          },
+          "width": 240
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 180
         },
         {
           "key": {
             "group": "Jpeg",
             "property": "ExifDirectory*36867",
             "preview": false
-          }
+          },
+          "width": 140
         }
       ]
     },
@@ -765,42 +813,48 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 180
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": true
-          }
+          },
+          "width": 260
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 200
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Performers",
             "preview": false
-          }
+          },
+          "width": 120
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Album",
             "preview": false
-          }
+          },
+          "width": 140
         }
       ]
     },
@@ -832,28 +886,32 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 200
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 220
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 320
         }
       ]
     },
@@ -890,28 +948,32 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 200
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 220
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 320
         }
       ]
     },
@@ -964,28 +1026,32 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 200
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 220
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 320
         }
       ]
     },
@@ -1015,42 +1081,48 @@
             "group": "Basic",
             "property": "ItemType",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "Basic",
             "property": "Folder",
             "preview": false
-          }
+          },
+          "width": 160
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": false
-          }
+          },
+          "width": 180
         },
         {
           "key": {
             "group": "Basic",
             "property": "FullName",
             "preview": true
-          }
+          },
+          "width": 280
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Year",
             "preview": false
-          }
+          },
+          "width": 50
         },
         {
           "key": {
             "group": "MediaTag",
             "property": "Title",
             "preview": false
-          }
+          },
+          "width": 180
         }
       ]
     }

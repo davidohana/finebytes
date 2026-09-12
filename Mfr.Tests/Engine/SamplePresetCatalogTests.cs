@@ -29,7 +29,7 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies every sample ships Rename List columns with known catalog field keys.
+        /// Verifies every sample ships Rename List columns with known catalog field keys and positive widths.
         /// </summary>
         [Fact]
         public void Catalog_visible_columns_are_present_and_known()
@@ -43,7 +43,10 @@ namespace Mfr.Tests.Engine
                     Assert.All(
                         preset.VisibleColumns,
                         column =>
-                            Assert.True(RenameListFieldCatalog.TryGetField(column.Key, out _), column.Key.ToString())
+                        {
+                            Assert.True(RenameListFieldCatalog.TryGetField(column.Key, out _), column.Key.ToString());
+                            Assert.True(column.Width is > 0, column.Key.ToString());
+                        }
                     );
                 }
             );
@@ -65,7 +68,9 @@ namespace Mfr.Tests.Engine
             );
             Assert.Contains(
                 _Preset("Date Taken Prefix").VisibleColumns!,
-                column => column.Key == RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*36867")
+                column =>
+                    column.Key == RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*36867")
+                    && column.Width == 140
             );
             Assert.Contains(
                 _Preset("Name from Image").VisibleColumns!,
