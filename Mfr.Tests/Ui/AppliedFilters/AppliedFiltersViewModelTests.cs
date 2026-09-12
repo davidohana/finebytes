@@ -873,6 +873,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Single(saved.Chain.Steps);
             Assert.True(manager.NameToPreset.ContainsKey("My Preset"));
             Assert.Same(saved, viewModel.LastLoaded);
+            Assert.Equal("Saved preset \"My Preset\".", viewModel.LastStatusMessage.ToPlainText());
+            Assert.All(viewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
             Assert.True(File.Exists(manager.PresetsFilePath));
         }
 
@@ -928,6 +930,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Null(viewModel.SavePreset("   ", description: null, visibleColumns: null));
             Assert.Empty(manager.NameToPreset);
             Assert.Null(viewModel.LastLoaded);
+            Assert.True(viewModel.LastStatusMessage.IsEmpty);
         }
 
         /// <summary>
@@ -1018,6 +1021,46 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Single(viewModel.Steps);
             Assert.Equal("Letters Case", viewModel.Steps[0].DisplayName);
             Assert.Same(letters, viewModel.Steps[0].Filter);
+            Assert.Equal("Loaded preset \"LoadMe\".", viewModel.LastStatusMessage.ToPlainText());
+            Assert.All(viewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
+        }
+
+        /// <summary>
+        /// Verifies Load Preset publishes one sticky message and Append/Remove do not flash status.
+        /// </summary>
+        [Fact]
+        public void LoadPreset_Does_Not_Emit_Per_Filter_Status_And_Append_Remove_Stay_Silent()
+        {
+            var shrink = new ShrinkSpacesFilter();
+            var letters = new LettersCaseFilter();
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Multi",
+                Chain = new FilterChain
+                {
+                    Steps =
+                    [
+                        new FilterChainStep(Enabled: true, Filter: shrink),
+                        new FilterChainStep(Enabled: true, Filter: letters),
+                    ],
+                },
+            };
+            var viewModel = new AppliedFiltersViewModel();
+
+            viewModel.LoadPreset(preset);
+
+            Assert.Equal(2, viewModel.Count);
+            Assert.Equal("Loaded preset \"Multi\".", viewModel.LastStatusMessage.ToPlainText());
+            Assert.Single(viewModel.LastStatusMessage.Runs);
+
+            var statusAfterLoad = viewModel.LastStatusMessage.ToPlainText();
+            viewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            Assert.Equal(statusAfterLoad, viewModel.LastStatusMessage.ToPlainText());
+
+            viewModel.SetSelectedSteps([viewModel.Steps[^1]]);
+            viewModel.RemoveSelectedCommand.Execute(null);
+            Assert.Equal(statusAfterLoad, viewModel.LastStatusMessage.ToPlainText());
         }
 
         /// <summary>
@@ -1047,6 +1090,36 @@ namespace Mfr.Tests.Ui.AppliedFilters
             viewModel.LoadPreset(preset);
 
             Assert.Same(columns, applied);
+        }
+
+        /// <summary>
+        /// Verifies Load Preset does not publish sticky status when Rename List column apply throws.
+        /// </summary>
+        [Fact]
+        public void LoadPreset_Does_Not_Set_Status_When_Column_Apply_Throws()
+        {
+            var columns = new List<RenameListVisibleColumnSpec>
+            {
+                new(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    Width: 180
+                ),
+            };
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "BadCols",
+                Chain = new FilterChain { Steps = [] },
+                VisibleColumns = columns,
+            };
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.SetRenameListColumnSource(
+                capture: () => [],
+                apply: _ => throw new InvalidOperationException("column apply failed")
+            );
+
+            Assert.Throws<InvalidOperationException>(() => viewModel.LoadPreset(preset));
+            Assert.True(viewModel.LastStatusMessage.IsEmpty);
         }
 
         /// <summary>

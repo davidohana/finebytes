@@ -6,7 +6,7 @@ Parent: Rename List / main shell feedback ([rename-list-go.plan.md](rename-list-
 
 - [x] P1 — Sticky rich status channel + brushes + Preview Errors red
 - [x] P2 — High-signal Rename List outcomes + colored cell errors
-- [ ] P3 — Preset load/save only
+- [x] P3 — Preset load/save only
 - [ ] P4 — File List CopyPath only
 - [ ] P5 — Selected count panel
 

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.ViewModels.Presets;
@@ -61,6 +62,12 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Gets the last preset loaded or saved into this pane, or <see langword="null"/> when none.
         /// </summary>
         public FilterPreset? LastLoaded { get; private set; }
+
+        /// <summary>
+        /// Gets the most recent high-signal Applied Filters status-bar message (preset load/save).
+        /// </summary>
+        [ObservableProperty]
+        private StyledTextDisplay _lastStatusMessage = StyledTextDisplay.Empty;
 
         /// <summary>
         /// Clears in-memory per-type add defaults after Reset Configuration deletes the file.
@@ -155,6 +162,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             PresetManager.Upsert(saved);
             PresetManager.SavePresets();
             SetLastLoaded(saved);
+            LastStatusMessage = StatusBarText.Neutral($"Saved preset \"{trimmedName}\".");
             return saved;
         }
 
@@ -216,6 +224,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// When <see cref="FilterPreset.VisibleColumns"/> is present and a Rename List column source is
         /// wired, applies those columns. Caller owns confirm-replace / corrupt-open UI. Empty chains are
         /// allowed. Omitted/<see langword="null"/> columns leave the Rename List unchanged.
+        /// Sticky status is set only after column apply so a throw stays dialog-only.
         /// </para>
         /// </summary>
         /// <param name="preset">Preset to load (uses its <see cref="FilterPreset.Chain"/>).</param>
@@ -229,6 +238,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             {
                 _applyRenameListColumns?.Invoke(preset.VisibleColumns);
             }
+
+            LastStatusMessage = StatusBarText.Neutral($"Loaded preset \"{preset.Name}\".");
         }
 
         /// <summary>

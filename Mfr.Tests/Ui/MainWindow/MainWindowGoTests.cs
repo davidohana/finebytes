@@ -218,6 +218,31 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
+        /// Verifies Applied Filters preset load/save status is sticky on the main-window hint.
+        /// </summary>
+        [AvaloniaFact]
+        public void AppliedFilters_preset_status_updates_main_window_hint()
+        {
+            var viewModel = new MainWindowViewModel();
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "ShellPreset",
+                Chain = new FilterChain { Steps = [] },
+            };
+
+            viewModel.AppliedFiltersViewModel.LoadPreset(preset);
+
+            Assert.Equal("Loaded preset \"ShellPreset\".", viewModel.StatusHint.ToPlainText());
+            Assert.All(viewModel.StatusHint.Runs, run => Assert.Null(run.ForegroundResourceKey));
+
+            viewModel.AppliedFiltersViewModel.SavePreset("ShellPresetSaved", description: null, visibleColumns: null);
+
+            Assert.Equal("Saved preset \"ShellPresetSaved\".", viewModel.StatusHint.ToPlainText());
+            Assert.All(viewModel.StatusHint.Runs, run => Assert.Null(run.ForegroundResourceKey));
+        }
+
+        /// <summary>
         /// Verifies stopping GO during preview publishes a warning Stopped status.
         /// </summary>
         [AvaloniaFact]

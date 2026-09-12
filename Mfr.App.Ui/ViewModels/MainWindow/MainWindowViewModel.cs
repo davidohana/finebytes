@@ -345,6 +345,14 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             {
                 FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
             }
+
+            if (
+                e.PropertyName is nameof(AppliedFiltersViewModel.LastStatusMessage)
+                && !AppliedFiltersViewModel.LastStatusMessage.IsEmpty
+            )
+            {
+                _ShowStickyStatusHint(AppliedFiltersViewModel.LastStatusMessage);
+            }
         }
 
         private void _OnFilterOptionsApplied(object? sender, EventArgs e)
