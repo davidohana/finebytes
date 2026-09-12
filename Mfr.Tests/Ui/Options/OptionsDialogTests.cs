@@ -3,6 +3,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.Resources;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.Options;
 using Mfr.App.Ui.Views;
@@ -36,7 +37,7 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies the Options dialog constructs remember checkboxes, prompts radios, and double-click.
+        /// Verifies the Options dialog constructs remember checkboxes, prompts radios, and double-click radios.
         /// </summary>
         [AvaloniaFact]
         public void OptionsDialog_shows_remember_prompts_and_double_click()
@@ -56,7 +57,6 @@ namespace Mfr.Tests.Ui.Options
 
                 Assert.Contains("Save File List last position", labels);
                 Assert.Contains("Remember window size and position", labels);
-                Assert.Contains("Double click in file list adds to Rename List", labels);
 
                 var radioLabels = dialog
                     .GetVisualDescendants()
@@ -66,6 +66,27 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Fewer", radioLabels);
                 Assert.Contains("Normal", radioLabels);
                 Assert.Contains("More", radioLabels);
+                Assert.Contains("Open", radioLabels);
+                Assert.Contains("Add to Rename List", radioLabels);
+
+                var checkTips = dialog
+                    .GetVisualDescendants()
+                    .OfType<CompactCheckBox>()
+                    .Select(box => ToolTip.GetTip(box)?.ToString())
+                    .ToList();
+                Assert.Contains(AppTips.OptionsRememberLastFolder, checkTips);
+                Assert.Contains(AppTips.OptionsRememberWindowState, checkTips);
+
+                var radioTips = dialog
+                    .GetVisualDescendants()
+                    .OfType<CompactRadioButton>()
+                    .Select(radio => ToolTip.GetTip(radio)?.ToString())
+                    .ToList();
+                Assert.Contains(AppTips.OptionsConfirmationFewer, radioTips);
+                Assert.Contains(AppTips.OptionsConfirmationNormal, radioTips);
+                Assert.Contains(AppTips.OptionsConfirmationMore, radioTips);
+                Assert.Contains(AppTips.OptionsDoubleClickOpen, radioTips);
+                Assert.Contains(AppTips.OptionsDoubleClickAdd, radioTips);
             }
             finally
             {

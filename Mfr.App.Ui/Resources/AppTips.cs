@@ -23,6 +23,34 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Toolbar tip for Options.</summary>
         public const string ShowOptions = "Options (Ctrl+,)";
 
+        /// <summary>Options: save File List last folder across launches.</summary>
+        public const string OptionsRememberLastFolder =
+            "Save the File List folder when closing and restore it next launch";
+
+        /// <summary>Options: remember main-window layout across launches.</summary>
+        public const string OptionsRememberWindowState =
+            "Restore main window size, position, and splitters next launch";
+
+        /// <summary>Options: Confirmation prompts — Fewer.</summary>
+        public const string OptionsConfirmationFewer =
+            "Skip optional confirms — Go continues when items have preview errors";
+
+        /// <summary>Options: Confirmation prompts — Normal (default).</summary>
+        public const string OptionsConfirmationNormal =
+            "Confirm Go when items have preview errors; skip replace-on-load and clear confirms";
+
+        /// <summary>Options: Confirmation prompts — More.</summary>
+        public const string OptionsConfirmationMore =
+            "Also confirm clearing lists and replacing Applied Filters when loading a preset";
+
+        /// <summary>Options: double-click opens in File List.</summary>
+        public const string OptionsDoubleClickOpen =
+            "Double-click opens folders or launches files with the default application";
+
+        /// <summary>Options: double-click adds to Rename List.</summary>
+        public const string OptionsDoubleClickAdd =
+            "Double-click adds the File List selection to the Rename List (same as Add Selected)";
+
         /// <summary>Tools → Reset Configuration menu tip (MFR7 ResetConfiguration).</summary>
         public const string ResetConfiguration = "Reset configuration to default values";
 

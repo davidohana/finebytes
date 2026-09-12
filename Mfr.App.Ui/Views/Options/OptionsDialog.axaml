@@ -5,6 +5,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:converters="using:Mfr.App.Ui.Converters"
   xmlns:cfg="using:Mfr.Models.Config"
+  xmlns:resources="using:Mfr.App.Ui.Resources"
   x:Class="Mfr.App.Ui.Views.Options.OptionsDialog"
   x:DataType="vm:OptionsDialogViewModel"
   Title="Options"
@@ -23,30 +24,52 @@
     <controls:ModalOkCancelFooter x:Name="Footer" DockPanel.Dock="Bottom" Margin="0,14,0,0" Spacing="12" />
 
     <StackPanel Spacing="10">
-      <controls:CompactCheckBox IsChecked="{Binding RememberLastFolder}" Content="Save File List last position" />
-      <controls:CompactCheckBox IsChecked="{Binding RememberWindowState}" Content="Remember window size and position" />
+      <controls:CompactCheckBox
+        IsChecked="{Binding RememberLastFolder}"
+        Content="Save File List last position"
+        ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberLastFolder}"
+      />
+      <controls:CompactCheckBox
+        IsChecked="{Binding RememberWindowState}"
+        Content="Remember window size and position"
+        ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberWindowState}"
+      />
       <StackPanel Orientation="Horizontal" Spacing="12">
         <TextBlock Text="Confirmation prompts:" VerticalAlignment="Center" />
         <controls:CompactRadioButton
           GroupName="ConfirmationPrompts"
           Content="Fewer"
+          ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationFewer}"
           IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Fewer}, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
           GroupName="ConfirmationPrompts"
           Content="Normal"
+          ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationNormal}"
           IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Normal}, Mode=TwoWay}"
         />
         <controls:CompactRadioButton
           GroupName="ConfirmationPrompts"
           Content="More"
+          ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationMore}"
           IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.More}, Mode=TwoWay}"
         />
       </StackPanel>
-      <controls:CompactCheckBox
-        IsChecked="{Binding DoubleClickAddsToRenameList}"
-        Content="Double click in file list adds to Rename List"
-      />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <TextBlock Text="Double-click in file list:" VerticalAlignment="Center" />
+        <controls:CompactRadioButton
+          GroupName="DoubleClickInFileList"
+          Content="Open"
+          ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickOpen}"
+          IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.False}, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          GroupName="DoubleClickInFileList"
+          Content="Add to Rename List"
+          ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickAdd}"
+          IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.True}, Mode=TwoWay}"
+        />
+      </StackPanel>
     </StackPanel>
   </DockPanel>
 </Window>
