@@ -1295,6 +1295,136 @@ namespace Mfr.Tests.Ui.FileList
             Assert.False(viewModel.ShowPropertiesCommand.CanExecute(null));
         }
 
+        /// <summary>
+        /// Verifies Delete sends the multi-selection to the Recycle Bin and refreshes.
+        /// </summary>
+        [Fact]
+        public void Delete_Recycles_Selected_Paths()
+        {
+            var ops = new RecordingFileShellOperations();
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shellOperations: ops);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([alpha, beta], beta);
+
+            Assert.True(viewModel.DeleteCommand.CanExecute(null));
+            viewModel.Delete();
+
+            var call = Assert.Single(ops.Deletes);
+            Assert.Equal([alpha.FullPath, beta.FullPath], call.Paths);
+            Assert.True(call.Recycle);
+            Assert.Equal("Deleted 2 item(s).", viewModel.LastStatusMessage.ToPlainText());
+            Assert.All(viewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
+        }
+
+        /// <summary>
+        /// Verifies permanent Delete uses recycle false and a success status.
+        /// </summary>
+        [Fact]
+        public void DeletePermanent_Deletes_Without_Recycle()
+        {
+            var ops = new RecordingFileShellOperations();
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shellOperations: ops);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+
+            Assert.True(viewModel.DeletePermanentCommand.CanExecute(null));
+            viewModel.DeletePermanent();
+
+            var call = Assert.Single(ops.Deletes);
+            Assert.Equal([alpha.FullPath], call.Paths);
+            Assert.False(call.Recycle);
+            Assert.Equal("Permanently deleted 1 item(s).", viewModel.LastStatusMessage.ToPlainText());
+        }
+
+        /// <summary>
+        /// Verifies cancel/fail sticky status for Recycle and permanent delete.
+        /// </summary>
+        [Theory]
+        [InlineData(
+            true,
+            FileShellOperationResult.Cancelled,
+            "Delete cancelled.",
+            StatusBarText.WarningForegroundResourceKey
+        )]
+        [InlineData(
+            false,
+            FileShellOperationResult.Cancelled,
+            "Permanent delete cancelled.",
+            StatusBarText.WarningForegroundResourceKey
+        )]
+        [InlineData(true, FileShellOperationResult.Failed, "Delete failed.", StatusBarText.ErrorForegroundResourceKey)]
+        [InlineData(
+            false,
+            FileShellOperationResult.Failed,
+            "Permanent delete failed.",
+            StatusBarText.ErrorForegroundResourceKey
+        )]
+        public void Delete_NonSuccess_Sets_Sticky_LastStatusMessage(
+            bool recycle,
+            FileShellOperationResult shellResult,
+            string expectedPlain,
+            string expectedBrushKey
+        )
+        {
+            var ops = new RecordingFileShellOperations { ResultToReturn = shellResult };
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shellOperations: ops);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+
+            if (recycle)
+            {
+                viewModel.Delete();
+            }
+            else
+            {
+                viewModel.DeletePermanent();
+            }
+
+            Assert.Equal(expectedPlain, viewModel.LastStatusMessage.ToPlainText());
+            Assert.Equal(expectedBrushKey, viewModel.LastStatusMessage.Runs[0].ForegroundResourceKey);
+        }
+
+        /// <summary>
+        /// Verifies Delete is disabled when nothing is selected.
+        /// </summary>
+        [Fact]
+        public void DeleteCommand_Disabled_When_Selection_Empty()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.SetSelectedEntries([]);
+
+            Assert.False(viewModel.DeleteCommand.CanExecute(null));
+            Assert.False(viewModel.DeletePermanentCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Delete is disabled on This PC even with a drive selected.
+        /// </summary>
+        [Fact]
+        public void DeleteCommand_Disabled_On_ThisPc()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var ops = new RecordingFileShellOperations();
+            var viewModel = _CreateViewModel(_CreateTree(), shellOperations: ops);
+            viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            Assert.NotEmpty(viewModel.Entries);
+            var drive = viewModel.Entries[0];
+            viewModel.SetSelectedEntries([drive], drive);
+
+            Assert.False(viewModel.DeleteCommand.CanExecute(null));
+            Assert.False(viewModel.DeletePermanentCommand.CanExecute(null));
+            viewModel.Delete();
+            Assert.Empty(ops.Deletes);
+        }
+
         private static bool _IsDriveName(string name)
         {
             return name.Contains(':', StringComparison.Ordinal);
@@ -1323,14 +1453,16 @@ namespace Mfr.Tests.Ui.FileList
         private FileListViewModel _CreateViewModel(
             string dir,
             IFileShellOpener? shellOpener = null,
-            ITextClipboard? clipboard = null
+            ITextClipboard? clipboard = null,
+            IFileShellOperations? shellOperations = null
         )
         {
             var viewModel = new FileListViewModel(
                 NullSystemIconProvider.Instance,
                 dir,
                 shellOpener ?? NullFileShellOpener.Instance,
-                clipboard ?? NullTextClipboard.Instance
+                clipboard ?? NullTextClipboard.Instance,
+                shellOperations ?? NullFileShellOperations.Instance
             );
             _viewModels.Add(viewModel);
             return viewModel;

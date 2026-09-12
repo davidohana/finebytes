@@ -231,7 +231,8 @@ namespace Mfr.Tests.Ui.RenameList
             var fileListViewModel = new FileListViewModel(
                 NullSystemIconProvider.Instance,
                 path,
-                NullFileShellOpener.Instance
+                NullFileShellOpener.Instance,
+                shellOperations: NullFileShellOperations.Instance
             );
             _fileListViewModels.Add(fileListViewModel);
             return fileListViewModel;

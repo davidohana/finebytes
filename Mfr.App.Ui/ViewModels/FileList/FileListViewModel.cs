@@ -63,6 +63,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         private readonly ISystemIconProvider _iconProvider;
         private readonly IFileShellOpener _shellOpener;
+        private readonly IFileShellOperations _shellOperations;
         private readonly ITextClipboard _clipboard;
         private readonly FileListThumbnailSession _thumbnails = new();
         private readonly List<FileListListedItem> _listedItems = [];
@@ -86,15 +87,20 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="clipboard">
         /// Clipboard for Copy path, or <see langword="null"/> to use the desktop main-window clipboard.
         /// </param>
+        /// <param name="shellOperations">
+        /// Shell delete/copy/move, or <see langword="null"/> to use the OS default.
+        /// </param>
         public FileListViewModel(
             ISystemIconProvider? iconProvider,
             string? initialPath,
             IFileShellOpener? shellOpener = null,
-            ITextClipboard? clipboard = null
+            ITextClipboard? clipboard = null,
+            IFileShellOperations? shellOperations = null
         )
         {
             _iconProvider = iconProvider ?? SystemIconProvider.CreateDefault();
             _shellOpener = shellOpener ?? FileShellOpener.CreateDefault();
+            _shellOperations = shellOperations ?? FileShellOperations.CreateDefault();
             _clipboard = clipboard ?? new DesktopTextClipboard();
             Entries = [];
             MaskSuggestions = [.. _DefaultMasks];
@@ -235,6 +241,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
         [NotifyCanExecuteChangedFor(nameof(CopyPathCommand))]
         [NotifyCanExecuteChangedFor(nameof(ShowInExplorerCommand))]
         [NotifyCanExecuteChangedFor(nameof(ShowPropertiesCommand))]
+        [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
+        [NotifyCanExecuteChangedFor(nameof(DeletePermanentCommand))]
         private FileListEntry? _selectedEntry;
 
         /// <summary>
@@ -243,7 +251,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public IReadOnlyList<FileListEntry> SelectedEntries => _selectedEntries;
 
         /// <summary>
-        /// Gets the most recent high-signal File List status-bar message (Copy path).
+        /// Gets the most recent high-signal File List status-bar message (Copy path, Delete).
         /// </summary>
         [ObservableProperty]
         private StyledTextDisplay _lastStatusMessage = StyledTextDisplay.Empty;
@@ -544,6 +552,24 @@ namespace Mfr.App.Ui.ViewModels.FileList
             }
 
             _shellOpener.ShowProperties(SelectedEntry.FullPath);
+        }
+
+        /// <summary>
+        /// Deletes the File List selection to the Recycle Bin (shell UI confirms as needed).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanDeleteSelection))]
+        public void Delete()
+        {
+            _DeleteSelection(recycle: true);
+        }
+
+        /// <summary>
+        /// Permanently deletes the File List selection (shell UI confirms; no app dialog).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanDeleteSelection))]
+        public void DeletePermanent()
+        {
+            _DeleteSelection(recycle: false);
         }
 
         /// <summary>
@@ -857,12 +883,62 @@ namespace Mfr.App.Ui.ViewModels.FileList
             return SelectedEntry is not null;
         }
 
+        private bool _CanDeleteSelection()
+        {
+            return _selectedEntries.Count > 0 && !FileListPath.IsComputerPath(CurrentPath);
+        }
+
+        /// <summary>
+        /// Runs shell delete for the current selection, then refreshes and publishes sticky status.
+        /// </summary>
+        /// <param name="recycle">When <see langword="true"/>, Recycle Bin; otherwise permanent delete.</param>
+        private void _DeleteSelection(bool recycle)
+        {
+            if (!_CanDeleteSelection())
+            {
+                return;
+            }
+
+            var paths = _selectedEntries.Select(entry => entry.FullPath).ToList();
+            var itemCount = paths.Count;
+            var result = _shellOperations.Delete(paths, recycle);
+            Refresh();
+            LastStatusMessage = _FormatDeleteStatus(result, recycle, itemCount);
+        }
+
+        /// <summary>
+        /// Maps shell delete outcome to a sticky File List status message.
+        /// </summary>
+        private static StyledTextDisplay _FormatDeleteStatus(
+            FileShellOperationResult result,
+            bool recycle,
+            int itemCount
+        )
+        {
+            var verb = recycle ? "Delete" : "Permanent delete";
+            if (result == FileShellOperationResult.Succeeded)
+            {
+                return StatusBarText.Neutral(
+                    recycle ? $"Deleted {itemCount} item(s)." : $"Permanently deleted {itemCount} item(s)."
+                );
+            }
+
+            if (result == FileShellOperationResult.Cancelled)
+            {
+                return StatusBarText.Warning($"{verb} cancelled.");
+            }
+
+            return StatusBarText.Error($"{verb} failed.");
+        }
+
         private void _NotifySelectionCommandsChanged()
         {
             OpenSelectedCommand.NotifyCanExecuteChanged();
             CopyPathCommand.NotifyCanExecuteChanged();
             ShowInExplorerCommand.NotifyCanExecuteChanged();
             ShowPropertiesCommand.NotifyCanExecuteChanged();
+            DeleteCommand.NotifyCanExecuteChanged();
+            DeletePermanentCommand.NotifyCanExecuteChanged();
         }
 
         private void _Navigate(string? path)

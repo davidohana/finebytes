@@ -33,6 +33,11 @@
           InputGesture="{x:Static input:AppShortcuts.ShowProperties}"
         />
         <MenuItem Header="Copy path" Command="{Binding CopyPathCommand}" />
+        <MenuItem
+          Header="Delete"
+          Command="{Binding DeleteCommand}"
+          InputGesture="{x:Static input:AppShortcuts.FileListDelete}"
+        />
         <Separator />
         <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />
         <MenuItem Header="Go Up" Command="{Binding GoUpCommand}" />

@@ -54,6 +54,8 @@ namespace Mfr.Tests.Ui.Input
             Assert.Equal(new KeyGesture(Key.Delete), AppShortcuts.RemoveSelectedDelete);
             Assert.Equal(new KeyGesture(Key.F4), AppShortcuts.LocateInFileList);
             Assert.Equal(new KeyGesture(Key.Enter, KeyModifiers.Alt), AppShortcuts.ShowProperties);
+            Assert.Equal(new KeyGesture(Key.Delete), AppShortcuts.FileListDelete);
+            Assert.Equal(new KeyGesture(Key.Delete, KeyModifiers.Shift), AppShortcuts.FileListDeletePermanent);
             Assert.Equal(new KeyGesture(Key.Up, KeyModifiers.Control), AppShortcuts.MoveSelectedUp);
             Assert.Equal(new KeyGesture(Key.Down, KeyModifiers.Control), AppShortcuts.MoveSelectedDown);
             Assert.Same(AppShortcuts.RemoveSelectedDelete, AppShortcuts.RemoveSelectedFilterDelete);

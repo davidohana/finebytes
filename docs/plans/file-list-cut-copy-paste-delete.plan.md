@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-delete
     content: "P2: Delete Recycle + Shift+Del permanent; menu + keys; refresh/status"
-    status: pending
+    status: completed
   - id: p3-cut-copy
     content: "P3: IFileClipboard CF_HDROP + DropEffect; Cut/Copy; ghosting"
     status: pending

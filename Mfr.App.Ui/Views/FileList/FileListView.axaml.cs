@@ -120,11 +120,23 @@ namespace Mfr.App.Ui.Views.FileList
 
         private void _OnListingShortcutKeyDown(object? sender, KeyEventArgs e)
         {
-            // Tunnel so DataGrid / ListBox do not swallow Alt+Enter or Home/End first.
-            if (
-                _viewModel is not null
-                && KeyGestureMatch.TryExecute(e, AppShortcuts.ShowProperties, _viewModel.ShowPropertiesCommand)
-            )
+            // Tunnel so DataGrid / ListBox do not swallow Alt+Enter, Del, or Shift+Del first.
+            if (_viewModel is null)
+            {
+                return;
+            }
+
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.ShowProperties, _viewModel.ShowPropertiesCommand))
+            {
+                return;
+            }
+
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.FileListDeletePermanent, _viewModel.DeletePermanentCommand))
+            {
+                return;
+            }
+
+            if (KeyGestureMatch.TryExecute(e, AppShortcuts.FileListDelete, _viewModel.DeleteCommand))
             {
                 return;
             }

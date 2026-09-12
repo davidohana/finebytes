@@ -79,6 +79,7 @@ namespace Mfr.Tests.Ui.FileList
                 Assert.Contains("Show in Explorer", headers);
                 Assert.Contains("Properties", headers);
                 Assert.Contains("Copy path", headers);
+                Assert.Contains("Delete", headers);
                 Assert.Contains("Refresh", headers);
                 Assert.Contains("Go Up", headers);
             }
@@ -198,6 +199,85 @@ namespace Mfr.Tests.Ui.FileList
             _RaiseKeyDown(grid, Key.Enter, KeyModifiers.Alt);
 
             Assert.Equal([alpha.FullPath], shell.ShownProperties);
+        }
+
+        /// <summary>
+        /// Verifies Del on the Report grid deletes the selection via shell ops (Recycle).
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_Grid_Delete_Key_Recycles_Selection()
+        {
+            var ops = new RecordingFileShellOperations();
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance,
+                shellOperations: ops
+            );
+            _viewModels.Add(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 560,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([alpha, beta], beta);
+            window.UpdateLayout();
+
+            var grid = view.FindControl<DataGrid>("ReportGrid");
+            Assert.NotNull(grid);
+            _RaiseKeyDown(grid, Key.Delete);
+
+            var call = Assert.Single(ops.Deletes);
+            Assert.Equal([alpha.FullPath, beta.FullPath], call.Paths);
+            Assert.True(call.Recycle);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Shift+Del on the Report grid permanently deletes the selection.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_Grid_Shift_Delete_Key_Deletes_Permanently()
+        {
+            var ops = new RecordingFileShellOperations();
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance,
+                shellOperations: ops
+            );
+            _viewModels.Add(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 560,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+            window.UpdateLayout();
+
+            var grid = view.FindControl<DataGrid>("ReportGrid");
+            Assert.NotNull(grid);
+            _RaiseKeyDown(grid, Key.Delete, KeyModifiers.Shift);
+
+            var call = Assert.Single(ops.Deletes);
+            Assert.Equal([alpha.FullPath], call.Paths);
+            Assert.False(call.Recycle);
+            window.Close();
         }
 
         /// <summary>
@@ -826,7 +906,8 @@ namespace Mfr.Tests.Ui.FileList
             var viewModel = new FileListViewModel(
                 NullSystemIconProvider.Instance,
                 _CreateSampleDir(),
-                NullFileShellOpener.Instance
+                NullFileShellOpener.Instance,
+                shellOperations: NullFileShellOperations.Instance
             );
             _viewModels.Add(viewModel);
             Assert.True(viewModel.IsReportView);
