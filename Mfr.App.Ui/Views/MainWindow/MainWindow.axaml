@@ -97,22 +97,38 @@
   <DockPanel>
     <Menu DockPanel.Dock="Top">
       <MenuItem Header="_MFR">
-        <MenuItem Header="_GO" Command="{Binding GoCommand}" InputGesture="{x:Static input:AppShortcuts.Go}" />
+        <MenuItem Header="_GO" Command="{Binding GoCommand}" InputGesture="{x:Static input:AppShortcuts.Go}">
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Go.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="_Undo Last"
           Command="{Binding UndoLastCommand}"
           InputGesture="{x:Static input:AppShortcuts.UndoLast}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Undo.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="_Log"
           Command="{Binding ShowLogCommand}"
           InputGesture="{x:Static input:AppShortcuts.ShowLog}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Log.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="_Options"
           Command="{Binding ShowOptionsCommand}"
           InputGesture="{x:Static input:AppShortcuts.ShowOptions}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Options.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <Separator />
         <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGesture="{x:Static input:AppShortcuts.Exit}" />
       </MenuItem>
@@ -245,17 +261,29 @@
           Header="Add Selected"
           Command="{Binding RenameListViewModel.AddSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.AddSelected}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/AddSelected.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Add All"
           Command="{Binding RenameListViewModel.AddAllCommand}"
           InputGesture="{x:Static input:AppShortcuts.AddAll}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/AddAll.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Remove"
           Command="{Binding RenameListViewModel.RemoveSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.RemoveSelected}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/RemoveSelected.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Remove All But Selected"
           Command="{Binding RenameListViewModel.RemoveAllButSelectedCommand}"
@@ -265,7 +293,11 @@
           Header="Clear"
           Command="{Binding RenameListViewModel.ClearCommand}"
           InputGesture="{x:Static input:AppShortcuts.ClearRenameList}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/Clear.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Locate in File List"
           Command="{Binding RenameListViewModel.LocateInFileListCommand}"
@@ -275,18 +307,30 @@
           Header="Move Selected Up"
           Command="{Binding RenameListViewModel.MoveSelectedUpCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveSelectedUp}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/MoveUp.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Move Selected Down"
           Command="{Binding RenameListViewModel.MoveSelectedDownCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveSelectedDown}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/MoveDown.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <Separator />
         <MenuItem
           Header="Select Visible Fields..."
           Command="{Binding RenameListViewModel.OpenFieldShuttleCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/SelectFields.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Select Sort Fields..."
           Command="{Binding RenameListViewModel.OpenEditSortFieldsCommand}"
@@ -322,39 +366,75 @@
           Header="Refresh"
           Command="{Binding RenameListViewModel.RefreshCommand}"
           InputGesture="{x:Static input:AppShortcuts.Refresh}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/Refresh.png" />
+          </MenuItem.Icon>
+        </MenuItem>
       </MenuItem>
       <MenuItem Header="F_ilters">
-        <MenuItem Header="Add Selected Filter" Command="{Binding AddSelectedFilterFromPaletteCommand}" />
+        <MenuItem Header="Add Selected Filter" Command="{Binding AddSelectedFilterFromPaletteCommand}">
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/AddSelected.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Remove Selected Filter"
           Command="{Binding AppliedFiltersViewModel.RemoveSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.RemoveSelectedFilterDelete}"
-        />
-        <MenuItem Header="Remove All Filters" Command="{Binding AppliedFiltersViewModel.ClearCommand}" />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/RemoveSelected.png" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem Header="Remove All Filters" Command="{Binding AppliedFiltersViewModel.ClearCommand}">
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/Clear.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <Separator />
         <MenuItem
           Header="Move Filter Up"
           Command="{Binding AppliedFiltersViewModel.MoveSelectedUpCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveFilterUp}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/MoveUp.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Move Filter Down"
           Command="{Binding AppliedFiltersViewModel.MoveSelectedDownCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveFilterDown}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/MoveDown.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <Separator />
-        <MenuItem Header="Presets" Click="_OnPresetsMenuClick" ToolTip.Tip="{x:Static resources:AppTips.Presets}" />
+        <MenuItem Header="Presets" Click="_OnPresetsMenuClick" ToolTip.Tip="{x:Static resources:AppTips.Presets}">
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/AppliedFilters/Presets.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Save Preset"
           Click="_OnSavePresetMenuClick"
           ToolTip.Tip="{x:Static resources:AppTips.SavePreset}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/AppliedFilters/SavePreset.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Filter Options"
           Click="_OnFilterOptionsMenuClick"
           IsEnabled="{Binding AppliedFiltersViewModel.CanShowFilterOptions}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/AppliedFilters/FilterOptions.png" />
+          </MenuItem.Icon>
+        </MenuItem>
       </MenuItem>
       <MenuItem Header="_Tools">
         <MenuItem
