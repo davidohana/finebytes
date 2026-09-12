@@ -1,6 +1,7 @@
 <Window
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   x:Class="Mfr.App.Ui.Views.ConfirmMessageDialog"
   Icon="/Assets/mfr.ico"
   Width="420"
@@ -14,23 +15,7 @@
   Foreground="{DynamicResource AppChromeForegroundBrush}"
 >
   <DockPanel Margin="12">
-    <StackPanel
-      x:Name="Footer"
-      DockPanel.Dock="Bottom"
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Spacing="8"
-      Margin="0,14,0,0"
-    >
-      <Button x:Name="OkButton" Classes="message-dialog-footer" Content="OK" IsDefault="True" Click="_OnOkClick" />
-      <Button
-        x:Name="CancelButton"
-        Classes="message-dialog-footer"
-        Content="Cancel"
-        IsCancel="True"
-        Click="_OnCancelClick"
-      />
-    </StackPanel>
+    <controls:ModalOkCancelFooter x:Name="Footer" DockPanel.Dock="Bottom" Margin="0,14,0,0" />
     <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
   </DockPanel>
 </Window>

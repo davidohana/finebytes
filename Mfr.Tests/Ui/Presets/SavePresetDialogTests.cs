@@ -40,13 +40,12 @@ namespace Mfr.Tests.Ui.Presets
             Assert.True(nameBox.IsEditable);
             Assert.Equal(["Demo"], Assert.IsAssignableFrom<IEnumerable<string>>(nameBox.ItemsSource).ToList());
 
-            var save = dialog.FindControl<Button>("SaveButton");
-            Assert.NotNull(save);
+            var save = ModalOkCancelFooterAccess.RequireAcceptButton(dialog);
             Assert.True(save.IsEnabled);
             Assert.True(save.IsDefault);
+            Assert.Equal("Save", save.Content?.ToString());
 
-            var footer = dialog.FindControl<StackPanel>("Footer");
-            Assert.NotNull(footer);
+            var footer = ModalOkCancelFooterAccess.RequireFooter(dialog);
             Assert.Equal(HorizontalAlignment.Center, footer.HorizontalAlignment);
 
             dialog.Close();
@@ -105,8 +104,7 @@ namespace Mfr.Tests.Ui.Presets
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var save = dialog.FindControl<Button>("SaveButton");
-            Assert.NotNull(save);
+            var save = ModalOkCancelFooterAccess.RequireAcceptButton(dialog);
             Assert.False(save.IsEnabled);
 
             dialog.Close();

@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 
 namespace Mfr.App.Ui.Views.AppliedFilters
@@ -46,21 +45,6 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         {
             base.OnOpened(e);
             ModalDialogTextFocus.FocusAndSelectAll(NameBox);
-        }
-
-        private void _OnOkClick(object? sender, RoutedEventArgs e)
-        {
-            if (DataContext is FilterOptionsDialogViewModel { CanConfirm: false })
-            {
-                return;
-            }
-
-            Close(true);
-        }
-
-        private void _OnCancelClick(object? sender, RoutedEventArgs e)
-        {
-            Close(false);
         }
     }
 }

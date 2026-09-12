@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.Presets;
 
 namespace Mfr.App.Ui.Views.Presets
@@ -54,21 +53,6 @@ namespace Mfr.App.Ui.Views.Presets
             }
 
             viewModel.ApplySuggestion(e.AddedItems[0] as string);
-        }
-
-        private void _OnSaveClick(object? sender, RoutedEventArgs e)
-        {
-            if (DataContext is SavePresetDialogViewModel { CanSave: false })
-            {
-                return;
-            }
-
-            Close(true);
-        }
-
-        private void _OnCancelClick(object? sender, RoutedEventArgs e)
-        {
-            Close(false);
         }
     }
 }

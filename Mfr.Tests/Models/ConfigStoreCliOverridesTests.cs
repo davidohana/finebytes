@@ -11,9 +11,7 @@ namespace Mfr.Tests.Models
     {
         public ConfigStoreCliOverridesTests()
         {
-            var emptyConfigPath = Path.Combine(Path.GetTempPath(), "mfr-test-empty-config-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(emptyConfigPath, """{}""");
-            ConfigStore.Load(emptyConfigPath);
+            ConfigStoreTestReset.LoadEmpty();
             FilterRuntimeConfig.SyncFromConfigStore();
         }
 

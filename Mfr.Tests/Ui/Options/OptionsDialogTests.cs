@@ -20,16 +20,7 @@ namespace Mfr.Tests.Ui.Options
     {
         public OptionsDialogTests()
         {
-            var emptyPath = Path.Combine(Path.GetTempPath(), "mfr-test-options-ui-empty-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(emptyPath, """{}""");
-            try
-            {
-                ConfigStore.Load(emptyPath);
-            }
-            finally
-            {
-                File.Delete(emptyPath);
-            }
+            ConfigStoreTestReset.LoadEmpty();
         }
 
         /// <summary>
@@ -87,7 +78,7 @@ namespace Mfr.Tests.Ui.Options
             var resultTask = dialog.ShowDialog<bool?>(owner);
             Dispatcher.UIThread.RunJobs();
 
-            _ClickFooterButton(dialog, "OK");
+            _ClickAccept(dialog);
             Assert.True(await resultTask);
             owner.Close();
         }
@@ -106,7 +97,7 @@ namespace Mfr.Tests.Ui.Options
             var resultTask = dialog.ShowDialog<bool?>(owner);
             Dispatcher.UIThread.RunJobs();
 
-            _ClickFooterButton(dialog, "Cancel");
+            _ClickCancel(dialog);
             Assert.False(await resultTask);
             owner.Close();
         }
@@ -248,12 +239,20 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Clicks the Options footer button with the given content.
+        /// Clicks the Options accept button.
         /// </summary>
-        private static void _ClickFooterButton(OptionsDialog dialog, string content)
+        private static void _ClickAccept(OptionsDialog dialog)
         {
-            var button = dialog.GetVisualDescendants().OfType<Button>().Single(b => b.Content?.ToString() == content);
-            button.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            ModalOkCancelFooterAccess.RequireAcceptButton(dialog).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        /// <summary>
+        /// Clicks the Options Cancel button.
+        /// </summary>
+        private static void _ClickCancel(OptionsDialog dialog)
+        {
+            ModalOkCancelFooterAccess.RequireCancelButton(dialog).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
         }
     }

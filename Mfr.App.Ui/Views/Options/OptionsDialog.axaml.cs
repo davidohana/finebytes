@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.Options;
 
 namespace Mfr.App.Ui.Views.Options
@@ -26,16 +25,6 @@ namespace Mfr.App.Ui.Views.Options
             : this()
         {
             DataContext = viewModel;
-        }
-
-        private void _OnOkClick(object? sender, RoutedEventArgs e)
-        {
-            Close(true);
-        }
-
-        private void _OnCancelClick(object? sender, RoutedEventArgs e)
-        {
-            Close(false);
         }
     }
 }

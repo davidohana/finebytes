@@ -18,16 +18,7 @@
   Foreground="{DynamicResource AppChromeForegroundBrush}"
 >
   <DockPanel Margin="12">
-    <StackPanel
-      DockPanel.Dock="Bottom"
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Spacing="12"
-      Margin="0,14,0,0"
-    >
-      <Button Classes="message-dialog-footer" Content="OK" MinWidth="80" IsDefault="True" Click="_OnOkClick" />
-      <Button Classes="message-dialog-footer" Content="Cancel" MinWidth="80" IsCancel="True" Click="_OnCancelClick" />
-    </StackPanel>
+    <controls:ModalOkCancelFooter x:Name="Footer" DockPanel.Dock="Bottom" Margin="0,14,0,0" Spacing="12" />
 
     <StackPanel Spacing="10">
       <controls:CompactCheckBox IsChecked="{Binding RememberLastFolder}" Content="Save File List last position" />

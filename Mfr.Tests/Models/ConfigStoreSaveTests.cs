@@ -11,12 +11,10 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Save_round_trips_mutated_confirm_replace_and_leaf()
         {
-            var emptyPath = Path.Combine(Path.GetTempPath(), "mfr-test-empty-config-" + Guid.NewGuid() + ".json");
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-save-config-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(emptyPath, """{}""");
             try
             {
-                ConfigStore.Load(emptyPath);
+                ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = true;
                 ConfigStore.Config.Filters.MaxListFileLineLength = 2500;
                 ConfigStore.Save(configPath);
@@ -43,7 +41,6 @@ namespace Mfr.Tests.Models
             }
             finally
             {
-                File.Delete(emptyPath);
                 if (File.Exists(configPath))
                 {
                     File.Delete(configPath);
@@ -54,9 +51,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Save_overwrites_existing_file()
         {
-            var emptyPath = Path.Combine(Path.GetTempPath(), "mfr-test-empty-config-" + Guid.NewGuid() + ".json");
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-save-overwrite-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(emptyPath, """{}""");
             File.WriteAllText(
                 configPath,
                 // lang=json,strict
@@ -72,7 +67,7 @@ namespace Mfr.Tests.Models
             );
             try
             {
-                ConfigStore.Load(emptyPath);
+                ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = true;
                 ConfigStore.Save(configPath);
 
@@ -87,7 +82,6 @@ namespace Mfr.Tests.Models
             }
             finally
             {
-                File.Delete(emptyPath);
                 if (File.Exists(configPath))
                 {
                     File.Delete(configPath);
@@ -98,13 +92,11 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Save_creates_missing_directory()
         {
-            var emptyPath = Path.Combine(Path.GetTempPath(), "mfr-test-empty-config-" + Guid.NewGuid() + ".json");
             var dir = Path.Combine(Path.GetTempPath(), "mfr-test-save-dir-" + Guid.NewGuid());
             var configPath = Path.Combine(dir, "nested", "config.json");
-            File.WriteAllText(emptyPath, """{}""");
             try
             {
-                ConfigStore.Load(emptyPath);
+                ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = true;
                 ConfigStore.Save(configPath);
 
@@ -114,7 +106,6 @@ namespace Mfr.Tests.Models
             }
             finally
             {
-                File.Delete(emptyPath);
                 if (Directory.Exists(dir))
                 {
                     Directory.Delete(dir, recursive: true);

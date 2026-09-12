@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.FormatEditor;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.Models.Rename;
@@ -115,16 +114,6 @@ namespace Mfr.App.Ui.Views.FormatEditor
             }
 
             Closed -= _OnClosed;
-        }
-
-        private void _OnOkClick(object? sender, RoutedEventArgs e)
-        {
-            Close(true);
-        }
-
-        private void _OnCancelClick(object? sender, RoutedEventArgs e)
-        {
-            Close(false);
         }
     }
 }

@@ -72,25 +72,13 @@
     </Style>
   </Window.Styles>
   <DockPanel Margin="12">
-    <StackPanel
+    <controls:ModalOkCancelFooter
+      x:Name="Footer"
       DockPanel.Dock="Bottom"
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Spacing="8"
       Margin="0,12,0,0"
-    >
-      <Button
-        x:Name="OkButton"
-        Classes="message-dialog-footer"
-        Content="OK"
-        IsDefault="True"
-        IsEnabled="{Binding CanConfirm}"
-        ToolTip.Tip="{Binding ConfirmDisabledReason, Converter={x:Static converters:RichToolTipConverter.Instance}}"
-        ToolTip.ShowOnDisabled="True"
-        Click="_OnOkClick"
-      />
-      <Button Classes="message-dialog-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
-    </StackPanel>
+      IsAcceptEnabled="{Binding CanConfirm}"
+      AcceptDisabledTip="{Binding ConfirmDisabledReason, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+    />
 
     <!-- Outer frame matches MFR7 untitled GroupBox around form body (buttons stay outside). -->
     <Border

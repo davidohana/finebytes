@@ -11,12 +11,10 @@ namespace Mfr.Tests.Models
         [Fact]
         public void EnsureDefaultFile_creates_missing_file_with_defaults()
         {
-            var emptyPath = Path.Combine(Path.GetTempPath(), "mfr-test-empty-config-" + Guid.NewGuid() + ".json");
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-ensure-config-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(emptyPath, """{}""");
             try
             {
-                ConfigStore.Load(emptyPath);
+                ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.EnsureDefaultFile(configPath);
 
                 Assert.True(File.Exists(configPath));
@@ -38,7 +36,6 @@ namespace Mfr.Tests.Models
             }
             finally
             {
-                File.Delete(emptyPath);
                 File.Delete(configPath);
             }
         }

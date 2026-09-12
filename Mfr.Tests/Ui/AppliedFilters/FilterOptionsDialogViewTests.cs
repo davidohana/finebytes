@@ -384,8 +384,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Assert.True(dialog.MinHeight > 0);
                 var wholeHeight = dialog.Bounds.Height;
 
-                var ok = dialog.FindControl<Button>("OkButton");
-                Assert.NotNull(ok);
+                var ok = ModalOkCancelFooterAccess.RequireAcceptButton(dialog);
                 var topLeft = ok.TranslatePoint(default, dialog);
                 Assert.NotNull(topLeft);
                 Assert.True(

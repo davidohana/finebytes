@@ -318,8 +318,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.Equal(dialog.MinHeight, dialog.MaxHeight);
             Assert.True(dialog.MinHeight > 0);
 
-            var ok = dialog.FindControl<Button>("OkButton");
-            Assert.NotNull(ok);
+            var ok = ModalOkCancelFooterAccess.RequireAcceptButton(dialog);
             var topLeft = ok.TranslatePoint(default, dialog);
             Assert.NotNull(topLeft);
             var bottom = topLeft.Value.Y + ok.Bounds.Height;
@@ -401,8 +400,7 @@ namespace Mfr.Tests.Ui.FormatEditor
                 $"Expected grown height {dialog.Bounds.Height} > initial {initialHeight}."
             );
 
-            var ok = dialog.FindControl<Button>("OkButton");
-            Assert.NotNull(ok);
+            var ok = ModalOkCancelFooterAccess.RequireAcceptButton(dialog);
             var topLeft = ok.TranslatePoint(default, dialog);
             Assert.NotNull(topLeft);
             Assert.True(

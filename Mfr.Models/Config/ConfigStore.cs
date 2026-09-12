@@ -35,6 +35,8 @@ namespace Mfr.Models.Config
     /// </remarks>
     public static class ConfigStore
     {
+        private static readonly JsonSerializerOptions s_WriteOptions = new() { WriteIndented = true };
+
         /// <summary>
         /// Gets the active config for this process.
         /// </summary>
@@ -129,7 +131,7 @@ namespace Mfr.Models.Config
                 Directory.CreateDirectory(directory);
             }
 
-            var json = ConfigJsonWriter.Write(Config).ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+            var json = ConfigJsonWriter.Write(Config).ToJsonString(s_WriteOptions);
             File.WriteAllText(path, json);
         }
 

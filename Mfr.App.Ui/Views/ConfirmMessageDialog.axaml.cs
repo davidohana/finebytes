@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 
 namespace Mfr.App.Ui.Views
 {
@@ -28,16 +27,6 @@ namespace Mfr.App.Ui.Views
         {
             Title = title;
             MessageText.Text = message;
-        }
-
-        private void _OnOkClick(object? sender, RoutedEventArgs e)
-        {
-            Close(true);
-        }
-
-        private void _OnCancelClick(object? sender, RoutedEventArgs e)
-        {
-            Close(false);
         }
     }
 }

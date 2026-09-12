@@ -31,12 +31,10 @@ namespace Mfr.Tests.Ui
             Assert.NotNull(message);
             Assert.Equal("Will restart.", message.Text);
 
-            var footer = dialog.FindControl<StackPanel>("Footer");
-            Assert.NotNull(footer);
+            var footer = ModalOkCancelFooterAccess.RequireFooter(dialog);
             Assert.Equal(HorizontalAlignment.Center, footer.HorizontalAlignment);
 
-            var ok = dialog.FindControl<Button>("OkButton");
-            Assert.NotNull(ok);
+            var ok = footer.AcceptButton;
             Assert.Contains("message-dialog-footer", ok.Classes);
             Assert.True(ok.IsDefault);
             var app = Assert.IsAssignableFrom<Application>(Application.Current);
@@ -47,8 +45,7 @@ namespace Mfr.Tests.Ui
             );
             Assert.Equal(selectionBorder, ok.BorderBrush);
 
-            var cancel = dialog.FindControl<Button>("CancelButton");
-            Assert.NotNull(cancel);
+            var cancel = footer.DismissButton;
             Assert.Contains("message-dialog-footer", cancel.Classes);
             Assert.True(cancel.IsCancel);
             var cancelBrush = Assert.IsAssignableFrom<ISolidColorBrush>(cancel.Background);
@@ -98,8 +95,7 @@ namespace Mfr.Tests.Ui
             var resultTask = dialog.ShowDialog<bool>(owner);
             Dispatcher.UIThread.RunJobs();
 
-            var ok = dialog.FindControl<Button>("OkButton");
-            Assert.NotNull(ok);
+            var ok = ModalOkCancelFooterAccess.RequireAcceptButton(dialog);
             ok.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
 
@@ -121,8 +117,7 @@ namespace Mfr.Tests.Ui
             var resultTask = dialog.ShowDialog<bool>(owner);
             Dispatcher.UIThread.RunJobs();
 
-            var cancel = dialog.FindControl<Button>("CancelButton");
-            Assert.NotNull(cancel);
+            var cancel = ModalOkCancelFooterAccess.RequireCancelButton(dialog);
             cancel.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
 

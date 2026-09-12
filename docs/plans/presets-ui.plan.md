@@ -148,6 +148,10 @@ Open Manager / Save Preset from Applied Filters code-behind + MainWindow Filters
 
 Do **not** retest JSON polymorphism (`PresetJsonPolymorphismTests`).
 
+## Related (shipped elsewhere)
+
+- Options dialog checkbox for confirm-replace — [options-dialog.plan.md](options-dialog.plan.md)
+
 ## Out of scope (explicit)
 
 - F8 session persistence of working Applied Filters chain
@@ -156,6 +160,4 @@ Do **not** retest JSON polymorphism (`PresetJsonPolymorphismTests`).
 - Import MFR7 `.mps`
 - Packing Rename List **sort** (or other session fields) into presets
 - Soft-load of corrupt `presets.json`
-- Options dialog checkbox for the confirm flag — shipped in
-  [options-dialog.plan.md](options-dialog.plan.md)
 - Editing description from Preset Manager (use Save Preset + overwrite)

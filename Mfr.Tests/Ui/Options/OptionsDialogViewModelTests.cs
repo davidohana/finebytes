@@ -10,16 +10,7 @@ namespace Mfr.Tests.Ui.Options
     {
         public OptionsDialogViewModelTests()
         {
-            var emptyPath = Path.Combine(Path.GetTempPath(), "mfr-test-options-empty-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(emptyPath, """{}""");
-            try
-            {
-                ConfigStore.Load(emptyPath);
-            }
-            finally
-            {
-                File.Delete(emptyPath);
-            }
+            ConfigStoreTestReset.LoadEmpty();
         }
 
         [Fact]
