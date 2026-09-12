@@ -83,11 +83,20 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// Optional sole name to select after rebuild (e.g. after rename). When null, keeps current
         /// selection names that are still present.
         /// </param>
+        /// <remarks>
+        /// When every previously selected name is gone (e.g. after delete), selects the row at the
+        /// prior first-selected index (clamped), matching Applied Filters / Rename List remove.
+        /// </remarks>
         public void Refresh(string? preferredName = null)
         {
             IReadOnlyList<string> selectedNames = preferredName is not null
                 ? [preferredName]
                 : [.. _selectedPresets.Select(preset => preset.Name)];
+            var anchorIndex = _selectedPresets
+                .Select(Presets.IndexOf)
+                .Where(index => index >= 0)
+                .DefaultIfEmpty(-1)
+                .Min();
 
             _ReloadPresetsFromManager();
 
@@ -100,9 +109,9 @@ namespace Mfr.App.Ui.ViewModels.Presets
             var restored = Presets
                 .Where(preset => selectedNames.Contains(preset.Name, StringComparer.Ordinal))
                 .ToList();
-            if (restored.Count == 0 && Presets.Count > 0)
+            if (restored.Count == 0)
             {
-                restored = [Presets[0]];
+                restored = [.. _SelectPresetsAfterRemove(anchorIndex)];
             }
 
             SetSelectedPresets(restored);
@@ -170,6 +179,22 @@ namespace Mfr.App.Ui.ViewModels.Presets
             {
                 Presets.Add(preset);
             }
+        }
+
+        /// <summary>
+        /// Picks the row to focus after delete: same index when possible, otherwise the last row.
+        /// </summary>
+        /// <param name="anchorIndex">First selected index before the remove.</param>
+        /// <returns>Zero or one preset to select.</returns>
+        private IReadOnlyList<FilterPreset> _SelectPresetsAfterRemove(int anchorIndex)
+        {
+            if (Presets.Count == 0 || anchorIndex < 0)
+            {
+                return [];
+            }
+
+            var nextIndex = Math.Min(anchorIndex, Presets.Count - 1);
+            return [Presets[nextIndex]];
         }
 
         private bool _CanMoveSelectedUp()

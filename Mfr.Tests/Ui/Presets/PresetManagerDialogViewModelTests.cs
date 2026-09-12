@@ -45,6 +45,45 @@ namespace Mfr.Tests.Ui.Presets
         }
 
         /// <summary>
+        /// Verifies Refresh after delete keeps selection at the same index instead of jumping to first.
+        /// </summary>
+        [Fact]
+        public void Refresh_After_Delete_Keeps_Selection_At_Same_Index()
+        {
+            var (manager, viewModel) = _CreateWithPresets("A", "B", "C", "D");
+            viewModel.SetSelectedPresets([viewModel.Presets[2]]);
+
+            Assert.True(manager.TryRemove("C"));
+            viewModel.Refresh();
+
+            Assert.Equal(["A", "B", "D"], viewModel.Presets.Select(preset => preset.Name));
+            Assert.Equal(["D"], viewModel.SelectedPresets.Select(preset => preset.Name));
+
+            viewModel.SetSelectedPresets([viewModel.Presets[2]]);
+            Assert.True(manager.TryRemove("D"));
+            viewModel.Refresh();
+
+            Assert.Equal(["A", "B"], viewModel.Presets.Select(preset => preset.Name));
+            Assert.Equal(["B"], viewModel.SelectedPresets.Select(preset => preset.Name));
+        }
+
+        /// <summary>
+        /// Verifies Refresh after multi-delete selects the row at the first deleted index.
+        /// </summary>
+        [Fact]
+        public void Refresh_After_Multi_Delete_Selects_At_Anchor_Index()
+        {
+            var (manager, viewModel) = _CreateWithPresets("A", "B", "C", "D", "E");
+            viewModel.SetSelectedPresets([viewModel.Presets[1], viewModel.Presets[2]]);
+
+            Assert.Equal(2, manager.RemoveMany(["B", "C"]));
+            viewModel.Refresh();
+
+            Assert.Equal(["A", "D", "E"], viewModel.Presets.Select(preset => preset.Name));
+            Assert.Equal(["D"], viewModel.SelectedPresets.Select(preset => preset.Name));
+        }
+
+        /// <summary>
         /// Verifies Load/Rename require exactly one selection; Delete any selection; description only when single.
         /// </summary>
         [Fact]

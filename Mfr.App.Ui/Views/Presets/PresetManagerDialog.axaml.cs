@@ -106,6 +106,11 @@ namespace Mfr.App.Ui.Views.Presets
             {
                 var (AddedCount, SkippedCount) = _appliedFilters.ImportSamplePresets(dialogViewModel.SelectedNames());
                 _ViewModel.Refresh();
+                if (SkippedCount == 0)
+                {
+                    return;
+                }
+
                 await new OkMessageDialog(
                     "Import Sample Presets",
                     $"Added {AddedCount}. Skipped {SkippedCount} (name already exists)."
