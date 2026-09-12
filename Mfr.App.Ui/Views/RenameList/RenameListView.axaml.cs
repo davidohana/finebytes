@@ -180,7 +180,6 @@ namespace Mfr.App.Ui.Views.RenameList
                 ShowErrorAsync = _ShowExportErrorAsync,
                 PromptAsync = _PromptOverrideAsync,
                 ConfirmPreviewErrorsAsync = _ConfirmPreviewErrorsAsync,
-                ShowCommitErrorSummaryAsync = _ShowCommitErrorSummaryAsync,
             };
         }
 
@@ -196,20 +195,6 @@ namespace Mfr.App.Ui.Views.RenameList
                 message: $"{errorCount} items with preview errors will be ignored. Do you want to continue?"
             );
             return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
-        }
-
-        private async Task _ShowCommitErrorSummaryAsync(int errorCount)
-        {
-            if (TopLevel.GetTopLevel(this) is not Window owner)
-            {
-                return;
-            }
-
-            var message =
-                $"{errorCount} items could not be renamed."
-                + $"{Environment.NewLine}{Environment.NewLine}"
-                + "Right-click an item and choose Show Rename Error for details.";
-            await new OkMessageDialog(title: "Rename Errors", message).ShowDialog(owner).ConfigureAwait(true);
         }
 
         private static void _ClearUiHooks(RenameListViewModel viewModel)

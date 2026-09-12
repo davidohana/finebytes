@@ -10,7 +10,7 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 15 
 - **failFast** — GUI `failFast: false` (continue after per-item failures). Cancel via progress token stops remaining work.
 - **Progress** — Extend engine `Commit` with `IProgress` + `CancellationToken` (mirror Preview/Refresh). UI: new `RenameListProgressOperation.Commit` + copy; GO may run Preview then Commit as two sequential `_RunProgressAsync` calls.
 - **Post-GO refresh** — After Commit: `_RefreshFieldDisplay`; if Auto-Preview on, allow normal re-preview (plum survives via ResetState change). Do **not** clear commit errors except GO start / F5.
-- **Post-apply summary** — If any `CommitError`, show [`OkMessageDialog`](../../Mfr.App.Ui/Views/OkMessageDialog.axaml.cs) with count + hint to right-click **Show Rename Error**.
+- **Post-apply status** — After Commit, set `LastGoStatus` for the main status bar (success and/or error counts; errors hint to right-click **Show Rename Error**). No summary dialog.
 - **Go CanExecute** — Enabled when rename list has ≥1 row and `!IsBusy` (empty list no-ops; no ChangeCount gate).
 - **Plum vs lavender** — Row class: `HasCommitError` → plum; else `HasPreviewError` → lavender.
 - **Out of scope** — Undo Log, trial, Contents warn, **Show Last Rename Errors** (note in [docs/debts.md](../debts.md)).
@@ -26,7 +26,7 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 15 
 
 ### Behavior
 
-1. Clear apply errors → ensure preview → warn if preview-error count → apply with progress/Stop → plum rows → optional summary → Show Rename Error on row.
+1. Clear apply errors → ensure preview → warn if preview-error count → apply with progress/Stop → plum rows → status-bar outcome → Show Rename Error on row.
 1. Preview-error rows skipped; Forced/manual overrides apply only via last Preview snapshot (finebytes PreviewStart/End already).
 1. Ctrl+G / menu **GO** / toolbar **GO!**; F5 clears apply-error highlight.
 
@@ -88,15 +88,15 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 15 
 **Scope / files**
 
 - [`MainWindowViewModel.Go`](../../Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs) — real `CanExecute`; async orchestration (wait pending Auto-Preview drain if any, then `RenameListViewModel` commit-go)
-- New `RenameListViewModel.Commit.cs` (or extend Preview partial): clear errors → Preview → confirm → Commit → refresh → optional summary
-- Dialog events (confirm / OK summary) mirrored like `RowErrorDialogRequested` from view code-behind
+- New `RenameListViewModel.Commit.cs` (or extend Preview partial): clear errors → Preview → confirm → Commit → refresh → `LastGoStatus` status bar
+- Dialog events (preview-error confirm) mirrored like `RowErrorDialogRequested` from view code-behind
 - [`RenameListProgressOperation`](../../Mfr.App.Ui/ViewModels/RenameList/RenameListProgressOperation.cs) + [`RenameListProgressCopy`](../../Mfr.App.Ui/ViewModels/RenameList/RenameListProgressCopy.cs) — Commit arm
 - [`docs/keyboard-shortcuts.md`](../keyboard-shortcuts.md) — remove GO from stubs sentence
 - [`docs/debts.md`](../debts.md) — Show Last Rename Errors deferred
 - Mark parent Phase 15 done when exiting
-- Tests: CanExecute; warn abort; commit called; overrides survive into commit (engine assert OK); F5 clears plum; progress op
+- Tests: CanExecute; warn abort; commit called; overrides survive into commit (engine assert OK); F5 clears plum; progress op; success/error status text
 
-**Exit:** Ctrl+G / menu / toolbar perform real renames; plum + Show Rename Error; preview-error rows skipped after warn; shortcuts doc updated.
+**Exit:** Ctrl+G / menu / toolbar perform real renames; plum + Show Rename Error; preview-error rows skipped after warn; status-bar GO outcome; shortcuts doc updated.
 
 ## Test focus
 

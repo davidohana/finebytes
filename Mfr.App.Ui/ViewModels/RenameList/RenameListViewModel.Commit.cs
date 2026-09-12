@@ -1,5 +1,6 @@
 using Mfr.Engine.Commit;
 using Mfr.Models.Filters;
+using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -25,6 +26,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
+            LastGoStatus = string.Empty;
             _renameList.ClearCommitErrors();
             _RefreshFieldDisplay();
 
@@ -57,11 +59,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
+            IReadOnlyList<RenameResultItem>? results = null;
             await _RunProgressAsync(
                     RenameListProgressOperation.Commit,
                     (token, progress) =>
                     {
-                        _renameList.Commit(plan, failFast: false, cancellationToken: token, progress: progress);
+                        results = _renameList.Commit(plan, failFast: false, cancellationToken: token, progress: progress);
                     }
                 )
                 .ConfigureAwait(true);
@@ -69,11 +72,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _ClearPreviewCounts();
             _RefreshFieldDisplay();
 
-            var commitErrorCount = Entries.Count(entry => entry.HasCommitError);
-            if (commitErrorCount > 0)
-            {
-                await _ShowCommitErrorSummaryAsync(commitErrorCount).ConfigureAwait(true);
-            }
+            var renamedCount = results?.Count(item => item.Status == RenameStatus.CommitOk) ?? 0;
+            var commitErrorCount = results?.Count(item => item.Status == RenameStatus.CommitError) ?? 0;
+            LastGoStatus = _FormatGoOutcome(renamedCount, commitErrorCount);
 
             return true;
         }
@@ -89,15 +90,27 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return await confirm(errorCount).ConfigureAwait(true);
         }
 
-        private async Task _ShowCommitErrorSummaryAsync(int errorCount)
+        /// <summary>
+        /// Builds the status-bar message after a completed GO commit.
+        /// </summary>
+        private static string _FormatGoOutcome(int renamedCount, int errorCount)
         {
-            var showSummary = UiHooks?.ShowCommitErrorSummaryAsync;
-            if (showSummary is null)
+            if (errorCount > 0 && renamedCount > 0)
             {
-                return;
+                return $"Renamed {renamedCount} item(s). {errorCount} could not be renamed — right-click Show Rename Error.";
             }
 
-            await showSummary(errorCount).ConfigureAwait(true);
+            if (errorCount > 0)
+            {
+                return $"{errorCount} item(s) could not be renamed. Right-click Show Rename Error for details.";
+            }
+
+            if (renamedCount > 0)
+            {
+                return $"Renamed {renamedCount} item(s).";
+            }
+
+            return "No items were renamed.";
         }
     }
 }

@@ -332,6 +332,14 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 _ShowTransientStatusHint(RenameListViewModel.LastLocateError);
             }
 
+            if (
+                e.PropertyName is nameof(RenameListViewModel.LastGoStatus)
+                && !string.IsNullOrEmpty(RenameListViewModel.LastGoStatus)
+            )
+            {
+                _ShowTransientStatusHint(RenameListViewModel.LastGoStatus);
+            }
+
             if (e.PropertyName is nameof(RenameListViewModel.CellStatusHint))
             {
                 _paneStatusHint = RenameListViewModel.CellStatusHint;

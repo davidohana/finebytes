@@ -121,10 +121,10 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies commit failures request the post-GO summary after valid rows have been attempted.
+        /// Verifies commit failures set a status-bar GO outcome after valid rows have been attempted.
         /// </summary>
         [AvaloniaFact]
-        public async Task Go_commit_errors_request_summary()
+        public async Task Go_commit_errors_set_status()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var source = Path.Combine(dir, "alpha.txt");
@@ -137,18 +137,12 @@ namespace Mfr.Tests.Ui.MainWindow
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync([source, blocked]).ConfigureAwait(true);
 
-            var summaryCount = 0;
             viewModel.RenameListViewModel.UiHooks = new RenameListUiHooks
             {
                 ConfirmPreviewErrorsAsync = _ =>
                 {
                     File.Delete(source);
                     return Task.FromResult(true);
-                },
-                ShowCommitErrorSummaryAsync = errorCount =>
-                {
-                    summaryCount = errorCount;
-                    return Task.CompletedTask;
                 },
             };
 
@@ -159,9 +153,33 @@ namespace Mfr.Tests.Ui.MainWindow
                 .ConfigureAwait(true);
 
             Assert.True(commitStarted);
-            Assert.Equal(1, summaryCount);
+            Assert.Contains("could not be renamed", viewModel.RenameListViewModel.LastGoStatus);
+            Assert.Contains("Show Rename Error", viewModel.RenameListViewModel.LastGoStatus);
             Assert.Single(viewModel.RenameListViewModel.Entries, entry => entry.HasCommitError);
             Assert.Equal("occupied", await File.ReadAllTextAsync(occupied));
+        }
+
+        /// <summary>
+        /// Verifies a successful GO reports renamed count in the status-bar outcome.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Go_success_sets_status()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = Path.Combine(dir, "alpha.txt");
+            var destination = Path.Combine(dir, "renamed.txt");
+            await File.WriteAllTextAsync(source, "alpha");
+            var viewModel = new MainWindowViewModel(dir);
+            viewModel.RenameListViewModel.DisableAutoPreview();
+            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
+
+            var commitStarted = await viewModel
+                .RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("alpha", "renamed")))
+                .ConfigureAwait(true);
+
+            Assert.True(commitStarted);
+            Assert.Equal("Renamed 1 item(s).", viewModel.RenameListViewModel.LastGoStatus);
+            Assert.True(File.Exists(destination));
         }
 
         private static FilterChain _Chain(params ReplacerFilter[] filters)

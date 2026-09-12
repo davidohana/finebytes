@@ -306,7 +306,7 @@ Wire UI to existing engine commit.
 
 **Status:** done.
 
-**MFR7 flow:** clear apply errors → ensure preview if needed → warn on preview-error count → apply with progress → plum rows for apply/rename errors → row menu **Show Rename Error**.
+**MFR7 flow:** clear apply errors → ensure preview if needed → warn on preview-error count → apply with progress → plum rows for apply/rename errors → status-bar outcome → row menu **Show Rename Error**.
 
 **Work**
 

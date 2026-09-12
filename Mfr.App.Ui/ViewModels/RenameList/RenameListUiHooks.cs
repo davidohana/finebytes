@@ -43,13 +43,5 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </para>
         /// </remarks>
         public Func<int, Task<bool>>? ConfirmPreviewErrorsAsync { get; init; }
-
-        /// <summary>
-        /// Post-GO summary when one or more rows failed to commit; argument is the commit-error count.
-        /// </summary>
-        /// <remarks>
-        /// <para>When null, the summary is skipped.</para>
-        /// </remarks>
-        public Func<int, Task>? ShowCommitErrorSummaryAsync { get; init; }
     }
 }
