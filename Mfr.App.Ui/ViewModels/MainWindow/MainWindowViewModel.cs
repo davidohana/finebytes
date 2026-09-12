@@ -291,11 +291,6 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             {
                 ItemCount = RenameListViewModel.ItemCount;
                 GoCommand.NotifyCanExecuteChanged();
-                if (ItemCount == 0)
-                {
-                    // Empty list: drop leftover GO/add text (Clear often leaves CellStatusHint already empty).
-                    StatusHint = StyledTextDisplay.Empty;
-                }
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.ChangeCount))
@@ -325,7 +320,8 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
 
             if (e.PropertyName is nameof(RenameListViewModel.LastStatusMessage))
             {
-                _ApplyStatusHintIfPresent(RenameListViewModel.LastStatusMessage);
+                // Empty is applied so Clear can wipe a prior GO/add message.
+                StatusHint = RenameListViewModel.LastStatusMessage;
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.CellStatusHint))
@@ -452,9 +448,9 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Applies a non-empty status message as the current status-bar hint (last write wins).
+        /// Applies a status message to the status-bar hint (last write wins). Empty clears the bar.
         /// </summary>
-        /// <param name="message">Status published by Rename List, Applied Filters, or File List.</param>
+        /// <param name="message">Status published by Applied Filters or File List.</param>
         private void _ApplyStatusHintIfPresent(StyledTextDisplay message)
         {
             if (message.IsEmpty)
