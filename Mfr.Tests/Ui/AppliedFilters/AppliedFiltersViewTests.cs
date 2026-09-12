@@ -5,7 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views.AppliedFilters;
 
 namespace Mfr.Tests.Ui.AppliedFilters

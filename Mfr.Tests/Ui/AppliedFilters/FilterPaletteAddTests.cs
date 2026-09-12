@@ -3,7 +3,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.App.Ui.Views.FilterPalette;

@@ -3,7 +3,7 @@ using Avalonia;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
-using Mfr.App.Ui.Views.DragAndDrop;
+using Mfr.App.Ui.Views.RenameList;
 
 namespace Mfr.App.Ui.Views.FileList
 {

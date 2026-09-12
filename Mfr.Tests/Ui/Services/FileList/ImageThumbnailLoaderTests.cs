@@ -3,7 +3,7 @@ using Avalonia.Media.Imaging;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels.FileList;
 
-namespace Mfr.Tests.Ui.Thumbnails
+namespace Mfr.Tests.Ui.Services.FileList
 {
     /// <summary>
     /// Tests image preview decoding for Thumbnails view.

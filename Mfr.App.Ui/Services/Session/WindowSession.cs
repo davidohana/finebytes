@@ -10,10 +10,10 @@ namespace Mfr.App.Ui.Services.Session
     /// </summary>
     internal static class WindowSession
     {
-        /// <summary>Matches <see cref="Views.MainWindow"/> XAML <c>MinWidth</c>.</summary>
+        /// <summary>Matches <see cref="Views.MainWindow.MainWindow"/> XAML <c>MinWidth</c>.</summary>
         private const double MinWidth = 800;
 
-        /// <summary>Matches <see cref="Views.MainWindow"/> XAML <c>MinHeight</c>.</summary>
+        /// <summary>Matches <see cref="Views.MainWindow.MainWindow"/> XAML <c>MinHeight</c>.</summary>
         private const double MinHeight = 500;
 
         /// <summary>Default size as a fraction of the primary screen working area.</summary>

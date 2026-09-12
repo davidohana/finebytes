@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Attributes"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:attr="using:Mfr.App.Ui.Views.FilterEditors.Attributes"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="160"
@@ -22,25 +23,25 @@
         </controls:RichToolTip>
       </ToolTip.Tip>
       <StackPanel Spacing="6" Grid.IsSharedSizeScope="True">
-        <controls:AttributeTriStateRow
+        <attr:AttributeTriStateRow
           x:Name="ReadOnlyRow"
           Label="Read-only:"
           GroupName="AttributesSetterReadOnly"
           Value="{Binding ReadOnly, Mode=TwoWay}"
         />
-        <controls:AttributeTriStateRow
+        <attr:AttributeTriStateRow
           x:Name="HiddenRow"
           Label="Hidden:"
           GroupName="AttributesSetterHidden"
           Value="{Binding Hidden, Mode=TwoWay}"
         />
-        <controls:AttributeTriStateRow
+        <attr:AttributeTriStateRow
           x:Name="ArchiveRow"
           Label="Archive:"
           GroupName="AttributesSetterArchive"
           Value="{Binding Archive, Mode=TwoWay}"
         />
-        <controls:AttributeTriStateRow
+        <attr:AttributeTriStateRow
           x:Name="SystemRow"
           Label="System:"
           GroupName="AttributesSetterSystem"

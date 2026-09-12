@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Trimming"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:trim="using:Mfr.App.Ui.Views.FilterEditors.Trimming"
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="220"
@@ -99,6 +100,6 @@
         </Grid>
       </StackPanel>
     </controls:FieldsetGroup>
-    <controls:VisualTrimHelperView x:Name="TrimHelper" DataContext="{Binding TrimHelper}" />
+    <trim:VisualTrimHelperView x:Name="TrimHelper" DataContext="{Binding TrimHelper}" />
   </StackPanel>
 </UserControl>

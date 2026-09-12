@@ -1,6 +1,6 @@
 using Mfr.App.Ui.ViewModels.FileList;
 
-namespace Mfr.Tests.Ui.Thumbnails
+namespace Mfr.Tests.Ui.Services.FileList
 {
     /// <summary>
     /// Tests discrete thumbnail size snapping used by the File List.

@@ -2,9 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FileList;
-using AppMainWindow = Mfr.App.Ui.Views.MainWindow;
+using Mfr.App.Ui.ViewModels.MainWindow;
+using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
 
 namespace Mfr.Tests.Ui.MainWindow
 {

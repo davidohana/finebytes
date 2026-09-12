@@ -18,7 +18,7 @@ description: Current layers and allowed project dependencies.
 
 Supporting:
 
-- Tests: [`Mfr.Tests/`](../Mfr.Tests) (guardrails + regression, TagLib-backed `AudioTagPersistence` integration in `Metadata/`; UI tests under `Ui/<Pane>/` with matching namespaces; refs entry points only per architecture test)
+- Tests: [`Mfr.Tests/`](../Mfr.Tests) (guardrails + regression, TagLib-backed `AudioTagPersistence` integration in `Metadata/`; UI tests under `Ui/<Pane>/` with matching namespaces, plus `Ui/Services/<Slice>/` for non-View service coverage such as `FileList`; refs entry points only per architecture test)
 - UI: [`Mfr.App.Ui/`](../Mfr.App.Ui) (Avalonia 11 + CommunityToolkit.Mvvm desktop shell; `just run-ui`)
 
 ## Allowed dependencies
@@ -56,10 +56,10 @@ Current code-behind / AXAML consumers (verify with `using Mfr.App.Ui.Services` u
 
 | Site                                       | Service surface                                       | Why                                                                               |
 | ------------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------- |
-| `MainWindow`                               | `Services.Session` (`MainWindowPaneGrids`)            | Session splitter restore/capture needs named pane grids from the window           |
-| `MainWindow`                               | `Services.Help` (`FilterHelpHost`)                    | Missing-help dialog text lists the app-local `help/` folder                       |
+| `Views/MainWindow/MainWindow`              | `Services.Session` (`MainWindowPaneGrids`)            | Session splitter restore/capture needs named pane grids from the window           |
+| `Views/MainWindow/MainWindow`              | `Services.Help` (`FilterHelpHost`)                    | Missing-help dialog text lists the app-local `help/` folder                       |
 | `PathMoverFilterEditorView`                | `Services.FolderPicker`                               | Folder picker needs a visual root; VM gets an injected async delegate             |
 | `FileListView`                             | `Services.RenameList` (`RenameListAddSourceResolver`) | DnD / Add-Selected path validation shared with Rename List add                    |
 | `FileListAddressBarView` (+ AXAML `xmlns`) | `Services.FileList` (`PathBreadcrumbSegment`)         | Breadcrumb overflow UI binds the same segment type as the File List service model |
 
-`Views/DragAndDrop/` helpers do not currently import Services; keep new DnD format / path helpers in Views or Services deliberately, and extend this table if a View starts using Services there.
+`Views/DragAndDrop/` helpers do not currently import Services; keep new DnD format / path helpers in Views or Services deliberately, and extend this table if a View starts using Services there. Rename List–specific drag format constants live under `Views/RenameList/` (`RenameListDragFormats`); crash UI lives under `Views/Crash/` + `ViewModels/Crash/` while `Diagnostics/UiCrashHandler` stays outside Views (covered by `Mfr.Tests/Ui/Crash/`). File List service tests live under `Mfr.Tests/Ui/Services/FileList/`.

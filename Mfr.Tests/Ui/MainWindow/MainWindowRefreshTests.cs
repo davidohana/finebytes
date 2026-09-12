@@ -1,5 +1,5 @@
 using Avalonia.Headless.XUnit;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.MainWindow;
 
 namespace Mfr.Tests.Ui.MainWindow
 {

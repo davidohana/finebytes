@@ -7,7 +7,7 @@ using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.RenameList;
 
-namespace Mfr.App.Ui.Views.Controls
+namespace Mfr.App.Ui.Views.FilterEditors.Trimming
 {
     /// <summary>
     /// Read-only sample text box that maps mouse selection to trim/extract options (MFR7 Visual Trim Helper).

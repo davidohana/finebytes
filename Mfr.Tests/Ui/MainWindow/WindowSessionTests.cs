@@ -2,8 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.Services.Session;
-using Mfr.App.Ui.ViewModels;
-using AppMainWindow = Mfr.App.Ui.Views.MainWindow;
+using Mfr.App.Ui.ViewModels.MainWindow;
+using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
 
 namespace Mfr.Tests.Ui.MainWindow
 {

@@ -7,7 +7,7 @@
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="100"
-  x:Class="Mfr.App.Ui.Views.Controls.ReplacerMatchOptionsFieldset"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Replace.ReplacerMatchOptionsFieldset"
   x:CompileBindings="False"
 >
   <controls:FieldsetGroup Header="Options">

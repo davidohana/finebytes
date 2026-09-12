@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FormatEditor;
+using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.Views.FormatEditor

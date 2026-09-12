@@ -2,9 +2,9 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Mfr.App.Ui.Services.Session;
-using Mfr.App.Ui.ViewModels;
-using Mfr.App.Ui.Views;
+using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views.GridColumnSizing;
+using Mfr.App.Ui.Views.MainWindow;
 using Mfr.Engine.Presets;
 using Mfr.Models.Config;
 

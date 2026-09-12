@@ -9,7 +9,7 @@
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="28"
-  x:Class="Mfr.App.Ui.Views.Controls.AttributeTriStateRow"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Attributes.AttributeTriStateRow"
   x:Name="Root"
   x:CompileBindings="False"
 >

@@ -1,6 +1,6 @@
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.ViewModels
+namespace Mfr.App.Ui.ViewModels.Crash
 {
     /// <summary>
     /// View model for the unexpected-error dialog.

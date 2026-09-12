@@ -8,7 +8,6 @@ using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 

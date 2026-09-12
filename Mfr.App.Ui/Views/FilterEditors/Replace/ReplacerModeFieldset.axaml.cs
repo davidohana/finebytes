@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 
-namespace Mfr.App.Ui.Views.Controls
+namespace Mfr.App.Ui.Views.FilterEditors.Replace
 {
     /// <summary>
     /// Literal / Wildcard / Regex mode radios for Replacer and Replace List editors.

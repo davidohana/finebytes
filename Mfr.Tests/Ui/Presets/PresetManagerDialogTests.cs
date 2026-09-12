@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Mfr.App.Ui.Views.Presets;
 
 namespace Mfr.Tests.Ui.Presets
 {

@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace Mfr.App.Ui.Views.Controls
+namespace Mfr.App.Ui.Views.FilterEditors.Replace
 {
     /// <summary>
     /// Case / replace-all / whole-word options shared by Replacer and Replace List editors.

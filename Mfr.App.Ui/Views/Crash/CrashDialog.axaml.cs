@@ -1,10 +1,10 @@
 using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.Crash;
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.Crash
 {
     /// <summary>
     /// Modal dialog for an unexpected process fault.

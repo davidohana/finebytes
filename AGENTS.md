@@ -36,7 +36,7 @@
 - Namespace **must** match folder path under the project (`RootNamespace` = project name). Example: `Mfr.App.Ui/Views/FilterEditors/Space/Foo.cs` → `namespace Mfr.App.Ui.Views.FilterEditors.Space`.
 - AXAML `x:Class` namespace must match the view’s folder the same way; keep the code-behind namespace identical.
 - When adding or moving types, update **folder + namespace + usings + x:Class** together — never leave a file in a new folder with an old namespace.
-- Mirror feature folders across UI pairs: `ViewModels/<Feature>/` ↔ `Views/<Feature>/` (and `Mfr.Tests/Ui/<Feature>/` for that pane’s tests). Put category editors under the same `FilterGroup` name as `Mfr.Filters` (e.g. `…/FilterEditors/Trimming/`).
+- Mirror feature folders across UI pairs: `ViewModels/<Feature>/` ↔ `Views/<Feature>/` (and `Mfr.Tests/Ui/<Feature>/` for that pane’s tests). Put category editors under the same `FilterGroup` name as `Mfr.Filters` (e.g. `…/FilterEditors/Trimming/`). Non-View App.Ui services may use `Mfr.Tests/Ui/Services/<Slice>/` (e.g. `Services/FileList`).
 - Enforced by IDE0130 (warning) in `.editorconfig`; do not suppress without a nearby comment.
 
 ## Refactoring compatibility policy

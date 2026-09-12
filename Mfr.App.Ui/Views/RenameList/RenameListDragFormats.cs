@@ -1,6 +1,6 @@
 using Avalonia.Input;
 
-namespace Mfr.App.Ui.Views.DragAndDrop
+namespace Mfr.App.Ui.Views.RenameList
 {
     /// <summary>
     /// Shared Avalonia data formats for Rename List row drags (reorder and drag-back to File List).

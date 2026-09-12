@@ -1,7 +1,7 @@
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.Services.FileList;
 
-namespace Mfr.Tests.Ui.Platform
+namespace Mfr.Tests.Ui.Services.FileList
 {
     /// <summary>
     /// Tests for <see cref="ISystemIconProvider"/> OS integrations.

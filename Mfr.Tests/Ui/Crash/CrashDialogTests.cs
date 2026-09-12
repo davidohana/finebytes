@@ -1,6 +1,6 @@
 using Avalonia.Headless.XUnit;
-using Mfr.App.Ui.ViewModels;
-using Mfr.App.Ui.Views;
+using Mfr.App.Ui.ViewModels.Crash;
+using Mfr.App.Ui.Views.Crash;
 
 namespace Mfr.Tests.Ui.Crash
 {

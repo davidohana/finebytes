@@ -9,7 +9,7 @@
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="60"
-  x:Class="Mfr.App.Ui.Views.Controls.ReplacerModeFieldset"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Replace.ReplacerModeFieldset"
   x:CompileBindings="False"
 >
   <controls:FieldsetGroup Header="Mode">

@@ -14,7 +14,7 @@ using Mfr.Engine.Presets;
 using Mfr.Models.Config;
 using Mfr.Utils;
 
-namespace Mfr.App.Ui.ViewModels
+namespace Mfr.App.Ui.ViewModels.MainWindow
 {
     /// <summary>
     /// Root view model for the main window shell (menus, toolbar, status, pane hosts).

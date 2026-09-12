@@ -1,8 +1,8 @@
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views;
-using AppMainWindow = Mfr.App.Ui.Views.MainWindow;
+using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
 
 namespace Mfr.Tests.Ui.MainWindow
 {

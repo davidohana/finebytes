@@ -8,7 +8,7 @@
   mc:Ignorable="d"
   d:DesignWidth="420"
   d:DesignHeight="100"
-  x:Class="Mfr.App.Ui.Views.Controls.VisualTrimHelperView"
+  x:Class="Mfr.App.Ui.Views.FilterEditors.Trimming.VisualTrimHelperView"
   x:DataType="vm:VisualTrimHelperViewModel"
 >
   <StackPanel Spacing="4">

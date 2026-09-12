@@ -4,10 +4,10 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Session;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.Engine.Config;
 
-namespace Mfr.App.Ui.Views
+namespace Mfr.App.Ui.Views.MainWindow
 {
     /// <summary>
     /// Main application window with the MFR 7.4 splitter layout.

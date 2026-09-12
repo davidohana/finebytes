@@ -3,8 +3,9 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Views.Controls;
+using Mfr.App.Ui.Views.FilterEditors.Attributes;
 
-namespace Mfr.Tests.Ui.Controls
+namespace Mfr.Tests.Ui.FilterEditors.Attributes
 {
     /// <summary>
     /// Headless layout tests for <see cref="AttributeTriStateRow"/>.

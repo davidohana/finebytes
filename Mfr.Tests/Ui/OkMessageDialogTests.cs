@@ -38,9 +38,7 @@ namespace Mfr.Tests.Ui
             Assert.Contains("message-dialog-footer", ok.Classes);
             Assert.True(ok.IsDefault);
             var app = Assert.IsAssignableFrom<Application>(Application.Current);
-            Assert.True(
-                app.TryGetResource("AppChromeSelectionBrush", app.ActualThemeVariant, out var selection)
-            );
+            Assert.True(app.TryGetResource("AppChromeSelectionBrush", app.ActualThemeVariant, out var selection));
             Assert.Equal(selection, ok.Background);
 
             dialog.Close();

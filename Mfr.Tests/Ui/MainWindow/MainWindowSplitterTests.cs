@@ -4,8 +4,8 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Mfr.App.Ui.Services.Session;
-using Mfr.App.Ui.ViewModels;
-using AppMainWindow = Mfr.App.Ui.Views.MainWindow;
+using Mfr.App.Ui.ViewModels.MainWindow;
+using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
 
 namespace Mfr.Tests.Ui.MainWindow
 {

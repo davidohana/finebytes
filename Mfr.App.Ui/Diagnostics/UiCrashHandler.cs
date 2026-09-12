@@ -2,8 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
-using Mfr.App.Ui.ViewModels;
-using Mfr.App.Ui.Views;
+using Mfr.App.Ui.ViewModels.Crash;
+using Mfr.App.Ui.Views.Crash;
 using Mfr.Engine.Logging;
 using Serilog;
 

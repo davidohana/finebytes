@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Mfr.Filters.Attributes;
 
-namespace Mfr.App.Ui.Views.Controls
+namespace Mfr.App.Ui.Views.FilterEditors.Attributes
 {
     /// <summary>
     /// Labeled On / Off / Keep radio row bound to an <see cref="AttributeTriState"/> value.

@@ -2,7 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Mfr.App.Ui.ViewModels;
+using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.FilterEditors;
 

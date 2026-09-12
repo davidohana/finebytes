@@ -1,7 +1,7 @@
 using Mfr.App.Ui.Services.FileList;
 using Mfr.Utils;
 
-namespace Mfr.Tests.Ui.Platform
+namespace Mfr.Tests.Ui.Services.FileList
 {
     /// <summary>
     /// Tests WSL UNC host detection and path rewriting.
