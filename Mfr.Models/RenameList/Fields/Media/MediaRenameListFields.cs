@@ -45,7 +45,7 @@ namespace Mfr.Models.RenameList.Fields.Media
                 "Description",
                 "Description",
                 MediaRenameListProperty.Description,
-                defaultWidth: 180
+                defaultWidth: 220
             ),
             new MediaPropertyRenameListField(
                 "AudioBitrate",

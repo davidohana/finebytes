@@ -82,7 +82,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.Folder,
             displayName: PathFieldLabels.ParentDirectory,
-            defaultWidth: 240,
+            defaultWidth: 400,
             writeTarget: new ParentDirectoryTarget(),
             tip: PathFieldTips.ParentDirectory
         )
@@ -103,7 +103,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FullName,
             displayName: PathFieldLabels.FullFileName,
-            defaultWidth: 180,
+            defaultWidth: 300,
             writeTarget: new FileFullNameTarget(),
             tip: PathFieldTips.FullFileName
         )
@@ -124,7 +124,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.FullPath,
             displayName: PathFieldLabels.FullPath,
-            defaultWidth: 180,
+            defaultWidth: 450,
             writeTarget: new FullPathTarget()
         )
     {
@@ -144,7 +144,7 @@ namespace Mfr.Models.RenameList.Fields.Basic
         : BasicRenameListField(
             propertyKey: BasicRenameListFields.Key.Name,
             displayName: PathFieldLabels.FileName,
-            defaultWidth: 150,
+            defaultWidth: 220,
             writeTarget: new FilePrefixTarget(),
             tip: PathFieldTips.FileName
         )

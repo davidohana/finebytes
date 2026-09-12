@@ -30,24 +30,24 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
-            _Semantic("Album", SemanticAudioField.Album),
-            _Semantic("AlbumArtists", SemanticAudioField.AlbumArtists),
+            _Semantic("Album", SemanticAudioField.Album, defaultWidth: 200),
+            _Semantic("AlbumArtists", SemanticAudioField.AlbumArtists, defaultWidth: 200),
             _First("FirstAlbumArtist", SemanticAudioField.AlbumArtists),
-            _Semantic("Performers", SemanticAudioField.Performers),
+            _Semantic("Performers", SemanticAudioField.Performers, defaultWidth: 200),
             _First("FirstPerformer", SemanticAudioField.Performers),
             _Semantic("AmazonId", SemanticAudioField.AmazonId),
             _Semantic("BeatsPerMinute", SemanticAudioField.BeatsPerMinute),
-            _Semantic("Comment", SemanticAudioField.Comment),
+            _Semantic("Comment", SemanticAudioField.Comment, defaultWidth: 200),
             _Semantic("Composers", SemanticAudioField.Composers),
             _First("FirstComposer", SemanticAudioField.Composers),
             _Semantic("Conductor", SemanticAudioField.Conductor),
-            _Semantic("Copyright", SemanticAudioField.Copyright),
+            _Semantic("Copyright", SemanticAudioField.Copyright, defaultWidth: 200),
             _Semantic("Disc", SemanticAudioField.Disc),
             _Semantic("DiscCount", SemanticAudioField.DiscCount),
             _Semantic("Genres", SemanticAudioField.Genre),
             _First("FirstGenre", SemanticAudioField.Genre),
             _Semantic("Grouping", SemanticAudioField.Grouping),
-            _Semantic("Lyrics", SemanticAudioField.Lyrics),
+            _Semantic("Lyrics", SemanticAudioField.Lyrics, defaultWidth: 200),
             _Semantic("MusicBrainzReleaseArtistId", SemanticAudioField.MusicBrainzReleaseArtistId),
             _Semantic("MusicBrainzReleaseId", SemanticAudioField.MusicBrainzReleaseId),
             _Semantic("MusicBrainzReleaseCountry", SemanticAudioField.MusicBrainzReleaseCountry),
@@ -58,7 +58,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
             _Semantic("MusicBrainzTrackId", SemanticAudioField.MusicBrainzTrackId),
             _Semantic("MusicIpId", SemanticAudioField.MusicIpId),
             new AudioTagTagTypesField(),
-            _Semantic("Title", SemanticAudioField.Title),
+            _Semantic("Title", SemanticAudioField.Title, defaultWidth: 200),
             _Semantic("Track", SemanticAudioField.Track, defaultWidth: 40),
             _Semantic("TrackCount", SemanticAudioField.TrackCount),
             _Semantic("Year", SemanticAudioField.Year, defaultWidth: 60),
@@ -70,7 +70,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         private static AudioTagSemanticRenameListField _Semantic(
             string propertyKey,
             SemanticAudioField field,
-            int defaultWidth = 100
+            int defaultWidth = 160
         )
         {
             return new AudioTagSemanticRenameListField(

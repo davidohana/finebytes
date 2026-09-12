@@ -137,10 +137,10 @@ namespace Mfr.Tests.Models
         }
 
         [Theory]
-        [InlineData(BasicRenameListFields.Key.Name, "File Name", 150, true, true)]
-        [InlineData(BasicRenameListFields.Key.Folder, "Parent Directory", 240, true, true)]
-        [InlineData(BasicRenameListFields.Key.FullName, "Full File Name", 180, true, true)]
-        [InlineData(BasicRenameListFields.Key.FullPath, "Full Path", 180, true, true)]
+        [InlineData(BasicRenameListFields.Key.Name, "File Name", 220, true, true)]
+        [InlineData(BasicRenameListFields.Key.Folder, "Parent Directory", 400, true, true)]
+        [InlineData(BasicRenameListFields.Key.FullName, "Full File Name", 300, true, true)]
+        [InlineData(BasicRenameListFields.Key.FullPath, "Full Path", 450, true, true)]
         public void Field_definitions_with_width_overrides_carry_mfr7_labels_and_flags(
             string propertyKey,
             string displayName,

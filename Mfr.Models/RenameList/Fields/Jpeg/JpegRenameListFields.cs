@@ -24,32 +24,32 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 "ExifDirectory*40091",
                 "Title",
                 JpegRenameListExifProperty.Title,
-                defaultWidth: 100
+                defaultWidth: 160
             ),
             new JpegExifRenameListField(
                 "ExifDirectory*40095",
                 "Subject",
                 JpegRenameListExifProperty.Subject,
-                defaultWidth: 100
+                defaultWidth: 160
             ),
             new JpegExifRenameListField(
                 "ExifDirectory*40093",
                 "Author",
                 JpegRenameListExifProperty.Author,
-                defaultWidth: 100,
+                defaultWidth: 160,
                 tip: JpegRenameListFieldTips.Author
             ),
             new JpegExifRenameListField(
                 "ExifDirectory*40094",
                 "Keywords",
                 JpegRenameListExifProperty.Keywords,
-                defaultWidth: 100
+                defaultWidth: 160
             ),
             new JpegExifRenameListField(
                 "ExifDirectory*40092",
                 "Comments",
                 JpegRenameListExifProperty.Comments,
-                defaultWidth: 100
+                defaultWidth: 160
             ),
             new JpegExifRenameListField(
                 "ExifDirectory*36867",
@@ -64,12 +64,17 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 JpegRenameListExifProperty.Model,
                 defaultWidth: 60
             ),
-            new JpegExifRenameListField("ExifDirectory*270", "Description", JpegRenameListExifProperty.Description),
+            new JpegExifRenameListField(
+                "ExifDirectory*270",
+                "Description",
+                JpegRenameListExifProperty.Description,
+                defaultWidth: 160
+            ),
             new JpegExifRenameListField(
                 "ExifDirectory*315",
                 "Artist",
                 JpegRenameListExifProperty.Artist,
-                defaultWidth: 60,
+                defaultWidth: 120,
                 tip: JpegRenameListFieldTips.Artist
             ),
             new JpegExifRenameListField(
@@ -82,7 +87,7 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 "ExifDirectory*37510",
                 "User Comment",
                 JpegRenameListExifProperty.UserComment,
-                defaultWidth: 60
+                defaultWidth: 140
             ),
             new JpegExifRenameListField(
                 "ExifDirectory*33434",

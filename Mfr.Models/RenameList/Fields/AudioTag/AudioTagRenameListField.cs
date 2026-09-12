@@ -20,7 +20,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
     internal abstract class AudioTagRenameListField(
         string propertyKey,
         string displayName,
-        int? defaultWidth = 100,
+        int? defaultWidth = 160,
         bool supportsPreview = false,
         FilterTarget? writeTarget = null,
         string? tip = null
@@ -50,7 +50,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         string propertyKey,
         string displayName,
         SemanticAudioField field,
-        int? defaultWidth = 100,
+        int? defaultWidth = 160,
         string? tip = null
     )
         : AudioTagRenameListField(

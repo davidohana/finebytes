@@ -115,9 +115,9 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 200),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 320),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 400),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 340),
                 ]
             );
         }
@@ -147,9 +147,9 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 200),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 200),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 360),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 400),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 340),
                 ]
             );
         }
@@ -198,12 +198,12 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 180),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 280),
                     _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 280),
-                    _MediaTag("Performers", preview: true, width: 120),
-                    _MediaTag("Album", preview: true, width: 140),
-                    _MediaTag("Title", preview: true, width: 160),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 300),
+                    _MediaTag("Performers", preview: true, width: 180),
+                    _MediaTag("Album", preview: true, width: 180),
+                    _MediaTag("Title", preview: true, width: 200),
                     _MediaTag("Track", preview: true, width: 45),
                     _MediaTag("TrackCount", preview: true, width: 50),
                 ]
@@ -258,12 +258,12 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 160),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 200),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 340),
-                    _MediaTag("Performers", preview: false, width: 120),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 300),
+                    _MediaTag("Performers", preview: false, width: 180),
                     _MediaTag("Track", preview: false, width: 45),
-                    _MediaTag("Title", preview: false, width: 160),
+                    _MediaTag("Title", preview: false, width: 200),
                 ]
             );
         }
@@ -285,8 +285,8 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 180),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 160),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
                     _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 300),
                     _Jpeg("ExifDirectory*36867", preview: false, width: 140),
                 ]
@@ -312,8 +312,8 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 180),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 160),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
                     _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 300),
                     _Image("Format", preview: false, width: 60),
                     _Image("Width", preview: false, width: 55),
@@ -342,10 +342,10 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 220),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 180),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 320),
-                    _Basic(BasicRenameListFields.Key.FullPath, preview: true, width: 300),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 400),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 340),
+                    _Basic(BasicRenameListFields.Key.FullPath, preview: true, width: 450),
                 ]
             );
         }
@@ -369,9 +369,9 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 180),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: true, width: 240),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 180),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 320),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: true, width: 360),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 280),
                     _Jpeg("ExifDirectory*36867", preview: false, width: 140),
                 ]
             );
@@ -393,11 +393,11 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 180),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: true, width: 260),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 200),
-                    _MediaTag("Performers", preview: false, width: 120),
-                    _MediaTag("Album", preview: false, width: 140),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 320),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: true, width: 360),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 280),
+                    _MediaTag("Performers", preview: false, width: 180),
+                    _MediaTag("Album", preview: false, width: 180),
                 ]
             );
         }
@@ -419,9 +419,9 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 200),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 320),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 400),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 340),
                 ]
             );
         }
@@ -452,9 +452,9 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 200),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 320),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 400),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 340),
                 ]
             );
         }
@@ -487,9 +487,9 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 200),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 320),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 400),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 340),
                 ]
             );
         }
@@ -506,11 +506,11 @@ namespace Mfr.Engine.Presets.Samples
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
-                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 160),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 180),
-                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 280),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 300),
                     _MediaTag("Year", preview: false, width: 50),
-                    _MediaTag("Title", preview: false, width: 180),
+                    _MediaTag("Title", preview: false, width: 200),
                 ]
             );
         }

@@ -73,8 +73,8 @@ namespace Mfr.Tests.Ui.RenameList
             var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 2);
 
             Assert.Null(renameListViewModel.VisibleColumns[0].ResolveCatalogWidth());
-            Assert.Equal(240, renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
-            Assert.Equal(180, renameListViewModel.VisibleColumns[2].ResolveCatalogWidth());
+            Assert.Equal(400, renameListViewModel.VisibleColumns[1].ResolveCatalogWidth());
+            Assert.Equal(300, renameListViewModel.VisibleColumns[2].ResolveCatalogWidth());
 
             var fileFolderMinWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(
                 "File/Folder",
@@ -96,11 +96,11 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(fileFolderMinWidth > fileFolderHeaderOnlyWidth);
             Assert.Equal(fileFolderMinWidth, _DataColumn(grid, 0).Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 0).Width.UnitType);
-            Assert.Equal(240, _DataColumn(grid, 1).Width.Value);
+            Assert.Equal(400, _DataColumn(grid, 1).Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 1).Width.UnitType);
-            Assert.Equal(Math.Max(180, fullFileNameMinWidth), _DataColumn(grid, 2).Width.Value);
+            Assert.Equal(Math.Max(300, fullFileNameMinWidth), _DataColumn(grid, 2).Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 2).Width.UnitType);
-            Assert.Equal(Math.Max(180, previewFullFileNameMinWidth), _DataColumn(grid, 3).Width.Value);
+            Assert.Equal(Math.Max(300, previewFullFileNameMinWidth), _DataColumn(grid, 3).Width.Value);
             Assert.Equal(DataGridLengthUnitType.Pixel, _DataColumn(grid, 3).Width.UnitType);
             Assert.Equal(fileFolderMinWidth, _DataColumn(grid, 0).MinWidth);
             Assert.Equal(parentFolderMinWidth, _DataColumn(grid, 1).MinWidth);
