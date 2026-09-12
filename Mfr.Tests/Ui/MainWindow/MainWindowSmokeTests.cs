@@ -90,6 +90,34 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
+        /// Verifies Preview Errors count gets the error class when the count is non-zero.
+        /// </summary>
+        [AvaloniaFact]
+        public void MainWindow_PreviewErrors_Uses_HasErrors_Class()
+        {
+            var viewModel = new MainWindowViewModel();
+            var window = new AppMainWindow { DataContext = viewModel };
+            window.Show();
+            window.UpdateLayout();
+
+            var previewErrors = window
+                .GetVisualDescendants()
+                .OfType<TextBlock>()
+                .Single(block => block.Classes.Contains("status-bar-preview-errors"));
+
+            Assert.False(viewModel.HasPreviewErrors);
+            Assert.DoesNotContain("has-errors", previewErrors.Classes);
+
+            viewModel.PreviewErrorCount = 2;
+            Assert.True(viewModel.HasPreviewErrors);
+            Assert.Contains("has-errors", previewErrors.Classes);
+
+            viewModel.PreviewErrorCount = 0;
+            Assert.False(viewModel.HasPreviewErrors);
+            Assert.DoesNotContain("has-errors", previewErrors.Classes);
+        }
+
+        /// <summary>
         /// Verifies status-bar ItemCount tracks Rename List add and clear.
         /// </summary>
         [AvaloniaFact]

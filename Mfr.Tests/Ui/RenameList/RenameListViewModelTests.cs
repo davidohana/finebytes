@@ -42,11 +42,18 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(2, renameListViewModel.Entries.Count);
             Assert.Equal(["alpha.txt", "beta.md"], _PreviewNames(renameListViewModel));
+            Assert.Equal("Added 2 item(s).", renameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.All(renameListViewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
 
             fileListViewModel.SetSelectedEntries([alpha]);
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
             Assert.Equal(2, renameListViewModel.Entries.Count);
+            Assert.Equal("No items were added.", renameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.Equal(
+                StatusBarText.WarningForegroundResourceKey,
+                renameListViewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
         }
 
         /// <summary>
@@ -545,6 +552,8 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.ExportThisColumnAsync(nameKey);
 
             Assert.Equal($"alpha{Environment.NewLine}beta{Environment.NewLine}", await File.ReadAllTextAsync(outPath));
+            Assert.Equal("Exported 2 row(s).", renameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.All(renameListViewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
         }
 
         /// <summary>
@@ -581,6 +590,8 @@ namespace Mfr.Tests.Ui.RenameList
                 $"Full File Name,File Name{Environment.NewLine}row.txt,row{Environment.NewLine}",
                 await File.ReadAllTextAsync(outPath)
             );
+            Assert.Equal("Exported 1 row(s).", renameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.All(renameListViewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
         }
 
         /// <summary>
@@ -605,6 +616,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.ExportThisColumnAsync(nameKey);
 
             Assert.False(File.Exists(outPath));
+            Assert.DoesNotContain("Exported", renameListViewModel.LastStatusMessage.ToPlainText());
         }
 
         /// <summary>
@@ -693,6 +705,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Contains(missingDir, errorMessage);
             Assert.Empty(shell.RevealedInFileManager);
             Assert.False(File.Exists(missingDir));
+            Assert.DoesNotContain("Exported", renameListViewModel.LastStatusMessage.ToPlainText());
         }
 
         /// <summary>

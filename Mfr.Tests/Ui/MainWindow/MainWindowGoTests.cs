@@ -217,6 +217,108 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Equal("Renamed 1 item(s).", viewModel.StatusHint.ToPlainText());
         }
 
+        /// <summary>
+        /// Verifies stopping GO during preview publishes a warning Stopped status.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Go_preview_stop_sets_stopped_status()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var paths = new List<string>();
+            for (var i = 0; i < 40; i++)
+            {
+                var path = Path.Combine(dir, $"f{i:D2}.txt");
+                await File.WriteAllTextAsync(path, "x");
+                paths.Add(path);
+            }
+
+            var viewModel = new MainWindowViewModel(dir);
+            viewModel.RenameListViewModel.DisableAutoPreview();
+            await viewModel.RenameListViewModel.AddPathsAsync(paths).ConfigureAwait(true);
+
+            void OnProgressChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (
+                    e.PropertyName is nameof(RenameListProgressViewModel.IsBusy)
+                    && viewModel.RenameListViewModel.IsBusy
+                    && viewModel.RenameListViewModel.Progress.Operation == RenameListProgressOperation.Preview
+                )
+                {
+                    viewModel.RenameListViewModel.Progress.CancelCommand.Execute(null);
+                }
+            }
+
+            viewModel.RenameListViewModel.Progress.PropertyChanged += OnProgressChanged;
+            try
+            {
+                var commitStarted = await viewModel
+                    .RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("f", "g")))
+                    .ConfigureAwait(true);
+
+                Assert.False(commitStarted);
+                Assert.Equal("Stopped.", viewModel.RenameListViewModel.LastStatusMessage.ToPlainText());
+                Assert.Equal(
+                    StatusBarText.WarningForegroundResourceKey,
+                    viewModel.RenameListViewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+                );
+                Assert.Equal("Stopped.", viewModel.StatusHint.ToPlainText());
+            }
+            finally
+            {
+                viewModel.RenameListViewModel.Progress.PropertyChanged -= OnProgressChanged;
+            }
+        }
+
+        /// <summary>
+        /// Verifies stopping GO mid-commit publishes a warning with renamed count.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Go_commit_stop_sets_stopped_status()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var paths = new List<string>();
+            for (var i = 0; i < 20; i++)
+            {
+                var path = Path.Combine(dir, $"item{i:D2}.txt");
+                await File.WriteAllTextAsync(path, "x");
+                paths.Add(path);
+            }
+
+            var viewModel = new MainWindowViewModel(dir);
+            viewModel.RenameListViewModel.DisableAutoPreview();
+            await viewModel.RenameListViewModel.AddPathsAsync(paths).ConfigureAwait(true);
+
+            void OnProgressChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (
+                    e.PropertyName is nameof(RenameListProgressViewModel.IsBusy)
+                    && viewModel.RenameListViewModel.IsBusy
+                    && viewModel.RenameListViewModel.Progress.Operation == RenameListProgressOperation.Commit
+                )
+                {
+                    viewModel.RenameListViewModel.Progress.CancelCommand.Execute(null);
+                }
+            }
+
+            viewModel.RenameListViewModel.Progress.PropertyChanged += OnProgressChanged;
+            try
+            {
+                var commitStarted = await viewModel
+                    .RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("item", "done")))
+                    .ConfigureAwait(true);
+
+                Assert.True(commitStarted);
+                var status = viewModel.RenameListViewModel.LastStatusMessage;
+                Assert.StartsWith("Stopped.", status.ToPlainText());
+                Assert.Equal(StatusBarText.WarningForegroundResourceKey, status.Runs[0].ForegroundResourceKey);
+                Assert.Equal(status.ToPlainText(), viewModel.StatusHint.ToPlainText());
+            }
+            finally
+            {
+                viewModel.RenameListViewModel.Progress.PropertyChanged -= OnProgressChanged;
+            }
+        }
+
         private static FilterChain _Chain(params ReplacerFilter[] filters)
         {
             return new FilterChain

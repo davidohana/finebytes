@@ -51,6 +51,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             if (!previewCompleted || plan is null)
             {
+                if (!previewCompleted)
+                {
+                    LastStatusMessage = StatusBarText.Warning("Stopped.");
+                }
+
                 return false;
             }
 
@@ -60,7 +65,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             IReadOnlyList<RenameResultItem>? results = null;
-            await _RunProgressAsync(
+            var commitCompleted = await _RunProgressAsync(
                     RenameListProgressOperation.Commit,
                     (token, progress) =>
                     {
@@ -79,7 +84,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var renamedCount = results?.Count(item => item.Status == RenameStatus.CommitOk) ?? 0;
             var commitErrorCount = results?.Count(item => item.Status == RenameStatus.CommitError) ?? 0;
-            LastStatusMessage = _FormatGoOutcome(renamedCount, commitErrorCount);
+            LastStatusMessage = _FormatGoOutcome(
+                renamedCount: renamedCount,
+                errorCount: commitErrorCount,
+                stopped: !commitCompleted
+            );
 
             return true;
         }
@@ -96,10 +105,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Builds the status-bar message after a completed GO commit.
+        /// Builds the status-bar message after a GO commit (or Stop mid-commit).
         /// </summary>
-        private static StyledTextDisplay _FormatGoOutcome(int renamedCount, int errorCount)
+        private static StyledTextDisplay _FormatGoOutcome(int renamedCount, int errorCount, bool stopped)
         {
+            if (stopped)
+            {
+                var stoppedPart =
+                    renamedCount > 0
+                        ? StatusBarText.Warning($"Stopped. Renamed {renamedCount} item(s).")
+                        : StatusBarText.Warning("Stopped.");
+                if (errorCount == 0)
+                {
+                    return stoppedPart;
+                }
+
+                return StatusBarText.Combine(
+                    stoppedPart,
+                    StatusBarText.Neutral(" "),
+                    StatusBarText.Error($"{errorCount} could not be renamed — right-click Show Rename Error.")
+                );
+            }
+
             if (errorCount > 0 && renamedCount > 0)
             {
                 return StatusBarText.Combine(

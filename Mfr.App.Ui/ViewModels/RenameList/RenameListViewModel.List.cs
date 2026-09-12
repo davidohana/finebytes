@@ -174,6 +174,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
+            LastStatusMessage = StatusBarText.Neutral($"Exported {Entries.Count} row(s).");
             _shellOpener.RevealInFileManager(path);
         }
 

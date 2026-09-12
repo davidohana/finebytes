@@ -208,7 +208,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return StatusBarText.Warning("No items were added.");
             }
 
-            return StyledTextDisplay.Empty;
+            return StatusBarText.Neutral($"Added {addedCount} item(s).");
         }
 
         /// <summary>

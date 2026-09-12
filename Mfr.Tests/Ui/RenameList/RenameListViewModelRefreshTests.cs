@@ -1,3 +1,4 @@
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
@@ -51,12 +52,15 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
             var entry = Assert.Single(renameListViewModel.Entries);
             var before = entry.GetFieldText(sizeKey);
+            var statusBefore = renameListViewModel.LastStatusMessage.ToPlainText();
 
             File.WriteAllText(path, new string('x', 4096));
 
             await renameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
 
             Assert.NotEqual(before, entry.GetFieldText(sizeKey));
+            Assert.Equal(statusBefore, renameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.DoesNotContain("Refreshed", renameListViewModel.LastStatusMessage.ToPlainText());
         }
 
         /// <summary>
@@ -81,12 +85,51 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.Equal("Before", entry.GetFieldText(titleKey));
+            var statusBefore = renameListViewModel.LastStatusMessage.ToPlainText();
 
             TaggedMinimalWav.WriteTagged(path, title: "After", album: null);
 
             await renameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
 
             Assert.Equal("After", entry.GetFieldText(titleKey));
+            Assert.Equal(statusBefore, renameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.DoesNotContain("Refreshed", renameListViewModel.LastStatusMessage.ToPlainText());
+        }
+
+        /// <summary>
+        /// Verifies Refresh with metadata load errors publishes a warning status (clean refresh stays silent).
+        /// </summary>
+        [Fact]
+        public async Task Refresh_with_load_errors_sets_warning_status()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "info.htm");
+            File.WriteAllText(path, "<html></html>");
+
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(titleKey),
+                new RenameListVisibleColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                ),
+            ]);
+
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.True(entry.IsLoadError(titleKey));
+
+            await renameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+
+            Assert.True(entry.IsLoadError(titleKey));
+            Assert.Equal(
+                "Refreshed 1 item(s). 1 item(s) with load error(s) — select a cell for details.",
+                renameListViewModel.LastStatusMessage.ToPlainText()
+            );
+            Assert.Equal(
+                StatusBarText.WarningForegroundResourceKey,
+                renameListViewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
         }
 
         /// <summary>
@@ -108,6 +151,14 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
 
             Assert.True(entry.IsMissingFromDisk);
+            Assert.Equal(
+                "Refreshed 1 item(s). 1 item(s) with load error(s) — select a cell for details.",
+                renameListViewModel.LastStatusMessage.ToPlainText()
+            );
+            Assert.Equal(
+                StatusBarText.WarningForegroundResourceKey,
+                renameListViewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
         }
     }
 }

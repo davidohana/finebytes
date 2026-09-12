@@ -53,7 +53,29 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _RefreshFieldDisplay();
+            var refreshStatus = _FormatRefreshOutcome();
+            if (!refreshStatus.IsEmpty)
+            {
+                LastStatusMessage = refreshStatus;
+            }
+
             OriginalsRefreshed?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Builds the status-bar message after Refresh when load errors remain; silent when clean.
+        /// </summary>
+        private StyledTextDisplay _FormatRefreshOutcome()
+        {
+            var itemsWithLoadErrors = Entries.Count(entry => entry.HasRowError);
+            if (itemsWithLoadErrors == 0)
+            {
+                return StyledTextDisplay.Empty;
+            }
+
+            return StatusBarText.Warning(
+                $"Refreshed {Entries.Count} item(s). {itemsWithLoadErrors} item(s) with load error(s) — select a cell for details."
+            );
         }
 
         /// <summary>

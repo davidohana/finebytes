@@ -1,4 +1,5 @@
 using Avalonia.Media;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 
@@ -33,10 +34,14 @@ namespace Mfr.Tests.Ui.RenameList
                 var explanation = RenameListFieldCatalog.DescribeLoadError(item, titleKey);
 
                 var hint = RenameListCellHint.FormatLoadError("Album Artist", explanation);
-                Assert.Equal(2, hint.Runs.Count);
+                Assert.Equal(3, hint.Runs.Count);
                 Assert.Equal("Album Artist", hint.Runs[0].Text);
-                Assert.Contains("Could not read metadata:", hint.Runs[1].Text, StringComparison.Ordinal);
-                Assert.Contains("audio or media metadata", hint.Runs[1].Text, StringComparison.Ordinal);
+                Assert.Null(hint.Runs[0].ForegroundResourceKey);
+                Assert.Equal(": ", hint.Runs[1].Text);
+                Assert.Null(hint.Runs[1].ForegroundResourceKey);
+                Assert.Contains("Could not read metadata:", hint.Runs[2].Text, StringComparison.Ordinal);
+                Assert.Contains("audio or media metadata", hint.Runs[2].Text, StringComparison.Ordinal);
+                Assert.Equal(StatusBarText.ErrorForegroundResourceKey, hint.Runs[2].ForegroundResourceKey);
             }
             finally
             {
@@ -59,19 +64,21 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies preview-error hints include the MFR7 item-preview-error marker.
+        /// Verifies preview-error hints include the MFR7 item-preview-error marker in the error brush.
         /// </summary>
         [Fact]
-        public void FormatParts_Includes_PreviewError_Marker_When_Prefixed()
+        public void FormatPreviewError_Uses_Error_Brush_For_Marker()
         {
-            var hint = RenameListCellHint.FormatParts(
-                "Full File Name",
-                $"{RenameListCellHint.PreviewErrorMarker} alpha.txt"
-            );
-            Assert.Equal(2, hint.Runs.Count);
+            var hint = RenameListCellHint.FormatPreviewError("Full File Name", "alpha.txt");
+            Assert.Equal(4, hint.Runs.Count);
             Assert.Equal("Full File Name", hint.Runs[0].Text);
             Assert.Equal(FontWeight.Bold, hint.Runs[0].FontWeight);
-            Assert.Equal($": {RenameListCellHint.PreviewErrorMarker} alpha.txt", hint.Runs[1].Text);
+            Assert.Null(hint.Runs[0].ForegroundResourceKey);
+            Assert.Equal(": ", hint.Runs[1].Text);
+            Assert.Equal(RenameListCellHint.PreviewErrorMarker, hint.Runs[2].Text);
+            Assert.Equal(StatusBarText.ErrorForegroundResourceKey, hint.Runs[2].ForegroundResourceKey);
+            Assert.Equal(" alpha.txt", hint.Runs[3].Text);
+            Assert.Equal($"Full File Name: {RenameListCellHint.PreviewErrorMarker} alpha.txt", hint.ToPlainText());
         }
     }
 }

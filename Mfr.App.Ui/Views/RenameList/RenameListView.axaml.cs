@@ -523,7 +523,8 @@ namespace Mfr.App.Ui.Views.RenameList
             var cellText = entry.GetFieldText(fieldKey.Value);
             if (entry.HasPreviewError)
             {
-                cellText = $"{RenameListCellHint.PreviewErrorMarker} {cellText}";
+                _viewModel.CellStatusHint = RenameListCellHint.FormatPreviewError(field.DisplayName, cellText);
+                return;
             }
 
             _viewModel.CellStatusHint = RenameListCellHint.FormatParts(field.DisplayName, cellText);
