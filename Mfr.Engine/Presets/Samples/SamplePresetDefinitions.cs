@@ -8,6 +8,7 @@ using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.Tags;
 
 namespace Mfr.Engine.Presets.Samples
@@ -20,7 +21,7 @@ namespace Mfr.Engine.Presets.Samples
         private static readonly FilePrefixTarget FilePrefix = new();
 
         /// <summary>
-        /// Builds the locked 13-sample catalog (unsorted).
+        /// Builds the locked 14-sample catalog (unsorted).
         /// </summary>
         /// <returns>All sample presets.</returns>
         public static IReadOnlyList<FilterPreset> CreateAll()
@@ -36,6 +37,7 @@ namespace Mfr.Engine.Presets.Samples
                 _FlattenPath(),
                 _DateTakenFolders(),
                 _ArtistAlbumFolders(),
+                _ArtistYearAlbumBitrateFolder(),
                 _SwapAroundHyphen(),
                 _SafeFilename(),
                 _StripBracketJunk(),
@@ -393,6 +395,36 @@ namespace Mfr.Engine.Presets.Samples
             );
         }
 
+        private static FilterPreset _ArtistYearAlbumBitrateFolder()
+        {
+            return _Preset(
+                id: "10000000-0000-4000-8000-000000000014",
+                name: "Artist Year Album Bitrate Folder",
+                description: "Move audio files into a folder named from tags.\nFormat: Artist - Year - Album [bitrate]\nE.g: Miles Davis and Sonny Rollins - 1951 - Dig [128]\nEdit the Path Mover root (default C:\\Music) before Apply.",
+                chain: _Chain(
+                    _On(
+                        new PathMoverFilter(
+                            new PathMoverOptions(
+                                RootFolder: @"C:\Music",
+                                SubFolder: @"<audio-artist> - <audio-year> - <audio-album> [<media-audio-bitrate>]"
+                            )
+                        )
+                    )
+                ),
+                columns:
+                [
+                    _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 320),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: true, width: 420),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 280),
+                    _MediaTag("Performers", preview: false, width: 180),
+                    _MediaTag("Year", preview: false, width: 50),
+                    _MediaTag("Album", preview: false, width: 180),
+                    _Media("AudioBitrate", preview: false, width: 55),
+                ]
+            );
+        }
+
         private static FilterPreset _SwapAroundHyphen()
         {
             return _Preset(
@@ -547,6 +579,11 @@ namespace Mfr.Engine.Presets.Samples
         private static RenameListVisibleColumnSpec _MediaTag(string propertyKey, bool preview, int width)
         {
             return _Column(AudioTagRenameListFields.Group, propertyKey, preview, width);
+        }
+
+        private static RenameListVisibleColumnSpec _Media(string propertyKey, bool preview, int width)
+        {
+            return _Column(MediaRenameListFields.Group, propertyKey, preview, width);
         }
 
         private static RenameListVisibleColumnSpec _Image(string propertyKey, bool preview, int width)

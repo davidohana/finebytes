@@ -724,11 +724,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             {
                 Steps =
                 [
-                    .. Steps.Select(step => new FilterChainStep(
-                        step.Enabled,
-                        step.Filter,
-                        Name: step.DisplayName
-                    )),
+                    .. Steps.Select(step => new FilterChainStep(step.Enabled, step.Filter, Name: step.DisplayName)),
                 ],
             };
         }

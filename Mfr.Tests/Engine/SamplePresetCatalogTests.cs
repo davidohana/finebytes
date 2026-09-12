@@ -8,6 +8,7 @@ using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Engine
@@ -21,9 +22,9 @@ namespace Mfr.Tests.Engine
         /// Verifies the catalog exposes the complete locked set of samples.
         /// </summary>
         [Fact]
-        public void Catalog_contains_all_13_samples()
+        public void Catalog_contains_all_14_samples()
         {
-            Assert.Equal(13, SamplePresetCatalog.Presets.Count);
+            Assert.Equal(14, SamplePresetCatalog.Presets.Count);
             Assert.All(SamplePresetCatalog.Presets, preset => Assert.NotEmpty(preset.Chain.Steps));
         }
 
@@ -86,6 +87,10 @@ namespace Mfr.Tests.Engine
                 column =>
                     column.Key
                     == RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Folder)
+            );
+            Assert.Contains(
+                _Preset("Artist Year Album Bitrate Folder").VisibleColumns!,
+                column => column.Key == RenameListFieldKey.Original(MediaRenameListFields.Group, "AudioBitrate")
             );
         }
 
@@ -189,6 +194,22 @@ namespace Mfr.Tests.Engine
             var pathMover = Assert.IsType<PathMoverFilter>(step.Filter);
             Assert.Equal(@"C:\Photos", pathMover.Options.RootFolder);
             Assert.Equal(@"<exif-date:yyyy>\<exif-date:MM>\<exif-date:dd>", pathMover.Options.SubFolder);
+        }
+
+        /// <summary>
+        /// Verifies the Artist Year Album Bitrate Folder sample uses tags and media bitrate.
+        /// </summary>
+        [Fact]
+        public void Artist_Year_Album_Bitrate_Folder_has_locked_path_mover()
+        {
+            var step = Assert.Single(_Preset("Artist Year Album Bitrate Folder").Chain.Steps);
+            Assert.True(step.Enabled);
+            var pathMover = Assert.IsType<PathMoverFilter>(step.Filter);
+            Assert.Equal(@"C:\Music", pathMover.Options.RootFolder);
+            Assert.Equal(
+                @"<audio-artist> - <audio-year> - <audio-album> [<media-audio-bitrate>]",
+                pathMover.Options.SubFolder
+            );
         }
 
         /// <summary>
