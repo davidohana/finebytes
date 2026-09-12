@@ -475,7 +475,9 @@ namespace Mfr.Engine.Presets.Samples
                             new StripParenthesesOptions(Type: ParenthesisType.Square, RemoveContents: true)
                         )
                     ),
-                    _On(new ShrinkSpacesFilter(FilePrefix))
+                    _On(new ShrinkSpacesFilter(FilePrefix)),
+                    _On(new StripSpacesRightFilter(FilePrefix)),
+                    _On(new StripSpacesLeftFilter(FilePrefix))
                 ),
                 columns:
                 [
