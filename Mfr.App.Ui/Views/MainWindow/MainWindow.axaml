@@ -370,20 +370,34 @@
 
     <Border DockPanel.Dock="Top" Padding="4,2">
       <StackPanel Orientation="Horizontal" Spacing="4">
-        <Button Command="{Binding GoCommand}" ToolTip.Tip="{x:Static resources:AppTips.Go}">
+        <Button
+          Classes="rename-list-action"
+          Command="{Binding GoCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.Go}"
+        >
           <Image Width="24" Height="24" Stretch="Uniform" Source="/Assets/Go.png" />
         </Button>
         <Button
-          Content="Undo"
+          Classes="rename-list-action"
           Command="{Binding UndoLastCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.UndoLast}"
-        />
-        <Button Content="Log" Command="{Binding ShowLogCommand}" ToolTip.Tip="{x:Static resources:AppTips.ShowLog}" />
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/Undo.png" />
+        </Button>
         <Button
-          Content="Options"
+          Classes="rename-list-action"
+          Command="{Binding ShowLogCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.ShowLog}"
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/Log.png" />
+        </Button>
+        <Button
+          Classes="rename-list-action"
           Command="{Binding ShowOptionsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.ShowOptions}"
-        />
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/Options.png" />
+        </Button>
       </StackPanel>
     </Border>
 
