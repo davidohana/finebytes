@@ -10,10 +10,10 @@ todos:
     status: completed
   - id: p3-options-ui
     content: "P3: Options dialog 3-state + double-click checkbox; update Options tests"
-    status: pending
+    status: completed
   - id: p4-filelist-dblclick
     content: "P4: File List DoubleTapped open vs AddSelected + headless tests"
-    status: pending
+    status: completed
   - id: p5-docs
     content: "P5: debts + options-dialog plan amend + MfrConfig remarks"
     status: pending

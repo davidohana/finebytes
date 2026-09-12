@@ -13,6 +13,7 @@ using Mfr.App.Ui.Input;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.Views.GridColumnSizing;
+using Mfr.Models.Config;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.Views.FileList
@@ -432,10 +433,16 @@ namespace Mfr.App.Ui.Views.FileList
 
         private void _OnEntriesDoubleTapped(object? sender, TappedEventArgs e)
         {
-            if (DataContext is FileListViewModel viewModel)
+            if (DataContext is not FileListViewModel viewModel)
             {
-                viewModel.OpenSelected();
+                return;
             }
+
+            FileListDoubleClickAction.Execute(
+                addsToRenameList: ConfigStore.Config.Ui.DoubleClickAddsToRenameList,
+                addSelectedCommand: AddSelectedCommand,
+                openSelectedCommand: viewModel.OpenSelectedCommand
+            );
         }
 
         private void _OnEntriesContextRequested(object? sender, ContextRequestedEventArgs e)
