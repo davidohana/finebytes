@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: fix-compile
     content: Fix focus args, clipboard APIs, AttachDeveloperTools, any other Avalonia 12 compile breaks
-    status: pending
+    status: completed
   - id: docs-layering
     content: Update Avalonia 11 mentions in README / mfr-folder-layering.md to Avalonia 12
     status: pending

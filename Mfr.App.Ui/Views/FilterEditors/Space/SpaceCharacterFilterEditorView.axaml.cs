@@ -30,7 +30,7 @@ namespace Mfr.App.Ui.Views.FilterEditors.Space
             }
         }
 
-        private void _OnOtherCharacterBoxGotFocus(object? sender, GotFocusEventArgs e)
+        private void _OnOtherCharacterBoxGotFocus(object? sender, FocusChangedEventArgs e)
         {
             if (DataContext is SpaceCharacterFilterEditorViewModel vm)
             {

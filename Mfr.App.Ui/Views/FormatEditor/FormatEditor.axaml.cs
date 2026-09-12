@@ -1137,7 +1137,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             return null;
         }
 
-        private void _OnTemplateFocusChanged(object? sender, RoutedEventArgs e)
+        private void _OnTemplateFocusChanged(object? sender, FocusChangedEventArgs e)
         {
             _UpdateWatermarkVisibility();
             var focused = TemplateBox.IsFocused || TemplateBox.TextArea.IsFocused;

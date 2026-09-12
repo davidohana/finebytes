@@ -424,7 +424,9 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var root = Assert.IsAssignableFrom<Visual>(list.GetVisualRoot());
+            var presentationSource = list.GetPresentationSource();
+            Assert.NotNull(presentationSource);
+            var root = Assert.IsAssignableFrom<Visual>(presentationSource.RootVisual);
             var scrollBar = root.GetVisualDescendants()
                 .OfType<ScrollBar>()
                 .First(bar => bar.Orientation == Orientation.Vertical && bar.IsVisible);

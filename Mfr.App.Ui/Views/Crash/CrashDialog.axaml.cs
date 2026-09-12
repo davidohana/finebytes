@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Avalonia.Controls;
+using Avalonia.Input.Platform;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.Crash;
 using Mfr.Utils;

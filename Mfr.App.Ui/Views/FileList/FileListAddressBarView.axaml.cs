@@ -229,7 +229,7 @@ namespace Mfr.App.Ui.Views.FileList
             e.Handled = true;
         }
 
-        private void _OnPathLostFocus(object? sender, RoutedEventArgs e)
+        private void _OnPathLostFocus(object? sender, FocusChangedEventArgs e)
         {
             Dispatcher.UIThread.Post(_CommitPathIfAddressBarInactive, DispatcherPriority.Input);
         }

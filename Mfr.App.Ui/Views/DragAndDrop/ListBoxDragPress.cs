@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.Views.DragAndDrop
     /// <param name="HitIndex">Pressed row index when <paramref name="SelectionSnapshot"/> is set.</param>
     internal readonly record struct ListBoxDragPress(
         Point StartPoint,
-        PointerEventArgs StartArgs,
+        PointerPressedEventArgs StartArgs,
         IReadOnlyList<int>? SelectionSnapshot,
         int? HitIndex
     );

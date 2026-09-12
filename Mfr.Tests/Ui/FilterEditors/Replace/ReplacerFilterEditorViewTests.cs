@@ -54,7 +54,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             Assert.NotNull(wholeWord);
             Assert.Equal(string.Empty, find.Text);
             Assert.Equal(string.Empty, replacement.Text);
-            Assert.Equal("feat.", find.Watermark);
+            Assert.Equal("feat.", find.PlaceholderText);
             Assert.Equal("feature.", replacement.Watermark);
             Assert.True(literal.IsChecked);
             Assert.False(caseSensitive.IsChecked);
@@ -70,7 +70,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Equal("DSC*.JPG", find.Watermark);
+            Assert.Equal("DSC*.JPG", find.PlaceholderText);
             Assert.Equal("photo.jpg", replacement.Watermark);
 
             var filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
@@ -86,7 +86,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             Dispatcher.UIThread.RunJobs();
             filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(ReplacerMode.Regex, filter.Options.Match.Mode);
-            Assert.Equal(@"\((.+)\)", find.Watermark);
+            Assert.Equal(@"\((.+)\)", find.PlaceholderText);
             Assert.Equal("$1", replacement.Watermark);
 
             window.Close();

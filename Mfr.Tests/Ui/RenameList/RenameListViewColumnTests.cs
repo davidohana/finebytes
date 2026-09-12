@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -1274,7 +1275,7 @@ namespace Mfr.Tests.Ui.RenameList
 
         private static void _RaiseHeaderContextMenu(DataGridColumnHeader header)
         {
-            header.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            header.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = InputElement.ContextRequestedEvent });
             Dispatcher.UIThread.RunJobs();
         }
 

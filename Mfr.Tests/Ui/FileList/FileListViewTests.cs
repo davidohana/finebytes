@@ -119,7 +119,7 @@ namespace Mfr.Tests.Ui.FileList
             Dispatcher.UIThread.RunJobs();
 
             var content = _ListContainer(list, alpha).GetVisualDescendants().OfType<TextBlock>().First();
-            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = InputElement.ContextRequestedEvent });
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal([alpha], viewModel.SelectedEntries);
@@ -160,7 +160,7 @@ namespace Mfr.Tests.Ui.FileList
             Dispatcher.UIThread.RunJobs();
 
             var content = _ListContainer(list, beta).GetVisualDescendants().OfType<TextBlock>().First();
-            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = InputElement.ContextRequestedEvent });
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(2, viewModel.SelectedEntries.Count);

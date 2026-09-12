@@ -45,7 +45,7 @@ namespace Mfr.App.Ui.Views.FileList
         private bool _isSyncingSelection;
         private bool _selectionChangeFromView;
         private Point? _dragStartPoint;
-        private PointerEventArgs? _dragStartArgs;
+        private PointerPressedEventArgs? _dragStartArgs;
         private FileListEntry? _dragHitEntry;
         private IReadOnlyList<FileListEntry>? _dragSelectionSnapshot;
         private bool _isDragPending;
@@ -165,7 +165,7 @@ namespace Mfr.App.Ui.Views.FileList
             _BeginPotentialDrag(_FindEntryFromSource(e.Source), e);
         }
 
-        private void _BeginPotentialDrag(FileListEntry? hit, PointerEventArgs e)
+        private void _BeginPotentialDrag(FileListEntry? hit, PointerPressedEventArgs e)
         {
             _ClearDragState();
 
@@ -372,7 +372,7 @@ namespace Mfr.App.Ui.Views.FileList
             e.Handled = true;
         }
 
-        private void _OnMaskLostFocus(object? sender, RoutedEventArgs e)
+        private void _OnMaskLostFocus(object? sender, FocusChangedEventArgs e)
         {
             Dispatcher.UIThread.Post(_CommitMaskIfInactive, DispatcherPriority.Input);
         }

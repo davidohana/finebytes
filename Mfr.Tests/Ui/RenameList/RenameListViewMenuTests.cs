@@ -72,7 +72,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var row = grid.GetVisualDescendants().OfType<DataGridRow>().First(r => r.Index == 0);
             var content = row.GetVisualDescendants().OfType<TextBlock>().First();
-            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = InputElement.ContextRequestedEvent });
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal([viewModel.Entries[0]], viewModel.SelectedEntries);
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var row = grid.GetVisualDescendants().OfType<DataGridRow>().First(r => r.Index == 1);
             var content = row.GetVisualDescendants().OfType<TextBlock>().First();
-            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            content.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = InputElement.ContextRequestedEvent });
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal([viewModel.Entries[0], viewModel.Entries[1]], viewModel.SelectedEntries);
@@ -111,7 +111,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(grid.ContextMenu);
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
             var rowContent = row.GetVisualDescendants().OfType<TextBlock>().First();
-            rowContent.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            rowContent.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = InputElement.ContextRequestedEvent });
             Dispatcher.UIThread.RunJobs();
             Assert.Equal([entry], viewModel.SelectedEntries);
 

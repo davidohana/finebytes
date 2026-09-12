@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
+using Avalonia.Input;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
 using Mfr.Filters.Attributes;
 
@@ -18,7 +18,7 @@ namespace Mfr.App.Ui.Views.FilterEditors.Attributes
             InitializeComponent();
         }
 
-        private void _OnDateBoxLostFocus(object? sender, RoutedEventArgs e)
+        private void _OnDateBoxLostFocus(object? sender, FocusChangedEventArgs e)
         {
             if (DataContext is DateTimeSetterFilterEditorViewModel editor)
             {
@@ -26,7 +26,7 @@ namespace Mfr.App.Ui.Views.FilterEditors.Attributes
             }
         }
 
-        private void _OnTimeBoxLostFocus(object? sender, RoutedEventArgs e)
+        private void _OnTimeBoxLostFocus(object? sender, FocusChangedEventArgs e)
         {
             if (DataContext is DateTimeSetterFilterEditorViewModel editor)
             {

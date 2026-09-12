@@ -122,7 +122,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             var row = list.ContainerFromIndex(0) as ListBoxItem;
             Assert.NotNull(row);
-            row.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            row.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = InputElement.ContextRequestedEvent });
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
@@ -144,7 +144,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             var row = list.ContainerFromIndex(1) as ListBoxItem;
             Assert.NotNull(row);
-            row.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            row.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = InputElement.ContextRequestedEvent });
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal([viewModel.Steps[0], viewModel.Steps[1]], viewModel.SelectedSteps);

@@ -30,7 +30,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private RenameListProgressDialog? _progressDialog;
         private RenameListFieldShuttleDialog? _fieldShuttleDialog;
         private Point? _dragStartPoint;
-        private PointerEventArgs? _dragStartArgs;
+        private PointerPressedEventArgs? _dragStartArgs;
         private RenameListEntry? _dragHitEntry;
         private IReadOnlyList<RenameListEntry>? _dragSelectionSnapshot;
         private KeyModifiers _lastSortClickModifiers = KeyModifiers.None;
@@ -302,7 +302,7 @@ namespace Mfr.App.Ui.Views.RenameList
             return false;
         }
 
-        private void _OnGridFocusChanged(object? sender, RoutedEventArgs e)
+        private void _OnGridFocusChanged(object? sender, FocusChangedEventArgs e)
         {
             if (_viewModel is null)
             {
@@ -335,7 +335,7 @@ namespace Mfr.App.Ui.Views.RenameList
             _BeginPotentialDrag(e.Row?.DataContext as RenameListEntry, e.PointerPressedEventArgs);
         }
 
-        private void _BeginPotentialDrag(RenameListEntry? hit, PointerEventArgs e)
+        private void _BeginPotentialDrag(RenameListEntry? hit, PointerPressedEventArgs e)
         {
             _ClearDragState();
 
