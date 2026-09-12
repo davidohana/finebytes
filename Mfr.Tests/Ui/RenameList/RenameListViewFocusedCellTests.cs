@@ -4,7 +4,6 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.App.Ui.Views.RenameList;
 
 namespace Mfr.Tests.Ui.RenameList
 {
