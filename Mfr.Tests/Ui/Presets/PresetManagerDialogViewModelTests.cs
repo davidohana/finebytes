@@ -15,20 +15,24 @@ namespace Mfr.Tests.Ui.Presets
         public void Refresh_Sorts_And_Exposes_Selected_Description()
         {
             var manager = PresetManager.CreateEmpty();
-            manager.NameToPreset["Zebra"] = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "Zebra",
-                Description = "last",
-                Chain = new FilterChain { Steps = [] },
-            };
-            manager.NameToPreset["Alpha"] = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "Alpha",
-                Description = "first",
-                Chain = new FilterChain { Steps = [] },
-            };
+            manager.Upsert(
+                new FilterPreset
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Zebra",
+                    Description = "last",
+                    Chain = new FilterChain { Steps = [] },
+                }
+            );
+            manager.Upsert(
+                new FilterPreset
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Alpha",
+                    Description = "first",
+                    Chain = new FilterChain { Steps = [] },
+                }
+            );
             var applied = new AppliedFiltersViewModel(presetManager: manager);
             var viewModel = new PresetManagerDialogViewModel(applied);
 
@@ -48,27 +52,30 @@ namespace Mfr.Tests.Ui.Presets
         public void Refresh_Preserves_Selection_By_Name()
         {
             var manager = PresetManager.CreateEmpty();
-            manager.NameToPreset["A"] = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "A",
-                Description = "a",
-                Chain = new FilterChain { Steps = [] },
-            };
-            manager.NameToPreset["B"] = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "B",
-                Description = "b",
-                Chain = new FilterChain { Steps = [] },
-            };
+            manager.Upsert(
+                new FilterPreset
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "A",
+                    Description = "a",
+                    Chain = new FilterChain { Steps = [] },
+                }
+            );
+            manager.Upsert(
+                new FilterPreset
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "B",
+                    Description = "b",
+                    Chain = new FilterChain { Steps = [] },
+                }
+            );
             var applied = new AppliedFiltersViewModel(presetManager: manager);
             var viewModel = new PresetManagerDialogViewModel(applied);
             viewModel.SelectedPreset = viewModel.Presets.First(preset => preset.Name == "B");
 
             var renamed = manager.NameToPreset["B"] with { Name = "B2", Description = "b2" };
-            manager.NameToPreset.Remove("B");
-            manager.NameToPreset["B2"] = renamed;
+            Assert.True(manager.TryRename("B", renamed));
             viewModel.Refresh(preferredName: "B2");
 
             Assert.Equal("B2", viewModel.SelectedPreset?.Name);

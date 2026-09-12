@@ -152,7 +152,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 Chain = ToChain(),
                 VisibleColumns = visibleColumns,
             };
-            PresetManager.NameToPreset[trimmedName] = saved;
+            PresetManager.Upsert(saved);
             PresetManager.SavePresets();
             SetLastLoaded(saved);
             return saved;
@@ -184,7 +184,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                     continue;
                 }
 
-                PresetManager.NameToPreset[name] = sample;
+                PresetManager.Upsert(sample);
                 addedCount++;
             }
 
@@ -243,17 +243,90 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             ArgumentNullException.ThrowIfNull(name);
 
-            if (!PresetManager.NameToPreset.Remove(name))
+            return DeletePresets([name]) > 0;
+        }
+
+        /// <summary>
+        /// Deletes named presets from the manager and persists once.
+        /// <para>
+        /// When any deleted preset was last-loaded, clears last-loaded.
+        /// </para>
+        /// </summary>
+        /// <param name="names">Exact preset name keys to remove.</param>
+        /// <returns>Number of presets removed.</returns>
+        public int DeletePresets(IReadOnlyList<string> names)
+        {
+            ArgumentNullException.ThrowIfNull(names);
+
+            var removedCount = 0;
+            var clearedLastLoaded = false;
+            foreach (var name in names.Distinct(StringComparer.Ordinal))
+            {
+                if (!PresetManager.Remove(name))
+                {
+                    continue;
+                }
+
+                removedCount++;
+                if (
+                    !clearedLastLoaded
+                    && LastLoaded is not null
+                    && string.Equals(LastLoaded.Name, name, StringComparison.Ordinal)
+                )
+                {
+                    SetLastLoaded(null);
+                    clearedLastLoaded = true;
+                }
+            }
+
+            if (removedCount > 0)
+            {
+                PresetManager.SavePresets();
+            }
+
+            return removedCount;
+        }
+
+        /// <summary>
+        /// Moves selected presets one step toward <paramref name="offset"/> and persists.
+        /// </summary>
+        /// <param name="selectedNames">Exact names of presets to move.</param>
+        /// <param name="offset">Direction (-1 up, +1 down).</param>
+        /// <returns><see langword="true"/> when at least one preset changed position.</returns>
+        public bool TryMovePresetsTowardNeighbor(IReadOnlyCollection<string> selectedNames, int offset)
+        {
+            ArgumentNullException.ThrowIfNull(selectedNames);
+
+            if (!PresetManager.TryMoveSelectedTowardNeighbor(selectedNames, offset))
             {
                 return false;
             }
 
             PresetManager.SavePresets();
-            if (LastLoaded is not null && string.Equals(LastLoaded.Name, name, StringComparison.Ordinal))
+            return true;
+        }
+
+        /// <summary>
+        /// Moves presets at <paramref name="sourceIndices"/> to <paramref name="targetIndex"/> and persists.
+        /// </summary>
+        /// <param name="sourceIndices">Indices of presets to move.</param>
+        /// <param name="targetIndex">Destination index before the move.</param>
+        /// <param name="newIndices">Indices of the moved presets after a successful move.</param>
+        /// <returns><see langword="true"/> when the list order changed.</returns>
+        public bool TryMovePresetsTo(
+            IReadOnlyList<int> sourceIndices,
+            int targetIndex,
+            out IReadOnlyList<int> newIndices
+        )
+        {
+            ArgumentNullException.ThrowIfNull(sourceIndices);
+
+            if (!PresetManager.TryMoveIndicesTo(sourceIndices, targetIndex, out newIndices))
             {
-                SetLastLoaded(null);
+                return false;
             }
 
+            PresetManager.SavePresets();
             return true;
         }
 
@@ -294,8 +367,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             var renamed = existing with { Name = trimmedName };
-            PresetManager.NameToPreset.Remove(currentName);
-            PresetManager.NameToPreset[trimmedName] = renamed;
+            if (!PresetManager.TryRename(currentName, renamed))
+            {
+                return new PresetRenameResult(PresetRenameStatus.NotFound, Preset: null);
+            }
+
             PresetManager.SavePresets();
             if (LastLoaded is not null && string.Equals(LastLoaded.Name, currentName, StringComparison.Ordinal))
             {

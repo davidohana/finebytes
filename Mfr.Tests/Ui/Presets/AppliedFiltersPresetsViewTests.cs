@@ -66,12 +66,14 @@ namespace Mfr.Tests.Ui.Presets
             var manager = PresetManager.CreateEmpty();
             foreach (var name in new[] { "beta", "Alpha", "alpha2" })
             {
-                manager.NameToPreset[name] = new FilterPreset
-                {
-                    Id = Guid.NewGuid(),
-                    Name = name,
-                    Chain = new FilterChain { Steps = [] },
-                };
+                manager.Upsert(
+                    new FilterPreset
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = name,
+                        Chain = new FilterChain { Steps = [] },
+                    }
+                );
             }
 
             var (window, view) = _Show(new AppliedFiltersViewModel(presetManager: manager));
@@ -129,13 +131,15 @@ namespace Mfr.Tests.Ui.Presets
         {
             var manager = PresetManager.CreateEmpty();
             var letters = new LettersCaseFilter();
-            manager.NameToPreset["Demo"] = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "Demo",
-                Description = "demo",
-                Chain = new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
-            };
+            manager.Upsert(
+                new FilterPreset
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Demo",
+                    Description = "demo",
+                    Chain = new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
+                }
+            );
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
             var (window, view) = _Show(viewModel);
             return (window, viewModel, view);

@@ -58,26 +58,28 @@ namespace Mfr.Tests.Cli
             File.WriteAllText(sourcePath, "x");
 
             var presetManager = new PresetManager(presetsFilePath);
-            presetManager.NameToPreset["counter"] = new FilterPreset
-            {
-                Id = Guid.NewGuid(),
-                Name = "counter",
-                Description = null,
-                Chain = FilterChain.CreateAllEnabled([
-                    new CounterFilter(
-                        Target: new FilePrefixTarget(),
-                        Options: new CounterOptions(
-                            Start: 1,
-                            Step: 1,
-                            LeadingZerosMode: CounterLeadingZerosMode.Custom,
-                            CustomLength: 3,
-                            Position: CounterPosition.Replace,
-                            Separator: " - ",
-                            ResetPerFolder: false
-                        )
-                    ),
-                ]),
-            };
+            presetManager.Upsert(
+                new FilterPreset
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "counter",
+                    Description = null,
+                    Chain = FilterChain.CreateAllEnabled([
+                        new CounterFilter(
+                            Target: new FilePrefixTarget(),
+                            Options: new CounterOptions(
+                                Start: 1,
+                                Step: 1,
+                                LeadingZerosMode: CounterLeadingZerosMode.Custom,
+                                CustomLength: 3,
+                                Position: CounterPosition.Replace,
+                                Separator: " - ",
+                                ResetPerFolder: false
+                            )
+                        ),
+                    ]),
+                }
+            );
             presetManager.SavePresets();
 
             var configPath = dir.CombinePath("config.json");

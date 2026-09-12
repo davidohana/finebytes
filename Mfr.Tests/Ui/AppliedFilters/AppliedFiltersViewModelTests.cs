@@ -707,7 +707,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Name = "Demo",
                 Chain = new FilterChain { Steps = [] },
             };
-            manager.NameToPreset[preset.Name] = preset;
+            manager.Upsert(preset);
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
 
             viewModel.SetLastLoaded(preset);
@@ -841,8 +841,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Chain = new FilterChain { Steps = [] },
                 VisibleColumns = null,
             };
-            manager.NameToPreset[existing.Name] = existing;
-
+            manager.Upsert(existing);
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             var columns = new List<RenameListVisibleColumnSpec>
@@ -889,7 +888,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var manager = PresetManager.CreateEmpty();
             var sampleNames = SamplePresetCatalog.Presets.Take(2).Select(preset => preset.Name).ToList();
             var existing = SamplePresetCatalog.Presets[0] with { Id = Guid.NewGuid(), Description = "user-owned" };
-            manager.NameToPreset[existing.Name] = existing;
+            manager.Upsert(existing);
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
 
             var (AddedCount, SkippedCount) = viewModel.ImportSamplePresets(sampleNames);
@@ -928,8 +927,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                     ),
                 ],
             };
-            manager.NameToPreset[existing.Name] = existing;
-
+            manager.Upsert(existing);
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -957,7 +955,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Description = "demo",
                 Chain = new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
             };
-            manager.NameToPreset[preset.Name] = preset;
+            manager.Upsert(preset);
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             Assert.Null(viewModel.LastLoaded);
@@ -1098,14 +1096,14 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Name = "Gone",
                 Chain = new FilterChain { Steps = [] },
             };
-            manager.NameToPreset[preset.Name] = preset;
+            manager.Upsert(preset);
             var other = new FilterPreset
             {
                 Id = Guid.NewGuid(),
                 Name = "Keep",
                 Chain = new FilterChain { Steps = [] },
             };
-            manager.NameToPreset[other.Name] = other;
+            manager.Upsert(other);
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
             viewModel.SetLastLoaded(preset);
             Assert.Same(preset, viewModel.LastLoaded);
@@ -1132,7 +1130,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Description = "keep",
                 Chain = new FilterChain { Steps = [] },
             };
-            manager.NameToPreset[preset.Name] = preset;
+            manager.Upsert(preset);
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
             viewModel.SetLastLoaded(preset);
 
@@ -1167,8 +1165,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Name = "Beta",
                 Chain = new FilterChain { Steps = [] },
             };
-            manager.NameToPreset[alpha.Name] = alpha;
-            manager.NameToPreset[beta.Name] = beta;
+            manager.Upsert(alpha);
+            manager.Upsert(beta);
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
 
             Assert.Equal(PresetRenameStatus.BlankName, viewModel.RenamePreset("Alpha", "   ").Status);
@@ -1197,8 +1195,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Name = "Gone",
                 Chain = new FilterChain { Steps = [] },
             };
-            manager.NameToPreset[keep.Name] = keep;
-            manager.NameToPreset[gone.Name] = gone;
+            manager.Upsert(keep);
+            manager.Upsert(gone);
             var viewModel = new AppliedFiltersViewModel(presetManager: manager);
             viewModel.SetLastLoaded(keep);
 

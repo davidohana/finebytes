@@ -44,6 +44,7 @@ namespace Mfr.Tests.Engine
             Assert.Equal(2, manager.NameToPreset.Count);
             Assert.True(manager.NameToPreset.ContainsKey("Rock"));
             Assert.True(manager.NameToPreset.ContainsKey("Pop"));
+            Assert.Equal(["Rock", "Pop"], manager.Presets.Select(preset => preset.Name));
         }
 
         [Fact]
@@ -137,38 +138,144 @@ namespace Mfr.Tests.Engine
 
             Assert.False(manager.NameToPreset.ContainsKey("First"));
             Assert.True(manager.NameToPreset.ContainsKey("Second"));
+            Assert.Equal(["Second"], manager.Presets.Select(preset => preset.Name));
         }
 
         [Fact]
         /// <summary>
-        /// Verifies that saving writes presets sorted by name.
+        /// Verifies that saving writes presets in stored list order (not sorted by name).
         /// </summary>
-        public void SavePresets_Writes_Sorted_By_Name()
+        public void SavePresets_Writes_Stored_Order()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var presetsPath = dir.CombinePath("presets.json");
             var manager = new PresetManager(presetsPath);
-            manager.NameToPreset["z"] = _CreatePreset("z");
-            manager.NameToPreset["A"] = _CreatePreset("A");
-            manager.NameToPreset["a"] = _CreatePreset("a");
+            manager.Upsert(_CreatePreset("z"));
+            manager.Upsert(_CreatePreset("A"));
+            manager.Upsert(_CreatePreset("a"));
 
             manager.SavePresets();
 
-            using var doc = JsonDocument.Parse(File.ReadAllText(presetsPath));
-            var presetsProperty = doc
-                .RootElement.EnumerateObject()
-                .First(p => string.Equals(p.Name, "presets", StringComparison.OrdinalIgnoreCase));
-            var names = presetsProperty
-                .Value.EnumerateArray()
-                .Select(p =>
-                {
-                    var nameProperty = p.EnumerateObject()
-                        .First(prop => string.Equals(prop.Name, "name", StringComparison.OrdinalIgnoreCase));
-                    return nameProperty.Value.GetString()!;
-                })
-                .ToArray();
+            Assert.Equal(["z", "A", "a"], _ReadPresetNames(presetsPath));
+        }
 
-            Assert.Equal(["A", "a", "z"], names);
+        [Fact]
+        /// <summary>
+        /// Verifies load preserves JSON array order through save round-trip.
+        /// </summary>
+        public void LoadPresets_Preserves_Array_Order_RoundTrip()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var presetsPath = dir.CombinePath("presets.json");
+            _WritePresetsJson(
+                presetsPath, /*lang=json,strict*/
+                """
+                {
+                  "presets": [
+                    { "id": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", "name": "Zebra", "chain": { "steps": [] } },
+                    { "id": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb", "name": "Alpha", "chain": { "steps": [] } },
+                    { "id": "cccccccc-cccc-cccc-cccc-cccccccccccc", "name": "Middle", "chain": { "steps": [] } }
+                  ]
+                }
+                """
+            );
+
+            var manager = new PresetManager(presetsPath);
+            manager.LoadPresets();
+            Assert.Equal(["Zebra", "Alpha", "Middle"], manager.Presets.Select(preset => preset.Name));
+
+            manager.SavePresets();
+            Assert.Equal(["Zebra", "Alpha", "Middle"], _ReadPresetNames(presetsPath));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies Upsert appends new names and replaces existing names in place.
+        /// </summary>
+        public void Upsert_Appends_Or_Replaces_In_Place()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var first = _CreatePreset("First");
+            var second = _CreatePreset("Second");
+            manager.Upsert(first);
+            manager.Upsert(second);
+
+            var replaced = first with { Description = "updated" };
+            manager.Upsert(replaced);
+            manager.Upsert(_CreatePreset("Third"));
+
+            Assert.Equal(["First", "Second", "Third"], manager.Presets.Select(preset => preset.Name));
+            Assert.Equal("updated", manager.NameToPreset["First"].Description);
+            Assert.Same(replaced, manager.Presets[0]);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies Remove drops list and lookup entries and keeps remaining order.
+        /// </summary>
+        public void Remove_Drops_Preset_And_Keeps_Order()
+        {
+            var manager = PresetManager.CreateEmpty();
+            manager.Upsert(_CreatePreset("A"));
+            manager.Upsert(_CreatePreset("B"));
+            manager.Upsert(_CreatePreset("C"));
+
+            Assert.True(manager.Remove("B"));
+            Assert.False(manager.Remove("B"));
+            Assert.Equal(["A", "C"], manager.Presets.Select(preset => preset.Name));
+            Assert.False(manager.NameToPreset.ContainsKey("B"));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies TryRename keeps list index and updates the lookup key.
+        /// </summary>
+        public void TryRename_Keeps_Index_And_Updates_Lookup()
+        {
+            var manager = PresetManager.CreateEmpty();
+            manager.Upsert(_CreatePreset("A"));
+            var middle = _CreatePreset("B");
+            manager.Upsert(middle);
+            manager.Upsert(_CreatePreset("C"));
+
+            var renamed = middle with { Name = "B2", Description = "renamed" };
+            Assert.True(manager.TryRename("B", renamed));
+
+            Assert.Equal(["A", "B2", "C"], manager.Presets.Select(preset => preset.Name));
+            Assert.Same(renamed, manager.Presets[1]);
+            Assert.False(manager.NameToPreset.ContainsKey("B"));
+            Assert.Same(renamed, manager.NameToPreset["B2"]);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies TryMoveIndicesTo reorders the stored list.
+        /// </summary>
+        public void TryMoveIndicesTo_Reorders_Presets()
+        {
+            var manager = PresetManager.CreateEmpty();
+            manager.Upsert(_CreatePreset("A"));
+            manager.Upsert(_CreatePreset("B"));
+            manager.Upsert(_CreatePreset("C"));
+
+            Assert.True(manager.TryMoveIndicesTo([0], targetIndex: 2, out var newIndices));
+            Assert.Equal([1], newIndices);
+            Assert.Equal(["B", "A", "C"], manager.Presets.Select(preset => preset.Name));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies neighbor moves slide a selected block.
+        /// </summary>
+        public void TryMoveSelectedTowardNeighbor_Moves_Block()
+        {
+            var manager = PresetManager.CreateEmpty();
+            manager.Upsert(_CreatePreset("A"));
+            manager.Upsert(_CreatePreset("B"));
+            manager.Upsert(_CreatePreset("C"));
+
+            Assert.True(manager.TryMoveSelectedTowardNeighbor(["A", "B"], offset: 1));
+            Assert.Equal(["C", "A", "B"], manager.Presets.Select(preset => preset.Name));
         }
 
         [Fact]
@@ -185,6 +292,7 @@ namespace Mfr.Tests.Engine
 
             Assert.True(File.Exists(presetsPath));
             Assert.Empty(manager.NameToPreset);
+            Assert.Empty(manager.Presets);
             using var doc = JsonDocument.Parse(File.ReadAllText(presetsPath));
             Assert.Equal(JsonValueKind.Array, doc.RootElement.GetProperty("presets").ValueKind);
             Assert.Empty(doc.RootElement.GetProperty("presets").EnumerateArray());
@@ -212,12 +320,32 @@ namespace Mfr.Tests.Engine
         {
             var manager = PresetManager.CreateEmpty();
             Assert.Empty(manager.NameToPreset);
+            Assert.Empty(manager.Presets);
             Assert.False(File.Exists(manager.PresetsFilePath));
         }
 
         private static void _WritePresetsJson(string path, string content)
         {
             File.WriteAllText(path, content);
+        }
+
+        private static string[] _ReadPresetNames(string presetsPath)
+        {
+            using var doc = JsonDocument.Parse(File.ReadAllText(presetsPath));
+            var presetsProperty = doc
+                .RootElement.EnumerateObject()
+                .First(p => string.Equals(p.Name, "presets", StringComparison.OrdinalIgnoreCase));
+            return
+            [
+                .. presetsProperty
+                    .Value.EnumerateArray()
+                    .Select(p =>
+                    {
+                        var nameProperty = p.EnumerateObject()
+                            .First(prop => string.Equals(prop.Name, "name", StringComparison.OrdinalIgnoreCase));
+                        return nameProperty.Value.GetString()!;
+                    }),
+            ];
         }
 
         private static FilterPreset _CreatePreset(string name)
