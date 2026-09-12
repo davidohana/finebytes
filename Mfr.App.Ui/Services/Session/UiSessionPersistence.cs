@@ -104,6 +104,10 @@ namespace Mfr.App.Ui.Services.Session
                     fileList.MaskSuggestions = fileListSnapshot.MaskSuggestions is null
                         ? null
                         : [.. fileListSnapshot.MaskSuggestions];
+
+                    fileList.ViewMode = fileListSnapshot.ViewMode is { } viewMode
+                        ? FileListSessionSnapshot.FormatViewMode(viewMode)
+                        : null;
                 }
 
                 if (renameList is not null)

@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.ViewModels.FileList
+namespace Mfr.Models.Config
 {
     /// <summary>
     /// Layout used by the File List item pane.

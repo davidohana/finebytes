@@ -5,6 +5,7 @@
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.MainWindow"
   xmlns:filelist="using:Mfr.App.Ui.ViewModels.FileList"
+  xmlns:filelistconfig="using:Mfr.Models.Config"
   xmlns:views="using:Mfr.App.Ui.Views"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:filelistviews="using:Mfr.App.Ui.Views.FileList"
@@ -48,32 +49,32 @@
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.ViewLargeIcons}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
-      CommandParameter="{x:Static filelist:FileListViewMode.LargeIcons}"
+      CommandParameter="{x:Static filelistconfig:FileListViewMode.LargeIcons}"
     />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.ViewSmallIcons}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
-      CommandParameter="{x:Static filelist:FileListViewMode.SmallIcons}"
+      CommandParameter="{x:Static filelistconfig:FileListViewMode.SmallIcons}"
     />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.ViewReport}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
-      CommandParameter="{x:Static filelist:FileListViewMode.Report}"
+      CommandParameter="{x:Static filelistconfig:FileListViewMode.Report}"
     />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.ViewList}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
-      CommandParameter="{x:Static filelist:FileListViewMode.List}"
+      CommandParameter="{x:Static filelistconfig:FileListViewMode.List}"
     />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.ViewTiles}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
-      CommandParameter="{x:Static filelist:FileListViewMode.Tiles}"
+      CommandParameter="{x:Static filelistconfig:FileListViewMode.Tiles}"
     />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.ViewThumbnails}"
       Command="{Binding FileListViewModel.SetViewModeCommand}"
-      CommandParameter="{x:Static filelist:FileListViewMode.Thumbnails}"
+      CommandParameter="{x:Static filelistconfig:FileListViewMode.Thumbnails}"
     />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.AddSelected}"
@@ -133,7 +134,7 @@
           <MenuItem
             Header="Large _Icons"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
-            CommandParameter="{x:Static filelist:FileListViewMode.LargeIcons}"
+            CommandParameter="{x:Static filelistconfig:FileListViewMode.LargeIcons}"
             InputGesture="{x:Static input:AppShortcuts.ViewLargeIcons}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsLargeIconsView, Mode=OneWay}"
@@ -141,7 +142,7 @@
           <MenuItem
             Header="_Small Icons"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
-            CommandParameter="{x:Static filelist:FileListViewMode.SmallIcons}"
+            CommandParameter="{x:Static filelistconfig:FileListViewMode.SmallIcons}"
             InputGesture="{x:Static input:AppShortcuts.ViewSmallIcons}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsSmallIconsView, Mode=OneWay}"
@@ -149,7 +150,7 @@
           <MenuItem
             Header="_Report"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
-            CommandParameter="{x:Static filelist:FileListViewMode.Report}"
+            CommandParameter="{x:Static filelistconfig:FileListViewMode.Report}"
             InputGesture="{x:Static input:AppShortcuts.ViewReport}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsReportView, Mode=OneWay}"
@@ -157,7 +158,7 @@
           <MenuItem
             Header="_List"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
-            CommandParameter="{x:Static filelist:FileListViewMode.List}"
+            CommandParameter="{x:Static filelistconfig:FileListViewMode.List}"
             InputGesture="{x:Static input:AppShortcuts.ViewList}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsListView, Mode=OneWay}"
@@ -165,7 +166,7 @@
           <MenuItem
             Header="_Tiles"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
-            CommandParameter="{x:Static filelist:FileListViewMode.Tiles}"
+            CommandParameter="{x:Static filelistconfig:FileListViewMode.Tiles}"
             InputGesture="{x:Static input:AppShortcuts.ViewTiles}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsTilesView, Mode=OneWay}"
@@ -173,7 +174,7 @@
           <MenuItem
             Header="Thumb_nails"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
-            CommandParameter="{x:Static filelist:FileListViewMode.Thumbnails}"
+            CommandParameter="{x:Static filelistconfig:FileListViewMode.Thumbnails}"
             InputGesture="{x:Static input:AppShortcuts.ViewThumbnails}"
             ToggleType="Radio"
             IsChecked="{Binding FileListViewModel.IsThumbnailsView, Mode=OneWay}"

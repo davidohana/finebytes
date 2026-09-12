@@ -2,6 +2,7 @@ using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.Models.Config;
 
 namespace Mfr.Tests.Ui.FileList
 {
@@ -37,7 +38,8 @@ namespace Mfr.Tests.Ui.FileList
                 FileMask: "*.wav",
                 ExcludeMasks: ["*.tmp", "*.bak"],
                 ExcludeMasksEnabled: true,
-                MaskSuggestions: ["*.wav", "*.mp3"]
+                MaskSuggestions: ["*.wav", "*.mp3"],
+                ViewMode: FileListViewMode.Tiles
             );
 
             viewModel.ApplySession(snapshot);
@@ -46,10 +48,11 @@ namespace Mfr.Tests.Ui.FileList
             Assert.True(viewModel.ExcludeMasksEnabled);
             Assert.Equal(["*.tmp", "*.bak"], viewModel.ExcludeMasks);
             Assert.Equal(["*.wav", "*.mp3"], viewModel.MaskSuggestions);
+            Assert.Equal(FileListViewMode.Tiles, viewModel.ViewMode);
         }
 
         /// <summary>
-        /// Verifies capture round-trips mask, exclude, and current path fields.
+        /// Verifies capture round-trips mask, exclude, path, and view-mode fields.
         /// </summary>
         [Fact]
         public void CaptureSession_RoundTrips_Mask_Exclude_And_Path()
@@ -62,9 +65,11 @@ namespace Mfr.Tests.Ui.FileList
             viewModel.MaskSuggestions.Clear();
             viewModel.MaskSuggestions.Add("*.jpg");
             viewModel.MaskSuggestions.Add("*.png");
+            viewModel.SetViewMode(FileListViewMode.List);
 
             var captured = viewModel.CaptureSession();
             Assert.Equal(dir, captured.LastOpenedDirectory);
+            Assert.Equal(FileListViewMode.List, captured.ViewMode);
 
             var restored = _CreateViewModel(_tempDirectoryFixture.CreateTempDir());
             restored.ApplySession(captured);
@@ -73,6 +78,7 @@ namespace Mfr.Tests.Ui.FileList
             Assert.Equal(captured.ExcludeMasksEnabled, restored.ExcludeMasksEnabled);
             Assert.Equal(captured.ExcludeMasks, restored.ExcludeMasks);
             Assert.Equal(captured.MaskSuggestions, restored.MaskSuggestions);
+            Assert.Equal(captured.ViewMode, restored.ViewMode);
         }
 
         /// <summary>
@@ -88,7 +94,8 @@ namespace Mfr.Tests.Ui.FileList
                 FileMask: null,
                 ExcludeMasks: null,
                 ExcludeMasksEnabled: null,
-                MaskSuggestions: null
+                MaskSuggestions: null,
+                ViewMode: null
             );
 
             viewModel.ApplySession(snapshot);
@@ -97,6 +104,7 @@ namespace Mfr.Tests.Ui.FileList
             Assert.False(viewModel.ExcludeMasksEnabled);
             Assert.Equal(FileListViewModel.DefaultExcludeMasks, viewModel.ExcludeMasks);
             Assert.NotEmpty(viewModel.MaskSuggestions);
+            Assert.Equal(FileListViewMode.Report, viewModel.ViewMode);
         }
 
         /// <summary>
@@ -112,7 +120,8 @@ namespace Mfr.Tests.Ui.FileList
                 FileMask: "*.txt",
                 ExcludeMasks: [],
                 ExcludeMasksEnabled: false,
-                MaskSuggestions: null
+                MaskSuggestions: null,
+                ViewMode: null
             );
 
             viewModel.ApplySession(snapshot);
@@ -120,6 +129,38 @@ namespace Mfr.Tests.Ui.FileList
             Assert.Equal("*.txt", viewModel.Mask);
             Assert.Empty(viewModel.ExcludeMasks);
             Assert.False(viewModel.ExcludeMasksEnabled);
+        }
+
+        /// <summary>
+        /// Verifies session JSON view-mode tokens map through FromSessionState.
+        /// </summary>
+        [Fact]
+        public void FromSessionState_Parses_ViewMode_Token()
+        {
+            var session = new SessionState
+            {
+                FileList = new SessionStateFileList { ViewMode = "thumbnails" },
+            };
+
+            var snapshot = FileListSessionSnapshot.FromSessionState(session);
+
+            Assert.Equal(FileListViewMode.Thumbnails, snapshot.ViewMode);
+        }
+
+        /// <summary>
+        /// Verifies unrecognized view-mode tokens are treated as unset.
+        /// </summary>
+        [Fact]
+        public void FromSessionState_Unknown_ViewMode_Is_Unset()
+        {
+            var session = new SessionState
+            {
+                FileList = new SessionStateFileList { ViewMode = "not-a-mode" },
+            };
+
+            var snapshot = FileListSessionSnapshot.FromSessionState(session);
+
+            Assert.Null(snapshot.ViewMode);
         }
 
         private FileListViewModel _CreateViewModel(string path)

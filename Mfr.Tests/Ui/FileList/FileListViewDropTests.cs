@@ -7,6 +7,7 @@ using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.FileList;
+using Mfr.Models.Config;
 using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Ui.FileList

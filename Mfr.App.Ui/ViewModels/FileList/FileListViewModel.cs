@@ -6,6 +6,7 @@ using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.Engine.Logging;
+using Mfr.Models.Config;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels.FileList
@@ -729,7 +730,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
-        /// Restores mask, exclude-mask, and suggestion fields from a session snapshot.
+        /// Restores mask, exclude-mask, suggestion, and view-mode fields from a session snapshot.
         /// </summary>
         /// <param name="snapshot">Persisted File List session fields.</param>
         internal void ApplySession(FileListSessionSnapshot snapshot)
@@ -760,10 +761,15 @@ namespace Mfr.App.Ui.ViewModels.FileList
                     MaskSuggestions.Add(mask);
                 }
             }
+
+            if (snapshot.ViewMode is { } viewMode)
+            {
+                SetViewMode(viewMode);
+            }
         }
 
         /// <summary>
-        /// Captures current mask, exclude-mask, and suggestion fields for session save.
+        /// Captures current mask, exclude-mask, suggestion, and view-mode fields for session save.
         /// </summary>
         /// <returns>Snapshot to merge into persisted session state.</returns>
         internal FileListSessionSnapshot CaptureSession()
@@ -773,7 +779,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 FileMask: Mask,
                 ExcludeMasks: [.. ExcludeMasks],
                 ExcludeMasksEnabled: ExcludeMasksEnabled,
-                MaskSuggestions: [.. MaskSuggestions]
+                MaskSuggestions: [.. MaskSuggestions],
+                ViewMode: ViewMode
             );
         }
 
