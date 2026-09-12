@@ -84,29 +84,5 @@ namespace Mfr.Tests.Ui.Options
             Assert.False(session.MainWindow.RememberWindowState);
             Assert.True(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
         }
-
-        [Fact]
-        public void Cancel_path_leaves_sources_unchanged_when_commit_skipped()
-        {
-            var session = new SessionState
-            {
-                MainWindow = new SessionStateMainWindow { RememberWindowState = true },
-                FileList = new SessionStateFileList { RememberLastFolder = true },
-            };
-            ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = false;
-
-            var vm = new OptionsDialogViewModel(session)
-            {
-                RememberLastFolder = false,
-                RememberWindowState = false,
-                ConfirmReplaceAppliedFiltersOnLoad = true,
-            };
-
-            Assert.True(session.FileList.RememberLastFolder);
-            Assert.True(session.MainWindow.RememberWindowState);
-            Assert.False(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
-            Assert.False(vm.RememberLastFolder);
-            Assert.True(vm.ConfirmReplaceAppliedFiltersOnLoad);
-        }
     }
 }

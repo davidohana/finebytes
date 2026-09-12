@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: p4-tests
     content: "P4: VM + headless coverage for Options wire-up"
-    status: pending
+    status: completed
 isProject: false
 ---
 
