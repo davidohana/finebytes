@@ -992,6 +992,76 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies commit reports changed-row progress through the apply-commit phase.
+        /// </summary>
+        public void Commit_Reports_ApplyCommit_Progress()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var firstSource = dir.CombinePath("first.mp3");
+            var secondSource = dir.CombinePath("second.mp3");
+            File.WriteAllText(firstSource, "x");
+            File.WriteAllText(secondSource, "y");
+
+            var renameList = new RenameList();
+            renameList.AddSources([firstSource, secondSource]);
+            var plan = _SetupPreview(renameList, _CounterReplacePrefixPreset("counter"));
+            var reports = new List<RenameListProgress>();
+
+            var results = renameList.Commit(
+                plan,
+                failFast: false,
+                dryRun: true,
+                progress: new SynchronousProgress<RenameListProgress>(reports.Add)
+            );
+
+            Assert.Equal(2, results.Count(item => item.Status == RenameStatus.CommitOk));
+            Assert.NotEmpty(reports);
+            var last = reports[^1];
+            Assert.Equal(RenameListProgressPhase.ApplyCommit, last.Phase);
+            Assert.Equal(2, last.MetadataProcessedCount);
+            Assert.Equal(2, last.MetadataTotalCount);
+            Assert.NotEmpty(last.LastPath);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies cancel after one applied row stops remaining commits without rolling back the completed row.
+        /// </summary>
+        public void Commit_Cancel_MidRun_Stops_Remaining_Items()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var firstSource = dir.CombinePath("first.mp3");
+            var secondSource = dir.CombinePath("second.mp3");
+            File.WriteAllText(firstSource, "x");
+            File.WriteAllText(secondSource, "y");
+
+            var renameList = new RenameList();
+            renameList.AddSources([firstSource, secondSource]);
+            var plan = _SetupPreview(renameList, _CounterReplacePrefixPreset("counter"));
+            using var cts = new CancellationTokenSource();
+
+            var results = renameList.Commit(
+                plan,
+                failFast: false,
+                cancellationToken: cts.Token,
+                progress: new SynchronousProgress<RenameListProgress>(report =>
+                {
+                    if (report.Phase == RenameListProgressPhase.ApplyCommit && report.MetadataProcessedCount >= 1)
+                    {
+                        cts.Cancel();
+                    }
+                })
+            );
+
+            Assert.True(cts.IsCancellationRequested);
+            Assert.Equal(1, results.Count(item => item.Status == RenameStatus.CommitOk));
+            Assert.Equal(1, results.Count(item => item.Status == RenameStatus.CommitSkipped));
+            Assert.Equal(1, new[] { firstSource, secondSource }.Count(File.Exists));
+            Assert.Equal(1, new[] { dir.CombinePath("001.mp3"), dir.CombinePath("002.mp3") }.Count(File.Exists));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that preview errors are cleared before each new preview run.
         /// </summary>
         public void Preview_ResetsPreviewError_OnEachRun()

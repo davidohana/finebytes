@@ -179,7 +179,7 @@ namespace Mfr.Engine.RenameList
                 }
 
                 RenameListMetadataLoader.TryEnsureLoaded(item, requirement);
-                tracker.OnMetadataProcessed(item.Original.FullPath);
+                tracker.OnRowProcessed(item.Original.FullPath);
             }
         }
 
@@ -523,7 +523,7 @@ namespace Mfr.Engine.RenameList
                 }
 
                 RenameListOriginalsRefresher.RefreshItemOriginal(item, casingCache, _includedResolvedPaths);
-                tracker.OnMetadataProcessed(item.Original.FullPath);
+                tracker.OnRowProcessed(item.Original.FullPath);
             }
 
             tracker.ReportFinal();
@@ -617,7 +617,7 @@ namespace Mfr.Engine.RenameList
             foreach (var renameItem in _renameItems)
             {
                 renameItem.SetPreviewError(message: setupError.Message, cause: setupError);
-                tracker.OnMetadataProcessed(renameItem.Original.FullPath);
+                tracker.OnRowProcessed(renameItem.Original.FullPath);
             }
         }
 
@@ -664,7 +664,7 @@ namespace Mfr.Engine.RenameList
                     Log.Warning(ex, "Preview failed for '{SourcePath}'.", renameItem.Original.FullPath);
                 }
 
-                tracker.OnMetadataProcessed(renameItem.Original.FullPath);
+                tracker.OnRowProcessed(renameItem.Original.FullPath);
             }
         }
 
@@ -713,13 +713,17 @@ namespace Mfr.Engine.RenameList
         /// Return <c>false</c> to skip that item with status <see cref="RenameStatus.CommitSkipped"/> without treating it as an error.
         /// Items in an unresolvable cycle that are already in flight (stashed to a temp path) bypass this callback to avoid orphaned files.
         /// </param>
+        /// <param name="cancellationToken">When canceled, stops applying remaining items without throwing.</param>
+        /// <param name="progress">Optional progress sink (processed count, total changed rows, last path).</param>
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="plan"/> is <c>null</c>.</exception>
         public IReadOnlyList<RenameResultItem> Commit(
             CommitPlan plan,
             bool failFast,
             bool dryRun = false,
-            Func<RenameItem, bool>? confirmBeforeApply = null
+            Func<RenameItem, bool>? confirmBeforeApply = null,
+            CancellationToken cancellationToken = default,
+            IProgress<RenameListProgress>? progress = null
         )
         {
             ArgumentNullException.ThrowIfNull(plan);
@@ -732,13 +736,22 @@ namespace Mfr.Engine.RenameList
                 confirmBeforeApply is not null
             );
 
+            var tracker = new RenameListProgressTracker(progress, cancellationToken);
+            var commitItemCount = plan
+                .Steps.Select(step => step.Item)
+                .Distinct(ReferenceEqualityComparer.Instance)
+                .Count();
+            tracker.BeginCommitPhase(commitItemCount);
+
             var results = CommitExecutor.Execute(
                 plan: plan,
                 allItems: _renameItems,
                 confirmBeforeApply: confirmBeforeApply,
                 failFast: failFast,
-                dryRun: dryRun
+                dryRun: dryRun,
+                tracker: tracker
             );
+            tracker.ReportFinal();
 
             foreach (var item in _renameItems)
             {

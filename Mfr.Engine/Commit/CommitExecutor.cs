@@ -1,3 +1,4 @@
+using Mfr.Engine.RenameList;
 using Mfr.Metadata;
 using Mfr.Models.Tags;
 using Serilog;
@@ -48,15 +49,18 @@ namespace Mfr.Engine.Commit
         /// </param>
         /// <param name="failFast">If <c>true</c>, stops after the first per-item error.</param>
         /// <param name="dryRun">If <c>true</c>, skips all filesystem writes.</param>
+        /// <param name="tracker">Cancellation state and per-item commit progress.</param>
         /// <returns>Per-item commit outcomes in the same order as <paramref name="allItems"/>.</returns>
         internal static IReadOnlyList<RenameResultItem> Execute(
             CommitPlan plan,
             IReadOnlyList<RenameItem> allItems,
             Func<RenameItem, bool>? confirmBeforeApply,
             bool failFast,
-            bool dryRun
+            bool dryRun,
+            RenameListProgressTracker? tracker = null
         )
         {
+            tracker ??= new RenameListProgressTracker(progress: null);
             var outcomes = new Dictionary<RenameItem, PlanOutcome>(ReferenceEqualityComparer.Instance);
 
             _ExecutePlan(
@@ -64,7 +68,8 @@ namespace Mfr.Engine.Commit
                 confirmBeforeApply: confirmBeforeApply,
                 failFast: failFast,
                 dryRun: dryRun,
-                outcomes: outcomes
+                outcomes: outcomes,
+                tracker: tracker
             );
 
             return [.. allItems.Select(item => _BuildResultForItem(item: item, outcomes: outcomes))];
@@ -78,22 +83,37 @@ namespace Mfr.Engine.Commit
         /// <param name="failFast">Whether to stop on the first plan-step error.</param>
         /// <param name="dryRun">Whether to skip filesystem writes.</param>
         /// <param name="outcomes">Per-item outcome accumulator populated by this method.</param>
+        /// <param name="tracker">Cancellation state and per-item commit progress.</param>
         private static void _ExecutePlan(
             CommitPlan plan,
             Func<RenameItem, bool>? confirmBeforeApply,
             bool failFast,
             bool dryRun,
-            Dictionary<RenameItem, PlanOutcome> outcomes
+            Dictionary<RenameItem, PlanOutcome> outcomes,
+            RenameListProgressTracker tracker
         )
         {
             var stopped = false;
             var inFlightStashedItems = new HashSet<RenameItem>(ReferenceEqualityComparer.Instance);
+            var processedItems = new HashSet<RenameItem>(ReferenceEqualityComparer.Instance);
 
             foreach (var step in plan.Steps)
             {
                 if (stopped)
                 {
                     break;
+                }
+
+                // Once a cycle has moved a source to a temporary path, finish that cycle before
+                // observing cancellation so no source is stranded at its stash path.
+                if (tracker.IsCanceled && inFlightStashedItems.Count == 0)
+                {
+                    if (step is FinalizeStep canceledFinalizeStep)
+                    {
+                        _RebaseCanceledItemMovedByParent(canceledFinalizeStep);
+                    }
+
+                    continue;
                 }
 
                 if (step.Item.Status != RenameStatus.PreviewOk)
@@ -109,6 +129,8 @@ namespace Mfr.Engine.Commit
                         inFlightStashedItems.Add(stashStep.Item);
                         continue;
                     }
+
+                    _ReportItemProcessed(stashStep.Item, processedItems, tracker);
 
                     // Stash failure is a per-item error: honor fail-fast so later cycle members
                     // (and the rest of the plan) are not attempted against a path that never vacated.
@@ -130,17 +152,73 @@ namespace Mfr.Engine.Commit
                     if (!confirmed)
                     {
                         inFlightStashedItems.Remove(finalizeStep.Item);
+                        _ReportItemProcessed(finalizeStep.Item, processedItems, tracker);
                         continue;
                     }
 
                     var stepFailed = !_ExecuteFinalizeStep(step: finalizeStep, dryRun: dryRun, outcomes: outcomes);
                     inFlightStashedItems.Remove(finalizeStep.Item);
+                    _ReportItemProcessed(finalizeStep.Item, processedItems, tracker);
                     if (stepFailed && failFast)
                     {
                         stopped = true;
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Keeps a canceled descendant row aligned when a committed parent-folder move already relocated it on disk.
+        /// </summary>
+        private static void _RebaseCanceledItemMovedByParent(FinalizeStep step)
+        {
+            var item = step.Item;
+            var sourceWasRebased = !string.Equals(
+                step.ActualSourcePath,
+                item.Original.FullPath,
+                StringComparison.Ordinal
+            );
+            if (!sourceWasRebased || (!File.Exists(step.ActualSourcePath) && !Directory.Exists(step.ActualSourcePath)))
+            {
+                return;
+            }
+
+            var rebasedOriginal = item.Original.Clone();
+            var trimmedPath = step.ActualSourcePath.TrimEnd(
+                Path.DirectorySeparatorChar,
+                Path.AltDirectorySeparatorChar
+            );
+            rebasedOriginal.DirectoryPath = Path.GetDirectoryName(trimmedPath) ?? string.Empty;
+
+            if (item.Original.Attributes.HasFlag(FileAttributes.Directory))
+            {
+                rebasedOriginal.Prefix = Path.GetFileName(trimmedPath);
+                rebasedOriginal.Extension = string.Empty;
+            }
+            else
+            {
+                rebasedOriginal.Prefix = Path.GetFileNameWithoutExtension(trimmedPath);
+                rebasedOriginal.Extension = FileMeta.ExtensionWithoutDot(trimmedPath);
+            }
+
+            item.Original = rebasedOriginal;
+        }
+
+        /// <summary>
+        /// Reports completion once for an item that may have both stash and finalize steps.
+        /// </summary>
+        private static void _ReportItemProcessed(
+            RenameItem item,
+            HashSet<RenameItem> processedItems,
+            RenameListProgressTracker tracker
+        )
+        {
+            if (!processedItems.Add(item))
+            {
+                return;
+            }
+
+            tracker.OnRowProcessed(item.Original.FullPath);
         }
 
         /// <summary>

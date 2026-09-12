@@ -71,35 +71,64 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Canceling after a parent-folder move keeps the skipped child aligned with its rebased on-disk path.
+        /// </summary>
+        [Fact]
+        public void Cancel_after_parent_move_rebases_skipped_child()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var oldFolderPath = dir.CombinePath("Album");
+            Directory.CreateDirectory(oldFolderPath);
+            var oldFilePath = oldFolderPath.CombinePath("track.mp3");
+            File.WriteAllText(oldFilePath, "x");
+
+            var newFolderPath = dir.CombinePath("AlbumRenamed");
+            var rebasedFilePath = newFolderPath.CombinePath("track.mp3");
+            var renamedFilePath = newFolderPath.CombinePath("song.mp3");
+
+            var renameList = new RenameList();
+            renameList.AddSources(sources: [oldFolderPath], includeFiles: false, includeFolders: true);
+            renameList.AddSources(sources: [oldFilePath], includeFiles: true, includeFolders: false);
+            var fileItem = renameList.RenameItems.Single(item => item.Original.FullPath == oldFilePath);
+
+            var preset = _CreatePresetAllEnabled(
+                "folder-and-child-cancel",
+                _LiteralPrefixReplacer("Album", "AlbumRenamed"),
+                _LiteralPrefixReplacer("track", "song")
+            );
+            var plan = _SetupPreview(renameList, preset);
+            using var cts = new CancellationTokenSource();
+
+            var result = renameList.Commit(
+                plan,
+                failFast: false,
+                cancellationToken: cts.Token,
+                progress: new SynchronousProgress<RenameListProgress>(report =>
+                {
+                    if (report.Phase == RenameListProgressPhase.ApplyCommit && report.MetadataProcessedCount >= 1)
+                    {
+                        cts.Cancel();
+                    }
+                })
+            );
+
+            Assert.True(cts.IsCancellationRequested);
+            Assert.Equal(1, result.Count(item => item.Status == RenameStatus.CommitOk));
+            Assert.Equal(1, result.Count(item => item.Status == RenameStatus.CommitSkipped));
+            Assert.Equal(rebasedFilePath, fileItem.Original.FullPath);
+            Assert.True(File.Exists(rebasedFilePath));
+            Assert.False(File.Exists(oldFilePath));
+            Assert.False(File.Exists(renamedFilePath));
+        }
+
+        /// <summary>
         /// Performs a folder swap (FolderA &lt;-&gt; FolderB). The planner must stash one folder while
         /// the other moves and then finalize the stashed one.
         /// </summary>
         [Fact]
         public void Two_folder_swap_completes_via_stash_and_finalize()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var folderA = dir.CombinePath("FolderA");
-            var folderB = dir.CombinePath("FolderB");
-            Directory.CreateDirectory(folderA);
-            Directory.CreateDirectory(folderB);
-            File.WriteAllText(folderA.CombinePath("a.txt"), "from-a");
-            File.WriteAllText(folderB.CombinePath("b.txt"), "from-b");
-
-            var renameList = new RenameList();
-            renameList.AddSources(sources: [folderA, folderB], includeFiles: false, includeFolders: true);
-            Assert.Equal(2, renameList.RenameItems.Count);
-
-            // A pair of replacers performs FolderA -> tmp -> FolderB while FolderB -> FolderA via case differences
-            // would not work; instead we use FullPathTarget formatters keyed by source path so each item gets a
-            // distinct preview destination without collisions.
-            var preset = _CreatePresetAllEnabled(
-                "folder-swap",
-                _LiteralPrefixReplacer("FolderA", "__SWAP_PLACEHOLDER__"),
-                _LiteralPrefixReplacer("FolderB", "FolderA"),
-                _LiteralPrefixReplacer("__SWAP_PLACEHOLDER__", "FolderB")
-            );
-            var plan = _SetupPreview(renameList, preset);
-
+            var (renameList, plan, folderA, folderB) = _SetupFolderSwap();
             var itemA = renameList.RenameItems.Single(item => item.Original.FullPath == folderA);
             var itemB = renameList.RenameItems.Single(item => item.Original.FullPath == folderB);
             Assert.Equal(folderB, itemA.Preview.FullPath);
@@ -116,6 +145,38 @@ namespace Mfr.Tests.Engine
             // The original siblings should not coexist with their swapped counterparts.
             Assert.False(File.Exists(folderA.CombinePath("a.txt")));
             Assert.False(File.Exists(folderB.CombinePath("b.txt")));
+        }
+
+        /// <summary>
+        /// Canceling after the first finalize in a stashed cycle still completes that cycle so no temp path is stranded.
+        /// </summary>
+        [Fact]
+        public void Cancel_during_folder_swap_finishes_in_flight_cycle()
+        {
+            var (renameList, plan, folderA, folderB) = _SetupFolderSwap();
+            using var cts = new CancellationTokenSource();
+
+            var result = renameList.Commit(
+                plan,
+                failFast: false,
+                cancellationToken: cts.Token,
+                progress: new SynchronousProgress<RenameListProgress>(report =>
+                {
+                    if (report.Phase == RenameListProgressPhase.ApplyCommit && report.MetadataProcessedCount >= 1)
+                    {
+                        cts.Cancel();
+                    }
+                })
+            );
+
+            Assert.True(cts.IsCancellationRequested);
+            Assert.Equal(2, result.Count(item => item.Status == RenameStatus.CommitOk));
+            Assert.True(File.Exists(folderB.CombinePath("a.txt")));
+            Assert.True(File.Exists(folderA.CombinePath("b.txt")));
+            Assert.DoesNotContain(
+                Directory.EnumerateFileSystemEntries(Path.GetDirectoryName(folderA)!),
+                path => path.Contains(".mfrtmp-", StringComparison.Ordinal)
+            );
         }
 
         /// <summary>
@@ -275,6 +336,32 @@ namespace Mfr.Tests.Engine
                 name,
                 new FormatterFilter(Target: new FullPathTarget(), Options: new FormatterOptions(fullPath))
             );
+        }
+
+        /// <summary>
+        /// Creates two populated folders and previews a swap that requires stash-and-finalize planning.
+        /// </summary>
+        private (RenameList RenameList, CommitPlan Plan, string FolderA, string FolderB) _SetupFolderSwap()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var folderA = dir.CombinePath("FolderA");
+            var folderB = dir.CombinePath("FolderB");
+            Directory.CreateDirectory(folderA);
+            Directory.CreateDirectory(folderB);
+            File.WriteAllText(folderA.CombinePath("a.txt"), "from-a");
+            File.WriteAllText(folderB.CombinePath("b.txt"), "from-b");
+
+            var renameList = new RenameList();
+            renameList.AddSources(sources: [folderA, folderB], includeFiles: false, includeFolders: true);
+
+            var preset = _CreatePresetAllEnabled(
+                "folder-swap",
+                _LiteralPrefixReplacer("FolderA", "__SWAP_PLACEHOLDER__"),
+                _LiteralPrefixReplacer("FolderB", "FolderA"),
+                _LiteralPrefixReplacer("__SWAP_PLACEHOLDER__", "FolderB")
+            );
+            var plan = _SetupPreview(renameList, preset);
+            return (renameList, plan, folderA, folderB);
         }
 
         private static CommitPlan _SetupPreview(RenameList renameList, FilterPreset preset)

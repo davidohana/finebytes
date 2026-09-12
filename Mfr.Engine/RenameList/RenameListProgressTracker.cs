@@ -6,10 +6,9 @@ namespace Mfr.Engine.RenameList
     /// <param name="ScannedCount">Filesystem entries visited during resolve.</param>
     /// <param name="AddedCount">Items newly accepted into the rename list during resolve.</param>
     /// <param name="LastPath">Most recent path considered.</param>
-    /// <param name="MetadataTotalCount">Total rows for <see cref="RenameListProgressPhase.LoadMetadata"/> or
-    /// <see cref="RenameListProgressPhase.ApplyPreview"/>; zero during resolve.</param>
+    /// <param name="MetadataTotalCount">Total rows for metadata, preview, or commit phases; zero during resolve.</param>
     /// <param name="Phase">Current stage of the operation.</param>
-    /// <param name="MetadataProcessedCount">Rows processed during metadata hydrate/refresh or preview apply.</param>
+    /// <param name="MetadataProcessedCount">Rows processed during metadata hydrate/refresh, preview, or commit.</param>
     public sealed record RenameListProgress(
         int ScannedCount,
         int AddedCount,
@@ -83,6 +82,15 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
+        /// Switches progress to per-row commit apply (<see cref="RenameListProgressPhase.ApplyCommit"/>).
+        /// </summary>
+        /// <param name="totalItems">Changed rows to commit.</param>
+        public void BeginCommitPhase(int totalItems)
+        {
+            _BeginRowPhase(RenameListProgressPhase.ApplyCommit, totalItems);
+        }
+
+        /// <summary>
         /// Records a scanned filesystem entry and may report progress.
         /// </summary>
         /// <param name="path">Path that was visited.</param>
@@ -105,10 +113,10 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Records one row processed during metadata hydrate/refresh or preview apply.
+        /// Records one row processed during metadata hydrate/refresh, preview, or commit.
         /// </summary>
         /// <param name="path">Path whose row was processed or skipped.</param>
-        public void OnMetadataProcessed(string path)
+        public void OnRowProcessed(string path)
         {
             _metadataProcessedCount++;
             LastPath = path;

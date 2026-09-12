@@ -17,7 +17,7 @@ namespace Mfr.Tests.Engine
             tracker.OnScanned(@"C:\a.mp3");
             tracker.OnAdded(@"C:\a.mp3");
             tracker.BeginMetadataPhase(2);
-            tracker.OnMetadataProcessed(@"C:\a.mp3");
+            tracker.OnRowProcessed(@"C:\a.mp3");
             tracker.ReportFinal();
 
             var last = reports[^1];
@@ -39,13 +39,33 @@ namespace Mfr.Tests.Engine
             var tracker = new RenameListProgressTracker(new SynchronousProgress<RenameListProgress>(reports.Add));
 
             tracker.BeginPreviewPhase(3);
-            tracker.OnMetadataProcessed(@"C:\a.txt");
+            tracker.OnRowProcessed(@"C:\a.txt");
             tracker.ReportFinal();
 
             var last = reports[^1];
             Assert.Equal(RenameListProgressPhase.ApplyPreview, last.Phase);
             Assert.Equal(1, last.MetadataProcessedCount);
             Assert.Equal(3, last.MetadataTotalCount);
+            Assert.Equal(@"C:\a.txt", last.LastPath);
+        }
+
+        /// <summary>
+        /// Verifies commit phase reports <see cref="RenameListProgressPhase.ApplyCommit"/> with a changed-row total.
+        /// </summary>
+        [Fact]
+        public void Commit_Phase_Reports_ApplyCommit()
+        {
+            var reports = new List<RenameListProgress>();
+            var tracker = new RenameListProgressTracker(new SynchronousProgress<RenameListProgress>(reports.Add));
+
+            tracker.BeginCommitPhase(2);
+            tracker.OnRowProcessed(@"C:\a.txt");
+            tracker.ReportFinal();
+
+            var last = reports[^1];
+            Assert.Equal(RenameListProgressPhase.ApplyCommit, last.Phase);
+            Assert.Equal(1, last.MetadataProcessedCount);
+            Assert.Equal(2, last.MetadataTotalCount);
             Assert.Equal(@"C:\a.txt", last.LastPath);
         }
 
