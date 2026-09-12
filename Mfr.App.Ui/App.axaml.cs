@@ -47,7 +47,7 @@ namespace Mfr.App.Ui
 
                 desktop.MainWindow = mainWindow;
 #if DEBUG
-                this.AttachDevTools();
+                this.AttachDeveloperTools();
 #endif
             }
 
