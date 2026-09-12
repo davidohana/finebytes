@@ -80,6 +80,14 @@ Plain implement (skill not in play): omit review/commit; do not set `Commit: yes
 
 Style / persistence / naming: already in `AGENTS.md` — do not restate.
 
+## Subagent models
+
+When launching `Task` for implement or review:
+
+- **Default:** omit `model` or set `inherit` (Auto).
+- **Allowed alternative:** Grok only (`cursor-grok-4.6-high`) when the parent picks a stronger model.
+- **Do not** set GPT Sol, Claude, Composer, or any other slug unless the user explicitly named that model in the request.
+
 ## Parent duties
 
 - Keep Task prompts under ~20 lines when possible.
