@@ -296,38 +296,47 @@
     </Style>
 
     <Style Selector="Border.rename-list-legend">
-      <Setter Property="Width" Value="116" />
+      <Setter Property="Width" Value="132" />
       <Setter Property="Margin" Value="4,0,4,4" />
-      <Setter Property="Padding" Value="0" />
+      <Setter Property="Padding" Value="6,4,6,6" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
       <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="3" />
       <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
     </Style>
     <Style Selector="Border.rename-list-legend TextBlock.rename-list-legend-title">
-      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
       <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="TextAlignment" Value="Center" />
-      <Setter Property="Padding" Value="0,2" />
+      <Setter Property="Margin" Value="0,2,0,6" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    </Style>
+    <Style Selector="StackPanel.rename-list-legend-swatches">
+      <Setter Property="Spacing" Value="3" />
     </Style>
     <Style Selector="Border.rename-list-legend-swatch">
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
       <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="Margin" Value="0,-1,0,0" />
-      <Setter Property="MinHeight" Value="20" />
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="Padding" Value="4,2" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
     </Style>
     <Style Selector="Border.rename-list-legend-swatch TextBlock">
-      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
       <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="TextAlignment" Value="Center" />
-      <Setter Property="Padding" Value="2,2" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
     <Style Selector="TextBlock.rename-list-legend-footer">
       <Setter Property="TextWrapping" Value="Wrap" />
       <Setter Property="TextAlignment" Value="Center" />
-      <Setter Property="Margin" Value="2,8,2,4" />
-      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Margin" Value="2,8,2,2" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
     </Style>
   </UserControl.Styles>
   <Border Classes="pane">
@@ -445,37 +454,42 @@
       >
         <StackPanel>
           <TextBlock Classes="rename-list-legend-title" Text="Color Legend" />
-          <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendOriginalValue}">
-            <TextBlock Text="Original Value" Foreground="{DynamicResource AppChromeForegroundBrush}" />
-          </Border>
-          <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendValueChanged}">
-            <TextBlock Text="Value Changed" Foreground="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
-          </Border>
-          <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendManualOverride}">
-            <TextBlock Text="Manual Override" Foreground="{DynamicResource RenameListManualOverrideForegroundBrush}" />
-          </Border>
-          <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendValueError}">
-            <!-- Same em dash + italic gray as load-error / missing cells (MFR7 Value Error). -->
-            <TextBlock
-              Text="—  Value Error"
-              FontStyle="Italic"
-              Foreground="{DynamicResource RenameListMissingOnDiskForegroundBrush}"
-            />
-          </Border>
-          <Border
-            Classes="rename-list-legend-swatch"
-            Background="{DynamicResource RenameListPreviewErrorRowBrush}"
-            ToolTip.Tip="{x:Static resources:AppTips.LegendPreviewError}"
-          >
-            <TextBlock Text="Preview Error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
-          </Border>
-          <Border
-            Classes="rename-list-legend-swatch"
-            Background="{DynamicResource RenameListCommitErrorRowBrush}"
-            ToolTip.Tip="{x:Static resources:AppTips.LegendRenameError}"
-          >
-            <TextBlock Text="Rename Error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
-          </Border>
+          <StackPanel Classes="rename-list-legend-swatches">
+            <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendOriginalValue}">
+              <TextBlock Text="Original Value" Foreground="{DynamicResource AppChromeForegroundBrush}" />
+            </Border>
+            <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendValueChanged}">
+              <TextBlock Text="Value Changed" Foreground="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
+            </Border>
+            <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendManualOverride}">
+              <TextBlock
+                Text="Manual Override"
+                Foreground="{DynamicResource RenameListManualOverrideForegroundBrush}"
+              />
+            </Border>
+            <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendValueError}">
+              <!-- Same em dash + italic gray as load-error / missing cells (MFR7 Value Error). -->
+              <TextBlock
+                Text="—  Value Error"
+                FontStyle="Italic"
+                Foreground="{DynamicResource RenameListMissingOnDiskForegroundBrush}"
+              />
+            </Border>
+            <Border
+              Classes="rename-list-legend-swatch"
+              Background="{DynamicResource RenameListPreviewErrorRowBrush}"
+              ToolTip.Tip="{x:Static resources:AppTips.LegendPreviewError}"
+            >
+              <TextBlock Text="Preview Error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
+            </Border>
+            <Border
+              Classes="rename-list-legend-swatch"
+              Background="{DynamicResource RenameListCommitErrorRowBrush}"
+              ToolTip.Tip="{x:Static resources:AppTips.LegendRenameError}"
+            >
+              <TextBlock Text="Rename Error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
+            </Border>
+          </StackPanel>
           <TextBlock
             Classes="rename-list-legend-footer"
             Text="Right-Click on a cell or row with error to see error details."
