@@ -5,7 +5,10 @@ using Avalonia.Threading;
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.MainWindow;
+using Mfr.App.Ui.ViewModels.Options;
+using Mfr.App.Ui.Views.Options;
 using Mfr.Engine.Config;
+using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.Views.MainWindow
 {
@@ -16,6 +19,7 @@ namespace Mfr.App.Ui.Views.MainWindow
     {
         private MainWindowViewModel? _boundViewModel;
         private bool _resetConfigurationInProgress;
+        private bool _optionsDialogInProgress;
 
         /// <summary>
         /// Initializes the main window.
@@ -31,6 +35,11 @@ namespace Mfr.App.Ui.Views.MainWindow
         /// Optional Reset Configuration overrides for headless tests; leave null in production.
         /// </summary>
         internal ResetConfigurationHooks? ResetConfigurationHooks { get; set; }
+
+        /// <summary>
+        /// Optional Options dialog overrides for headless tests; leave null in production.
+        /// </summary>
+        internal OptionsDialogHooks? OptionsDialogHooks { get; set; }
 
         /// <summary>
         /// Builds the pane-grid handle used by session splitter restore/capture.
@@ -53,6 +62,7 @@ namespace Mfr.App.Ui.Views.MainWindow
             {
                 _boundViewModel.AppliedFiltersViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
                 _boundViewModel.AppliedFiltersViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
+                _boundViewModel.OptionsRequested -= _OnOptionsRequested;
                 _boundViewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
                 _boundViewModel = null;
             }
@@ -65,6 +75,7 @@ namespace Mfr.App.Ui.Views.MainWindow
             _boundViewModel = viewModel;
             viewModel.AppliedFiltersViewModel.FilterDefaultSaved += _OnFilterDefaultSaved;
             viewModel.AppliedFiltersViewModel.FilterHelpMissing += _OnFilterHelpMissing;
+            viewModel.OptionsRequested += _OnOptionsRequested;
             viewModel.ResetConfigurationRequested += _OnResetConfigurationRequested;
         }
 
@@ -78,9 +89,84 @@ namespace Mfr.App.Ui.Views.MainWindow
             Dispatcher.UIThread.Post(() => _ = _ShowFilterHelpMissingAsync(helpFileName));
         }
 
+        private void _OnOptionsRequested(object? sender, EventArgs e)
+        {
+            Dispatcher.UIThread.Post(() => _ = _ShowOptionsAsync());
+        }
+
         private void _OnResetConfigurationRequested(object? sender, EventArgs e)
         {
             Dispatcher.UIThread.Post(() => _ = _ResetConfigurationAsync());
+        }
+
+        /// <summary>
+        /// Hosts the Options dialog; on OK commits drafts and writes <c>config.json</c>.
+        /// <para>
+        /// No-ops when <see cref="MainWindowViewModel.Session"/> is null — remember flags must
+        /// land on the live session document, not a throwaway <see cref="SessionState"/>.
+        /// </para>
+        /// </summary>
+        private async Task _ShowOptionsAsync()
+        {
+            if (_optionsDialogInProgress)
+            {
+                return;
+            }
+
+            if (DataContext is not MainWindowViewModel viewModel)
+            {
+                return;
+            }
+
+            if (viewModel.Session is not SessionState session)
+            {
+                return;
+            }
+
+            _optionsDialogInProgress = true;
+            try
+            {
+                var dialogVm = new OptionsDialogViewModel(session);
+                var hooks = OptionsDialogHooks;
+                bool? accepted;
+                if (hooks?.Show is not null)
+                {
+                    accepted = await hooks.Show(dialogVm);
+                }
+                else
+                {
+                    var dialog = new OptionsDialog(dialogVm);
+                    accepted = await dialog.ShowDialog<bool?>(this);
+                }
+
+                if (accepted != true)
+                {
+                    return;
+                }
+
+                dialogVm.Commit();
+                try
+                {
+                    if (hooks?.SaveConfig is not null)
+                    {
+                        hooks.SaveConfig();
+                    }
+                    else
+                    {
+                        ConfigStore.Save();
+                    }
+                }
+                catch (Exception)
+                {
+                    await new OkMessageDialog(title: "Options", message: "Failed to save configuration.").ShowDialog(
+                        this
+                    );
+                }
+            }
+            finally
+            {
+                _optionsDialogInProgress = false;
+            }
         }
 
         private async Task _ShowFilterDefaultSavedAsync(string catalogDisplayName)
@@ -236,6 +322,7 @@ namespace Mfr.App.Ui.Views.MainWindow
 
             viewModel.AppliedFiltersViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
             viewModel.AppliedFiltersViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
+            viewModel.OptionsRequested -= _OnOptionsRequested;
             viewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
 
             if (viewModel.SuppressSessionSaveOnClose)

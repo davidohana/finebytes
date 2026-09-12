@@ -248,16 +248,24 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         public void ShowLog() { }
 
         /// <summary>
-        /// Opens Options. Placeholder until the options window is implemented.
+        /// Opens the Options dialog (remember flags and preset confirm).
         /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanExecuteUnimplemented))]
-        public void ShowOptions() { }
+        [RelayCommand]
+        public void ShowOptions()
+        {
+            OptionsRequested?.Invoke(this, EventArgs.Empty);
+        }
 
         /// <summary>
         /// When <see langword="true"/>, closing this window does not write <c>session.json</c>
         /// (Reset Configuration after deleting persisted files).
         /// </summary>
         internal bool SuppressSessionSaveOnClose { get; set; }
+
+        /// <summary>
+        /// Raised when the user chooses MFR → Options; the main window hosts the dialog.
+        /// </summary>
+        internal event EventHandler? OptionsRequested;
 
         /// <summary>
         /// Raised when the user chooses Tools → Reset Configuration; the main window confirms and restarts.

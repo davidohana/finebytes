@@ -23,3 +23,7 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 ## Status bar
 
 - Undo Last → sticky status outcome when Undo ships (deferred with Undo itself)
+
+## Options dialog (deferred from v1)
+
+- Explorer shell integrate, double-click-to-add, Undo & Log retention tab — see [options-dialog.plan.md](plans/options-dialog.plan.md)

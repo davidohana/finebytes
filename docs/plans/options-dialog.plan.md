@@ -10,16 +10,16 @@ todos:
     status: completed
   - id: p3-wire-showoptions
     content: "P3: Enable ShowOptions, host dialog, persist on OK, update docs"
-    status: pending
+    status: completed
   - id: p4-tests
-    content: "P4: VM + headless coverage; shortcuts no longer list Options as stub"
+    content: "P4: VM + headless coverage for Options wire-up"
     status: pending
 isProject: false
 ---
 
 # Options dialog plan
 
-Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope until Options UI); stub in [keyboard-shortcuts.md](../keyboard-shortcuts.md).
+Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope until Options UI); shortcut listed in [keyboard-shortcuts.md](../keyboard-shortcuts.md).
 
 ## Decisions (locked)
 
@@ -38,7 +38,7 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
 
 - Help: `Help/optionswin.html` (+ `optionswin1.gif` / `optionswin2.gif`); related `resetconfig.html`, `log.html`
 - Code: `D:\Devl\mfr7\Core\MFRGui\Forms\Main\Options.cs` (+ `.resx`); open from `Main.cs` (`mniOptions` / `btnOptions`); persist `OptionsForm.LoadConfig`/`SaveConfig` → `mfrconfig.xml`
-- finebytes status: **no Options UI** — `ShowOptions` stub (`_CanExecuteUnimplemented`); add-mode + remember-folder in **session**; confirm-replace + log retention in **hand-edit `config.json`**
+- finebytes status: **Options UI shipped** (P1–P3) — remember flags in **session**; confirm-replace via Options + `config.json`; log retention still hand-edit / deferred Undo & Log tab
 
 ### Behavior
 
@@ -113,7 +113,7 @@ Wire via event/hooks from [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/Main
 ### P4 — Tests
 
 - **Scope:** VM tests for load/commit/cancel; headless smoke that Options command is enabled and dialog can open (follow `mfr-ui-headless-tests` / existing MainWindow smoke). Session persistence coverage for the two remember flags if gaps exist.
-- **Exit:** `just test` green; Options removed from “stubs” wording in shortcuts doc.
+- **Exit:** `just test` green (shortcuts stub wording already cleared in P3).
 
 ## Key files
 

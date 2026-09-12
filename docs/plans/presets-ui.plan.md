@@ -69,7 +69,7 @@ Engine / models / Applied Filters plumbing. Menu/toolbar stay disabled.
 
 1. **`PresetManager.OpenDefault()` / `CreateEmpty()`** — missing file → write empty container then load; corrupt → still throw. Tests for both.
 1. **`FilterPreset.VisibleColumns`** — optional `IReadOnlyList<RenameListVisibleColumnSpec>?` (`key` + `width`). Docs in [Mfr.Filters/docs/README.md](../../Mfr.Filters/docs/README.md); JSON probe with columns present/absent.
-1. **`MfrConfig.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad`** — default `false`; JSON string `"true"`/`"false"`; hand-edit only (Options UI stubbed). Binding coverage.
+1. **`MfrConfig.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad`** — default `false`; JSON string `"true"`/`"false"`; Options dialog + hand-edit / CLI. Binding coverage.
 1. **`AppliedFiltersViewModel.ReplaceFromChain`** — one `ChainChanged`; catalog display names; `Enabled` from steps; select first step if any. Inject `PresetManager` (+ **`LastLoaded`**). Wire `PresetManager.OpenDefault()` in [`App.axaml.cs`](../../Mfr.App.Ui/App.axaml.cs) → `MainWindowViewModel`.
 
 **Exit:** unit/engine tests green; UI still stubs.
@@ -156,5 +156,6 @@ Do **not** retest JSON polymorphism (`PresetJsonPolymorphismTests`).
 - Import MFR7 `.mps`
 - Packing Rename List **sort** (or other session fields) into presets
 - Soft-load of corrupt `presets.json`
-- Options dialog checkbox for the confirm flag (config.json only until Options UI exists)
+- Options dialog checkbox for the confirm flag — shipped in
+  [options-dialog.plan.md](options-dialog.plan.md)
 - Editing description from Preset Manager (use Save Preset + overwrite)

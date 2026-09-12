@@ -23,7 +23,7 @@ namespace Mfr.Models.Config
     public sealed class UiConfig
     {
         /// <summary>
-        /// Presets UI options (hand-edit <c>config.json</c>; Options dialog not wired yet).
+        /// Presets UI options (Options dialog + hand-edit <c>config.json</c> / CLI <c>--set</c>).
         /// </summary>
         [ConfigSection]
         public PresetsUiConfig Presets = new();
@@ -106,7 +106,7 @@ namespace Mfr.Models.Config
         public LogConfig Log = new();
 
         /// <summary>
-        /// UI options (presets confirm-replace and related hand-edit settings).
+        /// UI options (Options dialog + hand-edit <c>config.json</c> / CLI <c>--set</c>).
         /// </summary>
         [ConfigSection]
         public UiConfig Ui = new();
