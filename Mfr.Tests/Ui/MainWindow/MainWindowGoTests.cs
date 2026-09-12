@@ -87,7 +87,8 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies declining the preview-error warning aborts before any valid rename is committed.
+        /// Verifies declining the preview-error warning aborts before any valid rename is committed
+        /// and does not wipe a prior sticky status.
         /// </summary>
         [AvaloniaFact]
         public async Task Go_preview_error_warning_cancel_aborts_commit()
@@ -100,6 +101,8 @@ namespace Mfr.Tests.Ui.MainWindow
             var viewModel = new MainWindowViewModel(dir);
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
+
+            viewModel.RenameListViewModel.LastStatusMessage = StatusBarText.Neutral("Prior sticky.");
 
             var warnedCount = 0;
             viewModel.RenameListViewModel.UiHooks = new RenameListUiHooks
@@ -120,6 +123,8 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.True(File.Exists(source));
             Assert.Equal("occupied", await File.ReadAllTextAsync(occupied));
             Assert.Equal(RenameListProgressOperation.Preview, viewModel.RenameListViewModel.Progress.Operation);
+            Assert.Equal("Prior sticky.", viewModel.RenameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.Equal("Prior sticky.", viewModel.StatusHint.ToPlainText());
         }
 
         /// <summary>
@@ -212,9 +217,7 @@ namespace Mfr.Tests.Ui.MainWindow
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
 
-            viewModel.RenameListViewModel.CellStatusHint = StyledTextDisplay.FromPlain(
-                "Full File Name: alpha.txt"
-            );
+            viewModel.RenameListViewModel.CellStatusHint = StyledTextDisplay.FromPlain("Full File Name: alpha.txt");
 
             await viewModel
                 .RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("alpha", "renamed")))

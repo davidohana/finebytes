@@ -180,11 +180,8 @@
       <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
       <Setter Property="FontStyle" Value="Italic" />
     </Style>
-    <!-- Manual override (blue) wins over preview-changed (red). -->
+    <!-- Manual override (blue) wins over preview-changed (red). Selected uses the same brush. -->
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-preview-changed">
-      <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
-    </Style>
-    <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-preview-changed">
       <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-manual-override">

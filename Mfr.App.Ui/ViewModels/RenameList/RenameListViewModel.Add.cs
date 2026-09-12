@@ -83,7 +83,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var insertAt = _ResolveInsertAt();
             SetDropMarkIndex(null);
             var oldCount = _renameList.RenameItems.Count;
-            LastStatusMessage = StyledTextDisplay.Empty;
 
             var addMode = AddMode;
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;

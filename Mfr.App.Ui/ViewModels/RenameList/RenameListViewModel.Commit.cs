@@ -18,6 +18,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <see langword="true"/> when the commit stage was reached; <see langword="false"/> when GO was refused,
         /// preview was canceled, or the preview-error warning was declined.
         /// </returns>
+        /// <remarks>
+        /// Does not clear <see cref="LastStatusMessage"/> at start — cancel / decline keep the prior sticky status
+        /// until an outcome publishes (or <c>Clear</c> / locate success wipe intentionally).
+        /// </remarks>
         public async Task<bool> GoAsync(FilterChain chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
@@ -27,7 +31,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            LastStatusMessage = StyledTextDisplay.Empty;
             _renameList.ClearCommitErrors();
             _RefreshFieldDisplay();
 

@@ -208,7 +208,7 @@ ______________________________________________________________________
 | **15** GO                    | `Ctrl+G` → Commit; plum apply errors; Show Rename Error  | 14d overrides in commit path |
 | **16** Color legend          | Toolbar toggle + side panel                              | 14d blue + 15 plum           |
 
-**Focused-cell chrome (done, MFR7 parity):** light-blue `DataGridCell:current` fill (`RenameListFocusedCellBrush`) so the current column is visible inside the selected row. Not a full-column wash; omit from Phase 16 legend (MFR7 Legend omits focus too).
+**Focused-cell chrome (done, MFR7 parity):** amber `DataGridCell:current` fill (`RenameListFocusedCellBrush`) so the current column is visible inside the selected row. Not a full-column wash; omit from Phase 16 legend (MFR7 Legend omits focus too).
 
 ______________________________________________________________________
 

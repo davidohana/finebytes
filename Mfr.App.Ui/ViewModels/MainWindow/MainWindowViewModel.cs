@@ -448,9 +448,13 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Applies a status message to the status-bar hint (last write wins). Empty clears the bar.
+        /// Applies a non-empty pane status to the status-bar hint (last write wins).
         /// </summary>
         /// <param name="message">Status published by Applied Filters or File List.</param>
+        /// <remarks>
+        /// Empty is ignored so producers can reset their property without wiping the bar.
+        /// Rename List assigns <see cref="StatusHint"/> directly (including Empty) so Clear can wipe.
+        /// </remarks>
         private void _ApplyStatusHintIfPresent(StyledTextDisplay message)
         {
             if (message.IsEmpty)
