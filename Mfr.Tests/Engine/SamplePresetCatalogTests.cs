@@ -221,6 +221,30 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies duplicate-type sample steps ship meaningful names (no catalog <c>(2)</c> suffixes).
+        /// </summary>
+        [Fact]
+        public void Duplicate_type_samples_use_meaningful_step_names()
+        {
+            var bracketJunk = _Preset("Strip Bracket Junk");
+            Assert.Equal(
+                ["Strip Round Parentheses", "Strip Square Brackets", null, null, null],
+                bracketJunk.Chain.Steps.Select(step => step.Name)
+            );
+
+            var artistTrackTitle = _Preset("Artist - Track - Title");
+            Assert.Equal(
+                ["Track Number", "Pad Track Number", "Append Title", "Prepend Artist"],
+                artistTrackTitle.Chain.Steps.Select(step => step.Name)
+            );
+
+            Assert.All(
+                SamplePresetCatalog.Presets.SelectMany(preset => preset.Chain.Steps),
+                step => Assert.DoesNotContain("(2)", step.Name ?? string.Empty, StringComparison.Ordinal)
+            );
+        }
+
+        /// <summary>
         /// Verifies the Tags from Filename sample wipes ID3 blocks, maps named tokens, and writes track count.
         /// </summary>
         [Fact]

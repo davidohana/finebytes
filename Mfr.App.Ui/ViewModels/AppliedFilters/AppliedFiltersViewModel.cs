@@ -722,16 +722,24 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             return new FilterChain
             {
-                Steps = [.. Steps.Select(step => new FilterChainStep(step.Enabled, step.Filter))],
+                Steps =
+                [
+                    .. Steps.Select(step => new FilterChainStep(
+                        step.Enabled,
+                        step.Filter,
+                        Name: step.DisplayName
+                    )),
+                ],
             };
         }
 
         /// <summary>
         /// Replaces the Applied Filters stack from a preset or session chain.
         /// <para>
-        /// Clears existing steps, rebuilds from <paramref name="chain"/>, synthesizes catalog display names
-        /// (custom Filter Options names do not round-trip), copies each step’s <c>Enabled</c> flag, raises
-        /// <see cref="ChainChanged"/> once, and selects the first step when any exist.
+        /// Clears existing steps, rebuilds from <paramref name="chain"/>, restores each step’s
+        /// <see cref="FilterChainStep.Name"/> when set (otherwise synthesizes a catalog display name),
+        /// copies each step’s <c>Enabled</c> flag, raises <see cref="ChainChanged"/> once, and selects
+        /// the first step when any exist.
         /// </para>
         /// </summary>
         /// <param name="chain">Source chain (always replaces; never merges).</param>
@@ -751,7 +759,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 foreach (var chainStep in chain.Steps)
                 {
                     var entry = _CatalogEntryFor(chainStep.Filter);
-                    var displayName = _GenerateCatalogDisplayName(entry);
+                    var displayName = _ResolveDisplayName(chainStep.Name, entry);
                     var step = new AppliedFilterStepViewModel(displayName, chainStep.Filter)
                     {
                         Enabled = chainStep.Enabled,
@@ -930,6 +938,22 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             var firstSelectedIndex = _FindFirstSelectedIndex(_selectedSteps.ToHashSet());
             return firstSelectedIndex >= 0 ? firstSelectedIndex : Steps.Count;
+        }
+
+        /// <summary>
+        /// Uses a stored step name when present; otherwise synthesizes a catalog label.
+        /// </summary>
+        /// <param name="storedName">Optional name from <see cref="FilterChainStep.Name"/>.</param>
+        /// <param name="entry">Catalog entry for the filter type.</param>
+        /// <returns>List label for the new step.</returns>
+        private string _ResolveDisplayName(string? storedName, FilterCatalogEntry entry)
+        {
+            if (!string.IsNullOrWhiteSpace(storedName))
+            {
+                return storedName.Trim();
+            }
+
+            return _GenerateCatalogDisplayName(entry);
         }
 
         /// <summary>

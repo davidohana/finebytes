@@ -318,6 +318,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.False(chain.Steps[1].Enabled);
             Assert.IsType<ShrinkSpacesFilter>(chain.Steps[0].Filter);
             Assert.IsType<LettersCaseFilter>(chain.Steps[1].Filter);
+            Assert.Equal("Shrink Spaces", chain.Steps[0].Name);
+            Assert.Equal("Letters Case", chain.Steps[1].Name);
         }
 
         /// <summary>
@@ -719,8 +721,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
         /// <summary>
         /// Verifies <see cref="AppliedFiltersViewModel.ReplaceFromChain"/> rebuilds steps, copies enabled flags,
-        /// uses catalog display names, selects the first step, raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once,
-        /// and does not set <see cref="AppliedFiltersViewModel.LastLoaded"/> (preset load sets last-loaded after replace).
+        /// uses catalog display names when step names are omitted, selects the first step, raises
+        /// <see cref="AppliedFiltersViewModel.ChainChanged"/> once, and does not set
+        /// <see cref="AppliedFiltersViewModel.LastLoaded"/> (preset load sets last-loaded after replace).
         /// </summary>
         [Fact]
         public void ReplaceFromChain_Rebuilds_With_Catalog_Names_And_Single_ChainChanged()
@@ -754,6 +757,29 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Same(letters, viewModel.Steps[0].Filter);
             Assert.Same(shrink, viewModel.Steps[1].Filter);
             Assert.Null(viewModel.LastLoaded);
+        }
+
+        /// <summary>
+        /// Verifies stored <see cref="FilterChainStep.Name"/> values replace catalog labels on load and round-trip
+        /// through <see cref="AppliedFiltersViewModel.ToChain"/>.
+        /// </summary>
+        [Fact]
+        public void ReplaceFromChain_Uses_Stored_Step_Names()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            var chain = new FilterChain
+            {
+                Steps =
+                [
+                    new FilterChainStep(Enabled: true, Filter: new LettersCaseFilter(), Name: "Round Brackets"),
+                    new FilterChainStep(Enabled: true, Filter: new LettersCaseFilter(), Name: "Square Brackets"),
+                ],
+            };
+
+            viewModel.ReplaceFromChain(chain);
+
+            Assert.Equal(["Round Brackets", "Square Brackets"], viewModel.Steps.Select(step => step.DisplayName));
+            Assert.Equal(["Round Brackets", "Square Brackets"], viewModel.ToChain().Steps.Select(step => step.Name));
         }
 
         /// <summary>

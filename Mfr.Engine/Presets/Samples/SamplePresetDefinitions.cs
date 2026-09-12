@@ -217,7 +217,7 @@ namespace Mfr.Engine.Presets.Samples
                 name: "Artist - Track - Title",
                 description: "Set track titles for MP3 files from ID3 tag.\nFormat: Artist - Track Number - Track Title.mp3",
                 chain: _Chain(
-                    _On(new FormatterFilter(FilePrefix, new FormatterOptions("<audio-track>"))),
+                    _On(new FormatterFilter(FilePrefix, new FormatterOptions("<audio-track>")), "Track Number"),
                     _On(
                         new FixLeadingZerosFilter(
                             FilePrefix,
@@ -227,7 +227,8 @@ namespace Mfr.Engine.Presets.Samples
                                 MaxCount: 1,
                                 WholeWordOnly: true
                             )
-                        )
+                        ),
+                        "Pad Track Number"
                     ),
                     _On(
                         new InserterFilter(
@@ -238,7 +239,8 @@ namespace Mfr.Engine.Presets.Samples
                                 StartFrom: InserterOrigin.End,
                                 Overwrite: false
                             )
-                        )
+                        ),
+                        "Append Title"
                     ),
                     _On(
                         new InserterFilter(
@@ -249,7 +251,8 @@ namespace Mfr.Engine.Presets.Samples
                                 StartFrom: InserterOrigin.Beginning,
                                 Overwrite: false
                             )
-                        )
+                        ),
+                        "Prepend Artist"
                     )
                 ),
                 columns:
@@ -467,13 +470,15 @@ namespace Mfr.Engine.Presets.Samples
                         new StripParenthesesFilter(
                             FilePrefix,
                             new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
-                        )
+                        ),
+                        "Strip Round Parentheses"
                     ),
                     _On(
                         new StripParenthesesFilter(
                             FilePrefix,
                             new StripParenthesesOptions(Type: ParenthesisType.Square, RemoveContents: true)
-                        )
+                        ),
+                        "Strip Square Brackets"
                     ),
                     _On(new ShrinkSpacesFilter(FilePrefix)),
                     _On(new StripSpacesRightFilter(FilePrefix)),
@@ -533,14 +538,14 @@ namespace Mfr.Engine.Presets.Samples
             return new FilterChain { Steps = steps };
         }
 
-        private static FilterChainStep _On(BaseFilter filter)
+        private static FilterChainStep _On(BaseFilter filter, string? name = null)
         {
-            return new FilterChainStep(Enabled: true, Filter: filter);
+            return new FilterChainStep(Enabled: true, Filter: filter, Name: name);
         }
 
-        private static FilterChainStep _Off(BaseFilter filter)
+        private static FilterChainStep _Off(BaseFilter filter, string? name = null)
         {
-            return new FilterChainStep(Enabled: false, Filter: filter);
+            return new FilterChainStep(Enabled: false, Filter: filter, Name: name);
         }
 
         private static RenameListVisibleColumnSpec _Basic(string propertyKey, bool preview, int width)
