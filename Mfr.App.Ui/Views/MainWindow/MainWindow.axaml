@@ -453,34 +453,44 @@
     </Menu>
 
     <Border DockPanel.Dock="Top" Padding="4,2">
+      <Border.Styles>
+        <!-- Room around opaque toolbar glyphs (e.g. Options) so hover chrome is visible. -->
+        <Style Selector="Button.rename-list-action">
+          <Setter Property="Width" Value="32" />
+          <Setter Property="Height" Value="32" />
+          <Setter Property="MinWidth" Value="32" />
+          <Setter Property="MinHeight" Value="32" />
+          <Setter Property="Padding" Value="4" />
+        </Style>
+      </Border.Styles>
       <StackPanel Orientation="Horizontal" Spacing="4">
         <Button
           Classes="rename-list-action"
           Command="{Binding GoCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.Go}"
         >
-          <Image Width="24" Height="24" Stretch="Uniform" Source="/Assets/Go.png" />
+          <Image Width="20" Height="20" Stretch="Uniform" Source="/Assets/Go.png" />
         </Button>
         <Button
           Classes="rename-list-action"
           Command="{Binding UndoLastCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.UndoLast}"
         >
-          <Image Width="24" Height="24" Stretch="None" Source="/Assets/Undo.png" />
+          <Image Width="20" Height="20" Stretch="Uniform" Source="/Assets/Undo.png" />
         </Button>
         <Button
           Classes="rename-list-action"
           Command="{Binding ShowLogCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.ShowLog}"
         >
-          <Image Width="24" Height="24" Stretch="None" Source="/Assets/Log.png" />
+          <Image Width="20" Height="20" Stretch="Uniform" Source="/Assets/Log.png" />
         </Button>
         <Button
           Classes="rename-list-action"
           Command="{Binding ShowOptionsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.ShowOptions}"
         >
-          <Image Width="24" Height="24" Stretch="None" Source="/Assets/Options.png" />
+          <Image Width="20" Height="20" Stretch="Uniform" Source="/Assets/Options.png" />
         </Button>
       </StackPanel>
     </Border>
