@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Models.Filters;
-using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels.Presets
 {
@@ -199,14 +198,26 @@ namespace Mfr.App.Ui.ViewModels.Presets
 
         private bool _CanMoveSelectedUp()
         {
-            return _selectedPresets.Count > 0
-                && ListReorder.CanMoveSelectedTowardNeighbor(Presets, _selectedPresets.ToHashSet(), offset: -1);
+            return _CanMoveSelected(offset: -1);
         }
 
         private bool _CanMoveSelectedDown()
         {
-            return _selectedPresets.Count > 0
-                && ListReorder.CanMoveSelectedTowardNeighbor(Presets, _selectedPresets.ToHashSet(), offset: 1);
+            return _CanMoveSelected(offset: 1);
+        }
+
+        /// <summary>
+        /// Whether the current selection can move one step on the engine list (not the UI mirror).
+        /// </summary>
+        private bool _CanMoveSelected(int offset)
+        {
+            if (_selectedPresets.Count == 0)
+            {
+                return false;
+            }
+
+            var names = _selectedPresets.Select(preset => preset.Name).ToList();
+            return _appliedFilters.PresetManager.CanMoveSelectedTowardNeighbor(names, offset);
         }
 
         private void _NotifySelectionCommandsChanged()

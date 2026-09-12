@@ -288,6 +288,10 @@ namespace Mfr.Engine.Presets
         /// <summary>
         /// Finds the list index of the preset with <paramref name="name"/>.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the name is in <see cref="NameToPreset"/> but missing from <see cref="Presets"/>
+        /// (list/lookup invariant broken).
+        /// </exception>
         private int _IndexOfName(string name)
         {
             for (var index = 0; index < _presets.Count; index++)
@@ -298,7 +302,9 @@ namespace Mfr.Engine.Presets
                 }
             }
 
-            return -1;
+            throw new InvalidOperationException(
+                $"Preset '{name}' is in the name lookup but missing from the ordered list."
+            );
         }
     }
 

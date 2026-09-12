@@ -126,7 +126,8 @@ namespace Mfr.Tests.Engine
         public void Catalog_enabled_portable_filters_complete_setup()
         {
             var filters = SamplePresetCatalog
-                .Presets.SelectMany(preset => preset.Chain.Steps)
+                .Presets.Select(SamplePresetCatalog.CreateIndependentCopy)
+                .SelectMany(preset => preset.Chain.Steps)
                 .Where(step => step.Enabled)
                 .Select(step => step.Filter)
                 .Where(filter => filter is not PathMoverFilter);
@@ -141,7 +142,8 @@ namespace Mfr.Tests.Engine
         public void Catalog_enabled_path_movers_complete_setup()
         {
             var pathMovers = SamplePresetCatalog
-                .Presets.SelectMany(preset => preset.Chain.Steps)
+                .Presets.Select(SamplePresetCatalog.CreateIndependentCopy)
+                .SelectMany(preset => preset.Chain.Steps)
                 .Where(step => step.Enabled)
                 .Select(step => step.Filter)
                 .OfType<PathMoverFilter>();
@@ -245,9 +247,27 @@ namespace Mfr.Tests.Engine
             trackCount.Setup();
         }
 
+        /// <summary>
+        /// Verifies <see cref="SamplePresetCatalog.CreateIndependentCopy"/> does not share filter instances.
+        /// </summary>
+        [Fact]
+        public void CreateIndependentCopy_Does_Not_Alias_Catalog_Filters()
+        {
+            var template = SamplePresetCatalog.Presets[0];
+            var copy = SamplePresetCatalog.CreateIndependentCopy(template);
+
+            Assert.Equal(template.Name, copy.Name);
+            Assert.Equal(template.Id, copy.Id);
+            Assert.NotSame(template, copy);
+            Assert.NotSame(template.Chain, copy.Chain);
+            Assert.NotSame(template.Chain.Steps[0].Filter, copy.Chain.Steps[0].Filter);
+        }
+
         private static FilterPreset _Preset(string name)
         {
-            return Assert.Single(SamplePresetCatalog.Presets, preset => preset.Name == name);
+            return SamplePresetCatalog.CreateIndependentCopy(
+                Assert.Single(SamplePresetCatalog.Presets, preset => preset.Name == name)
+            );
         }
     }
 }

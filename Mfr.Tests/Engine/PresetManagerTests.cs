@@ -280,6 +280,39 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies CanMoveSelectedTowardNeighbor matches whether a neighbor swap is possible.
+        /// </summary>
+        public void CanMoveSelectedTowardNeighbor_Matches_Edge()
+        {
+            var manager = PresetManager.CreateEmpty();
+            manager.Upsert(_CreatePreset("A"));
+            manager.Upsert(_CreatePreset("B"));
+            manager.Upsert(_CreatePreset("C"));
+
+            Assert.False(manager.CanMoveSelectedTowardNeighbor(["A"], offset: -1));
+            Assert.True(manager.CanMoveSelectedTowardNeighbor(["A"], offset: 1));
+            Assert.False(manager.CanMoveSelectedTowardNeighbor(["A", "B", "C"], offset: 1));
+            Assert.False(manager.CanMoveSelectedTowardNeighbor([], offset: 1));
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies TryRename refuses a name already used by another preset.
+        /// </summary>
+        public void TryRename_Throws_When_Name_Taken()
+        {
+            var manager = PresetManager.CreateEmpty();
+            manager.Upsert(_CreatePreset("A"));
+            manager.Upsert(_CreatePreset("B"));
+
+            var renamed = manager.NameToPreset["A"] with { Name = "B" };
+            Assert.Throws<InvalidOperationException>(() => manager.TryRename("A", renamed));
+            Assert.True(manager.NameToPreset.ContainsKey("A"));
+            Assert.True(manager.NameToPreset.ContainsKey("B"));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies <see cref="PresetManager.OpenOrCreate"/> writes an empty file when missing, then loads.
         /// </summary>
         public void OpenOrCreate_Creates_Empty_File_When_Missing()

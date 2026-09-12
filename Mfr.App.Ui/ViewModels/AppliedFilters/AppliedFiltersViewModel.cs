@@ -184,7 +184,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                     continue;
                 }
 
-                PresetManager.Upsert(sample);
+                PresetManager.Upsert(SamplePresetCatalog.CreateIndependentCopy(sample));
                 addedCount++;
             }
 

@@ -898,6 +898,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Same(existing, manager.NameToPreset[existing.Name]);
             Assert.Equal("user-owned", manager.NameToPreset[existing.Name].Description);
             Assert.True(manager.NameToPreset.ContainsKey(sampleNames[1]));
+            Assert.NotSame(SamplePresetCatalog.Presets[1], manager.NameToPreset[sampleNames[1]]);
 
             var reloaded = new PresetManager(manager.PresetsFilePath);
             reloaded.LoadPresets();
@@ -1204,6 +1205,81 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Same(keep, viewModel.LastLoaded);
             Assert.False(manager.NameToPreset.ContainsKey("Gone"));
+        }
+
+        /// <summary>
+        /// Verifies multi-delete persists once and clears last-loaded when it is among the deleted names.
+        /// </summary>
+        [Fact]
+        public void DeletePresets_Clears_LastLoaded_And_Persists_Once()
+        {
+            var manager = PresetManager.CreateEmpty();
+            var keep = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "Keep",
+                Chain = new FilterChain { Steps = [] },
+            };
+            var goneA = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "GoneA",
+                Chain = new FilterChain { Steps = [] },
+            };
+            var goneB = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "GoneB",
+                Chain = new FilterChain { Steps = [] },
+            };
+            manager.Upsert(keep);
+            manager.Upsert(goneA);
+            manager.Upsert(goneB);
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            viewModel.SetLastLoaded(goneA);
+
+            Assert.Equal(2, viewModel.DeletePresets(["GoneA", "GoneB", "GoneA", "Missing"]));
+
+            Assert.Null(viewModel.LastLoaded);
+            Assert.Equal(["Keep"], manager.Presets.Select(preset => preset.Name));
+
+            var reloaded = new PresetManager(manager.PresetsFilePath);
+            reloaded.LoadPresets();
+            Assert.Equal(["Keep"], reloaded.Presets.Select(preset => preset.Name));
+        }
+
+        /// <summary>
+        /// Verifies preset neighbor moves and index moves persist through the Applied Filters façade.
+        /// </summary>
+        [Fact]
+        public void TryMovePresets_Reorders_And_Persists()
+        {
+            var manager = PresetManager.CreateEmpty();
+            manager.Upsert(_NamedPreset("A"));
+            manager.Upsert(_NamedPreset("B"));
+            manager.Upsert(_NamedPreset("C"));
+            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+
+            Assert.True(viewModel.TryMovePresetsTowardNeighbor(["A", "B"], offset: 1));
+            Assert.Equal(["C", "A", "B"], manager.Presets.Select(preset => preset.Name));
+
+            Assert.True(viewModel.TryMovePresetsTo([0], targetIndex: 3, out var newIndices));
+            Assert.Equal([2], newIndices);
+            Assert.Equal(["A", "B", "C"], manager.Presets.Select(preset => preset.Name));
+
+            var reloaded = new PresetManager(manager.PresetsFilePath);
+            reloaded.LoadPresets();
+            Assert.Equal(["A", "B", "C"], reloaded.Presets.Select(preset => preset.Name));
+        }
+
+        private static FilterPreset _NamedPreset(string name)
+        {
+            return new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Chain = new FilterChain { Steps = [] },
+            };
         }
 
         /// <summary>
