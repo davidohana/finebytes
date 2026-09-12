@@ -63,10 +63,11 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
         private void _OnListPointerReleased(object? sender, PointerReleasedEventArgs e)
         {
+            // Explorer: press on a multi-selected row without dragging collapses to that row on release.
             _dragSession.OnReleased(
-                (listBox, snapshot, hit) =>
+                (listBox, _, hit) =>
                 {
-                    _RestoreListSelection(listBox, snapshot, hit);
+                    _RestoreListSelection(listBox, [hit], hit);
                     _viewModel?.SetSelectedSteps(_ReadSelectedSteps(listBox));
                 }
             );
