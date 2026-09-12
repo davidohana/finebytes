@@ -10,7 +10,7 @@ using Mfr.Models.Filters;
 namespace Mfr.App.Ui.Views.Presets
 {
     /// <summary>
-    /// Modal Preset Manager: load, delete, and rename named presets.
+    /// Modal Preset Manager: load, delete, rename, and reorder named presets.
     /// <para>
     /// Closes with <see langword="true"/> after a successful Load; <see langword="false"/> when closed
     /// without loading.
@@ -29,12 +29,13 @@ namespace Mfr.App.Ui.Views.Presets
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
+            _WireSelectionHandlers();
         }
 
         /// <summary>
         /// Initializes the dialog with list state and the shared host load path.
         /// </summary>
-        /// <param name="viewModel">Sorted preset list and selection.</param>
+        /// <param name="viewModel">Ordered preset list and multi-selection.</param>
         /// <param name="appliedFilters">Pane that mutates presets and the Applied Filters chain.</param>
         /// <param name="tryLoadAsync">
         /// Shared load path (confirm → replace → optional columns). Returns <see langword="true"/> on success.
@@ -132,16 +133,17 @@ namespace Mfr.App.Ui.Views.Presets
         }
 
         /// <summary>
-        /// Runs the shared host load path for the selection and closes OK on success.
+        /// Runs the shared host load path for the sole selection and closes OK on success.
         /// </summary>
         /// <returns>A task that completes when load UI finishes (success, cancel, or error dialog).</returns>
         private async Task _TryLoadSelectedAsync()
         {
-            if (_ViewModel?.SelectedPreset is not { } preset || _tryLoadAsync is null)
+            if (_ViewModel is not { HasSingleSelection: true } || _tryLoadAsync is null)
             {
                 return;
             }
 
+            var preset = _ViewModel.SelectedPresets[0];
             if (!await _tryLoadAsync(preset))
             {
                 return;
@@ -152,15 +154,18 @@ namespace Mfr.App.Ui.Views.Presets
 
         private async void _OnDeleteClick(object? sender, RoutedEventArgs e)
         {
-            if (_ViewModel?.SelectedPreset is not { } preset || _appliedFilters is null)
+            if (_ViewModel is not { HasSelection: true } || _appliedFilters is null)
             {
                 return;
             }
 
-            var confirm = new ConfirmMessageDialog(
-                "Delete Preset",
-                $"Delete preset '{preset.Name}'? This cannot be undone."
-            );
+            var names = _ViewModel.SelectedPresets.Select(preset => preset.Name).ToList();
+            var title = names.Count == 1 ? "Delete Preset" : "Delete Presets";
+            var message =
+                names.Count == 1
+                    ? $"Delete preset '{names[0]}'? This cannot be undone."
+                    : $"Delete {names.Count} presets? This cannot be undone.";
+            var confirm = new ConfirmMessageDialog(title, message);
             if (await confirm.ShowDialog<bool?>(this) != true)
             {
                 return;
@@ -168,22 +173,23 @@ namespace Mfr.App.Ui.Views.Presets
 
             try
             {
-                _appliedFilters.DeletePreset(preset.Name);
+                _appliedFilters.DeletePresets(names);
                 _ViewModel.Refresh();
             }
             catch (Exception ex)
             {
-                await _ShowErrorAsync("Delete Preset", ex);
+                await _ShowErrorAsync(title, ex);
             }
         }
 
         private async void _OnRenameClick(object? sender, RoutedEventArgs e)
         {
-            if (_ViewModel?.SelectedPreset is not { } preset || _appliedFilters is null)
+            if (_ViewModel is not { HasSingleSelection: true } || _appliedFilters is null)
             {
                 return;
             }
 
+            var preset = _ViewModel.SelectedPresets[0];
             var prompt = new TextInputPrompt
             {
                 Title = "Rename Preset",

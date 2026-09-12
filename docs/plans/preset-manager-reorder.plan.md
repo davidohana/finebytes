@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-multi-select-move
     content: P2 — Manager multi-select, Up/Down, batch delete; Manager+▾(+Save) use stored order
-    status: pending
+    status: completed
   - id: p3-dnd
     content: P3 — Manager ListBox DnD reorder (ListBoxDragSession/DropMark) + headless tests
     status: pending

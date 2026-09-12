@@ -58,10 +58,10 @@ namespace Mfr.Tests.Ui.Presets
         }
 
         /// <summary>
-        /// Verifies clicking ▾ opens the flyout with sorted preset names.
+        /// Verifies clicking ▾ opens the flyout with presets in stored order.
         /// </summary>
         [AvaloniaFact]
-        public void QuickPick_Click_Opens_Sorted_Items()
+        public void QuickPick_Click_Opens_Stored_Order_Items()
         {
             var manager = PresetManager.CreateEmpty();
             foreach (var name in new[] { "beta", "Alpha", "alpha2" })
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Ui.Presets
 
             Assert.True(flyout.IsOpen);
             Assert.Equal(
-                ["Alpha", "alpha2", "beta"],
+                ["beta", "Alpha", "alpha2"],
                 flyout.Items.OfType<MenuItem>().Select(item => item.Header?.ToString()).ToList()
             );
 

@@ -116,10 +116,10 @@ namespace Mfr.Tests.Ui.Presets
         }
 
         /// <summary>
-        /// Verifies existing preset names are exposed sorted for the Name suggestions list.
+        /// Verifies existing preset names keep the caller’s order for the Name suggestions list.
         /// </summary>
         [Fact]
-        public void ExistingNames_Are_Sorted()
+        public void ExistingNames_Keep_Caller_Order()
         {
             var presets = new[]
             {
@@ -145,7 +145,7 @@ namespace Mfr.Tests.Ui.Presets
 
             var viewModel = new SavePresetDialogViewModel(existingPresets: presets);
 
-            Assert.Equal(["Alpha", "alpha2", "beta"], viewModel.ExistingNames);
+            Assert.Equal(["beta", "Alpha", "alpha2"], viewModel.ExistingNames);
         }
 
         /// <summary>

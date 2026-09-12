@@ -50,7 +50,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Rebuilds the ▾ quick-pick menu with sorted preset names (or a disabled empty placeholder).
+        /// Rebuilds the ▾ quick-pick menu in stored preset order (or a disabled empty placeholder).
         /// </summary>
         /// <param name="flyout">Quick-pick flyout to refill.</param>
         private void _RebuildPresetsQuickPick(MenuFlyout flyout)
@@ -62,7 +62,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            var presets = PresetNameOrder.ByName(_viewModel.PresetManager.NameToPreset.Values).ToList();
+            var presets = _viewModel.PresetManager.Presets;
             if (presets.Count == 0)
             {
                 _AddNoPresetsPlaceholder(flyout);
@@ -187,7 +187,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
             var dialogVm = new SavePresetDialogViewModel(
                 _viewModel.LastLoaded,
-                existingPresets: _viewModel.PresetManager.NameToPreset.Values,
+                existingPresets: _viewModel.PresetManager.Presets,
                 prefillFromLastLoaded: _viewModel.Steps.Count > 0
             );
             var dialog = new SavePresetDialog(dialogVm);

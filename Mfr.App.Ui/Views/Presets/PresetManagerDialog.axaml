@@ -56,7 +56,7 @@
         x:Name="LoadButton"
         Classes="message-dialog-footer"
         Content="Load"
-        IsEnabled="{Binding HasSelection}"
+        IsEnabled="{Binding HasSingleSelection}"
         Click="_OnLoadClick"
       />
       <Button
@@ -70,8 +70,20 @@
         x:Name="RenameButton"
         Classes="message-dialog-footer"
         Content="Rename"
-        IsEnabled="{Binding HasSelection}"
+        IsEnabled="{Binding HasSingleSelection}"
         Click="_OnRenameClick"
+      />
+      <Button
+        x:Name="MoveUpButton"
+        Classes="message-dialog-footer"
+        Content="Up"
+        Command="{Binding MoveSelectedUpCommand}"
+      />
+      <Button
+        x:Name="MoveDownButton"
+        Classes="message-dialog-footer"
+        Content="Down"
+        Command="{Binding MoveSelectedDownCommand}"
       />
       <Button
         x:Name="CloseButton"
@@ -90,8 +102,8 @@
         Grid.Row="1"
         Grid.Column="0"
         Classes="preset-manager-list"
+        SelectionMode="Multiple"
         ItemsSource="{Binding Presets}"
-        SelectedItem="{Binding SelectedPreset}"
         DoubleTapped="_OnPresetsListDoubleTapped"
         KeyDown="_OnPresetsListKeyDown"
       >

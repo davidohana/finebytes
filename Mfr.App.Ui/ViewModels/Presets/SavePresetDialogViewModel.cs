@@ -32,7 +32,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         {
             var presets = existingPresets?.ToList() ?? [];
             _nameToPreset = presets.ToDictionary(preset => preset.Name, StringComparer.Ordinal);
-            ExistingNames = [.. PresetNameOrder.ByName(presets).Select(preset => preset.Name)];
+            ExistingNames = [.. presets.Select(preset => preset.Name)];
 
             if (lastLoaded is null || !prefillFromLastLoaded)
             {
@@ -45,7 +45,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         }
 
         /// <summary>
-        /// Gets sorted existing preset names for the Name suggestions list.
+        /// Gets existing preset names for the Name suggestions list (caller order).
         /// </summary>
         public IReadOnlyList<string> ExistingNames { get; }
 
