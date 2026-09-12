@@ -177,8 +177,12 @@
       <Setter Property="Margin" Value="{StaticResource DataGridTextColumnCellTextBlockMargin}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-load-error">
-      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+      <!-- Same gray as missing-on-disk / Color Legend "Value Error". -->
+      <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
       <Setter Property="FontStyle" Value="Italic" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-load-error">
+      <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskSelectedForegroundBrush}" />
     </Style>
     <!-- Manual override (blue) wins over preview-changed (red). Selected uses the same brush. -->
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-preview-changed">
@@ -451,7 +455,12 @@
             <TextBlock Text="Manual Override" Foreground="{DynamicResource RenameListManualOverrideForegroundBrush}" />
           </Border>
           <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendValueError}">
-            <TextBlock Text="Value Error" Foreground="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
+            <!-- Same em dash + italic gray as load-error / missing cells (MFR7 Value Error). -->
+            <TextBlock
+              Text="—  Value Error"
+              FontStyle="Italic"
+              Foreground="{DynamicResource RenameListMissingOnDiskForegroundBrush}"
+            />
           </Border>
           <Border
             Classes="rename-list-legend-swatch"

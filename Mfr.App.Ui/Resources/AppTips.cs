@@ -91,8 +91,9 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Color legend: Manual Override swatch (blue text).</summary>
         public const string LegendManualOverride = "Value was set with Manual Override (F2) — used on GO";
 
-        /// <summary>Color legend: Value Error swatch (gray text).</summary>
-        public const string LegendValueError = "Field could not be loaded, or the item is missing on disk";
+        /// <summary>Color legend: Value Error swatch (gray italic em dash).</summary>
+        public const string LegendValueError =
+            "Gray italic — means load failed or the item is missing on disk";
 
         /// <summary>Color legend: Preview Error swatch (lavender row).</summary>
         public const string LegendPreviewError = "Preview failed for this row — ignored on GO; right-click for details";
