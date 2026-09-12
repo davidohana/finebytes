@@ -16,8 +16,7 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="panes">Pane grids for splitter restore.</param>
         /// <param name="session">Loaded session document.</param>
         /// <remarks>
-        /// File List mask fields and Rename List session fields are restored separately via
-        /// <see cref="FileListSessionSnapshot.FromSessionState"/> and pane apply/capture methods.
+        /// File List and Rename List session fields are restored separately via pane apply/capture methods.
         /// </remarks>
         public static void TryRestore(Window window, MainWindowPaneGrids panes, SessionState session)
         {
@@ -42,14 +41,14 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Updates <c>session.json</c>: window/folder when their remember flags are on; masks and Rename List
-        /// always.
+        /// Updates <c>session.json</c>: window/folder when their remember flags are on; File List masks/view
+        /// and Rename List always.
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
         /// <param name="panes">Pane grids for splitter capture.</param>
         /// <param name="session">Live session document to merge into and write.</param>
-        /// <param name="fileListSnapshot">
-        /// File List mask and folder fields to persist, or <see langword="null"/> when unavailable.
+        /// <param name="fileList">
+        /// File List session fields to persist, or <see langword="null"/> when unavailable.
         /// </param>
         /// <param name="renameList">
         /// Rename List session fields, or <see langword="null"/> to leave the saved section unchanged.
@@ -61,7 +60,7 @@ namespace Mfr.App.Ui.Services.Session
             Window window,
             MainWindowPaneGrids panes,
             SessionState session,
-            FileListSessionSnapshot? fileListSnapshot,
+            SessionStateFileList? fileList,
             SessionStateRenameList? renameList = null,
             string? sessionFilePath = null
         )
@@ -83,29 +82,25 @@ namespace Mfr.App.Ui.Services.Session
                     session.MainWindow = captured;
                 }
 
-                if (fileListSnapshot is not null)
+                if (fileList is not null)
                 {
-                    var fileList = session.EnsureFileList();
-                    fileList.RememberLastFolder = rememberLastFolder;
+                    var saved = session.EnsureFileList();
+                    saved.RememberLastFolder = rememberLastFolder;
 
-                    if (rememberLastFolder && _IsPersistableFolder(fileListSnapshot.LastOpenedDirectory))
+                    if (rememberLastFolder && _IsPersistableFolder(fileList.LastOpenedDirectory))
                     {
-                        fileList.LastOpenedDirectory = fileListSnapshot.LastOpenedDirectory;
+                        saved.LastOpenedDirectory = fileList.LastOpenedDirectory;
                     }
 
-                    fileList.FileMask = fileListSnapshot.FileMask;
+                    saved.FileMask = fileList.FileMask;
 
-                    fileList.ExcludeMasks = fileListSnapshot.ExcludeMasks is null
-                        ? null
-                        : [.. fileListSnapshot.ExcludeMasks];
+                    saved.ExcludeMasks = fileList.ExcludeMasks is null ? null : [.. fileList.ExcludeMasks];
 
-                    fileList.ExcludeMasksEnabled = fileListSnapshot.ExcludeMasksEnabled;
+                    saved.ExcludeMasksEnabled = fileList.ExcludeMasksEnabled;
 
-                    fileList.MaskSuggestions = fileListSnapshot.MaskSuggestions is null
-                        ? null
-                        : [.. fileListSnapshot.MaskSuggestions];
+                    saved.MaskSuggestions = fileList.MaskSuggestions is null ? null : [.. fileList.MaskSuggestions];
 
-                    fileList.ViewMode = fileListSnapshot.ViewMode;
+                    saved.ViewMode = fileList.ViewMode;
                 }
 
                 if (renameList is not null)

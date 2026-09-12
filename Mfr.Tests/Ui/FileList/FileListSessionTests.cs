@@ -1,5 +1,4 @@
 using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Models.Config;
@@ -7,9 +6,9 @@ using Mfr.Models.Config;
 namespace Mfr.Tests.Ui.FileList
 {
     /// <summary>
-    /// Tests File List session snapshot apply and capture round-trips.
+    /// Tests File List session apply and capture round-trips.
     /// </summary>
-    public sealed class FileListSessionSnapshotTests : IDisposable
+    public sealed class FileListSessionTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
         private readonly List<FileListViewModel> _viewModels = [];
@@ -26,23 +25,24 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
-        /// Verifies apply restores mask, exclude masks, and suggestions from a snapshot.
+        /// Verifies apply restores mask, exclude masks, suggestions, and view mode.
         /// </summary>
         [Fact]
         public void ApplySession_Restores_Mask_Exclude_And_Suggestions()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var viewModel = _CreateViewModel(dir);
-            var snapshot = new FileListSessionSnapshot(
-                LastOpenedDirectory: dir,
-                FileMask: "*.wav",
-                ExcludeMasks: ["*.tmp", "*.bak"],
-                ExcludeMasksEnabled: true,
-                MaskSuggestions: ["*.wav", "*.mp3"],
-                ViewMode: FileListViewMode.Tiles
-            );
+            var fileList = new SessionStateFileList
+            {
+                LastOpenedDirectory = dir,
+                FileMask = "*.wav",
+                ExcludeMasks = ["*.tmp", "*.bak"],
+                ExcludeMasksEnabled = true,
+                MaskSuggestions = ["*.wav", "*.mp3"],
+                ViewMode = FileListViewMode.Tiles,
+            };
 
-            viewModel.ApplySession(snapshot);
+            viewModel.ApplySession(fileList);
 
             Assert.Equal("*.wav", viewModel.Mask);
             Assert.True(viewModel.ExcludeMasksEnabled);
@@ -82,28 +82,35 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
-        /// Verifies unset snapshot fields keep File List defaults.
+        /// Verifies unset session fields keep File List defaults.
         /// </summary>
         [Fact]
         public void ApplySession_Unset_Fields_Keep_Defaults()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var viewModel = _CreateViewModel(dir);
-            var snapshot = new FileListSessionSnapshot(
-                LastOpenedDirectory: null,
-                FileMask: null,
-                ExcludeMasks: null,
-                ExcludeMasksEnabled: null,
-                MaskSuggestions: null,
-                ViewMode: null
-            );
 
-            viewModel.ApplySession(snapshot);
+            viewModel.ApplySession(new SessionStateFileList());
 
             Assert.Equal("*", viewModel.Mask);
             Assert.False(viewModel.ExcludeMasksEnabled);
             Assert.Equal(FileListViewModel.DefaultExcludeMasks, viewModel.ExcludeMasks);
             Assert.NotEmpty(viewModel.MaskSuggestions);
+            Assert.Equal(FileListViewMode.Report, viewModel.ViewMode);
+        }
+
+        /// <summary>
+        /// Verifies null session section is a no-op.
+        /// </summary>
+        [Fact]
+        public void ApplySession_Null_Keeps_Defaults()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var viewModel = _CreateViewModel(dir);
+
+            viewModel.ApplySession(null);
+
+            Assert.Equal("*", viewModel.Mask);
             Assert.Equal(FileListViewMode.Report, viewModel.ViewMode);
         }
 
@@ -115,36 +122,18 @@ namespace Mfr.Tests.Ui.FileList
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var viewModel = _CreateViewModel(dir);
-            var snapshot = new FileListSessionSnapshot(
-                LastOpenedDirectory: null,
-                FileMask: "*.txt",
-                ExcludeMasks: [],
-                ExcludeMasksEnabled: false,
-                MaskSuggestions: null,
-                ViewMode: null
-            );
+            var fileList = new SessionStateFileList
+            {
+                FileMask = "*.txt",
+                ExcludeMasks = [],
+                ExcludeMasksEnabled = false,
+            };
 
-            viewModel.ApplySession(snapshot);
+            viewModel.ApplySession(fileList);
 
             Assert.Equal("*.txt", viewModel.Mask);
             Assert.Empty(viewModel.ExcludeMasks);
             Assert.False(viewModel.ExcludeMasksEnabled);
-        }
-
-        /// <summary>
-        /// Verifies session view-mode is copied through FromSessionState.
-        /// </summary>
-        [Fact]
-        public void FromSessionState_Copies_ViewMode()
-        {
-            var session = new SessionState
-            {
-                FileList = new SessionStateFileList { ViewMode = FileListViewMode.Thumbnails },
-            };
-
-            var snapshot = FileListSessionSnapshot.FromSessionState(session);
-
-            Assert.Equal(FileListViewMode.Thumbnails, snapshot.ViewMode);
         }
 
         private FileListViewModel _CreateViewModel(string path)

@@ -4,7 +4,6 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.FilterEditors;
@@ -78,7 +77,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             );
             if (session is not null)
             {
-                FileListViewModel.ApplySession(FileListSessionSnapshot.FromSessionState(session));
+                FileListViewModel.ApplySession(session.FileList);
                 RenameListViewModel.ApplySessionSection(session.RenameList);
             }
 

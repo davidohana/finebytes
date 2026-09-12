@@ -44,7 +44,7 @@ Inside [`Mfr.App.Ui/`](../Mfr.App.Ui), keep dependencies one-way:
 
 `Views → ViewModels → Services → Engine / Models / Utils`
 
-Do not import `ViewModels` (or Views) from `Services`. Session restore/save passes snapshot DTOs across that boundary (`FileListSessionSnapshot`); apply/capture lives on the File List view model. Guarded by `UiServicesLayerArchitectureTests`.
+Do not import `ViewModels` (or Views) from `Services`. Session restore/save passes Models session DTOs (`SessionStateFileList`, `SessionStateRenameList`) across that boundary; apply/capture lives on the pane view models. Guarded by `UiServicesLayerArchitectureTests`.
 
 ViewModels must not import Views. Guarded by `UiViewModelsLayerArchitectureTests`.
 

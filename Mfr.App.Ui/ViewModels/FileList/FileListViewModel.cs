@@ -3,7 +3,6 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
-using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.Engine.Logging;
 using Mfr.Models.Config;
@@ -730,39 +729,42 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
-        /// Restores mask, exclude-mask, suggestion, and view-mode fields from a session snapshot.
+        /// Restores mask, exclude-mask, suggestion, and view-mode fields from session.
         /// </summary>
-        /// <param name="snapshot">Persisted File List session fields.</param>
-        internal void ApplySession(FileListSessionSnapshot snapshot)
+        /// <param name="fileList">Persisted File List section, or <see langword="null"/> to keep defaults.</param>
+        internal void ApplySession(SessionStateFileList? fileList)
         {
-            ArgumentNullException.ThrowIfNull(snapshot);
-
-            if (!string.IsNullOrEmpty(snapshot.FileMask))
+            if (fileList is null)
             {
-                Mask = snapshot.FileMask;
+                return;
+            }
+
+            if (!string.IsNullOrEmpty(fileList.FileMask))
+            {
+                Mask = fileList.FileMask;
             }
 
             // Null means unset: keep the defaults. An empty list means the user cleared them.
-            if (snapshot.ExcludeMasks is not null)
+            if (fileList.ExcludeMasks is not null)
             {
-                ExcludeMasks = [.. snapshot.ExcludeMasks];
+                ExcludeMasks = [.. fileList.ExcludeMasks];
             }
 
-            if (snapshot.ExcludeMasksEnabled is { } excludeEnabled)
+            if (fileList.ExcludeMasksEnabled is { } excludeEnabled)
             {
                 ExcludeMasksEnabled = excludeEnabled;
             }
 
-            if (snapshot.MaskSuggestions is { Count: > 0 })
+            if (fileList.MaskSuggestions is { Count: > 0 })
             {
                 MaskSuggestions.Clear();
-                foreach (var mask in snapshot.MaskSuggestions)
+                foreach (var mask in fileList.MaskSuggestions)
                 {
                     MaskSuggestions.Add(mask);
                 }
             }
 
-            if (snapshot.ViewMode is { } viewMode)
+            if (fileList.ViewMode is { } viewMode)
             {
                 SetViewMode(viewMode);
             }
@@ -771,17 +773,18 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <summary>
         /// Captures current mask, exclude-mask, suggestion, and view-mode fields for session save.
         /// </summary>
-        /// <returns>Snapshot to merge into persisted session state.</returns>
-        internal FileListSessionSnapshot CaptureSession()
+        /// <returns>File List session section matching the current view model.</returns>
+        internal SessionStateFileList CaptureSession()
         {
-            return new FileListSessionSnapshot(
-                LastOpenedDirectory: CurrentPath,
-                FileMask: Mask,
-                ExcludeMasks: [.. ExcludeMasks],
-                ExcludeMasksEnabled: ExcludeMasksEnabled,
-                MaskSuggestions: [.. MaskSuggestions],
-                ViewMode: ViewMode
-            );
+            return new SessionStateFileList
+            {
+                LastOpenedDirectory = CurrentPath,
+                FileMask = Mask,
+                ExcludeMasks = [.. ExcludeMasks],
+                ExcludeMasksEnabled = ExcludeMasksEnabled,
+                MaskSuggestions = [.. MaskSuggestions],
+                ViewMode = ViewMode,
+            };
         }
 
         partial void OnViewModeChanged(FileListViewMode value)

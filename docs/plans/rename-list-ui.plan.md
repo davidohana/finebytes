@@ -142,19 +142,20 @@ flowchart LR
 
 ______________________________________________________________________
 
-## Status (2026-09-12)
+## Status (2026-09-13)
 
 |                |                                              |
 | -------------- | -------------------------------------------- |
 | **Shipped**    | Phases **1–13**, **14a–14e**, **15**, **16** |
 | **Next**       | **14f** Drag-out FileDrop                    |
 | **Blocked on** | —                                            |
+| **Left**       | **1 item:** 14f only                         |
 
 ______________________________________________________________________
 
-## Shipped (1–13, 14a–14e except 14f) — consolidated
+## Shipped (1–13, 14a–14e, 15, 16) — consolidated
 
-Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Export (header submenu txt/csv + main-menu CSV), Edit as Name List, and Properties / Show in Explorer. Detail below is reference only; do not re-open unless a regression.
+Working Rename List end-to-end for add/remove/order, columns, sort, load errors, refresh, live preview, Remove Unchanged, Export (header submenu txt/csv + main-menu CSV), Edit as Name List, Manual Override (F2), Properties / Show in Explorer, GO commit, and color legend. Detail below is reference only; do not re-open unless a regression.
 
 | Block                     | What shipped                                                                                                                                                                           |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -173,18 +174,16 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 | **14c** Edit as Name List | `SupportsWrite` + `WriteTarget`; `CollectNameList`; header Edit as Name List → embedded `NameListFilter` via `AddAndSelect` (no file I/O); F5 Name List editor                         |
 | **14e** Properties        | Alt+Enter + row **Properties** → shell property sheet; **Show in Explorer** on Rename List; same Properties on File List (clears debts.md dialog bullet)                               |
 | **14d** Manual Override   | F2 dual-side overrides; PreviewStart/End; blue cells; Cancel (selection + header column-wide); F5 clears                                                                               |
+| **15** GO                 | Ctrl+G / menu / toolbar → `Commit`; plum apply-error rows; Show Rename Error                                                                                                           |
+| **16** Color legend       | Toolbar toggle + right-dock swatches (black/red/blue/gray/lavender/plum)                                                                                                               |
 
-**Already reusable for remaining work (do not rebuild):**
+**Already reusable for 14f (do not rebuild):**
 
-- Engine `RenameList.Preview` / `Commit` / `CommitExecutor` + `RenameItem.CommitError` + `RenameListCommitTests` — ready for **15** UI wiring
-- `RenameListRowErrorDialog` — reuse for Show Rename Error (**15**), not a third dialog
-- Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)
-- Cell/row classes: red / blue / gray / lavender / plum in `RenameListView.axaml` (documented by Phase **16** legend)
-- `MainWindowViewModel.GoAsync()` + `AppShortcuts.Go` / menu / toolbar — **shipped** (Phase 15); Ctrl+G applies renames ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
-- `IFileShellOpener.ShowProperties` / `RevealInFileManager` / `OpenWithDefaultApp` — `Services/Shell`, shared by File List and Rename List
-- `SupportsWrite` / `WriteTarget` on catalog fields — ready for **14d** Manual Override
+- Inbound File List/Explorer drop + internal reorder (4c/4d) in [`RenameListView.axaml.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs) — outbound FileDrop must coexist
+- `IFileShellOpener` / shell path helpers; selected-row `FullPath`s on entries
+- Cell/row classes + legend (**16**); GO / override / export paths already shipped
 
-**Write vs preview (important for 14d):**
+**Write vs preview (catalog):**
 
 | MFR7 type        | Examples                                           | Preview col | Edit as Name List / F2    |
 | ---------------- | -------------------------------------------------- | ----------- | ------------------------- |
@@ -196,9 +195,9 @@ ______________________________________________________________________
 
 ## Remaining — execution order
 
-| Phase            | What                                  | Depends on              |
-| ---------------- | ------------------------------------- | ----------------------- |
-| **14f** Drag-out | Selected rows as FileDrop to Explorer | coexist with 4d reorder |
+| Phase            | What                                  | Depends on              | Status  |
+| ---------------- | ------------------------------------- | ----------------------- | ------- |
+| **14f** Drag-out | Selected rows as FileDrop to Explorer | coexist with 4d reorder | pending |
 
 **Focused-cell chrome (done, MFR7 parity):** amber `DataGridCell:current` fill (`RenameListFocusedCellBrush`) so the current column is visible inside the selected row. Not a full-column wash; omit from Phase 16 legend (MFR7 Legend omits focus too).
 
@@ -288,7 +287,7 @@ Selected Rename List rows drag as filesystem paths.
 
 ### Phase 14 exit
 
-Header menu has Export + Edit as Name List; F2 manual override + blue; Properties; Explorer drag-out. Then **15** → **16**.
+**14a–14e done.** Exit when **14f** ships: Explorer drag-out coexists with 4d reorder. (**15** / **16** already shipped out of order.)
 
 ______________________________________________________________________
 
@@ -296,7 +295,7 @@ ______________________________________________________________________
 
 Wire UI to existing engine commit.
 
-**Status:** done.
+**Status:** done (shipped before 14f).
 
 **MFR7 flow:** clear apply errors → ensure preview if needed → warn on preview-error count → apply with progress → plum rows for apply/rename errors → status-bar outcome → row menu **Show Rename Error**.
 
@@ -341,4 +340,4 @@ ______________________________________________________________________
 
 ## What to implement next
 
-1. **14f** drag-out
+1. **14f** drag-out — only remaining phase; then this plan is complete.
