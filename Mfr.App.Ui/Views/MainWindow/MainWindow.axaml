@@ -354,14 +354,22 @@
           ToggleType="CheckBox"
           IsChecked="{Binding RenameListViewModel.IsAutoSort, Mode=OneWay}"
           ToolTip.Tip="{Binding RenameListViewModel.SortSummaryText}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/AutoSort.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Auto-Preview"
           Command="{Binding RenameListViewModel.ToggleAutoPreviewCommand}"
           ToggleType="CheckBox"
           IsChecked="{Binding RenameListViewModel.IsAutoPreview, Mode=OneWay}"
           ToolTip.Tip="{x:Static resources:AppTips.AutoPreview}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/AutoPreview.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Refresh"
           Command="{Binding RenameListViewModel.RefreshCommand}"
