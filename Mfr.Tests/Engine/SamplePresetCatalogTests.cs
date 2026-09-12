@@ -4,6 +4,11 @@ using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
+using Mfr.Models.RenameList;
+using Mfr.Models.RenameList.Fields.AudioTag;
+using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Image;
+using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Engine
@@ -21,6 +26,63 @@ namespace Mfr.Tests.Engine
         {
             Assert.Equal(13, SamplePresetCatalog.Presets.Count);
             Assert.All(SamplePresetCatalog.Presets, preset => Assert.NotEmpty(preset.Chain.Steps));
+        }
+
+        /// <summary>
+        /// Verifies every sample ships Rename List columns with known catalog field keys.
+        /// </summary>
+        [Fact]
+        public void Catalog_visible_columns_are_present_and_known()
+        {
+            Assert.All(
+                SamplePresetCatalog.Presets,
+                preset =>
+                {
+                    Assert.NotNull(preset.VisibleColumns);
+                    Assert.NotEmpty(preset.VisibleColumns);
+                    Assert.All(
+                        preset.VisibleColumns,
+                        column =>
+                            Assert.True(RenameListFieldCatalog.TryGetField(column.Key, out _), column.Key.ToString())
+                    );
+                }
+            );
+        }
+
+        /// <summary>
+        /// Verifies domain samples expose the fields their chains read or write.
+        /// </summary>
+        [Fact]
+        public void Catalog_visible_columns_include_relevant_domain_fields()
+        {
+            Assert.Contains(
+                _Preset("Tags from Filename").VisibleColumns!,
+                column => column.Key == RenameListFieldKey.Preview(AudioTagRenameListFields.Group, "Title")
+            );
+            Assert.Contains(
+                _Preset("Artist - Track - Title").VisibleColumns!,
+                column => column.Key == RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Performers")
+            );
+            Assert.Contains(
+                _Preset("Date Taken Prefix").VisibleColumns!,
+                column => column.Key == RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*36867")
+            );
+            Assert.Contains(
+                _Preset("Name from Image").VisibleColumns!,
+                column => column.Key == RenameListFieldKey.Original(ImageRenameListFields.Group, "Width")
+            );
+            Assert.Contains(
+                _Preset("Flatten Path").VisibleColumns!,
+                column =>
+                    column.Key
+                    == RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath)
+            );
+            Assert.Contains(
+                _Preset("Date Taken Folders").VisibleColumns!,
+                column =>
+                    column.Key
+                    == RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Folder)
+            );
         }
 
         /// <summary>

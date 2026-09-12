@@ -149,7 +149,37 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000002",
@@ -176,7 +206,37 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000003",
@@ -229,7 +289,72 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Performers",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Album",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Title",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Track",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "TrackCount",
+            "preview": true
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000004",
@@ -295,7 +420,58 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Performers",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Track",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Title",
+            "preview": false
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000005",
@@ -316,7 +492,44 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "Jpeg",
+            "property": "ExifDirectory*36867",
+            "preview": false
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000006",
@@ -337,7 +550,72 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "Image",
+            "property": "Format",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Image",
+            "property": "Width",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Image",
+            "property": "Height",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Image",
+            "property": "BitDepth",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Image",
+            "property": "HorzRes",
+            "preview": false
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000007",
@@ -368,7 +646,44 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullPath",
+            "preview": true
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000008",
@@ -387,7 +702,44 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Jpeg",
+            "property": "ExifDirectory*36867",
+            "preview": false
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000009",
@@ -406,7 +758,51 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Performers",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Album",
+            "preview": false
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000010",
@@ -429,7 +825,37 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000011",
@@ -457,7 +883,37 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000012",
@@ -501,7 +957,37 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        }
+      ]
     },
     {
       "id": "10000000-0000-4000-8000-000000000013",
@@ -522,7 +1008,51 @@
             }
           }
         ]
-      }
+      },
+      "visibleColumns": [
+        {
+          "key": {
+            "group": "Basic",
+            "property": "ItemType",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "Folder",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "Basic",
+            "property": "FullName",
+            "preview": true
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Year",
+            "preview": false
+          }
+        },
+        {
+          "key": {
+            "group": "MediaTag",
+            "property": "Title",
+            "preview": false
+          }
+        }
+      ]
     }
   ]
 }
