@@ -15,6 +15,11 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 
 - Show Last Rename Errors — row-level **Show Rename Error** is available; a list-wide history view is deferred
 
+## Avalonia / tooling
+
+- Avalonia **12** upgrade (breaking-change pass: packages, APIs, headless/UI tests) — still on 11.3.x
+- Official Avalonia **Hot Reload** (Plus license + Avalonia 12) — or evaluate community HotAvalonia on 11 if AXAML iteration pain justifies it
+
 ## Status bar
 
 - Undo Last → sticky status outcome when Undo ships (deferred with Undo itself)

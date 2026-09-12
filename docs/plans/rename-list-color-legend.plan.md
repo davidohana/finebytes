@@ -6,7 +6,7 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 16 
 
 - **Toolbar only** — `ToggleButton.rename-list-action` on the left rail after Refresh (last item, MFR7 “last after Auto-Preview” intent with finebytes Refresh already present). No View-menu item, no keyboard shortcut.
 - **Default off, not session-persisted** — MFR7 never saved legend visibility; skip `SessionStateRenameList` field (YAGNI vs fixed-width / Auto-Preview prefs).
-- **Layout** — Inside [`RenameListView.axaml`](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml): change root to `ColumnDefinitions="Auto,*,Auto"`; legend in column 2 (~112–120px, `IsVisible` bound). Star column already shrinks — no manual width math.
+- **Layout** — Inside [`RenameListView.axaml`](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml): change root to `ColumnDefinitions="Auto,*,Auto"`; legend in column 2 (~132px after polish, `IsVisible` bound). Star column already shrinks — no manual width math.
 - **Swatches document shipped brushes** — Use `DynamicResource` keys from [`Themes/RenameList.axaml`](../../Mfr.App.Ui/Themes/RenameList.axaml) / chrome (so light/dark match the grid). Do **not** retarget row/cell colors to raw MFR7 Plum. Omit focused-cell amber (MFR7 legend omits focus).
 - **Labels** — MFR7 strings except blue swatch: **`Manual Override`** (not MFR7 `Forced Value`) so legend matches finebytes 14d menus/commands. Footer hint unchanged.
 - **Icon** — Add `Assets/RenameList/Legend.png` (24×24), ported from MFR7 toolbar image (`btnLegendEnabled.Image` / `design_interface_toolbar.legend.png` in `RenameList.resx`).
@@ -29,16 +29,16 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 16 
 
 ### Legend UI (exact labels)
 
-| Order  | Label                                                           | Meaning                                            | finebytes brush / class                                                        |
-| ------ | --------------------------------------------------------------- | -------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Title  | **Color Legend**                                                | —                                                  | —                                                                              |
-| 1      | `Original Value`                                                | Unchanged default fg                               | Theme foreground on pane bg                                                    |
-| 2      | `Value Changed`                                                 | Preview will change                                | `RenameListPreviewChangedForegroundBrush` / `rename-list-preview-changed`      |
-| 3      | `Manual Override`                                               | Forced / manual cell override (MFR7: Forced Value) | `RenameListManualOverrideForegroundBrush` / `rename-list-manual-override`      |
-| 4      | `Value Error`                                                   | Load / missing gray                                | muted / `RenameListMissingOnDiskForegroundBrush` (covers load-error + missing) |
-| 5      | `Preview Error`                                                 | Preview-error row                                  | `RenameListPreviewErrorRowBrush` / `rename-list-preview-error`                 |
-| 6      | `Rename Error`                                                  | Commit/apply error row                             | `RenameListCommitErrorRowBrush` / `rename-list-commit-error`                   |
-| Footer | `Right-Click on a cell or row with error to see error details.` | —                                                  | —                                                                              |
+| Order  | Label                                                           | Meaning                                            | finebytes brush / class                                                    |
+| ------ | --------------------------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------- |
+| Title  | **Color Legend**                                                | —                                                  | —                                                                          |
+| 1      | `Original Value`                                                | Unchanged default fg                               | Theme foreground on pane bg                                                |
+| 2      | `Value Changed`                                                 | Preview will change                                | `RenameListPreviewChangedForegroundBrush` / `rename-list-preview-changed`  |
+| 3      | `Manual Override`                                               | Forced / manual cell override (MFR7: Forced Value) | `RenameListManualOverrideForegroundBrush` / `rename-list-manual-override`  |
+| 4      | `—  Value Error` (italic gray + em dash sample)                 | Load / missing gray                                | `RenameListMissingOnDiskForegroundBrush` (load-error cells use same brush) |
+| 5      | `Preview Error`                                                 | Preview-error row                                  | `RenameListPreviewErrorRowBrush` / `rename-list-preview-error`             |
+| 6      | `Rename Error`                                                  | Commit/apply error row                             | `RenameListCommitErrorRowBrush` / `rename-list-commit-error`               |
+| Footer | `Right-Click on a cell or row with error to see error details.` | —                                                  | —                                                                          |
 
 ### Parity gaps (intentional)
 

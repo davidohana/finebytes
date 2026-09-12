@@ -176,12 +176,20 @@
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock">
       <Setter Property="Margin" Value="{StaticResource DataGridTextColumnCellTextBlockMargin}" />
     </Style>
-    <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-load-error">
-      <!-- Same gray as missing-on-disk / Color Legend "Value Error". -->
+    <Style
+      Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-load-error,
+                 DataGrid.rename-list DataGridCell TextBlock.rename-list-missing-on-disk"
+    >
+      <!-- Same gray as Color Legend "Value Error" (load failed or missing on disk). -->
       <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-load-error">
       <Setter Property="FontStyle" Value="Italic" />
     </Style>
-    <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-load-error">
+    <Style
+      Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-load-error,
+                 DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-missing-on-disk"
+    >
       <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskSelectedForegroundBrush}" />
     </Style>
     <!-- Manual override (blue) wins over preview-changed (red). Selected uses the same brush. -->
@@ -193,12 +201,6 @@
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-manual-override">
       <Setter Property="Foreground" Value="{DynamicResource RenameListManualOverrideSelectedForegroundBrush}" />
-    </Style>
-    <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-missing-on-disk">
-      <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
-    </Style>
-    <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-missing-on-disk">
-      <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskSelectedForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell:focus /template/ Grid#FocusVisual">
       <Setter Property="IsVisible" Value="False" />
@@ -450,7 +452,7 @@
         Grid.Column="2"
         Classes="rename-list-legend"
         IsVisible="{Binding IsLegendVisible}"
-        ToolTip.Tip="Rename List Color Legend Panel"
+        ToolTip.Tip="{x:Static resources:AppTips.ColorLegendPanel}"
       >
         <StackPanel>
           <TextBlock Classes="rename-list-legend-title" Text="Color Legend" />

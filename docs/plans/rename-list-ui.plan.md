@@ -322,7 +322,7 @@ ______________________________________________________________________
 
 After **14d** and **15** so the panel documents the full set.
 
-MFR7: toolbar CheckOnClick + right-dock legend (~112–120px) — [Legend.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/Legend.cs), help Highlighting section.
+MFR7: toolbar CheckOnClick + right-dock legend (~132px) — [Legend.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/Legend.cs), help Highlighting section.
 
 | Swatch      | Meaning                  | Finebytes status |
 | ----------- | ------------------------ | ---------------- |

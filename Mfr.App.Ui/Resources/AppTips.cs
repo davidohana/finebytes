@@ -82,6 +82,9 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List color legend toolbar tip (MFR7 btnLegendEnabled).</summary>
         public const string ColorLegend = "Show or Hide Rename List Color Legend Panel";
 
+        /// <summary>Rename List color legend panel tip (MFR7 ColorLegend).</summary>
+        public const string ColorLegendPanel = "Rename List Color Legend Panel";
+
         /// <summary>Color legend: Original Value swatch.</summary>
         public const string LegendOriginalValue = "Unchanged original or preview value";
 
@@ -92,8 +95,7 @@ namespace Mfr.App.Ui.Resources
         public const string LegendManualOverride = "Value was set with Manual Override (F2) — used on GO";
 
         /// <summary>Color legend: Value Error swatch (gray italic em dash).</summary>
-        public const string LegendValueError =
-            "Gray italic — means load failed or the item is missing on disk";
+        public const string LegendValueError = "Gray italic — means load failed or the item is missing on disk";
 
         /// <summary>Color legend: Preview Error swatch (lavender row).</summary>
         public const string LegendPreviewError = "Preview failed for this row — ignored on GO; right-click for details";
