@@ -1018,6 +1018,84 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies that preview preserves an earlier commit error while reporting the latest preview outcome.
+        /// </summary>
+        public void Preview_PreservesCommitError_AndReportsLatestStatus()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = dir.CombinePath("track.mp3");
+            File.WriteAllText(source, "x");
+
+            var renameList = new RenameList();
+            renameList.AddSources([source]);
+            var item = Assert.Single(renameList.RenameItems);
+            var commitError = new RenameItemError("commit failed");
+            item.CommitError = commitError;
+            item.Status = RenameStatus.CommitError;
+
+            var plan = _SetupPreview(renameList, _CreateEmptyStepsPreset("preview-after-commit-error"));
+
+            Assert.Same(commitError, item.CommitError);
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+            Assert.Equal(1, plan.UnchangedCount);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that a new preview error remains authoritative while preserving an earlier commit error.
+        /// </summary>
+        public void Preview_PreservesCommitError_WhenNewPreviewFails()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = dir.CombinePath("track.mp3");
+            File.WriteAllText(source, "x");
+
+            var renameList = new RenameList();
+            renameList.AddSources([source]);
+            var item = Assert.Single(renameList.RenameItems);
+            var commitError = new RenameItemError("commit failed");
+            item.CommitError = commitError;
+            item.Status = RenameStatus.CommitError;
+
+            var plan = _SetupPreview(
+                renameList,
+                _FailingReplacerUnsupportedTargetPreset("failed-preview-after-commit-error")
+            );
+
+            Assert.Same(commitError, item.CommitError);
+            Assert.NotNull(item.PreviewError);
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.Equal(1, plan.ErrorCount);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies the explicit clear API removes commit errors and resets their status on every row.
+        /// </summary>
+        public void ClearCommitErrors_ClearsErrors_AndResetsStatus()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var firstSource = dir.CombinePath("first.mp3");
+            var secondSource = dir.CombinePath("second.mp3");
+            File.WriteAllText(firstSource, "x");
+            File.WriteAllText(secondSource, "y");
+
+            var renameList = new RenameList();
+            renameList.AddSources([firstSource, secondSource]);
+            foreach (var item in renameList.RenameItems)
+            {
+                item.CommitError = new RenameItemError("commit failed");
+                item.Status = RenameStatus.CommitError;
+            }
+
+            renameList.ClearCommitErrors();
+
+            Assert.All(renameList.RenameItems, item => Assert.Null(item.CommitError));
+            Assert.All(renameList.RenameItems, item => Assert.Equal(RenameStatus.Init, item.Status));
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that commit throws when the plan argument is null.
         /// </summary>
         public void Commit_Throws_WhenPlanIsNull()

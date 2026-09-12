@@ -51,6 +51,27 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies RefreshOriginals clears an earlier commit error and its status.
+        /// </summary>
+        [Fact]
+        public void RefreshOriginals_Clears_CommitError_And_Status()
+        {
+            var path = Path.Combine(_tempRoot, "commit-error.txt");
+            File.WriteAllText(path, "content");
+
+            var renameList = new RenameList();
+            renameList.AddSources([path]);
+            var item = Assert.Single(renameList.RenameItems);
+            item.CommitError = new RenameItemError("commit failed");
+            item.Status = RenameStatus.CommitError;
+
+            renameList.RefreshOriginals();
+
+            Assert.Null(item.CommitError);
+            Assert.Equal(RenameStatus.Init, item.Status);
+        }
+
+        /// <summary>
         /// Verifies RefreshOriginals clears metadata caches so hydrate reads updated tags.
         /// </summary>
         [Fact]

@@ -493,7 +493,7 @@ namespace Mfr.Engine.RenameList
         /// <remarks>
         /// <para>
         /// Does not run preview. Missing paths keep the stored path; field-load errors clear with the cache
-        /// so a later hydrate can succeed. Clears all manual field overrides (MFR7 F5).
+        /// so a later hydrate can succeed. Clears all manual field overrides and commit errors (MFR7 F5).
         /// </para>
         /// </remarks>
         public void RefreshOriginals(
@@ -501,6 +501,7 @@ namespace Mfr.Engine.RenameList
             IProgress<RenameListProgress>? progress = null
         )
         {
+            ClearCommitErrors();
             if (_renameItems.Count == 0)
             {
                 return;
@@ -526,6 +527,17 @@ namespace Mfr.Engine.RenameList
             }
 
             tracker.ReportFinal();
+        }
+
+        /// <summary>
+        /// Clears persisted commit errors and resets rows currently in commit-error status.
+        /// </summary>
+        public void ClearCommitErrors()
+        {
+            foreach (var item in _renameItems)
+            {
+                item.ClearCommitError();
+            }
         }
 
         /// <summary>

@@ -367,20 +367,28 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
-        /// Resets transient preview/commit state for a fresh processing cycle.
+        /// Resets transient preview state for a fresh processing cycle.
         /// </summary>
         /// <remarks>
-        /// <para>Does not clear manual field overrides.</para>
+        /// <para>Does not clear manual field overrides or commit-error state.</para>
         /// </remarks>
         public void ResetState()
         {
             Preview = Original.Clone();
             PreviewError = null;
-            CommitError = null;
             Status = RenameStatus.Init;
             WordSeparator = ' ';
             SentenceEndChars = ".!?";
             StripAllEmbeddedTagsOnCommit = false;
+        }
+
+        internal void ClearCommitError()
+        {
+            CommitError = null;
+            if (Status == RenameStatus.CommitError)
+            {
+                Status = RenameStatus.Init;
+            }
         }
 
         internal void ClearPreview()
