@@ -1,0 +1,41 @@
+<Window
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.Options"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  x:Class="Mfr.App.Ui.Views.Options.OptionsDialog"
+  x:DataType="vm:OptionsDialogViewModel"
+  Title="Options"
+  Icon="/Assets/mfr.ico"
+  Width="460"
+  MinWidth="400"
+  SizeToContent="Height"
+  WindowStartupLocation="CenterOwner"
+  ShowInTaskbar="False"
+  CanResize="False"
+  FontFamily="{StaticResource AppChromeFont}"
+  FontSize="{StaticResource AppChromeFontSize}"
+  Foreground="{DynamicResource AppChromeForegroundBrush}"
+>
+  <DockPanel Margin="12">
+    <StackPanel
+      DockPanel.Dock="Bottom"
+      Orientation="Horizontal"
+      HorizontalAlignment="Center"
+      Spacing="12"
+      Margin="0,14,0,0"
+    >
+      <Button Classes="message-dialog-footer" Content="OK" MinWidth="80" IsDefault="True" Click="_OnOkClick" />
+      <Button Classes="message-dialog-footer" Content="Cancel" MinWidth="80" IsCancel="True" Click="_OnCancelClick" />
+    </StackPanel>
+
+    <StackPanel Spacing="10">
+      <controls:CompactCheckBox IsChecked="{Binding RememberLastFolder}" Content="Save File List last position" />
+      <controls:CompactCheckBox IsChecked="{Binding RememberWindowState}" Content="Remember window size and position" />
+      <controls:CompactCheckBox
+        IsChecked="{Binding ConfirmReplaceAppliedFiltersOnLoad}"
+        Content="Confirm before replacing Applied Filters when loading a preset"
+      />
+    </StackPanel>
+  </DockPanel>
+</Window>

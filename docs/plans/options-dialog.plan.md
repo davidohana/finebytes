@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-options-dialog
     content: "P2: OptionsDialog ViewModel + AXAML (3 checkboxes)"
-    status: pending
+    status: completed
   - id: p3-wire-showoptions
     content: "P3: Enable ShowOptions, host dialog, persist on OK, update docs"
     status: pending
