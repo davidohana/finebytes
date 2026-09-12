@@ -17,7 +17,7 @@ Parent: Rename List / main shell feedback ([rename-list-go.plan.md](rename-list-
 - **Stays until replaced** — Last write wins on the left hint. Clearing a cell hint clears the bar (does **not** restore a prior GO/add message). Rename List publishes Empty only for intentional wipes (`Clear`, locate success); GO/Add must not clear at start so cancel/decline keep the prior sticky. AF/File List Empty is ignored so mid-op resets do not wipe.
 - **No chrome hover hints** — Toolbar/menu already have `ToolTip` / `AppTips`. Do **not** mirror those into the status bar. Keep Avalonia tooltips as-is.
 - **Severity colors in the left hint** — `StyledTextRun.ForegroundResourceKey`:
-  - **Error** → `StatusBarErrorForegroundBrush` (GO commit errors, locate miss, add exception, load-error cell hints).
+  - **Error** → `AppChromeErrorForegroundBrush` (GO commit errors, locate miss, add exception, load-error cell hints; same brush as preview glyph / row error path).
   - **Warning** → `StatusBarWarningForegroundBrush` (partial success, skips, stopped GO, refresh with load errors, “no items added”).
   - **Neutral** → default (pure success, normal cell values).
   - Mixed messages use multiple runs.

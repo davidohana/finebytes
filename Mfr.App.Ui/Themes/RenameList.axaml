@@ -5,7 +5,6 @@
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#808080" />
           <SolidColorBrush x:Key="RenameListMissingOnDiskSelectedForegroundBrush" Color="#555555" />
-          <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#C00000" />
           <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF0000" />
           <SolidColorBrush x:Key="RenameListManualOverrideForegroundBrush" Color="#0000FF" />
           <SolidColorBrush x:Key="RenameListManualOverrideSelectedForegroundBrush" Color="#00008B" />
@@ -18,7 +17,6 @@
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#909090" />
           <SolidColorBrush x:Key="RenameListMissingOnDiskSelectedForegroundBrush" Color="#C0C0C0" />
-          <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#FF8080" />
           <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF8080" />
           <SolidColorBrush x:Key="RenameListManualOverrideForegroundBrush" Color="#8090FF" />
           <SolidColorBrush x:Key="RenameListManualOverrideSelectedForegroundBrush" Color="#B0C0FF" />
@@ -42,7 +40,7 @@
     <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
     <Setter Property="FontSize" Value="{DynamicResource AppChromeSortGlyphFontSize}" />
     <Setter Property="FontWeight" Value="SemiBold" />
-    <Setter Property="Foreground" Value="{DynamicResource AppChromePreviewGlyphForegroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeErrorForegroundBrush}" />
   </Style>
   <Style Selector="Border.rename-list-sort-glyph">
     <Setter Property="Background" Value="{DynamicResource AppChromeSortGlyphBackgroundBrush}" />

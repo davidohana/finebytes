@@ -16,7 +16,8 @@
       <SolidColorBrush x:Key="AppChromeSortGlyphForegroundBrush" Color="#6E6E6E" />
       <SolidColorBrush x:Key="AppChromeSortGlyphBackgroundBrush" Color="#ECECEC" />
       <SolidColorBrush x:Key="AppChromeSortGlyphBorderBrush" Color="#D8D8D8" />
-      <SolidColorBrush x:Key="AppChromePreviewGlyphForegroundBrush" Color="#C00000" />
+      <!-- Shared error-red (status bar, preview glyph, Rename List row error path). -->
+      <SolidColorBrush x:Key="AppChromeErrorForegroundBrush" Color="#C00000" />
       <SolidColorBrush x:Key="AppChromePreviewGlyphBackgroundBrush" Color="#FFE8E8" />
       <SolidColorBrush x:Key="AppChromePreviewGlyphBorderBrush" Color="#F0A0A0" />
       <SolidColorBrush x:Key="DropMarkBrush" Color="#FA8072" />
@@ -37,7 +38,7 @@
       <SolidColorBrush x:Key="AppChromeSortGlyphForegroundBrush" Color="#A8A8A8" />
       <SolidColorBrush x:Key="AppChromeSortGlyphBackgroundBrush" Color="#383838" />
       <SolidColorBrush x:Key="AppChromeSortGlyphBorderBrush" Color="#454545" />
-      <SolidColorBrush x:Key="AppChromePreviewGlyphForegroundBrush" Color="#FF8080" />
+      <SolidColorBrush x:Key="AppChromeErrorForegroundBrush" Color="#FF8080" />
       <SolidColorBrush x:Key="AppChromePreviewGlyphBackgroundBrush" Color="#4A2828" />
       <SolidColorBrush x:Key="AppChromePreviewGlyphBorderBrush" Color="#804040" />
       <SolidColorBrush x:Key="DropMarkBrush" Color="#FA8072" />

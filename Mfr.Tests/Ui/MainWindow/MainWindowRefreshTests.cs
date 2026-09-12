@@ -43,7 +43,7 @@ namespace Mfr.Tests.Ui.MainWindow
             var dir = _tempDirectoryFixture.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, "a.txt"), "a");
             var viewModel = new MainWindowViewModel(dir);
-            viewModel.RenameListViewModel.SetGridFocused(true);
+            viewModel.RenameListViewModel.IsGridFocused = true;
             File.WriteAllText(Path.Combine(dir, "b.txt"), "b");
 
             await viewModel.RefreshFocusedPaneCommand.ExecuteAsync(null).ConfigureAwait(true);
@@ -65,7 +65,7 @@ namespace Mfr.Tests.Ui.MainWindow
             var entry = Assert.Single(viewModel.RenameListViewModel.Entries);
             var beforeSize = entry.EngineItem.Original.FileSize;
             File.WriteAllText(path, new string('x', 4096));
-            viewModel.RenameListViewModel.SetGridFocused(true);
+            viewModel.RenameListViewModel.IsGridFocused = true;
 
             await viewModel.RefreshFocusedPaneCommand.ExecuteAsync(null).ConfigureAwait(true);
 

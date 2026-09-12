@@ -370,12 +370,9 @@
 
     <Border DockPanel.Dock="Top" Padding="4,2">
       <StackPanel Orientation="Horizontal" Spacing="4">
-        <Button
-          Content="GO ▶"
-          Command="{Binding GoCommand}"
-          MinWidth="72"
-          ToolTip.Tip="{x:Static resources:AppTips.Go}"
-        />
+        <Button Command="{Binding GoCommand}" ToolTip.Tip="{x:Static resources:AppTips.Go}">
+          <Image Width="24" Height="24" Stretch="Uniform" Source="/Assets/Go.png" />
+        </Button>
         <Button
           Content="Undo"
           Command="{Binding UndoLastCommand}"

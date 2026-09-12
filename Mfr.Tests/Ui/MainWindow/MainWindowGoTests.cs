@@ -315,37 +315,20 @@ namespace Mfr.Tests.Ui.MainWindow
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync(paths).ConfigureAwait(true);
 
-            void OnProgressChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
-            {
-                if (
-                    e.PropertyName is nameof(RenameListProgressViewModel.IsBusy)
-                    && viewModel.RenameListViewModel.IsBusy
-                    && viewModel.RenameListViewModel.Progress.Operation == RenameListProgressOperation.Preview
+            var commitStarted = await _CancelWhenBusyAsync(
+                    viewModel.RenameListViewModel,
+                    RenameListProgressOperation.Preview,
+                    () => viewModel.RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("f", "g")))
                 )
-                {
-                    viewModel.RenameListViewModel.Progress.CancelCommand.Execute(null);
-                }
-            }
+                .ConfigureAwait(true);
 
-            viewModel.RenameListViewModel.Progress.PropertyChanged += OnProgressChanged;
-            try
-            {
-                var commitStarted = await viewModel
-                    .RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("f", "g")))
-                    .ConfigureAwait(true);
-
-                Assert.False(commitStarted);
-                Assert.Equal("Stopped.", viewModel.RenameListViewModel.LastStatusMessage.ToPlainText());
-                Assert.Equal(
-                    StatusBarText.WarningForegroundResourceKey,
-                    viewModel.RenameListViewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
-                );
-                Assert.Equal("Stopped.", viewModel.StatusHint.ToPlainText());
-            }
-            finally
-            {
-                viewModel.RenameListViewModel.Progress.PropertyChanged -= OnProgressChanged;
-            }
+            Assert.False(commitStarted);
+            Assert.Equal("Stopped.", viewModel.RenameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.Equal(
+                StatusBarText.WarningForegroundResourceKey,
+                viewModel.RenameListViewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
+            Assert.Equal("Stopped.", viewModel.StatusHint.ToPlainText());
         }
 
         /// <summary>
@@ -367,34 +350,49 @@ namespace Mfr.Tests.Ui.MainWindow
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync(paths).ConfigureAwait(true);
 
+            var commitStarted = await _CancelWhenBusyAsync(
+                    viewModel.RenameListViewModel,
+                    RenameListProgressOperation.Commit,
+                    () => viewModel.RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("item", "done")))
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(commitStarted);
+            var status = viewModel.RenameListViewModel.LastStatusMessage;
+            Assert.StartsWith("Stopped.", status.ToPlainText());
+            Assert.Equal(StatusBarText.WarningForegroundResourceKey, status.Runs[0].ForegroundResourceKey);
+            Assert.Equal(status.ToPlainText(), viewModel.StatusHint.ToPlainText());
+        }
+
+        /// <summary>
+        /// Cancels Rename List progress when <paramref name="operation"/> becomes busy.
+        /// </summary>
+        private static async Task<T> _CancelWhenBusyAsync<T>(
+            RenameListViewModel renameList,
+            RenameListProgressOperation operation,
+            Func<Task<T>> action
+        )
+        {
             void OnProgressChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
             {
                 if (
                     e.PropertyName is nameof(RenameListProgressViewModel.IsBusy)
-                    && viewModel.RenameListViewModel.IsBusy
-                    && viewModel.RenameListViewModel.Progress.Operation == RenameListProgressOperation.Commit
+                    && renameList.IsBusy
+                    && renameList.Progress.Operation == operation
                 )
                 {
-                    viewModel.RenameListViewModel.Progress.CancelCommand.Execute(null);
+                    renameList.Progress.CancelCommand.Execute(null);
                 }
             }
 
-            viewModel.RenameListViewModel.Progress.PropertyChanged += OnProgressChanged;
+            renameList.Progress.PropertyChanged += OnProgressChanged;
             try
             {
-                var commitStarted = await viewModel
-                    .RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("item", "done")))
-                    .ConfigureAwait(true);
-
-                Assert.True(commitStarted);
-                var status = viewModel.RenameListViewModel.LastStatusMessage;
-                Assert.StartsWith("Stopped.", status.ToPlainText());
-                Assert.Equal(StatusBarText.WarningForegroundResourceKey, status.Runs[0].ForegroundResourceKey);
-                Assert.Equal(status.ToPlainText(), viewModel.StatusHint.ToPlainText());
+                return await action().ConfigureAwait(true);
             }
             finally
             {
-                viewModel.RenameListViewModel.Progress.PropertyChanged -= OnProgressChanged;
+                renameList.Progress.PropertyChanged -= OnProgressChanged;
             }
         }
 

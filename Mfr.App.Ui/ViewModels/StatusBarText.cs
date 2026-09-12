@@ -8,7 +8,7 @@ namespace Mfr.App.Ui.ViewModels
         /// <summary>
         /// Theme resource key for error-severity status text.
         /// </summary>
-        public const string ErrorForegroundResourceKey = "StatusBarErrorForegroundBrush";
+        public const string ErrorForegroundResourceKey = "AppChromeErrorForegroundBrush";
 
         /// <summary>
         /// Theme resource key for warning-severity status text.

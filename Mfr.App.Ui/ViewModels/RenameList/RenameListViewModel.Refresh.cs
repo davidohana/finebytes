@@ -1,3 +1,4 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -14,9 +15,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Gets whether the Rename List grid currently has keyboard focus.
+        /// Whether the Rename List grid currently has keyboard focus (F5 routing vs File List).
         /// </summary>
-        public bool IsGridFocused { get; private set; }
+        [ObservableProperty]
+        private bool _isGridFocused;
 
         /// <summary>
         /// Re-reads original fields from disk for every row, then hydrates metadata for visible columns and sort keys.
@@ -42,6 +44,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     }
                 )
                 .ConfigureAwait(true);
+
             if (!completed)
             {
                 return;
@@ -76,21 +79,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return StatusBarText.Warning(
                 $"Refreshed {Entries.Count} item(s). {itemsWithLoadErrors} item(s) with load error(s) — select a cell for details."
             );
-        }
-
-        /// <summary>
-        /// Updates grid-focus state for F5 routing (Rename List vs File List).
-        /// </summary>
-        /// <param name="focused">Whether the Rename List grid has focus.</param>
-        internal void SetGridFocused(bool focused)
-        {
-            if (IsGridFocused == focused)
-            {
-                return;
-            }
-
-            IsGridFocused = focused;
-            OnPropertyChanged(nameof(IsGridFocused));
         }
 
         private bool _CanRefresh()

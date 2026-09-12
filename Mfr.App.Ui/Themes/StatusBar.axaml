@@ -3,11 +3,9 @@
     <ResourceDictionary>
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
-          <SolidColorBrush x:Key="StatusBarErrorForegroundBrush" Color="#C00000" />
           <SolidColorBrush x:Key="StatusBarWarningForegroundBrush" Color="#A67C00" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
-          <SolidColorBrush x:Key="StatusBarErrorForegroundBrush" Color="#FF8080" />
           <SolidColorBrush x:Key="StatusBarWarningForegroundBrush" Color="#E6B422" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>
@@ -15,6 +13,6 @@
   </Styles.Resources>
 
   <Style Selector="TextBlock.status-bar-preview-errors.has-errors">
-    <Setter Property="Foreground" Value="{DynamicResource StatusBarErrorForegroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeErrorForegroundBrush}" />
   </Style>
 </Styles>

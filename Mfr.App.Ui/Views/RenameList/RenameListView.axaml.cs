@@ -308,7 +308,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 var isGridFocused =
                     focused == RenameGrid
                     || (focused is Visual visual && visual.GetVisualAncestors().Contains(RenameGrid));
-                _viewModel.SetGridFocused(isGridFocused);
+                _viewModel.IsGridFocused = isGridFocused;
             });
         }
 
