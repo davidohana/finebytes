@@ -1,4 +1,5 @@
 using Mfr.App.Ui.Services.FileList;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -1405,7 +1406,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(nestedDir, fileListViewModel.CurrentPath);
             Assert.NotNull(fileListViewModel.SelectedEntry);
             Assert.Equal(nestedPath, fileListViewModel.SelectedEntry.FullPath);
-            Assert.Empty(renameListViewModel.LastLocateError);
+            Assert.Empty(renameListViewModel.LastStatusMessage.ToPlainText());
         }
 
         /// <summary>
@@ -1425,7 +1426,11 @@ namespace Mfr.Tests.Ui.RenameList
             fileListViewModel.Mask = "*.md";
             renameListViewModel.LocateInFileListCommand.Execute(null);
 
-            Assert.Contains("Failed to locate", renameListViewModel.LastLocateError);
+            Assert.Contains("Failed to locate", renameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.Equal(
+                StatusBarText.ErrorForegroundResourceKey,
+                renameListViewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
         }
 
         /// <summary>
@@ -1766,7 +1771,7 @@ namespace Mfr.Tests.Ui.RenameList
         /// Verifies adding an inaccessible folder sets a skip summary on the Rename List.
         /// </summary>
         [Fact]
-        public async Task AddSelected_Inaccessible_Folder_Sets_LastAddError()
+        public async Task AddSelected_Inaccessible_Folder_Sets_LastStatusMessage()
         {
             if (!OperatingSystem.IsWindows())
             {
@@ -1791,7 +1796,14 @@ namespace Mfr.Tests.Ui.RenameList
                 await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
                 Assert.Empty(renameListViewModel.Entries);
-                Assert.Equal("Added 0 item(s). Skipped 1 inaccessible source(s).", renameListViewModel.LastAddError);
+                Assert.Equal(
+                    "Added 0 item(s). Skipped 1 inaccessible source(s).",
+                    renameListViewModel.LastStatusMessage.ToPlainText()
+                );
+                Assert.Equal(
+                    StatusBarText.WarningForegroundResourceKey,
+                    renameListViewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+                );
             }
             finally
             {

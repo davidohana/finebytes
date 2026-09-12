@@ -39,6 +39,8 @@
     <StyleInclude Source="/Themes/MessageDialog.axaml" />
     <StyleInclude Source="/Themes/FilterEditor.axaml" />
     <StyleInclude Source="/Themes/RenameList.axaml" />
+    <StyleInclude Source="/Themes/StatusBar.axaml" />
+
     <!-- Light selection highlight for all editable text. -->
     <Style Selector="TextBox">
       <Setter Property="SelectionBrush" Value="{DynamicResource TextSelectionBrush}" />

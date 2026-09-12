@@ -1,4 +1,5 @@
 using Avalonia.Headless.XUnit;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Replace;
@@ -153,8 +154,11 @@ namespace Mfr.Tests.Ui.MainWindow
                 .ConfigureAwait(true);
 
             Assert.True(commitStarted);
-            Assert.Contains("could not be renamed", viewModel.RenameListViewModel.LastGoStatus);
-            Assert.Contains("Show Rename Error", viewModel.RenameListViewModel.LastGoStatus);
+            var status = viewModel.RenameListViewModel.LastStatusMessage;
+            Assert.Contains("could not be renamed", status.ToPlainText());
+            Assert.Contains("Show Rename Error", status.ToPlainText());
+            Assert.Contains(status.Runs, run => run.ForegroundResourceKey == StatusBarText.ErrorForegroundResourceKey);
+            Assert.Equal(status.ToPlainText(), viewModel.StatusHint.ToPlainText());
             Assert.Single(viewModel.RenameListViewModel.Entries, entry => entry.HasCommitError);
             Assert.Equal("occupied", await File.ReadAllTextAsync(occupied));
         }
@@ -178,8 +182,39 @@ namespace Mfr.Tests.Ui.MainWindow
                 .ConfigureAwait(true);
 
             Assert.True(commitStarted);
-            Assert.Equal("Renamed 1 item(s).", viewModel.RenameListViewModel.LastGoStatus);
+            Assert.Equal("Renamed 1 item(s).", viewModel.RenameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.Equal("Renamed 1 item(s).", viewModel.StatusHint.ToPlainText());
+            Assert.All(
+                viewModel.RenameListViewModel.LastStatusMessage.Runs,
+                run => Assert.Null(run.ForegroundResourceKey)
+            );
             Assert.True(File.Exists(destination));
+        }
+
+        /// <summary>
+        /// Verifies GO status stays until replaced and returns after a cell hint clears.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Go_status_is_sticky_across_cell_hint_overlay()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = Path.Combine(dir, "alpha.txt");
+            await File.WriteAllTextAsync(source, "alpha");
+            var viewModel = new MainWindowViewModel(dir);
+            viewModel.RenameListViewModel.DisableAutoPreview();
+            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
+
+            await viewModel
+                .RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("alpha", "renamed")))
+                .ConfigureAwait(true);
+
+            Assert.Equal("Renamed 1 item(s).", viewModel.StatusHint.ToPlainText());
+
+            viewModel.RenameListViewModel.CellStatusHint = StyledTextDisplay.FromPlain("Full File Name: renamed.txt");
+            Assert.Equal("Full File Name: renamed.txt", viewModel.StatusHint.ToPlainText());
+
+            viewModel.RenameListViewModel.CellStatusHint = StyledTextDisplay.Empty;
+            Assert.Equal("Renamed 1 item(s).", viewModel.StatusHint.ToPlainText());
         }
 
         private static FilterChain _Chain(params ReplacerFilter[] filters)

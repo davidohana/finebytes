@@ -83,7 +83,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var insertAt = _ResolveInsertAt();
             SetDropMarkIndex(null);
             var oldCount = _renameList.RenameItems.Count;
-            LastAddError = string.Empty;
+            LastStatusMessage = StyledTextDisplay.Empty;
 
             var addMode = AddMode;
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
@@ -118,7 +118,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
             catch (Exception ex)
             {
-                LastAddError = ex.Message;
+                LastStatusMessage = StatusBarText.Error(ex.Message);
                 Log.Error(ex, "Unexpected failure while adding rename sources.");
                 OnAddCanceled();
                 return;
@@ -142,7 +142,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 SetSelectedEntries([Entries[insertAt]]);
             }
 
-            LastAddError = _FormatAddOutcome(addedCount: addedCount, skippedSourceCount: addSummary.SkippedSourceCount);
+            LastStatusMessage = _FormatAddOutcome(
+                addedCount: addedCount,
+                skippedSourceCount: addSummary.SkippedSourceCount
+            );
             _LogAddOutcome(
                 addedCount: addedCount,
                 skippedSourceCount: addSummary.SkippedSourceCount,
@@ -191,19 +194,21 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Builds the status-bar message after a completed add.
         /// </summary>
-        private static string _FormatAddOutcome(int addedCount, int skippedSourceCount)
+        private static StyledTextDisplay _FormatAddOutcome(int addedCount, int skippedSourceCount)
         {
             if (skippedSourceCount > 0)
             {
-                return $"Added {addedCount} item(s). Skipped {skippedSourceCount} inaccessible source(s).";
+                return StatusBarText.Warning(
+                    $"Added {addedCount} item(s). Skipped {skippedSourceCount} inaccessible source(s)."
+                );
             }
 
             if (addedCount == 0)
             {
-                return "No items were added.";
+                return StatusBarText.Warning("No items were added.");
             }
 
-            return string.Empty;
+            return StyledTextDisplay.Empty;
         }
 
         /// <summary>

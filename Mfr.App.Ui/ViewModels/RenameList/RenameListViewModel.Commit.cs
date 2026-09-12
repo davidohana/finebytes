@@ -26,7 +26,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            LastGoStatus = string.Empty;
+            LastStatusMessage = StyledTextDisplay.Empty;
             _renameList.ClearCommitErrors();
             _RefreshFieldDisplay();
 
@@ -64,7 +64,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     RenameListProgressOperation.Commit,
                     (token, progress) =>
                     {
-                        results = _renameList.Commit(plan, failFast: false, cancellationToken: token, progress: progress);
+                        results = _renameList.Commit(
+                            plan,
+                            failFast: false,
+                            cancellationToken: token,
+                            progress: progress
+                        );
                     }
                 )
                 .ConfigureAwait(true);
@@ -74,7 +79,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var renamedCount = results?.Count(item => item.Status == RenameStatus.CommitOk) ?? 0;
             var commitErrorCount = results?.Count(item => item.Status == RenameStatus.CommitError) ?? 0;
-            LastGoStatus = _FormatGoOutcome(renamedCount, commitErrorCount);
+            LastStatusMessage = _FormatGoOutcome(renamedCount, commitErrorCount);
 
             return true;
         }
@@ -93,24 +98,29 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Builds the status-bar message after a completed GO commit.
         /// </summary>
-        private static string _FormatGoOutcome(int renamedCount, int errorCount)
+        private static StyledTextDisplay _FormatGoOutcome(int renamedCount, int errorCount)
         {
             if (errorCount > 0 && renamedCount > 0)
             {
-                return $"Renamed {renamedCount} item(s). {errorCount} could not be renamed — right-click Show Rename Error.";
+                return StatusBarText.Combine(
+                    StatusBarText.Neutral($"Renamed {renamedCount} item(s). "),
+                    StatusBarText.Error($"{errorCount} could not be renamed — right-click Show Rename Error.")
+                );
             }
 
             if (errorCount > 0)
             {
-                return $"{errorCount} item(s) could not be renamed. Right-click Show Rename Error for details.";
+                return StatusBarText.Error(
+                    $"{errorCount} item(s) could not be renamed. Right-click Show Rename Error for details."
+                );
             }
 
             if (renamedCount > 0)
             {
-                return $"Renamed {renamedCount} item(s).";
+                return StatusBarText.Neutral($"Renamed {renamedCount} item(s).");
             }
 
-            return "No items were renamed.";
+            return StatusBarText.Neutral("No items were renamed.");
         }
     }
 }

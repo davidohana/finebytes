@@ -177,22 +177,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public RenameListColumnSortStates ColumnSortStates { get; private set; } = RenameListColumnSortStates.Inactive;
 
         /// <summary>
-        /// Gets the most recent user-facing add failure message, or empty when none.
+        /// Gets the most recent high-signal Rename List status-bar message (add / locate / GO).
         /// </summary>
         [ObservableProperty]
-        private string _lastAddError = string.Empty;
-
-        /// <summary>
-        /// Gets the most recent locate-in-File-List failure message, or empty when none.
-        /// </summary>
-        [ObservableProperty]
-        private string _lastLocateError = string.Empty;
-
-        /// <summary>
-        /// Gets the most recent GO outcome for the status bar, or empty when none.
-        /// </summary>
-        [ObservableProperty]
-        private string _lastGoStatus = string.Empty;
+        private StyledTextDisplay _lastStatusMessage = StyledTextDisplay.Empty;
 
         /// <summary>
         /// Status-bar hint for the focused or selected Rename List cell.

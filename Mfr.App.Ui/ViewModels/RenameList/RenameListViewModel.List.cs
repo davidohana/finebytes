@@ -353,11 +353,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var fullPath = entry.EngineItem.Original.FullPath;
             if (_fileListViewModel.TryLocatePath(fullPath))
             {
-                LastLocateError = string.Empty;
+                LastStatusMessage = StyledTextDisplay.Empty;
                 return;
             }
 
-            LastLocateError = $"Failed to locate \"{fullPath}\" in the File List.";
+            LastStatusMessage = StatusBarText.Error($"Failed to locate \"{fullPath}\" in the File List.");
         }
 
         /// <summary>

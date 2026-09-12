@@ -21,10 +21,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
     /// </summary>
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private const int StatusHintClearMilliseconds = 8_000;
-
-        private CancellationTokenSource? _statusHintClearCts;
-        private string _transientStatusHint = string.Empty;
+        private StyledTextDisplay _lastStatusHint = StyledTextDisplay.Empty;
         private StyledTextDisplay _paneStatusHint = StyledTextDisplay.Empty;
         private bool _previewDirty;
         private bool _previewRunning;
@@ -170,7 +167,13 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// Count of items with a preview error.
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasPreviewErrors))]
         private int _previewErrorCount;
+
+        /// <summary>
+        /// Gets whether the Preview Errors count should use the error brush.
+        /// </summary>
+        public bool HasPreviewErrors => PreviewErrorCount > 0;
 
         /// <summary>
         /// Refreshes original Rename List fields when that grid has focus; otherwise reloads the File List.
@@ -317,27 +320,11 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             }
 
             if (
-                e.PropertyName is nameof(RenameListViewModel.LastAddError)
-                && !string.IsNullOrEmpty(RenameListViewModel.LastAddError)
+                e.PropertyName is nameof(RenameListViewModel.LastStatusMessage)
+                && !RenameListViewModel.LastStatusMessage.IsEmpty
             )
             {
-                _ShowTransientStatusHint(RenameListViewModel.LastAddError);
-            }
-
-            if (
-                e.PropertyName is nameof(RenameListViewModel.LastLocateError)
-                && !string.IsNullOrEmpty(RenameListViewModel.LastLocateError)
-            )
-            {
-                _ShowTransientStatusHint(RenameListViewModel.LastLocateError);
-            }
-
-            if (
-                e.PropertyName is nameof(RenameListViewModel.LastGoStatus)
-                && !string.IsNullOrEmpty(RenameListViewModel.LastGoStatus)
-            )
-            {
-                _ShowTransientStatusHint(RenameListViewModel.LastGoStatus);
+                _ShowStickyStatusHint(RenameListViewModel.LastStatusMessage);
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.CellStatusHint))
@@ -451,39 +438,17 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Shows a status-bar message and clears it after a short delay unless replaced sooner.
+        /// Stores a sticky status-bar message until another high-signal outcome replaces it.
         /// </summary>
-        private void _ShowTransientStatusHint(string message)
+        private void _ShowStickyStatusHint(StyledTextDisplay message)
         {
-            _statusHintClearCts?.Cancel();
-            _statusHintClearCts?.Dispose();
-            _transientStatusHint = message;
+            _lastStatusHint = message;
             _UpdateStatusHint();
-
-            _statusHintClearCts = new CancellationTokenSource();
-            var token = _statusHintClearCts.Token;
-            _ = _ClearStatusHintAfterDelayAsync(message, token);
         }
 
         private void _UpdateStatusHint()
         {
-            StatusHint = !string.IsNullOrEmpty(_transientStatusHint)
-                ? StyledTextDisplay.FromPlain(_transientStatusHint)
-                : _paneStatusHint;
-        }
-
-        private async Task _ClearStatusHintAfterDelayAsync(string message, CancellationToken token)
-        {
-            try
-            {
-                await Task.Delay(StatusHintClearMilliseconds, token).ConfigureAwait(true);
-                if (string.Equals(_transientStatusHint, message, StringComparison.Ordinal))
-                {
-                    _transientStatusHint = string.Empty;
-                    _UpdateStatusHint();
-                }
-            }
-            catch (OperationCanceledException) { }
+            StatusHint = !_paneStatusHint.IsEmpty ? _paneStatusHint : _lastStatusHint;
         }
 
         private static bool _CanExecuteUnimplemented()

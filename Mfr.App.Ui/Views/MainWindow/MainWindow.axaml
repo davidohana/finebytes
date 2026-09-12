@@ -420,6 +420,8 @@
           Grid.Column="4"
           Margin="16,0,0,0"
           VerticalAlignment="Center"
+          Classes="status-bar-preview-errors"
+          Classes.has-errors="{Binding HasPreviewErrors}"
           Text="{Binding PreviewErrorCount, StringFormat='Preview Errors: {0}'}"
         />
       </Grid>
