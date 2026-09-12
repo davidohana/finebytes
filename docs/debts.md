@@ -26,4 +26,4 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 
 ## Options dialog (deferred from v1)
 
-- Explorer shell integrate, double-click-to-add, Undo & Log retention tab — see [options-dialog.plan.md](plans/options-dialog.plan.md)
+- Explorer shell integrate, Undo & Log retention tab — see [options-dialog.plan.md](plans/options-dialog.plan.md) (double-click-to-add and confirmation prompts shipped in [options-confirmations-and-double-click.plan.md](plans/options-confirmations-and-double-click.plan.md))

@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: p5-docs
     content: "P5: debts + options-dialog plan amend + MfrConfig remarks"
-    status: pending
+    status: completed
 isProject: false
 ---
 

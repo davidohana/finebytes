@@ -18,8 +18,9 @@ namespace Mfr.Models.Config
     /// </para>
     /// <para>
     /// When the default AppData file is missing, <see cref="EnsureDefaultFile"/> writes one with current
-    /// defaults so the user can hand-edit filter and log settings. The Options dialog persists selected
-    /// UI prefs via <see cref="Save"/> (overwrite); other leaves remain hand-edit / CLI <c>--set</c>.
+    /// defaults so the user can hand-edit filter and log settings. The Options dialog persists
+    /// <c>ui.confirmationPrompts</c> and <c>ui.doubleClickAddsToRenameList</c> via <see cref="Save"/>
+    /// (overwrite); other leaves remain hand-edit / CLI <c>--set</c>.
     /// When a property is omitted, values still come from <see cref="MfrConfig"/> field initializers.
     /// </para>
     /// <para>

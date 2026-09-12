@@ -18,19 +18,26 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// UI-related config loaded from the <c>ui</c> section of the config file.
+    /// UI prefs from the Options dialog, loaded from the <c>ui</c> section of the config file.
+    /// <para>
+    /// <see cref="ConfirmationPrompts"/> gates optional confirms via <see cref="ConfirmationPolicy"/>;
+    /// <see cref="DoubleClickAddsToRenameList"/> selects File List double-click open vs add.
+    /// </para>
     /// </summary>
     public sealed class UiConfig
     {
         /// <summary>
-        /// How often the UI asks for confirmation before gated actions.
-        /// <para>Default <see cref="ConfirmationPrompts.Normal"/>.</para>
+        /// How often the UI asks for confirmation before gated actions (Fewer / Normal / More).
+        /// <para>
+        /// Default <see cref="ConfirmationPrompts.Normal"/>. Replaces the former
+        /// <c>ui.presets.confirmReplaceAppliedFiltersOnLoad</c> bool (no migration).
+        /// </para>
         /// </summary>
         public ConfirmationPrompts ConfirmationPrompts = ConfirmationPrompts.Normal;
 
         /// <summary>
         /// When <see langword="true"/>, double-click in the File List adds the selection to the Rename List.
-        /// <para>Default <see langword="false"/> (open / navigate instead).</para>
+        /// <para>Default <see langword="false"/> (open / navigate instead). Options dialog + <c>ui.doubleClickAddsToRenameList</c>.</para>
         /// </summary>
         public bool DoubleClickAddsToRenameList;
     }
@@ -100,7 +107,8 @@ namespace Mfr.Models.Config
         public LogConfig Log = new();
 
         /// <summary>
-        /// UI options (Options dialog + hand-edit <c>config.json</c> / CLI <c>--set</c>).
+        /// UI options persisted by the Options dialog (<c>ui.confirmationPrompts</c>,
+        /// <c>ui.doubleClickAddsToRenameList</c>) plus hand-edit <c>config.json</c> / CLI <c>--set</c>.
         /// </summary>
         [ConfigSection]
         public UiConfig Ui = new();
