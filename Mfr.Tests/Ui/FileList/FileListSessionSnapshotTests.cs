@@ -132,35 +132,19 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
-        /// Verifies session JSON view-mode tokens map through FromSessionState.
+        /// Verifies session view-mode is copied through FromSessionState.
         /// </summary>
         [Fact]
-        public void FromSessionState_Parses_ViewMode_Token()
+        public void FromSessionState_Copies_ViewMode()
         {
             var session = new SessionState
             {
-                FileList = new SessionStateFileList { ViewMode = "thumbnails" },
+                FileList = new SessionStateFileList { ViewMode = FileListViewMode.Thumbnails },
             };
 
             var snapshot = FileListSessionSnapshot.FromSessionState(session);
 
             Assert.Equal(FileListViewMode.Thumbnails, snapshot.ViewMode);
-        }
-
-        /// <summary>
-        /// Verifies unrecognized view-mode tokens are treated as unset.
-        /// </summary>
-        [Fact]
-        public void FromSessionState_Unknown_ViewMode_Is_Unset()
-        {
-            var session = new SessionState
-            {
-                FileList = new SessionStateFileList { ViewMode = "not-a-mode" },
-            };
-
-            var snapshot = FileListSessionSnapshot.FromSessionState(session);
-
-            Assert.Null(snapshot.ViewMode);
         }
 
         private FileListViewModel _CreateViewModel(string path)

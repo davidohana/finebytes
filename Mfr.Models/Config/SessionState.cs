@@ -186,12 +186,11 @@ namespace Mfr.Models.Config
         public List<string>? MaskSuggestions { get; set; }
 
         /// <summary>
-        /// Last File List layout mode (<c>largeIcons</c>, <c>smallIcons</c>, <c>report</c>, <c>list</c>,
-        /// <c>tiles</c>, <c>thumbnails</c>).
-        /// <para>Null or unrecognized means unset (first launch uses Report).</para>
+        /// Last File List layout mode.
+        /// <para>Null means unset (first launch uses Report).</para>
         /// </summary>
         [JsonPropertyName("viewMode")]
-        public string? ViewMode { get; set; }
+        public FileListViewMode? ViewMode { get; set; }
     }
 
     /// <summary>
