@@ -1,9 +1,9 @@
 ---
 name: Sample presets import
-overview: Ship 13 curated JSON sample presets (MFR7-style workflows plus folder/safety helpers), exposed via a Preset Manager checklist dialog that imports selected samples and skips name collisions with an explicit note.
+overview: Ship 13 curated typed sample presets (MFR7-style workflows plus folder/safety helpers), exposed via a Preset Manager checklist dialog that imports selected samples and skips name collisions with an explicit note.
 todos:
   - id: p1-sample-catalog
-    content: P1 — Author 13-sample JSON, SamplePresetCatalog embedded resource, deserialize/coverage tests
+    content: P1 — Author 13 typed sample builders, SamplePresetCatalog, coverage tests
     status: completed
   - id: p2-import-dialog
     content: P2 — ImportSamplePresets API, checklist dialog with skip note, Preset Manager button, result feedback, UI/VM tests
@@ -20,7 +20,7 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (F7 done; seed presets were out
 - **UX:** Checklist dialog from Preset Manager (**Import samples…**). User picks which samples to add, then imports.
 - **Name conflicts:** Exact-name match → **skip** (keep user’s preset). Dialog copy must state that presets with the same name will be skipped.
 - **First run:** Still empty `presets.json`. No auto-seed.
-- **Format:** Hand-authored finebytes JSON only. **No** `.mps` reader / MFR7 migration.
+- **Format:** Typed C# builders (`FilterPreset` / filter records) in `SamplePresetDefinitions`. **No** `.mps` reader / MFR7 migration.
 - **Catalog size:** **13** curated samples — 7 MFR7-derived + 6 finebytes additions (folders, swap, safe names, brackets, year-title). Still not a full MFR7 dump; trivial one-filter demos stay out.
 - **Sample display names:** Clear/concise finebytes names (not MFR7 filenames). Skip-on-conflict uses these exact strings.
 - **Skip feedback:** After import, brief result (e.g. “Added N. Skipped M (name already exists).”) when anything was skipped or when selection was all collisions.
@@ -188,23 +188,23 @@ Descriptions for MFR7-derived samples are copied from MFR7 where present. Additi
 flowchart LR
   mgr[PresetManagerDialog] --> dlg[ImportSamplePresetsDialog]
   dlg --> catalog[SamplePresetCatalog]
-  catalog --> json[Embedded sample-presets.json]
+  catalog --> defs[SamplePresetDefinitions C#]
   dlg -->|selected names| importApi[AppliedFiltersViewModel.ImportSamplePresets]
   importApi -->|skip exact name| pm[PresetManager.NameToPreset]
   importApi -->|SavePresets| disk[AppData presets.json]
 ```
 
-- Embed one container JSON under [`Mfr.Engine`](../../Mfr.Engine/) (e.g. `Presets/Samples/sample-presets.json` as `EmbeddedResource`) so UI and tests share one catalog without Avalonia.
-- [`SamplePresetCatalog`](../../Mfr.Engine/Presets/) loads once, exposes sorted `IReadOnlyList<FilterPreset>` (or name/description DTOs + lookup).
-- Import API on [`AppliedFiltersViewModel`](../../Mfr.App.Ui/ViewModels/AppliedFilters/AppliedFiltersViewModel.cs): for each selected name, if absent → add (keep sample `Id` from JSON) and `SavePresets()` once; return `(addedCount, skippedCount)`.
+- Build samples as typed filter records under [`Mfr.Engine/Presets/Samples/`](../../Mfr.Engine/Presets/Samples/) so UI and tests share one catalog without Avalonia and renames stay compile-time safe.
+- [`SamplePresetCatalog`](../../Mfr.Engine/Presets/) exposes sorted `IReadOnlyList<FilterPreset>`.
+- Import API on [`AppliedFiltersViewModel`](../../Mfr.App.Ui/ViewModels/AppliedFilters/AppliedFiltersViewModel.cs): for each selected name, if absent → add (keep sample `Id`) and `SavePresets()` once; return `(addedCount, skippedCount)`.
 
 ## Phases
 
-### P1 — Sample catalog + JSON assets
+### P1 — Sample catalog
 
-- Author [`Mfr.Engine/Presets/Samples/sample-presets.json`](../../Mfr.Engine/Presets/Samples/sample-presets.json) with the **13** presets (stable GUIDs, descriptions per **Sample catalog** above, chains as listed).
-- Add `SamplePresetCatalog` (+ embed in [`Mfr.Engine.csproj`](../../Mfr.Engine/Mfr.Engine.csproj)).
-- Tests: deserialize container; every sample name unique; every filter type known; spot-check several chains (Beautify Names, Date Taken Folders, Swap Around Hyphen, Safe Filename, Tags from Filename).
+- Author [`SamplePresetDefinitions`](../../Mfr.Engine/Presets/Samples/SamplePresetDefinitions.cs) with the **13** presets (stable GUIDs, descriptions per **Sample catalog** above, chains as listed).
+- Add `SamplePresetCatalog`.
+- Tests: catalog loads; every sample name unique; every filter type known; spot-check several chains (Beautify Names, Date Taken Folders, Swap Around Hyphen, Safe Filename, Tags from Filename).
 
 **Exit:** Catalog loads in tests; no UI yet.
 
@@ -224,4 +224,4 @@ flowchart LR
 - [`PresetJsonOptions.cs`](../../Mfr.Engine/Presets/PresetJsonOptions.cs) — deserialize samples
 - [`PresetManagerDialog.axaml`](../../Mfr.App.Ui/Views/Presets/PresetManagerDialog.axaml) (+ code-behind)
 - [`AppliedFiltersViewModel.cs`](../../Mfr.App.Ui/ViewModels/AppliedFilters/AppliedFiltersViewModel.cs) — import entry point
-- New: `SamplePresetCatalog`, `ImportSamplePresetsDialog` (+ VM), `sample-presets.json`
+- New: `SamplePresetCatalog`, `SamplePresetDefinitions`, `ImportSamplePresetsDialog` (+ VM)

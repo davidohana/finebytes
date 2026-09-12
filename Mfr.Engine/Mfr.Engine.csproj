@@ -25,8 +25,4 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Mfr.Tests" />
   </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Presets\Samples\sample-presets.json" />
-  </ItemGroup>
 </Project>

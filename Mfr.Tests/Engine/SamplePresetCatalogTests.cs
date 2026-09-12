@@ -4,7 +4,6 @@ using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Replace;
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Image;
@@ -14,15 +13,15 @@ using Mfr.Models.Tags;
 namespace Mfr.Tests.Engine
 {
     /// <summary>
-    /// Verifies the embedded sample-preset catalog and its curated filter chains.
+    /// Verifies the typed sample-preset catalog and its curated filter chains.
     /// </summary>
     public sealed class SamplePresetCatalogTests
     {
         /// <summary>
-        /// Verifies the embedded JSON deserializes to the complete locked catalog.
+        /// Verifies the catalog exposes the complete locked set of samples.
         /// </summary>
         [Fact]
-        public void Catalog_deserializes_all_13_samples()
+        public void Catalog_contains_all_13_samples()
         {
             Assert.Equal(13, SamplePresetCatalog.Presets.Count);
             Assert.All(SamplePresetCatalog.Presets, preset => Assert.NotEmpty(preset.Chain.Steps));
@@ -107,7 +106,7 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies every filter discriminator in the sample JSON is currently shipped.
+        /// Verifies every sample filter type is currently shipped in the filter catalog.
         /// </summary>
         [Fact]
         public void Catalog_filter_types_are_known()
