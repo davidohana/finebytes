@@ -184,20 +184,27 @@
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-preview-changed">
       <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
     </Style>
+    <!-- Darker red on tinted row fills (selection / error backgrounds). -->
     <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-preview-changed">
-      <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedSelectedForegroundBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow.rename-list-preview-error DataGridCell TextBlock.rename-list-preview-changed">
+      <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedSelectedForegroundBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow.rename-list-commit-error DataGridCell TextBlock.rename-list-preview-changed">
+      <Setter Property="Foreground" Value="{DynamicResource RenameListPreviewChangedSelectedForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-manual-override">
       <Setter Property="Foreground" Value="{DynamicResource RenameListManualOverrideForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-manual-override">
-      <Setter Property="Foreground" Value="{DynamicResource RenameListManualOverrideForegroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource RenameListManualOverrideSelectedForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell TextBlock.rename-list-missing-on-disk">
       <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow:selected DataGridCell TextBlock.rename-list-missing-on-disk">
-      <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
+      <Setter Property="Foreground" Value="{DynamicResource RenameListMissingOnDiskSelectedForegroundBrush}" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridCell:focus /template/ Grid#FocusVisual">
       <Setter Property="IsVisible" Value="False" />

@@ -4,18 +4,25 @@
       <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Light">
           <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#808080" />
+          <SolidColorBrush x:Key="RenameListMissingOnDiskSelectedForegroundBrush" Color="#555555" />
           <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#C00000" />
           <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF0000" />
+          <!-- Darker on tinted fills (selection / error rows); pure red is hard to read there. -->
+          <SolidColorBrush x:Key="RenameListPreviewChangedSelectedForegroundBrush" Color="#8B0000" />
           <SolidColorBrush x:Key="RenameListManualOverrideForegroundBrush" Color="#0000FF" />
+          <SolidColorBrush x:Key="RenameListManualOverrideSelectedForegroundBrush" Color="#00008B" />
           <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#FFF0F5" />
           <SolidColorBrush x:Key="RenameListCommitErrorRowBrush" Color="#DDA0DD" />
           <SolidColorBrush x:Key="RenameListFocusedCellBrush" Color="#E8F4FF" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
           <SolidColorBrush x:Key="RenameListMissingOnDiskForegroundBrush" Color="#909090" />
+          <SolidColorBrush x:Key="RenameListMissingOnDiskSelectedForegroundBrush" Color="#C0C0C0" />
           <SolidColorBrush x:Key="RenameListRowErrorGlyphForegroundBrush" Color="#FF8080" />
           <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF8080" />
+          <SolidColorBrush x:Key="RenameListPreviewChangedSelectedForegroundBrush" Color="#FFB0B0" />
           <SolidColorBrush x:Key="RenameListManualOverrideForegroundBrush" Color="#8090FF" />
+          <SolidColorBrush x:Key="RenameListManualOverrideSelectedForegroundBrush" Color="#B0C0FF" />
           <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#4A3038" />
           <SolidColorBrush x:Key="RenameListCommitErrorRowBrush" Color="#5A405A" />
           <SolidColorBrush x:Key="RenameListFocusedCellBrush" Color="#3A6A9A" />
