@@ -1,6 +1,7 @@
 using Avalonia.Media;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.Shell;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.Utils;
 
@@ -1158,6 +1159,44 @@ namespace Mfr.Tests.Ui.FileList
             await viewModel.CopyPathCommand.ExecuteAsync(null);
 
             Assert.Equal($"{alpha.FullPath}{Environment.NewLine}{beta.FullPath}", clipboard.LastText);
+            Assert.Equal("Copied 2 path(s).", viewModel.LastStatusMessage.ToPlainText());
+            Assert.All(viewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
+        }
+
+        /// <summary>
+        /// Verifies Copy path sets an error status when the clipboard throws.
+        /// </summary>
+        [Fact]
+        public async Task CopyPath_Clipboard_Failure_Sets_Error_LastStatusMessage()
+        {
+            var clipboard = new ThrowingClipboard("clipboard unavailable");
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, clipboard: clipboard);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+
+            await viewModel.CopyPathCommand.ExecuteAsync(null);
+
+            Assert.Equal("clipboard unavailable", viewModel.LastStatusMessage.ToPlainText());
+            Assert.Equal(
+                StatusBarText.ErrorForegroundResourceKey,
+                viewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
+        }
+
+        /// <summary>
+        /// Verifies navigating does not publish File List sticky status.
+        /// </summary>
+        [Fact]
+        public void Navigate_Does_Not_Set_LastStatusMessage()
+        {
+            var dir = _CreateTree();
+            var child = Path.Combine(dir, "zeta-folder");
+            var viewModel = _CreateViewModel(dir);
+
+            viewModel.NavigateTo(child);
+
+            Assert.True(viewModel.LastStatusMessage.IsEmpty);
         }
 
         /// <summary>
@@ -1353,6 +1392,14 @@ namespace Mfr.Tests.Ui.FileList
             {
                 LastText = text;
                 return Task.CompletedTask;
+            }
+        }
+
+        private sealed class ThrowingClipboard(string message) : ITextClipboard
+        {
+            public Task SetTextAsync(string text)
+            {
+                throw new InvalidOperationException(message);
             }
         }
     }

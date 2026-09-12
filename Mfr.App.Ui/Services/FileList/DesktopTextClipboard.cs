@@ -16,7 +16,7 @@ namespace Mfr.App.Ui.Services.FileList
                 || desktop.MainWindow?.Clipboard is not { } clipboard
             )
             {
-                return;
+                throw new InvalidOperationException("Clipboard is unavailable.");
             }
 
             await clipboard.SetTextAsync(text).ConfigureAwait(true);

@@ -91,6 +91,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
             AppliedFiltersViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
             AppliedFiltersViewModel.ChainChanged += _OnPreviewInputsChanged;
+            FileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             FilterPaletteViewModel.PropertyChanged += _OnFilterPalettePropertyChanged;
             ItemCount = RenameListViewModel.ItemCount;
             FilterCount = AppliedFiltersViewModel.Count;
@@ -319,12 +320,9 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 GoCommand.NotifyCanExecuteChanged();
             }
 
-            if (
-                e.PropertyName is nameof(RenameListViewModel.LastStatusMessage)
-                && !RenameListViewModel.LastStatusMessage.IsEmpty
-            )
+            if (e.PropertyName is nameof(RenameListViewModel.LastStatusMessage))
             {
-                _ShowStickyStatusHint(RenameListViewModel.LastStatusMessage);
+                _ForwardStickyStatusIfPresent(RenameListViewModel.LastStatusMessage);
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.CellStatusHint))
@@ -346,12 +344,17 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
             }
 
-            if (
-                e.PropertyName is nameof(AppliedFiltersViewModel.LastStatusMessage)
-                && !AppliedFiltersViewModel.LastStatusMessage.IsEmpty
-            )
+            if (e.PropertyName is nameof(AppliedFiltersViewModel.LastStatusMessage))
             {
-                _ShowStickyStatusHint(AppliedFiltersViewModel.LastStatusMessage);
+                _ForwardStickyStatusIfPresent(AppliedFiltersViewModel.LastStatusMessage);
+            }
+        }
+
+        private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName is nameof(FileListViewModel.LastStatusMessage))
+            {
+                _ForwardStickyStatusIfPresent(FileListViewModel.LastStatusMessage);
             }
         }
 
@@ -443,6 +446,20 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         private bool _CanGo()
         {
             return RenameListViewModel.ItemCount >= 1 && !RenameListViewModel.IsBusy;
+        }
+
+        /// <summary>
+        /// Forwards a non-empty pane status message onto the sticky status bar.
+        /// </summary>
+        /// <param name="message">Status published by Rename List, Applied Filters, or File List.</param>
+        private void _ForwardStickyStatusIfPresent(StyledTextDisplay message)
+        {
+            if (message.IsEmpty)
+            {
+                return;
+            }
+
+            _ShowStickyStatusHint(message);
         }
 
         /// <summary>

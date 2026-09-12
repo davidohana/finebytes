@@ -243,6 +243,12 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public IReadOnlyList<FileListEntry> SelectedEntries => _selectedEntries;
 
         /// <summary>
+        /// Gets the most recent high-signal File List status-bar message (Copy path).
+        /// </summary>
+        [ObservableProperty]
+        private StyledTextDisplay _lastStatusMessage = StyledTextDisplay.Empty;
+
+        /// <summary>
         /// Whether <see cref="GoUp"/> can move to a parent folder, Network, or This PC.
         /// </summary>
         [ObservableProperty]
@@ -479,6 +485,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         /// <summary>
         /// Copies selected full paths to the clipboard, one per line.
+        /// <para>
+        /// Publishes a neutral sticky status on success, or an error status when the clipboard fails.
+        /// </para>
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanCopyPath))]
         public async Task CopyPathAsync()
@@ -488,8 +497,19 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return;
             }
 
+            var pathCount = _selectedEntries.Count;
             var text = string.Join(Environment.NewLine, _selectedEntries.Select(entry => entry.FullPath));
-            await _clipboard.SetTextAsync(text).ConfigureAwait(true);
+            try
+            {
+                await _clipboard.SetTextAsync(text).ConfigureAwait(true);
+            }
+            catch (Exception ex)
+            {
+                LastStatusMessage = StatusBarText.Error(ex.Message);
+                return;
+            }
+
+            LastStatusMessage = StatusBarText.Neutral($"Copied {pathCount} path(s).");
         }
 
         /// <summary>

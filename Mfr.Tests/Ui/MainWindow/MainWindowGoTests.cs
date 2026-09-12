@@ -243,6 +243,20 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
+        /// Verifies File List sticky status is forwarded to the main-window hint.
+        /// </summary>
+        [AvaloniaFact]
+        public void FileList_status_updates_main_window_hint()
+        {
+            var viewModel = new MainWindowViewModel();
+
+            viewModel.FileListViewModel.LastStatusMessage = StatusBarText.Neutral("Copied 1 path(s).");
+
+            Assert.Equal("Copied 1 path(s).", viewModel.StatusHint.ToPlainText());
+            Assert.All(viewModel.StatusHint.Runs, run => Assert.Null(run.ForegroundResourceKey));
+        }
+
+        /// <summary>
         /// Verifies stopping GO during preview publishes a warning Stopped status.
         /// </summary>
         [AvaloniaFact]
