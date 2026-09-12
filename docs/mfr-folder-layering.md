@@ -19,7 +19,7 @@ description: Current layers and allowed project dependencies.
 Supporting:
 
 - Tests: [`Mfr.Tests/`](../Mfr.Tests) (guardrails + regression, TagLib-backed `AudioTagPersistence` integration in `Metadata/`; UI tests under `Ui/<Pane>/` with matching namespaces, plus `Ui/Services/<Slice>/` for non-View service coverage such as `FileList`; refs entry points only per architecture test)
-- UI: [`Mfr.App.Ui/`](../Mfr.App.Ui) (Avalonia 11 + CommunityToolkit.Mvvm desktop shell; `just run-ui`)
+- UI: [`Mfr.App.Ui/`](../Mfr.App.Ui) (Avalonia 12 + CommunityToolkit.Mvvm desktop shell; `just run-ui`)
 
 ## Allowed dependencies
 

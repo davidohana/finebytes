@@ -1,6 +1,6 @@
 # App UI
 
-Avalonia 11 desktop entry point (`Mfr.App.Ui`) for Magic File Renamer.
+Avalonia 12 desktop entry point (`Mfr.App.Ui`) for Magic File Renamer.
 
 From the repository root:
 

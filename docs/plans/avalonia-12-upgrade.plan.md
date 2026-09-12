@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: docs-layering
     content: Update Avalonia 11 mentions in README / mfr-folder-layering.md to Avalonia 12
-    status: pending
+    status: completed
   - id: automated-checks
     content: Run just format, just lint, just test; fix failures
     status: pending
