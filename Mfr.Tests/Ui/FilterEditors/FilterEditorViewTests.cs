@@ -168,7 +168,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         /// Verifies the title-bar save-as-default button persists options for the next palette add.
         /// </summary>
         [AvaloniaFact]
-        public void Save_as_default_button_persists_options_for_next_add()
+        public async Task Save_as_default_button_persists_options_for_next_add()
         {
             var defaultsPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-ui-{Guid.NewGuid():N}.json");
             try
@@ -196,7 +196,7 @@ namespace Mfr.Tests.Ui.FilterEditors
                 Assert.True(saveButton.Command!.CanExecute(null));
                 saveButton.Command.Execute(null);
 
-                applied.Clear();
+                await applied.Clear();
                 applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
                 Assert.Equal(LettersCaseMode.UpperCase, ((LettersCaseFilter)applied.Steps[0].Filter).Options.Mode);
 

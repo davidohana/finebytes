@@ -143,7 +143,7 @@ namespace Mfr.Tests.Ui.MainWindow
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
             Assert.Equal(1, viewModel.ItemCount);
 
-            renameListViewModel.ClearCommand.Execute(null);
+            await renameListViewModel.ClearCommand.ExecuteAsync(null);
             Assert.Equal(0, viewModel.ItemCount);
         }
 

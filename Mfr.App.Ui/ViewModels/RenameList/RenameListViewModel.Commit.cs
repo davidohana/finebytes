@@ -1,5 +1,6 @@
 using Avalonia.Media;
 using Mfr.Engine.Commit;
+using Mfr.Models.Config;
 using Mfr.Models.Filters;
 using Mfr.Models.Rename;
 
@@ -99,6 +100,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private async Task<bool> _ConfirmPreviewErrorsAsync(int errorCount)
         {
+            if (!ConfirmationPolicy.ShouldConfirm(ConfirmationKind.GoWithPreviewErrors))
+            {
+                return true;
+            }
+
             var confirm = UiHooks?.ConfirmPreviewErrorsAsync;
             if (confirm is null)
             {

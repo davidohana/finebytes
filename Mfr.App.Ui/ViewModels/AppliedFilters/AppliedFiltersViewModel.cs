@@ -7,6 +7,7 @@ using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.Engine.Presets;
 using Mfr.Filters;
+using Mfr.Models.Config;
 using Mfr.Models.Filters;
 using Mfr.Models.RenameList;
 using Mfr.Utils;
@@ -25,6 +26,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private Action<IReadOnlyList<RenameListVisibleColumnSpec>>? _applyRenameListColumns;
         private int _chainChangedBatchDepth;
         private bool _chainChangedQueued;
+
+        /// <summary>
+        /// Optional UI hooks for confirm dialogs; when null, gated confirms abort.
+        /// </summary>
+        public AppliedFiltersUiHooks? UiHooks { get; set; }
 
         /// <summary>
         /// Initializes an empty applied-filter list.
@@ -207,16 +213,13 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Gets whether loading a preset should confirm before replacing the current Applied Filters chain.
         /// </summary>
-        /// <param name="shouldConfirm">
-        /// Whether policy requires a replace-on-load confirm (typically from
-        /// <see cref="Models.Config.ConfirmationPolicy"/>).
-        /// </param>
         /// <returns>
-        /// <see langword="true"/> when confirmation is required and the stack is non-empty.
+        /// <see langword="true"/> when <see cref="ConfirmationPolicy"/> requires replace-on-load confirm
+        /// and the stack is non-empty.
         /// </returns>
-        public bool NeedsConfirmReplaceOnLoad(bool shouldConfirm)
+        public bool NeedsConfirmReplaceOnLoad()
         {
-            return shouldConfirm && Steps.Count > 0;
+            return ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ReplaceAppliedFiltersOnLoad) && Steps.Count > 0;
         }
 
         /// <summary>
@@ -520,14 +523,23 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Removes every step from the stack.
+        /// Removes every step from the stack, confirming first when policy requires it.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_HasSteps))]
-        public void Clear()
+        public async Task Clear()
         {
             if (Steps.Count == 0)
             {
                 return;
+            }
+
+            if (ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearAppliedFilters))
+            {
+                var confirm = UiHooks?.ConfirmClearAsync;
+                if (confirm is null || !await confirm().ConfigureAwait(true))
+                {
+                    return;
+                }
             }
 
             _DetachAndClearSteps();

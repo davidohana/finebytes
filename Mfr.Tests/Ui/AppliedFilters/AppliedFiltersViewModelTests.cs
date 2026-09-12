@@ -144,13 +144,13 @@ namespace Mfr.Tests.Ui.AppliedFilters
         /// Verifies clear removes every step and selection.
         /// </summary>
         [Fact]
-        public void Clear_Removes_All_Steps()
+        public async Task Clear_Removes_All_Steps()
         {
             var viewModel = new AppliedFiltersViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
-            viewModel.ClearCommand.Execute(null);
+            await viewModel.ClearCommand.ExecuteAsync(null);
 
             Assert.Empty(viewModel.Steps);
             Assert.Empty(viewModel.SelectedSteps);
@@ -493,7 +493,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         /// Verifies save-as-default persists options used on the next palette add.
         /// </summary>
         [Fact]
-        public void SaveSelectedAsDefault_applies_on_next_add()
+        public async Task SaveSelectedAsDefault_applies_on_next_add()
         {
             var defaultsPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-test-{Guid.NewGuid():N}.json");
             try
@@ -513,7 +513,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
                 Assert.Equal("Letters Case", savedName);
 
-                viewModel.Clear();
+                await viewModel.Clear();
                 viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
                 var added = Assert.IsType<LettersCaseFilter>(viewModel.Steps[0].Filter);
                 Assert.IsType<FileExtensionTarget>(added.Target);
@@ -1191,21 +1191,6 @@ namespace Mfr.Tests.Ui.AppliedFilters
             viewModel.SetRenameListColumnSource(capture: () => columns, apply: _ => { });
 
             Assert.Same(columns, viewModel.CaptureRenameListColumns());
-        }
-
-        /// <summary>
-        /// Verifies confirm-replace is required only when policy says confirm and the stack is non-empty.
-        /// </summary>
-        [Fact]
-        public void NeedsConfirmReplaceOnLoad_Requires_Policy_And_NonEmpty_Stack()
-        {
-            var viewModel = new AppliedFiltersViewModel();
-            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(shouldConfirm: true));
-            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(shouldConfirm: false));
-
-            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
-            Assert.True(viewModel.NeedsConfirmReplaceOnLoad(shouldConfirm: true));
-            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(shouldConfirm: false));
         }
 
         /// <summary>

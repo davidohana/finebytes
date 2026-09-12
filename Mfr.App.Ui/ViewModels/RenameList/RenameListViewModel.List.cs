@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Filters.Formatting;
+using Mfr.Models.Config;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -244,10 +245,32 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Removes every row from the Rename List.
+        /// Removes every row from the Rename List, confirming first when policy requires it.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanClear))]
-        public void Clear()
+        public async Task Clear()
+        {
+            if (Entries.Count == 0)
+            {
+                return;
+            }
+
+            if (ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList))
+            {
+                var confirm = UiHooks?.ConfirmClearAsync;
+                if (confirm is null || !await confirm().ConfigureAwait(true))
+                {
+                    return;
+                }
+            }
+
+            ClearWithoutConfirm();
+        }
+
+        /// <summary>
+        /// Clears the Rename List without a confirmation dialog (e.g. Alt+drag drop).
+        /// </summary>
+        internal void ClearWithoutConfirm()
         {
             if (Entries.Count == 0)
             {

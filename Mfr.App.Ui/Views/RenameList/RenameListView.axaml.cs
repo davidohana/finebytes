@@ -180,6 +180,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 ShowErrorAsync = _ShowExportErrorAsync,
                 PromptAsync = _PromptOverrideAsync,
                 ConfirmPreviewErrorsAsync = _ConfirmPreviewErrorsAsync,
+                ConfirmClearAsync = _ConfirmClearAsync,
             };
         }
 
@@ -194,6 +195,17 @@ namespace Mfr.App.Ui.Views.RenameList
                 title: "Preview Errors",
                 message: $"{errorCount} items with preview errors will be ignored. Do you want to continue?"
             );
+            return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
+        }
+
+        private async Task<bool> _ConfirmClearAsync()
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return false;
+            }
+
+            var dialog = new ConfirmMessageDialog(title: "Clear Rename List", message: "Clear the Rename List?");
             return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
         }
 
@@ -547,7 +559,7 @@ namespace Mfr.App.Ui.Views.RenameList
             // File payloads only (File List / Explorer); internal reorder does not clear.
             if (!isReorder && e.KeyModifiers.HasFlag(KeyModifiers.Alt))
             {
-                _viewModel.Clear();
+                _viewModel.ClearWithoutConfirm();
                 _ClearDropMark();
                 e.DragEffects = DragDropEffects.Copy;
                 return;

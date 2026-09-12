@@ -66,11 +66,37 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            _viewModel?.PropertyChanged -= _OnViewModelPropertyChanged;
+            if (_viewModel is not null)
+            {
+                _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
+                _ClearUiHooks(_viewModel);
+            }
 
             _viewModel = viewModel;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
+            _WireUiHooks(_viewModel);
             _QueueRestoreSelectionFromViewModel();
+        }
+
+        private void _WireUiHooks(AppliedFiltersViewModel viewModel)
+        {
+            viewModel.UiHooks = new AppliedFiltersUiHooks { ConfirmClearAsync = _ConfirmClearAsync };
+        }
+
+        private static void _ClearUiHooks(AppliedFiltersViewModel viewModel)
+        {
+            viewModel.UiHooks = null;
+        }
+
+        private async Task<bool> _ConfirmClearAsync()
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return false;
+            }
+
+            var dialog = new ConfirmMessageDialog(title: "Remove All Filters", message: "Remove all Applied Filters?");
+            return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
         }
 
         private void _OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

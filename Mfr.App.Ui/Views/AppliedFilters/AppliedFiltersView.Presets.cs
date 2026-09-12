@@ -3,7 +3,6 @@ using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.App.Ui.Views.Presets;
 using Mfr.Models;
-using Mfr.Models.Config;
 using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.Views.AppliedFilters
@@ -237,11 +236,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return false;
             }
 
-            if (
-                !_viewModel.NeedsConfirmReplaceOnLoad(
-                    ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ReplaceAppliedFiltersOnLoad)
-                )
-            )
+            if (!_viewModel.NeedsConfirmReplaceOnLoad())
             {
                 return true;
             }

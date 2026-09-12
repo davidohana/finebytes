@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-wire-confirms
     content: "P2: Wire policy at preset load, Go preview-errors, Clear RL / Clear AF"
-    status: pending
+    status: completed
   - id: p3-options-ui
     content: "P3: Options dialog 3-state + double-click checkbox; update Options tests"
     status: pending

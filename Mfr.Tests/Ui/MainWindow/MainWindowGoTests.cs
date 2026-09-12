@@ -11,9 +11,18 @@ namespace Mfr.Tests.Ui.MainWindow
     /// <summary>
     /// Main-window GO command state and Rename List commit orchestration.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class MainWindowGoTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
+
+        /// <summary>
+        /// Initializes a fresh empty config so confirmation-level tests are isolated.
+        /// </summary>
+        public MainWindowGoTests()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+        }
 
         /// <inheritdoc />
         public void Dispose()
@@ -125,6 +134,49 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Equal(RenameListProgressOperation.Preview, viewModel.RenameListViewModel.Progress.Operation);
             Assert.Equal("Prior sticky.", viewModel.RenameListViewModel.LastStatusMessage.ToPlainText());
             Assert.Equal("Prior sticky.", viewModel.StatusHint.ToPlainText());
+        }
+
+        /// <summary>
+        /// Verifies Fewer skips the preview-error dialog and still reaches the commit stage.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Go_preview_errors_fewer_skips_confirm_and_commits()
+        {
+            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var okSource = Path.Combine(dir, "alpha.txt");
+            var blocked = Path.Combine(dir, "blocked.txt");
+            var occupied = Path.Combine(dir, "taken.txt");
+            await File.WriteAllTextAsync(okSource, "alpha");
+            await File.WriteAllTextAsync(blocked, "blocked");
+            await File.WriteAllTextAsync(occupied, "occupied");
+            var viewModel = new MainWindowViewModel(dir);
+            viewModel.RenameListViewModel.DisableAutoPreview();
+            await viewModel.RenameListViewModel.AddPathsAsync([okSource, blocked]).ConfigureAwait(true);
+
+            var warnedCount = 0;
+            viewModel.RenameListViewModel.UiHooks = new RenameListUiHooks
+            {
+                ConfirmPreviewErrorsAsync = errorCount =>
+                {
+                    warnedCount = errorCount;
+                    return Task.FromResult(false);
+                },
+            };
+
+            var commitStarted = await viewModel
+                .RenameListViewModel.GoAsync(
+                    _Chain(_PrefixReplacer("alpha", "renamed"), _PrefixReplacer("blocked", "taken"))
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(commitStarted);
+            Assert.Equal(0, warnedCount);
+            Assert.True(File.Exists(Path.Combine(dir, "renamed.txt")));
+            Assert.True(File.Exists(blocked));
+            Assert.Equal("occupied", await File.ReadAllTextAsync(occupied));
+            Assert.Equal("Renamed 1 item(s).", viewModel.RenameListViewModel.LastStatusMessage.ToPlainText());
         }
 
         /// <summary>
@@ -251,7 +303,7 @@ namespace Mfr.Tests.Ui.MainWindow
 
             Assert.Equal("Renamed 1 item(s).", viewModel.StatusHint.ToPlainText());
 
-            viewModel.RenameListViewModel.ClearCommand.Execute(null);
+            await viewModel.RenameListViewModel.ClearCommand.ExecuteAsync(null);
 
             Assert.Equal(0, viewModel.ItemCount);
             Assert.True(viewModel.StatusHint.IsEmpty);

@@ -8,7 +8,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// When <see cref="RenameListViewModel.UiHooks"/> is null, or a feature's delegate is null,
     /// that feature is a no-op (export needs <see cref="PickSavePathAsync"/>; Manual Override
     /// needs <see cref="PromptAsync"/>; GO preview-error confirm needs
-    /// <see cref="ConfirmPreviewErrorsAsync"/> and aborts when missing).
+    /// <see cref="ConfirmPreviewErrorsAsync"/> and aborts when missing; Clear confirm needs
+    /// <see cref="ConfirmClearAsync"/> when policy requires it and aborts when missing).
     /// </para>
     /// </remarks>
     public sealed class RenameListUiHooks
@@ -43,5 +44,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </para>
         /// </remarks>
         public Func<int, Task<bool>>? ConfirmPreviewErrorsAsync { get; init; }
+
+        /// <summary>
+        /// Confirm before clearing a non-empty Rename List when confirmation policy requires it.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Returns <see langword="true"/> to clear. When null while confirm is required, Clear aborts.
+        /// </para>
+        /// </remarks>
+        public Func<Task<bool>>? ConfirmClearAsync { get; init; }
     }
 }
