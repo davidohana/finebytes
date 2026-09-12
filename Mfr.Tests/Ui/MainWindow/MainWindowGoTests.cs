@@ -73,7 +73,8 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies the bound main-window GO command previews the live filters and performs the filesystem rename.
+        /// Verifies the bound main-window GO command previews the live filters, performs the filesystem
+        /// rename, and reloads the File List so the new name is visible.
         /// </summary>
         [AvaloniaFact]
         public async Task GoCommand_previews_and_commits_live_filter_chain()
@@ -88,11 +89,15 @@ namespace Mfr.Tests.Ui.MainWindow
             viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
             viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
 
+            Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "alpha.txt");
+
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
 
             Assert.False(File.Exists(source));
             Assert.True(File.Exists(destination));
             Assert.Equal(RenameListProgressOperation.Commit, viewModel.RenameListViewModel.Progress.Operation);
+            Assert.DoesNotContain(viewModel.FileListViewModel.Entries, entry => entry.Name == "alpha.txt");
+            Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "renamed.txt");
         }
 
         /// <summary>

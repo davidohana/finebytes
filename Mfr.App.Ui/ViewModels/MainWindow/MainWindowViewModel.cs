@@ -213,6 +213,9 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// <summary>
         /// Previews the live filter chain and applies valid rename changes.
         /// </summary>
+        /// <remarks>
+        /// Reloads the File List after commit so renamed/moved names appear without a manual refresh.
+        /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanGo))]
         public async Task GoAsync()
         {
@@ -225,7 +228,14 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             var commitStarted = await RenameListViewModel
                 .GoAsync(AppliedFiltersViewModel.ToChain())
                 .ConfigureAwait(true);
-            if (!commitStarted || !RenameListViewModel.IsAutoPreview)
+            if (!commitStarted)
+            {
+                return;
+            }
+
+            FileListViewModel.Refresh();
+
+            if (!RenameListViewModel.IsAutoPreview)
             {
                 return;
             }
