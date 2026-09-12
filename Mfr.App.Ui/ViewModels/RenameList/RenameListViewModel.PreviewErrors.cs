@@ -54,12 +54,5 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             return _selectedEntries[0].HasPreviewError;
         }
-
-        private void _NotifyShowPreviewErrorChanged()
-        {
-            OnPropertyChanged(nameof(CanShowPreviewError));
-            OnPropertyChanged(nameof(CanShowRowErrorMenu));
-            ShowPreviewErrorCommand.NotifyCanExecuteChanged();
-        }
     }
 }

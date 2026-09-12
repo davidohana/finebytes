@@ -49,12 +49,5 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             return _selectedEntries[0].HasCommitError;
         }
-
-        private void _NotifyShowCommitErrorChanged()
-        {
-            OnPropertyChanged(nameof(CanShowCommitError));
-            OnPropertyChanged(nameof(CanShowRowErrorMenu));
-            ShowCommitErrorCommand.NotifyCanExecuteChanged();
-        }
     }
 }

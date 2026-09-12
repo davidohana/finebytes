@@ -221,9 +221,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ShowInExplorerCommand.NotifyCanExecuteChanged();
             ShowPropertiesCommand.NotifyCanExecuteChanged();
             _NotifyManualOverrideCommandsChanged();
-            _NotifyShowLoadErrorsChanged();
-            _NotifyShowPreviewErrorChanged();
-            _NotifyShowCommitErrorChanged();
+            _NotifyRowErrorCommandsChanged();
         }
 
         /// <summary>
@@ -320,9 +318,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             FieldDisplayRevision++;
-            _NotifyShowLoadErrorsChanged();
-            _NotifyShowPreviewErrorChanged();
-            _NotifyShowCommitErrorChanged();
+            _NotifyRowErrorCommandsChanged();
         }
 
         private bool _CanRemoveSelected()
@@ -379,9 +375,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ShowInExplorerCommand.NotifyCanExecuteChanged();
             ShowPropertiesCommand.NotifyCanExecuteChanged();
             _NotifyManualOverrideCommandsChanged();
-            _NotifyShowLoadErrorsChanged();
-            _NotifyShowPreviewErrorChanged();
-            _NotifyShowCommitErrorChanged();
+            _NotifyRowErrorCommandsChanged();
             _NotifyRefreshChanged();
         }
 

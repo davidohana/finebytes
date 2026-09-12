@@ -44,10 +44,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return RenameListFieldCatalog.HasAnyLoadError(_selectedEntries[0].EngineItem);
         }
 
-        private void _NotifyShowLoadErrorsChanged()
+        /// <summary>
+        /// Notifies all Show * Error menu visibility and command CanExecute state.
+        /// </summary>
+        private void _NotifyRowErrorCommandsChanged()
         {
+            OnPropertyChanged(nameof(CanShowCommitError));
+            OnPropertyChanged(nameof(CanShowPreviewError));
             OnPropertyChanged(nameof(CanShowLoadErrors));
             OnPropertyChanged(nameof(CanShowRowErrorMenu));
+            ShowCommitErrorCommand.NotifyCanExecuteChanged();
+            ShowPreviewErrorCommand.NotifyCanExecuteChanged();
             ShowLoadErrorsCommand.NotifyCanExecuteChanged();
         }
     }
