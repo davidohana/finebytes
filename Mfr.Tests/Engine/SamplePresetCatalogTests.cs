@@ -174,8 +174,7 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal(expectedTypes, preset.Chain.Steps.Select(step => step.Filter.Type));
             var casingList = Assert.IsType<CasingListFilter>(preset.Chain.Steps[^1].Filter);
-            string[] expectedWords = ["a", "an", "the", "and", "or", "of", "to", "in", "on", "for", "with"];
-            Assert.Equal(expectedWords, casingList.Options.Words);
+            Assert.Equal(LettersCaseOptions.DefaultCapitalizeSkipWords, casingList.Options.Words);
             Assert.True(casingList.Options.UppercaseSentenceInitial);
         }
 

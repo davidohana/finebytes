@@ -6,7 +6,13 @@ Changes letter casing on the target segment. **Capitalize** and **sentence case*
 
 - **`mode`** (enum, required) — One of the **Modes** below.
 - **`capitalizeSkipWords`** (array of string, default `[]` in JSON; add-to-list uses
-  `a`, `an`, `the`, `and`, `or`, `of`, `to`, `for`, `in`, `on`, `at`, `by`, `with`)
+  `DefaultCapitalizeSkipWords`: articles, short conjunctions, common prepositions, and short `be`
+  forms — `a`, `an`, `the`, `and`, `but`, `or`, `nor`, `so`, `yet`, `am`, `are`, `be`, `been`,
+  `being`, `is`, `was`, `were`, `as`, `at`, `by`, `for`, `from`, `in`, `into`, `of`, `off`, `on`,
+  `onto`, `out`, `over`, `per`, `than`, `to`, `up`, `upon`, `via`, `with`, `about`, `above`,
+  `across`, `after`, `against`, `along`, `among`, `around`, `before`, `behind`, `below`, `beneath`,
+  `beside`, `between`, `beyond`, `despite`, `down`, `during`, `inside`, `like`, `near`, `outside`,
+  `since`, `through`, `toward`, `towards`, `under`, `until`, `versus`, `vs`, `within`, `without`)
   - **Capitalize only:** words matched case-insensitively stay lowercase.
 - **`weirdUppercaseChancePercent`** (int, default `50`)
   - **Weird case only:** chance each letter is uppercased (clamped 0–100).
@@ -88,7 +94,15 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
   },
   "options": {
     "mode": "Capitalize",
-    "capitalizeSkipWords": ["a", "an", "the", "and", "or", "of", "to", "for", "in", "on", "at", "by", "with"],
+    "capitalizeSkipWords": [
+      "a", "about", "above", "across", "after", "against", "along", "am", "among", "an", "and",
+      "are", "around", "as", "at", "be", "been", "before", "behind", "being", "below", "beneath",
+      "beside", "between", "beyond", "but", "by", "despite", "down", "during", "for", "from", "in",
+      "inside", "into", "is", "like", "near", "nor", "of", "off", "on", "onto", "or", "out",
+      "outside", "over", "per", "since", "so", "than", "the", "through", "to", "toward", "towards",
+      "under", "until", "up", "upon", "versus", "via", "vs", "was", "were", "with", "within",
+      "without", "yet"
+    ],
     "weirdUppercaseChancePercent": 50,
     "weirdFixedPlaces": false
   }

@@ -17,21 +17,6 @@ namespace Mfr.Engine.Presets.Samples
     /// </summary>
     internal static class SamplePresetDefinitions
     {
-        private static readonly string[] CommonSmallWords =
-        [
-            "a",
-            "an",
-            "the",
-            "and",
-            "or",
-            "of",
-            "to",
-            "in",
-            "on",
-            "for",
-            "with",
-        ];
-
         private static readonly FilePrefixTarget FilePrefix = new();
 
         /// <summary>
@@ -95,7 +80,10 @@ namespace Mfr.Engine.Presets.Samples
                     _On(
                         new LettersCaseFilter(
                             FilePrefix,
-                            new LettersCaseOptions(LettersCaseMode.Capitalize, CommonSmallWords)
+                            new LettersCaseOptions(
+                                LettersCaseMode.Capitalize,
+                                LettersCaseOptions.DefaultCapitalizeSkipWords
+                            )
                         )
                     ),
                     _On(
@@ -108,7 +96,10 @@ namespace Mfr.Engine.Presets.Samples
                     _On(
                         new CasingListFilter(
                             FilePrefix,
-                            new CasingListOptions(Words: CommonSmallWords, UppercaseSentenceInitial: true)
+                            new CasingListOptions(
+                                Words: LettersCaseOptions.DefaultCapitalizeSkipWords,
+                                UppercaseSentenceInitial: true
+                            )
                         )
                     )
                 ),
