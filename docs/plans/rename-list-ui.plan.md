@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–13 + 14a + 14b + 14c + 14e done. Next: 14d → 14f → 15 → 16."
+overview: "Phases 1–13 + 14a–14e + 15 + 16 done. Next: 14f drag-out."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -121,7 +121,7 @@ todos:
     status: completed
   - id: phase-16
     content: "Phase 16: color-legend toolbar (MFR7) — after 14d blue + GO plum"
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -129,31 +129,26 @@ isProject: false
 
 Canonical plan: this file under `docs/plans/`. Sources: [mfr7 help](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html), [FieldSelector.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/FieldSelector.cs), [SortFieldSelector.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/SortFieldSelector.cs), [RenameList.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/RenameList.cs) (UI), engine [Mfr.Engine/RenameList/RenameList.cs](../../Mfr.Engine/RenameList/RenameList.cs).
 
-**Phase numbers = execution order.** Color legend is **16** (needs 14d blue + 15 plum).
+**Phase numbers = execution order.** Color legend is **16** (done — [rename-list-color-legend.plan.md](rename-list-color-legend.plan.md)).
 
 **No legacy migrations:** session/config use current shapes only; unknown JSON → defaults (`AGENTS.md`). `sortFields` is field-key JSON only.
 
 ```mermaid
 flowchart LR
-  Done[1–13 + 14a + 14b + 14c + 14e]
-  P14d[14d Override F2]
+  Done[1–13 + 14a-e + 15 + 16]
   P14f[14f Drag-out]
-  P15[15 GO]
-  P16[16 Legend]
-  Done --> P14d
-  P14d --> P14f --> P15 --> P16
+  Done --> P14f
 ```
 
 ______________________________________________________________________
 
-## Status (2026-09-11)
+## Status (2026-09-12)
 
-|                |                                                                 |
-| -------------- | --------------------------------------------------------------- |
-| **Shipped**    | Phases **1–13**, **14a–14e** (except **14f**)                   |
-| **Next**       | **14f** Drag-out FileDrop                                       |
-| **Then**       | **15** GO → **16** color legend                                 |
-| **Blocked on** | 16 needs 14d blue (done) + 15 plum; 15 must honor 14d overrides |
+|                |                                              |
+| -------------- | -------------------------------------------- |
+| **Shipped**    | Phases **1–13**, **14a–14e**, **15**, **16** |
+| **Next**       | **14f** Drag-out FileDrop                    |
+| **Blocked on** | —                                            |
 
 ______________________________________________________________________
 
@@ -184,7 +179,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 - Engine `RenameList.Preview` / `Commit` / `CommitExecutor` + `RenameItem.CommitError` + `RenameListCommitTests` — ready for **15** UI wiring
 - `RenameListRowErrorDialog` — reuse for Show Rename Error (**15**), not a third dialog
 - Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)
-- Cell/row classes: red / gray / lavender in `RenameListView.axaml`; **blue** and **plum** still missing
+- Cell/row classes: red / blue / gray / lavender / plum in `RenameListView.axaml` (documented by Phase **16** legend)
 - `MainWindowViewModel.GoAsync()` + `AppShortcuts.Go` / menu / toolbar — **shipped** (Phase 15); Ctrl+G applies renames ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
 - `IFileShellOpener.ShowProperties` / `RevealInFileManager` / `OpenWithDefaultApp` — `Services/Shell`, shared by File List and Rename List
 - `SupportsWrite` / `WriteTarget` on catalog fields — ready for **14d** Manual Override
@@ -201,12 +196,9 @@ ______________________________________________________________________
 
 ## Remaining — execution order
 
-| Phase                        | What                                                     | Depends on                   |
-| ---------------------------- | -------------------------------------------------------- | ---------------------------- |
-| **14d** Manual Override (F2) | Override original/preview; blue cells; Cancel; F5 clears | `SupportsWrite`              |
-| **14f** Drag-out             | Selected rows as FileDrop to Explorer                    | coexist with 4d reorder      |
-| **15** GO                    | `Ctrl+G` → Commit; plum apply errors; Show Rename Error  | 14d overrides in commit path |
-| **16** Color legend          | Toolbar toggle + side panel                              | 14d blue + 15 plum           |
+| Phase            | What                                  | Depends on              |
+| ---------------- | ------------------------------------- | ----------------------- |
+| **14f** Drag-out | Selected rows as FileDrop to Explorer | coexist with 4d reorder |
 
 **Focused-cell chrome (done, MFR7 parity):** amber `DataGridCell:current` fill (`RenameListFocusedCellBrush`) so the current column is visible inside the selected row. Not a full-column wash; omit from Phase 16 legend (MFR7 Legend omits focus too).
 
@@ -326,6 +318,8 @@ ______________________________________________________________________
 
 ## Phase 16 — color legend
 
+**Status:** done — [rename-list-color-legend.plan.md](rename-list-color-legend.plan.md).
+
 After **14d** and **15** so the panel documents the full set.
 
 MFR7: toolbar CheckOnClick + right-dock legend (~112–120px) — [Legend.cs](d:/Devl/mfr7/Core/MFRGui/Forms/RenameList/Legend.cs), help Highlighting section.
@@ -339,13 +333,12 @@ MFR7: toolbar CheckOnClick + right-dock legend (~112–120px) — [Legend.cs](d:
 | Lavender bg | Preview error            | shipped (11)     |
 | Plum bg     | Rename / apply error     | shipped (15)     |
 
-Footer hint: right-click cell/row for error details. Toggle shrinks grid width (mirror other `rename-list-action` toggles). Persist toggle in session if cheap; otherwise default off like MFR7.
+Footer hint: right-click cell/row for error details. Toggle shrinks grid width (mirror other `rename-list-action` toggles). Default off; not session-persisted (MFR7). Blue label: **Manual Override**.
 
-**Exit:** legend matches shipped colors; toolbar toggle shows/hides panel. Update [debts.md](../../docs/debts.md) to drop the legend bullet when done.
+**Exit:** legend matches shipped colors; toolbar toggle shows/hides panel.
 
 ______________________________________________________________________
 
 ## What to implement next
 
 1. **14f** drag-out
-1. **16** color legend

@@ -111,11 +111,7 @@
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Undo.png" />
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem
-          Header="_Log"
-          Command="{Binding ShowLogCommand}"
-          InputGesture="{x:Static input:AppShortcuts.ShowLog}"
-        >
+        <MenuItem Header="_Log" Command="{Binding ShowLogCommand}" InputGesture="{x:Static input:AppShortcuts.ShowLog}">
           <MenuItem.Icon>
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Log.png" />
           </MenuItem.Icon>

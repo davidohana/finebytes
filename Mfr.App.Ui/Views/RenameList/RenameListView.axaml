@@ -290,9 +290,44 @@
       <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
     </Style>
+
+    <Style Selector="Border.rename-list-legend">
+      <Setter Property="Width" Value="116" />
+      <Setter Property="Margin" Value="4,0,4,4" />
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    </Style>
+    <Style Selector="Border.rename-list-legend TextBlock.rename-list-legend-title">
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="TextAlignment" Value="Center" />
+      <Setter Property="Padding" Value="0,2" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    </Style>
+    <Style Selector="Border.rename-list-legend-swatch">
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="Margin" Value="0,-1,0,0" />
+      <Setter Property="MinHeight" Value="20" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    </Style>
+    <Style Selector="Border.rename-list-legend-swatch TextBlock">
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="TextAlignment" Value="Center" />
+      <Setter Property="Padding" Value="2,2" />
+    </Style>
+    <Style Selector="TextBlock.rename-list-legend-footer">
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="TextAlignment" Value="Center" />
+      <Setter Property="Margin" Value="2,8,2,4" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    </Style>
   </UserControl.Styles>
   <Border Classes="pane">
-    <Grid ColumnDefinitions="Auto,*">
+    <Grid ColumnDefinitions="Auto,*,Auto">
       <StackPanel Grid.Column="0" Orientation="Vertical" Spacing="0" Margin="4,0,4,4">
         <Button
           Classes="rename-list-action"
@@ -338,6 +373,13 @@
         </Button>
         <Button
           Classes="rename-list-action"
+          Command="{Binding RefreshCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.Refresh}"
+        >
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Refresh.png" />
+        </Button>
+        <Button
+          Classes="rename-list-action"
           Command="{Binding OpenFieldShuttleCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
         >
@@ -360,13 +402,15 @@
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AutoPreview.png" />
         </ToggleButton>
-        <Button
+        <ToggleButton
+          x:Name="LegendToggle"
           Classes="rename-list-action"
-          Command="{Binding RefreshCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.Refresh}"
+          IsChecked="{Binding IsLegendVisible, Mode=OneWay}"
+          Command="{Binding ToggleLegendCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.ColorLegend}"
         >
-          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Refresh.png" />
-        </Button>
+          <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Legend.png" />
+        </ToggleButton>
       </StackPanel>
       <DataGrid
         x:Name="RenameGrid"
@@ -388,6 +432,47 @@
       >
         <DataGrid.Columns />
       </DataGrid>
+      <Border
+        x:Name="ColorLegendPanel"
+        Grid.Column="2"
+        Classes="rename-list-legend"
+        IsVisible="{Binding IsLegendVisible}"
+        ToolTip.Tip="Rename List Color Legend Panel"
+      >
+        <StackPanel>
+          <TextBlock Classes="rename-list-legend-title" Text="Color Legend" />
+          <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendOriginalValue}">
+            <TextBlock Text="Original Value" Foreground="{DynamicResource AppChromeForegroundBrush}" />
+          </Border>
+          <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendValueChanged}">
+            <TextBlock Text="Value Changed" Foreground="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
+          </Border>
+          <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendManualOverride}">
+            <TextBlock Text="Manual Override" Foreground="{DynamicResource RenameListManualOverrideForegroundBrush}" />
+          </Border>
+          <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendValueError}">
+            <TextBlock Text="Value Error" Foreground="{DynamicResource RenameListMissingOnDiskForegroundBrush}" />
+          </Border>
+          <Border
+            Classes="rename-list-legend-swatch"
+            Background="{DynamicResource RenameListPreviewErrorRowBrush}"
+            ToolTip.Tip="{x:Static resources:AppTips.LegendPreviewError}"
+          >
+            <TextBlock Text="Preview Error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
+          </Border>
+          <Border
+            Classes="rename-list-legend-swatch"
+            Background="{DynamicResource RenameListCommitErrorRowBrush}"
+            ToolTip.Tip="{x:Static resources:AppTips.LegendRenameError}"
+          >
+            <TextBlock Text="Rename Error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
+          </Border>
+          <TextBlock
+            Classes="rename-list-legend-footer"
+            Text="Right-Click on a cell or row with error to see error details."
+          />
+        </StackPanel>
+      </Border>
     </Grid>
   </Border>
 </UserControl>

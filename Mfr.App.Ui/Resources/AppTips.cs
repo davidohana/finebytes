@@ -79,6 +79,28 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List Auto-Preview toolbar and menu tip (MFR7 AutoPreview).</summary>
         public const string AutoPreview = "Auto-Preview. Push or unpush to change status.";
 
+        /// <summary>Rename List color legend toolbar tip (MFR7 btnLegendEnabled).</summary>
+        public const string ColorLegend = "Show or Hide Rename List Color Legend Panel";
+
+        /// <summary>Color legend: Original Value swatch.</summary>
+        public const string LegendOriginalValue = "Unchanged original or preview value";
+
+        /// <summary>Color legend: Value Changed swatch (red text).</summary>
+        public const string LegendValueChanged = "Preview value differs from original — will change when you GO";
+
+        /// <summary>Color legend: Manual Override swatch (blue text).</summary>
+        public const string LegendManualOverride = "Value was set with Manual Override (F2) — used on GO";
+
+        /// <summary>Color legend: Value Error swatch (gray text).</summary>
+        public const string LegendValueError = "Field could not be loaded, or the item is missing on disk";
+
+        /// <summary>Color legend: Preview Error swatch (lavender row).</summary>
+        public const string LegendPreviewError = "Preview failed for this row — ignored on GO; right-click for details";
+
+        /// <summary>Color legend: Rename Error swatch (plum row).</summary>
+        public const string LegendRenameError =
+            "Last GO failed for this row — right-click Show Rename Error; F5 clears";
+
         /// <summary>Rename List row-error badge in the status column.</summary>
         public const string RenameListRowErrorGlyph =
             "This row has an error. Right-click and choose Show Error Details.";
