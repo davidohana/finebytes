@@ -120,7 +120,7 @@
       <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
 
-    <Style Selector="TextBlock.applied-filter-apply-to">
+    <Style Selector="TextBlock.applied-filter-subtitle">
       <Setter Property="FontSize" Value="11" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
       <Setter Property="TextTrimming" Value="CharacterEllipsis" />
@@ -254,11 +254,7 @@
               <CheckBox Grid.Column="0" Classes="applied-filter-enabled" IsChecked="{Binding Enabled, Mode=TwoWay}" />
               <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
-                <TextBlock
-                  Classes="applied-filter-apply-to"
-                  Text="{Binding ApplyToLabel}"
-                  IsVisible="{Binding ApplyToLabel, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
-                />
+                <TextBlock Classes="applied-filter-subtitle" Text="{Binding Subtitle}" />
               </StackPanel>
             </Grid>
           </DataTemplate>

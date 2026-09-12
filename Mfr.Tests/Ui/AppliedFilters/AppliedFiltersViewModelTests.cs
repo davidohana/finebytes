@@ -13,7 +13,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
     public sealed class AppliedFiltersViewModelTests
     {
         /// <summary>
-        /// Verifies add creates an enabled step with catalog defaults and Apply-To subtitle.
+        /// Verifies add creates an enabled step with catalog defaults and combined subtitle.
         /// </summary>
         [Fact]
         public void Add_Creates_Enabled_Step_With_Defaults()
@@ -27,7 +27,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var step = viewModel.Steps[0];
             Assert.True(step.Enabled);
             Assert.Equal("Shrink Spaces", step.DisplayName);
+            Assert.Equal("Shrink Spaces", step.CatalogDisplayName);
             Assert.Equal("File Name", step.ApplyToLabel);
+            Assert.Equal("Shrink Spaces · File Name", step.Subtitle);
             Assert.IsType<ShrinkSpacesFilter>(step.Filter);
             Assert.Equal([step], viewModel.SelectedSteps);
         }
@@ -323,7 +325,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies non-string filters have no Apply-To subtitle.
+        /// Verifies non-string filters have no Apply-To label; subtitle is catalog name only.
         /// </summary>
         [Fact]
         public void ApplyToLabel_Is_Empty_For_Non_String_Filters()
@@ -332,7 +334,28 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
 
-            Assert.Equal(string.Empty, viewModel.Steps[0].ApplyToLabel);
+            var step = viewModel.Steps[0];
+            Assert.Equal(string.Empty, step.ApplyToLabel);
+            Assert.Equal("Audio Tag Remover", step.CatalogDisplayName);
+            Assert.Equal("Audio Tag Remover", step.Subtitle);
+        }
+
+        /// <summary>
+        /// Verifies renaming the list label keeps catalog type in the subtitle.
+        /// </summary>
+        [Fact]
+        public void SetDisplayName_keeps_catalog_type_in_subtitle()
+        {
+            var viewModel = new AppliedFiltersViewModel();
+            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            var step = viewModel.Steps[0];
+
+            step.SetDisplayName("My custom name");
+
+            Assert.Equal("My custom name", step.DisplayName);
+            Assert.Equal("Shrink Spaces", step.CatalogDisplayName);
+            Assert.Equal("File Name", step.ApplyToLabel);
+            Assert.Equal("Shrink Spaces · File Name", step.Subtitle);
         }
 
         /// <summary>
@@ -398,7 +421,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Equal("My Letters", step.DisplayName);
             Assert.False(step.Enabled);
             Assert.Equal(new LettersCaseFilter(), step.Filter);
+            Assert.Equal("Letters Case", step.CatalogDisplayName);
             Assert.Equal("File Name", step.ApplyToLabel);
+            Assert.Equal("Letters Case · File Name", step.Subtitle);
             Assert.Equal(1, chainChanged);
             Assert.Equal(1, optionsApplied);
         }

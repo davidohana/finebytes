@@ -16,7 +16,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
     public sealed class AppliedFiltersViewTests
     {
         /// <summary>
-        /// Verifies seeded steps render display name and Apply-To subtitle in the list.
+        /// Verifies seeded steps render display name and catalog/Apply-To subtitle in the list.
         /// </summary>
         [AvaloniaFact]
         public void Seeded_steps_render_in_list()
@@ -25,9 +25,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal(2, list.ItemCount);
             Assert.Equal("Shrink Spaces", _RowDisplayName(list, 0));
-            Assert.Equal("File Name", AppliedFiltersTestUi.RowApplyToLabel(list, 0));
+            Assert.Equal("Shrink Spaces · File Name", AppliedFiltersTestUi.RowSubtitle(list, 0));
             Assert.Equal("Letters Case", _RowDisplayName(list, 1));
-            Assert.Equal("File Name", AppliedFiltersTestUi.RowApplyToLabel(list, 1));
+            Assert.Equal("Letters Case · File Name", AppliedFiltersTestUi.RowSubtitle(list, 1));
             Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
             Assert.Single(list.Selection.SelectedIndexes);
 

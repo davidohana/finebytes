@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Mfr.Filters;
 using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.ViewModels.AppliedFilters
@@ -20,7 +21,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
             DisplayName = displayName;
             Filter = filter;
-            ApplyToLabel = FilterTargetCatalog.GetApplyToLabel(filter);
+            _RefreshLabels(filter);
         }
 
         /// <summary>
@@ -36,10 +37,34 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private string _displayName;
 
         /// <summary>
-        /// Gets the Apply-To subtitle for string-target filters.
+        /// Gets the catalog display name for this filter type (stable after rename).
         /// </summary>
         [ObservableProperty]
-        private string _applyToLabel;
+        [NotifyPropertyChangedFor(nameof(Subtitle))]
+        private string _catalogDisplayName = string.Empty;
+
+        /// <summary>
+        /// Gets the Apply-To label for string-target filters; otherwise empty.
+        /// </summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(Subtitle))]
+        private string _applyToLabel = string.Empty;
+
+        /// <summary>
+        /// Gets the list subtitle: catalog type, plus Apply-To when present.
+        /// </summary>
+        public string Subtitle
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ApplyToLabel))
+                {
+                    return CatalogDisplayName;
+                }
+
+                return $"{CatalogDisplayName} · {ApplyToLabel}";
+            }
+        }
 
         /// <summary>
         /// Gets the filter configuration for this step.
@@ -47,7 +72,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         public BaseFilter Filter { get; private set; }
 
         /// <summary>
-        /// Replaces the filter configuration and refreshes <see cref="ApplyToLabel"/>.
+        /// Replaces the filter configuration and refreshes catalog / Apply-To labels.
         /// </summary>
         /// <param name="filter">New filter instance for this step.</param>
         internal void SetFilter(BaseFilter filter)
@@ -59,7 +84,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             Filter = filter;
-            ApplyToLabel = FilterTargetCatalog.GetApplyToLabel(filter);
+            _RefreshLabels(filter);
             OnPropertyChanged(nameof(Filter));
         }
 
@@ -71,6 +96,14 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
             DisplayName = displayName;
+        }
+
+        private void _RefreshLabels(BaseFilter filter)
+        {
+            CatalogDisplayName = FilterCatalog
+                .Entries.Single(entry => entry.FilterType == filter.GetType())
+                .DisplayName;
+            ApplyToLabel = FilterTargetCatalog.GetApplyToLabel(filter);
         }
     }
 }
