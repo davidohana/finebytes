@@ -846,8 +846,9 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (e.PropertyName is nameof(RenameListViewModel.FieldDisplayRevision))
             {
+                // Row highlights only — do not republish the cell status hint here. Refresh after
+                // GO/preview would overlay the sticky outcome until the list is cleared.
                 _ApplyErrorRowHighlights();
-                _PublishFocusedCellHint();
             }
         }
 

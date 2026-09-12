@@ -1,3 +1,4 @@
+using Avalonia.Media;
 using Mfr.Engine.Commit;
 using Mfr.Models.Filters;
 using Mfr.Models.Rename;
@@ -123,7 +124,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return StatusBarText.Combine(
                     stoppedPart,
                     StatusBarText.Neutral(" "),
-                    StatusBarText.Error($"{errorCount} could not be renamed — right-click Show Rename Error.")
+                    _FormatCouldNotRenameHint(errorCount, itemSuffix: false)
                 );
             }
 
@@ -131,15 +132,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 return StatusBarText.Combine(
                     StatusBarText.Neutral($"Renamed {renamedCount} item(s). "),
-                    StatusBarText.Error($"{errorCount} could not be renamed — right-click Show Rename Error.")
+                    _FormatCouldNotRenameHint(errorCount, itemSuffix: false)
                 );
             }
 
             if (errorCount > 0)
             {
-                return StatusBarText.Error(
-                    $"{errorCount} item(s) could not be renamed. Right-click Show Rename Error for details."
-                );
+                return _FormatCouldNotRenameHint(errorCount, itemSuffix: true);
             }
 
             if (renamedCount > 0)
@@ -148,6 +147,29 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return StatusBarText.Neutral("No items were renamed.");
+        }
+
+        /// <summary>
+        /// Builds the error fragment that points at the row menu command (command name in bold).
+        /// </summary>
+        private static StyledTextDisplay _FormatCouldNotRenameHint(int errorCount, bool itemSuffix)
+        {
+            var leading = itemSuffix
+                ? $"{errorCount} item(s) could not be renamed. Right-click "
+                : $"{errorCount} could not be renamed — right-click ";
+            var trailing = itemSuffix ? " for details." : ".";
+
+            return StatusBarText.Combine(
+                StatusBarText.Error(leading),
+                StyledTextDisplay.FromRuns(
+                    new StyledTextRun("Show Rename Error")
+                    {
+                        FontWeight = FontWeight.Bold,
+                        ForegroundResourceKey = StatusBarText.ErrorForegroundResourceKey,
+                    }
+                ),
+                StatusBarText.Error(trailing)
+            );
         }
     }
 }

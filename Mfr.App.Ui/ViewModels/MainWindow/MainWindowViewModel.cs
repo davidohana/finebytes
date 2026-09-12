@@ -21,8 +21,6 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
     /// </summary>
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private StyledTextDisplay _lastStatusHint = StyledTextDisplay.Empty;
-        private StyledTextDisplay _paneStatusHint = StyledTextDisplay.Empty;
         private bool _previewDirty;
         private bool _previewRunning;
         private Task _previewDrainTask = Task.CompletedTask;
@@ -97,7 +95,6 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             FilterCount = AppliedFiltersViewModel.Count;
             ChangeCount = RenameListViewModel.ChangeCount;
             PreviewErrorCount = RenameListViewModel.PreviewErrorCount;
-            _RefreshSelectedCount();
             WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
         }
 
@@ -173,21 +170,9 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         private int _previewErrorCount;
 
         /// <summary>
-        /// Selected row count in the focused pane (Rename List when its grid is focused; otherwise File List).
-        /// </summary>
-        [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(HasSelected))]
-        private int _selectedCount;
-
-        /// <summary>
         /// Gets whether the Preview Errors count should use the error brush.
         /// </summary>
         public bool HasPreviewErrors => PreviewErrorCount > 0;
-
-        /// <summary>
-        /// Gets whether the Selected count panel should be visible.
-        /// </summary>
-        public bool HasSelected => SelectedCount > 0;
 
         /// <summary>
         /// Refreshes original Rename List fields when that grid has focus; otherwise reloads the File List.
@@ -335,22 +320,13 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
 
             if (e.PropertyName is nameof(RenameListViewModel.LastStatusMessage))
             {
-                _ForwardStickyStatusIfPresent(RenameListViewModel.LastStatusMessage);
+                _ApplyStatusHintIfPresent(RenameListViewModel.LastStatusMessage);
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.CellStatusHint))
             {
-                _paneStatusHint = RenameListViewModel.CellStatusHint;
-                _UpdateStatusHint();
-            }
-
-            if (
-                e.PropertyName
-                is nameof(RenameListViewModel.SelectedEntries)
-                    or nameof(RenameListViewModel.IsGridFocused)
-            )
-            {
-                _RefreshSelectedCount();
+                // Last write wins — empty clears the bar (no restore of a prior operation message).
+                StatusHint = RenameListViewModel.CellStatusHint;
             }
         }
 
@@ -368,7 +344,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
 
             if (e.PropertyName is nameof(AppliedFiltersViewModel.LastStatusMessage))
             {
-                _ForwardStickyStatusIfPresent(AppliedFiltersViewModel.LastStatusMessage);
+                _ApplyStatusHintIfPresent(AppliedFiltersViewModel.LastStatusMessage);
             }
         }
 
@@ -376,27 +352,8 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         {
             if (e.PropertyName is nameof(FileListViewModel.LastStatusMessage))
             {
-                _ForwardStickyStatusIfPresent(FileListViewModel.LastStatusMessage);
+                _ApplyStatusHintIfPresent(FileListViewModel.LastStatusMessage);
             }
-
-            if (e.PropertyName is nameof(FileListViewModel.SelectedEntries))
-            {
-                _RefreshSelectedCount();
-            }
-        }
-
-        /// <summary>
-        /// Updates <see cref="SelectedCount"/> from the focused pane's selection.
-        /// </summary>
-        private void _RefreshSelectedCount()
-        {
-            if (RenameListViewModel.IsGridFocused)
-            {
-                SelectedCount = RenameListViewModel.SelectedEntries.Count;
-                return;
-            }
-
-            SelectedCount = FileListViewModel.SelectedEntries.Count;
         }
 
         private void _OnFilterOptionsApplied(object? sender, EventArgs e)
@@ -490,31 +447,17 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Forwards a non-empty pane status message onto the sticky status bar.
+        /// Applies a non-empty status message as the current status-bar hint (last write wins).
         /// </summary>
         /// <param name="message">Status published by Rename List, Applied Filters, or File List.</param>
-        private void _ForwardStickyStatusIfPresent(StyledTextDisplay message)
+        private void _ApplyStatusHintIfPresent(StyledTextDisplay message)
         {
             if (message.IsEmpty)
             {
                 return;
             }
 
-            _ShowStickyStatusHint(message);
-        }
-
-        /// <summary>
-        /// Stores a sticky status-bar message until another high-signal outcome replaces it.
-        /// </summary>
-        private void _ShowStickyStatusHint(StyledTextDisplay message)
-        {
-            _lastStatusHint = message;
-            _UpdateStatusHint();
-        }
-
-        private void _UpdateStatusHint()
-        {
-            StatusHint = !_paneStatusHint.IsEmpty ? _paneStatusHint : _lastStatusHint;
+            StatusHint = message;
         }
 
         private static bool _CanExecuteUnimplemented()

@@ -8,14 +8,13 @@ Parent: Rename List / main shell feedback ([rename-list-go.plan.md](rename-list-
 - [x] P2 — High-signal Rename List outcomes + colored cell errors
 - [x] P3 — Preset load/save only
 - [x] P4 — File List CopyPath only
-- [x] P5 — Selected count panel
+- [x] P5 — Selected count panel — **removed** (ambiguous which list; dropped after ship)
 
 ## Decisions (locked)
 
-- **High-signal only** — Because status is sticky, publish operation text only for infrequent / outcome-heavy actions. **In scope:** Rename List add (incl. skips/zero/exception), GO / stop / commit errors, export success, locate failure, refresh **when load errors exist**, preset load/save, File List CopyPath. **Out of scope (no sticky spam):** folder navigate, routine remove/clear/reorder, interactive filter add/remove, auto-sort apply, plain refresh with no load errors.
-- **Rich sticky status channel** — Collapse Rename List `LastAddError` / `LastLocateError` / `LastGoStatus` into one `LastStatusMessage` of type `StyledTextDisplay` (not `string`). Same property type on `FileListViewModel` and `AppliedFiltersViewModel` (presets / CopyPath). `MainWindowViewModel` watches producers and stores the display in `_lastStatusHint`.
-- **Stays until replaced** — No timed clear (`StatusHintClearMilliseconds` / `_ClearStatusHintAfterDelayAsync` removed). Last message remains until another **in-scope** operation publishes a new one.
-- **Overlay priority** — Rename List **cell hint** overlays while a cell is focused/selected; on clear, **restore `_lastStatusHint`**. Priority: cell overlay > sticky last status > empty.
+- **High-signal only** — Publish operation text only for infrequent / outcome-heavy actions. **In scope:** Rename List add (incl. skips/zero/exception), GO / stop / commit errors, export success, locate failure, refresh **when load errors exist**, preset load/save, File List CopyPath. **Out of scope:** folder navigate, routine remove/clear/reorder, interactive filter add/remove, auto-sort apply, plain refresh with no load errors.
+- **Rich status channel** — Collapse Rename List `LastAddError` / `LastLocateError` / `LastGoStatus` into one `LastStatusMessage` of type `StyledTextDisplay` (not `string`). Same property type on `FileListViewModel` and `AppliedFiltersViewModel` (presets / CopyPath). `MainWindowViewModel` applies non-empty messages (and cell hints) directly to `StatusHint` — last write wins.
+- **Stays until replaced** — Last write wins on the left hint. Operation outcomes and cell hints both set `StatusHint` directly; clearing a cell hint clears the bar (does **not** restore a prior GO/add message). Empty `LastStatusMessage` from producers is ignored so mid-op clears do not wipe the bar before the outcome.
 - **No chrome hover hints** — Toolbar/menu already have `ToolTip` / `AppTips`. Do **not** mirror those into the status bar. Keep Avalonia tooltips as-is.
 - **Severity colors in the left hint** — `StyledTextRun.ForegroundResourceKey`:
   - **Error** → `StatusBarErrorForegroundBrush` (GO commit errors, locate miss, add exception, load-error cell hints).
@@ -30,13 +29,13 @@ Parent: Rename List / main shell feedback ([rename-list-go.plan.md](rename-list-
 - **Export** — Neutral success sticky + reveal-in-Explorer; failures stay dialog-only.
 - **Clipboard** — File List `CopyPath` only.
 - **Undo Last** — Out of scope; debts note when Undo ships.
-- **Selection** — `Selected: {n}` for focused pane when `n > 0`.
+- **Selection count** — Removed after ship: `Selected: N` was ambiguous (File List vs Rename List).
 
 ## MFR7 reference brief
 
 - **Sources:** `statusbar.html`; `renamelist.html`; `hints.txt` + `StatusMessage`; GO outcome via status.
 - **Behavior to match:** Left hint + counts; Preview Errors red when ≥1; Rename List cell value in status bar.
-- **finebytes extension:** Colored runs; sticky until next high-signal message; selection count.
+- **finebytes extension:** Colored runs; last-write status hint (no overlay restore); selection count removed.
 - **Parity gaps:** No `hints.txt` / chrome status-bar hot hints (tooltips cover chrome); no navigate/filter/sort spam; no Undo Log; no green success.
 
 ## Non-goals
@@ -49,7 +48,7 @@ Parent: Rename List / main shell feedback ([rename-list-go.plan.md](rename-list-
 - Replacing confirm dialogs.
 - Per-control Filter Editor hints.
 - Green success accents; status-bar icons.
-- New count panels beyond Selected + existing four.
+- New count panels beyond the existing four (Items / Filters / Changes / Preview Errors). No Selected count.
 - Auto-clear / fade after a timeout.
 
 ## Phases
@@ -86,7 +85,7 @@ Parent: Rename List / main shell feedback ([rename-list-go.plan.md](rename-list-
 - Wire File List `LastStatusMessage`.
 - **Exit:** CopyPath tests only.
 
-### P5 — Selected count panel
+### P5 — Selected count panel — removed
 
-- Focused-pane `Selected: N` when > 0.
-- **Exit:** Multi-select updates panel; empty hides it.
+- Shipped then dropped: focused-pane `Selected: N` was unclear which list it belonged to.
+- **Exit:** Panel and `SelectedCount` wiring removed from main window / tests.

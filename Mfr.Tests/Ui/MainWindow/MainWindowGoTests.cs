@@ -1,4 +1,5 @@
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -157,7 +158,13 @@ namespace Mfr.Tests.Ui.MainWindow
             var status = viewModel.RenameListViewModel.LastStatusMessage;
             Assert.Contains("could not be renamed", status.ToPlainText());
             Assert.Contains("Show Rename Error", status.ToPlainText());
-            Assert.Contains(status.Runs, run => run.ForegroundResourceKey == StatusBarText.ErrorForegroundResourceKey);
+            Assert.Contains(
+                status.Runs,
+                run =>
+                    run.Text == "Show Rename Error"
+                    && run.FontWeight == FontWeight.Bold
+                    && run.ForegroundResourceKey == StatusBarText.ErrorForegroundResourceKey
+            );
             Assert.Equal(status.ToPlainText(), viewModel.StatusHint.ToPlainText());
             Assert.Single(viewModel.RenameListViewModel.Entries, entry => entry.HasCommitError);
             Assert.Equal("occupied", await File.ReadAllTextAsync(occupied));
@@ -192,10 +199,11 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies GO status stays until replaced and returns after a cell hint clears.
+        /// Verifies GO status is visible after an earlier cell hint, and clearing the cell hint
+        /// does not restore a previous operation message (last write wins).
         /// </summary>
         [AvaloniaFact]
-        public async Task Go_status_is_sticky_across_cell_hint_overlay()
+        public async Task Go_status_last_write_wins_over_cell_hint()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var source = Path.Combine(dir, "alpha.txt");
@@ -203,6 +211,10 @@ namespace Mfr.Tests.Ui.MainWindow
             var viewModel = new MainWindowViewModel(dir);
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
+
+            viewModel.RenameListViewModel.CellStatusHint = StyledTextDisplay.FromPlain(
+                "Full File Name: alpha.txt"
+            );
 
             await viewModel
                 .RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("alpha", "renamed")))
@@ -214,7 +226,7 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Equal("Full File Name: renamed.txt", viewModel.StatusHint.ToPlainText());
 
             viewModel.RenameListViewModel.CellStatusHint = StyledTextDisplay.Empty;
-            Assert.Equal("Renamed 1 item(s).", viewModel.StatusHint.ToPlainText());
+            Assert.True(viewModel.StatusHint.IsEmpty);
         }
 
         /// <summary>
