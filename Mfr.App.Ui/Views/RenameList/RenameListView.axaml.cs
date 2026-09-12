@@ -143,8 +143,6 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 _viewModel.FieldShuttleRequested -= _OnFieldShuttleRequested;
                 _viewModel.RowErrorDialogRequested -= _OnRowErrorDialogRequested;
-                _viewModel.PreviewErrorConfirmationRequested -= _OnPreviewErrorConfirmationRequested;
-                _viewModel.CommitErrorSummaryRequested -= _OnCommitErrorSummaryRequested;
                 _viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
                 _viewModel.Progress.PropertyChanged -= _OnProgressPropertyChanged;
                 _ClearUiHooks(_viewModel);
@@ -158,8 +156,6 @@ namespace Mfr.App.Ui.Views.RenameList
 
             _viewModel.FieldShuttleRequested += _OnFieldShuttleRequested;
             _viewModel.RowErrorDialogRequested += _OnRowErrorDialogRequested;
-            _viewModel.PreviewErrorConfirmationRequested += _OnPreviewErrorConfirmationRequested;
-            _viewModel.CommitErrorSummaryRequested += _OnCommitErrorSummaryRequested;
             _viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             _viewModel.Progress.PropertyChanged += _OnProgressPropertyChanged;
             _WireUiHooks(_viewModel);
@@ -168,34 +164,6 @@ namespace Mfr.App.Ui.Views.RenameList
             _SyncSelectionToGrid();
             _ApplyDropMarkVisuals();
             _ClearSortDescriptions();
-        }
-
-        private async Task<bool> _OnPreviewErrorConfirmationRequested(object? sender, int errorCount)
-        {
-            if (TopLevel.GetTopLevel(this) is not Window owner)
-            {
-                return false;
-            }
-
-            var dialog = new ConfirmMessageDialog(
-                title: "Preview Errors",
-                message: $"{errorCount} items with preview errors will be ignored. Do you want to continue?"
-            );
-            return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
-        }
-
-        private async Task _OnCommitErrorSummaryRequested(object? sender, int errorCount)
-        {
-            if (TopLevel.GetTopLevel(this) is not Window owner)
-            {
-                return;
-            }
-
-            var message =
-                $"{errorCount} items could not be renamed."
-                + $"{Environment.NewLine}{Environment.NewLine}"
-                + "Right-click an item and choose Show Rename Error for details.";
-            await new OkMessageDialog(title: "Rename Errors", message).ShowDialog(owner).ConfigureAwait(true);
         }
 
         private void _WireUiHooks(RenameListViewModel viewModel)
@@ -211,7 +179,37 @@ namespace Mfr.App.Ui.Views.RenameList
                     ),
                 ShowErrorAsync = _ShowExportErrorAsync,
                 PromptAsync = _PromptOverrideAsync,
+                ConfirmPreviewErrorsAsync = _ConfirmPreviewErrorsAsync,
+                ShowCommitErrorSummaryAsync = _ShowCommitErrorSummaryAsync,
             };
+        }
+
+        private async Task<bool> _ConfirmPreviewErrorsAsync(int errorCount)
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return false;
+            }
+
+            var dialog = new ConfirmMessageDialog(
+                title: "Preview Errors",
+                message: $"{errorCount} items with preview errors will be ignored. Do you want to continue?"
+            );
+            return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
+        }
+
+        private async Task _ShowCommitErrorSummaryAsync(int errorCount)
+        {
+            if (TopLevel.GetTopLevel(this) is not Window owner)
+            {
+                return;
+            }
+
+            var message =
+                $"{errorCount} items could not be renamed."
+                + $"{Environment.NewLine}{Environment.NewLine}"
+                + "Right-click an item and choose Show Rename Error for details.";
+            await new OkMessageDialog(title: "Rename Errors", message).ShowDialog(owner).ConfigureAwait(true);
         }
 
         private static void _ClearUiHooks(RenameListViewModel viewModel)

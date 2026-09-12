@@ -4,36 +4,10 @@ using Mfr.Models.Filters;
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Handles a request to confirm continuing GO when preview errors are present.
-    /// </summary>
-    /// <param name="sender">Rename List view model raising the request.</param>
-    /// <param name="errorCount">Number of rows that GO will ignore because preview failed.</param>
-    /// <returns><see langword="true"/> to continue to commit; otherwise <see langword="false"/>.</returns>
-    public delegate Task<bool> RenameListPreviewErrorConfirmationHandler(object? sender, int errorCount);
-
-    /// <summary>
-    /// Handles a request to show the post-GO commit-error summary.
-    /// </summary>
-    /// <param name="sender">Rename List view model raising the request.</param>
-    /// <param name="errorCount">Number of rows whose commit failed.</param>
-    /// <returns>A task that completes when the summary closes.</returns>
-    public delegate Task RenameListCommitErrorSummaryHandler(object? sender, int errorCount);
-
-    /// <summary>
     /// GO preview and filesystem commit orchestration for <see cref="RenameListViewModel"/>.
     /// </summary>
     public sealed partial class RenameListViewModel
     {
-        /// <summary>
-        /// Raised when GO needs confirmation before ignoring rows with preview errors.
-        /// </summary>
-        public event RenameListPreviewErrorConfirmationHandler? PreviewErrorConfirmationRequested;
-
-        /// <summary>
-        /// Raised after GO when one or more rows could not be committed.
-        /// </summary>
-        public event RenameListCommitErrorSummaryHandler? CommitErrorSummaryRequested;
-
         /// <summary>
         /// Clears old commit errors, previews the current chain, confirms preview errors, and commits valid rows.
         /// </summary>
@@ -106,35 +80,24 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private async Task<bool> _ConfirmPreviewErrorsAsync(int errorCount)
         {
-            var handlers = PreviewErrorConfirmationRequested;
-            if (handlers is null)
+            var confirm = UiHooks?.ConfirmPreviewErrorsAsync;
+            if (confirm is null)
             {
                 return false;
             }
 
-            foreach (var handler in handlers.GetInvocationList().Cast<RenameListPreviewErrorConfirmationHandler>())
-            {
-                if (!await handler(this, errorCount).ConfigureAwait(true))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return await confirm(errorCount).ConfigureAwait(true);
         }
 
         private async Task _ShowCommitErrorSummaryAsync(int errorCount)
         {
-            var handlers = CommitErrorSummaryRequested;
-            if (handlers is null)
+            var showSummary = UiHooks?.ShowCommitErrorSummaryAsync;
+            if (showSummary is null)
             {
                 return;
             }
 
-            foreach (var handler in handlers.GetInvocationList().Cast<RenameListCommitErrorSummaryHandler>())
-            {
-                await handler(this, errorCount).ConfigureAwait(true);
-            }
+            await showSummary(errorCount).ConfigureAwait(true);
         }
     }
 }

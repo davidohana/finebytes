@@ -100,10 +100,13 @@ namespace Mfr.Tests.Ui.MainWindow
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
 
             var warnedCount = 0;
-            viewModel.RenameListViewModel.PreviewErrorConfirmationRequested += (_, errorCount) =>
+            viewModel.RenameListViewModel.UiHooks = new RenameListUiHooks
             {
-                warnedCount = errorCount;
-                return Task.FromResult(false);
+                ConfirmPreviewErrorsAsync = errorCount =>
+                {
+                    warnedCount = errorCount;
+                    return Task.FromResult(false);
+                },
             };
 
             var commitStarted = await viewModel
@@ -134,16 +137,19 @@ namespace Mfr.Tests.Ui.MainWindow
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync([source, blocked]).ConfigureAwait(true);
 
-            viewModel.RenameListViewModel.PreviewErrorConfirmationRequested += (_, _) =>
-            {
-                File.Delete(source);
-                return Task.FromResult(true);
-            };
             var summaryCount = 0;
-            viewModel.RenameListViewModel.CommitErrorSummaryRequested += (_, errorCount) =>
+            viewModel.RenameListViewModel.UiHooks = new RenameListUiHooks
             {
-                summaryCount = errorCount;
-                return Task.CompletedTask;
+                ConfirmPreviewErrorsAsync = _ =>
+                {
+                    File.Delete(source);
+                    return Task.FromResult(true);
+                },
+                ShowCommitErrorSummaryAsync = errorCount =>
+                {
+                    summaryCount = errorCount;
+                    return Task.CompletedTask;
+                },
             };
 
             var commitStarted = await viewModel

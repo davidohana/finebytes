@@ -7,7 +7,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// <para>
     /// When <see cref="RenameListViewModel.UiHooks"/> is null, or a feature's delegate is null,
     /// that feature is a no-op (export needs <see cref="PickSavePathAsync"/>; Manual Override
-    /// needs <see cref="PromptAsync"/>).
+    /// needs <see cref="PromptAsync"/>; GO preview-error confirm needs
+    /// <see cref="ConfirmPreviewErrorsAsync"/> and aborts when missing).
     /// </para>
     /// </remarks>
     public sealed class RenameListUiHooks
@@ -32,5 +33,23 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <para>Returns the entered string, or <see langword="null"/> when cancelled.</para>
         /// </remarks>
         public Func<TextInputPrompt, Task<string?>>? PromptAsync { get; init; }
+
+        /// <summary>
+        /// GO confirm when preview errors will be ignored; argument is the preview-error row count.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Returns <see langword="true"/> to continue to commit. When null, GO aborts (same as declining).
+        /// </para>
+        /// </remarks>
+        public Func<int, Task<bool>>? ConfirmPreviewErrorsAsync { get; init; }
+
+        /// <summary>
+        /// Post-GO summary when one or more rows failed to commit; argument is the commit-error count.
+        /// </summary>
+        /// <remarks>
+        /// <para>When null, the summary is skipped.</para>
+        /// </remarks>
+        public Func<int, Task>? ShowCommitErrorSummaryAsync { get; init; }
     }
 }
