@@ -396,7 +396,7 @@
       BorderThickness="0,1,0,0"
       BorderBrush="{DynamicResource ThemeControlMidBrush}"
     >
-      <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto">
         <views:StyledTextView Grid.Column="0" VerticalAlignment="Center" Display="{Binding StatusHint}" />
         <TextBlock
           Grid.Column="1"
@@ -418,6 +418,14 @@
         />
         <TextBlock
           Grid.Column="4"
+          Margin="16,0,0,0"
+          VerticalAlignment="Center"
+          Classes="status-bar-selected"
+          IsVisible="{Binding HasSelected}"
+          Text="{Binding SelectedCount, StringFormat='Selected: {0}'}"
+        />
+        <TextBlock
+          Grid.Column="5"
           Margin="16,0,0,0"
           VerticalAlignment="Center"
           Classes="status-bar-preview-errors"

@@ -97,6 +97,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             FilterCount = AppliedFiltersViewModel.Count;
             ChangeCount = RenameListViewModel.ChangeCount;
             PreviewErrorCount = RenameListViewModel.PreviewErrorCount;
+            _RefreshSelectedCount();
             WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
         }
 
@@ -172,9 +173,21 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         private int _previewErrorCount;
 
         /// <summary>
+        /// Selected row count in the focused pane (Rename List when its grid is focused; otherwise File List).
+        /// </summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(HasSelected))]
+        private int _selectedCount;
+
+        /// <summary>
         /// Gets whether the Preview Errors count should use the error brush.
         /// </summary>
         public bool HasPreviewErrors => PreviewErrorCount > 0;
+
+        /// <summary>
+        /// Gets whether the Selected count panel should be visible.
+        /// </summary>
+        public bool HasSelected => SelectedCount > 0;
 
         /// <summary>
         /// Refreshes original Rename List fields when that grid has focus; otherwise reloads the File List.
@@ -330,6 +343,15 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 _paneStatusHint = RenameListViewModel.CellStatusHint;
                 _UpdateStatusHint();
             }
+
+            if (
+                e.PropertyName
+                is nameof(RenameListViewModel.SelectedEntries)
+                    or nameof(RenameListViewModel.IsGridFocused)
+            )
+            {
+                _RefreshSelectedCount();
+            }
         }
 
         private void _OnAppliedFiltersPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -356,6 +378,25 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             {
                 _ForwardStickyStatusIfPresent(FileListViewModel.LastStatusMessage);
             }
+
+            if (e.PropertyName is nameof(FileListViewModel.SelectedEntries))
+            {
+                _RefreshSelectedCount();
+            }
+        }
+
+        /// <summary>
+        /// Updates <see cref="SelectedCount"/> from the focused pane's selection.
+        /// </summary>
+        private void _RefreshSelectedCount()
+        {
+            if (RenameListViewModel.IsGridFocused)
+            {
+                SelectedCount = RenameListViewModel.SelectedEntries.Count;
+                return;
+            }
+
+            SelectedCount = FileListViewModel.SelectedEntries.Count;
         }
 
         private void _OnFilterOptionsApplied(object? sender, EventArgs e)

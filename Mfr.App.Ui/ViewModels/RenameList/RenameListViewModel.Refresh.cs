@@ -79,7 +79,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Updates grid-focus state used to route F5 between File List and Rename List.
+        /// Updates grid-focus state for F5 routing and the status-bar Selected count pane.
         /// </summary>
         /// <param name="focused">Whether the Rename List grid has focus.</param>
         internal void SetGridFocused(bool focused)
@@ -90,6 +90,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             IsGridFocused = focused;
+            OnPropertyChanged(nameof(IsGridFocused));
         }
 
         private bool _CanRefresh()

@@ -14,3 +14,7 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 ## Rename List
 
 - Show Last Rename Errors — row-level **Show Rename Error** is available; a list-wide history view is deferred
+
+## Status bar
+
+- Undo Last → sticky status outcome when Undo ships (deferred with Undo itself)

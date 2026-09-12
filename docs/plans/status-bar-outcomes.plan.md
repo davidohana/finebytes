@@ -8,7 +8,7 @@ Parent: Rename List / main shell feedback ([rename-list-go.plan.md](rename-list-
 - [x] P2 — High-signal Rename List outcomes + colored cell errors
 - [x] P3 — Preset load/save only
 - [x] P4 — File List CopyPath only
-- [ ] P5 — Selected count panel
+- [x] P5 — Selected count panel
 
 ## Decisions (locked)
 
