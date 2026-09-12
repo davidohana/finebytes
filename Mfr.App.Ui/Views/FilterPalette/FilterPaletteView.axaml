@@ -106,7 +106,7 @@
         Classes="clearButton"
         DockPanel.Dock="Bottom"
         Margin="4,4,4,4"
-        Watermark="Filter…"
+        PlaceholderText="Filter…"
         Text="{Binding SearchText, Mode=TwoWay}"
         KeyDown="_OnSearchKeyDown"
       />

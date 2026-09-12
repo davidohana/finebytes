@@ -51,7 +51,7 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 16 
 
 - Changing any highlight rules, precedence, or brush values.
 - Menu item, shortcut, session persist, help HTML page, marked-row (Salmon) swatch, focused-cell swatch.
-- Phase 14f drag-out.
+- Phase 14f drag-out (cut from parent plan).
 
 ## Phases
 

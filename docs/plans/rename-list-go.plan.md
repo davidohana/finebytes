@@ -38,7 +38,7 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 15 
 
 ## Non-goals
 
-- Phase 16 color legend; 14f drag-out; Undo/Log/Options stubs; session persistence of commit errors; new error dialog type.
+- Phase 16 color legend; 14f drag-out (cut); Undo/Log/Options stubs; session persistence of commit errors; new error dialog type.
 
 ## Phases
 

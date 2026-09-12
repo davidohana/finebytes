@@ -64,7 +64,7 @@
             MinWidth="240"
             MaxLength="100"
             VerticalAlignment="Center"
-            Watermark="_"
+            PlaceholderText="_"
             Text="{Binding Replacement}"
           >
             <ToolTip.Tip>

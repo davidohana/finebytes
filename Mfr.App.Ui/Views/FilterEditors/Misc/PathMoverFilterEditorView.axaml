@@ -47,7 +47,7 @@
               Classes="filter-editor-field-wrap"
               MinWidth="240"
               MaxLength="520"
-              Watermark="C:\"
+              PlaceholderText="C:\"
               Text="{Binding RootFolder}"
             />
           </StackPanel>

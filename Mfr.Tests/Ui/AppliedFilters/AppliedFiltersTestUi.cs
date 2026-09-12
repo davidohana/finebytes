@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Headless;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -106,26 +105,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         /// <param name="rowIndex">Zero-based row index.</param>
         public static void ClickRow(Window window, ListBox list, int rowIndex)
         {
-            list.ScrollIntoView(rowIndex);
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var item = list.ContainerFromIndex(rowIndex) as ListBoxItem;
-            Assert.NotNull(item);
-
-            var labelText = item.GetVisualDescendants()
-                .OfType<TextBlock>()
-                .FirstOrDefault(text => !string.IsNullOrEmpty(text.Text));
-            var target = (Visual?)labelText ?? item;
-            var local = new Point(Math.Max(2, target.Bounds.Width / 2), Math.Max(2, target.Bounds.Height / 2));
-            var windowPoint = target.TranslatePoint(local, window);
-            Assert.True(windowPoint.HasValue);
-
-            // Avalonia 12: route through the window so ListBox selection follows the real pointer path.
-            window.MouseMove(windowPoint.Value, RawInputModifiers.None);
-            window.MouseDown(windowPoint.Value, MouseButton.Left, RawInputModifiers.None);
-            window.MouseUp(windowPoint.Value, MouseButton.Left, RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
+            HeadlessPointerClicks.ClickListBoxRow(window, list, rowIndex);
         }
     }
 }

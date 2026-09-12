@@ -36,7 +36,7 @@
           MinWidth="240"
           MinHeight="88"
           AcceptsReturn="True"
-          Watermark="Alpha&#x0a;Beta&#x0a;Gamma"
+          PlaceholderText="Alpha&#x0a;Beta&#x0a;Gamma"
           Text="{Binding EntriesText}"
         />
       </controls:MultilineEntriesFieldset>

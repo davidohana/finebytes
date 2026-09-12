@@ -84,7 +84,7 @@
               Width="72"
               MaxLength="3"
               HorizontalAlignment="Left"
-              Watermark="eng"
+              PlaceholderText="eng"
               Text="{Binding Language}"
             />
           </controls:FilterEditorLabeledRow>

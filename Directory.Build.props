@@ -1,0 +1,8 @@
+<Project>
+  <!-- Shared Avalonia package versions for Ui + Tests (bump here, not per csproj). -->
+  <PropertyGroup>
+    <AvaloniaVersion>12.1.2</AvaloniaVersion>
+    <AvaloniaEditVersion>12.0.0</AvaloniaEditVersion>
+    <AvaloniaDiagnosticsSupportVersion>2.2.3</AvaloniaDiagnosticsSupportVersion>
+  </PropertyGroup>
+</Project>

@@ -93,6 +93,7 @@ namespace Mfr.Tests.Models
                         ExcludeMasksEnabled = true,
                         MaskSuggestions = ["*.mp3", "*.flac"],
                         ViewMode = FileListViewMode.List,
+                        ThumbnailSize = 128,
                     },
                     RenameList = new SessionStateRenameList
                     {
@@ -141,6 +142,7 @@ namespace Mfr.Tests.Models
                 Assert.Contains("*.mp3", loaded.FileList.MaskSuggestions!);
                 Assert.Contains("*.flac", loaded.FileList.MaskSuggestions!);
                 Assert.Equal(FileListViewMode.List, loaded.FileList.ViewMode);
+                Assert.Equal(128, loaded.FileList.ThumbnailSize);
                 Assert.NotNull(loaded.RenameList);
                 Assert.NotNull(loaded.RenameList.SortFields);
                 Assert.Single(loaded.RenameList.SortFields);

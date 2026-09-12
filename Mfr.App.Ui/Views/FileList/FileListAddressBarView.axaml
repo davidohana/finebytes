@@ -219,7 +219,7 @@
           Classes="address-edit"
           IsVisible="{Binding IsPathEditing}"
           Text="{Binding PathText, Mode=TwoWay}"
-          Watermark="Folder path or \\server\share"
+          PlaceholderText="Folder path or \\server\share"
           ToolTip.Tip="{x:Static resources:AppTips.AddressEdit}"
           KeyDown="_OnPathKeyDown"
           LostFocus="_OnPathLostFocus"

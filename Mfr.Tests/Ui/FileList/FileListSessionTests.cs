@@ -40,6 +40,7 @@ namespace Mfr.Tests.Ui.FileList
                 ExcludeMasksEnabled = true,
                 MaskSuggestions = ["*.wav", "*.mp3"],
                 ViewMode = FileListViewMode.Tiles,
+                ThumbnailSize = ThumbnailSizes.Large,
             };
 
             viewModel.ApplySession(fileList);
@@ -49,6 +50,7 @@ namespace Mfr.Tests.Ui.FileList
             Assert.Equal(["*.tmp", "*.bak"], viewModel.ExcludeMasks);
             Assert.Equal(["*.wav", "*.mp3"], viewModel.MaskSuggestions);
             Assert.Equal(FileListViewMode.Tiles, viewModel.ViewMode);
+            Assert.Equal(ThumbnailSizes.Large, viewModel.ThumbnailSize);
         }
 
         /// <summary>
@@ -66,10 +68,12 @@ namespace Mfr.Tests.Ui.FileList
             viewModel.MaskSuggestions.Add("*.jpg");
             viewModel.MaskSuggestions.Add("*.png");
             viewModel.SetViewMode(FileListViewMode.List);
+            viewModel.SetThumbnailSize(ThumbnailSizes.Huge);
 
             var captured = viewModel.CaptureSession();
             Assert.Equal(dir, captured.LastOpenedDirectory);
             Assert.Equal(FileListViewMode.List, captured.ViewMode);
+            Assert.Equal(ThumbnailSizes.Huge, captured.ThumbnailSize);
 
             var restored = _CreateViewModel(_tempDirectoryFixture.CreateTempDir());
             restored.ApplySession(captured);
@@ -79,6 +83,7 @@ namespace Mfr.Tests.Ui.FileList
             Assert.Equal(captured.ExcludeMasks, restored.ExcludeMasks);
             Assert.Equal(captured.MaskSuggestions, restored.MaskSuggestions);
             Assert.Equal(captured.ViewMode, restored.ViewMode);
+            Assert.Equal(captured.ThumbnailSize, restored.ThumbnailSize);
         }
 
         /// <summary>
@@ -97,6 +102,7 @@ namespace Mfr.Tests.Ui.FileList
             Assert.Equal(FileListViewModel.DefaultExcludeMasks, viewModel.ExcludeMasks);
             Assert.NotEmpty(viewModel.MaskSuggestions);
             Assert.Equal(FileListViewMode.Report, viewModel.ViewMode);
+            Assert.Equal(ThumbnailSizes.Default, viewModel.ThumbnailSize);
         }
 
         /// <summary>
@@ -112,6 +118,21 @@ namespace Mfr.Tests.Ui.FileList
 
             Assert.Equal("*", viewModel.Mask);
             Assert.Equal(FileListViewMode.Report, viewModel.ViewMode);
+            Assert.Equal(ThumbnailSizes.Default, viewModel.ThumbnailSize);
+        }
+
+        /// <summary>
+        /// Verifies an off-step thumbnail size is snapped on restore.
+        /// </summary>
+        [Fact]
+        public void ApplySession_Clamps_ThumbnailSize()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var viewModel = _CreateViewModel(dir);
+
+            viewModel.ApplySession(new SessionStateFileList { ThumbnailSize = 100 });
+
+            Assert.Equal(ThumbnailSizes.Medium, viewModel.ThumbnailSize);
         }
 
         /// <summary>

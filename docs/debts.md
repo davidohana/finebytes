@@ -14,6 +14,7 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 ## Rename List
 
 - Show Last Rename Errors — row-level **Show Rename Error** is available; a list-wide history view is deferred
+- Drag-out FileDrop to Explorer (selected rows) — cut from [rename-list-ui.plan.md](plans/rename-list-ui.plan.md) 14f; inbound drop + reorder already ship
 
 ## Avalonia / tooling
 

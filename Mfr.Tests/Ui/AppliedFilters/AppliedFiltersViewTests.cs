@@ -1,8 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
-using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.MainWindow;
@@ -176,14 +174,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var checkBox = container.GetVisualDescendants().OfType<CheckBox>().FirstOrDefault();
             Assert.NotNull(checkBox);
 
-            var local = new Point(Math.Max(2, checkBox.Bounds.Width / 2), Math.Max(2, checkBox.Bounds.Height / 2));
-            var windowPoint = checkBox.TranslatePoint(local, window);
-            Assert.True(windowPoint.HasValue);
-
-            window.MouseMove(windowPoint.Value);
-            window.MouseDown(windowPoint.Value, MouseButton.Left);
-            window.MouseUp(windowPoint.Value, MouseButton.Left);
-            Dispatcher.UIThread.RunJobs();
+            HeadlessPointerClicks.ClickAt(window, checkBox);
         }
     }
 }

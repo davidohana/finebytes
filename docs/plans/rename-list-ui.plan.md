@@ -1,6 +1,6 @@
 ---
 name: Rename List UI
-overview: "Phases 1–13 + 14a–14e + 15 + 16 done. Next: 14f drag-out."
+overview: "Complete. Phases 1–13 + 14a–14e + 15 + 16 shipped; 14f drag-out cut."
 todos:
   - id: phase-1a
     content: "1a Engine: Remove/Clear + reindex (no UI)"
@@ -114,8 +114,8 @@ todos:
     content: "14e: Properties — Alt+Enter + row menu → Windows property sheet (+ File List + Show in Explorer)"
     status: completed
   - id: phase-14f
-    content: "14f: Drag-out FileDrop to Explorer (selected rows)"
-    status: pending
+    content: "14f: Drag-out FileDrop to Explorer (selected rows) — cut"
+    status: cancelled
   - id: phase-15
     content: "Phase 15: GO commit from UI"
     status: completed
@@ -136,20 +136,18 @@ Canonical plan: this file under `docs/plans/`. Sources: [mfr7 help](d:/Devl/mfr7
 ```mermaid
 flowchart LR
   Done[1–13 + 14a-e + 15 + 16]
-  P14f[14f Drag-out]
-  Done --> P14f
 ```
 
 ______________________________________________________________________
 
 ## Status (2026-09-13)
 
-|                |                                              |
-| -------------- | -------------------------------------------- |
-| **Shipped**    | Phases **1–13**, **14a–14e**, **15**, **16** |
-| **Next**       | **14f** Drag-out FileDrop                    |
-| **Blocked on** | —                                            |
-| **Left**       | **1 item:** 14f only                         |
+|                |                                                              |
+| -------------- | ------------------------------------------------------------ |
+| **Shipped**    | Phases **1–13**, **14a–14e**, **15**, **16**                 |
+| **Next**       | — (plan complete)                                            |
+| **Cut**        | **14f** Drag-out FileDrop (see [debts.md](../debts.md))      |
+| **Blocked on** | —                                                            |
 
 ______________________________________________________________________
 
@@ -177,12 +175,6 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 | **15** GO                 | Ctrl+G / menu / toolbar → `Commit`; plum apply-error rows; Show Rename Error                                                                                                           |
 | **16** Color legend       | Toolbar toggle + right-dock swatches (black/red/blue/gray/lavender/plum)                                                                                                               |
 
-**Already reusable for 14f (do not rebuild):**
-
-- Inbound File List/Explorer drop + internal reorder (4c/4d) in [`RenameListView.axaml.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs) — outbound FileDrop must coexist
-- `IFileShellOpener` / shell path helpers; selected-row `FullPath`s on entries
-- Cell/row classes + legend (**16**); GO / override / export paths already shipped
-
 **Write vs preview (catalog):**
 
 | MFR7 type        | Examples                                           | Preview col | Edit as Name List / F2    |
@@ -191,19 +183,11 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 | `ReadWrite`      | Extended dates/attrs                               | yes (12)    | **no**                    |
 | `ReadOnly`       | Size, Image, Jpeg, Media, Mpeg, First\*, Tag Types | no          | **no**                    |
 
-______________________________________________________________________
-
-## Remaining — execution order
-
-| Phase            | What                                  | Depends on              | Status  |
-| ---------------- | ------------------------------------- | ----------------------- | ------- |
-| **14f** Drag-out | Selected rows as FileDrop to Explorer | coexist with 4d reorder | pending |
-
 **Focused-cell chrome (done, MFR7 parity):** amber `DataGridCell:current` fill (`RenameListFocusedCellBrush`) so the current column is visible inside the selected row. Not a full-column wash; omit from Phase 16 legend (MFR7 Legend omits focus too).
 
 ______________________________________________________________________
 
-## Phase 14 — advanced menus (14b–14f)
+## Phase 14 — advanced menus (14a–14e)
 
 MFR7: [renamelist.html](d:/Devl/mfr7/Site/finebytes/mfr/Help/renamelist.html) (`#export`, `#freeedit`, `#manualrename`, `#removeunchanged`, `#morefeats`), UI `RenameList.cs`, `RenameItemList.GenerateNameList`.
 
@@ -273,21 +257,13 @@ Windows property sheet for the focused item (MFR7 Alt+Enter / row **Properties**
 
 **Tests:** enabled/disabled with selection; opener called with path; headless menu items present.
 
-### 14f — Drag-out to Explorer
+### 14f — Drag-out to Explorer (cut)
 
-Selected Rename List rows drag as filesystem paths.
-
-**Work**
-
-- Start drag with Avalonia file-list / `DataFormats.Files` of selected `FullPath`s (MFR7 `FileDrop`).
-- Coexist with internal reorder (4d): outbound FileDrop when dragging **outside** the grid; keep reorder when dropping on the grid.
-- **Defer:** cell-text / rename-item drops onto filter editors — note in [debts.md](../../docs/debts.md) if skipped.
-
-**Tests:** payload has selected paths; empty selection does not start file drag.
+**Cancelled.** Outbound FileDrop of selected rows to Explorer is not in scope. Noted under Rename List in [debts.md](../debts.md) if revisited later. Inbound drop + internal reorder (4c/4d) stay as shipped.
 
 ### Phase 14 exit
 
-**14a–14e done.** Exit when **14f** ships: Explorer drag-out coexists with 4d reorder. (**15** / **16** already shipped out of order.)
+**Done** (14a–14e). 14f cut. (**15** / **16** shipped.)
 
 ______________________________________________________________________
 
@@ -295,7 +271,7 @@ ______________________________________________________________________
 
 Wire UI to existing engine commit.
 
-**Status:** done (shipped before 14f).
+**Status:** done.
 
 **MFR7 flow:** clear apply errors → ensure preview if needed → warn on preview-error count → apply with progress → plum rows for apply/rename errors → status-bar outcome → row menu **Show Rename Error**.
 
@@ -340,4 +316,4 @@ ______________________________________________________________________
 
 ## What to implement next
 
-1. **14f** drag-out — only remaining phase; then this plan is complete.
+Nothing — this plan is complete.

@@ -191,6 +191,13 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("viewMode")]
         public FileListViewMode? ViewMode { get; set; }
+
+        /// <summary>
+        /// Last Thumbnails-view image size in pixels.
+        /// <para>Null means unset (first launch uses the default medium size).</para>
+        /// </summary>
+        [JsonPropertyName("thumbnailSize")]
+        public int? ThumbnailSize { get; set; }
     }
 
     /// <summary>

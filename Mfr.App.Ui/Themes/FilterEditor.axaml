@@ -269,8 +269,8 @@
   </Style>
 
   <!--
-    Watermarks look like filled values at rest. Hide unless the empty field is focused.
-    Foreground (not Opacity): PART_Watermark Opacity is a template local DynamicResource.
+    PlaceholderText (template PART_Watermark) looks like filled values at rest.
+    Hide unless the empty field is focused. Foreground (not Opacity): PART_Watermark Opacity is a template local DynamicResource.
   -->
   <Style
     Selector="TextBox.filter-editor-field /template/ TextBlock#PART_Watermark,

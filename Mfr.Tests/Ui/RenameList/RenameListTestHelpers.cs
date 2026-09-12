@@ -1,4 +1,6 @@
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Input;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
@@ -51,6 +53,110 @@ namespace Mfr.Tests.Ui.RenameList
         internal static List<RenameListSortKey> SortSession(RenameListFieldKey fieldKey, bool descending = false)
         {
             return [new RenameListSortKey(fieldKey, descending)];
+        }
+
+        /// <summary>
+        /// Scrolls <paramref name="entry"/> / <paramref name="fieldKey"/> into the host viewport.
+        /// </summary>
+        /// <param name="grid">Rename List grid.</param>
+        /// <param name="entry">Row entry.</param>
+        /// <param name="fieldKey">Column field key.</param>
+        internal static void ScrollFieldIntoView(DataGrid grid, RenameListEntry entry, RenameListFieldKey fieldKey)
+        {
+            var column = grid.Columns.FirstOrDefault(item => RenameListGridColumns.GetFieldKey(item) == fieldKey);
+            Assert.NotNull(column);
+            grid.ScrollIntoView(entry, column);
+        }
+
+        /// <summary>
+        /// Window point over the center of <paramref name="fieldKey"/> on <paramref name="entry"/>.
+        /// </summary>
+        /// <param name="window">Host window.</param>
+        /// <param name="grid">Rename List grid.</param>
+        /// <param name="entry">Row entry.</param>
+        /// <param name="fieldKey">Column field key.</param>
+        /// <returns>Point in window coordinates.</returns>
+        internal static Point FieldCellWindowPoint(
+            Window window,
+            DataGrid grid,
+            RenameListEntry entry,
+            RenameListFieldKey fieldKey
+        )
+        {
+            var row = grid.GetVisualDescendants()
+                .OfType<DataGridRow>()
+                .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
+            Assert.NotNull(row);
+
+            var x = 0.0;
+            var found = false;
+            foreach (var column in grid.Columns.OrderBy(item => item.DisplayIndex))
+            {
+                var width = column.Width.IsAbsolute ? column.Width.Value : column.ActualWidth;
+                if (RenameListGridColumns.GetFieldKey(column) == fieldKey)
+                {
+                    x += width / 2;
+                    found = true;
+                    break;
+                }
+
+                x += width;
+            }
+
+            Assert.True(found);
+            var windowPoint = row.TranslatePoint(new Point(x, Math.Max(1, row.Bounds.Height / 2)), window);
+            Assert.True(windowPoint.HasValue);
+            return windowPoint.Value;
+        }
+
+        /// <summary>
+        /// Scrolls a field cell into view and left-clicks it through the host window.
+        /// </summary>
+        /// <param name="window">Host window.</param>
+        /// <param name="grid">Rename List grid.</param>
+        /// <param name="entry">Row entry.</param>
+        /// <param name="fieldKey">Column field key.</param>
+        internal static void ClickFieldCell(
+            Window window,
+            DataGrid grid,
+            RenameListEntry entry,
+            RenameListFieldKey fieldKey
+        )
+        {
+            // Wide absolute columns can sit past the host width; scroll before hit-test.
+            ScrollFieldIntoView(grid, entry, fieldKey);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var windowPoint = FieldCellWindowPoint(window, grid, entry, fieldKey);
+            window.MouseMove(windowPoint, RawInputModifiers.None);
+            window.MouseDown(windowPoint, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(windowPoint, MouseButton.Left, RawInputModifiers.None);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+        }
+
+        /// <summary>
+        /// Scrolls a field cell into view and moves the pointer over it (no click).
+        /// </summary>
+        /// <param name="window">Host window.</param>
+        /// <param name="grid">Rename List grid.</param>
+        /// <param name="entry">Row entry.</param>
+        /// <param name="fieldKey">Column field key.</param>
+        internal static void MoveOverFieldCell(
+            Window window,
+            DataGrid grid,
+            RenameListEntry entry,
+            RenameListFieldKey fieldKey
+        )
+        {
+            ScrollFieldIntoView(grid, entry, fieldKey);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var windowPoint = FieldCellWindowPoint(window, grid, entry, fieldKey);
+            window.MouseMove(windowPoint, RawInputModifiers.None);
+            Dispatcher.UIThread.RunJobs();
         }
 
         /// <summary>

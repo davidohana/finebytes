@@ -729,7 +729,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
-        /// Restores mask, exclude-mask, suggestion, and view-mode fields from session.
+        /// Restores mask, exclude-mask, suggestion, view-mode, and thumbnail-size fields from session.
         /// </summary>
         /// <param name="fileList">Persisted File List section, or <see langword="null"/> to keep defaults.</param>
         internal void ApplySession(SessionStateFileList? fileList)
@@ -768,10 +768,15 @@ namespace Mfr.App.Ui.ViewModels.FileList
             {
                 SetViewMode(viewMode);
             }
+
+            if (fileList.ThumbnailSize is { } thumbnailSize)
+            {
+                SetThumbnailSize(thumbnailSize);
+            }
         }
 
         /// <summary>
-        /// Captures current mask, exclude-mask, suggestion, and view-mode fields for session save.
+        /// Captures current mask, exclude-mask, suggestion, view-mode, and thumbnail-size fields for session save.
         /// </summary>
         /// <returns>File List session section matching the current view model.</returns>
         internal SessionStateFileList CaptureSession()
@@ -784,6 +789,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 ExcludeMasksEnabled = ExcludeMasksEnabled,
                 MaskSuggestions = [.. MaskSuggestions],
                 ViewMode = ViewMode,
+                ThumbnailSize = ThumbnailSize,
             };
         }
 

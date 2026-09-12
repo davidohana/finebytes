@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
@@ -33,7 +32,7 @@ namespace Mfr.Tests.Ui.RenameList
             var (renameListViewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 8);
             var target = renameListViewModel.Entries[3];
 
-            _ClickFullFileNameCell(window, grid, target);
+            RenameListTestHelpers.ClickFieldCell(window, grid, target, RenameListTestHelpers.FullFileNameKey);
 
             Assert.Contains(
                 target.FullFileName,
@@ -65,7 +64,12 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            _ClickFullFileNameCell(window, grid, renameListViewModel.Entries[deleteIndex]);
+            RenameListTestHelpers.ClickFieldCell(
+                window,
+                grid,
+                renameListViewModel.Entries[deleteIndex],
+                RenameListTestHelpers.FullFileNameKey
+            );
             Assert.Contains(deletedName, renameListViewModel.CellStatusHint.ToPlainText(), StringComparison.Ordinal);
 
             grid.Focus();
@@ -97,14 +101,14 @@ namespace Mfr.Tests.Ui.RenameList
             var selected = renameListViewModel.Entries[1];
             var other = renameListViewModel.Entries[4];
 
-            _ClickFullFileNameCell(window, grid, selected);
+            RenameListTestHelpers.ClickFieldCell(window, grid, selected, RenameListTestHelpers.FullFileNameKey);
             Assert.Contains(
                 selected.FullFileName,
                 renameListViewModel.CellStatusHint.ToPlainText(),
                 StringComparison.Ordinal
             );
 
-            _MoveOverFullFileNameCell(window, grid, other);
+            RenameListTestHelpers.MoveOverFieldCell(window, grid, other, RenameListTestHelpers.FullFileNameKey);
             Dispatcher.UIThread.RunJobs();
 
             var hint = renameListViewModel.CellStatusHint.ToPlainText();
@@ -112,76 +116,6 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.DoesNotContain(other.FullFileName, hint, StringComparison.Ordinal);
 
             window.Close();
-        }
-
-        private static void _ClickFullFileNameCell(Window window, DataGrid grid, RenameListEntry entry)
-        {
-            _ScrollFullFileNameIntoView(grid, entry);
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var windowPoint = _FullFileNameCellPoint(window, grid, entry);
-            window.MouseMove(windowPoint, RawInputModifiers.None);
-            window.MouseDown(windowPoint, MouseButton.Left, RawInputModifiers.None);
-            window.MouseUp(windowPoint, MouseButton.Left, RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
-        }
-
-        private static void _MoveOverFullFileNameCell(Window window, DataGrid grid, RenameListEntry entry)
-        {
-            _ScrollFullFileNameIntoView(grid, entry);
-            window.UpdateLayout();
-            Dispatcher.UIThread.RunJobs();
-
-            var windowPoint = _FullFileNameCellPoint(window, grid, entry);
-            window.MouseMove(windowPoint, RawInputModifiers.None);
-            Dispatcher.UIThread.RunJobs();
-        }
-
-        /// <summary>
-        /// Scrolls the Full Name column into the host so headless hit-test can resolve the cell.
-        /// </summary>
-        private static void _ScrollFullFileNameIntoView(DataGrid grid, RenameListEntry entry)
-        {
-            var fullNameKey = RenameListFieldKey.Original(
-                BasicRenameListField.Group,
-                BasicRenameListFields.Key.FullName
-            );
-            var column = grid.Columns.FirstOrDefault(item => RenameListGridColumns.GetFieldKey(item) == fullNameKey);
-            Assert.NotNull(column);
-            grid.ScrollIntoView(entry, column);
-        }
-
-        private static Point _FullFileNameCellPoint(Window window, DataGrid grid, RenameListEntry entry)
-        {
-            var row = grid.GetVisualDescendants()
-                .OfType<DataGridRow>()
-                .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
-            Assert.NotNull(row);
-
-            var fullNameKey = RenameListFieldKey.Original(
-                BasicRenameListField.Group,
-                BasicRenameListFields.Key.FullName
-            );
-            var x = 0.0;
-            var found = false;
-            foreach (var column in grid.Columns.OrderBy(column => column.DisplayIndex))
-            {
-                var width = column.Width.IsAbsolute ? column.Width.Value : column.ActualWidth;
-                if (RenameListGridColumns.GetFieldKey(column) == fullNameKey)
-                {
-                    x += width / 2;
-                    found = true;
-                    break;
-                }
-
-                x += width;
-            }
-
-            Assert.True(found);
-            var windowPoint = row.TranslatePoint(new Point(x, Math.Max(1, row.Bounds.Height / 2)), window);
-            Assert.True(windowPoint.HasValue);
-            return windowPoint.Value;
         }
     }
 }

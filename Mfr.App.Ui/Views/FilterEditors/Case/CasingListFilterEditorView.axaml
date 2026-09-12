@@ -29,7 +29,7 @@
             x:Name="WordsBox"
             Classes="filter-editor-field-wrap"
             MinWidth="240"
-            Watermark="and or with RMX"
+            PlaceholderText="and or with RMX"
             Text="{Binding WordsText}"
           />
         </StackPanel>

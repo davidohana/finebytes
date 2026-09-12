@@ -101,6 +101,7 @@ namespace Mfr.App.Ui.Services.Session
                     saved.MaskSuggestions = fileList.MaskSuggestions is null ? null : [.. fileList.MaskSuggestions];
 
                     saved.ViewMode = fileList.ViewMode;
+                    saved.ThumbnailSize = fileList.ThumbnailSize;
                 }
 
                 if (renameList is not null)

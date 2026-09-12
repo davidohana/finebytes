@@ -29,7 +29,7 @@
               Classes="filter-editor-field"
               MinWidth="240"
               Text="{Binding Find}"
-              Watermark="{Binding FindWatermark}"
+              PlaceholderText="{Binding FindWatermark}"
             />
           </controls:FilterEditorLabeledRow>
           <controls:FilterEditorLabeledRow
