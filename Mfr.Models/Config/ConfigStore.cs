@@ -5,7 +5,7 @@ using Mfr.Utils.Config;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Loads optional process-wide config from JSON.
+    /// Loads and saves process-wide config as JSON.
     /// <para>Default file: <see cref="_DefaultConfigFilePath"/>.</para>
     /// </summary>
     /// <remarks>
@@ -18,7 +18,8 @@ namespace Mfr.Models.Config
     /// </para>
     /// <para>
     /// When the default AppData file is missing, <see cref="EnsureDefaultFile"/> writes one with current
-    /// defaults so the user can hand-edit filter and log settings (there is no Options UI for these).
+    /// defaults so the user can hand-edit filter and log settings. The Options dialog persists selected
+    /// UI prefs via <see cref="Save"/> (overwrite); other leaves remain hand-edit / CLI <c>--set</c>.
     /// When a property is omitted, values still come from <see cref="MfrConfig"/> field initializers.
     /// </para>
     /// <para>
@@ -112,6 +113,27 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
+        /// Writes <see cref="Config"/> to JSON, creating the directory when needed.
+        /// <para>Always overwrites. Used by the Options dialog after OK.</para>
+        /// </summary>
+        /// <param name="configFilePath">
+        /// Path to JSON. When <c>null</c> or whitespace, <see cref="_DefaultConfigFilePath"/> is used.
+        /// </param>
+        /// <exception cref="IOException">Thrown when the file cannot be written.</exception>
+        public static void Save(string? configFilePath = null)
+        {
+            var path = _ResolvePath(configFilePath);
+            var directory = Path.GetDirectoryName(path);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            var json = ConfigJsonWriter.Write(Config).ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(path, json);
+        }
+
+        /// <summary>
         /// Writes <see cref="Config"/> to JSON when the file is missing, so it can be hand-edited.
         /// <para>
         /// Existing files are left unchanged. Failures are swallowed so a missing AppData write does not
@@ -131,16 +153,7 @@ namespace Mfr.Models.Config
                     return;
                 }
 
-                var directory = Path.GetDirectoryName(path);
-                if (!string.IsNullOrWhiteSpace(directory))
-                {
-                    Directory.CreateDirectory(directory);
-                }
-
-                var json = ConfigJsonWriter
-                    .Write(Config)
-                    .ToJsonString(new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(path, json);
+                Save(path);
             }
             catch
             {
