@@ -223,6 +223,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _NotifyManualOverrideCommandsChanged();
             _NotifyShowLoadErrorsChanged();
             _NotifyShowPreviewErrorChanged();
+            _NotifyShowCommitErrorChanged();
         }
 
         /// <summary>
@@ -321,6 +322,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             FieldDisplayRevision++;
             _NotifyShowLoadErrorsChanged();
             _NotifyShowPreviewErrorChanged();
+            _NotifyShowCommitErrorChanged();
         }
 
         private bool _CanRemoveSelected()
@@ -379,6 +381,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _NotifyManualOverrideCommandsChanged();
             _NotifyShowLoadErrorsChanged();
             _NotifyShowPreviewErrorChanged();
+            _NotifyShowCommitErrorChanged();
             _NotifyRefreshChanged();
         }
 

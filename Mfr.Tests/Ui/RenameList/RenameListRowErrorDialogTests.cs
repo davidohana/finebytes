@@ -120,6 +120,36 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies a rename failure uses the shared dialog with commit-specific copy.
+        /// </summary>
+        [AvaloniaFact]
+        public void Dialog_shows_rename_error_content()
+        {
+            var content = RenameListCommitErrorDisplay.Create(
+                @"D:\Music\song.mp3",
+                "Access to the destination was denied.",
+                "Type: System.UnauthorizedAccessException"
+            );
+            var dialog = new RenameListRowErrorDialog(content);
+            dialog.Show();
+            dialog.UpdateLayout();
+
+            var summaryText = dialog.FindControl<TextBlock>("SummaryText");
+            var primaryDetailsText = dialog.FindControl<TextBox>("PrimaryDetailsText");
+            var technicalExpander = dialog.FindControl<Expander>("TechnicalDetailsExpander");
+            Assert.NotNull(summaryText);
+            Assert.NotNull(primaryDetailsText);
+            Assert.NotNull(technicalExpander);
+
+            Assert.Equal(RenameListCommitErrorDisplay.DialogTitle, dialog.Title);
+            Assert.Equal(RenameListCommitErrorDisplay.Summary, summaryText.Text);
+            Assert.Contains(@"D:\Music\song.mp3", primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.Contains("destination was denied", primaryDetailsText.Text, StringComparison.Ordinal);
+            Assert.True(technicalExpander.IsVisible);
+            Assert.False(technicalExpander.IsExpanded);
+        }
+
+        /// <summary>
         /// Verifies the technical expander stays hidden when technical text is absent.
         /// </summary>
         [AvaloniaFact]

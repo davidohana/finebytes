@@ -1,8 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Tests.Ui.RenameList
@@ -93,6 +95,39 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal([viewModel.Entries[0], viewModel.Entries[1]], viewModel.SelectedEntries);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the row menu exposes Show Rename Error and its command requests the shared dialog.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Row_menu_shows_rename_error_and_requests_dialog()
+        {
+            var (viewModel, window, grid) = await _context.ShowWithRowsAsync(rowCount: 1);
+            var entry = Assert.Single(viewModel.Entries);
+            entry.EngineItem.CommitError = new RenameItemError("commit failed");
+
+            Assert.NotNull(grid.ContextMenu);
+            var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
+            var rowContent = row.GetVisualDescendants().OfType<TextBlock>().First();
+            rowContent.RaiseEvent(new ContextRequestedEventArgs { RoutedEvent = Control.ContextRequestedEvent });
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal([entry], viewModel.SelectedEntries);
+
+            var menuItem = grid
+                .ContextMenu.Items.OfType<MenuItem>()
+                .Single(item => Equals(item.Header, "Show Rename Error"));
+
+            Assert.True(menuItem.IsVisible);
+
+            RenameListRowErrorDialogContent? content = null;
+            viewModel.RowErrorDialogRequested += (_, value) => content = value;
+            menuItem.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
+
+            Assert.NotNull(content);
+            Assert.Equal(RenameListCommitErrorDisplay.DialogTitle, content.Title);
+            Assert.Equal("commit failed", content.UserMessage);
             window.Close();
         }
 

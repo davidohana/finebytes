@@ -22,6 +22,11 @@
       <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
       <ContextMenu x:Key="RenameListRowContextMenu" x:Shared="False">
         <MenuItem
+          Header="Show Rename Error"
+          Command="{Binding ShowCommitErrorCommand}"
+          IsVisible="{Binding CanShowCommitError}"
+        />
+        <MenuItem
           Header="Show Preview Error"
           Command="{Binding ShowPreviewErrorCommand}"
           IsVisible="{Binding CanShowPreviewError}"
@@ -240,6 +245,20 @@
       <Setter Property="Opacity" Value="1" />
     </Style>
     <Style Selector="DataGrid.rename-list DataGridRow.rename-list-preview-error:selected /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <!-- MFR7 ApplyErrorBackColor (Plum); commit error takes precedence over preview error. -->
+    <Style Selector="DataGrid.rename-list DataGridRow.rename-list-commit-error">
+      <Setter Property="Background" Value="{DynamicResource RenameListCommitErrorRowBrush}" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow.rename-list-commit-error /template/ Rectangle#BackgroundRectangle">
+      <Setter Property="Fill" Value="{DynamicResource RenameListCommitErrorRowBrush}" />
+      <Setter Property="Stroke" Value="Transparent" />
+      <Setter Property="Opacity" Value="1" />
+    </Style>
+    <Style Selector="DataGrid.rename-list DataGridRow.rename-list-commit-error:selected /template/ Rectangle#BackgroundRectangle">
       <Setter Property="Fill" Value="{DynamicResource AppChromeSelectionBrush}" />
       <Setter Property="Stroke" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Opacity" Value="1" />

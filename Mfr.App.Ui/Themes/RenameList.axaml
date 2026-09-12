@@ -8,6 +8,7 @@
           <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF0000" />
           <SolidColorBrush x:Key="RenameListManualOverrideForegroundBrush" Color="#0000FF" />
           <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#FFF0F5" />
+          <SolidColorBrush x:Key="RenameListCommitErrorRowBrush" Color="#DDA0DD" />
           <SolidColorBrush x:Key="RenameListFocusedCellBrush" Color="#E8F4FF" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Dark">
@@ -16,6 +17,7 @@
           <SolidColorBrush x:Key="RenameListPreviewChangedForegroundBrush" Color="#FF8080" />
           <SolidColorBrush x:Key="RenameListManualOverrideForegroundBrush" Color="#8090FF" />
           <SolidColorBrush x:Key="RenameListPreviewErrorRowBrush" Color="#4A3038" />
+          <SolidColorBrush x:Key="RenameListCommitErrorRowBrush" Color="#5A405A" />
           <SolidColorBrush x:Key="RenameListFocusedCellBrush" Color="#3A6A9A" />
         </ResourceDictionary>
       </ResourceDictionary.ThemeDictionaries>

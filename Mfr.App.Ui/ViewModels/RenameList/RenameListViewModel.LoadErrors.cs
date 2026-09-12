@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Raised when the user requests a row error dialog (load, preview, or later apply).
+        /// Raised when the user requests a row error dialog (load, preview, or rename).
         /// </summary>
         public event EventHandler<RenameListRowErrorDialogContent>? RowErrorDialogRequested;
 

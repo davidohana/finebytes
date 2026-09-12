@@ -61,6 +61,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool HasPreviewError => EngineItem.PreviewError is not null;
 
         /// <summary>
+        /// Returns whether the last commit left a rename error on this row (plum highlight).
+        /// </summary>
+        public bool HasCommitError => EngineItem.CommitError is not null;
+
+        /// <summary>
         /// Returns whether this row path is missing from disk (whole-row gray; not a metadata load error).
         /// </summary>
         public bool IsMissingFromDisk => RenameListDiskPaths.IsMissingFromDisk(EngineItem);

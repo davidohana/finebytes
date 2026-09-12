@@ -69,7 +69,7 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 15 
 
 ### P3 — Plum + Show Rename Error (UI)
 
-- [ ] **Status:** pending
+- [x] **Status:** done
 
 **Scope / files**
 

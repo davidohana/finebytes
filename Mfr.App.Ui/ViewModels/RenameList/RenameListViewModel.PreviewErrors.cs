@@ -15,7 +15,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Gets whether the error-menu separator should appear (any Show * Error item visible).
         /// </summary>
-        public bool CanShowRowErrorMenu => CanShowPreviewError || CanShowLoadErrors;
+        public bool CanShowRowErrorMenu => CanShowCommitError || CanShowPreviewError || CanShowLoadErrors;
 
         /// <summary>
         /// Shows the last preview failure for the selected row.

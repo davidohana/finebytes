@@ -712,23 +712,26 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private void _OnLoadingRow(object? sender, DataGridRowEventArgs e)
         {
-            _ApplyPreviewErrorRowClass(e.Row);
+            _ApplyErrorRowClasses(e.Row);
         }
 
-        private void _ApplyPreviewErrorRowHighlights()
+        private void _ApplyErrorRowHighlights()
         {
             foreach (var row in RenameGrid.GetVisualDescendants().OfType<DataGridRow>())
             {
-                _ApplyPreviewErrorRowClass(row);
+                _ApplyErrorRowClasses(row);
             }
         }
 
         /// <summary>
-        /// Applies lavender preview-error row styling from the last preview pass.
+        /// Applies commit-error plum before preview-error lavender for the row.
         /// </summary>
-        private static void _ApplyPreviewErrorRowClass(DataGridRow row)
+        private static void _ApplyErrorRowClasses(DataGridRow row)
         {
-            var hasPreviewError = row.DataContext is RenameListEntry { HasPreviewError: true };
+            var entry = row.DataContext as RenameListEntry;
+            var hasCommitError = entry?.HasCommitError == true;
+            var hasPreviewError = !hasCommitError && entry?.HasPreviewError == true;
+            row.Classes.Set("rename-list-commit-error", hasCommitError);
             row.Classes.Set("rename-list-preview-error", hasPreviewError);
         }
 
@@ -827,7 +830,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (e.PropertyName is nameof(RenameListViewModel.FieldDisplayRevision))
             {
-                _ApplyPreviewErrorRowHighlights();
+                _ApplyErrorRowHighlights();
                 _PublishFocusedCellHint();
             }
         }
