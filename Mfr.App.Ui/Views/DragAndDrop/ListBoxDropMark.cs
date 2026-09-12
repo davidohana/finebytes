@@ -1,20 +1,16 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
-using Avalonia.Controls.Shapes;
 
 namespace Mfr.App.Ui.Views.DragAndDrop
 {
     /// <summary>
-    /// Salmon insert marker for ListBox drag-and-drop: row class, or a line after the last item.
+    /// Salmon insert-line marker for ListBox drag-and-drop reorder.
     /// </summary>
     internal sealed class ListBoxDropMark
     {
-        private ListBoxItem? _dropMarkItem;
+        private readonly DropInsertLineAdorner _line = new();
         private ListBox? _dropMarkList;
         private int? _dropMarkInsertIndex;
-        private Canvas? _appendMarkHost;
-        private Rectangle? _appendMarkLine;
 
         /// <summary>
         /// Shows or moves the insert marker for a drop at <paramref name="position"/>.
@@ -32,19 +28,7 @@ namespace Mfr.App.Ui.Views.DragAndDrop
             Clear();
             _dropMarkList = listBox;
             _dropMarkInsertIndex = insertIndex;
-
-            if (insertIndex < listBox.ItemCount)
-            {
-                if (listBox.ContainerFromIndex(insertIndex) is ListBoxItem item)
-                {
-                    item.Classes.Set("drop-mark", true);
-                    _dropMarkItem = item;
-                }
-
-                return;
-            }
-
-            _ShowAppendMark(listBox);
+            _line.Show(listBox, _GetInsertLineY(listBox, insertIndex));
         }
 
         /// <summary>
@@ -52,14 +36,7 @@ namespace Mfr.App.Ui.Views.DragAndDrop
         /// </summary>
         public void Clear()
         {
-            _dropMarkItem?.Classes.Set("drop-mark", false);
-            _dropMarkItem = null;
-
-            if (_dropMarkList is { } markedList)
-            {
-                AdornerLayer.SetAdorner(markedList, null);
-            }
-
+            _line.Clear(_dropMarkList);
             _dropMarkList = null;
             _dropMarkInsertIndex = null;
         }
@@ -76,35 +53,35 @@ namespace Mfr.App.Ui.Views.DragAndDrop
             }
         }
 
-        private void _ShowAppendMark(ListBox listBox)
+        private static double _GetInsertLineY(ListBox listBox, int insertIndex)
         {
-            var y = 2.0;
+            if (listBox.ItemCount == 0)
+            {
+                return 2.0;
+            }
+
+            if (insertIndex < listBox.ItemCount)
+            {
+                if (
+                    listBox.ContainerFromIndex(insertIndex) is Control item
+                    && item.TranslatePoint(default, listBox) is { } origin
+                )
+                {
+                    return origin.Y;
+                }
+
+                return 2.0;
+            }
+
             if (
-                listBox.ItemCount > 0
-                && listBox.ContainerFromIndex(listBox.ItemCount - 1) is Control lastItem
-                && lastItem.TranslatePoint(default, listBox) is { } origin
+                listBox.ContainerFromIndex(listBox.ItemCount - 1) is Control lastItem
+                && lastItem.TranslatePoint(default, listBox) is { } lastOrigin
             )
             {
-                y = origin.Y + lastItem.Bounds.Height;
+                return lastOrigin.Y + lastItem.Bounds.Height;
             }
 
-            _appendMarkHost ??= new Canvas { IsHitTestVisible = false };
-            _appendMarkLine ??= new Rectangle
-            {
-                Height = 3,
-                IsHitTestVisible = false,
-                Fill = DropMarkBrushes.Resolve(listBox),
-            };
-
-            if (_appendMarkLine.Parent is null)
-            {
-                _appendMarkHost.Children.Add(_appendMarkLine);
-            }
-
-            _appendMarkLine.Width = Math.Max(0, listBox.Bounds.Width - 4);
-            Canvas.SetLeft(_appendMarkLine, 2);
-            Canvas.SetTop(_appendMarkLine, Math.Clamp(y - 1.5, 0, Math.Max(0, listBox.Bounds.Height - 3)));
-            AdornerLayer.SetAdorner(listBox, _appendMarkHost);
+            return 2.0;
         }
     }
 }

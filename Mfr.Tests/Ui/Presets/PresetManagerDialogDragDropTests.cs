@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -14,7 +15,7 @@ namespace Mfr.Tests.Ui.Presets
     public sealed class PresetManagerDialogDragDropTests
     {
         /// <summary>
-        /// Verifies drag-over paints the salmon insert marker on the target row.
+        /// Verifies drag-over shows the salmon insert line on the list adorner.
         /// </summary>
         [AvaloniaFact]
         public void DragOver_marks_insert_row()
@@ -31,14 +32,14 @@ namespace Mfr.Tests.Ui.Presets
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Contains("drop-mark", firstItem.Classes);
+            Assert.NotNull(AdornerLayer.GetAdorner(list));
 
             list.RaiseEvent(
                 new DragEventArgs(DragDrop.DragLeaveEvent, dataTransfer, list, new Point(-8, -8), KeyModifiers.None)
             );
             Dispatcher.UIThread.RunJobs();
 
-            Assert.DoesNotContain("drop-mark", firstItem.Classes);
+            Assert.Null(AdornerLayer.GetAdorner(list));
 
             dialog.Close();
         }

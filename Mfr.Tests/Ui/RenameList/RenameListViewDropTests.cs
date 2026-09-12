@@ -236,7 +236,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies internal reorder DragOver cancels Auto-Sort and sets the salmon drop mark.
+        /// Verifies internal reorder DragOver cancels Auto-Sort and shows the salmon insert line.
         /// </summary>
         [AvaloniaFact]
         public async Task DragOver_Internal_Reorder_With_AutoSort_Cancels_AutoSort_And_Sets_DropMark()
@@ -266,8 +266,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.False(renameListViewModel.IsAutoSort);
             Assert.Equal(1, renameListViewModel.DropMarkIndex);
-            var markedRow = grid.GetVisualDescendants().OfType<DataGridRow>().First(row => row.Index == 1);
-            Assert.Contains("drop-mark", markedRow.Classes);
+            Assert.NotNull(AdornerLayer.GetAdorner(grid));
 
             window.Close();
         }
@@ -328,8 +327,6 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(2, renameListViewModel.DropMarkIndex);
-            var lastRow = grid.GetVisualDescendants().OfType<DataGridRow>().First(row => row.Index == 1);
-            Assert.DoesNotContain("drop-mark", lastRow.Classes);
             Assert.NotNull(AdornerLayer.GetAdorner(grid));
 
             window.Close();

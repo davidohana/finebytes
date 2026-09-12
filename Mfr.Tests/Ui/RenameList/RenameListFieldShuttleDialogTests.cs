@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -239,7 +240,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies drag-over on the selected list paints the salmon insert marker on the target row.
+        /// Verifies drag-over on the selected list shows the salmon insert line on the list adorner.
         /// </summary>
         [AvaloniaFact]
         public void DragOver_selected_list_marks_insert_row()
@@ -262,7 +263,7 @@ namespace Mfr.Tests.Ui.RenameList
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Contains("drop-mark", firstItem.Classes);
+            Assert.NotNull(AdornerLayer.GetAdorner(selectedList));
 
             selectedList.RaiseEvent(
                 new DragEventArgs(
@@ -275,7 +276,7 @@ namespace Mfr.Tests.Ui.RenameList
             );
             Dispatcher.UIThread.RunJobs();
 
-            Assert.DoesNotContain("drop-mark", firstItem.Classes);
+            Assert.Null(AdornerLayer.GetAdorner(selectedList));
 
             dialog.Close();
         }
