@@ -133,4 +133,4 @@ When launching `Task` for implement or review:
 - Keep Task prompts under ~20 lines when possible.
 - After each commit, update the plan checkbox/todo in the same turn.
 - Note in the run (briefly) whether each slice was **reviewed** or **deferred**.
-- At the end of a multi-phase run: batch-review any deferred slices (one subagent), then short summary + aggregated deeper-refactor list (cost-to-value) — not a second full review dump beyond that batch.
+- At the end of a multi-phase run: batch-review any deferred slices (one subagent), then short summary + aggregated deeper-refactor report (elaborated per “End-of-run deeper-refactor report”) — not a second full review dump beyond that batch.
