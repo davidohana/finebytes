@@ -5,7 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.DragAndDrop;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -21,8 +21,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void DragOver_marks_insert_row()
         {
             var (window, _, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
-            var payload = new AppliedFilterDragPayload([0]);
-            var dataTransfer = payload.CreateTransfer();
+            var payload = new IndicesDragPayload([0]);
+            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.AppliedFiltersFormat);
 
             var firstItem = list.ContainerFromIndex(1) as ListBoxItem;
             Assert.NotNull(firstItem);
@@ -51,8 +51,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Drop_reorders_selected_filter()
         {
             var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
-            var payload = new AppliedFilterDragPayload([0]);
-            var dataTransfer = payload.CreateTransfer();
+            var payload = new IndicesDragPayload([0]);
+            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.AppliedFiltersFormat);
 
             var targetItem = list.ContainerFromIndex(1) as ListBoxItem;
             Assert.NotNull(targetItem);

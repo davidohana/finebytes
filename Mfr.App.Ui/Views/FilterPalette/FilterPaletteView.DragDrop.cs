@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.FilterPalette;
-using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.Filters;
 
@@ -68,7 +67,10 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _OnListDragOver(object? sender, DragEventArgs e)
         {
-            if (RemoveAppliedStepsCommand is null || AppliedFilterDragPayload.TryRead(e.DataTransfer) is null)
+            if (
+                RemoveAppliedStepsCommand is null
+                || IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.AppliedFiltersFormat) is null
+            )
             {
                 e.DragEffects = DragDropEffects.None;
                 return;
@@ -81,7 +83,11 @@ namespace Mfr.App.Ui.Views.FilterPalette
         private void _OnListDrop(object? sender, DragEventArgs e)
         {
             var command = RemoveAppliedStepsCommand;
-            if (command is null || AppliedFilterDragPayload.TryRead(e.DataTransfer) is not { } payload)
+            if (
+                command is null
+                || IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.AppliedFiltersFormat)
+                    is not { } payload
+            )
             {
                 return;
             }

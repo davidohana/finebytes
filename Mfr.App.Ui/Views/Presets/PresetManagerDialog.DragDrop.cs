@@ -55,8 +55,8 @@ namespace Mfr.App.Ui.Views.Presets
                 return null;
             }
 
-            var payload = new PresetDragPayload(indices);
-            return new ListBoxDragStart(payload.CreateTransfer(), DragDropEffects.Move);
+            var payload = new IndicesDragPayload(indices);
+            return new ListBoxDragStart(payload.CreateTransfer(IndicesDragPayload.PresetsFormat), DragDropEffects.Move);
         }
 
         private void _OnListPointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -85,7 +85,7 @@ namespace Mfr.App.Ui.Views.Presets
                 return;
             }
 
-            if (PresetDragPayload.TryRead(e.DataTransfer) is null)
+            if (IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.PresetsFormat) is null)
             {
                 e.DragEffects = DragDropEffects.None;
                 _dropMark.Clear();
@@ -121,7 +121,7 @@ namespace Mfr.App.Ui.Views.Presets
                 return;
             }
 
-            if (PresetDragPayload.TryRead(e.DataTransfer) is not { } reorderPayload)
+            if (IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.PresetsFormat) is not { } reorderPayload)
             {
                 return;
             }

@@ -57,8 +57,11 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return null;
             }
 
-            var payload = new AppliedFilterDragPayload(indices);
-            return new ListBoxDragStart(payload.CreateTransfer(), DragDropEffects.Move);
+            var payload = new IndicesDragPayload(indices);
+            return new ListBoxDragStart(
+                payload.CreateTransfer(IndicesDragPayload.AppliedFiltersFormat),
+                DragDropEffects.Move
+            );
         }
 
         private void _OnListPointerReleased(object? sender, PointerReleasedEventArgs e)
@@ -88,7 +91,9 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             }
 
             var isFromPalette = FilterPaletteDragPayload.TryRead(e.DataTransfer) is not null;
-            var isReorder = !isFromPalette && AppliedFilterDragPayload.TryRead(e.DataTransfer) is not null;
+            var isReorder =
+                !isFromPalette
+                && IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.AppliedFiltersFormat) is not null;
             if (!isReorder && !isFromPalette)
             {
                 e.DragEffects = DragDropEffects.None;
@@ -143,7 +148,10 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            if (AppliedFilterDragPayload.TryRead(e.DataTransfer) is { } reorderPayload)
+            if (
+                IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.AppliedFiltersFormat) is
+                { } reorderPayload
+            )
             {
                 e.Handled = true;
                 _dropMark.Clear();

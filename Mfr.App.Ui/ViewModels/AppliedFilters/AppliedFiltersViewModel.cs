@@ -148,7 +148,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             {
                 Id = id,
                 Name = trimmedName,
-                Description = _TrimDescriptionOrNull(description),
+                Description = description.TrimmedOrNull(),
                 Chain = ToChain(),
                 VisibleColumns = visibleColumns,
             };
@@ -379,22 +379,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             return new PresetRenameResult(PresetRenameStatus.Success, renamed);
-        }
-
-        /// <summary>
-        /// Trims a description and maps blank / whitespace-only to <see langword="null"/>.
-        /// </summary>
-        /// <param name="description">Raw description from Save Preset.</param>
-        /// <returns>Trimmed text, or <see langword="null"/> when empty.</returns>
-        private static string? _TrimDescriptionOrNull(string? description)
-        {
-            var trimmed = description?.Trim();
-            if (string.IsNullOrEmpty(trimmed))
-            {
-                return null;
-            }
-
-            return trimmed;
         }
 
         /// <summary>

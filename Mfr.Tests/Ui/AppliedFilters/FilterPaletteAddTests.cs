@@ -5,6 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.App.Ui.Views.FilterPalette;
 using Mfr.Filters;
 
@@ -120,8 +121,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
             mainViewModel.AppliedFiltersViewModel.SetSelectedSteps([]);
             mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
-            var payload = new AppliedFilterDragPayload([0]);
-            var dataTransfer = payload.CreateTransfer();
+            var payload = new IndicesDragPayload([0]);
+            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.AppliedFiltersFormat);
 
             paletteList.RaiseEvent(
                 new DragEventArgs(DragDrop.DropEvent, dataTransfer, paletteList, default, KeyModifiers.None)

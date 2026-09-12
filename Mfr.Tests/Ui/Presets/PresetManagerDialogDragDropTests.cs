@@ -4,7 +4,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Mfr.App.Ui.Views.Presets;
+using Mfr.App.Ui.Views.DragAndDrop;
 
 namespace Mfr.Tests.Ui.Presets
 {
@@ -20,8 +20,8 @@ namespace Mfr.Tests.Ui.Presets
         public void DragOver_marks_insert_row()
         {
             var (dialog, _, list) = PresetManagerDialogTestUi.ShowWithPresets("A", "B", "C");
-            var payload = new PresetDragPayload([0]);
-            var dataTransfer = payload.CreateTransfer();
+            var payload = new IndicesDragPayload([0]);
+            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.PresetsFormat);
 
             var firstItem = list.ContainerFromIndex(1) as ListBoxItem;
             Assert.NotNull(firstItem);
@@ -50,8 +50,8 @@ namespace Mfr.Tests.Ui.Presets
         public void Drop_reorders_selected_preset()
         {
             var (dialog, viewModel, list) = PresetManagerDialogTestUi.ShowWithPresets("A", "B", "C");
-            var payload = new PresetDragPayload([0]);
-            var dataTransfer = payload.CreateTransfer();
+            var payload = new IndicesDragPayload([0]);
+            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.PresetsFormat);
 
             var targetItem = list.ContainerFromIndex(1) as ListBoxItem;
             Assert.NotNull(targetItem);
@@ -80,8 +80,8 @@ namespace Mfr.Tests.Ui.Presets
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var payload = new PresetDragPayload([0, 1]);
-            var dataTransfer = payload.CreateTransfer();
+            var payload = new IndicesDragPayload([0, 1]);
+            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.PresetsFormat);
 
             var targetItem = list.ContainerFromIndex(2) as ListBoxItem;
             Assert.NotNull(targetItem);

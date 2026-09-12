@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.Models.Filters;
+using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels.Presets
 {
@@ -81,14 +82,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// <summary>
         /// Gets the trimmed description, or <see langword="null"/> when blank.
         /// </summary>
-        public string? TrimmedDescriptionOrNull
-        {
-            get
-            {
-                var trimmed = Description.Trim();
-                return trimmed.Length == 0 ? null : trimmed;
-            }
-        }
+        public string? TrimmedDescriptionOrNull => Description.TrimmedOrNull();
 
         /// <summary>
         /// Prefills description and columns from an existing preset chosen in the Name suggestions list.
