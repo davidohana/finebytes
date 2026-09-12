@@ -22,6 +22,8 @@ namespace Mfr.App.Ui.Views.DragAndDrop
             var insertIndex = ListBoxDrag.GetDropIndex(listBox, position);
             if (ReferenceEquals(listBox, _dropMarkList) && _dropMarkInsertIndex == insertIndex)
             {
+                // Refresh Y when the same slot stays marked (layout / virtualization).
+                _line.Show(listBox, _GetInsertLineY(listBox, insertIndex));
                 return;
             }
 
@@ -53,6 +55,9 @@ namespace Mfr.App.Ui.Views.DragAndDrop
             }
         }
 
+        /// <summary>
+        /// Vertical position for the insert line at <paramref name="insertIndex"/> (top of row, or below last).
+        /// </summary>
         private static double _GetInsertLineY(ListBox listBox, int insertIndex)
         {
             if (listBox.ItemCount == 0)

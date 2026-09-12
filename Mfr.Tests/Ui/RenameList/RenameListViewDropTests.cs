@@ -1,12 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
+using Mfr.Tests.Ui.DragAndDrop;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -266,7 +266,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.False(renameListViewModel.IsAutoSort);
             Assert.Equal(1, renameListViewModel.DropMarkIndex);
-            Assert.NotNull(AdornerLayer.GetAdorner(grid));
+            DropInsertLineAssert.IsVisible(grid);
 
             window.Close();
         }
@@ -327,7 +327,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(2, renameListViewModel.DropMarkIndex);
-            Assert.NotNull(AdornerLayer.GetAdorner(grid));
+            DropInsertLineAssert.IsVisible(grid);
 
             window.Close();
         }
@@ -362,7 +362,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(2, renameListViewModel.DropMarkIndex);
-            Assert.NotNull(AdornerLayer.GetAdorner(grid));
+            DropInsertLineAssert.IsVisible(grid);
 
             window.Close();
         }

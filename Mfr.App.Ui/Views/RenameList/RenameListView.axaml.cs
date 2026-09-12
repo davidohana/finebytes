@@ -608,6 +608,8 @@ namespace Mfr.App.Ui.Views.RenameList
             }
 
             _viewModel.SetDropMarkIndex(insertIndex);
+            // Refresh line Y even when the index is unchanged (layout / virtualization).
+            _ApplyDropMarkVisuals();
         }
 
         /// <summary>
@@ -752,7 +754,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return 2.0;
             }
 
-            var rows = RenameGrid.GetVisualDescendants().OfType<DataGridRow>().ToList();
+            var rows = RenameGrid.GetVisualDescendants().OfType<DataGridRow>();
             if (insertIndex < entryCount)
             {
                 if (

@@ -1,6 +1,5 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -10,6 +9,7 @@ using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Tests.Ui.DragAndDrop;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -263,7 +263,7 @@ namespace Mfr.Tests.Ui.RenameList
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.NotNull(AdornerLayer.GetAdorner(selectedList));
+            DropInsertLineAssert.IsVisible(selectedList);
 
             selectedList.RaiseEvent(
                 new DragEventArgs(
@@ -276,7 +276,7 @@ namespace Mfr.Tests.Ui.RenameList
             );
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Null(AdornerLayer.GetAdorner(selectedList));
+            DropInsertLineAssert.IsCleared(selectedList);
 
             dialog.Close();
         }

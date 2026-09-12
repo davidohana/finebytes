@@ -1,12 +1,12 @@
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Views.DragAndDrop;
+using Mfr.Tests.Ui.DragAndDrop;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -33,14 +33,14 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.NotNull(AdornerLayer.GetAdorner(list));
+            DropInsertLineAssert.IsVisible(list);
 
             list.RaiseEvent(
                 new DragEventArgs(DragDrop.DragLeaveEvent, dataTransfer, list, new Point(-8, -8), KeyModifiers.None)
             );
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Null(AdornerLayer.GetAdorner(list));
+            DropInsertLineAssert.IsCleared(list);
 
             window.Close();
         }

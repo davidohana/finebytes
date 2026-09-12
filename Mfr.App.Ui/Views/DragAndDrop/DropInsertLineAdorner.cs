@@ -9,6 +9,11 @@ namespace Mfr.App.Ui.Views.DragAndDrop
     /// </summary>
     internal sealed class DropInsertLineAdorner
     {
+        /// <summary>
+        /// Insert-line thickness in device-independent pixels.
+        /// </summary>
+        public const double Thickness = 3;
+
         private Canvas? _host;
         private Rectangle? _line;
 
@@ -20,21 +25,17 @@ namespace Mfr.App.Ui.Views.DragAndDrop
         public void Show(Control target, double y)
         {
             _host ??= new Canvas { IsHitTestVisible = false };
-            _line ??= new Rectangle
-            {
-                Height = 3,
-                IsHitTestVisible = false,
-                Fill = DropMarkBrushes.Resolve(target),
-            };
+            _line ??= new Rectangle { Height = Thickness, IsHitTestVisible = false };
 
             if (_line.Parent is null)
             {
                 _host.Children.Add(_line);
             }
 
+            _line.Fill = DropMarkBrushes.Resolve(target);
             _line.Width = Math.Max(0, target.Bounds.Width - 4);
             Canvas.SetLeft(_line, 2);
-            Canvas.SetTop(_line, Math.Clamp(y - 1.5, 0, Math.Max(0, target.Bounds.Height - 3)));
+            Canvas.SetTop(_line, Math.Clamp(y - (Thickness / 2), 0, Math.Max(0, target.Bounds.Height - Thickness)));
             AdornerLayer.SetAdorner(target, _host);
         }
 
