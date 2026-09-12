@@ -1,8 +1,8 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Layout;
-using Avalonia.Media;
 using Avalonia.Threading;
 using Mfr.App.Ui.Views;
 
@@ -36,8 +36,12 @@ namespace Mfr.Tests.Ui
             var ok = dialog.FindControl<Button>("OkButton");
             Assert.NotNull(ok);
             Assert.Contains("message-dialog-footer", ok.Classes);
-            var brush = Assert.IsAssignableFrom<ISolidColorBrush>(ok.Background);
-            Assert.Equal(0, brush.Color.A);
+            Assert.True(ok.IsDefault);
+            var app = Assert.IsAssignableFrom<Application>(Application.Current);
+            Assert.True(
+                app.TryGetResource("AppChromeSelectionBrush", app.ActualThemeVariant, out var selection)
+            );
+            Assert.Equal(selection, ok.Background);
 
             dialog.Close();
         }

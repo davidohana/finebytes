@@ -121,27 +121,11 @@
     <Style Selector="Button.field-shuttle-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
-    <Style Selector="Button.field-shuttle-footer:disabled">
-      <Setter Property="Opacity" Value="0.45" />
-    </Style>
-    <Style Selector="Button.field-shuttle-footer-primary">
-      <Setter Property="MinHeight" Value="28" />
-      <Setter Property="MinWidth" Value="88" />
-      <Setter Property="Padding" Value="12,4" />
+    <Style Selector="Button.field-shuttle-footer[IsDefault=True]">
       <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
-      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
-    <Style Selector="Button.field-shuttle-footer-primary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
-    </Style>
-    <Style Selector="Button.field-shuttle-footer-primary:disabled">
+    <Style Selector="Button.field-shuttle-footer:disabled">
       <Setter Property="Opacity" Value="0.45" />
     </Style>
     <Style Selector="Border.field-shuttle-priority">
@@ -183,7 +167,7 @@
     <Grid DockPanel.Dock="Bottom" Margin="0,14,0,0" ColumnDefinitions="*,Auto,*">
       <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
         <Button
-          Classes="field-shuttle-footer-primary"
+          Classes="field-shuttle-footer"
           Content="OK"
           IsDefault="True"
           IsEnabled="{Binding CanConfirm}"

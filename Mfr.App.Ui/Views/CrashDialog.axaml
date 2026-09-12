@@ -39,7 +39,13 @@
     >
       <Button Content="Copy details" Click="_OnCopyDetailsClick" />
       <Button Content="Open log folder" IsEnabled="{Binding HasLogDirectory}" Click="_OnOpenLogFolderClick" />
-      <Button Content="OK" IsDefault="True" IsCancel="True" Click="_OnOkClick" />
+      <Button
+        Classes="message-dialog-footer"
+        Content="OK"
+        IsDefault="True"
+        IsCancel="True"
+        Click="_OnOkClick"
+      />
     </StackPanel>
     <TextBlock DockPanel.Dock="Top" Text="Details" FontWeight="SemiBold" Margin="0,0,0,4" />
     <TextBox

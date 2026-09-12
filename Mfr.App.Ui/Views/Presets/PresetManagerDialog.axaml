@@ -49,7 +49,7 @@
       <Button
         x:Name="ImportSamplesButton"
         Classes="message-dialog-footer"
-        Content="Import samples…"
+        Content="Import sample presets…"
         Click="_OnImportSamplesClick"
       />
       <Button

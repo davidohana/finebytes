@@ -17,7 +17,7 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (F7 done; seed presets were out
 
 ## Decisions (locked)
 
-- **UX:** Checklist dialog from Preset Manager (**Import samples…**). User picks which samples to add, then imports.
+- **UX:** Checklist dialog from Preset Manager (**Import sample presets…**). User picks which samples to add, then imports.
 - **Name conflicts:** Exact-name match → **skip** (keep user’s preset). Dialog copy must state that presets with the same name will be skipped.
 - **First run:** Still empty `presets.json`. No auto-seed.
 - **Format:** Typed C# builders (`FilterPreset` / filter records) in `SamplePresetDefinitions`. **No** `.mps` reader / MFR7 migration.
@@ -160,7 +160,7 @@ Descriptions for MFR7-derived samples are copied from MFR7 where present. Additi
 
 ### UX notes
 
-- Manager gains **Import samples…** (always enabled).
+- Manager gains **Import sample presets…** (always enabled).
 - Child dialog: checked list (name + description), Select all / none optional, static note about skip-on-same-name, Import / Cancel.
 - Does not load into Applied Filters; only upserts into `presets.json` via existing save path.
 
@@ -216,7 +216,7 @@ flowchart LR
 - Tests: VM import skip/add; headless Manager opens import dialog / Import enabled rules (per [`mfr-ui-headless-tests`](../../.agents/skills/mfr-ui-headless-tests/SKILL.md)).
 - Amend [presets-ui.plan.md](presets-ui.plan.md) out-of-scope note: seed presets now covered by this plan.
 
-**Exit:** User can open Presets → Import samples…, pick items, get skip messaging, see new names in Manager / ▾.
+**Exit:** User can open Presets → Import sample presets…, pick items, get skip messaging, see new names in Manager / ▾.
 
 ## Key files
 

@@ -85,7 +85,7 @@ namespace Mfr.Tests.Ui.Presets
         }
 
         /// <summary>
-        /// Verifies the Preset Manager Import samples button invokes its child-dialog host path.
+        /// Verifies the Preset Manager Import sample presets button invokes its child-dialog host path.
         /// </summary>
         [AvaloniaFact]
         public void Manager_Import_Samples_Button_Invokes_Dialog_Path()

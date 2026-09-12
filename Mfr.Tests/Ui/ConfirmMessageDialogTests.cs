@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -38,13 +39,26 @@ namespace Mfr.Tests.Ui
             Assert.NotNull(ok);
             Assert.Contains("message-dialog-footer", ok.Classes);
             Assert.True(ok.IsDefault);
-            var okBrush = Assert.IsAssignableFrom<ISolidColorBrush>(ok.Background);
-            Assert.Equal(0, okBrush.Color.A);
+            var app = Assert.IsAssignableFrom<Application>(Application.Current);
+            Assert.True(
+                app.TryGetResource("AppChromeSelectionBrush", app.ActualThemeVariant, out var selection)
+            );
+            Assert.Equal(selection, ok.Background);
+            Assert.True(
+                app.TryGetResource(
+                    "AppChromeSelectionBorderBrush",
+                    app.ActualThemeVariant,
+                    out var selectionBorder
+                )
+            );
+            Assert.Equal(selectionBorder, ok.BorderBrush);
 
             var cancel = dialog.FindControl<Button>("CancelButton");
             Assert.NotNull(cancel);
             Assert.Contains("message-dialog-footer", cancel.Classes);
             Assert.True(cancel.IsCancel);
+            var cancelBrush = Assert.IsAssignableFrom<ISolidColorBrush>(cancel.Background);
+            Assert.Equal(0, cancelBrush.Color.A);
 
             dialog.Close(false);
         }
