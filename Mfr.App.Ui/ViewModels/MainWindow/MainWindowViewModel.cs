@@ -210,10 +210,28 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Applies pending rename changes. Disabled until preview/GO is implemented.
+        /// Previews the live filter chain and applies valid rename changes.
         /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanExecuteUnimplemented))]
-        public void Go() { }
+        [RelayCommand(CanExecute = nameof(_CanGo))]
+        public async Task GoAsync()
+        {
+            await WaitForPendingPreviewAsync().ConfigureAwait(true);
+            if (!_CanGo())
+            {
+                return;
+            }
+
+            var commitStarted = await RenameListViewModel
+                .GoAsync(AppliedFiltersViewModel.ToChain())
+                .ConfigureAwait(true);
+            if (!commitStarted || !RenameListViewModel.IsAutoPreview)
+            {
+                return;
+            }
+
+            _RequestPreview();
+            await WaitForPendingPreviewAsync().ConfigureAwait(true);
+        }
 
         /// <summary>
         /// Undoes the last GO. Placeholder until undo is implemented.
@@ -270,6 +288,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             if (e.PropertyName is nameof(RenameListViewModel.ItemCount))
             {
                 ItemCount = RenameListViewModel.ItemCount;
+                GoCommand.NotifyCanExecuteChanged();
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.ChangeCount))
@@ -290,6 +309,11 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             if (e.PropertyName is nameof(RenameListViewModel.IsBusy) && !RenameListViewModel.IsBusy && _previewDirty)
             {
                 _RequestPreview();
+            }
+
+            if (e.PropertyName is nameof(RenameListViewModel.IsBusy))
+            {
+                GoCommand.NotifyCanExecuteChanged();
             }
 
             if (
@@ -411,6 +435,11 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         private bool _CanAddSelectedFilterFromPalette()
         {
             return FilterPaletteViewModel.SelectedFilter is not null;
+        }
+
+        private bool _CanGo()
+        {
+            return RenameListViewModel.ItemCount >= 1 && !RenameListViewModel.IsBusy;
         }
 
         /// <summary>

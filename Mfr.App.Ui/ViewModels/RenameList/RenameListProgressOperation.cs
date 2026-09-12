@@ -24,5 +24,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Applying the filter chain to produce Rename List preview values.
         /// </summary>
         Preview,
+
+        /// <summary>
+        /// Applying previewed rename changes to the filesystem.
+        /// </summary>
+        Commit,
     }
 }

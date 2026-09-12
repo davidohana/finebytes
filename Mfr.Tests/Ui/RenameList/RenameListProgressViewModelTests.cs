@@ -349,6 +349,41 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies commit operations expose their processed count and progress bar.
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_Commit_Shows_Row_Progress()
+        {
+            var viewModel = new RenameListProgressViewModel();
+
+            var completed = await viewModel
+                .RunAsync(
+                    RenameListProgressOperation.Commit,
+                    (_, progress) =>
+                    {
+                        progress.Report(
+                            new RenameListProgress(
+                                ScannedCount: 0,
+                                AddedCount: 0,
+                                LastPath: "C:\\a.txt",
+                                MetadataTotalCount: 10,
+                                Phase: RenameListProgressPhase.ApplyCommit,
+                                MetadataProcessedCount: 4
+                            )
+                        );
+                        _WaitFor(() => viewModel.MetadataProcessedCount == 4);
+                    }
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(completed);
+            Assert.Equal("Renaming: 4 of 10 files", viewModel.MetadataProgressText);
+            Assert.True(viewModel.ShowMetadataProgress);
+            Assert.True(viewModel.ShowProgressBar);
+            Assert.False(viewModel.ShowResolveProgress);
+        }
+
+        /// <summary>
         /// Verifies a second RunAsync while busy is refused and does not steal the in-flight cancel token.
         /// </summary>
         [Fact]
@@ -427,6 +462,14 @@ namespace Mfr.Tests.Ui.RenameList
             "Previewing ...",
             "Previewing ...",
             "Previewing: 2 of 5 files"
+        )]
+        [InlineData(
+            RenameListProgressOperation.Commit,
+            RenameListProgressPhase.ApplyCommit,
+            false,
+            "Renaming files ...",
+            "Renaming files ...",
+            "Renaming: 2 of 5 files"
         )]
         public void ProgressCopy_matches_operation(
             RenameListProgressOperation operation,

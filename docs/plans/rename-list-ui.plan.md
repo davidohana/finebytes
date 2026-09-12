@@ -118,7 +118,7 @@ todos:
     status: pending
   - id: phase-15
     content: "Phase 15: GO commit from UI"
-    status: pending
+    status: completed
   - id: phase-16
     content: "Phase 16: color-legend toolbar (MFR7) — after 14d blue + GO plum"
     status: pending
@@ -185,7 +185,7 @@ Working Rename List end-to-end for add/remove/order, columns, sort, load errors,
 - `RenameListRowErrorDialog` — reuse for Show Rename Error (**15**), not a third dialog
 - Header menu hook in [`RenameListView.HeaderMenu.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.HeaderMenu.cs)
 - Cell/row classes: red / gray / lavender in `RenameListView.axaml`; **blue** and **plum** still missing
-- `MainWindowViewModel.Go()` + `AppShortcuts.Go` / menu / toolbar — **stubs**; Ctrl+G labeled but no-op ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
+- `MainWindowViewModel.GoAsync()` + `AppShortcuts.Go` / menu / toolbar — **shipped** (Phase 15); Ctrl+G applies renames ([keyboard-shortcuts.md](../../docs/keyboard-shortcuts.md))
 - `IFileShellOpener.ShowProperties` / `RevealInFileManager` / `OpenWithDefaultApp` — `Services/Shell`, shared by File List and Rename List
 - `SupportsWrite` / `WriteTarget` on catalog fields — ready for **14d** Manual Override
 
@@ -304,11 +304,13 @@ ______________________________________________________________________
 
 Wire UI to existing engine commit.
 
+**Status:** done.
+
 **MFR7 flow:** clear apply errors → ensure preview if needed → warn on preview-error count → apply with progress → plum rows for apply/rename errors → row menu **Show Rename Error**.
 
 **Work**
 
-- Implement `MainWindowViewModel.Go()` (today empty): Preview if stale / needed → `Commit` → update grid statuses.
+- Implement `MainWindowViewModel.GoAsync()`: Preview → `Commit` → update grid statuses.
 - Progress: reuse Rename List progress patterns from preview/refresh.
 - **Plum** row highlighting for `CommitError` / rename failure (`rename-list-commit-error` or similar).
 - Row menu **Show Rename Error** → reuse `RenameListRowErrorDialog` (not Show Load Errors / Show Preview Error copy).
@@ -335,7 +337,7 @@ MFR7: toolbar CheckOnClick + right-dock legend (~112–120px) — [Legend.cs](d:
 | Blue fg     | Forced / manual override | **14d**          |
 | Gray fg     | Load / missing error     | shipped (8/9)    |
 | Lavender bg | Preview error            | shipped (11)     |
-| Plum bg     | Rename / apply error     | **15**           |
+| Plum bg     | Rename / apply error     | shipped (15)     |
 
 Footer hint: right-click cell/row for error details. Toggle shrinks grid width (mirror other `rename-list-action` toggles). Persist toggle in session if cheap; otherwise default off like MFR7.
 
@@ -346,4 +348,4 @@ ______________________________________________________________________
 ## What to implement next
 
 1. **14f** drag-out
-1. **15** GO UI + plum → **16** legend
+1. **16** color legend

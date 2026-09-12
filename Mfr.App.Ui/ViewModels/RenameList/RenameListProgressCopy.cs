@@ -62,6 +62,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     TitleWhenLoadingMetadata: null,
                     MetadataLineLabel: "Previewing"
                 ),
+                RenameListProgressOperation.Commit => new Spec(
+                    InitialPhase: RenameListProgressPhase.ApplyCommit,
+                    ShowResolve: false,
+                    Title: "Renaming files ...",
+                    TitleWhenLoadingMetadata: null,
+                    MetadataLineLabel: "Renaming"
+                ),
                 _ => throw new ArgumentOutOfRangeException(nameof(operation), operation, message: null),
             };
         }

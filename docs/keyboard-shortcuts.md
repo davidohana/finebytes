@@ -18,7 +18,7 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 | Refresh focused pane | F5              |
 | Go to address bar    | Ctrl+L or Alt+D |
 
-GO, Undo, Log, and Options appear in the menu and toolbar now; the commands themselves are still stubs.
+Undo, Log, and Options appear in the menu and toolbar now; those commands are still stubs. GO previews the current list, warns before ignoring preview errors, and then applies valid renames.
 
 Ctrl+L is the address bar (Explorer / Chrome). Log is Ctrl+Shift+L so the two do not clash. Alt+F4 is shown on **MFR → Exit** and is handled by the window manager on Windows, not as an extra app binding.
 

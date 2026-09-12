@@ -10,3 +10,7 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 ## FormatEditor
 
 - Nested `FormatEditor` in token `source=` fields + nested error/caret spans (high cost; soft Source text boxes are enough for now)
+
+## Rename List
+
+- Show Last Rename Errors — row-level **Show Rename Error** is available; a list-wide history view is deferred

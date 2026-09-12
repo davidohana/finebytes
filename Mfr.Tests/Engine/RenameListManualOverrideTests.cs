@@ -109,6 +109,29 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies a preview-side override survives the mandatory GO preview and is committed.
+        /// </summary>
+        [Fact]
+        public void Preview_override_is_included_in_commit_plan()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "hello.txt");
+            var destination = Path.Combine(_tempRoot, "forced.txt");
+            var renameList = new RenameList();
+            renameList.AddSources([path]);
+            var item = renameList.RenameItems[0];
+
+            var previewName = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            item.SetOverride(previewName, "forced");
+
+            var plan = renameList.Preview(FilterChain.CreateAllEnabled([]));
+            renameList.Commit(plan, failFast: false);
+
+            Assert.False(File.Exists(path));
+            Assert.True(File.Exists(destination));
+            Assert.Equal(RenameStatus.CommitOk, item.Status);
+        }
+
+        /// <summary>
         /// Verifies clearing one side leaves other overrides intact.
         /// </summary>
         [Fact]

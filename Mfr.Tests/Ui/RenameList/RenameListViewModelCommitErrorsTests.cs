@@ -74,5 +74,26 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[1]]);
             Assert.False(renameListViewModel.CanShowCommitError);
         }
+
+        /// <summary>
+        /// Verifies F5-style original refresh clears the persisted plum commit-error state.
+        /// </summary>
+        [Fact]
+        public async Task Refresh_clears_commit_error_plum_state()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "note.txt");
+            await File.WriteAllTextAsync(path, "plain text");
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            var entry = Assert.Single(renameListViewModel.Entries);
+            entry.EngineItem.CommitError = new RenameItemError("commit failed");
+            Assert.True(entry.HasCommitError);
+
+            await renameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
+
+            Assert.False(entry.HasCommitError);
+            Assert.Null(entry.EngineItem.CommitError);
+        }
     }
 }

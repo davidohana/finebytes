@@ -135,7 +135,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets whether the per-row progress line should be shown.
         /// </summary>
         public bool ShowMetadataProgress =>
-            Phase is RenameListProgressPhase.LoadMetadata or RenameListProgressPhase.ApplyPreview;
+            Phase
+                is RenameListProgressPhase.LoadMetadata
+                    or RenameListProgressPhase.ApplyPreview
+                    or RenameListProgressPhase.ApplyCommit;
 
         /// <summary>
         /// Gets whether the determinate progress bar should be shown.
@@ -179,7 +182,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Runs background work with operation-specific dialog copy.
         /// </summary>
-        /// <param name="operation">Add, metadata hydrate, refresh, or preview.</param>
+        /// <param name="operation">Add, metadata hydrate, refresh, preview, or commit.</param>
         /// <param name="work">Engine work invoked with the operation cancel token and progress sink.</param>
         /// <returns>
         /// <see langword="true"/> when the work finished without user cancel; <see langword="false"/> when canceled
