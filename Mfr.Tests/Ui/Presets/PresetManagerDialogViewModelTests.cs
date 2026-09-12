@@ -53,14 +53,14 @@ namespace Mfr.Tests.Ui.Presets
             var (manager, viewModel) = _CreateWithPresets("A", "B", "C", "D");
             viewModel.SetSelectedPresets([viewModel.Presets[2]]);
 
-            Assert.True(manager.TryRemove("C"));
+            Assert.True(manager.Remove("C"));
             viewModel.Refresh();
 
             Assert.Equal(["A", "B", "D"], viewModel.Presets.Select(preset => preset.Name));
             Assert.Equal(["D"], viewModel.SelectedPresets.Select(preset => preset.Name));
 
             viewModel.SetSelectedPresets([viewModel.Presets[2]]);
-            Assert.True(manager.TryRemove("D"));
+            Assert.True(manager.Remove("D"));
             viewModel.Refresh();
 
             Assert.Equal(["A", "B"], viewModel.Presets.Select(preset => preset.Name));
@@ -76,7 +76,8 @@ namespace Mfr.Tests.Ui.Presets
             var (manager, viewModel) = _CreateWithPresets("A", "B", "C", "D", "E");
             viewModel.SetSelectedPresets([viewModel.Presets[1], viewModel.Presets[2]]);
 
-            Assert.Equal(2, manager.RemoveMany(["B", "C"]));
+            Assert.True(manager.Remove("B"));
+            Assert.True(manager.Remove("C"));
             viewModel.Refresh();
 
             Assert.Equal(["A", "D", "E"], viewModel.Presets.Select(preset => preset.Name));
