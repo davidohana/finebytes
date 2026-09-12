@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: migrate-xunit
     content: Migrate Mfr.Tests from xunit 2.9.3 to xUnit v3 for Headless.XUnit 12
-    status: pending
+    status: completed
   - id: fix-compile
     content: Fix focus args, clipboard APIs, AttachDeveloperTools, any other Avalonia 12 compile breaks
     status: pending

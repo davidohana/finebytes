@@ -1,3 +1,5 @@
+using System.Runtime.CompilerServices;
+
 namespace Mfr.Tests.TestSupport
 {
     /// <summary>
@@ -11,12 +13,22 @@ namespace Mfr.Tests.TestSupport
         /// <summary>
         /// Initializes a new instance of the <see cref="WindowsFactAttribute"/> class.
         /// </summary>
-        public WindowsFactAttribute()
+        /// <param name="sourceFilePath">Caller source file (forwarded to xUnit v3).</param>
+        /// <param name="sourceLineNumber">Caller source line (forwarded to xUnit v3).</param>
+        public WindowsFactAttribute(
+            [CallerFilePath] string? sourceFilePath = null,
+            [CallerLineNumber] int sourceLineNumber = -1
+        )
+            : base(sourceFilePath, sourceLineNumber)
         {
-            if (!OperatingSystem.IsWindows())
-            {
-                Skip = "Windows-only behavior";
-            }
+            Skip = "Windows-only behavior";
+            SkipUnless = nameof(IsWindows);
+            SkipType = typeof(WindowsFactAttribute);
         }
+
+        /// <summary>
+        /// Gets a value indicating whether the current OS is Windows.
+        /// </summary>
+        public static bool IsWindows => OperatingSystem.IsWindows();
     }
 }
