@@ -7,9 +7,9 @@
   x:DataType="vm:PresetManagerDialogViewModel"
   Title="Presets"
   Icon="/Assets/mfr.ico"
-  Width="560"
+  Width="620"
   Height="380"
-  MinWidth="480"
+  MinWidth="540"
   MinHeight="300"
   WindowStartupLocation="CenterOwner"
   ShowInTaskbar="False"
@@ -45,88 +45,103 @@
       <Setter Property="CornerRadius" Value="3" />
       <Setter Property="Padding" Value="8" />
     </Style>
+    <Style Selector="Button.preset-manager-action">
+      <Setter Property="MinWidth" Value="110" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+    </Style>
   </Window.Styles>
-  <DockPanel Margin="12">
+  <Grid Margin="12" ColumnDefinitions="*,Auto,12,*,12,Auto" RowDefinitions="Auto,*">
+    <TextBlock Grid.Row="0" Grid.Column="0" Text="Presets:" Margin="0,0,0,6" />
+    <TextBlock Grid.Row="0" Grid.Column="3" Text="Description:" Margin="0,0,0,6" />
+
+    <ListBox
+      x:Name="PresetsList"
+      Grid.Row="1"
+      Grid.Column="0"
+      Classes="preset-manager-list"
+      SelectionMode="Multiple"
+      ItemsSource="{Binding Presets}"
+      DoubleTapped="_OnPresetsListDoubleTapped"
+      KeyDown="_OnPresetsListKeyDown"
+    >
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="models:FilterPreset">
+          <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+
     <StackPanel
-      x:Name="Footer"
-      DockPanel.Dock="Bottom"
-      Orientation="Horizontal"
-      HorizontalAlignment="Center"
-      Spacing="8"
-      Margin="0,14,0,0"
+      Grid.Row="1"
+      Grid.Column="1"
+      Orientation="Vertical"
+      VerticalAlignment="Center"
+      Spacing="4"
+      Margin="4,0,0,0"
     >
       <Button
-        x:Name="ImportSamplesButton"
-        Classes="message-dialog-footer"
-        Content="Import sample presets…"
-        Click="_OnImportSamplesClick"
-      />
-      <Button
-        x:Name="LoadButton"
-        Classes="message-dialog-footer"
-        Content="Load"
-        IsEnabled="{Binding HasSingleSelection}"
-        Click="_OnLoadClick"
-      />
-      <Button
-        x:Name="DeleteButton"
-        Classes="message-dialog-footer"
-        Content="Delete"
-        IsEnabled="{Binding HasSelection}"
-        Click="_OnDeleteClick"
-      />
-      <Button
-        x:Name="RenameButton"
-        Classes="message-dialog-footer"
-        Content="Rename"
-        IsEnabled="{Binding HasSingleSelection}"
-        Click="_OnRenameClick"
-      />
-      <Button
         x:Name="MoveUpButton"
-        Classes="message-dialog-footer"
-        Content="Up"
+        Classes="rename-list-action"
+        ToolTip.Tip="Move up"
         Command="{Binding MoveSelectedUpCommand}"
-      />
+      >
+        <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveUp.png" />
+      </Button>
       <Button
         x:Name="MoveDownButton"
-        Classes="message-dialog-footer"
-        Content="Down"
+        Classes="rename-list-action"
+        ToolTip.Tip="Move down"
         Command="{Binding MoveSelectedDownCommand}"
-      />
+      >
+        <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
+      </Button>
+    </StackPanel>
+
+    <Border Grid.Row="1" Grid.Column="3" Classes="preset-manager-description">
+      <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <TextBlock Text="{Binding SelectedDescription}" TextWrapping="Wrap" />
+      </ScrollViewer>
+    </Border>
+
+    <Grid Grid.Row="0" Grid.RowSpan="2" Grid.Column="5" RowDefinitions="Auto,*,Auto">
+      <StackPanel Grid.Row="0" Orientation="Vertical" Spacing="8">
+        <Button
+          x:Name="LoadButton"
+          Classes="message-dialog-footer preset-manager-action"
+          Content="Load"
+          IsDefault="True"
+          IsEnabled="{Binding HasSingleSelection}"
+          Click="_OnLoadClick"
+        />
+        <Button
+          x:Name="RenameButton"
+          Classes="message-dialog-footer preset-manager-action"
+          Content="Rename"
+          IsEnabled="{Binding HasSingleSelection}"
+          Click="_OnRenameClick"
+        />
+        <Button
+          x:Name="DeleteButton"
+          Classes="message-dialog-footer preset-manager-action"
+          Content="Delete"
+          IsEnabled="{Binding HasSelection}"
+          Click="_OnDeleteClick"
+        />
+        <Button
+          x:Name="ImportSamplesButton"
+          Classes="message-dialog-footer preset-manager-action"
+          Content="Import samples…"
+          Click="_OnImportSamplesClick"
+        />
+      </StackPanel>
       <Button
         x:Name="CloseButton"
-        Classes="message-dialog-footer"
+        Grid.Row="2"
+        Classes="message-dialog-footer preset-manager-action"
         Content="Close"
         IsCancel="True"
         Click="_OnCloseClick"
       />
-    </StackPanel>
-
-    <Grid ColumnDefinitions="*,12,*" RowDefinitions="Auto,*">
-      <TextBlock Grid.Row="0" Grid.Column="0" Text="Presets:" Margin="0,0,0,6" />
-      <TextBlock Grid.Row="0" Grid.Column="2" Text="Description:" Margin="0,0,0,6" />
-      <ListBox
-        x:Name="PresetsList"
-        Grid.Row="1"
-        Grid.Column="0"
-        Classes="preset-manager-list"
-        SelectionMode="Multiple"
-        ItemsSource="{Binding Presets}"
-        DoubleTapped="_OnPresetsListDoubleTapped"
-        KeyDown="_OnPresetsListKeyDown"
-      >
-        <ListBox.ItemTemplate>
-          <DataTemplate x:DataType="models:FilterPreset">
-            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
-      <Border Grid.Row="1" Grid.Column="2" Classes="preset-manager-description">
-        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-          <TextBlock Text="{Binding SelectedDescription}" TextWrapping="Wrap" />
-        </ScrollViewer>
-      </Border>
     </Grid>
-  </DockPanel>
+  </Grid>
 </Window>
