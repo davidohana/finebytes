@@ -379,11 +379,12 @@ namespace Mfr.Tests.Ui.RenameList
                 .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
             Assert.NotNull(row);
 
+            // Row content can be wider than the pane; keep synthetic DnD points inside view Bounds
+            // (DragLeave uses Bounds.Size.Contains to ignore nested-child leaves).
             var localY = Math.Max(4, row.Bounds.Height * rowFractionY);
-            var local = new Point(Math.Max(8, row.Bounds.Width / 2), localY);
-            var pointOnView = row.TranslatePoint(local, view);
+            var pointOnView = row.TranslatePoint(new Point(_LocalXOverRow(row, grid), localY), view);
             Assert.True(pointOnView.HasValue);
-            return pointOnView.Value;
+            return _ClampToView(view, pointOnView.Value);
         }
 
         private static Point _PointBelowLastEntry(RenameListView view, DataGrid grid, RenameListEntry entry)
@@ -393,10 +394,35 @@ namespace Mfr.Tests.Ui.RenameList
                 .FirstOrDefault(item => ReferenceEquals(item.DataContext, entry));
             Assert.NotNull(row);
 
-            var local = new Point(Math.Max(8, row.Bounds.Width / 2), row.Bounds.Height + 4);
+            var local = new Point(_LocalXOverRow(row, grid), row.Bounds.Height + 4);
             var pointOnView = row.TranslatePoint(local, view);
             Assert.True(pointOnView.HasValue);
-            return pointOnView.Value;
+            return _ClampToView(view, pointOnView.Value);
+        }
+
+        /// <summary>
+        /// Horizontal midpoint of the visible overlap between the row and the grid viewport.
+        /// </summary>
+        private static double _LocalXOverRow(DataGridRow row, DataGrid grid)
+        {
+            return Math.Max(8, Math.Min(row.Bounds.Width, grid.Bounds.Width) / 2);
+        }
+
+        /// <summary>
+        /// Clamps a view-local point into the pane so DragLeave Bounds.Contains stays true.
+        /// </summary>
+        private static Point _ClampToView(RenameListView view, Point pointOnView)
+        {
+            var pane = new Rect(view.Bounds.Size);
+            if (pane.Contains(pointOnView))
+            {
+                return pointOnView;
+            }
+
+            return new Point(
+                Math.Clamp(pointOnView.X, 1, Math.Max(1, pane.Width - 1)),
+                Math.Clamp(pointOnView.Y, 1, Math.Max(1, pane.Height - 1))
+            );
         }
 
         private static async Task _WaitUntil(Func<bool> condition)

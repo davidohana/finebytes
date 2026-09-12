@@ -76,3 +76,9 @@ max_line_length = 120
 end_of_line = crlf
 insert_final_newline = true
 trim_trailing_whitespace = true
+
+# xUnit v3 xUnit1051 wants TestContext.Current.CancellationToken on every cancellable call.
+# Volume is huge/mechanical after the Avalonia 12 + xUnit v3 migration; silence in tests.
+# Prefer passing the token in new cancellation-aware tests when it is locally meaningful.
+[Mfr.Tests/**/*.cs]
+dotnet_diagnostic.xUnit1051.severity = none

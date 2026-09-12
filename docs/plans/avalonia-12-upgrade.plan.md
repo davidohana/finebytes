@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: automated-checks
     content: Run just format, just lint, just test; fix failures
-    status: pending
+    status: completed
   - id: manual-smoke
     content: Run post-upgrade manual UI checklist (grids, Format Editor, DnD, clipboard, DevTools, selection)
     status: pending
@@ -107,7 +107,7 @@ ______________________________________________________________________
 
 **Rename List (DataGrid heavy)**
 
-3. Load files; columns show; row status / error styling OK.
+1. Load files; columns show; row status / error styling OK.
 1. Column resize, reorder, auto-fit (header double-click / existing autofit behavior).
 1. Sort by clicking headers; glyphs match.
 1. Multi-select, keyboard Ctrl+Up/Down / existing shortcuts still work.
@@ -116,35 +116,35 @@ ______________________________________________________________________
 
 **File List**
 
-9. Browse folder; report DataGrid sort + selection.
+1. Browse folder; report DataGrid sort + selection.
 1. Drop from Rename List back onto File List.
 1. Copy path → clipboard contains expected paths.
 1. Address bar / mask LostFocus commit still works.
 
 **Format Editor (AvaloniaEdit)**
 
-13. Open Format Editor; template text, token colors, yellow wash / selection sync.
-01. Caret move, undo, context menu / token insert.
-01. Focus watermark show/hide on GotFocus/LostFocus.
+1. Open Format Editor; template text, token colors, yellow wash / selection sync.
+1. Caret move, undo, context menu / token insert.
+1. Focus watermark show/hide on GotFocus/LostFocus.
 
 **Filters / presets DnD**
 
-16. Drag filter from Palette → Applied; reorder Applied list.
-01. Preset Manager list reorder DnD.
-01. Field shuttle dialog DnD if used regularly.
-01. Folder path drop onto Path Mover / Visual Trim helpers.
+1. Drag filter from Palette → Applied; reorder Applied list.
+1. Preset Manager list reorder DnD.
+1. Field shuttle dialog DnD if used regularly.
+1. Folder path drop onto Path Mover / Visual Trim helpers.
 
 **Selection / editors**
 
-20. ListBox multi-select in Applied Filters / Palette (mouse click + Ctrl/Shift).
-01. Space Character “other character” box focus behavior.
-01. Date/Time setter commit on LostFocus.
+1. ListBox multi-select in Applied Filters / Palette (mouse click + Ctrl/Shift).
+1. Space Character “other character” box focus behavior.
+1. Date/Time setter commit on LostFocus.
 
 **Regression tripwires**
 
-23. No startup exception about text shaping / HarfBuzz.
-01. No clipboard “unavailable” on Copy path when window is focused.
-01. Thumbnails / system icons still load in File List if enabled.
+1. No startup exception about text shaping / HarfBuzz.
+1. No clipboard “unavailable” on Copy path when window is focused.
+1. Thumbnails / system icons still load in File List if enabled.
 
 ### C. Optional follow-ups (only if something fails)
 

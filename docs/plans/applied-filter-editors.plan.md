@@ -35,7 +35,7 @@ Workspace plan (synced from Cursor `applied_filter_editors_c4a4260f`). Canonical
 
 **Status (2026-09-12):** **F1–F7 and F9–F10 complete** on master. Every option-bearing catalog filter has a registered editor; optionless string filters stay title-only. Live option replace + Rename List Auto-Preview via `ToChain()` work. Shared `FormatEditor` is wired across format-capable filters. Pin **📌**, reset **↺**, and help **?** ship in Filter Configuration. **F7 Presets UI** ships Preset Manager, a single Save Preset dialog (upsert + overwrite warn), toolbar ▾ quick-pick, and confirm-replace. **F8** (session persist of the working Applied Filters chain) was **removed**. **F10** polishes Filter Options layout (shared label rows, MFR7 copy/spacing, blank-name OK gate).
 
-### Priority (what's left)
+## Priority (what's left)
 
 | Order | Item                     | Why next |
 | ----- | ------------------------ | -------- |

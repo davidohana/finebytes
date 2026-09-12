@@ -10,6 +10,8 @@ md003.style = "atx"
 # Filter examples often contain `(…)[…]` strings (e.g. CapitalizeAfter Before/After).
 md011.enabled = false
 md013.enabled = false
+# Multi-phase review plans repeat section titles (Applied / Correctness / Deeper / exit).
+md024.enabled = false
 md025.enabled = false
 md033.allowed_elements = "br,!--,![CDATA["
 md036.enabled = false

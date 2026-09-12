@@ -80,6 +80,13 @@ namespace Mfr.Tests.Ui.RenameList
             RenameListFieldKey fieldKey
         )
         {
+            var column = grid.Columns.FirstOrDefault(item => RenameListGridColumns.GetFieldKey(item) == fieldKey);
+            Assert.NotNull(column);
+            // Wide absolute columns can sit past the host width; scroll before hit-test.
+            grid.ScrollIntoView(entry, column);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
             var windowPoint = _FieldCellPoint(window, grid, entry, fieldKey);
             window.MouseMove(windowPoint, RawInputModifiers.None);
             window.MouseDown(windowPoint, MouseButton.Left, RawInputModifiers.None);

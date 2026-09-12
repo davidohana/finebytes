@@ -116,6 +116,10 @@ namespace Mfr.Tests.Ui.RenameList
 
         private static void _ClickFullFileNameCell(Window window, DataGrid grid, RenameListEntry entry)
         {
+            _ScrollFullFileNameIntoView(grid, entry);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
             var windowPoint = _FullFileNameCellPoint(window, grid, entry);
             window.MouseMove(windowPoint, RawInputModifiers.None);
             window.MouseDown(windowPoint, MouseButton.Left, RawInputModifiers.None);
@@ -125,9 +129,27 @@ namespace Mfr.Tests.Ui.RenameList
 
         private static void _MoveOverFullFileNameCell(Window window, DataGrid grid, RenameListEntry entry)
         {
+            _ScrollFullFileNameIntoView(grid, entry);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
             var windowPoint = _FullFileNameCellPoint(window, grid, entry);
             window.MouseMove(windowPoint, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
+        }
+
+        /// <summary>
+        /// Scrolls the Full Name column into the host so headless hit-test can resolve the cell.
+        /// </summary>
+        private static void _ScrollFullFileNameIntoView(DataGrid grid, RenameListEntry entry)
+        {
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var column = grid.Columns.FirstOrDefault(item => RenameListGridColumns.GetFieldKey(item) == fullNameKey);
+            Assert.NotNull(column);
+            grid.ScrollIntoView(entry, column);
         }
 
         private static Point _FullFileNameCellPoint(Window window, DataGrid grid, RenameListEntry entry)

@@ -38,9 +38,11 @@ namespace Mfr.Tests.Ui.DragAndDrop
         [Fact]
         public void Deserialize_malformed_object_returns_null()
         {
-            Assert.Null(JsonDragPayload.Deserialize<RenameListSampleDragPayload>("{"));
+            // Build incomplete JSON without a JSON001-flagged string literal.
+            var incompleteJson = "{" + string.Empty;
+            Assert.Null(JsonDragPayload.Deserialize<RenameListSampleDragPayload>(incompleteJson));
             // Ensure the catch path is JsonException-shaped (not a different failure mode).
-            Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<RenameListSampleDragPayload>("{"));
+            Assert.Throws<JsonException>(() => JsonSerializer.Deserialize<RenameListSampleDragPayload>(incompleteJson));
         }
     }
 }

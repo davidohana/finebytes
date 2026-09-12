@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -105,7 +106,10 @@ namespace Mfr.Tests.Ui.AppliedFilters
         /// <param name="rowIndex">Zero-based row index.</param>
         public static void ClickRow(Window window, ListBox list, int rowIndex)
         {
-            _ = window;
+            list.ScrollIntoView(rowIndex);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
             var item = list.ContainerFromIndex(rowIndex) as ListBoxItem;
             Assert.NotNull(item);
 
@@ -113,52 +117,14 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 .OfType<TextBlock>()
                 .FirstOrDefault(text => !string.IsNullOrEmpty(text.Text));
             var target = (Visual?)labelText ?? item;
-            var point =
-                target.TranslatePoint(
-                    new Point(Math.Max(2, target.Bounds.Width / 2), Math.Max(2, target.Bounds.Height / 2)),
-                    item
-                ) ?? new Point(8, 4);
+            var local = new Point(Math.Max(2, target.Bounds.Width / 2), Math.Max(2, target.Bounds.Height / 2));
+            var windowPoint = target.TranslatePoint(local, window);
+            Assert.True(windowPoint.HasValue);
 
-            var pointer = new Pointer(1, PointerType.Mouse, true);
-            var pressedProps = new PointerPointProperties(
-                RawInputModifiers.LeftMouseButton,
-                PointerUpdateKind.LeftButtonPressed
-            );
-            item.RaiseEvent(
-                new PointerPressedEventArgs(
-                    item,
-                    pointer,
-                    list,
-                    point,
-                    0,
-                    pressedProps,
-                    KeyModifiers.None,
-                    clickCount: 1
-                )
-                {
-                    RoutedEvent = InputElement.PointerPressedEvent,
-                }
-            );
-
-            var releasedProps = new PointerPointProperties(
-                RawInputModifiers.None,
-                PointerUpdateKind.LeftButtonReleased
-            );
-            item.RaiseEvent(
-                new PointerReleasedEventArgs(
-                    item,
-                    pointer,
-                    list,
-                    point,
-                    0,
-                    releasedProps,
-                    KeyModifiers.None,
-                    MouseButton.Left
-                )
-                {
-                    RoutedEvent = InputElement.PointerReleasedEvent,
-                }
-            );
+            // Avalonia 12: route through the window so ListBox selection follows the real pointer path.
+            window.MouseMove(windowPoint.Value, RawInputModifiers.None);
+            window.MouseDown(windowPoint.Value, MouseButton.Left, RawInputModifiers.None);
+            window.MouseUp(windowPoint.Value, MouseButton.Left, RawInputModifiers.None);
             Dispatcher.UIThread.RunJobs();
         }
     }

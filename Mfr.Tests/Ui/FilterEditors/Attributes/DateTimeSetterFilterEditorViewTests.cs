@@ -1,7 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
-using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
@@ -125,7 +124,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         {
             dateBox.Text = text;
             editorVm.DateText = text;
-            dateBox.RaiseEvent(new RoutedEventArgs(InputElement.LostFocusEvent));
+            // Avalonia 12: LostFocus uses FocusChangedEventArgs (not plain RoutedEventArgs).
+            dateBox.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent));
             editorVm.CommitDateText();
         }
 
@@ -133,7 +133,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         {
             timeBox.Text = text;
             editorVm.TimeText = text;
-            timeBox.RaiseEvent(new RoutedEventArgs(InputElement.LostFocusEvent));
+            timeBox.RaiseEvent(new FocusChangedEventArgs(InputElement.LostFocusEvent));
             editorVm.CommitTimeText();
         }
     }
