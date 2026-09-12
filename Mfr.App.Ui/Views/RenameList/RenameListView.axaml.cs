@@ -740,43 +740,18 @@ namespace Mfr.App.Ui.Views.RenameList
                 return;
             }
 
-            _dropInsertLine.Show(RenameGrid, _GetInsertLineY(markIndex));
+            _dropInsertLine.Show(RenameGrid, _InsertLineY(markIndex));
         }
 
-        /// <summary>
-        /// Vertical position for the salmon insert line at <paramref name="insertIndex"/>.
-        /// </summary>
-        private double _GetInsertLineY(int insertIndex)
+        private double _InsertLineY(int insertIndex)
         {
             var entryCount = _viewModel?.Entries.Count ?? 0;
-            if (entryCount == 0)
-            {
-                return 2.0;
-            }
+            return DropInsertLinePosition.GetY(RenameGrid, insertIndex, entryCount, _ContainerFromRowIndex);
+        }
 
-            var rows = RenameGrid.GetVisualDescendants().OfType<DataGridRow>();
-            if (insertIndex < entryCount)
-            {
-                if (
-                    rows.FirstOrDefault(row => row.Index == insertIndex) is Control row
-                    && row.TranslatePoint(default, RenameGrid) is { } origin
-                )
-                {
-                    return origin.Y;
-                }
-
-                return 2.0;
-            }
-
-            if (
-                rows.FirstOrDefault(row => row.Index == entryCount - 1) is Control lastRow
-                && lastRow.TranslatePoint(default, RenameGrid) is { } lastOrigin
-            )
-            {
-                return lastOrigin.Y + lastRow.Bounds.Height;
-            }
-
-            return 2.0;
+        private Control? _ContainerFromRowIndex(int index)
+        {
+            return RenameGrid.GetVisualDescendants().OfType<DataGridRow>().FirstOrDefault(row => row.Index == index);
         }
 
         private static bool _CanAcceptFileDrop(DragEventArgs e)

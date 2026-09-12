@@ -23,14 +23,14 @@ namespace Mfr.App.Ui.Views.DragAndDrop
             if (ReferenceEquals(listBox, _dropMarkList) && _dropMarkInsertIndex == insertIndex)
             {
                 // Refresh Y when the same slot stays marked (layout / virtualization).
-                _line.Show(listBox, _GetInsertLineY(listBox, insertIndex));
+                _line.Show(listBox, _InsertLineY(listBox, insertIndex));
                 return;
             }
 
             Clear();
             _dropMarkList = listBox;
             _dropMarkInsertIndex = insertIndex;
-            _line.Show(listBox, _GetInsertLineY(listBox, insertIndex));
+            _line.Show(listBox, _InsertLineY(listBox, insertIndex));
         }
 
         /// <summary>
@@ -55,38 +55,9 @@ namespace Mfr.App.Ui.Views.DragAndDrop
             }
         }
 
-        /// <summary>
-        /// Vertical position for the insert line at <paramref name="insertIndex"/> (top of row, or below last).
-        /// </summary>
-        private static double _GetInsertLineY(ListBox listBox, int insertIndex)
+        private static double _InsertLineY(ListBox listBox, int insertIndex)
         {
-            if (listBox.ItemCount == 0)
-            {
-                return 2.0;
-            }
-
-            if (insertIndex < listBox.ItemCount)
-            {
-                if (
-                    listBox.ContainerFromIndex(insertIndex) is Control item
-                    && item.TranslatePoint(default, listBox) is { } origin
-                )
-                {
-                    return origin.Y;
-                }
-
-                return 2.0;
-            }
-
-            if (
-                listBox.ContainerFromIndex(listBox.ItemCount - 1) is Control lastItem
-                && lastItem.TranslatePoint(default, listBox) is { } lastOrigin
-            )
-            {
-                return lastOrigin.Y + lastItem.Bounds.Height;
-            }
-
-            return 2.0;
+            return DropInsertLinePosition.GetY(listBox, insertIndex, listBox.ItemCount, listBox.ContainerFromIndex);
         }
     }
 }
