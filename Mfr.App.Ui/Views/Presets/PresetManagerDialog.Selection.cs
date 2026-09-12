@@ -63,7 +63,27 @@ namespace Mfr.App.Ui.Views.Presets
                 return;
             }
 
+            if (_TryKeepMultiSelectionForDrag())
+            {
+                return;
+            }
+
             _selectionViewModel.SetSelectedPresets(_ReadSelectedPresets(PresetsList));
+        }
+
+        /// <summary>
+        /// Undoes Avalonia's press collapse of a multi-selection before the next paint.
+        /// </summary>
+        private bool _TryKeepMultiSelectionForDrag()
+        {
+            if (_dragSession.SelectionSnapshot is not { Count: > 0 } snapshot)
+            {
+                return false;
+            }
+
+            var anchor = _dragSession.HitIndex is int hit && snapshot.Contains(hit) ? hit : snapshot[^1];
+            _RestoreListSelection(PresetsList, snapshot, anchor);
+            return true;
         }
 
         private void _RestoreSelectionFromViewModel()

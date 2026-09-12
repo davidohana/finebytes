@@ -30,6 +30,7 @@ namespace Mfr.App.Ui.Views.Presets
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
             _WireSelectionHandlers();
+            _WireDragDropHandlers();
         }
 
         /// <summary>

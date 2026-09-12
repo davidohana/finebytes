@@ -89,11 +89,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
                 ? [preferredName]
                 : [.. _selectedPresets.Select(preset => preset.Name)];
 
-            Presets.Clear();
-            foreach (var preset in _appliedFilters.PresetManager.Presets)
-            {
-                Presets.Add(preset);
-            }
+            _ReloadPresetsFromManager();
 
             if (selectedNames.Count == 0)
             {
@@ -130,6 +126,24 @@ namespace Mfr.App.Ui.ViewModels.Presets
             _MoveSelected(offset: 1);
         }
 
+        /// <summary>
+        /// Moves presets at <paramref name="sourceIndices"/> to <paramref name="targetIndex"/> and persists.
+        /// </summary>
+        /// <param name="sourceIndices">Indices of rows to move.</param>
+        /// <param name="targetIndex">Destination index in <c>[0, Count]</c> before the move.</param>
+        public void MovePresetsTo(IReadOnlyList<int> sourceIndices, int targetIndex)
+        {
+            ArgumentNullException.ThrowIfNull(sourceIndices);
+
+            if (!_appliedFilters.TryMovePresetsTo(sourceIndices, targetIndex, out var newIndices))
+            {
+                return;
+            }
+
+            _ReloadPresetsFromManager();
+            SetSelectedPresets([.. newIndices.Select(index => Presets[index])]);
+        }
+
         private void _MoveSelected(int offset)
         {
             if (_selectedPresets.Count == 0)
@@ -144,6 +158,18 @@ namespace Mfr.App.Ui.ViewModels.Presets
             }
 
             Refresh();
+        }
+
+        /// <summary>
+        /// Replaces <see cref="Presets"/> from the engine list without changing selection.
+        /// </summary>
+        private void _ReloadPresetsFromManager()
+        {
+            Presets.Clear();
+            foreach (var preset in _appliedFilters.PresetManager.Presets)
+            {
+                Presets.Add(preset);
+            }
         }
 
         private bool _CanMoveSelectedUp()

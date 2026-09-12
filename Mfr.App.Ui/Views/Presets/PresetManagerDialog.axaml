@@ -29,6 +29,15 @@
       <Setter Property="Padding" Value="6,2" />
       <Setter Property="MinHeight" Value="22" />
     </Style>
+    <Style Selector="ListBox.preset-manager-list ListBoxItem.drop-mark">
+      <Setter Property="Background" Value="{DynamicResource DropMarkBrush}" />
+    </Style>
+    <Style Selector="ListBox.preset-manager-list ListBoxItem.drop-mark:selected">
+      <Setter Property="Background" Value="{DynamicResource DropMarkBrush}" />
+    </Style>
+    <Style Selector="ListBox.preset-manager-list ListBoxItem.drop-mark:pointerover">
+      <Setter Property="Background" Value="{DynamicResource DropMarkBrush}" />
+    </Style>
     <Style Selector="Border.preset-manager-description">
       <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />

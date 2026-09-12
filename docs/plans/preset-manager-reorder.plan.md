@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: p3-dnd
     content: P3 — Manager ListBox DnD reorder (ListBoxDragSession/DropMark) + headless tests
-    status: pending
+    status: completed
 isProject: false
 ---
 
