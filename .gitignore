@@ -29,6 +29,9 @@ packages/
 *.tmp
 *.bak
 
+# Agent / local scratch (temp scripts, one-off helpers)
+.tmp/
+
 # Windows
 Thumbs.db
 ehthumbs.db

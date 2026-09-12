@@ -291,6 +291,11 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             {
                 ItemCount = RenameListViewModel.ItemCount;
                 GoCommand.NotifyCanExecuteChanged();
+                if (ItemCount == 0)
+                {
+                    // Empty list: drop leftover GO/add text (Clear often leaves CellStatusHint already empty).
+                    StatusHint = StyledTextDisplay.Empty;
+                }
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.ChangeCount))

@@ -12,6 +12,7 @@
 - Always-on agent constraints live in this file. On-demand workflows live in skills under `.agents/skills/`.
 - UI interaction tests: see skill `mfr-ui-headless-tests` and `Mfr.Tests/Ui/FileList/FileListViewTests.cs`.
 - Plans: save all implementation / feature plans under `docs/plans/` (kebab-case names, e.g. `docs/plans/rename-list-ui.plan.md`). Do not put project plans in `.cursor/plans/` or elsewhere.
+- Put any temporary scripts or scratch files under `.tmp/` (gitignored). Do not write them at the repo root or into source trees. Prefer the Shell tool’s inline commands when a file is unnecessary; delete scratch when done if practical.
 
 ## C# code style
 

@@ -230,6 +230,31 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
+        /// Verifies clearing the Rename List drops a prior GO status message.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Clear_after_go_clears_status_hint()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = Path.Combine(dir, "alpha.txt");
+            await File.WriteAllTextAsync(source, "alpha");
+            var viewModel = new MainWindowViewModel(dir);
+            viewModel.RenameListViewModel.DisableAutoPreview();
+            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
+
+            await viewModel
+                .RenameListViewModel.GoAsync(_Chain(_PrefixReplacer("alpha", "renamed")))
+                .ConfigureAwait(true);
+
+            Assert.Equal("Renamed 1 item(s).", viewModel.StatusHint.ToPlainText());
+
+            viewModel.RenameListViewModel.ClearCommand.Execute(null);
+
+            Assert.Equal(0, viewModel.ItemCount);
+            Assert.True(viewModel.StatusHint.IsEmpty);
+        }
+
+        /// <summary>
         /// Verifies Applied Filters preset load/save status is sticky on the main-window hint.
         /// </summary>
         [AvaloniaFact]

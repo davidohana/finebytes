@@ -259,6 +259,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             SetDropMarkIndex(null);
             SetSelectedEntries([]);
             CellStatusHint = StyledTextDisplay.Empty;
+            LastStatusMessage = StyledTextDisplay.Empty;
             _NotifyMembershipChanged();
         }
 
