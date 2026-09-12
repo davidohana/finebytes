@@ -12,7 +12,7 @@ using Mfr.App.Ui.Views.RenameList;
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Headless tests for Rename List focused-cell (light blue) chrome.
+    /// Headless tests for Rename List focused-cell (amber) chrome.
     /// </summary>
     public sealed class RenameListViewFocusedCellTests : IDisposable
     {
