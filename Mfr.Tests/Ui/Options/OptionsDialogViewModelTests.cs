@@ -21,13 +21,15 @@ namespace Mfr.Tests.Ui.Options
                 MainWindow = new SessionStateMainWindow { RememberWindowState = false },
                 FileList = new SessionStateFileList { RememberLastFolder = false },
             };
-            ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = true;
+            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
 
             var vm = new OptionsDialogViewModel(session);
 
             Assert.False(vm.RememberLastFolder);
             Assert.False(vm.RememberWindowState);
-            Assert.True(vm.ConfirmReplaceAppliedFiltersOnLoad);
+            Assert.Equal(ConfirmationPrompts.More, vm.ConfirmationPrompts);
+            Assert.True(vm.DoubleClickAddsToRenameList);
         }
 
         [Fact]
@@ -38,33 +40,38 @@ namespace Mfr.Tests.Ui.Options
                 MainWindow = new SessionStateMainWindow { RememberWindowState = true },
                 FileList = new SessionStateFileList { RememberLastFolder = true },
             };
-            ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = false;
+            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Config.Ui.DoubleClickAddsToRenameList = false;
 
             var vm = new OptionsDialogViewModel(session)
             {
                 RememberLastFolder = false,
                 RememberWindowState = false,
-                ConfirmReplaceAppliedFiltersOnLoad = true,
+                ConfirmationPrompts = ConfirmationPrompts.More,
+                DoubleClickAddsToRenameList = true,
             };
 
             vm.Commit();
 
             Assert.False(session.FileList.RememberLastFolder);
             Assert.False(session.MainWindow.RememberWindowState);
-            Assert.True(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
+            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
+            Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
         }
 
         [Fact]
         public void Commit_creates_missing_session_sections()
         {
             var session = new SessionState();
-            ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = false;
+            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Config.Ui.DoubleClickAddsToRenameList = false;
 
             var vm = new OptionsDialogViewModel(session)
             {
                 RememberLastFolder = false,
                 RememberWindowState = false,
-                ConfirmReplaceAppliedFiltersOnLoad = true,
+                ConfirmationPrompts = ConfirmationPrompts.More,
+                DoubleClickAddsToRenameList = true,
             };
 
             vm.Commit();
@@ -73,7 +80,8 @@ namespace Mfr.Tests.Ui.Options
             Assert.NotNull(session.MainWindow);
             Assert.False(session.FileList.RememberLastFolder);
             Assert.False(session.MainWindow.RememberWindowState);
-            Assert.True(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
+            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
+            Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
         }
     }
 }

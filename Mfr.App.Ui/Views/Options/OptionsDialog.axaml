@@ -3,6 +3,8 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.Options"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:cfg="using:Mfr.Models.Config"
   x:Class="Mfr.App.Ui.Views.Options.OptionsDialog"
   x:DataType="vm:OptionsDialogViewModel"
   Title="Options"
@@ -23,9 +25,27 @@
     <StackPanel Spacing="10">
       <controls:CompactCheckBox IsChecked="{Binding RememberLastFolder}" Content="Save File List last position" />
       <controls:CompactCheckBox IsChecked="{Binding RememberWindowState}" Content="Remember window size and position" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <TextBlock Text="Confirmation prompts:" VerticalAlignment="Center" />
+        <controls:CompactRadioButton
+          GroupName="ConfirmationPrompts"
+          Content="Fewer"
+          IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Fewer}, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          GroupName="ConfirmationPrompts"
+          Content="Normal"
+          IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Normal}, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          GroupName="ConfirmationPrompts"
+          Content="More"
+          IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.More}, Mode=TwoWay}"
+        />
+      </StackPanel>
       <controls:CompactCheckBox
-        IsChecked="{Binding ConfirmReplaceAppliedFiltersOnLoad}"
-        Content="Confirm before replacing Applied Filters when loading a preset"
+        IsChecked="{Binding DoubleClickAddsToRenameList}"
+        Content="Double click in file list adds to Rename List"
       />
     </StackPanel>
   </DockPanel>

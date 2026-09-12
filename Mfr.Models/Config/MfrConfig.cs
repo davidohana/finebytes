@@ -23,22 +23,16 @@ namespace Mfr.Models.Config
     public sealed class UiConfig
     {
         /// <summary>
-        /// Presets UI options (Options dialog + hand-edit <c>config.json</c> / CLI <c>--set</c>).
+        /// How often the UI asks for confirmation before gated actions.
+        /// <para>Default <see cref="ConfirmationPrompts.Normal"/>.</para>
         /// </summary>
-        [ConfigSection]
-        public PresetsUiConfig Presets = new();
-    }
+        public ConfirmationPrompts ConfirmationPrompts = ConfirmationPrompts.Normal;
 
-    /// <summary>
-    /// Presets UI options under <c>ui.presets</c>.
-    /// </summary>
-    public sealed class PresetsUiConfig
-    {
         /// <summary>
-        /// When <see langword="true"/>, confirm before replacing a non-empty Applied Filters chain on preset load.
-        /// <para>Default <see langword="false"/> (MFR7 parity: replace immediately).</para>
+        /// When <see langword="true"/>, double-click in the File List adds the selection to the Rename List.
+        /// <para>Default <see langword="false"/> (open / navigate instead).</para>
         /// </summary>
-        public bool ConfirmReplaceAppliedFiltersOnLoad;
+        public bool DoubleClickAddsToRenameList;
     }
 
     /// <summary>

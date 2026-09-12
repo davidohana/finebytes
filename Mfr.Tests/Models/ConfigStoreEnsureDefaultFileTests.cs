@@ -27,12 +27,14 @@ namespace Mfr.Tests.Models
                 Assert.Equal(string.Empty, doc.RootElement.GetProperty("log").GetProperty("directoryPath").GetString());
                 Assert.Equal("session-", doc.RootElement.GetProperty("log").GetProperty("filePrefix").GetString());
                 Assert.Equal(
-                    "false",
-                    doc.RootElement.GetProperty("ui")
-                        .GetProperty("presets")
-                        .GetProperty("confirmReplaceAppliedFiltersOnLoad")
-                        .GetString()
+                    "normal",
+                    doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString()
                 );
+                Assert.Equal(
+                    "false",
+                    doc.RootElement.GetProperty("ui").GetProperty("doubleClickAddsToRenameList").GetString()
+                );
+                Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("presets", out _));
             }
             finally
             {

@@ -1194,18 +1194,18 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies confirm-replace is required only when the flag is on and the stack is non-empty.
+        /// Verifies confirm-replace is required only when policy says confirm and the stack is non-empty.
         /// </summary>
         [Fact]
-        public void NeedsConfirmReplaceOnLoad_Requires_Flag_And_NonEmpty_Stack()
+        public void NeedsConfirmReplaceOnLoad_Requires_Policy_And_NonEmpty_Stack()
         {
             var viewModel = new AppliedFiltersViewModel();
-            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(confirmReplaceOnLoad: true));
-            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(confirmReplaceOnLoad: false));
+            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(shouldConfirm: true));
+            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(shouldConfirm: false));
 
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
-            Assert.True(viewModel.NeedsConfirmReplaceOnLoad(confirmReplaceOnLoad: true));
-            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(confirmReplaceOnLoad: false));
+            Assert.True(viewModel.NeedsConfirmReplaceOnLoad(shouldConfirm: true));
+            Assert.False(viewModel.NeedsConfirmReplaceOnLoad(shouldConfirm: false));
         }
 
         /// <summary>

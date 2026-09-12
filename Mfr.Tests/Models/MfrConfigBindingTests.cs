@@ -14,7 +14,6 @@ namespace Mfr.Tests.Models
         [InlineData(typeof(FilterConfig))]
         [InlineData(typeof(LogConfig))]
         [InlineData(typeof(UiConfig))]
-        [InlineData(typeof(PresetsUiConfig))]
         public void Every_public_instance_field_participates_in_config_binding(Type configType)
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
@@ -41,42 +40,44 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies <c>ui.presets.confirmReplaceAppliedFiltersOnLoad</c> binds from a JSON string bool.
+        /// Verifies <c>ui.confirmationPrompts</c> and <c>ui.doubleClickAddsToRenameList</c> bind from JSON strings.
         /// </summary>
         [Fact]
-        public void Ui_Presets_ConfirmReplaceAppliedFiltersOnLoad_binds_from_json_string()
+        public void Ui_confirmation_leaves_bind_from_json_strings()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """
                 {
                   "ui": {
-                    "presets": {
-                      "confirmReplaceAppliedFiltersOnLoad": "true"
-                    }
+                    "confirmationPrompts": "more",
+                    "doubleClickAddsToRenameList": "true"
                   }
                 }
                 """
             );
             var config = new MfrConfig();
-            Assert.False(config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
+            Assert.Equal(ConfirmationPrompts.Normal, config.Ui.ConfirmationPrompts);
+            Assert.False(config.Ui.DoubleClickAddsToRenameList);
 
             ConfigJsonApplier.Apply(doc.RootElement, config);
 
-            Assert.True(config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
+            Assert.Equal(ConfirmationPrompts.More, config.Ui.ConfirmationPrompts);
+            Assert.True(config.Ui.DoubleClickAddsToRenameList);
         }
 
         /// <summary>
-        /// Verifies omitted <c>ui.presets</c> leaves the confirm-replace flag at its default.
+        /// Verifies omitted <c>ui</c> leaves stay at their defaults.
         /// </summary>
         [Fact]
-        public void Ui_Presets_ConfirmReplaceAppliedFiltersOnLoad_defaults_false_when_omitted()
+        public void Ui_confirmation_leaves_default_when_omitted()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """{"filters":{"maxListFileLineLength":"1000"}}"""
             );
             var config = new MfrConfig();
             ConfigJsonApplier.Apply(doc.RootElement, config);
-            Assert.False(config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
+            Assert.Equal(ConfirmationPrompts.Normal, config.Ui.ConfirmationPrompts);
+            Assert.False(config.Ui.DoubleClickAddsToRenameList);
         }
     }
 }

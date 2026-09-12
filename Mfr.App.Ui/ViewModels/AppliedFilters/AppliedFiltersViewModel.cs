@@ -207,15 +207,16 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Gets whether loading a preset should confirm before replacing the current Applied Filters chain.
         /// </summary>
-        /// <param name="confirmReplaceOnLoad">
-        /// Value of <c>ui.presets.confirmReplaceAppliedFiltersOnLoad</c> (or a test override).
+        /// <param name="shouldConfirm">
+        /// Whether policy requires a replace-on-load confirm (typically from
+        /// <see cref="Models.Config.ConfirmationPolicy"/>).
         /// </param>
         /// <returns>
-        /// <see langword="true"/> when confirmation is enabled and the stack is non-empty.
+        /// <see langword="true"/> when confirmation is required and the stack is non-empty.
         /// </returns>
-        public bool NeedsConfirmReplaceOnLoad(bool confirmReplaceOnLoad)
+        public bool NeedsConfirmReplaceOnLoad(bool shouldConfirm)
         {
-            return confirmReplaceOnLoad && Steps.Count > 0;
+            return shouldConfirm && Steps.Count > 0;
         }
 
         /// <summary>

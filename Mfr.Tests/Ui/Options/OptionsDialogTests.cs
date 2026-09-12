@@ -36,10 +36,10 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies the Options dialog constructs and shows the three preference checkboxes.
+        /// Verifies the Options dialog constructs remember checkboxes, prompts radios, and double-click.
         /// </summary>
         [AvaloniaFact]
-        public void OptionsDialog_shows_three_checkboxes()
+        public void OptionsDialog_shows_remember_prompts_and_double_click()
         {
             var dialogVm = new OptionsDialogViewModel(new SessionState());
             var dialog = new OptionsDialog(dialogVm);
@@ -56,7 +56,16 @@ namespace Mfr.Tests.Ui.Options
 
                 Assert.Contains("Save File List last position", labels);
                 Assert.Contains("Remember window size and position", labels);
-                Assert.Contains("Confirm before replacing Applied Filters when loading a preset", labels);
+                Assert.Contains("Double click in file list adds to Rename List", labels);
+
+                var radioLabels = dialog
+                    .GetVisualDescendants()
+                    .OfType<CompactRadioButton>()
+                    .Select(radio => radio.Content?.ToString())
+                    .ToList();
+                Assert.Contains("Fewer", radioLabels);
+                Assert.Contains("Normal", radioLabels);
+                Assert.Contains("More", radioLabels);
             }
             finally
             {
@@ -113,7 +122,8 @@ namespace Mfr.Tests.Ui.Options
                 MainWindow = new SessionStateMainWindow { RememberWindowState = true },
                 FileList = new SessionStateFileList { RememberLastFolder = true },
             };
-            ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = false;
+            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Config.Ui.DoubleClickAddsToRenameList = false;
 
             var saved = false;
             OptionsDialogViewModel? shown = null;
@@ -126,7 +136,8 @@ namespace Mfr.Tests.Ui.Options
                         shown = vm;
                         vm.RememberLastFolder = false;
                         vm.RememberWindowState = false;
-                        vm.ConfirmReplaceAppliedFiltersOnLoad = true;
+                        vm.ConfirmationPrompts = ConfirmationPrompts.More;
+                        vm.DoubleClickAddsToRenameList = true;
                         return Task.FromResult<bool?>(true);
                     },
                     SaveConfig = () => saved = true,
@@ -137,9 +148,10 @@ namespace Mfr.Tests.Ui.Options
 
             Assert.NotNull(shown);
             Assert.True(saved);
-            Assert.False(session.FileList!.RememberLastFolder);
-            Assert.False(session.MainWindow!.RememberWindowState);
-            Assert.True(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
+            Assert.False(session.FileList.RememberLastFolder);
+            Assert.False(session.MainWindow.RememberWindowState);
+            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
+            Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
@@ -156,7 +168,8 @@ namespace Mfr.Tests.Ui.Options
                 MainWindow = new SessionStateMainWindow { RememberWindowState = true },
                 FileList = new SessionStateFileList { RememberLastFolder = true },
             };
-            ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = false;
+            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Config.Ui.DoubleClickAddsToRenameList = false;
 
             var saved = false;
             var (viewModel, window) = _ShowMainWindow(
@@ -166,7 +179,8 @@ namespace Mfr.Tests.Ui.Options
                     Show = vm =>
                     {
                         vm.RememberLastFolder = false;
-                        vm.ConfirmReplaceAppliedFiltersOnLoad = true;
+                        vm.ConfirmationPrompts = ConfirmationPrompts.More;
+                        vm.DoubleClickAddsToRenameList = true;
                         return Task.FromResult<bool?>(false);
                     },
                     SaveConfig = () => saved = true,
@@ -176,9 +190,10 @@ namespace Mfr.Tests.Ui.Options
             await _InvokeShowOptionsAsync(viewModel);
 
             Assert.False(saved);
-            Assert.True(session.FileList!.RememberLastFolder);
-            Assert.True(session.MainWindow!.RememberWindowState);
-            Assert.False(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
+            Assert.True(session.FileList.RememberLastFolder);
+            Assert.True(session.MainWindow.RememberWindowState);
+            Assert.Equal(ConfirmationPrompts.Fewer, ConfigStore.Config.Ui.ConfirmationPrompts);
+            Assert.False(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();

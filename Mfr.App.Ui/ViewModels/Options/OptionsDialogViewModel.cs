@@ -23,7 +23,8 @@ namespace Mfr.App.Ui.ViewModels.Options
             var fileList = session.FileList ?? new SessionStateFileList();
             RememberLastFolder = fileList.RememberLastFolder;
             RememberWindowState = mainWindow.RememberWindowState;
-            ConfirmReplaceAppliedFiltersOnLoad = ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad;
+            ConfirmationPrompts = ConfigStore.Config.Ui.ConfirmationPrompts;
+            DoubleClickAddsToRenameList = ConfigStore.Config.Ui.DoubleClickAddsToRenameList;
         }
 
         /// <summary>
@@ -39,10 +40,16 @@ namespace Mfr.App.Ui.ViewModels.Options
         private bool _rememberWindowState;
 
         /// <summary>
-        /// When <see langword="true"/>, confirm before replacing a non-empty Applied Filters chain on preset load.
+        /// Draft confirmation-prompts level for gated UI confirms.
         /// </summary>
         [ObservableProperty]
-        private bool _confirmReplaceAppliedFiltersOnLoad;
+        private ConfirmationPrompts _confirmationPrompts;
+
+        /// <summary>
+        /// When <see langword="true"/>, double-click in the File List adds the selection to the Rename List.
+        /// </summary>
+        [ObservableProperty]
+        private bool _doubleClickAddsToRenameList;
 
         /// <summary>
         /// Writes draft values into the live session and <see cref="ConfigStore.Config"/>.
@@ -53,7 +60,8 @@ namespace Mfr.App.Ui.ViewModels.Options
         {
             _session.EnsureFileList().RememberLastFolder = RememberLastFolder;
             _session.EnsureMainWindow().RememberWindowState = RememberWindowState;
-            ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = ConfirmReplaceAppliedFiltersOnLoad;
+            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts;
+            ConfigStore.Config.Ui.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
         }
     }
 }

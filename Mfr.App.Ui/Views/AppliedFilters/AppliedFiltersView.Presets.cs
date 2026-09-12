@@ -224,7 +224,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Confirms replacing a non-empty Applied Filters chain when the config flag is enabled.
+        /// Confirms replacing a non-empty Applied Filters chain when the confirmation policy requires it.
         /// </summary>
         /// <param name="owner">Owner window for the confirm dialog.</param>
         /// <returns>
@@ -237,7 +237,11 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return false;
             }
 
-            if (!_viewModel.NeedsConfirmReplaceOnLoad(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad))
+            if (
+                !_viewModel.NeedsConfirmReplaceOnLoad(
+                    ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ReplaceAppliedFiltersOnLoad)
+                )
+            )
             {
                 return true;
             }

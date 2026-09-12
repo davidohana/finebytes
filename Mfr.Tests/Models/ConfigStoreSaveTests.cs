@@ -9,13 +9,14 @@ namespace Mfr.Tests.Models
     public sealed class ConfigStoreSaveTests
     {
         [Fact]
-        public void Save_round_trips_mutated_confirm_replace_and_leaf()
+        public void Save_round_trips_mutated_ui_leaves_and_filter_leaf()
         {
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-save-config-" + Guid.NewGuid() + ".json");
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = true;
+                ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+                ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
                 ConfigStore.Config.Filters.MaxListFileLineLength = 2500;
                 ConfigStore.Save(configPath);
 
@@ -23,11 +24,12 @@ namespace Mfr.Tests.Models
                 using (var doc = JsonDocument.Parse(File.ReadAllText(configPath)))
                 {
                     Assert.Equal(
+                        "more",
+                        doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString()
+                    );
+                    Assert.Equal(
                         "true",
-                        doc.RootElement.GetProperty("ui")
-                            .GetProperty("presets")
-                            .GetProperty("confirmReplaceAppliedFiltersOnLoad")
-                            .GetString()
+                        doc.RootElement.GetProperty("ui").GetProperty("doubleClickAddsToRenameList").GetString()
                     );
                     Assert.Equal(
                         "2500",
@@ -36,7 +38,8 @@ namespace Mfr.Tests.Models
                 }
 
                 ConfigStore.Load(configPath);
-                Assert.True(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
+                Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
                 Assert.Equal(2500, ConfigStore.Config.Filters.MaxListFileLineLength);
             }
             finally
@@ -58,9 +61,8 @@ namespace Mfr.Tests.Models
                 """
                 {
                   "ui": {
-                    "presets": {
-                      "confirmReplaceAppliedFiltersOnLoad": "false"
-                    }
+                    "confirmationPrompts": "fewer",
+                    "doubleClickAddsToRenameList": "false"
                   }
                 }
                 """
@@ -68,16 +70,15 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = true;
+                ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+                ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
                 ConfigStore.Save(configPath);
 
                 using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
+                Assert.Equal("more", doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString());
                 Assert.Equal(
                     "true",
-                    doc.RootElement.GetProperty("ui")
-                        .GetProperty("presets")
-                        .GetProperty("confirmReplaceAppliedFiltersOnLoad")
-                        .GetString()
+                    doc.RootElement.GetProperty("ui").GetProperty("doubleClickAddsToRenameList").GetString()
                 );
             }
             finally
@@ -97,12 +98,14 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad = true;
+                ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+                ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
                 ConfigStore.Save(configPath);
 
                 Assert.True(File.Exists(configPath));
                 ConfigStore.Load(configPath);
-                Assert.True(ConfigStore.Config.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
+                Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
             }
             finally
             {
@@ -110,6 +113,44 @@ namespace Mfr.Tests.Models
                 {
                     Directory.Delete(dir, recursive: true);
                 }
+            }
+        }
+
+        [Fact]
+        public void Load_ignores_unknown_old_ui_presets_key()
+        {
+            var configPath = Path.Combine(
+                Path.GetTempPath(),
+                "mfr-test-save-legacy-presets-" + Guid.NewGuid() + ".json"
+            );
+            File.WriteAllText(
+                configPath,
+                // lang=json,strict
+                """
+                {
+                  "ui": {
+                    "presets": {
+                      "confirmReplaceAppliedFiltersOnLoad": "true"
+                    },
+                    "confirmationPrompts": "more"
+                  }
+                }
+                """
+            );
+            try
+            {
+                ConfigStore.Load(configPath);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
+                Assert.False(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
+            }
+            finally
+            {
+                if (File.Exists(configPath))
+                {
+                    File.Delete(configPath);
+                }
+
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
     }
