@@ -30,9 +30,10 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// <param name="initialFileListPath">
         /// Optional File List start path (e.g. remembered last folder). When null, the File List uses its default.
         /// </param>
-        /// <param name="session">
-        /// Loaded session to restore onto child panes and persist from this window. When null, panes keep
-        /// first-launch defaults and this window does not write session into <c>config.json</c>.
+        /// <param name="persistSession">
+        /// When <see langword="true"/>, restore child panes from <see cref="ConfigStore"/> and persist
+        /// session sections on close / Options. When <see langword="false"/>, panes keep first-launch
+        /// defaults and this window does not write session into <c>config.json</c>.
         /// </param>
         /// <param name="filterDefaults">
         /// Per-type filter add defaults. When null, uses an empty store that does not read AppData
@@ -44,12 +45,12 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// </param>
         public MainWindowViewModel(
             string? initialFileListPath = null,
-            SessionState? session = null,
+            bool persistSession = false,
             FilterDefaultsStore? filterDefaults = null,
             PresetManager? presetManager = null
         )
         {
-            Session = session;
+            PersistSession = persistSession;
             AppliedFiltersViewModel = new AppliedFiltersViewModel(
                 filterDefaults ?? FilterDefaultsStore.CreateEmpty(),
                 presetManager ?? PresetManager.CreateEmpty()
@@ -61,7 +62,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 RenameListViewModel.ApplyVisibleColumnSpecs
             );
             FilterEditorViewModel = new FilterEditorViewModel();
-            FilterEditorViewModel.ApplySession(session);
+            FilterEditorViewModel.ApplySession(persistSession);
             FilterEditorViewModel.SetSampleRenameItemSource(
                 () => [.. RenameListViewModel.Entries.Select(entry => entry.EngineItem)],
                 fullPath =>
@@ -69,10 +70,10 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                         .Entries.Select(entry => entry.EngineItem)
                         .FirstOrDefault(item => PathComparers.Os.Equals(item.Original.FullPath, fullPath))
             );
-            if (session is not null)
+            if (persistSession)
             {
-                FileListViewModel.ApplySession(session.FileList);
-                RenameListViewModel.ApplySessionSection(session.RenameList);
+                FileListViewModel.ApplySession(ConfigStore.FileList);
+                RenameListViewModel.ApplySessionSection(ConfigStore.RenameList);
             }
 
             RenameListViewModel.PropertyChanged += _OnRenameListPropertyChanged;
@@ -92,9 +93,9 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Loaded session document for this window, or <see langword="null"/> when the window was created without one.
+        /// When <see langword="true"/>, this window restores and persists <see cref="ConfigStore"/> session sections.
         /// </summary>
-        internal SessionState? Session { get; }
+        internal bool PersistSession { get; }
 
         /// <summary>
         /// Gets the main window title, including the product version.

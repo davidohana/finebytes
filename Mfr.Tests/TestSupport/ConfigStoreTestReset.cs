@@ -1,7 +1,7 @@
 namespace Mfr.Tests.TestSupport
 {
     /// <summary>
-    /// Resets <see cref="ConfigStore.Config"/> for isolated tests via an empty JSON document.
+    /// Resets <see cref="ConfigStore"/> for isolated tests via an empty JSON document.
     /// </summary>
     public static class ConfigStoreTestReset
     {

@@ -5,33 +5,31 @@ using Mfr.Models.Config;
 namespace Mfr.App.Ui.Services.Session
 {
     /// <summary>
-    /// Merges UI preferences with in-memory window/folder state into a <see cref="SessionState"/>.
+    /// Merges UI preferences with in-memory window/folder state into <see cref="ConfigStore"/> sections.
     /// </summary>
     internal static class UiSessionPersistence
     {
         /// <summary>
-        /// Restores remembered main-window layout from <paramref name="session"/>.
+        /// Restores remembered main-window layout from <see cref="ConfigStore.MainWindow"/>.
         /// </summary>
         /// <param name="window">Main window to configure.</param>
         /// <param name="panes">Pane grids for splitter restore.</param>
-        /// <param name="session">Loaded session document.</param>
         /// <remarks>
         /// File List and Rename List session fields are restored separately via pane apply/capture methods.
         /// </remarks>
-        public static void TryRestore(Window window, MainWindowPaneGrids panes, SessionState session)
+        public static void TryRestore(Window window, MainWindowPaneGrids panes)
         {
             ArgumentNullException.ThrowIfNull(window);
             ArgumentNullException.ThrowIfNull(panes);
-            ArgumentNullException.ThrowIfNull(session);
 
             var windowRestored = false;
-            var mainWindow = session.MainWindow ?? new SessionStateMainWindow();
+            var mainWindow = ConfigStore.MainWindow ?? new SessionStateMainWindow();
 
             if (mainWindow.RememberWindowState)
             {
-                windowRestored = WindowSession.TryRestore(window, session.MainWindow);
+                windowRestored = WindowSession.TryRestore(window, ConfigStore.MainWindow);
 
-                SplitterSession.TryRestore(panes, session.MainWindow?.Splitters);
+                SplitterSession.TryRestore(panes, ConfigStore.MainWindow?.Splitters);
             }
 
             if (!windowRestored)
@@ -41,13 +39,11 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Merges layout into <paramref name="session"/> then saves the whole prefs document via
-        /// <see cref="ConfigStore"/>: window/folder when their remember flags are on; File List masks/view
-        /// and Rename List always.
+        /// Merges layout into <see cref="ConfigStore"/> then saves the whole prefs document:
+        /// window/folder when their remember flags are on; File List masks/view and Rename List always.
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
         /// <param name="panes">Pane grids for splitter capture.</param>
-        /// <param name="session">Live session document to merge into and write.</param>
         /// <param name="fileList">
         /// File List session fields to persist, or <see langword="null"/> when unavailable.
         /// </param>
@@ -57,31 +53,29 @@ namespace Mfr.App.Ui.Services.Session
         public static void SaveOnClose(
             Window window,
             MainWindowPaneGrids panes,
-            SessionState session,
             SessionStateFileList? fileList,
             SessionStateRenameList? renameList = null
         )
         {
             ArgumentNullException.ThrowIfNull(window);
             ArgumentNullException.ThrowIfNull(panes);
-            ArgumentNullException.ThrowIfNull(session);
 
             try
             {
-                var rememberWindow = _RememberWindowState(session);
-                var rememberLastFolder = _RememberLastFolder(session);
+                var rememberWindow = (ConfigStore.MainWindow ?? new SessionStateMainWindow()).RememberWindowState;
+                var rememberLastFolder = (ConfigStore.FileList ?? new SessionStateFileList()).RememberLastFolder;
 
                 if (rememberWindow)
                 {
                     var captured = WindowSession.Capture(window);
                     captured.RememberWindowState = rememberWindow;
                     captured.Splitters = SplitterSession.Capture(panes);
-                    session.MainWindow = captured;
+                    ConfigStore.MainWindow = captured;
                 }
 
                 if (fileList is not null)
                 {
-                    var saved = session.EnsureFileList();
+                    var saved = ConfigStore.EnsureFileList();
                     saved.RememberLastFolder = rememberLastFolder;
 
                     if (rememberLastFolder && _IsPersistableFolder(fileList.LastOpenedDirectory))
@@ -103,26 +97,15 @@ namespace Mfr.App.Ui.Services.Session
 
                 if (renameList is not null)
                 {
-                    session.RenameList = renameList;
+                    ConfigStore.RenameList = renameList;
                 }
 
-                ConfigStore.Session = session;
                 ConfigStore.TrySave();
             }
             catch
             {
                 // Session save must not block shutdown or surface to the user.
             }
-        }
-
-        private static bool _RememberWindowState(SessionState session)
-        {
-            return (session.MainWindow ?? new SessionStateMainWindow()).RememberWindowState;
-        }
-
-        private static bool _RememberLastFolder(SessionState session)
-        {
-            return (session.FileList ?? new SessionStateFileList()).RememberLastFolder;
         }
 
         private static bool _IsPersistableFolder(string? path)

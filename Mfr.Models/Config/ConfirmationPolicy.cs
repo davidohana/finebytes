@@ -1,7 +1,7 @@
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Reads <see cref="UiConfig.ConfirmationPrompts"/> from <see cref="ConfigStore.Config"/> to decide whether a gated
+    /// Reads <see cref="UiConfig.ConfirmationPrompts"/> from <see cref="ConfigStore.Ui"/> to decide whether a gated
     /// confirm should show.
     /// </summary>
     public static class ConfirmationPolicy
@@ -14,7 +14,7 @@ namespace Mfr.Models.Config
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="kind"/> is not a defined member.</exception>
         public static bool ShouldConfirm(ConfirmationKind kind)
         {
-            var level = ConfigStore.Config.Ui.ConfirmationPrompts;
+            var level = ConfigStore.Ui.ConfirmationPrompts;
             return kind switch
             {
                 ConfirmationKind.GoWithPreviewErrors => level is ConfirmationPrompts.Normal or ConfirmationPrompts.More,

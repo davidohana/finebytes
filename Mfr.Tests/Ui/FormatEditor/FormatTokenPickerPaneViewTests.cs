@@ -14,8 +14,14 @@ namespace Mfr.Tests.Ui.FormatEditor
     /// <summary>
     /// Headless tests for <see cref="FormatTokenPickerPane"/> last-focus Insert/Edit and collapse.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class FormatTokenPickerPaneViewTests
     {
+        public FormatTokenPickerPaneViewTests()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+        }
+
         /// <summary>
         /// Verifies hosted format fields hide local Insert/Edit and expose the pane Edit.
         /// </summary>
@@ -208,11 +214,9 @@ namespace Mfr.Tests.Ui.FormatEditor
         [AvaloniaFact]
         public void FilterEditor_RestoresCollapsedTokenPickerFromSession()
         {
-            var session = new SessionState
-            {
-                FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
-            };
-            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(session);
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false };
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(persistSession: true);
 
             Assert.False(mainViewModel.FilterEditorViewModel.FormatTokenPickerExpanded);
 
@@ -229,7 +233,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(mainViewModel.FilterEditorViewModel.FormatTokenPickerExpanded);
-            Assert.True(session.FilterEditor.FormatTokenPickerExpanded);
+            Assert.True(ConfigStore.FilterEditor.FormatTokenPickerExpanded);
 
             window.Close();
         }
@@ -240,8 +244,8 @@ namespace Mfr.Tests.Ui.FormatEditor
         [AvaloniaFact]
         public void FilterEditor_SharesCollapsedPreferenceAcrossFormatEditors()
         {
-            var session = new SessionState();
-            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(session);
+            ConfigStoreTestReset.LoadEmpty();
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(persistSession: true);
             var applied = mainViewModel.AppliedFiltersViewModel;
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
@@ -255,7 +259,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.False(session.FilterEditor!.FormatTokenPickerExpanded);
+            Assert.False(ConfigStore.FilterEditor!.FormatTokenPickerExpanded);
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Inserter"));
             applied.SetSelectedSteps([applied.Steps[^1]]);

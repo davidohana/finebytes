@@ -102,8 +102,8 @@ namespace Mfr.App.Ui.Views.MainWindow
         /// <summary>
         /// Hosts the Options dialog; on OK commits drafts and writes <c>config.json</c>.
         /// <para>
-        /// No-ops when <see cref="MainWindowViewModel.Session"/> is null — remember flags must
-        /// land on the live session document, not a throwaway <see cref="SessionState"/>.
+        /// No-ops when <see cref="MainWindowViewModel.PersistSession"/> is false — remember flags must
+        /// land on live <see cref="ConfigStore"/> sections, not a throwaway draft.
         /// </para>
         /// </summary>
         private async Task _ShowOptionsAsync()
@@ -118,7 +118,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                 return;
             }
 
-            if (viewModel.Session is not SessionState session)
+            if (!viewModel.PersistSession)
             {
                 return;
             }
@@ -126,7 +126,7 @@ namespace Mfr.App.Ui.Views.MainWindow
             _optionsDialogInProgress = true;
             try
             {
-                var dialogVm = new OptionsDialogViewModel(session);
+                var dialogVm = new OptionsDialogViewModel();
                 var hooks = OptionsDialogHooks;
                 bool? accepted;
                 if (hooks?.Show is not null)
@@ -330,8 +330,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                 return;
             }
 
-            var session = viewModel.Session;
-            if (session is null)
+            if (!viewModel.PersistSession)
             {
                 return;
             }
@@ -339,7 +338,6 @@ namespace Mfr.App.Ui.Views.MainWindow
             UiSessionPersistence.SaveOnClose(
                 this,
                 GetPaneGrids(),
-                session,
                 viewModel.FileListViewModel.CaptureSession(),
                 viewModel.RenameListViewModel.CaptureSession()
             );

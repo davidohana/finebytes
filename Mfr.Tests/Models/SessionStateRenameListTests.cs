@@ -16,25 +16,22 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Session = new SessionState
+                ConfigStore.RenameList = new SessionStateRenameList
                 {
-                    RenameList = new SessionStateRenameList
-                    {
-                        SortFields = [new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true)],
-                    },
+                    SortFields = [new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true)],
                 };
                 ConfigStore.Save(path);
 
                 ConfigStore.Load(path);
                 Assert.Equal(
                     [new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true)],
-                    ConfigStore.Session.RenameList?.SortFields
+                    ConfigStore.RenameList?.SortFields
                 );
 
-                ConfigStore.Session = new SessionState { RenameList = new SessionStateRenameList { SortFields = [] } };
+                ConfigStore.RenameList = new SessionStateRenameList { SortFields = [] };
                 ConfigStore.Save(path);
                 ConfigStore.Load(path);
-                Assert.Empty(ConfigStore.Session.RenameList.SortFields);
+                Assert.Empty(ConfigStore.RenameList.SortFields);
             }
             finally
             {
@@ -64,23 +61,19 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Session = new SessionState
-                {
-                    RenameList = new SessionStateRenameList { VisibleColumns = sessionColumns },
-                };
+                ConfigStore.RenameList = new SessionStateRenameList { VisibleColumns = sessionColumns };
                 ConfigStore.Save(path);
 
                 ConfigStore.Load(path);
-                var loaded = ConfigStore.Session;
-                Assert.NotNull(loaded.RenameList?.VisibleColumns);
-                Assert.Equal(2, loaded.RenameList.VisibleColumns.Count);
+                Assert.NotNull(ConfigStore.RenameList?.VisibleColumns);
+                Assert.Equal(2, ConfigStore.RenameList.VisibleColumns.Count);
                 Assert.Equal(
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath),
-                    loaded.RenameList.VisibleColumns[0].Key
+                    ConfigStore.RenameList.VisibleColumns[0].Key
                 );
-                Assert.Equal(220, loaded.RenameList.VisibleColumns[0].Width);
-                Assert.Equal(previewKey, loaded.RenameList.VisibleColumns[1].Key);
-                Assert.Null(loaded.RenameList.VisibleColumns[1].Width);
+                Assert.Equal(220, ConfigStore.RenameList.VisibleColumns[0].Width);
+                Assert.Equal(previewKey, ConfigStore.RenameList.VisibleColumns[1].Key);
+                Assert.Null(ConfigStore.RenameList.VisibleColumns[1].Width);
             }
             finally
             {

@@ -21,7 +21,7 @@ namespace Mfr.App.Ui
             {
                 ConfigStore.Load();
                 ConfigStore.EnsureDefaultFile();
-                LogSession.Start(logLevel: LogEventLevel.Information, logConfig: ConfigStore.Config.Log);
+                LogSession.Start(logLevel: LogEventLevel.Information, logConfig: ConfigStore.Log);
                 return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
             }
             catch (Exception ex)

@@ -10,7 +10,6 @@ namespace Mfr.Tests.Models
     public sealed class MfrConfigBindingTests
     {
         [Theory]
-        [InlineData(typeof(MfrConfig))]
         [InlineData(typeof(LogConfig))]
         [InlineData(typeof(UiConfig))]
         public void Every_public_instance_field_participates_in_config_binding(Type configType)
@@ -39,44 +38,53 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies <c>ui.confirmationPrompts</c> and <c>ui.doubleClickAddsToRenameList</c> bind from JSON strings.
+        /// Verifies <c>ui.confirmationPrompts</c> binds from a JSON string leaf.
         /// </summary>
         [Fact]
-        public void Ui_confirmation_leaves_bind_from_json_strings()
+        public void Ui_confirmation_leaf_binds_from_json_string()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """
                 {
                   "ui": {
-                    "confirmationPrompts": "more",
-                    "doubleClickAddsToRenameList": "true"
+                    "confirmationPrompts": "more"
                   }
                 }
                 """
             );
-            var config = new MfrConfig();
-            Assert.Equal(ConfirmationPrompts.Normal, config.Ui.ConfirmationPrompts);
-            Assert.False(config.Ui.DoubleClickAddsToRenameList);
+            var ui = new UiConfig();
+            Assert.Equal(ConfirmationPrompts.Normal, ui.ConfirmationPrompts);
 
-            ConfigJsonApplier.Apply(doc.RootElement, config);
+            var root = new PrefsRootForTest { Ui = ui };
+            ConfigJsonApplier.Apply(doc.RootElement, root);
 
-            Assert.Equal(ConfirmationPrompts.More, config.Ui.ConfirmationPrompts);
-            Assert.True(config.Ui.DoubleClickAddsToRenameList);
+            Assert.Equal(ConfirmationPrompts.More, ui.ConfirmationPrompts);
         }
 
         /// <summary>
         /// Verifies omitted <c>ui</c> leaves stay at their defaults.
         /// </summary>
         [Fact]
-        public void Ui_confirmation_leaves_default_when_omitted()
+        public void Ui_confirmation_leaf_defaults_when_omitted()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """{"log":{"maxSessionFiles":"100"}}"""
             );
-            var config = new MfrConfig();
-            ConfigJsonApplier.Apply(doc.RootElement, config);
-            Assert.Equal(ConfirmationPrompts.Normal, config.Ui.ConfirmationPrompts);
-            Assert.False(config.Ui.DoubleClickAddsToRenameList);
+            var root = new PrefsRootForTest();
+            ConfigJsonApplier.Apply(doc.RootElement, root);
+            Assert.Equal(ConfirmationPrompts.Normal, root.Ui.ConfirmationPrompts);
+        }
+
+        /// <summary>
+        /// Minimal prefs root mirroring <see cref="ConfigStore"/> private binder shape for applier tests.
+        /// </summary>
+        private sealed class PrefsRootForTest
+        {
+            [ConfigSection]
+            public LogConfig Log = new();
+
+            [ConfigSection]
+            public UiConfig Ui = new();
         }
     }
 }

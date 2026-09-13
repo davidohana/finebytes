@@ -13,28 +13,24 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Session = new SessionState
+                ConfigStore.MainWindow = new SessionStateMainWindow { RememberWindowState = false };
+                ConfigStore.FileList = new SessionStateFileList { RememberLastFolder = false };
+                ConfigStore.RenameList = new SessionStateRenameList
                 {
-                    MainWindow = new SessionStateMainWindow { RememberWindowState = false },
-                    FileList = new SessionStateFileList { RememberLastFolder = false },
-                    RenameList = new SessionStateRenameList
-                    {
-                        AddMode = RenameListAddMode.Folders,
-                        AddFolderContents = false,
-                        UseFixedWidthFont = true,
-                        PreviewEnabled = false,
-                    },
+                    AddMode = RenameListAddMode.Folders,
+                    AddFolderContents = false,
+                    UseFixedWidthFont = true,
+                    PreviewEnabled = false,
                 };
                 ConfigStore.Save(path);
                 ConfigStore.Load(path);
 
-                var loaded = ConfigStore.Session;
-                Assert.False(loaded.MainWindow?.RememberWindowState);
-                Assert.False(loaded.FileList?.RememberLastFolder);
-                Assert.Equal(RenameListAddMode.Folders, loaded.RenameList?.AddMode);
-                Assert.False(loaded.RenameList?.AddFolderContents);
-                Assert.True(loaded.RenameList?.UseFixedWidthFont);
-                Assert.False(loaded.RenameList?.PreviewEnabled);
+                Assert.False(ConfigStore.MainWindow?.RememberWindowState);
+                Assert.False(ConfigStore.FileList?.RememberLastFolder);
+                Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList?.AddMode);
+                Assert.False(ConfigStore.RenameList?.AddFolderContents);
+                Assert.True(ConfigStore.RenameList?.UseFixedWidthFont);
+                Assert.False(ConfigStore.RenameList?.PreviewEnabled);
             }
             finally
             {
@@ -52,13 +48,11 @@ namespace Mfr.Tests.Models
                 // lang=json,strict
                 """
                 {
-                  "session": {
-                    "renameList": {
-                      "addMode": "filesAndFolders",
-                      "addFolderContents": false,
-                      "useFixedWidthFont": true,
-                      "previewEnabled": false
-                    }
+                  "renameList": {
+                    "addMode": "filesAndFolders",
+                    "addFolderContents": false,
+                    "useFixedWidthFont": true,
+                    "previewEnabled": false
                   }
                 }
                 """
@@ -67,11 +61,10 @@ namespace Mfr.Tests.Models
             {
                 ConfigStore.Load(path);
 
-                var session = ConfigStore.Session;
-                Assert.Equal(RenameListAddMode.FilesAndFolders, session.RenameList?.AddMode);
-                Assert.False(session.RenameList?.AddFolderContents);
-                Assert.True(session.RenameList?.UseFixedWidthFont);
-                Assert.False(session.RenameList?.PreviewEnabled);
+                Assert.Equal(RenameListAddMode.FilesAndFolders, ConfigStore.RenameList?.AddMode);
+                Assert.False(ConfigStore.RenameList?.AddFolderContents);
+                Assert.True(ConfigStore.RenameList?.UseFixedWidthFont);
+                Assert.False(ConfigStore.RenameList?.PreviewEnabled);
             }
             finally
             {
@@ -87,14 +80,13 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Session = new SessionState();
-                ConfigStore.Session.EnsureRenameList().AddMode = RenameListAddMode.Folders;
-                ConfigStore.Session.EnsureRenameList().UseFixedWidthFont = true;
+                ConfigStore.EnsureRenameList().AddMode = RenameListAddMode.Folders;
+                ConfigStore.EnsureRenameList().UseFixedWidthFont = true;
                 ConfigStore.TrySave(path);
 
                 ConfigStore.Load(path);
-                Assert.Equal(RenameListAddMode.Folders, ConfigStore.Session.RenameList?.AddMode);
-                Assert.True(ConfigStore.Session.RenameList?.UseFixedWidthFont);
+                Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList?.AddMode);
+                Assert.True(ConfigStore.RenameList?.UseFixedWidthFont);
             }
             finally
             {

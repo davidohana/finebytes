@@ -9,8 +9,14 @@ namespace Mfr.Tests.Ui.FilterEditors
     /// <summary>
     /// Unit tests for <see cref="FilterEditorViewModel"/> host selection/title behavior.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class FilterEditorViewModelTests
     {
+        public FilterEditorViewModelTests()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+        }
+
         /// <summary>
         /// Verifies an empty Applied selection clears the configuration title.
         /// </summary>
@@ -62,33 +68,31 @@ namespace Mfr.Tests.Ui.FilterEditors
         [Fact]
         public void ApplySession_restores_format_token_picker_expanded()
         {
-            var session = new SessionState
-            {
-                FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
-            };
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false };
             var editor = new FilterEditorViewModel();
 
-            editor.ApplySession(session);
+            editor.ApplySession(persistSession: true);
 
             Assert.False(editor.FormatTokenPickerExpanded);
         }
 
         /// <summary>
-        /// Verifies toggling the shared chrome writes through to the attached session document.
+        /// Verifies toggling the shared chrome writes through to <see cref="ConfigStore.FilterEditor"/>.
         /// </summary>
         [Fact]
         public void FormatTokenPickerExpanded_writes_through_to_session()
         {
-            var session = new SessionState();
+            ConfigStoreTestReset.LoadEmpty();
             var editor = new FilterEditorViewModel();
-            editor.ApplySession(session);
+            editor.ApplySession(persistSession: true);
 
-            Assert.Null(session.FilterEditor);
+            Assert.Null(ConfigStore.FilterEditor);
 
             editor.FormatTokenPickerExpanded = false;
 
-            Assert.NotNull(session.FilterEditor);
-            Assert.False(session.FilterEditor.FormatTokenPickerExpanded);
+            Assert.NotNull(ConfigStore.FilterEditor);
+            Assert.False(ConfigStore.FilterEditor.FormatTokenPickerExpanded);
         }
 
         /// <summary>
@@ -112,16 +116,16 @@ namespace Mfr.Tests.Ui.FilterEditors
         [Fact]
         public void OptionsEditor_format_token_picker_expanded_updates_pane_and_session()
         {
-            var session = new SessionState();
+            ConfigStoreTestReset.LoadEmpty();
             var editor = new FilterEditorViewModel();
-            editor.ApplySession(session);
+            editor.ApplySession(persistSession: true);
             var step = new AppliedFilterStepViewModel("Formatter", new FormatterFilter());
             editor.SyncSelection([step]);
 
             editor.OptionsEditor!.FormatTokenPickerExpanded = false;
 
             Assert.False(editor.FormatTokenPickerExpanded);
-            Assert.False(session.FilterEditor!.FormatTokenPickerExpanded);
+            Assert.False(ConfigStore.FilterEditor!.FormatTokenPickerExpanded);
         }
     }
 }

@@ -16,8 +16,8 @@ namespace Mfr.Tests.Ui.FilterEditors
         /// <summary>
         /// Shows Applied Filters above Filter Configuration for headless editor tests.
         /// </summary>
-        /// <param name="session">
-        /// Session restored onto the main view model, or <see langword="null"/> for first-launch defaults.
+        /// <param name="persistSession">
+        /// When <see langword="true"/>, restore Filter Configuration chrome from <see cref="ConfigStore"/>.
         /// </param>
         /// <param name="filterDefaults">
         /// Optional per-type add defaults store (isolated temp store when null).
@@ -27,9 +27,9 @@ namespace Mfr.Tests.Ui.FilterEditors
             Window Window,
             MainWindowViewModel MainViewModel,
             FilterEditorView EditorView
-        ) ShowFilterEditorPanes(SessionState? session = null, FilterDefaultsStore? filterDefaults = null)
+        ) ShowFilterEditorPanes(bool persistSession = false, FilterDefaultsStore? filterDefaults = null)
         {
-            var mainViewModel = new MainWindowViewModel(session: session, filterDefaults: filterDefaults);
+            var mainViewModel = new MainWindowViewModel(persistSession: persistSession, filterDefaults: filterDefaults);
             var appliedView = new AppliedFiltersView
             {
                 DataContext = mainViewModel.AppliedFiltersViewModel,

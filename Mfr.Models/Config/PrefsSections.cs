@@ -5,8 +5,7 @@ namespace Mfr.Models.Config
     /// <summary>
     /// UI prefs from the Options dialog, loaded from the <c>ui</c> section of the config file.
     /// <para>
-    /// <see cref="ConfirmationPrompts"/> gates optional confirms via <see cref="ConfirmationPolicy"/>;
-    /// <see cref="DoubleClickAddsToRenameList"/> selects File List double-click open vs add.
+    /// <see cref="ConfirmationPrompts"/> gates optional confirms via <see cref="ConfirmationPolicy"/>.
     /// </para>
     /// </summary>
     public sealed class UiConfig
@@ -19,12 +18,6 @@ namespace Mfr.Models.Config
         /// </para>
         /// </summary>
         public ConfirmationPrompts ConfirmationPrompts = ConfirmationPrompts.Normal;
-
-        /// <summary>
-        /// When <see langword="true"/>, double-click in the File List adds the selection to the Rename List.
-        /// <para>Default <see langword="false"/> (open / navigate instead). Options dialog + <c>ui.doubleClickAddsToRenameList</c>.</para>
-        /// </summary>
-        public bool DoubleClickAddsToRenameList;
     }
 
     /// <summary>
@@ -72,24 +65,5 @@ namespace Mfr.Models.Config
         [ConfigStringMaxLength(4096)]
         public string FileOutputTemplate =
             "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
-    }
-
-    /// <summary>
-    /// Resolved config for the current process (see <see cref="ConfigStore.Config"/>).
-    /// </summary>
-    public sealed class MfrConfig
-    {
-        /// <summary>
-        /// Diagnostic session-log options (CLI file/console and UI file).
-        /// </summary>
-        [ConfigSection]
-        public LogConfig Log = new();
-
-        /// <summary>
-        /// UI options persisted by the Options dialog (<c>ui.confirmationPrompts</c>,
-        /// <c>ui.doubleClickAddsToRenameList</c>) plus hand-edit <c>config.json</c> / CLI <c>--set</c>.
-        /// </summary>
-        [ConfigSection]
-        public UiConfig Ui = new();
     }
 }

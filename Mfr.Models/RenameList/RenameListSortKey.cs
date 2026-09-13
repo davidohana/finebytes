@@ -6,7 +6,7 @@ namespace Mfr.Models.RenameList
     /// <summary>
     /// One Auto-Sort key: original catalog field plus ascending/descending.
     /// <para>
-    /// Also the <c>config.json</c> <c>session.sortFields</c> element shape (<c>key</c> / <c>descending</c>).
+    /// Also the <c>config.json</c> <c>renameList.sortFields</c> element shape (<c>key</c> / <c>descending</c>).
     /// </para>
     /// </summary>
     /// <param name="FieldKey">Original field key to compare.</param>

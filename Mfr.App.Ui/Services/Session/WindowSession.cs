@@ -6,7 +6,7 @@ using Mfr.Models.Config;
 namespace Mfr.App.Ui.Services.Session
 {
     /// <summary>
-    /// Applies and captures main-window geometry for <see cref="SessionState"/> / <see cref="ConfigStore.Session"/>.
+    /// Applies and captures main-window geometry for <see cref="ConfigStore.MainWindow"/>.
     /// </summary>
     internal static class WindowSession
     {

@@ -6,7 +6,7 @@ using Mfr.Tests.Ui.RenameList;
 namespace Mfr.Tests.Models
 {
     /// <summary>
-    /// Tests for <see cref="ConfigStore"/> session / filterDefaults sections and soft-load dialect.
+    /// Tests for <see cref="ConfigStore"/> session sections / filterDefaults and soft-load dialect.
     /// </summary>
     [Collection(ConfigStoreCollection.Name)]
     public sealed class ConfigStorePrefsTests
@@ -19,10 +19,10 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStore.Load(path);
-                Assert.Null(ConfigStore.Session.MainWindow);
-                Assert.Null(ConfigStore.Session.FileList);
-                Assert.Null(ConfigStore.Session.RenameList);
-                Assert.Null(ConfigStore.Session.FilterEditor);
+                Assert.Null(ConfigStore.MainWindow);
+                Assert.Null(ConfigStore.FileList);
+                Assert.Null(ConfigStore.RenameList);
+                Assert.Null(ConfigStore.FilterEditor);
                 Assert.Empty(ConfigStore.FilterDefaultsJson);
             }
             finally
@@ -40,8 +40,8 @@ namespace Mfr.Tests.Models
             {
                 File.WriteAllText(path, "{ not-json");
                 ConfigStore.Load(path);
-                Assert.Null(ConfigStore.Session.MainWindow);
-                Assert.Equal(ConfirmationPrompts.Normal, ConfigStore.Config.Ui.ConfirmationPrompts);
+                Assert.Null(ConfigStore.MainWindow);
+                Assert.Equal(ConfirmationPrompts.Normal, ConfigStore.Ui.ConfirmationPrompts);
                 Assert.Empty(ConfigStore.FilterDefaultsJson);
             }
             finally
@@ -58,100 +58,99 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Session = new SessionState
+                ConfigStore.MainWindow = new SessionStateMainWindow
                 {
-                    MainWindow = new SessionStateMainWindow
+                    X = 12,
+                    Y = 34,
+                    Width = 1100,
+                    Height = 720,
+                    State = "Maximized",
+                    Splitters = new SessionStateSplitters
                     {
-                        X = 12,
-                        Y = 34,
-                        Width = 1100,
-                        Height = 720,
-                        State = "Maximized",
-                        Splitters = new SessionStateSplitters
-                        {
-                            FileList = 0.35,
-                            AvailableApplied = 0.45,
-                            FilterLists = 0.55,
-                            TopPanes = 0.65,
-                        },
+                        FileList = 0.35,
+                        AvailableApplied = 0.45,
+                        FilterLists = 0.55,
+                        TopPanes = 0.65,
                     },
-                    FileList = new SessionStateFileList
-                    {
-                        LastOpenedDirectory = Path.Combine(Path.GetTempPath(), "music"),
-                        FileMask = "*.mp3",
-                        ExcludeMasks = ["*.wav", "*.ogg"],
-                        ExcludeMasksEnabled = true,
-                        MaskSuggestions = ["*.mp3", "*.flac"],
-                        ViewMode = FileListViewMode.List,
-                        ThumbnailSize = 128,
-                    },
-                    RenameList = new SessionStateRenameList
-                    {
-                        SortFields = [new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true)],
-                        VisibleColumns =
-                        [
-                            new RenameListVisibleColumnSpec(
-                                RenameListFieldKey.Original(
-                                    BasicRenameListField.Group,
-                                    BasicRenameListFields.Key.FullPath
-                                ),
-                                Width: 220
-                            ),
-                            new RenameListVisibleColumnSpec(
-                                RenameListFieldKey.Preview(
-                                    BasicRenameListField.Group,
-                                    BasicRenameListFields.Key.FullName
-                                )
-                            ),
-                        ],
-                    },
-                    FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
                 };
+                ConfigStore.FileList = new SessionStateFileList
+                {
+                    LastOpenedDirectory = Path.Combine(Path.GetTempPath(), "music"),
+                    FileMask = "*.mp3",
+                    ExcludeMasks = ["*.wav", "*.ogg"],
+                    ExcludeMasksEnabled = true,
+                    MaskSuggestions = ["*.mp3", "*.flac"],
+                    ViewMode = FileListViewMode.List,
+                    ThumbnailSize = 128,
+                    DoubleClickAddsToRenameList = true,
+                };
+                ConfigStore.RenameList = new SessionStateRenameList
+                {
+                    SortFields = [new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true)],
+                    VisibleColumns =
+                    [
+                        new RenameListVisibleColumnSpec(
+                            RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath),
+                            Width: 220
+                        ),
+                        new RenameListVisibleColumnSpec(
+                            RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                        ),
+                    ],
+                };
+                ConfigStore.FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false };
 
                 ConfigStore.Save(path);
                 ConfigStore.Load(path);
 
-                var loaded = ConfigStore.Session;
-                Assert.NotNull(loaded.MainWindow);
-                Assert.Equal(12, loaded.MainWindow.X);
-                Assert.Equal(34, loaded.MainWindow.Y);
-                Assert.Equal(1100, loaded.MainWindow.Width);
-                Assert.Equal(720, loaded.MainWindow.Height);
-                Assert.Equal("Maximized", loaded.MainWindow.State);
-                Assert.NotNull(loaded.MainWindow.Splitters);
-                Assert.Equal(0.35, loaded.MainWindow.Splitters.FileList);
-                Assert.Equal(0.45, loaded.MainWindow.Splitters.AvailableApplied);
-                Assert.Equal(0.55, loaded.MainWindow.Splitters.FilterLists);
-                Assert.Equal(0.65, loaded.MainWindow.Splitters.TopPanes);
-                Assert.NotNull(loaded.FileList);
-                Assert.Equal(Path.Combine(Path.GetTempPath(), "music"), loaded.FileList.LastOpenedDirectory);
-                Assert.Equal("*.mp3", loaded.FileList.FileMask);
-                Assert.Equal(["*.wav", "*.ogg"], loaded.FileList.ExcludeMasks);
-                Assert.True(loaded.FileList.ExcludeMasksEnabled);
-                Assert.Equal(2, loaded.FileList.MaskSuggestions?.Count);
-                Assert.Contains("*.mp3", loaded.FileList.MaskSuggestions!);
-                Assert.Contains("*.flac", loaded.FileList.MaskSuggestions!);
-                Assert.Equal(FileListViewMode.List, loaded.FileList.ViewMode);
-                Assert.Equal(128, loaded.FileList.ThumbnailSize);
-                Assert.NotNull(loaded.RenameList);
-                Assert.NotNull(loaded.RenameList.SortFields);
-                Assert.Single(loaded.RenameList.SortFields);
-                Assert.Equal(RenameListTestHelpers.FullFileNameKey, loaded.RenameList.SortFields[0].FieldKey);
-                Assert.True(loaded.RenameList.SortFields[0].Descending);
-                Assert.NotNull(loaded.RenameList.VisibleColumns);
-                Assert.Equal(2, loaded.RenameList.VisibleColumns.Count);
+                Assert.NotNull(ConfigStore.MainWindow);
+                Assert.Equal(12, ConfigStore.MainWindow.X);
+                Assert.Equal(34, ConfigStore.MainWindow.Y);
+                Assert.Equal(1100, ConfigStore.MainWindow.Width);
+                Assert.Equal(720, ConfigStore.MainWindow.Height);
+                Assert.Equal("Maximized", ConfigStore.MainWindow.State);
+                Assert.NotNull(ConfigStore.MainWindow.Splitters);
+                Assert.Equal(0.35, ConfigStore.MainWindow.Splitters.FileList);
+                Assert.Equal(0.45, ConfigStore.MainWindow.Splitters.AvailableApplied);
+                Assert.Equal(0.55, ConfigStore.MainWindow.Splitters.FilterLists);
+                Assert.Equal(0.65, ConfigStore.MainWindow.Splitters.TopPanes);
+                Assert.NotNull(ConfigStore.FileList);
+                Assert.Equal(Path.Combine(Path.GetTempPath(), "music"), ConfigStore.FileList.LastOpenedDirectory);
+                Assert.Equal("*.mp3", ConfigStore.FileList.FileMask);
+                Assert.Equal(["*.wav", "*.ogg"], ConfigStore.FileList.ExcludeMasks);
+                Assert.True(ConfigStore.FileList.ExcludeMasksEnabled);
+                Assert.Equal(2, ConfigStore.FileList.MaskSuggestions?.Count);
+                Assert.Contains("*.mp3", ConfigStore.FileList.MaskSuggestions!);
+                Assert.Contains("*.flac", ConfigStore.FileList.MaskSuggestions!);
+                Assert.Equal(FileListViewMode.List, ConfigStore.FileList.ViewMode);
+                Assert.Equal(128, ConfigStore.FileList.ThumbnailSize);
+                Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
+                Assert.NotNull(ConfigStore.RenameList);
+                Assert.NotNull(ConfigStore.RenameList.SortFields);
+                Assert.Single(ConfigStore.RenameList.SortFields);
+                Assert.Equal(RenameListTestHelpers.FullFileNameKey, ConfigStore.RenameList.SortFields[0].FieldKey);
+                Assert.True(ConfigStore.RenameList.SortFields[0].Descending);
+                Assert.NotNull(ConfigStore.RenameList.VisibleColumns);
+                Assert.Equal(2, ConfigStore.RenameList.VisibleColumns.Count);
                 Assert.Equal(
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath),
-                    loaded.RenameList.VisibleColumns[0].Key
+                    ConfigStore.RenameList.VisibleColumns[0].Key
                 );
-                Assert.Equal(220, loaded.RenameList.VisibleColumns[0].Width);
+                Assert.Equal(220, ConfigStore.RenameList.VisibleColumns[0].Width);
                 Assert.Equal(
                     RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
-                    loaded.RenameList.VisibleColumns[1].Key
+                    ConfigStore.RenameList.VisibleColumns[1].Key
                 );
-                Assert.Null(loaded.RenameList.VisibleColumns[1].Width);
-                Assert.NotNull(loaded.FilterEditor);
-                Assert.False(loaded.FilterEditor.FormatTokenPickerExpanded);
+                Assert.Null(ConfigStore.RenameList.VisibleColumns[1].Width);
+                Assert.NotNull(ConfigStore.FilterEditor);
+                Assert.False(ConfigStore.FilterEditor.FormatTokenPickerExpanded);
+
+                using var doc = JsonDocument.Parse(File.ReadAllText(path));
+                Assert.False(doc.RootElement.TryGetProperty("session", out _));
+                Assert.True(doc.RootElement.TryGetProperty("mainWindow", out _));
+                Assert.True(doc.RootElement.TryGetProperty("fileList", out _));
+                Assert.True(doc.RootElement.TryGetProperty("renameList", out _));
+                Assert.True(doc.RootElement.TryGetProperty("filterEditor", out _));
             }
             finally
             {
@@ -171,8 +170,8 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
-                ConfigStore.Session = new SessionState { FileList = new SessionStateFileList { FileMask = "*.flac" } };
+                ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+                ConfigStore.FileList = new SessionStateFileList { FileMask = "*.flac" };
                 ConfigStore.Save(path);
 
                 var store = FilterDefaultsStore.CreateEmpty();
@@ -189,20 +188,14 @@ namespace Mfr.Tests.Models
                         "more",
                         doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString()
                     );
-                    Assert.Equal(
-                        "*.flac",
-                        doc.RootElement.GetProperty("session")
-                            .GetProperty("fileList")
-                            .GetProperty("fileMask")
-                            .GetString()
-                    );
+                    Assert.Equal("*.flac", doc.RootElement.GetProperty("fileList").GetProperty("fileMask").GetString());
                     Assert.True(doc.RootElement.GetProperty("filterDefaults").TryGetProperty("LettersCase", out _));
                     Assert.False(doc.RootElement.GetProperty("filterDefaults").TryGetProperty("defaults", out _));
                 }
 
                 ConfigStore.Load(path);
-                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
-                Assert.Equal("*.flac", ConfigStore.Session.FileList?.FileMask);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+                Assert.Equal("*.flac", ConfigStore.FileList?.FileMask);
                 var reloaded = FilterDefaultsStore.OpenDefault();
                 Assert.True(reloaded.TryGetDefault("LettersCase", out var filter));
                 Assert.Equal(LettersCaseMode.UpperCase, Assert.IsType<LettersCaseFilter>(filter).Options.Mode);
@@ -225,15 +218,15 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
-                ConfigStore.Session = new SessionState { MainWindow = new SessionStateMainWindow { Width = 900 } };
+                ConfigStore.FileList = new SessionStateFileList { DoubleClickAddsToRenameList = true };
+                ConfigStore.MainWindow = new SessionStateMainWindow { Width = 900 };
                 ConfigStore.Save(path);
 
                 FilterDefaultsStore.CreateEmpty().SetDefault(new LettersCaseFilter());
 
                 ConfigStore.Load(path);
-                Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
-                Assert.Equal(900, ConfigStore.Session.MainWindow?.Width);
+                Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
+                Assert.Equal(900, ConfigStore.MainWindow?.Width);
                 Assert.True(ConfigStore.FilterDefaultsJson.ContainsKey("LettersCase"));
             }
             finally
@@ -257,7 +250,7 @@ namespace Mfr.Tests.Models
                 {
                   "ui": {
                     "confirmationPrompts": "more",
-                    "doubleClickAddsToRenameList": "not-a-bool"
+                    "doubleClickAddsToRenameList": "true"
                   },
                   "log": {
                     "maxSessionFiles": "50"
@@ -268,9 +261,37 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStore.Load(path);
-                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
-                Assert.False(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
-                Assert.Equal(50, ConfigStore.Config.Log.MaxSessionFiles);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+                Assert.Null(ConfigStore.FileList);
+                Assert.Equal(50, ConfigStore.Log.MaxSessionFiles);
+            }
+            finally
+            {
+                File.Delete(path);
+                ConfigStoreTestReset.LoadEmpty();
+            }
+        }
+
+        [Fact]
+        public void Load_ignores_nested_session_object()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "mfr-legacy-session-" + Guid.NewGuid() + ".json");
+            File.WriteAllText(
+                path, /*lang=json,strict*/
+                """
+                {
+                  "session": {
+                    "fileList": {
+                      "fileMask": "*.legacy"
+                    }
+                  }
+                }
+                """
+            );
+            try
+            {
+                ConfigStore.Load(path);
+                Assert.Null(ConfigStore.FileList);
             }
             finally
             {

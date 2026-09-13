@@ -13,7 +13,7 @@ namespace Mfr.Tests.Cli
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
 
         /// <summary>
-        /// Resets <see cref="ConfigStore.Config"/> via <see cref="ConfigStore.Load()"/> before each test class instance.
+        /// Resets <see cref="ConfigStore"/> via <see cref="ConfigStore.Load()"/> before each test class instance.
         /// </summary>
         public CliLoggingTests()
         {
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Cli
         {
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
 
-            ConfigStore.Config.Log.DirectoryPath = logDirectoryPath;
+            ConfigStore.Log.DirectoryPath = logDirectoryPath;
 
             CliLogging.Start(LogEventLevel.Information);
 

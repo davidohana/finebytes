@@ -27,7 +27,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task Clear_More_accept_clears_list()
         {
-            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));
@@ -55,7 +55,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task Clear_More_decline_keeps_list()
         {
-            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task Clear_Normal_skips_confirm()
         {
-            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.Normal;
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Normal;
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));
@@ -101,7 +101,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task Clear_More_null_hook_aborts()
         {
-            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));
@@ -118,7 +118,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ClearWithoutConfirm_More_skips_hook()
         {
-            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));

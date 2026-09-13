@@ -30,7 +30,7 @@ namespace Mfr.Tests.Models
             bool expected
         )
         {
-            ConfigStore.Config.Ui.ConfirmationPrompts = level;
+            ConfigStore.Ui.ConfirmationPrompts = level;
             Assert.Equal(expected, ConfirmationPolicy.ShouldConfirm(kind));
         }
     }

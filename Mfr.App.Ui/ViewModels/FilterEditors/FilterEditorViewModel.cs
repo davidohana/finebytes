@@ -12,7 +12,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
     /// </summary>
     public sealed partial class FilterEditorViewModel : ViewModelBase
     {
-        private SessionState? _session;
+        private bool _persistSession;
         private Func<IReadOnlyList<RenameItem>>? _resolveSampleRenameItems;
         private Func<string, RenameItem?>? _resolveRenameItemByFullPath;
 
@@ -37,8 +37,8 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// <summary>
         /// Gets or sets whether the format-token picker catalog is expanded (shared across format editors).
         /// <para>
-        /// When a session document is attached, changes write through to
-        /// <see cref="SessionStateFilterEditor.FormatTokenPickerExpanded"/> (flushed on main-window close).
+        /// When session persistence is enabled, changes write through to
+        /// <see cref="ConfigStore.FilterEditor"/> (flushed on main-window close).
         /// </para>
         /// </summary>
         [ObservableProperty]
@@ -61,16 +61,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         }
 
         /// <summary>
-        /// Restores Filter Configuration chrome from <paramref name="session"/> and keeps a live write-through.
+        /// Restores Filter Configuration chrome from <see cref="ConfigStore.FilterEditor"/> when persisting.
         /// </summary>
-        /// <param name="session">
-        /// Loaded session document, or <see langword="null"/> for first-launch defaults and no persistence.
+        /// <param name="persistSession">
+        /// When <see langword="true"/>, restore from <see cref="ConfigStore"/> and write through on change.
+        /// When <see langword="false"/>, use first-launch defaults with no persistence.
         /// </param>
-        internal void ApplySession(SessionState? session)
+        internal void ApplySession(bool persistSession)
         {
-            _session = null;
-            FormatTokenPickerExpanded = session?.FilterEditor?.FormatTokenPickerExpanded ?? true;
-            _session = session;
+            _persistSession = false;
+            FormatTokenPickerExpanded =
+                !persistSession || (ConfigStore.FilterEditor?.FormatTokenPickerExpanded ?? true);
+            _persistSession = persistSession;
         }
 
         /// <summary>
@@ -102,9 +104,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
         partial void OnFormatTokenPickerExpandedChanged(bool value)
         {
-            if (_session is not null)
+            if (_persistSession)
             {
-                _session.EnsureFilterEditor().FormatTokenPickerExpanded = value;
+                ConfigStore.EnsureFilterEditor().FormatTokenPickerExpanded = value;
             }
 
             if (OptionsEditor is { } editor && editor.FormatTokenPickerExpanded != value)

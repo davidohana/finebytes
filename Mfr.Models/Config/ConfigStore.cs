@@ -8,14 +8,14 @@ namespace Mfr.Models.Config
 {
     /// <summary>
     /// Loads and saves process-wide preferences as a single <c>config.json</c>
-    /// (<c>log</c>/<c>ui</c> string leaves, <c>session</c>, and opaque <c>filterDefaults</c>).
+    /// (<c>log</c>/<c>ui</c> string leaves, UI session sections, and opaque <c>filterDefaults</c>).
     /// <para>Default file: <see cref="_DefaultConfigFilePath"/>.</para>
     /// </summary>
     /// <remarks>
     /// <para>
     /// Soft-load dialect for the whole prefs file: missing default AppData file → in-memory defaults.
-    /// Corrupt / unreadable → defaults (app continues). Missing keys → field initializers / empty
-    /// <see cref="Session"/> / empty <see cref="FilterDefaultsJson"/>. Invalid <c>log</c>/<c>ui</c>
+    /// Corrupt / unreadable → defaults (app continues). Missing keys → field initializers / null session
+    /// sections / empty <see cref="FilterDefaultsJson"/>. Invalid <c>log</c>/<c>ui</c>
     /// leaf → that leaf is skipped. Bad <c>filterDefaults</c> entries are skipped later by
     /// <c>FilterDefaultsStore</c> (Engine). Explicit <c>--config PATH</c> missing → hard-fail
     /// (CLI typo). Explicit path corrupt → soft to defaults. Opposite of hard-fail
@@ -23,16 +23,18 @@ namespace Mfr.Models.Config
     /// </para>
     /// <para>
     /// When the default AppData file is missing, <see cref="EnsureDefaultFile"/> writes one with current
-    /// defaults so the user can hand-edit log settings. Empty <c>session</c> / <c>filterDefaults</c> are
+    /// defaults so the user can hand-edit log settings. Empty session sections / <c>filterDefaults</c> are
     /// omitted (same as first launch). Options, session close-save, and filter-default pin all persist via
-    /// <see cref="Save"/> (whole document overwrite). Null session properties are omitted on write.
-    /// When a property is omitted, values still come from <see cref="MfrConfig"/> field initializers.
+    /// <see cref="Save"/> (whole document overwrite). Null session section properties are omitted on write.
+    /// When a property is omitted, values still come from <see cref="LogConfig"/> / <see cref="UiConfig"/>
+    /// field initializers.
     /// </para>
     /// <para>
     /// Document shape: root object with <c>log</c>/<c>ui</c> (string leaves via
-    /// <see cref="ConfigJsonApplier"/> / <see cref="ConfigJsonWriter"/>), <c>session</c>
-    /// (<see cref="SessionState"/> via STJ), and <c>filterDefaults</c> (opaque map of type → filter JSON;
-    /// not nested under <c>defaults</c>).
+    /// <see cref="ConfigJsonApplier"/> / <see cref="ConfigJsonWriter"/>), sibling session sections
+    /// (<c>mainWindow</c>, <c>fileList</c>, <c>renameList</c>, <c>filterEditor</c> via STJ), and
+    /// <c>filterDefaults</c> (opaque map of type → filter JSON; not nested under <c>defaults</c>).
+    /// Nested <c>session</c> is not read (no migration).
     /// </para>
     /// </remarks>
     public static class ConfigStore
@@ -47,22 +49,79 @@ namespace Mfr.Models.Config
         };
 
         private static string? s_ActiveConfigFilePath;
+        private static PrefsRoot s_Prefs = new();
 
         /// <summary>
-        /// Gets the active config for this process.
+        /// Gets the diagnostic session-log options for this process.
         /// </summary>
-        public static MfrConfig Config { get; private set; } = new();
+        public static LogConfig Log => s_Prefs.Log;
 
         /// <summary>
-        /// Gets or sets the active UI session document for this process.
+        /// Gets the UI options persisted by the Options dialog (<c>ui.confirmationPrompts</c>).
         /// </summary>
-        public static SessionState Session { get; set; } = new();
+        public static UiConfig Ui => s_Prefs.Ui;
+
+        /// <summary>
+        /// Gets or sets the last main-window geometry and pane splitters, when remembered.
+        /// </summary>
+        public static SessionStateMainWindow? MainWindow { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last File List folder, masks, view, and double-click behavior.
+        /// </summary>
+        public static SessionStateFileList? FileList { get; set; }
+
+        /// <summary>
+        /// Gets or sets the last Rename List Auto-Sort and related session fields.
+        /// </summary>
+        public static SessionStateRenameList? RenameList { get; set; }
+
+        /// <summary>
+        /// Gets or sets Filter Configuration chrome (e.g. format-token picker collapse).
+        /// </summary>
+        public static SessionStateFilterEditor? FilterEditor { get; set; }
 
         /// <summary>
         /// Gets or sets the opaque <c>filterDefaults</c> map (type discriminator → filter JSON object).
         /// <para>Empty when omitted or unset. Typed deserialization lives in Engine <c>FilterDefaultsStore</c>.</para>
         /// </summary>
         public static JsonObject FilterDefaultsJson { get; set; } = [];
+
+        /// <summary>
+        /// Returns <see cref="MainWindow"/>, creating it when missing.
+        /// </summary>
+        /// <returns>The main-window session object.</returns>
+        public static SessionStateMainWindow EnsureMainWindow()
+        {
+            return MainWindow ??= new SessionStateMainWindow();
+        }
+
+        /// <summary>
+        /// Returns <see cref="FileList"/>, creating it when missing.
+        /// </summary>
+        /// <returns>The File List session object.</returns>
+        public static SessionStateFileList EnsureFileList()
+        {
+            return FileList ??= new SessionStateFileList();
+        }
+
+        /// <summary>
+        /// Returns <see cref="RenameList"/>, creating it when missing.
+        /// </summary>
+        /// <returns>The Rename List session object.</returns>
+        public static SessionStateRenameList EnsureRenameList()
+        {
+            return RenameList ??= new SessionStateRenameList();
+        }
+
+        /// <summary>
+        /// Returns <see cref="FilterEditor"/>, creating it when missing.
+        /// </summary>
+        /// <returns>The Filter Configuration session object.</returns>
+        public static SessionStateFilterEditor EnsureFilterEditor()
+        {
+            return FilterEditor ??= new SessionStateFilterEditor();
+        }
 
         /// <summary>
         /// Default JSON config path (<see cref="AppDataPaths.RoamingRoot"/> + <c>config.json</c>).
@@ -126,8 +185,11 @@ namespace Mfr.Models.Config
                     return;
                 }
 
-                ConfigJsonApplier.ApplySoft(doc.RootElement, Config);
-                Session = _ReadSession(doc.RootElement);
+                ConfigJsonApplier.ApplySoft(doc.RootElement, s_Prefs);
+                MainWindow = _ReadSection<SessionStateMainWindow>(doc.RootElement, "mainWindow");
+                FileList = _ReadSection<SessionStateFileList>(doc.RootElement, "fileList");
+                RenameList = _ReadSection<SessionStateRenameList>(doc.RootElement, "renameList");
+                FilterEditor = _ReadSection<SessionStateFilterEditor>(doc.RootElement, "filterEditor");
                 FilterDefaultsJson = _ReadFilterDefaults(doc.RootElement);
             }
             catch
@@ -152,18 +214,20 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Clears in-memory <see cref="Session"/> and <see cref="FilterDefaultsJson"/> after Reset Configuration.
-        /// <para>Does not change <see cref="Config"/> or the active file path (app restarts after reset).</para>
+        /// Clears in-memory session sections and <see cref="FilterDefaultsJson"/> after Reset Configuration.
+        /// <para>Does not change <see cref="Log"/> / <see cref="Ui"/> or the active file path (app restarts after reset).</para>
         /// </summary>
         public static void ClearSessionAndFilterDefaults()
         {
-            Session = new SessionState();
+            MainWindow = null;
+            FileList = null;
+            RenameList = null;
+            FilterEditor = null;
             FilterDefaultsJson = [];
         }
 
         /// <summary>
-        /// Writes <see cref="Config"/>, <see cref="Session"/>, and <see cref="FilterDefaultsJson"/> to JSON,
-        /// creating the directory when needed.
+        /// Writes prefs and session sections to JSON, creating the directory when needed.
         /// <para>Always overwrites. Used by Options OK, session close-save, and filter-default pin.</para>
         /// </summary>
         /// <param name="configFilePath">
@@ -181,12 +245,11 @@ namespace Mfr.Models.Config
                 Directory.CreateDirectory(directory);
             }
 
-            var root = ConfigJsonWriter.Write(Config);
-            var sessionNode = JsonSerializer.SerializeToNode(Session, s_SessionJsonOptions);
-            if (sessionNode is JsonObject { Count: > 0 } sessionObject)
-            {
-                root["session"] = sessionObject;
-            }
+            var root = ConfigJsonWriter.Write(s_Prefs);
+            _WriteSection(root, "mainWindow", MainWindow);
+            _WriteSection(root, "fileList", FileList);
+            _WriteSection(root, "renameList", RenameList);
+            _WriteSection(root, "filterEditor", FilterEditor);
 
             if (FilterDefaultsJson is { Count: > 0 })
             {
@@ -219,7 +282,7 @@ namespace Mfr.Models.Config
         /// Writes defaults to JSON when the file is missing, so it can be hand-edited.
         /// <para>
         /// Existing files are left unchanged. Failures are swallowed so a missing AppData write does not
-        /// crash the app. Empty <c>session</c> / <c>filterDefaults</c> are omitted until first real save.
+        /// crash the app. Empty session sections / <c>filterDefaults</c> are omitted until first real save.
         /// </para>
         /// </summary>
         /// <param name="configFilePath">
@@ -244,7 +307,7 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Applies CLI <c>--set</c> overrides to <see cref="Config"/> (after <see cref="Load"/>).
+        /// Applies CLI <c>--set</c> overrides to <see cref="Log"/> / <see cref="Ui"/> (after <see cref="Load"/>).
         /// <para>Keys are dotted paths (e.g. <c>log.maxSessionFiles</c>) matching <c>config.json</c>.</para>
         /// </summary>
         /// <param name="assignments">Raw <c>key=value</c> strings from the CLI; blank entries are skipped.</param>
@@ -261,7 +324,7 @@ namespace Mfr.Models.Config
 
             try
             {
-                ConfigOverridesApplier.Apply(list, Config);
+                ConfigOverridesApplier.Apply(list, s_Prefs);
             }
             catch (Exception ex)
             {
@@ -274,8 +337,11 @@ namespace Mfr.Models.Config
         /// </summary>
         private static void _ResetToDefaults()
         {
-            Config = new MfrConfig();
-            Session = new SessionState();
+            s_Prefs = new PrefsRoot();
+            MainWindow = null;
+            FileList = null;
+            RenameList = null;
+            FilterEditor = null;
             FilterDefaultsJson = [];
         }
 
@@ -290,35 +356,59 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Reads the <c>session</c> object, or an empty session when missing or unreadable.
+        /// Reads a root session section, or <see langword="null"/> when missing or unreadable.
         /// </summary>
+        /// <typeparam name="T">Session section type.</typeparam>
         /// <param name="root">Document root object.</param>
-        /// <returns>Deserialized session, or a new empty session.</returns>
-        private static SessionState _ReadSession(JsonElement root)
+        /// <param name="propertyName">Root property name.</param>
+        /// <returns>Deserialized section, or <see langword="null"/>.</returns>
+        private static T? _ReadSection<T>(JsonElement root, string propertyName)
+            where T : class
         {
-            if (!_TryGetPropertyIgnoreCase(root, "session", out var sessionElement))
+            if (!_TryGetPropertyIgnoreCase(root, propertyName, out var sectionElement))
             {
-                return new SessionState();
+                return null;
             }
 
-            if (sessionElement.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
+            if (sectionElement.ValueKind is JsonValueKind.Null or JsonValueKind.Undefined)
             {
-                return new SessionState();
+                return null;
             }
 
-            if (sessionElement.ValueKind != JsonValueKind.Object)
+            if (sectionElement.ValueKind != JsonValueKind.Object)
             {
-                return new SessionState();
+                return null;
             }
 
             try
             {
-                return JsonSerializer.Deserialize<SessionState>(sessionElement.GetRawText(), s_SessionJsonOptions)
-                    ?? new SessionState();
+                return JsonSerializer.Deserialize<T>(sectionElement.GetRawText(), s_SessionJsonOptions);
             }
             catch
             {
-                return new SessionState();
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Writes a session section when non-null and non-empty after null-ignore serialization.
+        /// </summary>
+        /// <typeparam name="T">Session section type.</typeparam>
+        /// <param name="root">Document root object.</param>
+        /// <param name="propertyName">Root property name.</param>
+        /// <param name="section">Section to write, or <see langword="null"/> to omit.</param>
+        private static void _WriteSection<T>(JsonObject root, string propertyName, T? section)
+            where T : class
+        {
+            if (section is null)
+            {
+                return;
+            }
+
+            var sectionNode = JsonSerializer.SerializeToNode(section, s_SessionJsonOptions);
+            if (sectionNode is JsonObject { Count: > 0 } sectionObject)
+            {
+                root[propertyName] = sectionObject;
             }
         }
 
@@ -376,6 +466,24 @@ namespace Mfr.Models.Config
 
             value = default;
             return false;
+        }
+
+        /// <summary>
+        /// Private root for string-leaf <c>log</c>/<c>ui</c> binding via <see cref="ConfigJsonApplier"/>.
+        /// </summary>
+        private sealed class PrefsRoot
+        {
+            /// <summary>
+            /// Diagnostic session-log options.
+            /// </summary>
+            [ConfigSection]
+            public LogConfig Log = new();
+
+            /// <summary>
+            /// UI options (<c>confirmationPrompts</c>).
+            /// </summary>
+            [ConfigSection]
+            public UiConfig Ui = new();
         }
     }
 }

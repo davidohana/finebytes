@@ -30,7 +30,7 @@ namespace Mfr.Tests.Engine
             var presetsPath = dir.CombinePath("presets.json");
 
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.Session = new SessionState { FileList = new SessionStateFileList { FileMask = "*.mp3" } };
+            ConfigStore.FileList = new SessionStateFileList { FileMask = "*.mp3" };
             ConfigStore.FilterDefaultsJson = new JsonObject { ["LettersCase"] = new JsonObject() };
             ConfigStore.Save(configPath);
             File.WriteAllText(
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Engine
 
             Assert.False(File.Exists(configPath));
             Assert.True(File.Exists(presetsPath));
-            Assert.Null(ConfigStore.Session.FileList);
+            Assert.Null(ConfigStore.FileList);
             Assert.Empty(ConfigStore.FilterDefaultsJson);
         }
 
@@ -54,12 +54,12 @@ namespace Mfr.Tests.Engine
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.Session = new SessionState { FileList = new SessionStateFileList { FileMask = "*.wav" } };
+            ConfigStore.FileList = new SessionStateFileList { FileMask = "*.wav" };
             ConfigStore.FilterDefaultsJson = new JsonObject { ["LettersCase"] = new JsonObject() };
 
             PersistedConfigurationReset.Reset(dir.CombinePath("config.json"));
 
-            Assert.Null(ConfigStore.Session.FileList);
+            Assert.Null(ConfigStore.FileList);
             Assert.Empty(ConfigStore.FilterDefaultsJson);
         }
     }

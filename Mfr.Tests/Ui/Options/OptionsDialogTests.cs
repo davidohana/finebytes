@@ -30,7 +30,7 @@ namespace Mfr.Tests.Ui.Options
         [AvaloniaFact]
         public void ShowOptionsCommand_is_enabled()
         {
-            var viewModel = new MainWindowViewModel(session: new SessionState());
+            var viewModel = new MainWindowViewModel(persistSession: true);
             Assert.True(viewModel.ShowOptionsCommand.CanExecute(null));
             Assert.False(viewModel.UndoLastCommand.CanExecute(null));
             Assert.False(viewModel.ShowLogCommand.CanExecute(null));
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Ui.Options
         [AvaloniaFact]
         public void OptionsDialog_shows_remember_prompts_and_double_click()
         {
-            var dialogVm = new OptionsDialogViewModel(new SessionState());
+            var dialogVm = new OptionsDialogViewModel();
             var dialog = new OptionsDialog(dialogVm);
             dialog.Show();
             Dispatcher.UIThread.RunJobs();
@@ -104,7 +104,7 @@ namespace Mfr.Tests.Ui.Options
             owner.Show();
             Dispatcher.UIThread.RunJobs();
 
-            var dialog = new OptionsDialog(new OptionsDialogViewModel(new SessionState()));
+            var dialog = new OptionsDialog(new OptionsDialogViewModel());
             var resultTask = dialog.ShowDialog<bool?>(owner);
             Dispatcher.UIThread.RunJobs();
 
@@ -123,7 +123,7 @@ namespace Mfr.Tests.Ui.Options
             owner.Show();
             Dispatcher.UIThread.RunJobs();
 
-            var dialog = new OptionsDialog(new OptionsDialogViewModel(new SessionState()));
+            var dialog = new OptionsDialog(new OptionsDialogViewModel());
             var resultTask = dialog.ShowDialog<bool?>(owner);
             Dispatcher.UIThread.RunJobs();
 
@@ -138,18 +138,18 @@ namespace Mfr.Tests.Ui.Options
         [AvaloniaFact]
         public async Task ShowOptions_Ok_commits_and_saves_config()
         {
-            var session = new SessionState
+            ConfigStore.MainWindow = new SessionStateMainWindow { RememberWindowState = true };
+            ConfigStore.FileList = new SessionStateFileList
             {
-                MainWindow = new SessionStateMainWindow { RememberWindowState = true },
-                FileList = new SessionStateFileList { RememberLastFolder = true },
+                RememberLastFolder = true,
+                DoubleClickAddsToRenameList = false,
             };
-            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
-            ConfigStore.Config.Ui.DoubleClickAddsToRenameList = false;
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
 
             var saved = false;
             OptionsDialogViewModel? shown = null;
             var (viewModel, window) = _ShowMainWindow(
-                session,
+                persistSession: true,
                 new OptionsDialogHooks
                 {
                     Show = vm =>
@@ -169,10 +169,10 @@ namespace Mfr.Tests.Ui.Options
 
             Assert.NotNull(shown);
             Assert.True(saved);
-            Assert.False(session.FileList.RememberLastFolder);
-            Assert.False(session.MainWindow.RememberWindowState);
-            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
-            Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
+            Assert.False(ConfigStore.FileList.RememberLastFolder);
+            Assert.False(ConfigStore.MainWindow.RememberWindowState);
+            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
@@ -184,17 +184,17 @@ namespace Mfr.Tests.Ui.Options
         [AvaloniaFact]
         public async Task ShowOptions_Cancel_does_not_commit_or_save()
         {
-            var session = new SessionState
+            ConfigStore.MainWindow = new SessionStateMainWindow { RememberWindowState = true };
+            ConfigStore.FileList = new SessionStateFileList
             {
-                MainWindow = new SessionStateMainWindow { RememberWindowState = true },
-                FileList = new SessionStateFileList { RememberLastFolder = true },
+                RememberLastFolder = true,
+                DoubleClickAddsToRenameList = false,
             };
-            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
-            ConfigStore.Config.Ui.DoubleClickAddsToRenameList = false;
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
 
             var saved = false;
             var (viewModel, window) = _ShowMainWindow(
-                session,
+                persistSession: true,
                 new OptionsDialogHooks
                 {
                     Show = vm =>
@@ -211,24 +211,24 @@ namespace Mfr.Tests.Ui.Options
             await _InvokeShowOptionsAsync(viewModel);
 
             Assert.False(saved);
-            Assert.True(session.FileList.RememberLastFolder);
-            Assert.True(session.MainWindow.RememberWindowState);
-            Assert.Equal(ConfirmationPrompts.Fewer, ConfigStore.Config.Ui.ConfirmationPrompts);
-            Assert.False(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
+            Assert.True(ConfigStore.FileList.RememberLastFolder);
+            Assert.True(ConfigStore.MainWindow.RememberWindowState);
+            Assert.Equal(ConfirmationPrompts.Fewer, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.False(ConfigStore.FileList.DoubleClickAddsToRenameList);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
         }
 
         /// <summary>
-        /// Verifies Options is a no-op when the window has no live session.
+        /// Verifies Options is a no-op when the window does not persist session.
         /// </summary>
         [AvaloniaFact]
         public async Task ShowOptions_without_session_is_noop()
         {
             var shown = false;
             var (viewModel, window) = _ShowMainWindow(
-                session: null,
+                persistSession: false,
                 new OptionsDialogHooks
                 {
                     Show = _ =>
@@ -242,18 +242,18 @@ namespace Mfr.Tests.Ui.Options
             await _InvokeShowOptionsAsync(viewModel);
 
             Assert.False(shown);
-            Assert.Null(viewModel.Session);
+            Assert.False(viewModel.PersistSession);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
         }
 
         private static (MainWindowViewModel ViewModel, AppMainWindow Window) _ShowMainWindow(
-            SessionState? session,
+            bool persistSession,
             OptionsDialogHooks hooks
         )
         {
-            var viewModel = session is null ? new MainWindowViewModel() : new MainWindowViewModel(session: session);
+            var viewModel = new MainWindowViewModel(persistSession: persistSession);
             var window = new AppMainWindow
             {
                 DataContext = viewModel,

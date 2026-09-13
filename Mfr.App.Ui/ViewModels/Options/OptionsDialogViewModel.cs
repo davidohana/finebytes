@@ -8,23 +8,17 @@ namespace Mfr.App.Ui.ViewModels.Options
     /// </summary>
     public sealed partial class OptionsDialogViewModel : ViewModelBase
     {
-        private readonly SessionState _session;
-
         /// <summary>
-        /// Initializes the dialog from the live session and <see cref="ConfigStore.Config"/>.
+        /// Initializes the dialog from live <see cref="ConfigStore"/> sections.
         /// </summary>
-        /// <param name="session">Live session document whose remember flags are edited.</param>
-        public OptionsDialogViewModel(SessionState session)
+        public OptionsDialogViewModel()
         {
-            ArgumentNullException.ThrowIfNull(session);
-
-            _session = session;
-            var mainWindow = session.MainWindow ?? new SessionStateMainWindow();
-            var fileList = session.FileList ?? new SessionStateFileList();
+            var mainWindow = ConfigStore.MainWindow ?? new SessionStateMainWindow();
+            var fileList = ConfigStore.FileList ?? new SessionStateFileList();
             RememberLastFolder = fileList.RememberLastFolder;
             RememberWindowState = mainWindow.RememberWindowState;
-            ConfirmationPrompts = ConfigStore.Config.Ui.ConfirmationPrompts;
-            DoubleClickAddsToRenameList = ConfigStore.Config.Ui.DoubleClickAddsToRenameList;
+            ConfirmationPrompts = ConfigStore.Ui.ConfirmationPrompts;
+            DoubleClickAddsToRenameList = fileList.DoubleClickAddsToRenameList;
         }
 
         /// <summary>
@@ -52,16 +46,16 @@ namespace Mfr.App.Ui.ViewModels.Options
         private bool _doubleClickAddsToRenameList;
 
         /// <summary>
-        /// Writes draft values into the live session and <see cref="ConfigStore.Config"/>.
+        /// Writes draft values into live <see cref="ConfigStore"/> sections.
         /// <para>Does not write <c>config.json</c>; the host calls <see cref="ConfigStore.Save"/>
         /// (whole prefs document, including the mutated session flags).</para>
         /// </summary>
         public void Commit()
         {
-            _session.EnsureFileList().RememberLastFolder = RememberLastFolder;
-            _session.EnsureMainWindow().RememberWindowState = RememberWindowState;
-            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts;
-            ConfigStore.Config.Ui.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
+            ConfigStore.EnsureFileList().RememberLastFolder = RememberLastFolder;
+            ConfigStore.EnsureMainWindow().RememberWindowState = RememberWindowState;
+            ConfigStore.EnsureFileList().DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts;
         }
     }
 }

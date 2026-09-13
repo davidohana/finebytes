@@ -15,11 +15,7 @@ namespace Mfr.App.Cli
         /// <param name="logLevel">Minimum level for both sinks.</param>
         internal static void Start(LogEventLevel logLevel)
         {
-            LogSession.Start(
-                logLevel: logLevel,
-                logConfig: ConfigStore.Config.Log,
-                configureAdditionalSinks: _AddConsoleSink
-            );
+            LogSession.Start(logLevel: logLevel, logConfig: ConfigStore.Log, configureAdditionalSinks: _AddConsoleSink);
         }
 
         /// <summary>
@@ -43,13 +39,13 @@ namespace Mfr.App.Cli
         }
 
         /// <summary>
-        /// Adds the CLI console sink (errors to stderr) using <see cref="ConfigStore.Config"/>.
+        /// Adds the CLI console sink (errors to stderr) using <see cref="ConfigStore.Log"/>.
         /// </summary>
         /// <param name="configuration">Serilog configuration after the shared file sink is attached.</param>
         private static void _AddConsoleSink(LoggerConfiguration configuration)
         {
             configuration.WriteTo.Console(
-                outputTemplate: ConfigStore.Config.Log.ConsoleOutputTemplate,
+                outputTemplate: ConfigStore.Log.ConsoleOutputTemplate,
                 theme: AnsiConsoleTheme.Code,
                 standardErrorFromLevel: LogEventLevel.Error
             );

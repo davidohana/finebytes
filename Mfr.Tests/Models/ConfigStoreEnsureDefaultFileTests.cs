@@ -27,12 +27,11 @@ namespace Mfr.Tests.Models
                     "normal",
                     doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString()
                 );
-                Assert.Equal(
-                    "false",
-                    doc.RootElement.GetProperty("ui").GetProperty("doubleClickAddsToRenameList").GetString()
-                );
+                Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("doubleClickAddsToRenameList", out _));
                 Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("presets", out _));
                 Assert.False(doc.RootElement.TryGetProperty("session", out _));
+                Assert.False(doc.RootElement.TryGetProperty("mainWindow", out _));
+                Assert.False(doc.RootElement.TryGetProperty("fileList", out _));
                 Assert.False(doc.RootElement.TryGetProperty("filterDefaults", out _));
             }
             finally

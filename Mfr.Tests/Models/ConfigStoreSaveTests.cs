@@ -9,14 +9,14 @@ namespace Mfr.Tests.Models
     public sealed class ConfigStoreSaveTests
     {
         [Fact]
-        public void Save_round_trips_mutated_ui_leaves()
+        public void Save_round_trips_mutated_ui_and_file_list_leaves()
         {
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-save-config-" + Guid.NewGuid() + ".json");
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
-                ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
+                ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+                ConfigStore.FileList = new SessionStateFileList { DoubleClickAddsToRenameList = true };
                 ConfigStore.Save(configPath);
 
                 Assert.True(File.Exists(configPath));
@@ -26,16 +26,18 @@ namespace Mfr.Tests.Models
                         "more",
                         doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString()
                     );
-                    Assert.Equal(
-                        "true",
-                        doc.RootElement.GetProperty("ui").GetProperty("doubleClickAddsToRenameList").GetString()
+                    Assert.True(
+                        doc.RootElement.GetProperty("fileList").GetProperty("doubleClickAddsToRenameList").GetBoolean()
+                    );
+                    Assert.False(
+                        doc.RootElement.GetProperty("ui").TryGetProperty("doubleClickAddsToRenameList", out _)
                     );
                     Assert.False(doc.RootElement.TryGetProperty("filters", out _));
                 }
 
                 ConfigStore.Load(configPath);
-                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
-                Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+                Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
             }
             finally
             {
@@ -56,8 +58,10 @@ namespace Mfr.Tests.Models
                 """
                 {
                   "ui": {
-                    "confirmationPrompts": "fewer",
-                    "doubleClickAddsToRenameList": "false"
+                    "confirmationPrompts": "fewer"
+                  },
+                  "fileList": {
+                    "doubleClickAddsToRenameList": false
                   }
                 }
                 """
@@ -65,15 +69,14 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
-                ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
+                ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+                ConfigStore.FileList = new SessionStateFileList { DoubleClickAddsToRenameList = true };
                 ConfigStore.Save(configPath);
 
                 using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
                 Assert.Equal("more", doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString());
-                Assert.Equal(
-                    "true",
-                    doc.RootElement.GetProperty("ui").GetProperty("doubleClickAddsToRenameList").GetString()
+                Assert.True(
+                    doc.RootElement.GetProperty("fileList").GetProperty("doubleClickAddsToRenameList").GetBoolean()
                 );
             }
             finally
@@ -93,14 +96,14 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
-                ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
+                ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+                ConfigStore.FileList = new SessionStateFileList { DoubleClickAddsToRenameList = true };
                 ConfigStore.Save(configPath);
 
                 Assert.True(File.Exists(configPath));
                 ConfigStore.Load(configPath);
-                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
-                Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+                Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
             }
             finally
             {
@@ -127,7 +130,8 @@ namespace Mfr.Tests.Models
                     "presets": {
                       "confirmReplaceAppliedFiltersOnLoad": "true"
                     },
-                    "confirmationPrompts": "more"
+                    "confirmationPrompts": "more",
+                    "doubleClickAddsToRenameList": "true"
                   }
                 }
                 """
@@ -135,8 +139,8 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStore.Load(configPath);
-                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
-                Assert.False(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+                Assert.Null(ConfigStore.FileList);
             }
             finally
             {

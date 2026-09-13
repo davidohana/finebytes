@@ -147,7 +147,7 @@ namespace Mfr.Tests.Ui.MainWindow
         [AvaloniaFact]
         public async Task Go_preview_errors_fewer_skips_confirm_and_commits()
         {
-            ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
 
             var dir = _tempDirectoryFixture.CreateTempDir();
             var okSource = Path.Combine(dir, "alpha.txt");

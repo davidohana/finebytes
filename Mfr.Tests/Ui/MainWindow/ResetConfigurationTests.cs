@@ -20,7 +20,7 @@ namespace Mfr.Tests.Ui.MainWindow
             var deleted = false;
             var started = false;
             var shutdown = false;
-            var viewModel = new MainWindowViewModel(session: new SessionState());
+            var viewModel = new MainWindowViewModel(persistSession: true);
             var window = new AppMainWindow
             {
                 DataContext = viewModel,
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Ui.MainWindow
             var deleted = false;
             string? startedPath = null;
             var shutdown = false;
-            var viewModel = new MainWindowViewModel(session: new SessionState());
+            var viewModel = new MainWindowViewModel(persistSession: true);
             var window = new AppMainWindow
             {
                 DataContext = viewModel,
@@ -98,7 +98,7 @@ namespace Mfr.Tests.Ui.MainWindow
         [AvaloniaFact]
         public void SuppressSessionSaveOnClose_Allows_Close_Without_Throw()
         {
-            var viewModel = new MainWindowViewModel(session: new SessionState()) { SuppressSessionSaveOnClose = true };
+            var viewModel = new MainWindowViewModel(persistSession: true) { SuppressSessionSaveOnClose = true };
             var window = new AppMainWindow
             {
                 DataContext = viewModel,
@@ -122,7 +122,7 @@ namespace Mfr.Tests.Ui.MainWindow
             var confirmCalls = 0;
             var deleted = 0;
             var tcs = new TaskCompletionSource<bool>();
-            var viewModel = new MainWindowViewModel(session: new SessionState());
+            var viewModel = new MainWindowViewModel(persistSession: true);
             var window = new AppMainWindow
             {
                 DataContext = viewModel,

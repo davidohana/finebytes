@@ -4,80 +4,13 @@ using Mfr.Models.RenameList;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Persisted UI session state grouped by owning component.
-    /// <para>Stored as the <c>session</c> object inside AppData <c>config.json</c>.</para>
-    /// </summary>
-    public sealed class SessionState
-    {
-        /// <summary>
-        /// Last main-window geometry and pane splitters, when remembered.
-        /// </summary>
-        [JsonPropertyName("mainWindow")]
-        public SessionStateMainWindow? MainWindow { get; set; }
-
-        /// <summary>
-        /// Last File List folder, masks, and mask suggestions.
-        /// </summary>
-        [JsonPropertyName("fileList")]
-        public SessionStateFileList? FileList { get; set; }
-
-        /// <summary>
-        /// Last Rename List Auto-Sort and related session fields.
-        /// </summary>
-        [JsonPropertyName("renameList")]
-        public SessionStateRenameList? RenameList { get; set; }
-
-        /// <summary>
-        /// Filter Configuration chrome (e.g. format-token picker collapse).
-        /// </summary>
-        [JsonPropertyName("filterEditor")]
-        public SessionStateFilterEditor? FilterEditor { get; set; }
-
-        /// <summary>
-        /// Returns <see cref="MainWindow"/>, creating it when missing.
-        /// </summary>
-        /// <returns>The main-window session object.</returns>
-        public SessionStateMainWindow EnsureMainWindow()
-        {
-            return MainWindow ??= new SessionStateMainWindow();
-        }
-
-        /// <summary>
-        /// Returns <see cref="FileList"/>, creating it when missing.
-        /// </summary>
-        /// <returns>The File List session object.</returns>
-        public SessionStateFileList EnsureFileList()
-        {
-            return FileList ??= new SessionStateFileList();
-        }
-
-        /// <summary>
-        /// Returns <see cref="RenameList"/>, creating it when missing.
-        /// </summary>
-        /// <returns>The Rename List session object.</returns>
-        public SessionStateRenameList EnsureRenameList()
-        {
-            return RenameList ??= new SessionStateRenameList();
-        }
-
-        /// <summary>
-        /// Returns <see cref="FilterEditor"/>, creating it when missing.
-        /// </summary>
-        /// <returns>The Filter Configuration session object.</returns>
-        public SessionStateFilterEditor EnsureFilterEditor()
-        {
-            return FilterEditor ??= new SessionStateFilterEditor();
-        }
-    }
-
-    /// <summary>
     /// Saved Filter Configuration chrome shared across filter option editors.
     /// </summary>
     public sealed class SessionStateFilterEditor
     {
         /// <summary>
         /// When true, the format-token picker catalog is visible; when false, only the Edit/collapse rail.
-        /// <para>Missing session section defaults to expanded on first launch.</para>
+        /// <para>Missing section defaults to expanded on first launch.</para>
         /// </summary>
         [JsonPropertyName("formatTokenPickerExpanded")]
         public bool FormatTokenPickerExpanded { get; set; } = true;
@@ -135,7 +68,7 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Saved File List folder and mask fields.
+    /// Saved File List folder, masks, view, and double-click behavior.
     /// </summary>
     public sealed class SessionStateFileList
     {
@@ -188,6 +121,13 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("thumbnailSize")]
         public int? ThumbnailSize { get; set; }
+
+        /// <summary>
+        /// When <see langword="true"/>, double-click in the File List adds the selection to the Rename List.
+        /// <para>Default <see langword="false"/> (open / navigate instead). Options dialog + <c>fileList.doubleClickAddsToRenameList</c>.</para>
+        /// </summary>
+        [JsonPropertyName("doubleClickAddsToRenameList")]
+        public bool DoubleClickAddsToRenameList { get; set; }
     }
 
     /// <summary>

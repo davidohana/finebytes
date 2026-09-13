@@ -22,30 +22,30 @@ namespace Mfr.Tests.Models
         [Fact]
         public void ApplyCliOverrides_EmptyList_Does_Not_Change_Defaults()
         {
-            var expected = ConfigStore.Config.Log.MaxSessionFiles;
+            var expected = ConfigStore.Log.MaxSessionFiles;
             ConfigStore.ApplyCliOverrides([]);
-            Assert.Equal(expected, ConfigStore.Config.Log.MaxSessionFiles);
+            Assert.Equal(expected, ConfigStore.Log.MaxSessionFiles);
         }
 
         [Fact]
         public void ApplyCliOverrides_Sets_Log_DirectoryPath()
         {
             ConfigStore.ApplyCliOverrides([@"log.directoryPath=C:\Temp\mfr-logs"]);
-            Assert.Equal(@"C:\Temp\mfr-logs", ConfigStore.Config.Log.DirectoryPath);
+            Assert.Equal(@"C:\Temp\mfr-logs", ConfigStore.Log.DirectoryPath);
         }
 
         [Fact]
         public void ApplyCliOverrides_Sets_Log_Field()
         {
             ConfigStore.ApplyCliOverrides(["log.maxSessionFiles=77"]);
-            Assert.Equal(77, ConfigStore.Config.Log.MaxSessionFiles);
+            Assert.Equal(77, ConfigStore.Log.MaxSessionFiles);
         }
 
         [Fact]
         public void ApplyCliOverrides_Last_Duplicate_Key_Wins()
         {
             ConfigStore.ApplyCliOverrides(["log.maxSessionFiles=50", "log.maxSessionFiles=60"]);
-            Assert.Equal(60, ConfigStore.Config.Log.MaxSessionFiles);
+            Assert.Equal(60, ConfigStore.Log.MaxSessionFiles);
         }
 
         [Fact]

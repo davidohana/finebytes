@@ -27,21 +27,20 @@ namespace Mfr.App.Ui
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var session = ConfigStore.Session;
-                var fileList = session.FileList ?? new SessionStateFileList();
+                var fileList = ConfigStore.FileList ?? new SessionStateFileList();
                 var initialFolder = fileList.RememberLastFolder ? fileList.LastOpenedDirectory : null;
 
                 var mainWindow = new MainWindow
                 {
                     DataContext = new MainWindowViewModel(
                         initialFileListPath: initialFolder,
-                        session: session,
+                        persistSession: true,
                         filterDefaults: FilterDefaultsStore.OpenDefault(),
                         presetManager: PresetManager.OpenDefault()
                     ),
                 };
 
-                UiSessionPersistence.TryRestore(mainWindow, mainWindow.GetPaneGrids(), session);
+                UiSessionPersistence.TryRestore(mainWindow, mainWindow.GetPaneGrids());
 
                 desktop.MainWindow = mainWindow;
 #if DEBUG
