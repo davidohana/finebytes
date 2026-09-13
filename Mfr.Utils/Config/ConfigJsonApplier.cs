@@ -36,12 +36,58 @@ namespace Mfr.Utils.Config
             JsonNamingPolicy? jsonPropertyNamingPolicy = null
         )
         {
+            _Apply(configObject, target, jsonPropertyNamingPolicy, softLeafSkip: false);
+        }
+
+        /// <summary>
+        /// Binds <paramref name="configObject"/> onto <paramref name="target"/>, skipping leaves/sections that throw
+        /// <see cref="InvalidDataException"/> so one bad value does not abort the rest.
+        /// <para>
+        /// Programmer errors (<see cref="InvalidOperationException"/> for bad attributes/types) still throw.
+        /// Used by soft-load prefs; CLI <c>--set</c> and hard <see cref="Apply"/> stay strict.
+        /// </para>
+        /// </summary>
+        /// <param name="configObject">A JSON object (typically the document root).</param>
+        /// <param name="target">The object whose annotated fields are updated.</param>
+        /// <param name="jsonPropertyNamingPolicy">
+        /// Converts CLR field names to JSON property names. When <c>null</c>, <see cref="JsonNamingPolicy.CamelCase"/> is used.
+        /// </param>
+        /// <exception cref="ArgumentNullException"><paramref name="target"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">
+        /// A field has incompatible attributes or types, or more than one leaf attribute.
+        /// </exception>
+        public static void ApplySoft(
+            JsonElement configObject,
+            object target,
+            JsonNamingPolicy? jsonPropertyNamingPolicy = null
+        )
+        {
+            _Apply(configObject, target, jsonPropertyNamingPolicy, softLeafSkip: true);
+        }
+
+        /// <summary>
+        /// Shared apply loop for hard and soft dialects.
+        /// </summary>
+        private static void _Apply(
+            JsonElement configObject,
+            object target,
+            JsonNamingPolicy? jsonPropertyNamingPolicy,
+            bool softLeafSkip
+        )
+        {
             ArgumentNullException.ThrowIfNull(target);
 
             var naming = ConfigFieldBindings.ResolveNaming(jsonPropertyNamingPolicy);
             foreach (var binding in ConfigFieldBindings.Enumerate(target.GetType(), naming))
             {
-                _ApplyBinding(configObject, target, binding, naming);
+                try
+                {
+                    _ApplyBinding(configObject, target, binding, naming, softLeafSkip);
+                }
+                catch (InvalidDataException) when (softLeafSkip)
+                {
+                    // Soft prefs: skip this leaf/section; keep field initializer / prior value.
+                }
             }
         }
 
@@ -52,13 +98,14 @@ namespace Mfr.Utils.Config
             JsonElement configObject,
             object target,
             ConfigFieldBinding binding,
-            JsonNamingPolicy naming
+            JsonNamingPolicy naming,
+            bool softLeafSkip
         )
         {
             switch (binding.Kind)
             {
                 case ConfigFieldKind.Section:
-                    _ApplySection(configObject, target, binding, naming);
+                    _ApplySection(configObject, target, binding, naming, softLeafSkip);
                     return;
                 case ConfigFieldKind.Int:
                     _ApplyIntLeaf(configObject, target, binding);
@@ -84,7 +131,8 @@ namespace Mfr.Utils.Config
             JsonElement configObject,
             object target,
             ConfigFieldBinding binding,
-            JsonNamingPolicy naming
+            JsonNamingPolicy naming,
+            bool softLeafSkip
         )
         {
             var nested = binding.Field.GetValue(target);
@@ -98,7 +146,7 @@ namespace Mfr.Utils.Config
                 return;
             }
 
-            Apply(nestedObject, nested, naming);
+            _Apply(nestedObject, nested, naming, softLeafSkip);
         }
 
         /// <summary>

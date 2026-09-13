@@ -41,7 +41,8 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Updates <c>session.json</c>: window/folder when their remember flags are on; File List masks/view
+        /// Merges layout into <paramref name="session"/> then saves the whole prefs document via
+        /// <see cref="ConfigStore"/>: window/folder when their remember flags are on; File List masks/view
         /// and Rename List always.
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
@@ -53,8 +54,8 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="renameList">
         /// Rename List session fields, or <see langword="null"/> to leave the saved section unchanged.
         /// </param>
-        /// <param name="sessionFilePath">
-        /// Path to <c>session.json</c>. When <c>null</c> or whitespace, the default AppData file is used.
+        /// <param name="configFilePath">
+        /// Path to <c>config.json</c>. When <c>null</c> or whitespace, the active / default AppData file is used.
         /// </param>
         public static void SaveOnClose(
             Window window,
@@ -62,7 +63,7 @@ namespace Mfr.App.Ui.Services.Session
             SessionState session,
             SessionStateFileList? fileList,
             SessionStateRenameList? renameList = null,
-            string? sessionFilePath = null
+            string? configFilePath = null
         )
         {
             ArgumentNullException.ThrowIfNull(window);
@@ -109,7 +110,8 @@ namespace Mfr.App.Ui.Services.Session
                     session.RenameList = renameList;
                 }
 
-                SessionStore.Save(session, sessionFilePath);
+                ConfigStore.Session = session;
+                ConfigStore.TrySave(configFilePath);
             }
             catch
             {

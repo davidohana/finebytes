@@ -1,56 +1,69 @@
+using System.Text.Json;
+using Mfr.Filters.Case;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Models
 {
     /// <summary>
-    /// Tests for <see cref="SessionStore"/>.
+    /// Tests for <see cref="ConfigStore"/> session / filterDefaults sections and soft-load dialect.
     /// </summary>
-    public sealed class SessionStoreTests
+    [Collection(ConfigStoreCollection.Name)]
+    public sealed class ConfigStorePrefsTests
     {
         [Fact]
-        public void Load_missing_file_returns_empty_session()
+        public void Load_missing_default_style_file_returns_empty_session()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-missing-" + Guid.NewGuid() + ".json");
-            var session = SessionStore.Load(path);
-            Assert.Equal(1, session.Version);
-            Assert.Null(session.MainWindow);
-            Assert.Null(session.FileList);
-            Assert.Null(session.RenameList);
-            Assert.Null(session.FilterEditor);
+            File.WriteAllText(path, """{}""");
+            try
+            {
+                ConfigStore.Load(path);
+                Assert.Equal(1, ConfigStore.Session.Version);
+                Assert.Null(ConfigStore.Session.MainWindow);
+                Assert.Null(ConfigStore.Session.FileList);
+                Assert.Null(ConfigStore.Session.RenameList);
+                Assert.Null(ConfigStore.Session.FilterEditor);
+                Assert.Empty(ConfigStore.FilterDefaultsJson);
+            }
+            finally
+            {
+                File.Delete(path);
+                ConfigStoreTestReset.LoadEmpty();
+            }
         }
 
         [Fact]
-        public void Load_corrupt_json_returns_empty_session()
+        public void Load_corrupt_json_returns_defaults()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-bad-" + Guid.NewGuid() + ".json");
             try
             {
                 File.WriteAllText(path, "{ not-json");
-                var session = SessionStore.Load(path);
-                Assert.Null(session.MainWindow);
-                Assert.Null(session.FileList);
-                Assert.Null(session.RenameList);
-                Assert.Null(session.FilterEditor);
+                ConfigStore.Load(path);
+                Assert.Null(ConfigStore.Session.MainWindow);
+                Assert.Equal(ConfirmationPrompts.Normal, ConfigStore.Config.Ui.ConfirmationPrompts);
+                Assert.Empty(ConfigStore.FilterDefaultsJson);
             }
             finally
             {
                 File.Delete(path);
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
 
         [Fact]
-        public void Load_non_positive_version_normalizes_to_one()
+        public void Load_non_positive_session_version_normalizes_to_one()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-ver-" + Guid.NewGuid() + ".json");
             try
             {
                 File.WriteAllText(
                     path, /*lang=json,strict*/
-                    """{"version":0}"""
+                    """{"session":{"version":0}}"""
                 );
-                var session = SessionStore.Load(path);
-                Assert.Equal(1, session.Version);
+                ConfigStore.Load(path);
+                Assert.Equal(1, ConfigStore.Session.Version);
             }
             finally
             {
@@ -58,16 +71,19 @@ namespace Mfr.Tests.Models
                 {
                     File.Delete(path);
                 }
+
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
 
         [Fact]
-        public void Save_and_Load_round_trip()
+        public void Save_and_Load_round_trip_session()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-round-" + Guid.NewGuid() + ".json");
             try
             {
-                var original = new SessionState
+                ConfigStoreTestReset.LoadEmpty();
+                ConfigStore.Session = new SessionState
                 {
                     Version = 1,
                     MainWindow = new SessionStateMainWindow
@@ -118,9 +134,10 @@ namespace Mfr.Tests.Models
                     FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false },
                 };
 
-                SessionStore.Save(original, path);
-                var loaded = SessionStore.Load(path);
+                ConfigStore.Save(path);
+                ConfigStore.Load(path);
 
+                var loaded = ConfigStore.Session;
                 Assert.Equal(1, loaded.Version);
                 Assert.NotNull(loaded.MainWindow);
                 Assert.Equal(12, loaded.MainWindow.X);
@@ -134,7 +151,7 @@ namespace Mfr.Tests.Models
                 Assert.Equal(0.55, loaded.MainWindow.Splitters.FilterLists);
                 Assert.Equal(0.65, loaded.MainWindow.Splitters.TopPanes);
                 Assert.NotNull(loaded.FileList);
-                Assert.Equal(original.FileList.LastOpenedDirectory, loaded.FileList.LastOpenedDirectory);
+                Assert.Equal(Path.Combine(Path.GetTempPath(), "music"), loaded.FileList.LastOpenedDirectory);
                 Assert.Equal("*.mp3", loaded.FileList.FileMask);
                 Assert.Equal(["*.wav", "*.ogg"], loaded.FileList.ExcludeMasks);
                 Assert.True(loaded.FileList.ExcludeMasksEnabled);
@@ -169,32 +186,150 @@ namespace Mfr.Tests.Models
                 {
                     File.Delete(path);
                 }
+
+                ConfigStoreTestReset.LoadEmpty();
+            }
+        }
+
+        [Fact]
+        public void Save_and_Load_round_trips_session_and_filter_default_in_one_file()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "mfr-unified-round-" + Guid.NewGuid() + ".json");
+            try
+            {
+                ConfigStoreTestReset.LoadEmpty();
+                ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+                ConfigStore.Session = new SessionState { FileList = new SessionStateFileList { FileMask = "*.flac" } };
+                ConfigStore.Save(path);
+
+                var store = FilterDefaultsStore.CreateEmpty();
+                store.SetDefault(
+                    new LettersCaseFilter(
+                        new FileExtensionTarget(),
+                        new LettersCaseOptions(LettersCaseMode.UpperCase, [])
+                    )
+                );
+
+                using (var doc = JsonDocument.Parse(File.ReadAllText(path)))
+                {
+                    Assert.Equal(
+                        "more",
+                        doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString()
+                    );
+                    Assert.Equal(
+                        "*.flac",
+                        doc.RootElement.GetProperty("session")
+                            .GetProperty("fileList")
+                            .GetProperty("fileMask")
+                            .GetString()
+                    );
+                    Assert.True(doc.RootElement.GetProperty("filterDefaults").TryGetProperty("LettersCase", out _));
+                    Assert.False(doc.RootElement.GetProperty("filterDefaults").TryGetProperty("defaults", out _));
+                }
+
+                ConfigStore.Load(path);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
+                Assert.Equal("*.flac", ConfigStore.Session.FileList?.FileMask);
+                var reloaded = FilterDefaultsStore.OpenDefault();
+                Assert.True(reloaded.TryGetDefault("LettersCase", out var filter));
+                Assert.Equal(LettersCaseMode.UpperCase, Assert.IsType<LettersCaseFilter>(filter).Options.Mode);
+            }
+            finally
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                ConfigStoreTestReset.LoadEmpty();
+            }
+        }
+
+        [Fact]
+        public void SetDefault_pin_save_rewrites_whole_config()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "mfr-pin-save-" + Guid.NewGuid() + ".json");
+            try
+            {
+                ConfigStoreTestReset.LoadEmpty();
+                ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
+                ConfigStore.Session = new SessionState { MainWindow = new SessionStateMainWindow { Width = 900 } };
+                ConfigStore.Save(path);
+
+                FilterDefaultsStore.CreateEmpty().SetDefault(new LettersCaseFilter());
+
+                ConfigStore.Load(path);
+                Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
+                Assert.Equal(900, ConfigStore.Session.MainWindow?.Width);
+                Assert.True(ConfigStore.FilterDefaultsJson.ContainsKey("LettersCase"));
+            }
+            finally
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                ConfigStoreTestReset.LoadEmpty();
+            }
+        }
+
+        [Fact]
+        public void Load_skips_invalid_ui_leaf_keeps_valid_leaves()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "mfr-soft-leaf-" + Guid.NewGuid() + ".json");
+            File.WriteAllText(
+                path, /*lang=json,strict*/
+                """
+                {
+                  "ui": {
+                    "confirmationPrompts": "more",
+                    "doubleClickAddsToRenameList": "not-a-bool"
+                  },
+                  "log": {
+                    "maxSessionFiles": "50"
+                  }
+                }
+                """
+            );
+            try
+            {
+                ConfigStore.Load(path);
+                Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
+                Assert.False(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
+                Assert.Equal(50, ConfigStore.Config.Log.MaxSessionFiles);
+            }
+            finally
+            {
+                File.Delete(path);
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
 
         /// <summary>
-        /// Verifies a missing session file is a no-op.
+        /// Verifies a missing prefs file delete is a no-op.
         /// </summary>
         [Fact]
         public void Delete_missing_is_noop()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-delete-missing-" + Guid.NewGuid() + ".json");
-            SessionStore.Delete(path);
+            ConfigStore.DeleteDefaultFile(path);
             Assert.False(File.Exists(path));
         }
 
         /// <summary>
-        /// Verifies an existing session file is removed.
+        /// Verifies an existing prefs file is removed.
         /// </summary>
         [Fact]
         public void Delete_removes_existing_file()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-delete-" + Guid.NewGuid() + ".json");
-            SessionStore.Save(new SessionState(), path);
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.Save(path);
             try
             {
                 Assert.True(File.Exists(path));
-                SessionStore.Delete(path);
+                ConfigStore.DeleteDefaultFile(path);
                 Assert.False(File.Exists(path));
             }
             finally
@@ -203,6 +338,8 @@ namespace Mfr.Tests.Models
                 {
                     File.Delete(path);
                 }
+
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
     }

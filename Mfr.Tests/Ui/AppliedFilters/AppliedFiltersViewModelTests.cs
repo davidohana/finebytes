@@ -10,6 +10,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
     /// <summary>
     /// Tests Applied Filters stack commands and <see cref="AppliedFiltersViewModel.ToChain"/>.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class AppliedFiltersViewModelTests
     {
         /// <summary>
@@ -495,10 +496,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public async Task SaveSelectedAsDefault_applies_on_next_add()
         {
-            var defaultsPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-test-{Guid.NewGuid():N}.json");
+            var configPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-test-{Guid.NewGuid():N}.json");
+            File.WriteAllText(configPath, """{}""");
             try
             {
-                var store = new FilterDefaultsStore(defaultsPath);
+                ConfigStore.Load(configPath);
+                var store = FilterDefaultsStore.CreateEmpty();
                 var viewModel = new AppliedFiltersViewModel(store);
                 viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
                 var customized = new LettersCaseFilter(
@@ -522,10 +525,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
             }
             finally
             {
-                if (File.Exists(defaultsPath))
+                if (File.Exists(configPath))
                 {
-                    File.Delete(defaultsPath);
+                    File.Delete(configPath);
                 }
+
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
 
@@ -535,10 +540,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ResetSelectedToDefaults_ignores_saved_type_default()
         {
-            var defaultsPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-test-{Guid.NewGuid():N}.json");
+            var configPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-test-{Guid.NewGuid():N}.json");
+            File.WriteAllText(configPath, """{}""");
             try
             {
-                var store = new FilterDefaultsStore(defaultsPath);
+                ConfigStore.Load(configPath);
+                var store = FilterDefaultsStore.CreateEmpty();
                 store.SetDefault(
                     new LettersCaseFilter(
                         new FileExtensionTarget(),
@@ -555,10 +562,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
             }
             finally
             {
-                if (File.Exists(defaultsPath))
+                if (File.Exists(configPath))
                 {
-                    File.Delete(defaultsPath);
+                    File.Delete(configPath);
                 }
+
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
 

@@ -5,7 +5,7 @@ namespace Mfr.Models.Config
 {
     /// <summary>
     /// Persisted UI session state grouped by owning component.
-    /// <para>Stored in <c>session.json</c> under the same AppData root as <c>config.json</c>.</para>
+    /// <para>Stored as the <c>session</c> object inside AppData <c>config.json</c>.</para>
     /// </summary>
     public sealed class SessionState
     {

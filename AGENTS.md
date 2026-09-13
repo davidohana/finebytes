@@ -49,9 +49,9 @@
 ### Persistence and session (no legacy migrations)
 
 - Do **not** add JSON converters, dual-property records, or load-time adapters to read old saved shapes (renamed keys, removed enums, old property names).
-- Persist **one current schema** per field (`session.json`, config snapshots, etc.). Use normal `[JsonPropertyName]` / record properties — not custom migration converters.
-- **Soft-load vs hard-fail (do not unify):** Session (`SessionStore`) and filter-defaults (`FilterDefaultsStore`) soft-load — corrupt/missing → empty/defaults, app continues. Config (`ConfigStore`) and presets (`PresetManager`) hard-fail — invalid → throw / abort load. See type remarks on those four types.
-- On soft-load stores, missing or unrecognized fields may fall back to **defaults** (same as first launch). Do not silently remap obsolete values unless the user explicitly asks for migration.
+- Persist **one current schema** per field (`config.json` prefs including nested `session` / `filterDefaults`, presets, etc.). Use normal `[JsonPropertyName]` / record properties — not custom migration converters.
+- **Soft-load vs hard-fail:** Prefs (`ConfigStore` — whole `config.json`: `log`/`ui`/`session`/opaque `filterDefaults`) soft-load — corrupt/missing → defaults, app continues; invalid leaves skipped via `ConfigJsonApplier.ApplySoft`. Typed filter-default entries skip unknown payloads in `FilterDefaultsStore`. Presets (`PresetManager`) hard-fail — invalid → throw / abort load. CLI `--set` and a missing explicit `--config` path stay hard-fail. See type remarks on `ConfigStore` / `PresetManager` / `FilterDefaultsStore`.
+- On soft-load prefs, missing or unrecognized fields may fall back to **defaults** (same as first launch). Do not silently remap obsolete values unless the user explicitly asks for migration. Do **not** read legacy `session.json` / `filter-defaults.json`.
 - Do **not** add tests whose only purpose is proving legacy JSON still loads after a schema change.
 - When replacing a persisted type (e.g. sort keys: enum → field key), delete the old type and update callers/tests; do not keep both paths “just in case.”
 

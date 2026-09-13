@@ -4,7 +4,7 @@ using Mfr.Models.Config;
 namespace Mfr.App.Ui.Services.Session
 {
     /// <summary>
-    /// Applies and captures main-window pane splitter ratios for <see cref="SessionStore"/>.
+    /// Applies and captures main-window pane splitter ratios for <see cref="SessionState"/> / <see cref="ConfigStore.Session"/>.
     /// </summary>
     internal static class SplitterSession
     {

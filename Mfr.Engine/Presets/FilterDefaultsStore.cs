@@ -1,130 +1,92 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using Mfr.Utils;
-using Serilog;
+using System.Text.Json.Nodes;
+using Mfr.Models.Config;
 
 namespace Mfr.Engine.Presets
 {
     /// <summary>
-    /// Loads and saves per-filter-type add defaults (Filter Configuration “save as default”).
+    /// In-memory cache of per-filter-type add defaults (Filter Configuration “save as default”).
     /// <para>
-    /// One snapshot per <see cref="BaseFilter.Type"/> discriminator in <c>filter-defaults.json</c>.
+    /// One snapshot per <see cref="BaseFilter.Type"/> discriminator, persisted as the opaque
+    /// <see cref="ConfigStore.FilterDefaultsJson"/> map inside <c>config.json</c> (not a separate file).
     /// Used when adding from the palette; not used by reset, presets, or session restore.
     /// </para>
     /// </summary>
     /// <remarks>
-    /// Soft-load dialect: corrupt or missing → empty cache (factory defaults on add); the app continues.
-    /// Same policy as <see cref="Models.Config.SessionStore"/>; opposite of hard-fail
-    /// <see cref="Models.Config.ConfigStore"/> and <see cref="PresetManager"/>.
-    /// Do not unify these modes — the split is intentional product dialect.
+    /// Soft-load dialect for entries: unknown or invalid type payloads are skipped (factory defaults on add).
+    /// The prefs document itself is soft-loaded by <see cref="ConfigStore"/>. Opposite of hard-fail
+    /// <see cref="PresetManager"/>. Does not own a file path — <see cref="ConfigStore"/> is the only
+    /// writer of <c>config.json</c>.
     /// </remarks>
-    /// <param name="defaultsFilePath">Path to the JSON file of type defaults.</param>
-    public sealed class FilterDefaultsStore(string defaultsFilePath)
+    public sealed class FilterDefaultsStore
     {
         private readonly Dictionary<string, BaseFilter> _typeToDefault = new(StringComparer.Ordinal);
 
         /// <summary>
-        /// Gets the JSON file path for type defaults.
-        /// </summary>
-        public string DefaultsFilePath { get; } =
-            string.IsNullOrWhiteSpace(defaultsFilePath)
-                ? throw new ArgumentException("Defaults file path must not be blank.", nameof(defaultsFilePath))
-                : defaultsFilePath;
-
-        /// <summary>
-        /// Gets the default AppData path for filter type defaults.
-        /// </summary>
-        /// <returns>Absolute path to <c>filter-defaults.json</c>.</returns>
-        public static string DefaultFilePath()
-        {
-            return AppDataPaths.RoamingRoot().CombinePath("filter-defaults.json");
-        }
-
-        /// <summary>
-        /// Opens the AppData store, loading when the file exists (missing or unreadable → empty).
+        /// Opens a store and loads typed defaults from <see cref="ConfigStore.FilterDefaultsJson"/>
+        /// (call after <see cref="ConfigStore.Load"/>).
         /// </summary>
         /// <returns>A store ready for get/set.</returns>
         public static FilterDefaultsStore OpenDefault()
         {
-            var store = new FilterDefaultsStore(DefaultFilePath());
+            var store = new FilterDefaultsStore();
             store.TryLoad();
             return store;
         }
 
         /// <summary>
-        /// Creates an empty store that does not read AppData (tests and isolated UI hosts).
+        /// Creates an empty store that does not read <see cref="ConfigStore.FilterDefaultsJson"/>
+        /// (tests and isolated UI hosts).
         /// </summary>
         /// <returns>A store with no type defaults loaded.</returns>
         public static FilterDefaultsStore CreateEmpty()
         {
-            return new FilterDefaultsStore(
-                Path.Combine(Path.GetTempPath(), $"mfr-empty-filter-defaults-{Guid.NewGuid():N}.json")
-            );
+            return new FilterDefaultsStore();
         }
 
         /// <summary>
-        /// Loads defaults from disk when the file exists and is readable; otherwise leaves the cache empty.
+        /// Loads defaults from <see cref="ConfigStore.FilterDefaultsJson"/> into the cache.
         /// <para>
-        /// Missing, corrupt, or wrong-shaped files leave the cache empty (same soft load as session).
-        /// Unknown or invalid entries are skipped (factory defaults remain for those types).
+        /// Missing or empty maps leave the cache empty. Unknown or invalid entries are skipped
+        /// (factory defaults remain for those types).
         /// </para>
         /// </summary>
         public void TryLoad()
         {
             _typeToDefault.Clear();
-            if (!File.Exists(DefaultsFilePath))
+            var defaults = ConfigStore.FilterDefaultsJson;
+            if (defaults.Count == 0)
             {
                 return;
             }
 
-            JsonDocument doc;
-            try
+            foreach (var property in defaults)
             {
-                doc = JsonDocument.Parse(File.ReadAllText(DefaultsFilePath));
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
-            {
-                // Preference file — do not fail app startup or hosts; add uses factory.
-                Log.Warning(ex, "Failed to read filter defaults file '{DefaultsFilePath}'.", DefaultsFilePath);
-                return;
-            }
-
-            using (doc)
-            {
-                if (
-                    !doc.RootElement.TryGetProperty("defaults", out var defaultsElement)
-                    || defaultsElement.ValueKind != JsonValueKind.Object
-                )
+                if (property.Value is null)
                 {
-                    return;
+                    continue;
                 }
 
-                foreach (var property in defaultsElement.EnumerateObject())
+                try
                 {
-                    try
+                    var filter = JsonSerializer.Deserialize<BaseFilter>(property.Value, PresetJsonOptions.Default);
+                    if (filter is null)
                     {
-                        var filter = JsonSerializer.Deserialize<BaseFilter>(
-                            property.Value.GetRawText(),
-                            PresetJsonOptions.Default
-                        );
-                        if (filter is null)
-                        {
-                            continue;
-                        }
+                        continue;
+                    }
 
-                        _typeToDefault[filter.Type] = filter;
-                    }
-                    catch (Exception ex) when (ex is JsonException or NotSupportedException)
-                    {
-                        // Unknown type discriminator or bad payload — skip; add uses factory.
-                    }
+                    _typeToDefault[filter.Type] = filter;
+                }
+                catch (Exception ex) when (ex is JsonException or NotSupportedException)
+                {
+                    // Unknown type discriminator or bad payload — skip; add uses factory.
                 }
             }
         }
 
         /// <summary>
-        /// Clears the in-memory type defaults without touching disk.
+        /// Clears the in-memory type defaults without writing <c>config.json</c>.
         /// </summary>
         public void Clear()
         {
@@ -132,54 +94,26 @@ namespace Mfr.Engine.Presets
         }
 
         /// <summary>
-        /// Deletes the defaults JSON file when it exists and clears the in-memory cache (Reset Configuration).
-        /// <para>Missing files are a no-op aside from clearing the cache.</para>
+        /// Merges the current type defaults into <see cref="ConfigStore.FilterDefaultsJson"/> and saves
+        /// the whole prefs document via <see cref="ConfigStore.Save"/>.
         /// </summary>
-        /// <exception cref="IOException">Thrown when the file exists but cannot be deleted.</exception>
-        public void DeleteFile()
-        {
-            Clear();
-            DeleteFileAt(DefaultsFilePath);
-        }
-
-        /// <summary>
-        /// Deletes the filter-defaults JSON file when it exists (Reset Configuration).
-        /// <para>Missing files are a no-op.</para>
-        /// </summary>
-        /// <param name="defaultsFilePath">
-        /// Absolute path to <c>filter-defaults.json</c>. When <c>null</c> or whitespace,
-        /// <see cref="DefaultFilePath"/> is used.
-        /// </param>
-        /// <exception cref="IOException">Thrown when the file exists but cannot be deleted.</exception>
-        public static void DeleteFileAt(string? defaultsFilePath = null)
-        {
-            var path = string.IsNullOrWhiteSpace(defaultsFilePath) ? DefaultFilePath() : defaultsFilePath.Trim();
-            AppDataFile.DeleteFileIfExists(path, "filter defaults file");
-        }
-
-        /// <summary>
-        /// Saves the current type defaults to disk.
-        /// </summary>
+        /// <exception cref="UserException">Thrown when the prefs file cannot be written.</exception>
         public void Save()
         {
             try
             {
-                var directory = Path.GetDirectoryName(DefaultsFilePath);
-                if (!string.IsNullOrWhiteSpace(directory))
+                JsonObject map = [];
+                foreach (var pair in _typeToDefault.OrderBy(entry => entry.Key, StringComparer.Ordinal))
                 {
-                    Directory.CreateDirectory(directory);
+                    map[pair.Key] = JsonSerializer.SerializeToNode(pair.Value, PresetJsonOptions.Default);
                 }
 
-                var sorted = _typeToDefault
-                    .OrderBy(pair => pair.Key, StringComparer.Ordinal)
-                    .ToDictionary(pair => pair.Key, pair => pair.Value, StringComparer.Ordinal);
-                var container = new FilterDefaultsContainer(sorted);
-                var json = JsonSerializer.Serialize(container, PresetJsonOptions.Default);
-                File.WriteAllText(DefaultsFilePath, json);
+                ConfigStore.FilterDefaultsJson = map;
+                ConfigStore.Save();
             }
             catch (Exception ex)
             {
-                throw new UserException($"Failed to save filter defaults file '{DefaultsFilePath}': {ex.Message}", ex);
+                throw new UserException($"Failed to save filter defaults into config: {ex.Message}", ex);
             }
         }
 
@@ -204,7 +138,7 @@ namespace Mfr.Engine.Presets
         }
 
         /// <summary>
-        /// Stores a clone of <paramref name="filter"/> as the add default for its type and writes disk.
+        /// Stores a clone of <paramref name="filter"/> as the add default for its type and writes prefs.
         /// </summary>
         /// <param name="filter">Current applied filter configuration to remember.</param>
         public void SetDefault(BaseFilter filter)
@@ -214,6 +148,11 @@ namespace Mfr.Engine.Presets
             Save();
         }
 
+        /// <summary>
+        /// Deep-clones <paramref name="filter"/> via JSON round-trip.
+        /// </summary>
+        /// <param name="filter">Filter to clone.</param>
+        /// <returns>A new filter instance with the same options.</returns>
         private static BaseFilter _Clone(BaseFilter filter)
         {
             var json = JsonSerializer.Serialize(filter, PresetJsonOptions.Default);
@@ -221,8 +160,4 @@ namespace Mfr.Engine.Presets
                 ?? throw new InvalidOperationException($"Failed to clone filter type '{filter.Type}'.");
         }
     }
-
-    internal sealed record FilterDefaultsContainer(
-        [property: JsonPropertyName("defaults")] Dictionary<string, BaseFilter> Defaults
-    );
 }

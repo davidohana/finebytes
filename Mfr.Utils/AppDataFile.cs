@@ -1,7 +1,7 @@
 namespace Mfr.Utils
 {
     /// <summary>
-    /// Shared AppData file helpers used by config, session, and filter-defaults stores.
+    /// Shared AppData file helpers used by prefs (`config.json`) and other roaming files.
     /// </summary>
     public static class AppDataFile
     {

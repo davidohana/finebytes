@@ -32,7 +32,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// </param>
         /// <param name="session">
         /// Loaded session to restore onto child panes and persist from this window. When null, panes keep
-        /// first-launch defaults and this window does not write <c>session.json</c>.
+        /// first-launch defaults and this window does not write session into <c>config.json</c>.
         /// </param>
         /// <param name="filterDefaults">
         /// Per-type filter add defaults. When null, uses an empty store that does not read AppData
@@ -42,20 +42,20 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// Named presets store. When null, uses an empty manager that does not read AppData
         /// (production passes <see cref="PresetManager.OpenDefault"/>).
         /// </param>
-        /// <param name="sessionFilePath">
-        /// Path used when the main window writes <c>session.json</c> on close. When null, close-save uses
-        /// <see cref="SessionStore.DefaultFilePath"/>. Production passes the same path used for load.
+        /// <param name="configFilePath">
+        /// Optional <c>config.json</c> path for close-save. When null, close-save uses the active / default
+        /// prefs path from <see cref="ConfigStore"/>.
         /// </param>
         public MainWindowViewModel(
             string? initialFileListPath = null,
             SessionState? session = null,
             FilterDefaultsStore? filterDefaults = null,
             PresetManager? presetManager = null,
-            string? sessionFilePath = null
+            string? configFilePath = null
         )
         {
             Session = session;
-            SessionFilePath = sessionFilePath;
+            ConfigFilePath = configFilePath;
             AppliedFiltersViewModel = new AppliedFiltersViewModel(
                 filterDefaults ?? FilterDefaultsStore.CreateEmpty(),
                 presetManager ?? PresetManager.CreateEmpty()
@@ -103,9 +103,9 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         internal SessionState? Session { get; }
 
         /// <summary>
-        /// Session JSON path for close save, or <see langword="null"/> to use the default AppData file.
+        /// <c>config.json</c> path for close save, or <see langword="null"/> to use the active / default AppData file.
         /// </summary>
-        internal string? SessionFilePath { get; }
+        internal string? ConfigFilePath { get; }
 
         /// <summary>
         /// Gets the main window title, including the product version.
@@ -266,7 +266,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// When <see langword="true"/>, closing this window does not write <c>session.json</c>
+        /// When <see langword="true"/>, closing this window does not write session into <c>config.json</c>
         /// (Reset Configuration after deleting persisted files).
         /// </summary>
         internal bool SuppressSessionSaveOnClose { get; set; }

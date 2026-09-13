@@ -220,6 +220,30 @@ namespace Mfr.Tests.Utils.Config
         }
 
         [Fact]
+        public void ApplySoft_skips_invalid_leaf_keeps_valid_leaves()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"port":"0","name":"xy","enabled":"false"}"""
+            );
+            var o = new SampleOptions();
+            ConfigJsonApplier.ApplySoft(doc.RootElement, o);
+            Assert.Equal(10, o.Port);
+            Assert.Equal("xy", o.Name);
+            Assert.False(o.Enabled);
+        }
+
+        [Fact]
+        public void ApplySoft_skips_wrong_section_kind()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"outer":"not-an-object"}"""
+            );
+            var o = new RootWithNestedSection();
+            ConfigJsonApplier.ApplySoft(doc.RootElement, o);
+            Assert.Equal(10, o.Outer.Port);
+        }
+
+        [Fact]
         public void Apply_section_combined_with_leaf_attribute_throws_InvalidOperationException()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/

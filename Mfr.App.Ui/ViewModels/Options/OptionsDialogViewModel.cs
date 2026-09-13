@@ -53,8 +53,8 @@ namespace Mfr.App.Ui.ViewModels.Options
 
         /// <summary>
         /// Writes draft values into the live session and <see cref="ConfigStore.Config"/>.
-        /// <para>Does not write <c>config.json</c> or <c>session.json</c>; the host calls
-        /// <see cref="ConfigStore.Save"/> and session flags ride close-save.</para>
+        /// <para>Does not write <c>config.json</c>; the host calls <see cref="ConfigStore.Save"/>
+        /// (whole prefs document, including the mutated session flags).</para>
         /// </summary>
         public void Commit()
         {

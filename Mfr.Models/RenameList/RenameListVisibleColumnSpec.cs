@@ -5,7 +5,7 @@ namespace Mfr.Models.RenameList
     /// <summary>
     /// One Rename List visible grid column for persistence: field identity plus optional width.
     /// <para>
-    /// Shared by <c>session.json</c> <c>renameList.visibleColumns</c> and preset <c>visibleColumns</c>
+    /// Shared by <c>config.json</c> <c>session.renameList.visibleColumns</c> and preset <c>visibleColumns</c>
     /// (<c>key</c> / <c>width</c>).
     /// </para>
     /// </summary>

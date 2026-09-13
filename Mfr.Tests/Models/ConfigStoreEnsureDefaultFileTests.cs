@@ -32,6 +32,10 @@ namespace Mfr.Tests.Models
                     doc.RootElement.GetProperty("ui").GetProperty("doubleClickAddsToRenameList").GetString()
                 );
                 Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("presets", out _));
+                Assert.True(doc.RootElement.TryGetProperty("session", out var sessionElement));
+                Assert.Equal(JsonValueKind.Object, sessionElement.ValueKind);
+                Assert.True(doc.RootElement.TryGetProperty("filterDefaults", out var defaultsElement));
+                Assert.Equal(JsonValueKind.Object, defaultsElement.ValueKind);
             }
             finally
             {

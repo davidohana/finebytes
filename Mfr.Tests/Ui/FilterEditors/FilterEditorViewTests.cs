@@ -20,6 +20,7 @@ namespace Mfr.Tests.Ui.FilterEditors
     /// <summary>
     /// Headless tests for the Filter Configuration host pane (selection, optionless, chrome).
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class FilterEditorViewTests
     {
         /// <summary>
@@ -170,10 +171,12 @@ namespace Mfr.Tests.Ui.FilterEditors
         [AvaloniaFact]
         public async Task Save_as_default_button_persists_options_for_next_add()
         {
-            var defaultsPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-ui-{Guid.NewGuid():N}.json");
+            var configPath = Path.Combine(Path.GetTempPath(), $"mfr-filter-defaults-ui-{Guid.NewGuid():N}.json");
+            File.WriteAllText(configPath, """{}""");
             try
             {
-                var store = new FilterDefaultsStore(defaultsPath);
+                ConfigStore.Load(configPath);
+                var store = FilterDefaultsStore.CreateEmpty();
                 var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(
                     filterDefaults: store
                 );
@@ -204,10 +207,12 @@ namespace Mfr.Tests.Ui.FilterEditors
             }
             finally
             {
-                if (File.Exists(defaultsPath))
+                if (File.Exists(configPath))
                 {
-                    File.Delete(defaultsPath);
+                    File.Delete(configPath);
                 }
+
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
 

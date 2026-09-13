@@ -6,39 +6,35 @@ namespace Mfr.Tests.Models
     /// <summary>
     /// Tests <see cref="SessionStateRenameList"/> sort/column session JSON shapes.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class SessionStateRenameListTests
     {
         [Fact]
-        public void Sort_fields_round_trip_via_session_store()
+        public void Sort_fields_round_trip_via_config_store_session()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-sort-" + Guid.NewGuid() + ".json");
             try
             {
-                SessionStore.Save(
-                    new SessionState
+                ConfigStoreTestReset.LoadEmpty();
+                ConfigStore.Session = new SessionState
+                {
+                    RenameList = new SessionStateRenameList
                     {
-                        RenameList = new SessionStateRenameList
-                        {
-                            SortFields =
-                            [
-                                new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true),
-                            ],
-                        },
+                        SortFields = [new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true)],
                     },
-                    path
-                );
+                };
+                ConfigStore.Save(path);
 
-                var loaded = SessionStore.Load(path);
+                ConfigStore.Load(path);
                 Assert.Equal(
                     [new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true)],
-                    loaded.RenameList?.SortFields
+                    ConfigStore.Session.RenameList?.SortFields
                 );
 
-                SessionStore.Save(
-                    new SessionState { RenameList = new SessionStateRenameList { SortFields = [] } },
-                    path
-                );
-                Assert.Empty(SessionStore.Load(path).RenameList!.SortFields!);
+                ConfigStore.Session = new SessionState { RenameList = new SessionStateRenameList { SortFields = [] } };
+                ConfigStore.Save(path);
+                ConfigStore.Load(path);
+                Assert.Empty(ConfigStore.Session.RenameList.SortFields);
             }
             finally
             {
@@ -46,6 +42,8 @@ namespace Mfr.Tests.Models
                 {
                     File.Delete(path);
                 }
+
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
 
@@ -65,12 +63,15 @@ namespace Mfr.Tests.Models
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-columns-" + Guid.NewGuid() + ".json");
             try
             {
-                SessionStore.Save(
-                    new SessionState { RenameList = new SessionStateRenameList { VisibleColumns = sessionColumns } },
-                    path
-                );
+                ConfigStoreTestReset.LoadEmpty();
+                ConfigStore.Session = new SessionState
+                {
+                    RenameList = new SessionStateRenameList { VisibleColumns = sessionColumns },
+                };
+                ConfigStore.Save(path);
 
-                var loaded = SessionStore.Load(path);
+                ConfigStore.Load(path);
+                var loaded = ConfigStore.Session;
                 Assert.NotNull(loaded.RenameList?.VisibleColumns);
                 Assert.Equal(2, loaded.RenameList.VisibleColumns.Count);
                 Assert.Equal(
@@ -87,6 +88,8 @@ namespace Mfr.Tests.Models
                 {
                     File.Delete(path);
                 }
+
+                ConfigStoreTestReset.LoadEmpty();
             }
         }
     }

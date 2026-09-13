@@ -27,8 +27,7 @@ namespace Mfr.App.Ui
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var sessionFilePath = SessionStore.DefaultFilePath();
-                var session = SessionStore.Load(sessionFilePath);
+                var session = ConfigStore.Session;
                 var fileList = session.FileList ?? new SessionStateFileList();
                 var initialFolder = fileList.RememberLastFolder ? fileList.LastOpenedDirectory : null;
 
@@ -38,8 +37,7 @@ namespace Mfr.App.Ui
                         initialFileListPath: initialFolder,
                         session: session,
                         filterDefaults: FilterDefaultsStore.OpenDefault(),
-                        presetManager: PresetManager.OpenDefault(),
-                        sessionFilePath: sessionFilePath
+                        presetManager: PresetManager.OpenDefault()
                     ),
                 };
 

@@ -342,7 +342,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                 session,
                 viewModel.FileListViewModel.CaptureSession(),
                 viewModel.RenameListViewModel.CaptureSession(),
-                sessionFilePath: viewModel.SessionFilePath
+                configFilePath: viewModel.ConfigFilePath
             );
         }
 
