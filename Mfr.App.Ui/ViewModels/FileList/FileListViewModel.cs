@@ -92,7 +92,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// Shell delete/copy/move, or <see langword="null"/> to use the OS default.
         /// </param>
         /// <param name="fileClipboard">
-        /// Explorer file clipboard for Cut/Copy, or <see langword="null"/> to use the OS default.
+        /// Explorer file clipboard for Cut/Copy/Paste, or <see langword="null"/> to use the OS default.
         /// </param>
         public FileListViewModel(
             ISystemIconProvider? iconProvider,
@@ -150,6 +150,11 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// Filesystem path of the current folder, <see cref="ComputerPath"/>, or <see cref="NetworkPath"/>.
         /// </summary>
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(CutCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CopyCommand))]
+        [NotifyCanExecuteChangedFor(nameof(PasteCommand))]
+        [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
+        [NotifyCanExecuteChangedFor(nameof(DeletePermanentCommand))]
         private string _currentPath = string.Empty;
 
         /// <summary>
@@ -260,7 +265,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public IReadOnlyList<FileListEntry> SelectedEntries => _selectedEntries;
 
         /// <summary>
-        /// Gets the most recent high-signal File List status-bar message (Copy path, Cut/Copy, Delete).
+        /// Gets the most recent high-signal File List status-bar message (Copy path, Cut/Copy/Paste, Delete).
         /// </summary>
         [ObservableProperty]
         private StyledTextDisplay _lastStatusMessage = StyledTextDisplay.Empty;
@@ -579,6 +584,40 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public void Copy()
         {
             _WriteFileClipboard(cut: false);
+        }
+
+        /// <summary>
+        /// Pastes clipboard files into <see cref="CurrentPath"/> (Copy or Move from Preferred DropEffect).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanPaste))]
+        public void Paste()
+        {
+            if (!_CanPaste())
+            {
+                return;
+            }
+
+            if (!_fileClipboard.TryGetPaste(out var paste) || paste.Paths.Count == 0)
+            {
+                return;
+            }
+
+            var itemCount = paste.Paths.Count;
+            var result = paste.PreferMove
+                ? _shellOperations.Move(paste.Paths, CurrentPath)
+                : _shellOperations.Copy(paste.Paths, CurrentPath);
+
+            if (result == FileShellOperationResult.Succeeded && paste.PreferMove)
+            {
+                _fileClipboard.CompleteMovePaste();
+            }
+
+            Refresh();
+            LastStatusMessage = _FormatShellVerbStatus(
+                result,
+                successMessage: $"Pasted {itemCount} item(s).",
+                verb: "Paste"
+            );
         }
 
         /// <summary>
@@ -916,7 +955,23 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         private bool _CanOperateOnSelection()
         {
-            return _selectedEntries.Count > 0 && !FileListPath.IsComputerPath(CurrentPath);
+            return _selectedEntries.Count > 0 && _IsFilesystemFolderLocation();
+        }
+
+        /// <summary>
+        /// Gets whether Paste can land clipboard files in <see cref="CurrentPath"/>.
+        /// </summary>
+        private bool _CanPaste()
+        {
+            return _IsFilesystemFolderLocation() && _fileClipboard.HasPasteableFiles;
+        }
+
+        /// <summary>
+        /// Shared gate for File List mutate verbs that need a real filesystem folder.
+        /// </summary>
+        private bool _IsFilesystemFolderLocation()
+        {
+            return FileListPath.IsFilesystemFolderPath(CurrentPath);
         }
 
         /// <summary>
@@ -972,24 +1027,31 @@ namespace Mfr.App.Ui.ViewModels.FileList
             var itemCount = paths.Count;
             var result = _shellOperations.Delete(paths, recycle);
             Refresh();
-            LastStatusMessage = _FormatDeleteStatus(result, recycle, itemCount);
+            var successMessage = recycle
+                ? $"Deleted {itemCount} item(s)."
+                : $"Permanently deleted {itemCount} item(s).";
+            LastStatusMessage = _FormatShellVerbStatus(
+                result,
+                successMessage,
+                verb: recycle ? "Delete" : "Permanent delete"
+            );
         }
 
         /// <summary>
-        /// Maps shell delete outcome to a sticky File List status message.
+        /// Maps a shell file-op outcome to a sticky File List status message.
         /// </summary>
-        private static StyledTextDisplay _FormatDeleteStatus(
+        /// <param name="result">Shell operation result.</param>
+        /// <param name="successMessage">Neutral text when <paramref name="result"/> succeeded.</param>
+        /// <param name="verb">Short verb for cancelled / failed messages (e.g. Paste, Delete).</param>
+        private static StyledTextDisplay _FormatShellVerbStatus(
             FileShellOperationResult result,
-            bool recycle,
-            int itemCount
+            string successMessage,
+            string verb
         )
         {
-            var verb = recycle ? "Delete" : "Permanent delete";
             if (result == FileShellOperationResult.Succeeded)
             {
-                return StatusBarText.Neutral(
-                    recycle ? $"Deleted {itemCount} item(s)." : $"Permanently deleted {itemCount} item(s)."
-                );
+                return StatusBarText.Neutral(successMessage);
             }
 
             if (result == FileShellOperationResult.Cancelled)
@@ -1003,6 +1065,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private void _OnFileClipboardChanged(object? sender, EventArgs e)
         {
             _ApplyCutMarks();
+            PasteCommand.NotifyCanExecuteChanged();
         }
 
         /// <summary>
@@ -1025,6 +1088,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             ShowPropertiesCommand.NotifyCanExecuteChanged();
             CutCommand.NotifyCanExecuteChanged();
             CopyCommand.NotifyCanExecuteChanged();
+            PasteCommand.NotifyCanExecuteChanged();
             DeleteCommand.NotifyCanExecuteChanged();
             DeletePermanentCommand.NotifyCanExecuteChanged();
         }

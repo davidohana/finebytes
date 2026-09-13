@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: p4-paste
     content: "P4: Paste into CurrentPath; Ctrl+V; Explorer round-trip"
-    status: pending
+    status: completed
   - id: p5-docs-debt
     content: "P5: debts.md + keyboard-shortcuts verify; plan complete"
     status: pending

@@ -42,6 +42,11 @@
           Command="{Binding CopyCommand}"
           InputGesture="{x:Static input:AppShortcuts.FileListCopy}"
         />
+        <MenuItem
+          Header="Paste"
+          Command="{Binding PasteCommand}"
+          InputGesture="{x:Static input:AppShortcuts.FileListPaste}"
+        />
         <MenuItem Header="Copy path" Command="{Binding CopyPathCommand}" />
         <MenuItem
           Header="Delete"

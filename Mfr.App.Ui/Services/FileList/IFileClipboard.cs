@@ -41,5 +41,14 @@ namespace Mfr.App.Ui.Services.FileList
         /// <param name="paste">Paste paths and whether Move is preferred when present.</param>
         /// <returns><see langword="true"/> when at least one filesystem path is available.</returns>
         bool TryGetPaste(out FileClipboardPaste paste);
+
+        /// <summary>
+        /// Completes a successful move-paste: clears cut ghosting and removes the cut file payload.
+        /// <para>
+        /// Matches Explorer: after Cut → Paste (Move), the clipboard is no longer pasteable as a cut.
+        /// Copy-paste must not call this.
+        /// </para>
+        /// </summary>
+        void CompleteMovePaste();
     }
 }

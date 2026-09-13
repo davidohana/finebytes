@@ -66,6 +66,24 @@ namespace Mfr.Tests.Ui.Services.FileList
         }
 
         /// <summary>
+        /// Verifies CompleteMovePaste clears cut marks and PreferMove paste payloads.
+        /// </summary>
+        [Fact]
+        public void Recording_Fake_CompleteMovePaste_Clears_Cut_Payload()
+        {
+            var clipboard = new RecordingFileClipboard();
+            clipboard.SetCut([TestPaths.Absolute("cut.txt")]);
+            Assert.True(clipboard.HasPasteableFiles);
+            Assert.NotEmpty(clipboard.CutPaths);
+
+            clipboard.CompleteMovePaste();
+
+            Assert.Empty(clipboard.CutPaths);
+            Assert.False(clipboard.HasPasteableFiles);
+            Assert.False(clipboard.TryGetPaste(out _));
+        }
+
+        /// <summary>
         /// Verifies Windows SetCopy / SetCut round-trip CF_HDROP + Preferred DropEffect.
         /// </summary>
         [WindowsFact]

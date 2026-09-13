@@ -94,6 +94,40 @@ namespace Mfr.App.Ui.Services.FileList
             }
         }
 
+        /// <inheritdoc />
+        public void CompleteMovePaste()
+        {
+            var hadMarks = _cutPaths.Count > 0;
+            _cutPaths.Clear();
+            var emptiedClipboard = _TryEmptyClipboard();
+            if (!hadMarks && !emptiedClipboard)
+            {
+                return;
+            }
+
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Empties the Win32 clipboard when it can be opened (post move-paste).
+        /// </summary>
+        private static bool _TryEmptyClipboard()
+        {
+            if (!NativeMethods.OpenClipboard(IntPtr.Zero))
+            {
+                return false;
+            }
+
+            try
+            {
+                return NativeMethods.EmptyClipboard();
+            }
+            finally
+            {
+                _ = NativeMethods.CloseClipboard();
+            }
+        }
+
         /// <summary>
         /// Writes CF_HDROP + Preferred DropEffect for <paramref name="paths"/>.
         /// <para>

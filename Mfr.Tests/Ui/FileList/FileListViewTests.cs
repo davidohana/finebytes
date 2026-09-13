@@ -80,6 +80,7 @@ namespace Mfr.Tests.Ui.FileList
                 Assert.Contains("Properties", headers);
                 Assert.Contains("Cut", headers);
                 Assert.Contains("Copy", headers);
+                Assert.Contains("Paste", headers);
                 Assert.Contains("Copy path", headers);
                 Assert.Contains("Delete", headers);
                 Assert.Contains("Refresh", headers);
@@ -361,6 +362,87 @@ namespace Mfr.Tests.Ui.FileList
 
             Assert.Equal([alpha.FullPath], Assert.Single(fileClipboard.Copies));
             Assert.False(alpha.IsCutMarked);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Ctrl+V on the Report grid pastes clipboard files into the current folder.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_Grid_Ctrl_V_Pastes_Into_Current_Folder()
+        {
+            var ops = new RecordingFileShellOperations();
+            var fileClipboard = new RecordingFileClipboard();
+            var source = TestPaths.Absolute("source.txt");
+            fileClipboard.SeedPaste([source], preferMove: false);
+
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance,
+                shellOperations: ops,
+                fileClipboard: fileClipboard
+            );
+            _viewModels.Add(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 560,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            Assert.True(viewModel.PasteCommand.CanExecute(null));
+            var grid = view.FindControl<DataGrid>("ReportGrid");
+            Assert.NotNull(grid);
+            _RaiseKeyDown(grid, Key.V, KeyModifiers.Control);
+
+            var call = Assert.Single(ops.Copies);
+            Assert.Equal([source], call.Paths);
+            Assert.Equal(viewModel.CurrentPath, call.DestinationDirectory);
+            Assert.Empty(ops.Moves);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Paste is disabled when the clipboard has no file payload or the location is non-filesystem.
+        /// </summary>
+        [AvaloniaFact]
+        public void Paste_Command_Enable_Disable_Matches_Clipboard_And_Location()
+        {
+            var fileClipboard = new RecordingFileClipboard();
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance,
+                fileClipboard: fileClipboard
+            );
+            _viewModels.Add(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 560,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            Assert.False(viewModel.PasteCommand.CanExecute(null));
+
+            fileClipboard.SeedPaste([TestPaths.Absolute("from-explorer.txt")], preferMove: false);
+            Assert.True(viewModel.PasteCommand.CanExecute(null));
+
+            if (OperatingSystem.IsWindows())
+            {
+                viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+                Assert.False(viewModel.PasteCommand.CanExecute(null));
+            }
+
             window.Close();
         }
 

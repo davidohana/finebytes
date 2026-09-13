@@ -60,5 +60,17 @@ namespace Mfr.App.Ui.Services.FileList
             paste = new FileClipboardPaste([], PreferMove: false);
             return false;
         }
+
+        /// <inheritdoc />
+        public void CompleteMovePaste()
+        {
+            if (_cutPaths.Count == 0)
+            {
+                return;
+            }
+
+            _cutPaths.Clear();
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
     }
 }

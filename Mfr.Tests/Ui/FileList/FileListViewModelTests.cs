@@ -1531,6 +1531,176 @@ namespace Mfr.Tests.Ui.FileList
             Assert.False(alpha.IsCutMarked);
         }
 
+        /// <summary>
+        /// Verifies Paste copies clipboard files into CurrentPath via shell ops.
+        /// </summary>
+        [Fact]
+        public void Paste_Copy_Uses_Shell_Copy_Into_CurrentPath()
+        {
+            var ops = new RecordingFileShellOperations();
+            var fileClipboard = new RecordingFileClipboard();
+            var source = TestPaths.Absolute("from-elsewhere.txt");
+            fileClipboard.SeedPaste([source], preferMove: false);
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shellOperations: ops, fileClipboard: fileClipboard);
+
+            Assert.True(viewModel.PasteCommand.CanExecute(null));
+            viewModel.Paste();
+
+            var call = Assert.Single(ops.Copies);
+            Assert.Equal([source], call.Paths);
+            Assert.Equal(dir, call.DestinationDirectory);
+            Assert.Empty(ops.Moves);
+            Assert.Equal("Pasted 1 item(s).", viewModel.LastStatusMessage.ToPlainText());
+        }
+
+        /// <summary>
+        /// Verifies move-paste uses shell Move and clears cut marks on success.
+        /// </summary>
+        [Fact]
+        public void Paste_Move_Uses_Shell_Move_And_Clears_Cut_Marks()
+        {
+            var ops = new RecordingFileShellOperations();
+            var fileClipboard = new RecordingFileClipboard();
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shellOperations: ops, fileClipboard: fileClipboard);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+            viewModel.Cut();
+            Assert.True(alpha.IsCutMarked);
+
+            var dest = _tempDirectoryFixture.CreateTempDir();
+            viewModel.NavigateTo(dest);
+            Assert.True(viewModel.PasteCommand.CanExecute(null));
+            viewModel.Paste();
+
+            var call = Assert.Single(ops.Moves);
+            Assert.Equal([alpha.FullPath], call.Paths);
+            Assert.Equal(dest, call.DestinationDirectory);
+            Assert.Empty(ops.Copies);
+            Assert.Empty(fileClipboard.CutPaths);
+            Assert.False(fileClipboard.HasPasteableFiles);
+            Assert.False(viewModel.PasteCommand.CanExecute(null));
+            Assert.Equal("Pasted 1 item(s).", viewModel.LastStatusMessage.ToPlainText());
+        }
+
+        /// <summary>
+        /// Verifies failed move-paste leaves cut marks and publishes error status.
+        /// </summary>
+        [Fact]
+        public void Paste_Move_Failure_Keeps_Cut_Marks()
+        {
+            var ops = new RecordingFileShellOperations { ResultToReturn = FileShellOperationResult.Failed };
+            var fileClipboard = new RecordingFileClipboard();
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shellOperations: ops, fileClipboard: fileClipboard);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+            viewModel.Cut();
+
+            var dest = _tempDirectoryFixture.CreateTempDir();
+            viewModel.NavigateTo(dest);
+            viewModel.Paste();
+
+            Assert.Single(ops.Moves);
+            Assert.Contains(alpha.FullPath, fileClipboard.CutPaths);
+            Assert.Equal("Paste failed.", viewModel.LastStatusMessage.ToPlainText());
+            Assert.Equal(
+                StatusBarText.ErrorForegroundResourceKey,
+                viewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
+        }
+
+        /// <summary>
+        /// Verifies Paste CanExecute for clipboard payload and pasteable location.
+        /// </summary>
+        [Theory]
+        [InlineData(false, false, false)]
+        [InlineData(true, false, true)]
+        [InlineData(true, true, false)]
+        public void PasteCommand_CanExecute_Matrix(bool hasFiles, bool onComputer, bool expected)
+        {
+            if (onComputer && !OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var fileClipboard = new RecordingFileClipboard();
+            if (hasFiles)
+            {
+                fileClipboard.SeedPaste([TestPaths.Absolute("clip.txt")], preferMove: false);
+            }
+
+            var viewModel = _CreateViewModel(_CreateTree(), fileClipboard: fileClipboard);
+            if (onComputer)
+            {
+                viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            }
+
+            Assert.Equal(expected, viewModel.PasteCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Paste is disabled on Network root even with a pasteable clipboard.
+        /// </summary>
+        [Fact]
+        public void PasteCommand_Disabled_On_Network()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var fileClipboard = new RecordingFileClipboard();
+            fileClipboard.SeedPaste([TestPaths.Absolute("clip.txt")], preferMove: false);
+            var viewModel = _CreateViewModel(_CreateTree(), fileClipboard: fileClipboard);
+            viewModel.NavigateTo(FileListViewModel.NetworkDisplayName);
+
+            Assert.False(viewModel.PasteCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Cut/Copy/Delete share the filesystem-folder gate (Network disabled like This PC).
+        /// </summary>
+        [Fact]
+        public void Cut_Copy_Delete_Disabled_On_Network()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var ops = new RecordingFileShellOperations();
+            var fileClipboard = new RecordingFileClipboard();
+            var viewModel = _CreateViewModel(_CreateTree(), shellOperations: ops, fileClipboard: fileClipboard);
+            viewModel.NavigateTo(FileListViewModel.NetworkDisplayName);
+            Assert.NotEmpty(viewModel.Entries);
+            var entry = viewModel.Entries[0];
+            viewModel.SetSelectedEntries([entry], entry);
+
+            Assert.False(viewModel.CutCommand.CanExecute(null));
+            Assert.False(viewModel.CopyCommand.CanExecute(null));
+            Assert.False(viewModel.DeleteCommand.CanExecute(null));
+            Assert.False(viewModel.DeletePermanentCommand.CanExecute(null));
+            viewModel.Delete();
+            Assert.Empty(ops.Deletes);
+        }
+
+        /// <summary>
+        /// Verifies Paste CanExecute refreshes when the file clipboard Changed event fires.
+        /// </summary>
+        [Fact]
+        public void PasteCommand_Notifies_When_Clipboard_Changed()
+        {
+            var fileClipboard = new RecordingFileClipboard();
+            var viewModel = _CreateViewModel(_CreateTree(), fileClipboard: fileClipboard);
+            Assert.False(viewModel.PasteCommand.CanExecute(null));
+
+            fileClipboard.SeedPaste([TestPaths.Absolute("now-pasteable.txt")], preferMove: false);
+
+            Assert.True(viewModel.PasteCommand.CanExecute(null));
+        }
+
         private static bool _IsDriveName(string name)
         {
             return name.Contains(':', StringComparison.Ordinal);

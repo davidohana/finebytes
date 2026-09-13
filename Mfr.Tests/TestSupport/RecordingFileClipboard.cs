@@ -88,17 +88,34 @@ namespace Mfr.Tests.TestSupport
             return false;
         }
 
-        /// <summary>
-        /// Clears cut marks as if the clipboard were replaced externally.
-        /// </summary>
-        public void ClearCutMarks()
+        /// <inheritdoc />
+        public void CompleteMovePaste()
         {
-            if (_cutPaths.Count == 0)
+            var hadMarks = _cutPaths.Count > 0;
+            _cutPaths.Clear();
+            var clearedCutPaste = false;
+            if (_paste is { PreferMove: true })
+            {
+                _paste = null;
+                clearedCutPaste = true;
+            }
+
+            if (!hadMarks && !clearedCutPaste)
             {
                 return;
             }
 
-            _cutPaths.Clear();
+            Changed?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Seeds a pasteable payload without writing SetCopy / SetCut (Explorer-style inbound paste).
+        /// </summary>
+        /// <param name="paths">Filesystem paths to expose via TryGetPaste.</param>
+        /// <param name="preferMove">Whether Preferred DropEffect is Move.</param>
+        public void SeedPaste(IReadOnlyList<string> paths, bool preferMove)
+        {
+            _paste = paths.Count > 0 ? new FileClipboardPaste([.. paths], preferMove) : null;
             Changed?.Invoke(this, EventArgs.Empty);
         }
     }
