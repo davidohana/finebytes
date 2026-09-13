@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Mfr.Engine.Config;
 using Mfr.Utils;
 
@@ -22,7 +23,7 @@ namespace Mfr.Tests.Engine
         /// Verifies only <c>config.json</c> is deleted and presets are left alone.
         /// </summary>
         [Fact]
-        public void DeleteAppDataFiles_removes_config_not_presets()
+        public void Reset_removes_config_not_presets()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var configPath = dir.CombinePath("config.json");
@@ -30,17 +31,14 @@ namespace Mfr.Tests.Engine
 
             ConfigStoreTestReset.LoadEmpty();
             ConfigStore.Session = new SessionState { FileList = new SessionStateFileList { FileMask = "*.mp3" } };
-            ConfigStore.FilterDefaultsJson = new System.Text.Json.Nodes.JsonObject
-            {
-                ["LettersCase"] = new System.Text.Json.Nodes.JsonObject(),
-            };
+            ConfigStore.FilterDefaultsJson = new JsonObject { ["LettersCase"] = new JsonObject() };
             ConfigStore.Save(configPath);
             File.WriteAllText(
                 presetsPath, /*lang=json,strict*/
                 """{"presets":[]}"""
             );
 
-            PersistedConfigurationReset.DeleteAppDataFiles(configPath);
+            PersistedConfigurationReset.Reset(configPath);
 
             Assert.False(File.Exists(configPath));
             Assert.True(File.Exists(presetsPath));
@@ -49,13 +47,20 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies missing files do not throw.
+        /// Verifies a missing prefs file does not throw and still clears in-memory session / filter-defaults.
         /// </summary>
         [Fact]
-        public void DeleteAppDataFiles_missing_files_is_noop()
+        public void Reset_missing_file_clears_memory()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            PersistedConfigurationReset.DeleteAppDataFiles(dir.CombinePath("config.json"));
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.Session = new SessionState { FileList = new SessionStateFileList { FileMask = "*.wav" } };
+            ConfigStore.FilterDefaultsJson = new JsonObject { ["LettersCase"] = new JsonObject() };
+
+            PersistedConfigurationReset.Reset(dir.CombinePath("config.json"));
+
+            Assert.Null(ConfigStore.Session.FileList);
+            Assert.Empty(ConfigStore.FilterDefaultsJson);
         }
     }
 }

@@ -54,16 +54,12 @@ namespace Mfr.App.Ui.Services.Session
         /// <param name="renameList">
         /// Rename List session fields, or <see langword="null"/> to leave the saved section unchanged.
         /// </param>
-        /// <param name="configFilePath">
-        /// Path to <c>config.json</c>. When <c>null</c> or whitespace, the active / default AppData file is used.
-        /// </param>
         public static void SaveOnClose(
             Window window,
             MainWindowPaneGrids panes,
             SessionState session,
             SessionStateFileList? fileList,
-            SessionStateRenameList? renameList = null,
-            string? configFilePath = null
+            SessionStateRenameList? renameList = null
         )
         {
             ArgumentNullException.ThrowIfNull(window);
@@ -111,7 +107,7 @@ namespace Mfr.App.Ui.Services.Session
                 }
 
                 ConfigStore.Session = session;
-                ConfigStore.TrySave(configFilePath);
+                ConfigStore.TrySave();
             }
             catch
             {

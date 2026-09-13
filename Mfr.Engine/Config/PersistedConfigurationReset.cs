@@ -18,9 +18,10 @@ namespace Mfr.Engine.Config
         /// Config path, or blank for the default AppData <c>config.json</c>.
         /// </param>
         /// <exception cref="IOException">Thrown when a present file cannot be deleted.</exception>
-        public static void DeleteAppDataFiles(string? configFilePath = null)
+        public static void Reset(string? configFilePath = null)
         {
             ConfigStore.DeleteDefaultFile(configFilePath);
+
             ConfigStore.ClearSessionAndFilterDefaults();
         }
     }

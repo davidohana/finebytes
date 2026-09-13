@@ -233,7 +233,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                     }
                     else
                     {
-                        PersistedConfigurationReset.DeleteAppDataFiles();
+                        PersistedConfigurationReset.Reset();
                         viewModel.AppliedFiltersViewModel.ClearFilterDefaultsCache();
                     }
                 }
