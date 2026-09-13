@@ -61,7 +61,7 @@ flowchart LR
 - **Scope:** After successful `dialogVm.Commit()` in [`MainWindow.axaml.cs`](../../Mfr.App.Ui/Views/MainWindow/MainWindow.axaml.cs) `_ShowOptionsAsync`, push `AddMode` / `AddFolderContents` onto `viewModel.RenameListViewModel` (before or after `ConfigStore.Save`; order does not matter for correctness). Amend [options-dialog.plan.md](options-dialog.plan.md) skip row to point at this plan. Write this plan under `docs/plans/`.
 - **Exit:** Changing Options and adding in the same session uses the new policy without restart; close-save keeps the values (`CaptureSession` already includes them).
 - **Tests:** Headless host test: Options OK updates `RenameListViewModel` add fields (extend Options OK persist pattern in [`OptionsDialogTests`](../../Mfr.Tests/Ui/Options/OptionsDialogTests.cs)).
-- **Status:** Completed.
+- **Status:** Completed (`64a49a9d`).
 
 ## Key reuse
 

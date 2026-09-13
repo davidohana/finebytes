@@ -145,9 +145,8 @@ namespace Mfr.App.Ui.Views.MainWindow
                 }
 
                 dialogVm.Commit();
-                var renameList = ConfigStore.EnsureRenameList();
-                viewModel.RenameListViewModel.AddMode = renameList.AddMode;
-                viewModel.RenameListViewModel.AddFolderContents = renameList.AddFolderContents;
+                viewModel.RenameListViewModel.AddMode = dialogVm.AddMode;
+                viewModel.RenameListViewModel.AddFolderContents = dialogVm.AddFolderContents;
                 try
                 {
                     if (hooks?.SaveConfig is not null)
