@@ -262,6 +262,23 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies limit 0 deletes all on-disk logs (Options Disabled / MFR7 LogLimit 0).
+        /// </summary>
+        [Fact]
+        public void PruneFiles_Zero_Deletes_All()
+        {
+            var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
+            for (var i = 0; i < 3; i++)
+            {
+                File.WriteAllText(logDirectoryPath.CombinePath($"{i}{RenameLogStore.FileExtension}"), "x");
+            }
+
+            RenameLogStore.PruneFiles(logDirectoryPath, maxFiles: 0);
+
+            Assert.Empty(Directory.EnumerateFiles(logDirectoryPath, $"*{RenameLogStore.FileExtension}"));
+        }
+
+        /// <summary>
         /// Verifies CaptureFromCommit trims after write when limit is finite.
         /// </summary>
         [Fact]

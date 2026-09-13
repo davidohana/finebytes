@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: p4-options-retention
     content: "P4: Options Undo & Log retention UI for renameLog.limit"
-    status: pending
+    status: completed
   - id: p5-docs-debts
     content: "P5: Update debts, shortcuts, parent plan cross-links"
     status: pending

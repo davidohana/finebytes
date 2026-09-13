@@ -24,6 +24,8 @@ namespace Mfr.Tests.Ui.Options
             Assert.False(vm.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Files, vm.AddMode);
             Assert.True(vm.AddFolderContents);
+            Assert.Equal(RenameLogRetentionMode.Limited, vm.RenameLogRetentionMode);
+            Assert.Equal(OptionsDialogViewModel.DefaultLimitedCount, vm.RenameLogLimitedCount);
         }
 
         [Fact]
@@ -37,6 +39,7 @@ namespace Mfr.Tests.Ui.Options
                 AddMode = RenameListAddMode.Folders,
                 AddFolderContents = false,
             };
+            ConfigStore.RenameLog.Limit = 25;
 
             var vm = new OptionsDialogViewModel();
 
@@ -46,6 +49,22 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(vm.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, vm.AddMode);
             Assert.False(vm.AddFolderContents);
+            Assert.Equal(RenameLogRetentionMode.Limited, vm.RenameLogRetentionMode);
+            Assert.Equal(25, vm.RenameLogLimitedCount);
+        }
+
+        [Theory]
+        [InlineData(0, RenameLogRetentionMode.Disabled, OptionsDialogViewModel.DefaultLimitedCount)]
+        [InlineData(int.MaxValue, RenameLogRetentionMode.Unlimited, OptionsDialogViewModel.DefaultLimitedCount)]
+        [InlineData(7, RenameLogRetentionMode.Limited, 7)]
+        public void Constructor_maps_renameLog_limit(int limit, RenameLogRetentionMode mode, decimal limitedCount)
+        {
+            ConfigStore.RenameLog.Limit = limit;
+
+            var vm = new OptionsDialogViewModel();
+
+            Assert.Equal(mode, vm.RenameLogRetentionMode);
+            Assert.Equal(limitedCount, vm.RenameLogLimitedCount);
         }
 
         [Fact]
@@ -59,6 +78,7 @@ namespace Mfr.Tests.Ui.Options
                 AddMode = RenameListAddMode.Files,
                 AddFolderContents = true,
             };
+            ConfigStore.RenameLog.Limit = 10;
 
             var vm = new OptionsDialogViewModel()
             {
@@ -68,6 +88,8 @@ namespace Mfr.Tests.Ui.Options
                 DoubleClickAddsToRenameList = true,
                 AddMode = RenameListAddMode.FilesAndFolders,
                 AddFolderContents = false,
+                RenameLogLimitedCount = 3,
+                RenameLogRetentionMode = RenameLogRetentionMode.Limited,
             };
 
             vm.Commit();
@@ -78,6 +100,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.FilesAndFolders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);
+            Assert.Equal(3, ConfigStore.RenameLog.Limit);
         }
 
         [Fact]
@@ -93,6 +116,7 @@ namespace Mfr.Tests.Ui.Options
                 DoubleClickAddsToRenameList = true,
                 AddMode = RenameListAddMode.Folders,
                 AddFolderContents = false,
+                RenameLogRetentionMode = RenameLogRetentionMode.Unlimited,
             };
 
             vm.Commit();
@@ -106,6 +130,38 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);
+            Assert.Equal(int.MaxValue, ConfigStore.RenameLog.Limit);
+        }
+
+        [Theory]
+        [InlineData(RenameLogRetentionMode.Disabled, 10, 0)]
+        [InlineData(RenameLogRetentionMode.Unlimited, 10, int.MaxValue)]
+        [InlineData(RenameLogRetentionMode.Limited, 42, 42)]
+        public void Commit_round_trips_renameLog_limit(
+            RenameLogRetentionMode mode,
+            decimal limitedCount,
+            int expectedLimit
+        )
+        {
+            ConfigStore.RenameLog.Limit = 10;
+            var vm = new OptionsDialogViewModel { RenameLogLimitedCount = limitedCount, RenameLogRetentionMode = mode };
+
+            vm.Commit();
+
+            Assert.Equal(expectedLimit, ConfigStore.RenameLog.Limit);
+        }
+
+        [Fact]
+        public void Changing_limited_count_selects_Limited_mode()
+        {
+            ConfigStore.RenameLog.Limit = 0;
+            var vm = new OptionsDialogViewModel();
+            Assert.Equal(RenameLogRetentionMode.Disabled, vm.RenameLogRetentionMode);
+
+            vm.RenameLogLimitedCount = 5;
+
+            Assert.Equal(RenameLogRetentionMode.Limited, vm.RenameLogRetentionMode);
+            Assert.Equal(5, vm.RenameLogLimitedCount);
         }
     }
 }

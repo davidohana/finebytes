@@ -63,6 +63,7 @@ namespace Mfr.Models.Config
 
         /// <summary>
         /// Gets rename-commit undo log retention (<c>renameLog.limit</c>).
+        /// <para>Options dialog Undo &amp; Log section; also read by rename-log capture/trim.</para>
         /// </summary>
         public static RenameLogConfig RenameLog => s_Prefs.RenameLog;
 

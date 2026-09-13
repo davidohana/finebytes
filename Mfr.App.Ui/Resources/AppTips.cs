@@ -65,6 +65,18 @@ namespace Mfr.App.Ui.Resources
         public const string OptionsAddFolderContents =
             "When adding a folder, also include matching items from its subfolders recursively";
 
+        /// <summary>Options: rename-log retention — Disabled.</summary>
+        public const string OptionsRenameLogDisabled =
+            "Do not save rename logs to disk; Undo Last still works for the in-memory last operation";
+
+        /// <summary>Options: rename-log retention — Limited.</summary>
+        public const string OptionsRenameLogLimited =
+            "Keep only the newest N on-disk rename logs (default 10); older files are deleted";
+
+        /// <summary>Options: rename-log retention — Unlimited.</summary>
+        public const string OptionsRenameLogUnlimited =
+            "Keep every on-disk rename log until you erase them in the Log window";
+
         /// <summary>Tools → Reset Configuration menu tip (MFR7 ResetConfiguration).</summary>
         public const string ResetConfiguration = "Reset configuration to default values";
 

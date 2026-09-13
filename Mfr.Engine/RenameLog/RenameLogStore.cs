@@ -285,21 +285,26 @@ namespace Mfr.Engine.RenameLog
         /// <summary>
         /// Deletes older <c>.mfrlog</c> files so at most <paramref name="maxFiles"/> remain.
         /// <para>
-        /// Does nothing when the directory is missing, <paramref name="maxFiles"/> is less than 1,
-        /// or <paramref name="maxFiles"/> is <see cref="int.MaxValue"/> (unlimited).
+        /// Does nothing when the directory is missing or <paramref name="maxFiles"/> is
+        /// <see cref="int.MaxValue"/> (unlimited). When <paramref name="maxFiles"/> is <c>0</c> or
+        /// less, deletes all <c>.mfrlog</c> files (Options Disabled / MFR7 LogLimit 0 trim).
         /// </para>
         /// </summary>
         /// <param name="logDirectoryPath">Directory to prune.</param>
-        /// <param name="maxFiles">Maximum files to keep (newest by creation time, then name).</param>
+        /// <param name="maxFiles">
+        /// Maximum files to keep (newest by creation time, then name). <c>0</c> or less deletes all;
+        /// <see cref="int.MaxValue"/> leaves all files.
+        /// </param>
         public static void PruneFiles(string logDirectoryPath, int maxFiles)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(logDirectoryPath);
 
-            if (!Directory.Exists(logDirectoryPath) || maxFiles < 1 || maxFiles == int.MaxValue)
+            if (!Directory.Exists(logDirectoryPath) || maxFiles == int.MaxValue)
             {
                 return;
             }
 
+            var keepCount = Math.Max(0, maxFiles);
             var logFilePaths = Directory
                 .EnumerateFiles(logDirectoryPath, $"*{FileExtension}", SearchOption.TopDirectoryOnly)
                 .Select(path => new FileInfo(path))
@@ -307,12 +312,12 @@ namespace Mfr.Engine.RenameLog
                 .ThenByDescending(fileInfo => fileInfo.Name, StringComparer.Ordinal)
                 .ToList();
 
-            if (logFilePaths.Count <= maxFiles)
+            if (logFilePaths.Count <= keepCount)
             {
                 return;
             }
 
-            foreach (var fileInfo in logFilePaths.Skip(maxFiles))
+            foreach (var fileInfo in logFilePaths.Skip(keepCount))
             {
                 try
                 {

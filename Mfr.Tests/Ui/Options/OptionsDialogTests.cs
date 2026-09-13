@@ -37,11 +37,11 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies the Options dialog constructs remember checkboxes, prompts radios, double-click radios,
-        /// and Rename List add-mode controls.
+        /// Verifies the Options dialog constructs Session, Confirmation, File List, Rename List,
+        /// and Undo &amp; Log retention controls.
         /// </summary>
         [AvaloniaFact]
-        public void OptionsDialog_shows_remember_prompts_double_click_and_add_mode()
+        public void OptionsDialog_shows_session_prompts_file_list_rename_list_and_undo_log()
         {
             var dialogVm = new OptionsDialogViewModel();
             var dialog = new OptionsDialog(dialogVm);
@@ -73,6 +73,9 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Files", radioLabels);
                 Assert.Contains("Folders", radioLabels);
                 Assert.Contains("Files and folders", radioLabels);
+                Assert.Contains("Log disabled (Undo for last renaming operation only)", radioLabels);
+                Assert.Contains("Limited to:", radioLabels);
+                Assert.Contains("Unlimited", radioLabels);
 
                 var groupHeaders = dialog
                     .GetVisualDescendants()
@@ -83,6 +86,7 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Confirmation prompts", groupHeaders);
                 Assert.Contains("File List", groupHeaders);
                 Assert.Contains("Rename List", groupHeaders);
+                Assert.Contains("Undo & Log", groupHeaders);
 
                 var rowLabels = dialog
                     .GetVisualDescendants()
@@ -91,6 +95,8 @@ namespace Mfr.Tests.Ui.Options
                     .ToList();
                 Assert.Contains("Double-click:", rowLabels);
                 Assert.Contains("Add:", rowLabels);
+
+                Assert.NotNull(dialog.FindControl<CompactNumericUpDown>("RenameLogLimitSpinner"));
 
                 var checkTips = dialog
                     .GetVisualDescendants()
@@ -114,6 +120,9 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains(AppTips.OptionsAddModeFiles, radioTips);
                 Assert.Contains(AppTips.OptionsAddModeFolders, radioTips);
                 Assert.Contains(AppTips.OptionsAddModeFilesAndFolders, radioTips);
+                Assert.Contains(AppTips.OptionsRenameLogDisabled, radioTips);
+                Assert.Contains(AppTips.OptionsRenameLogLimited, radioTips);
+                Assert.Contains(AppTips.OptionsRenameLogUnlimited, radioTips);
             }
             finally
             {
@@ -193,6 +202,53 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);
+            Assert.Equal(0, ConfigStore.RenameLog.Limit);
+
+            viewModel.SuppressSessionSaveOnClose = true;
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies OK with an explicit prune directory trims on-disk logs to the committed limit.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task ShowOptions_Ok_prunes_rename_logs_when_hooks_path_set()
+        {
+            using var tempDirs = new TempDirectoryFixture();
+            var logDir = tempDirs.CreateTempDir();
+            var baseTime = new DateTime(2026, 3, 1, 0, 0, 0, DateTimeKind.Utc);
+            for (var i = 0; i < 4; i++)
+            {
+                var path = Path.Combine(logDir, $"{i:D3}{RenameLogStore.FileExtension}");
+                File.WriteAllText(path, "x");
+                File.SetCreationTimeUtc(path, baseTime.AddMinutes(i));
+            }
+
+            _SeedOptionsPrefs();
+            var (viewModel, window) = _ShowMainWindow(
+                persistSession: true,
+                new OptionsDialogHooks
+                {
+                    Show = vm =>
+                    {
+                        vm.RenameLogLimitedCount = 2;
+                        vm.RenameLogRetentionMode = RenameLogRetentionMode.Limited;
+                        return Task.FromResult<bool?>(true);
+                    },
+                    SaveConfig = () => { },
+                    PruneRenameLogDirectoryPath = logDir,
+                }
+            );
+
+            await _InvokeShowOptionsAsync(viewModel);
+
+            Assert.Equal(2, ConfigStore.RenameLog.Limit);
+            var remaining = Directory
+                .EnumerateFiles(logDir, $"*{RenameLogStore.FileExtension}")
+                .Select(Path.GetFileName)
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToList();
+            Assert.Equal(["002.mfrlog", "003.mfrlog"], remaining);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
@@ -229,6 +285,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.False(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Files, ConfigStore.RenameList.AddMode);
             Assert.True(ConfigStore.RenameList.AddFolderContents);
+            Assert.Equal(10, ConfigStore.RenameLog.Limit);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
@@ -275,6 +332,7 @@ namespace Mfr.Tests.Ui.Options
                 AddMode = RenameListAddMode.Files,
                 AddFolderContents = true,
             };
+            ConfigStore.RenameLog.Limit = 10;
         }
 
         /// <summary>
@@ -288,6 +346,7 @@ namespace Mfr.Tests.Ui.Options
             vm.DoubleClickAddsToRenameList = true;
             vm.AddMode = RenameListAddMode.Folders;
             vm.AddFolderContents = false;
+            vm.RenameLogRetentionMode = RenameLogRetentionMode.Disabled;
         }
 
         private static (MainWindowViewModel ViewModel, AppMainWindow Window) _ShowMainWindow(

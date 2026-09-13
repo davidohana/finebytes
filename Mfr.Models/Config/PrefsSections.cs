@@ -72,6 +72,7 @@ namespace Mfr.Models.Config
     /// <para>
     /// Separate from diagnostic Serilog <c>log</c> / <c>logs/</c>. Disk files live under
     /// <see cref="AppDataPaths.LocalRoot"/> + <c>rename-logs</c> as JSON <c>.mfrlog</c>.
+    /// Edited by the Options dialog Undo &amp; Log section (Disabled / Limited / Unlimited).
     /// </para>
     /// </summary>
     public sealed class RenameLogConfig
@@ -80,7 +81,8 @@ namespace Mfr.Models.Config
         /// How many on-disk rename logs to keep.
         /// <para>
         /// <c>0</c> = disk off (in-memory last operation still captured for Undo Last);
-        /// <see cref="int.MaxValue"/> = unlimited; default <c>10</c>.
+        /// <see cref="int.MaxValue"/> = unlimited; default <c>10</c>. Options maps these to
+        /// Disabled / Unlimited / Limited radios and prunes on OK when the limit shrinks.
         /// </para>
         /// </summary>
         [ConfigIntRange(0, int.MaxValue)]

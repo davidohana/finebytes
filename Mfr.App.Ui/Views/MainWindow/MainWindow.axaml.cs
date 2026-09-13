@@ -10,6 +10,7 @@ using Mfr.App.Ui.ViewModels.Options;
 using Mfr.App.Ui.Views.LogDialog;
 using Mfr.App.Ui.Views.Options;
 using Mfr.Engine.Config;
+using Mfr.Engine.RenameLog;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.Views.MainWindow
@@ -160,6 +161,17 @@ namespace Mfr.App.Ui.Views.MainWindow
                 }
 
                 dialogVm.Commit();
+
+                // Production: trim default rename-logs dir. Hooks: only when an explicit path is set
+                // (headless OK tests must not prune the developer's AppData logs).
+                var pruneDirectoryPath = hooks is null
+                    ? RenameLogStore.DefaultDirectoryPath
+                    : hooks.PruneRenameLogDirectoryPath;
+                if (pruneDirectoryPath is not null)
+                {
+                    RenameLogStore.PruneFiles(pruneDirectoryPath, ConfigStore.RenameLog.Limit);
+                }
+
                 viewModel.RenameListViewModel.NotifyAddPolicyChanged();
                 try
                 {

@@ -114,6 +114,47 @@
           </controls:FilterEditorLabeledRow>
         </StackPanel>
       </controls:FieldsetGroup>
+
+      <controls:FieldsetGroup Header="Undo &amp; Log">
+        <StackPanel Spacing="6">
+          <controls:CompactRadioButton
+            GroupName="RenameLogRetention"
+            Content="Log disabled (Undo for last renaming operation only)"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsRenameLogDisabled}"
+            IsChecked="{Binding RenameLogRetentionMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:RenameLogRetentionMode.Disabled}, Mode=TwoWay}"
+          />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <controls:CompactRadioButton
+              GroupName="RenameLogRetention"
+              Content="Limited to:"
+              VerticalAlignment="Center"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsRenameLogLimited}"
+              IsChecked="{Binding RenameLogRetentionMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:RenameLogRetentionMode.Limited}, Mode=TwoWay}"
+            />
+            <controls:CompactNumericUpDown
+              x:Name="RenameLogLimitSpinner"
+              Minimum="{x:Static vm:OptionsDialogViewModel.MinLimitedCount}"
+              Maximum="{x:Static vm:OptionsDialogViewModel.MaxLimitedCount}"
+              Increment="1"
+              FormatString="0"
+              Width="64"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsRenameLogLimited}"
+              Value="{Binding RenameLogLimitedCount}"
+            />
+            <TextBlock
+              Text="renaming operations"
+              VerticalAlignment="Center"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsRenameLogLimited}"
+            />
+          </StackPanel>
+          <controls:CompactRadioButton
+            GroupName="RenameLogRetention"
+            Content="Unlimited"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsRenameLogUnlimited}"
+            IsChecked="{Binding RenameLogRetentionMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:RenameLogRetentionMode.Unlimited}, Mode=TwoWay}"
+          />
+        </StackPanel>
+      </controls:FieldsetGroup>
     </StackPanel>
   </DockPanel>
 </Window>
