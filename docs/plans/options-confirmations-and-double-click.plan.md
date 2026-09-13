@@ -57,7 +57,7 @@ Parent: [docs/plans/options-dialog.plan.md](docs/plans/options-dialog.plan.md) (
 ### Parity gaps / intentional diffs
 
 - 3-state confirmations: finebytes-only
-- Add-mode stays on Rename List (not Options)
+- Add-mode in Options — **shipped** in [options-add-mode.plan.md](options-add-mode.plan.md)
 - Explorer shell / Undo & Log still deferred
 
 ## Non-goals
@@ -65,7 +65,7 @@ Parent: [docs/plans/options-dialog.plan.md](docs/plans/options-dialog.plan.md) (
 - Explorer shell integrate
 - Undo / `.mfrlog` retention tab
 - Per-item commit confirm (CLI only)
-- Moving add-mode into Options
+- Add-mode Options UI — **shipped** in [options-add-mode.plan.md](options-add-mode.plan.md)
 - Migrating old `confirmReplaceAppliedFiltersOnLoad` values
 - Enter-key open/add (finebytes File List Enter is not an open path today)
 

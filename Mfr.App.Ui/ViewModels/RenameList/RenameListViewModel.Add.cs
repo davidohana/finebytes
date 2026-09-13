@@ -1,4 +1,3 @@
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.RenameList;
@@ -15,17 +14,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Which path kinds become Rename List rows when adding from the File List.
+        /// Refreshes Add Selected / Add All can-execute after Options commits add policy to
+        /// <see cref="ConfigStore"/>.
         /// </summary>
-        [ObservableProperty]
-        private RenameListAddMode _addMode;
-
-        /// <summary>
-        /// When true, folder sources recurse: matching files in subfolders, and descendant folder rows when
-        /// <see cref="AddMode"/> includes folders.
-        /// </summary>
-        [ObservableProperty]
-        private bool _addFolderContents;
+        internal void NotifyAddPolicyChanged()
+        {
+            AddSelectedCommand.NotifyCanExecuteChanged();
+            AddAllCommand.NotifyCanExecuteChanged();
+        }
 
         /// <summary>
         /// Adds the File List selection to the Rename List.
@@ -36,7 +32,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 _ToSourceItems(_fileListViewModel.SelectedEntries),
                 _fileListViewModel.Mask,
-                AddMode
+                _AddMode()
             );
             await _AddSourcesAsync(sources).ConfigureAwait(true);
         }
@@ -50,7 +46,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var sources = RenameListAddSourceResolver.ResolveSourcesFromSelection(
                 _ToSourceItems(_fileListViewModel.Entries),
                 _fileListViewModel.Mask,
-                AddMode
+                _AddMode()
             );
             await _AddSourcesAsync(sources).ConfigureAwait(true);
         }
@@ -63,7 +59,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             ArgumentNullException.ThrowIfNull(paths);
 
-            var sources = RenameListAddSourceResolver.ResolveSourcesFromPaths(paths, _fileListViewModel.Mask, AddMode);
+            var sources = RenameListAddSourceResolver.ResolveSourcesFromPaths(
+                paths,
+                _fileListViewModel.Mask,
+                _AddMode()
+            );
             await _AddSourcesAsync(sources).ConfigureAwait(true);
         }
 
@@ -84,7 +84,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             SetDropMarkIndex(null);
             var oldCount = _renameList.RenameItems.Count;
 
-            var addMode = AddMode;
+            var addMode = _AddMode();
+            var addFolderContents = _AddFolderContents();
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             var metadataRequirement = _CurrentMetadataRequirement();
             var addSummary = new RenameListAddSummary(0);
@@ -104,7 +105,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                                 sources: sources,
                                 includeFiles: addMode.IncludesFiles(),
                                 includeFolders: addMode.IncludesFolders(),
-                                includeSubdirs: AddFolderContents,
+                                includeSubdirs: addFolderContents,
                                 excludeMasks: excludeMasks,
                                 cancellationToken: token,
                                 progress: progress,
@@ -294,7 +295,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return RenameListAddSourceResolver.CanResolveFromSelection(
                 _ToSourceItems(_fileListViewModel.SelectedEntries),
                 _fileListViewModel.Mask,
-                AddMode
+                _AddMode()
             );
         }
 
@@ -315,14 +316,24 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return RenameListAddSourceResolver.CanResolveFromSelection(
                 _ToSourceItems(_fileListViewModel.Entries),
                 _fileListViewModel.Mask,
-                AddMode
+                _AddMode()
             );
         }
 
-        partial void OnAddModeChanged(RenameListAddMode value)
+        /// <summary>
+        /// Options-owned add mode from <see cref="ConfigStore"/> (defaults when the section is unset).
+        /// </summary>
+        private static RenameListAddMode _AddMode()
         {
-            AddSelectedCommand.NotifyCanExecuteChanged();
-            AddAllCommand.NotifyCanExecuteChanged();
+            return ConfigStore.RenameList?.AddMode ?? RenameListAddMode.Files;
+        }
+
+        /// <summary>
+        /// Options-owned folder-contents flag from <see cref="ConfigStore"/> (default on when unset).
+        /// </summary>
+        private static bool _AddFolderContents()
+        {
+            return ConfigStore.RenameList?.AddFolderContents ?? true;
         }
 
         private static IReadOnlyList<FileListSourceItem> _ToSourceItems(IEnumerable<FileListEntry> entries)

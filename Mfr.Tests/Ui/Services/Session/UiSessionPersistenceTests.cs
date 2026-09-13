@@ -69,5 +69,63 @@ namespace Mfr.Tests.Ui.Services.Session
                 ConfigStoreTestReset.LoadEmpty();
             }
         }
+
+        /// <summary>
+        /// Verifies close-save keeps Options-owned Rename List add policy when merging a pane capture.
+        /// </summary>
+        [AvaloniaFact]
+        public void SaveOnClose_Preserves_RenameList_Add_Policy()
+        {
+            var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-session-rl-close-" + Guid.NewGuid() + ".json");
+            File.WriteAllText(configPath, "{}");
+            try
+            {
+                ConfigStore.Load(configPath);
+                ConfigStore.RenameList = new RenameListPrefs
+                {
+                    AddMode = RenameListAddMode.Folders,
+                    AddFolderContents = false,
+                    UseFixedWidthFont = true,
+                    PreviewEnabled = true,
+                };
+                ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
+
+                var window = new AppMainWindow
+                {
+                    DataContext = new MainWindowViewModel(persistSession: false),
+                    Width = 1100,
+                    Height = 720,
+                };
+                window.Show();
+                window.UpdateLayout();
+
+                var capture = new RenameListPrefs
+                {
+                    AddMode = RenameListAddMode.Files,
+                    AddFolderContents = true,
+                    UseFixedWidthFont = false,
+                    PreviewEnabled = false,
+                    SortFields = [],
+                };
+
+                UiSessionPersistence.SaveOnClose(window, window.GetPaneGrids(), fileList: null, renameList: capture);
+
+                Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList?.AddMode);
+                Assert.False(ConfigStore.RenameList?.AddFolderContents);
+                Assert.False(ConfigStore.RenameList?.UseFixedWidthFont);
+                Assert.False(ConfigStore.RenameList?.PreviewEnabled);
+                Assert.NotNull(ConfigStore.RenameList?.SortFields);
+                Assert.Empty(ConfigStore.RenameList.SortFields);
+            }
+            finally
+            {
+                if (File.Exists(configPath))
+                {
+                    File.Delete(configPath);
+                }
+
+                ConfigStoreTestReset.LoadEmpty();
+            }
+        }
     }
 }

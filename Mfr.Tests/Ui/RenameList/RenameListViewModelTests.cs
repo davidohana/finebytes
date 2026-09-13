@@ -14,9 +14,18 @@ namespace Mfr.Tests.Ui.RenameList
     /// <summary>
     /// Tests Rename List add commands backed by the engine.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class RenameListViewModelTests : IDisposable
     {
         private readonly RenameListUiTestContext _context = new();
+
+        /// <summary>
+        /// Resets <see cref="ConfigStore"/> so Options-owned add policy defaults apply.
+        /// </summary>
+        public RenameListViewModelTests()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+        }
 
         /// <inheritdoc />
         public void Dispose()
@@ -83,11 +92,8 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _context.CreateFileListViewModel(parent);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel)
-            {
-                AddMode = RenameListAddMode.Folders,
-                AddFolderContents = false,
-            };
+            _SetAddPolicy(RenameListAddMode.Folders, addFolderContents: false);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             await renameListViewModel.AddPathsAsync([albumPath, Path.Combine(parent, "other.txt")]);
 
@@ -233,10 +239,8 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _context.CreateFileListViewModel(parent);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel)
-            {
-                AddMode = RenameListAddMode.FilesAndFolders,
-            };
+            _SetAddPolicy(RenameListAddMode.FilesAndFolders);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
@@ -256,11 +260,8 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _context.CreateFileListViewModel(parent);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel)
-            {
-                AddMode = RenameListAddMode.FilesAndFolders,
-                AddFolderContents = false,
-            };
+            _SetAddPolicy(RenameListAddMode.FilesAndFolders, addFolderContents: false);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
@@ -323,10 +324,8 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _context.CreateFileListViewModel(parent);
-            var renameListViewModel = new RenameListViewModel(fileListViewModel)
-            {
-                AddMode = RenameListAddMode.Folders,
-            };
+            _SetAddPolicy(RenameListAddMode.Folders);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
 
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
@@ -353,13 +352,15 @@ namespace Mfr.Tests.Ui.RenameList
             fileListViewModel.SetSelectedEntries([folderEntry]);
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
-            renameListViewModel.AddMode = RenameListAddMode.Folders;
+            _SetAddPolicy(RenameListAddMode.Folders);
+            renameListViewModel.NotifyAddPolicyChanged();
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
             fileListViewModel.SetSelectedEntries([fileEntry]);
             Assert.False(renameListViewModel.AddSelectedCommand.CanExecute(null));
 
-            renameListViewModel.AddMode = RenameListAddMode.Files;
+            _SetAddPolicy(RenameListAddMode.Files);
+            renameListViewModel.NotifyAddPolicyChanged();
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
         }
 
@@ -1289,10 +1290,11 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies add-policy and font prefs restore from a session section and round-trip through capture.
+        /// Verifies font/preview prefs restore from a session section and round-trip through capture.
+        /// <para>Add policy is Options-owned on ConfigStore — capture omits it (defaults on the object).</para>
         /// </summary>
         [Fact]
-        public void ApplySessionSection_Restores_Add_Policy_And_Font()
+        public void ApplySessionSection_Restores_Font_And_Preview()
         {
             var dir = _CreateSampleFolder();
             var fileListViewModel = _context.CreateFileListViewModel(dir);
@@ -1309,15 +1311,13 @@ namespace Mfr.Tests.Ui.RenameList
                 }
             );
 
-            Assert.Equal(RenameListAddMode.Folders, renameListViewModel.AddMode);
-            Assert.False(renameListViewModel.AddFolderContents);
             Assert.True(renameListViewModel.UseFixedWidthFont);
             Assert.False(renameListViewModel.IsAutoPreview);
             Assert.False(renameListViewModel.IsAutoSort);
 
             var captured = renameListViewModel.CaptureSession();
-            Assert.Equal(RenameListAddMode.Folders, captured.AddMode);
-            Assert.False(captured.AddFolderContents);
+            Assert.Equal(RenameListAddMode.Files, captured.AddMode);
+            Assert.True(captured.AddFolderContents);
             Assert.True(captured.UseFixedWidthFont);
             Assert.False(captured.PreviewEnabled);
             Assert.NotNull(captured.SortFields);
@@ -1710,6 +1710,16 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Empty(renameListViewModel.Entries);
             Assert.Equal(0, renameListViewModel.ItemCount);
             Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Sets Options-owned Rename List add policy on <see cref="ConfigStore"/>.
+        /// </summary>
+        private static void _SetAddPolicy(RenameListAddMode addMode, bool addFolderContents = true)
+        {
+            var renameList = ConfigStore.EnsureRenameList();
+            renameList.AddMode = addMode;
+            renameList.AddFolderContents = addFolderContents;
         }
 
         private string _CreateSampleFolder()

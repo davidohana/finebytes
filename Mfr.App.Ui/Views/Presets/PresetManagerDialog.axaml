@@ -92,16 +92,14 @@
       <Setter Property="Spacing" Value="6" />
       <Setter Property="Margin" Value="6,0" />
       <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
     </Style>
   </Window.Styles>
 
   <DockPanel Margin="16">
     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
       <TextBlock Classes="preset-manager-title" Text="Preset library" />
-      <TextBlock
-        Classes="preset-manager-subtitle"
-        Text="Load, reorder, or manage saved rename chains."
-      />
+      <TextBlock Classes="preset-manager-subtitle" Text="Load, reorder, or manage saved rename chains." />
     </StackPanel>
 
     <Grid ColumnDefinitions="*,Auto,14,*,14,Auto" RowDefinitions="Auto,*">

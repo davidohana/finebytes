@@ -57,14 +57,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private void _ApplySessionScalarDefaults()
         {
             var section = new RenameListPrefs();
-            AddMode = section.AddMode;
-            AddFolderContents = section.AddFolderContents;
             UseFixedWidthFont = section.UseFixedWidthFont;
             IsAutoPreview = section.PreviewEnabled;
         }
 
         /// <summary>
-        /// Restores sort, columns, add-policy, and display prefs from a session section.
+        /// Restores sort, columns, and display prefs from a session section.
+        /// <para>
+        /// Add policy (<see cref="RenameListPrefs.AddMode"/> / <see cref="RenameListPrefs.AddFolderContents"/>)
+        /// is Options-owned on <see cref="ConfigStore"/> — not applied here.
+        /// </para>
         /// </summary>
         /// <param name="renameList">
         /// Saved Rename List section, or <see langword="null"/> for first-launch defaults.
@@ -74,14 +76,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var section = renameList ?? new RenameListPrefs();
             ApplySession(renameList?.SortFields);
             ApplyVisibleColumnSpecs(renameList?.VisibleColumns);
-            AddMode = section.AddMode;
-            AddFolderContents = section.AddFolderContents;
             UseFixedWidthFont = section.UseFixedWidthFont;
             IsAutoPreview = section.PreviewEnabled;
         }
 
         /// <summary>
-        /// Captures sort, columns, add-policy, and display prefs for session save.
+        /// Captures sort, columns, and display prefs for session save.
+        /// <para>
+        /// Omits Options-owned add policy; close-save merges those from <see cref="ConfigStore.RenameList"/>.
+        /// </para>
         /// </summary>
         /// <returns>Rename List session section matching the current view model.</returns>
         internal RenameListPrefs CaptureSession()
@@ -90,8 +93,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 SortFields = [.. CaptureSortFields()],
                 VisibleColumns = [.. CaptureVisibleColumnSpecs()],
-                AddMode = AddMode,
-                AddFolderContents = AddFolderContents,
                 UseFixedWidthFont = UseFixedWidthFont,
                 PreviewEnabled = IsAutoPreview,
             };

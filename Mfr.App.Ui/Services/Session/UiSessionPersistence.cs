@@ -97,7 +97,12 @@ namespace Mfr.App.Ui.Services.Session
 
                 if (renameList is not null)
                 {
-                    ConfigStore.RenameList = renameList;
+                    // Merge pane fields only — Options-owned add policy stays on ConfigStore.
+                    var saved = ConfigStore.EnsureRenameList();
+                    saved.SortFields = renameList.SortFields is null ? null : [.. renameList.SortFields];
+                    saved.VisibleColumns = renameList.VisibleColumns is null ? null : [.. renameList.VisibleColumns];
+                    saved.UseFixedWidthFont = renameList.UseFixedWidthFont;
+                    saved.PreviewEnabled = renameList.PreviewEnabled;
                 }
 
                 ConfigStore.TrySave();

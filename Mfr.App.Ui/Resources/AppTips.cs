@@ -63,7 +63,7 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Options: recurse into folder sources when adding.</summary>
         public const string OptionsAddFolderContents =
-            "When adding a folder, also include matching items from its subfolders";
+            "When adding a folder, also include matching items from its subfolders recursively";
 
         /// <summary>Tools → Reset Configuration menu tip (MFR7 ResetConfiguration).</summary>
         public const string ResetConfiguration = "Reset configuration to default values";

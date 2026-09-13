@@ -100,7 +100,7 @@ namespace Mfr.App.Ui.Views.MainWindow
         }
 
         /// <summary>
-        /// Hosts the Options dialog; on OK commits drafts, syncs Rename List add policy, and writes <c>config.json</c>.
+        /// Hosts the Options dialog; on OK commits drafts and writes <c>config.json</c>.
         /// <para>
         /// No-ops when <see cref="MainWindowViewModel.PersistSession"/> is false — remember flags must
         /// land on live <see cref="ConfigStore"/> sections, not a throwaway draft.
@@ -145,8 +145,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                 }
 
                 dialogVm.Commit();
-                viewModel.RenameListViewModel.AddMode = dialogVm.AddMode;
-                viewModel.RenameListViewModel.AddFolderContents = dialogVm.AddFolderContents;
+                viewModel.RenameListViewModel.NotifyAddPolicyChanged();
                 try
                 {
                     if (hooks?.SaveConfig is not null)

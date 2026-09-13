@@ -1,6 +1,6 @@
 ---
 name: Options add mode
-overview: "Add MFR7-style Rename List add policy to the Options dialog: Files / Folders / Files and folders radios plus Add folder contents, persisted in renameList and applied to the live RenameListViewModel on OK."
+overview: "Add MFR7-style Rename List add policy to the Options dialog: Files / Folders / Files and folders radios plus Add folder contents, persisted in renameList and read from ConfigStore at add time (File List–style Options-owned prefs)."
 todos:
   - id: p1-options-ui
     content: "P1: OptionsDialogViewModel + AXAML radios/checkbox + AppTips; Commit to EnsureRenameList; VM + headless Options tests"
@@ -8,19 +8,23 @@ todos:
   - id: p2-live-sync-docs
     content: "P2: MainWindow OK pushes AddMode/AddFolderContents to RenameListViewModel; docs/plans/options-add-mode.plan.md + amend options-dialog.plan.md; sync test"
     status: completed
+  - id: deeper-configstore-owner
+    content: "Deeper: ConfigStore-owned add policy at add time; CaptureSession omit + SaveOnClose merge; NotifyAddPolicyChanged on Options OK"
+    status: completed
 isProject: false
 ---
 
 # Options add-mode UI
 
-Parent: [options-dialog.plan.md](options-dialog.plan.md) (explicitly skipped add-mode; this supersedes that skip). Prefs already exist on [`RenameListPrefs`](../../Mfr.Models/Config/SessionPrefs.cs) (`addMode`, `addFolderContents`) and [`RenameListViewModel`](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Add.cs).
+Parent: [options-dialog.plan.md](options-dialog.plan.md) (explicitly skipped add-mode; this supersedes that skip). Prefs live on [`RenameListPrefs`](../../Mfr.Models/Config/SessionPrefs.cs) (`addMode`, `addFolderContents`); add paths read them from [`ConfigStore`](../../Mfr.Models/Config/ConfigStore.cs) (same Options-owned pattern as File List double-click).
 
 ## Decisions (locked)
 
 - **Placement:** Options dialog only (no Rename List toolbar / menu / on-the-fly heuristics).
 - **Controls:** Radio trio bound to `RenameListAddMode` — **Files** / **Folders** / **Files and folders** — plus checkbox **Add folder contents** (not MFR7’s two coupled “Add files/Add folders” checks).
 - **Persist:** `renameList.addMode` + `renameList.addFolderContents` via `ConfigStore.EnsureRenameList()` on OK; existing `ConfigStore.Save()` path unchanged.
-- **Live apply:** On OK, also set `RenameListViewModel.AddMode` / `AddFolderContents` so same-session Add Selected/All/drop/double-click-add pick up the change. (Double-click flag can stay ConfigStore-only because File List reads it at tap time; add policy is VM-owned and `CaptureSession` would otherwise overwrite ConfigStore on close.)
+- **Runtime owner:** Add Selected/All/drop read add policy from `ConfigStore` at call time (not VM fields). Options OK calls `NotifyAddPolicyChanged()` so can-execute refreshes.
+- **Close-save:** `CaptureSession` omits add policy; `UiSessionPersistence.SaveOnClose` merges pane fields onto `EnsureRenameList()` and preserves Options-owned add fields (mirror File List double-click / remember).
 - **Contents checkbox:** Always enabled (still meaningful in Files-only mode when a folder source is expanded).
 
 ## MFR7 reference brief
@@ -43,8 +47,9 @@ flowchart LR
   Open["Options open"] --> Draft["OptionsDialogViewModel drafts AddMode + AddFolderContents"]
   Draft --> Ok["OK"]
   Ok --> Store["EnsureRenameList + ConfigStore.Save"]
-  Ok --> Vm["RenameListViewModel.AddMode / AddFolderContents"]
-  Vm --> Add["Add Selected / All / drop / double-click-add"]
+  Ok --> Notify["NotifyAddPolicyChanged"]
+  Store --> Add["Add Selected / All / drop reads ConfigStore"]
+  Notify --> CanExec["Add can-execute refresh"]
 ```
 
 ## Phases
@@ -58,12 +63,17 @@ flowchart LR
 
 ### P2 — Live Rename List sync + docs
 
-- **Scope:** After successful `dialogVm.Commit()` in [`MainWindow.axaml.cs`](../../Mfr.App.Ui/Views/MainWindow/MainWindow.axaml.cs) `_ShowOptionsAsync`, push `AddMode` / `AddFolderContents` onto `viewModel.RenameListViewModel` (before or after `ConfigStore.Save`; order does not matter for correctness). Amend [options-dialog.plan.md](options-dialog.plan.md) skip row to point at this plan. Write this plan under `docs/plans/`.
-- **Exit:** Changing Options and adding in the same session uses the new policy without restart; close-save keeps the values (`CaptureSession` already includes them).
-- **Tests:** Headless host test: Options OK updates `RenameListViewModel` add fields (extend Options OK persist pattern in [`OptionsDialogTests`](../../Mfr.Tests/Ui/Options/OptionsDialogTests.cs)).
-- **Status:** Completed (`64a49a9d`).
+- **Scope (superseded by deeper follow-up):** Originally pushed VM fields after Commit; now add paths read `ConfigStore` and Options OK only notifies can-execute. Plan file + [options-dialog.plan.md](options-dialog.plan.md) skip amendment remain.
+- **Exit:** Changing Options and adding in the same session uses the new policy without restart; close-save keeps Options values via merge.
+- **Status:** Completed (`64a49a9d`); deeper ownership follow-up below.
+
+### Deeper — ConfigStore-owned add policy
+
+- **Scope:** Drop `RenameListViewModel` AddMode/AddFolderContents observables; read `ConfigStore` in add/can-execute; omit from `CaptureSession`; merge in `SaveOnClose`; `NotifyAddPolicyChanged` on Options OK.
+- **Status:** Completed (this follow-up).
 
 ## Key reuse
 
 - `EnumToBooleanConverter` + `CompactRadioButton` / `CompactCheckBox` patterns already in Options.
-- No new persisted schema — only UI + live sync.
+- File List Options-owned close-save merge pattern for double-click / remember.
+- No new persisted schema — UI + ownership alignment only.

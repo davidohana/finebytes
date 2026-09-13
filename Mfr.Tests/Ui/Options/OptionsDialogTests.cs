@@ -160,7 +160,7 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies OK commits drafts, invokes config save, and syncs Rename List add policy live.
+        /// Verifies OK commits drafts, invokes config save, and refreshes Rename List add can-execute.
         /// </summary>
         [AvaloniaFact]
         public async Task ShowOptions_Ok_commits_and_saves_config()
@@ -183,9 +183,6 @@ namespace Mfr.Tests.Ui.Options
                 }
             );
 
-            Assert.Equal(RenameListAddMode.Files, viewModel.RenameListViewModel.AddMode);
-            Assert.True(viewModel.RenameListViewModel.AddFolderContents);
-
             await _InvokeShowOptionsAsync(viewModel);
 
             Assert.NotNull(shown);
@@ -196,8 +193,6 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);
-            Assert.Equal(RenameListAddMode.Folders, viewModel.RenameListViewModel.AddMode);
-            Assert.False(viewModel.RenameListViewModel.AddFolderContents);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
@@ -234,8 +229,6 @@ namespace Mfr.Tests.Ui.Options
             Assert.False(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Files, ConfigStore.RenameList.AddMode);
             Assert.True(ConfigStore.RenameList.AddFolderContents);
-            Assert.Equal(RenameListAddMode.Files, viewModel.RenameListViewModel.AddMode);
-            Assert.True(viewModel.RenameListViewModel.AddFolderContents);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
