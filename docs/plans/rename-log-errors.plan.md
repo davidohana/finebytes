@@ -13,7 +13,7 @@ isProject: false
 
 # Rename log errors plan
 
-Parent: [docs/plans/undo.plan.md](docs/plans/undo.plan.md) (capture currently CommitOk-only); related debt [docs/debts.md](docs/debts.md) “Show Last Rename Errors”.
+Parent: [docs/plans/undo.plan.md](docs/plans/undo.plan.md) (capture is CommitOk + CommitError); related debt [docs/debts.md](docs/debts.md) “Show Last Rename Errors”.
 
 ## Decisions (locked)
 
