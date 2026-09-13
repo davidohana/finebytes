@@ -1,3 +1,4 @@
+using Mfr.Engine.RenameList;
 using Mfr.Engine.RenameLog;
 using Mfr.Models.Config;
 using Mfr.Models.Rename;
@@ -61,12 +62,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            IReadOnlyList<RenameResultItem>? results = null;
+            RenameListUndoResult? undoResult = null;
             var commitCompleted = await _RunProgressAsync(
                     RenameListProgressOperation.Commit,
                     (token, progress) =>
                     {
-                        results = _renameList.Undo(log, failFast: false, cancellationToken: token, progress: progress);
+                        undoResult = _renameList.Undo(
+                            log,
+                            failFast: false,
+                            cancellationToken: token,
+                            progress: progress
+                        );
                     }
                 )
                 .ConfigureAwait(true);
@@ -75,11 +81,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _ClearPreviewCounts();
             _RefreshFieldDisplay();
 
+            var results = undoResult?.Results;
             var undoneCount = results?.Count(item => item.Status == RenameStatus.CommitOk) ?? 0;
             var commitErrorCount = results?.Count(item => item.Status == RenameStatus.CommitError) ?? 0;
+            var notLoadedCount = undoResult?.NotLoadedCount ?? 0;
             LastStatusMessage = _FormatUndoOutcome(
                 undoneCount: undoneCount,
                 errorCount: commitErrorCount,
+                notLoadedCount: notLoadedCount,
                 stopped: !commitCompleted
             );
 
@@ -116,45 +125,82 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Builds the status-bar message after an Undo commit (or Stop mid-undo).
         /// </summary>
-        private static StyledTextDisplay _FormatUndoOutcome(int undoneCount, int errorCount, bool stopped)
+        private static StyledTextDisplay _FormatUndoOutcome(
+            int undoneCount,
+            int errorCount,
+            int notLoadedCount,
+            bool stopped
+        )
         {
             if (stopped)
             {
-                var stoppedPart =
-                    undoneCount > 0
+                return _CombineUndoParts(
+                    primary: undoneCount > 0
                         ? StatusBarText.Warning($"Stopped. Undid {undoneCount} item(s).")
-                        : StatusBarText.Warning("Stopped.");
-                if (errorCount == 0)
-                {
-                    return stoppedPart;
-                }
-
-                return StatusBarText.Combine(
-                    stoppedPart,
-                    StatusBarText.Neutral(" "),
-                    StatusBarText.Error($"{errorCount} error(s) during undo.")
+                        : StatusBarText.Warning("Stopped."),
+                    errorCount: errorCount,
+                    notLoadedCount: notLoadedCount
                 );
             }
 
-            if (errorCount > 0 && undoneCount > 0)
+            if (undoneCount == 0 && errorCount == 0 && notLoadedCount > 0)
             {
-                return StatusBarText.Combine(
-                    StatusBarText.Neutral($"Undid {undoneCount} item(s). "),
-                    StatusBarText.Error($"{errorCount} error(s) during undo.")
-                );
+                return StatusBarText.Warning($"Could not load {notLoadedCount} item(s) for undo (paths missing).");
+            }
+
+            if (undoneCount == 0 && errorCount == 0 && notLoadedCount == 0)
+            {
+                return StatusBarText.Neutral("No items were undone.");
+            }
+
+            StyledTextDisplay? primary = null;
+            if (undoneCount > 0)
+            {
+                primary = StatusBarText.Neutral($"Undid {undoneCount} item(s).");
+            }
+
+            return _CombineUndoParts(primary: primary, errorCount: errorCount, notLoadedCount: notLoadedCount);
+        }
+
+        private static StyledTextDisplay _CombineUndoParts(
+            StyledTextDisplay? primary,
+            int errorCount,
+            int notLoadedCount
+        )
+        {
+            var parts = new List<StyledTextDisplay>();
+            if (primary is not null)
+            {
+                parts.Add(primary);
             }
 
             if (errorCount > 0)
             {
-                return StatusBarText.Error($"{errorCount} error(s) during undo.");
+                parts.Add(StatusBarText.Error($"{errorCount} error(s) during undo."));
             }
 
-            if (undoneCount > 0)
+            if (notLoadedCount > 0)
             {
-                return StatusBarText.Neutral($"Undid {undoneCount} item(s).");
+                parts.Add(StatusBarText.Warning($"{notLoadedCount} item(s) could not be loaded."));
             }
 
-            return StatusBarText.Neutral("No items were undone.");
+            if (parts.Count == 0)
+            {
+                return StatusBarText.Neutral("No items were undone.");
+            }
+
+            if (parts.Count == 1)
+            {
+                return parts[0];
+            }
+
+            var combined = parts[0];
+            for (var i = 1; i < parts.Count; i++)
+            {
+                combined = StatusBarText.Combine(combined, StatusBarText.Neutral(" "), parts[i]);
+            }
+
+            return combined;
         }
     }
 }

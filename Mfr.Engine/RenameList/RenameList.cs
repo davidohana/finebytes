@@ -710,7 +710,10 @@ namespace Mfr.Engine.RenameList
         /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
         /// <param name="cancellationToken">When canceled, stops applying remaining items without throwing.</param>
         /// <param name="progress">Optional progress sink for the undo commit phase.</param>
-        /// <returns>Per-item commit outcomes from the undo re-commit (also captured as a new last operation).</returns>
+        /// <returns>
+        /// Commit outcomes from the undo re-commit (also captured as a new last operation when any succeed)
+        /// plus how many undoable rows never loaded from <c>DestinationPath</c>.
+        /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="log"/> is <c>null</c>.</exception>
         /// <remarks>
         /// <para>
@@ -718,9 +721,10 @@ namespace Mfr.Engine.RenameList
         /// Rows with errors or only unrestorable changes (e.g. Tag Remover strip) are skipped.
         /// <c>StripAllEmbeddedTagsOnCommit</c> deltas on otherwise undoable rows are ignored when applying OldValues.
         /// Hidden destinations are included so attribute undos can reopen them.
+        /// Missing destination paths are skipped silently and reported via <see cref="RenameListUndoResult.NotLoadedCount"/>.
         /// </para>
         /// </remarks>
-        public IReadOnlyList<RenameResultItem> Undo(
+        public RenameListUndoResult Undo(
             RenameLogModel log,
             bool failFast = false,
             CancellationToken cancellationToken = default,
@@ -732,7 +736,7 @@ namespace Mfr.Engine.RenameList
             var undoableEntries = log.Entries.Where(static entry => entry.IsUndoable).ToList();
             if (undoableEntries.Count == 0)
             {
-                return [];
+                return new RenameListUndoResult(Results: [], NotLoadedCount: 0);
             }
 
             // Clear only after we know there is something to reverse — otherwise the current list is wiped for a no-op.
@@ -759,12 +763,15 @@ namespace Mfr.Engine.RenameList
                 destinationPathToEntry[NormalizePathKey(entry.DestinationPath)] = entry;
             }
 
+            var loadedDestinationKeys = new HashSet<string>(PathComparers.Os);
             foreach (var item in _renameItems)
             {
                 if (!destinationPathToEntry.TryGetValue(NormalizePathKey(item.Original.FullPath), out var logEntry))
                 {
                     continue;
                 }
+
+                loadedDestinationKeys.Add(NormalizePathKey(item.Original.FullPath));
 
                 try
                 {
@@ -782,8 +789,12 @@ namespace Mfr.Engine.RenameList
                 }
             }
 
+            var notLoadedCount = undoableEntries.Count(entry =>
+                !loadedDestinationKeys.Contains(NormalizePathKey(entry.DestinationPath))
+            );
+
             var plan = _CompletePreviewPlan(new RenameListProgressTracker(progress: null, cancellationToken));
-            return Commit(
+            var results = Commit(
                 plan,
                 failFast: failFast,
                 dryRun: false,
@@ -791,6 +802,7 @@ namespace Mfr.Engine.RenameList
                 progress: progress,
                 isUndo: true
             );
+            return new RenameListUndoResult(Results: results, NotLoadedCount: notLoadedCount);
         }
 
         /// <summary>

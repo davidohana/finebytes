@@ -48,11 +48,12 @@ namespace Mfr.Tests.Engine
             Assert.NotNull(RenameLogStore.LastOperation);
             Assert.False(RenameLogStore.LastOperation.IsUndo);
 
-            var undoResults = renameList.Undo(RenameLogStore.LastOperation);
-            Assert.Equal(RenameStatus.CommitOk, Assert.Single(undoResults).Status);
+            var undoResult = renameList.Undo(RenameLogStore.LastOperation);
+            Assert.Equal(0, undoResult.NotLoadedCount);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(undoResult.Results).Status);
             Assert.True(File.Exists(sourcePath));
             Assert.False(File.Exists(renamedPath));
-            Assert.Equal(sourcePath, Assert.Single(undoResults).DestinationPath);
+            Assert.Equal(sourcePath, Assert.Single(undoResult.Results).DestinationPath);
             Assert.NotNull(RenameLogStore.LastOperation);
             Assert.True(RenameLogStore.LastOperation.IsUndo);
             Assert.Equal(sourcePath, Assert.Single(RenameLogStore.LastOperation.Entries).DestinationPath);
@@ -78,8 +79,9 @@ namespace Mfr.Tests.Engine
             Assert.True(File.GetAttributes(path).HasFlag(FileAttributes.Hidden));
             Assert.NotNull(RenameLogStore.LastOperation);
 
-            var undoResults = renameList.Undo(RenameLogStore.LastOperation);
-            Assert.Equal(RenameStatus.CommitOk, Assert.Single(undoResults).Status);
+            var undoResult = renameList.Undo(RenameLogStore.LastOperation);
+            Assert.Equal(0, undoResult.NotLoadedCount);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(undoResult.Results).Status);
             Assert.False(File.GetAttributes(path).HasFlag(FileAttributes.Hidden));
         }
 
@@ -119,8 +121,9 @@ namespace Mfr.Tests.Engine
             renameList.AddSources([keepPath]);
             Assert.False(log.HasUndoableEntries);
 
-            var results = renameList.Undo(log);
-            Assert.Empty(results);
+            var undoResult = renameList.Undo(log);
+            Assert.Empty(undoResult.Results);
+            Assert.Equal(0, undoResult.NotLoadedCount);
             Assert.Single(renameList.RenameItems);
             Assert.Equal(keepPath, renameList.RenameItems[0].Original.FullPath);
             Assert.True(File.Exists(path));
@@ -140,7 +143,7 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList();
             renameList.AddSources([keepPath]);
 
-            var results = renameList.Undo(
+            var undoResult = renameList.Undo(
                 new RenameLog(
                     CommittedAt: DateTimeOffset.UtcNow,
                     Entries:
@@ -156,7 +159,8 @@ namespace Mfr.Tests.Engine
                 )
             );
 
-            Assert.Empty(results);
+            Assert.Empty(undoResult.Results);
+            Assert.Equal(0, undoResult.NotLoadedCount);
             Assert.Single(renameList.RenameItems);
             Assert.Equal(keepPath, renameList.RenameItems[0].Original.FullPath);
         }
@@ -194,8 +198,9 @@ namespace Mfr.Tests.Engine
             };
             var log = last with { Entries = [withStrip] };
 
-            var undoResults = renameList.Undo(log);
-            Assert.Equal(RenameStatus.CommitOk, Assert.Single(undoResults).Status);
+            var undoResult = renameList.Undo(log);
+            Assert.Equal(0, undoResult.NotLoadedCount);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(undoResult.Results).Status);
             Assert.True(File.Exists(sourcePath));
             Assert.False(File.Exists(renamedPath));
         }
@@ -207,9 +212,85 @@ namespace Mfr.Tests.Engine
         public void Undo_empty_log_returns_empty_results()
         {
             var renameList = new RenameList();
-            var results = renameList.Undo(new RenameLog(DateTimeOffset.UtcNow, Entries: []));
-            Assert.Empty(results);
+            var undoResult = renameList.Undo(new RenameLog(DateTimeOffset.UtcNow, Entries: []));
+            Assert.Empty(undoResult.Results);
+            Assert.Equal(0, undoResult.NotLoadedCount);
             Assert.Empty(renameList.RenameItems);
+        }
+
+        /// <summary>
+        /// Verifies Undo reports NotLoadedCount when DestinationPath files are already gone.
+        /// </summary>
+        [Fact]
+        public void Undo_missing_destination_reports_not_loaded()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var missingPath = dir.CombinePath("gone.txt");
+            var keepPath = dir.CombinePath("keep.txt");
+            File.WriteAllText(keepPath, "y");
+
+            var renameList = new RenameList();
+            renameList.AddSources([keepPath]);
+
+            var undoResult = renameList.Undo(
+                new RenameLog(
+                    CommittedAt: DateTimeOffset.UtcNow,
+                    Entries:
+                    [
+                        new RenameLogEntry(
+                            DestinationPath: missingPath,
+                            OriginalPath: dir.CombinePath("old.txt"),
+                            IsFolder: false,
+                            Changes: [new RenamePropertyChange("Prefix", "old", "gone")]
+                        ),
+                    ]
+                )
+            );
+
+            Assert.Empty(undoResult.Results);
+            Assert.Equal(1, undoResult.NotLoadedCount);
+            Assert.Empty(renameList.RenameItems);
+        }
+
+        /// <summary>
+        /// Verifies Undo undoes present rows and counts missing destinations separately.
+        /// </summary>
+        [Fact]
+        public void Undo_partial_missing_destination_reports_not_loaded()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("old-name.txt");
+            var renamedPath = dir.CombinePath("new-name.txt");
+            var missingPath = dir.CombinePath("missing.txt");
+            File.WriteAllText(sourcePath, "x");
+
+            var renameList = new RenameList();
+            renameList.AddSources([sourcePath]);
+            var goPlan = renameList.Preview(_PrefixFormatterPreset("go", "new-name").Chain);
+            var goResults = renameList.Commit(goPlan, failFast: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(goResults).Status);
+
+            var last = RenameLogStore.LastOperation!;
+            var present = Assert.Single(last.Entries);
+            var log = last with
+            {
+                Entries =
+                [
+                    present,
+                    new RenameLogEntry(
+                        DestinationPath: missingPath,
+                        OriginalPath: dir.CombinePath("was.txt"),
+                        IsFolder: false,
+                        Changes: [new RenamePropertyChange("Prefix", "was", "missing")]
+                    ),
+                ],
+            };
+
+            var undoResult = renameList.Undo(log);
+            Assert.Equal(1, undoResult.NotLoadedCount);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(undoResult.Results).Status);
+            Assert.True(File.Exists(sourcePath));
+            Assert.False(File.Exists(renamedPath));
         }
 
         private static FilterPreset _PrefixFormatterPreset(string name, string prefix)

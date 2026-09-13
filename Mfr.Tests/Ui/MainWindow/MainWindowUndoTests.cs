@@ -188,6 +188,40 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Equal("Nothing to undo.", viewModel.RenameListViewModel.LastStatusMessage.ToPlainText());
         }
 
+        /// <summary>
+        /// Verifies Undo status when DestinationPath files are already gone.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Undo_missing_paths_status()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var missing = Path.Combine(dir, "gone.txt");
+            var viewModel = new MainWindowViewModel(dir);
+            viewModel.RenameListViewModel.DisableAutoPreview();
+            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
+
+            var log = new RenameLog(
+                CommittedAt: DateTimeOffset.UtcNow,
+                Entries:
+                [
+                    new RenameLogEntry(
+                        DestinationPath: missing,
+                        OriginalPath: Path.Combine(dir, "old.txt"),
+                        IsFolder: false,
+                        Changes: [new RenamePropertyChange("Prefix", "old", "gone")]
+                    ),
+                ]
+            );
+
+            var started = await viewModel.RenameListViewModel.UndoAsync(log).ConfigureAwait(true);
+
+            Assert.True(started);
+            Assert.Equal(
+                "Could not load 1 item(s) for undo (paths missing).",
+                viewModel.RenameListViewModel.LastStatusMessage.ToPlainText()
+            );
+        }
+
         private static ReplacerFilter _PrefixReplacer(string find, string replacement)
         {
             return new ReplacerFilter(
