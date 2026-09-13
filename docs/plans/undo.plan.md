@@ -30,7 +30,7 @@ Parent: deferred from [rename-list-go.plan.md](rename-list-go.plan.md), [options
 
 - **v1 scope** — Full surface in this plan: Undo Last + Log window + disk `.mfrlog` history + Options retention (phased P1–P4), not Undo-Last-only first.
 - **Options retention UI** — Ship Undo & Log tab in **P4** (not hand-edit-only forever).
-- **Confirm before Undo?** — Gate via **Confirmation prompts** (`ConfirmationPolicy` + new `ConfirmationKind.UndoRename`). Same threshold as `GoWithPreviewErrors`: confirm at **Normal** and **More**, skip at **Fewer**. Applies to Undo Last and Log-window Undo. (MFR7 never confirmed; finebytes intentional.)
+- **Confirm before Undo?** — Gate via **`ConfirmationPolicy`** + `ConfirmationKind.UndoRename` (per-dialog suppress list; see [per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md)). Applies to Undo Last and Log-window Undo. (MFR7 never confirmed; finebytes intentional.)
 - **Rename List on undo** — **Replace without a separate non-empty-list warn** — clear current list and load the undone session (MFR7 parity). The Confirmation-prompts dialog above is the only pre-undo gate.
 - **Default disk retention** — Keep last **10** logs (0 = disk off / memory-only Undo Last; unlimited supported).
 
@@ -72,7 +72,7 @@ Parent: deferred from [rename-list-go.plan.md](rename-list-go.plan.md), [options
 - Ctrl+Z / Ctrl+Shift+L (not Ctrl+U / Ctrl+L)
 - JSON `.mfrlog` under LocalAppData `rename-logs` (not ProgramData XML)
 - Diagnostic `config.log` stays Serilog-only; rename retention is `renameLog`
-- Undo confirms via Confirmation prompts (Normal/More) — MFR7 had no confirm
+- Undo confirms via `ConfirmationKind.UndoRename` (suppressible) — MFR7 had no confirm
 - No MFR7 OptionsNode/`LogLimit` config bugs
 
 ## Non-goals
@@ -116,9 +116,9 @@ Hook points (shipped):
 
 ### P2 — Undo Last
 
-- Scope / files: engine `Undo(RenameLog)` → rebuild Rename List items, map OldValues → Preview, `Commit`; [`MainWindowViewModel.UndoLast`](../../Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs) + progress reuse; `CanExecute` when last op non-empty; before undo, `ConfirmationPolicy.ShouldConfirm(ConfirmationKind.UndoRename)` (add kind + Normal|More arm like GO preview errors); sticky status via `StatusBarText`; refresh File List after; docs [`keyboard-shortcuts.md`](../keyboard-shortcuts.md)
-- Exit criteria: Ctrl+Z / menu / toolbar undoes last GO (name move + a tag/attr case); confirm shows at Normal/More and is skipped at Fewer; “nothing to undo” when empty; Tag Remover strip still unrestorable
-- Tests: engine undo round-trip; VM/command enabled state; confirm gate by prompts level; status outcome
+- Scope / files: engine `Undo(RenameLog)` → rebuild Rename List items, map OldValues → Preview, `Commit`; [`MainWindowViewModel.UndoLast`](../../Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs) + progress reuse; `CanExecute` when last op non-empty; before undo, `ConfirmationPolicy.ShouldConfirm(ConfirmationKind.UndoRename)` (now suppress-list; see [per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md)); sticky status via `StatusBarText`; refresh File List after; docs [`keyboard-shortcuts.md`](../keyboard-shortcuts.md)
+- Exit criteria: Ctrl+Z / menu / toolbar undoes last GO (name move + a tag/attr case); confirm shows unless `UndoRename` suppressed; “nothing to undo” when empty; Tag Remover strip still unrestorable
+- Tests: engine undo round-trip; VM/command enabled state; confirm gate by suppress list; status outcome
 
 ### P3 — Log window
 

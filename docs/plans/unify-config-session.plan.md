@@ -23,7 +23,7 @@ isProject: false
 ```json
 {
   "log": { "...": "string leaves as today" },
-  "ui": { "confirmationPrompts": "...", "doubleClickAddsToRenameList": "..." },
+  "ui": { "suppressedConfirmations": [] },
   "mainWindow": {},
   "fileList": {},
   "renameList": {},

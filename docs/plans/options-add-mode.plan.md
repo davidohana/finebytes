@@ -56,7 +56,7 @@ flowchart LR
 
 ### P1 — Options draft + UI + Commit store
 
-- **Scope:** [`OptionsDialogViewModel.cs`](../../Mfr.App.Ui/ViewModels/Options/OptionsDialogViewModel.cs) — load/commit `AddMode` + `AddFolderContents` from/to `ConfigStore.EnsureRenameList()`. [`OptionsDialog.axaml`](../../Mfr.App.Ui/Views/Options/OptionsDialog.axaml) — label row + three `CompactRadioButton`s (`EnumToBooleanConverter` like Confirmation prompts) + `CompactCheckBox` for contents. [`AppTips.cs`](../../Mfr.App.Ui/Resources/AppTips.cs) tips for each control.
+- **Scope:** [`OptionsDialogViewModel.cs`](../../Mfr.App.Ui/ViewModels/Options/OptionsDialogViewModel.cs) — load/commit `AddMode` + `AddFolderContents` from/to `ConfigStore.EnsureRenameList()`. [`OptionsDialog.axaml`](../../Mfr.App.Ui/Views/Options/OptionsDialog.axaml) — label row + three `CompactRadioButton`s (`EnumToBooleanConverter`) + `CompactCheckBox` for contents. [`AppTips.cs`](../../Mfr.App.Ui/Resources/AppTips.cs) tips for each control.
 - **Exit:** Dialog shows and round-trips prefs in memory via `Commit()`.
 - **Tests:** Extend [`OptionsDialogViewModelTests`](../../Mfr.Tests/Ui/Options/OptionsDialogViewModelTests.cs); headless label/tip asserts in [`OptionsDialogTests`](../../Mfr.Tests/Ui/Options/OptionsDialogTests.cs).
 - **Status:** Completed (`f6b72177`).

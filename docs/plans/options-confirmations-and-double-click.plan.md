@@ -24,9 +24,13 @@ isProject: false
 
 Parent: [docs/plans/options-dialog.plan.md](docs/plans/options-dialog.plan.md) (v1 shipped).
 
+## Status
+
+Implemented. **Confirmation half superseded** by [per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md) (`ui.suppressedConfirmations` + Keep showing checkbox; 3-state removed). Double-click-to-add still as below (`fileList.doubleClickAddsToRenameList`).
+
 ## Decisions (locked)
 
-- **Confirmation prompts** enum on `config.json` (`ui.confirmationPrompts`), default **`Normal`**. Replaces `ui.presets.confirmReplaceAppliedFiltersOnLoad` (delete `PresetsUiConfig`; no migration — unknown old key ignored; missing enum → Normal).
+- **Confirmation prompts** enum on `config.json` (`ui.confirmationPrompts`), default **`Normal`**. Replaces `ui.presets.confirmReplaceAppliedFiltersOnLoad` (delete `PresetsUiConfig`; no migration — unknown old key ignored; missing enum → Normal). **Historical** — current schema is `ui.suppressedConfirmations` (see superseding plan).
 - **Semantics:**
 
 | Level                | Go with preview errors | Replace Applied Filters on preset load | Clear Rename List / Remove All Filters | Reset / delete preset / overwrite preset |

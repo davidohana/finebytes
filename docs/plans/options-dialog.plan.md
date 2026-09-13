@@ -26,7 +26,7 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
 - **v1 controls** (shipped; remember flags unchanged):
   1. **Save File List last position** → `SessionState.FileList.RememberLastFolder` (MFR7 `SaveFileListPos`)
   1. **Remember window size and position** → `SessionState.MainWindow.RememberWindowState` (finebytes-only; no MFR7 twin)
-  1. **Confirm before replacing Applied Filters on preset load** → was `MfrConfig.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad` — **superseded** by `ui.confirmationPrompts` (Fewer / Normal / More) in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md)
+  1. **Confirm before replacing Applied Filters on preset load** → was `MfrConfig.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad` — then `ui.confirmationPrompts` — now **`ui.suppressedConfirmations`** ([per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md); historical [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md))
 - **Single-pane dialog** — remember ×2 + confirmation prompts + double-click + add-mode + Undo & Log retention + OK/Cancel (v1 was three checkboxes; follow-ons amended). Undo & Log is a FieldsetGroup section (not a second tab) — see [undo.plan.md](undo.plan.md) P4.
 - **Add-mode** lives in Options only — see [options-add-mode.plan.md](options-add-mode.plan.md) (supersedes the earlier “do not duplicate / skip” decision).
 - **Persist on OK**: mutate live `Session` + `ConfigStore.Config`, then **write `config.json`**. Session flags ride the existing close-save path (`UiSessionPersistence`).
@@ -38,7 +38,7 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
 
 - Help: `Help/optionswin.html` (+ `optionswin1.gif` / `optionswin2.gif`); related `resetconfig.html`, `log.html`
 - Code: `D:\Devl\mfr7\Core\MFRGui\Forms\Main\Options.cs` (+ `.resx`); open from `Main.cs` (`mniOptions` / `btnOptions`); persist `OptionsForm.LoadConfig`/`SaveConfig` → `mfrconfig.xml`
-- finebytes status: **Options UI shipped** (this plan P1–P4) — remember flags in **session**; follow-on shipped **Confirmation prompts** + **double-click-to-add** via Options + `config.json`; **Undo & Log** retention shipped in [undo.plan.md](undo.plan.md) P4 (`renameLog.limit`)
+- finebytes status: **Options UI shipped** (this plan P1–P4) — remember flags in **session**; confirmations via **`ui.suppressedConfirmations`** + Keep showing checkbox ([per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md); double-click-to-add still from [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md)); **Undo & Log** retention shipped in [undo.plan.md](undo.plan.md) P4 (`renameLog.limit`)
 
 ### Behavior
 
@@ -54,20 +54,20 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
 
 ### Parity gaps / intentional diffs (v1)
 
-| MFR7                         | finebytes v1                                                                                                                                       |
-| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add files/folders/contents   | **Shipped** in [options-add-mode.plan.md](options-add-mode.plan.md) (`renameList.addMode` + `addFolderContents`)                                   |
-| Save File List last position | **Ship** as Remember last folder                                                                                                                   |
-| Explorer shell integrate     | **Defer** (admin/registry)                                                                                                                         |
-| Double-click to add          | **Shipped** in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md) (`ui.doubleClickAddsToRenameList`) |
-| Undo & Log tab               | **Shipped** as Undo & Log section in [undo.plan.md](undo.plan.md) P4 (`renameLog.limit`)                                                           |
-| —                            | **Ship** Remember window state; confirm-replace checkbox **superseded** by Confirmation prompts (Fewer / Normal / More)                            |
+| MFR7                         | finebytes v1                                                                                                                                                               |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add files/folders/contents   | **Shipped** in [options-add-mode.plan.md](options-add-mode.plan.md) (`renameList.addMode` + `addFolderContents`)                                                           |
+| Save File List last position | **Ship** as Remember last folder                                                                                                                                           |
+| Explorer shell integrate     | **Defer** (admin/registry)                                                                                                                                                 |
+| Double-click to add          | **Shipped** in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md) (`ui.doubleClickAddsToRenameList`)                         |
+| Undo & Log tab               | **Shipped** as Undo & Log section in [undo.plan.md](undo.plan.md) P4 (`renameLog.limit`)                                                                                   |
+| —                            | **Ship** Remember window state; confirm-replace checkbox **superseded** by per-dialog suppress list ([per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md)) |
 
 ## Non-goals
 
 - Explorer context-menu integration
 - Double-click-to-add preference — **done** in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md) (no longer deferred here)
-- Confirm-replace checkbox as a standalone Options control — **superseded** by Confirmation prompts in that follow-on plan
+- Confirm-replace checkbox as a standalone Options control — **superseded** by per-dialog confirmations ([per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md))
 - Undo & Log retention UI / renaming `.mfrlog` model — **done** in [undo.plan.md](undo.plan.md) (no longer deferred here)
 - Exposing `log.*` templates (hand-edit / CLI `--set` remains)
 - Add-mode Options UI — **done** in [options-add-mode.plan.md](options-add-mode.plan.md) (no longer “moving out of Rename List”)

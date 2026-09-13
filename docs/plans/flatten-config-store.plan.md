@@ -22,7 +22,7 @@ isProject: false
 
 ```csharp
 ConfigStore.Log                 // LogConfig
-ConfigStore.Ui                  // UiConfig (ConfirmationPrompts only)
+ConfigStore.Ui                  // UiConfig (suppressedConfirmations; see per-dialog-confirmations)
 ConfigStore.MainWindow          // MainWindowPrefs?
 ConfigStore.FileList            // FileListPrefs? (+ DoubleClickAddsToRenameList)
 ConfigStore.RenameList          // RenameListPrefs?
@@ -35,7 +35,7 @@ ConfigStore.FilterDefaultsJson  // JsonObject (unchanged)
 ```json
 {
   "log": { "...": "string leaves" },
-  "ui": { "confirmationPrompts": "..." },
+  "ui": { "suppressedConfirmations": [] },
   "mainWindow": { },
   "fileList": { "doubleClickAddsToRenameList": false, "...": "..." },
   "renameList": { },
@@ -45,7 +45,7 @@ ConfigStore.FilterDefaultsJson  // JsonObject (unchanged)
 ```
 
 - **Double-click:** move from `UiConfig` → `FileListPrefs.DoubleClickAddsToRenameList` (default `false`). Options still edits it; File List reads `ConfigStore.FileList`.
-- **ConfirmationPrompts:** stays on `UiConfig` / `ui.confirmationPrompts`.
+- **Confirmations:** `UiConfig.SuppressedConfirmations` / `ui.suppressedConfirmations` (replaces former `confirmationPrompts`; see [per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md)).
 - **Applier constraint:** keep a **private** prefs root inside `ConfigStore` with `[ConfigSection] Log` + `Ui` for `ConfigJsonApplier` / `ConfigJsonWriter` / CLI `--set`. Public surface is `ConfigStore.Log` / `ConfigStore.Ui` aliases (no public `MfrConfig`).
 - **Section DTOs:** `MainWindowPrefs` / `FileListPrefs` / `RenameListPrefs` / `FilterEditorPrefs` / `MainWindowSplitters` in [`SessionPrefs.cs`](../../Mfr.Models/Config/SessionPrefs.cs); `Ensure*` helpers on `ConfigStore`.
 - **Omit empty sections on write:** null/empty UI sections omitted; empty `filterDefaults` omitted.
