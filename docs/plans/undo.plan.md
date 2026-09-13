@@ -4,7 +4,7 @@ overview: "Plan rename-commit Undo Last and the Rename Log (MFR7-shaped): captur
 todos:
   - id: p1-rename-log-model
     content: "P1: Rename-log model, DestinationPath on outcomes, capture on Commit, renameLog prefs + disk store"
-    status: pending
+    status: completed
   - id: p2-undo-last
     content: "P2: Engine undo via OldValues + re-Commit; wire UndoLast command, status, File List refresh"
     status: pending
