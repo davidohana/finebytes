@@ -393,6 +393,9 @@ namespace Mfr.Tests.Engine
                 ]
             );
 
+            Assert.Equal(TestPaths.Absolute("ok-new.txt"), log.Entries[0].DetailsItemPath);
+            Assert.Equal(TestPaths.Absolute("err-src.txt"), log.Entries[1].DetailsItemPath);
+
             var details = log.FormatDetails();
             Assert.Contains("Item: " + TestPaths.Absolute("ok-new.txt"), details, StringComparison.Ordinal);
             Assert.Contains("Item: " + TestPaths.Absolute("err-src.txt"), details, StringComparison.Ordinal);

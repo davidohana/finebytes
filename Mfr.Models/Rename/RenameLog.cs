@@ -48,8 +48,7 @@ namespace Mfr.Models.Rename
 
             foreach (var entry in Entries)
             {
-                var itemPath = entry.Error is not null ? entry.OriginalPath : entry.DestinationPath;
-                builder.Append("Item: ").Append(itemPath).AppendLine();
+                builder.Append("Item: ").Append(entry.DetailsItemPath).AppendLine();
                 foreach (var change in entry.Changes)
                 {
                     builder
@@ -82,7 +81,7 @@ namespace Mfr.Models.Rename
     /// Post-commit path when successful (undo opens this path). For commit-error rows, the attempted
     /// destination or <paramref name="OriginalPath"/> when destination was blank.
     /// </param>
-    /// <param name="OriginalPath">Pre-commit path when known (audit / display; details <c>Item:</c> for errors).</param>
+    /// <param name="OriginalPath">Pre-commit path when known (audit / display).</param>
     /// <param name="IsFolder">Whether the entry is a directory.</param>
     /// <param name="Changes">Property-level Old→New deltas applied at commit.</param>
     /// <param name="Error">Optional commit-error message; undo skips rows with errors.</param>
@@ -94,6 +93,12 @@ namespace Mfr.Models.Rename
         string? Error = null
     )
     {
+        /// <summary>
+        /// Path shown as details <c>Item:</c> — <see cref="OriginalPath"/> when this row has an
+        /// <see cref="Error"/> (file still at source); otherwise <see cref="DestinationPath"/>.
+        /// </summary>
+        public string DetailsItemPath => Error is not null ? OriginalPath : DestinationPath;
+
         /// <summary>
         /// Whether Undo can reverse this row (no error, and at least one restorable change).
         /// </summary>
