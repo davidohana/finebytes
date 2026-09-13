@@ -1,6 +1,6 @@
 ---
 name: Options dialog
-overview: "Ship a minimal Options modal (MFR → Options / Ctrl+,) with remember last folder, remember window state, and (v1) confirm-replace on preset load. Follow-on [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md) replaced the confirm checkbox with Confirmation prompts (Fewer/Normal/More) and shipped double-click-to-add. Still deferred: MFR7 add-mode duplicates, Explorer shell, Undo/Log."
+overview: "Ship a minimal Options modal (MFR → Options / Ctrl+,) with remember last folder, remember window state, and (v1) confirm-replace on preset load. Follow-on [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md) replaced the confirm checkbox with Confirmation prompts (Fewer/Normal/More) and shipped double-click-to-add. Add-mode radios + contents shipped in [options-add-mode.plan.md](options-add-mode.plan.md). Still deferred: Explorer shell, Undo/Log."
 todos:
   - id: p1-config-save
     content: "P1: ConfigStore.Save + round-trip test"
@@ -27,8 +27,8 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
   1. **Save File List last position** → `SessionState.FileList.RememberLastFolder` (MFR7 `SaveFileListPos`)
   1. **Remember window size and position** → `SessionState.MainWindow.RememberWindowState` (finebytes-only; no MFR7 twin)
   1. **Confirm before replacing Applied Filters on preset load** → was `MfrConfig.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad` — **superseded** by `ui.confirmationPrompts` (Fewer / Normal / More) in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md)
-- **Single-pane dialog** (no General / Undo & Log tabs) — remember ×2 + confirmation prompts + double-click checkbox + OK/Cancel (v1 was three checkboxes; follow-on amended the third). Tabs when Log/Undo options return.
-- **Do not duplicate** Rename List add-mode / add-folder-contents (already in Rename List UI / session).
+- **Single-pane dialog** (no General / Undo & Log tabs) — remember ×2 + confirmation prompts + double-click + add-mode + OK/Cancel (v1 was three checkboxes; follow-ons amended). Tabs when Log/Undo options return.
+- **Add-mode** lives in Options only — see [options-add-mode.plan.md](options-add-mode.plan.md) (supersedes the earlier “do not duplicate / skip” decision).
 - **Persist on OK**: mutate live `Session` + `ConfigStore.Config`, then **write `config.json`**. Session flags ride the existing close-save path (`UiSessionPersistence`).
 - **Shortcut stays Ctrl+,** (finebytes); MFR7 Ctrl+T is not ported.
 
@@ -56,7 +56,7 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
 
 | MFR7                         | finebytes v1                                                                                                                                       |
 | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Add files/folders/contents   | **Skip** — Rename List toolbar/session                                                                                                             |
+| Add files/folders/contents   | **Shipped** in [options-add-mode.plan.md](options-add-mode.plan.md) (`renameList.addMode` + `addFolderContents`)                                   |
 | Save File List last position | **Ship** as Remember last folder                                                                                                                   |
 | Explorer shell integrate     | **Defer** (admin/registry)                                                                                                                         |
 | Double-click to add          | **Shipped** in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md) (`ui.doubleClickAddsToRenameList`) |
@@ -70,7 +70,7 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
 - Confirm-replace checkbox as a standalone Options control — **superseded** by Confirmation prompts in that follow-on plan
 - Undo & Log retention UI / renaming `.mfrlog` model
 - Exposing `log.*` templates (hand-edit / CLI `--set` remains)
-- Moving add-mode out of Rename List into Options
+- Add-mode Options UI — **done** in [options-add-mode.plan.md](options-add-mode.plan.md) (no longer “moving out of Rename List”)
 - Changing Reset Configuration (already Tools → Reset)
 
 ## Architecture
