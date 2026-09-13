@@ -42,20 +42,14 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// Named presets store. When null, uses an empty manager that does not read AppData
         /// (production passes <see cref="PresetManager.OpenDefault"/>).
         /// </param>
-        /// <param name="configFilePath">
-        /// Optional <c>config.json</c> path for close-save. When null, close-save uses the active / default
-        /// prefs path from <see cref="ConfigStore"/>.
-        /// </param>
         public MainWindowViewModel(
             string? initialFileListPath = null,
             SessionState? session = null,
             FilterDefaultsStore? filterDefaults = null,
-            PresetManager? presetManager = null,
-            string? configFilePath = null
+            PresetManager? presetManager = null
         )
         {
             Session = session;
-            ConfigFilePath = configFilePath;
             AppliedFiltersViewModel = new AppliedFiltersViewModel(
                 filterDefaults ?? FilterDefaultsStore.CreateEmpty(),
                 presetManager ?? PresetManager.CreateEmpty()
@@ -101,11 +95,6 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// Loaded session document for this window, or <see langword="null"/> when the window was created without one.
         /// </summary>
         internal SessionState? Session { get; }
-
-        /// <summary>
-        /// <c>config.json</c> path for close save, or <see langword="null"/> to use the active / default AppData file.
-        /// </summary>
-        internal string? ConfigFilePath { get; }
 
         /// <summary>
         /// Gets the main window title, including the product version.

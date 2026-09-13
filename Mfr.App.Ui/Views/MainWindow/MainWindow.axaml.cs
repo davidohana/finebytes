@@ -341,8 +341,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                 GetPaneGrids(),
                 session,
                 viewModel.FileListViewModel.CaptureSession(),
-                viewModel.RenameListViewModel.CaptureSession(),
-                configFilePath: viewModel.ConfigFilePath
+                viewModel.RenameListViewModel.CaptureSession()
             );
         }
 

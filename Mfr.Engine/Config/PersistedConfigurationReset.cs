@@ -12,7 +12,7 @@ namespace Mfr.Engine.Config
     public static class PersistedConfigurationReset
     {
         /// <summary>
-        /// Deletes the prefs file when present.
+        /// Deletes the prefs file when present and clears in-memory session / filter-defaults.
         /// </summary>
         /// <param name="configFilePath">
         /// Config path, or blank for the default AppData <c>config.json</c>.
@@ -21,6 +21,7 @@ namespace Mfr.Engine.Config
         public static void DeleteAppDataFiles(string? configFilePath = null)
         {
             ConfigStore.DeleteDefaultFile(configFilePath);
+            ConfigStore.ClearSessionAndFilterDefaults();
         }
     }
 }

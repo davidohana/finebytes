@@ -30,6 +30,10 @@ namespace Mfr.Tests.Engine
 
             ConfigStoreTestReset.LoadEmpty();
             ConfigStore.Session = new SessionState { FileList = new SessionStateFileList { FileMask = "*.mp3" } };
+            ConfigStore.FilterDefaultsJson = new System.Text.Json.Nodes.JsonObject
+            {
+                ["LettersCase"] = new System.Text.Json.Nodes.JsonObject(),
+            };
             ConfigStore.Save(configPath);
             File.WriteAllText(
                 presetsPath, /*lang=json,strict*/
@@ -40,6 +44,8 @@ namespace Mfr.Tests.Engine
 
             Assert.False(File.Exists(configPath));
             Assert.True(File.Exists(presetsPath));
+            Assert.Null(ConfigStore.Session.FileList);
+            Assert.Empty(ConfigStore.FilterDefaultsJson);
         }
 
         /// <summary>

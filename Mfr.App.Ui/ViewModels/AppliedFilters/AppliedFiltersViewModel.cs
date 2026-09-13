@@ -76,7 +76,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private StyledTextDisplay _lastStatusMessage = StyledTextDisplay.Empty;
 
         /// <summary>
-        /// Clears in-memory per-type add defaults after Reset Configuration deletes the file.
+        /// Clears in-memory per-type add defaults after Reset Configuration clears prefs.
         /// </summary>
         internal void ClearFilterDefaultsCache()
         {
