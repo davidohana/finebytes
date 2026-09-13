@@ -47,7 +47,7 @@ flowchart LR
   stubs[Menu_Toolbar_stubs] --> mgr[PresetManagerDialog]
   stubs --> saveDlg[SavePresetDialog]
   saveDlg -->|Upsert_by_name| pm[PresetManager]
-  mgr --> confirmGate{ConfirmFlag_and_nonEmpty}
+  mgr --> confirmGate{ShouldConfirm_and_nonEmpty}
   stubs --> quickPick[Toolbar_dropdown]
   quickPick --> confirmGate
   confirmGate -->|yes_or_skip| applied[AppliedFiltersViewModel]

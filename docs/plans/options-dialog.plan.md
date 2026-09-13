@@ -1,6 +1,6 @@
 ---
 name: Options dialog
-overview: "Ship a minimal Options modal (MFR → Options / Ctrl+,) with remember last folder, remember window state, confirmation prompts, double-click-to-add, add-mode, and Undo & Log rename-log retention. Follow-ons: [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md), [options-add-mode.plan.md](options-add-mode.plan.md), [undo.plan.md](undo.plan.md) P4. Still deferred: Explorer shell."
+overview: "Ship a minimal Options modal (MFR → Options / Ctrl+,) with remember last folder, remember window state, Reset confirmations / suppress list, double-click-to-add, add-mode, and Undo & Log rename-log retention. Confirmations: [per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md) (supersedes 3-state in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md)). Other follow-ons: [options-add-mode.plan.md](options-add-mode.plan.md), [undo.plan.md](undo.plan.md) P4. Still deferred: Explorer shell."
 todos:
   - id: p1-config-save
     content: "P1: ConfigStore.Save + round-trip test"
@@ -27,9 +27,9 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
   1. **Save File List last position** → `SessionState.FileList.RememberLastFolder` (MFR7 `SaveFileListPos`)
   1. **Remember window size and position** → `SessionState.MainWindow.RememberWindowState` (finebytes-only; no MFR7 twin)
   1. **Confirm before replacing Applied Filters on preset load** → was `MfrConfig.Ui.Presets.ConfirmReplaceAppliedFiltersOnLoad` — then `ui.confirmationPrompts` — now **`ui.suppressedConfirmations`** ([per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md); historical [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md))
-- **Single-pane dialog** — remember ×2 + confirmation prompts + double-click + add-mode + Undo & Log retention + OK/Cancel (v1 was three checkboxes; follow-ons amended). Undo & Log is a FieldsetGroup section (not a second tab) — see [undo.plan.md](undo.plan.md) P4.
+- **Single-pane dialog** — remember ×2 + Reset confirmations (suppress list) + double-click + add-mode + Undo & Log retention + OK/Cancel (v1 was three checkboxes; follow-ons amended). Undo & Log is a FieldsetGroup section (not a second tab) — see [undo.plan.md](undo.plan.md) P4.
 - **Add-mode** lives in Options only — see [options-add-mode.plan.md](options-add-mode.plan.md) (supersedes the earlier “do not duplicate / skip” decision).
-- **Persist on OK**: mutate live `Session` + `ConfigStore.Config`, then **write `config.json`**. Session flags ride the existing close-save path (`UiSessionPersistence`).
+- **Persist on OK**: mutate live session prefs + `ConfigStore` sections (`Ui` / `FileList` / `RenameList` / `RenameLog` as applicable), then **write `config.json`**. Session flags ride the existing close-save path (`UiSessionPersistence`).
 - **Shortcut stays Ctrl+,** (finebytes); MFR7 Ctrl+T is not ported.
 
 ## MFR7 reference brief
@@ -59,7 +59,7 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
 | Add files/folders/contents   | **Shipped** in [options-add-mode.plan.md](options-add-mode.plan.md) (`renameList.addMode` + `addFolderContents`)                                                           |
 | Save File List last position | **Ship** as Remember last folder                                                                                                                                           |
 | Explorer shell integrate     | **Defer** (admin/registry)                                                                                                                                                 |
-| Double-click to add          | **Shipped** in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md) (`ui.doubleClickAddsToRenameList`)                         |
+| Double-click to add          | **Shipped** in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md) (`fileList.doubleClickAddsToRenameList`)                   |
 | Undo & Log tab               | **Shipped** as Undo & Log section in [undo.plan.md](undo.plan.md) P4 (`renameLog.limit`)                                                                                   |
 | —                            | **Ship** Remember window state; confirm-replace checkbox **superseded** by per-dialog suppress list ([per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md)) |
 
@@ -80,7 +80,7 @@ flowchart LR
   Menu["MFR Options / Ctrl+,"] --> Show["ShowOptions"]
   Show --> Dlg["OptionsDialog + VM"]
   Dlg -->|OK| Sess["Session remember flags"]
-  Dlg -->|OK| Cfg["ConfigStore.Config + Save"]
+  Dlg -->|OK| Cfg["ConfigStore sections + Save"]
   Sess --> Close["UiSessionPersistence on close"]
   Cfg --> Json["config.json"]
   Cfg --> Prompts["ConfirmationPolicy / File List dbl-click"]
@@ -90,7 +90,7 @@ Pattern: modal Avalonia `Window` like [ExcludeMasksDialog](../../Mfr.App.Ui/View
 
 Wire via event/hooks from [MainWindowViewModel](../../Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs) (same style as `ResetConfigurationRequested`) so Views host the dialog.
 
-> **Follow-on:** confirmation 3-state + double-click-to-add — [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md).
+> **Follow-ons:** double-click-to-add — [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md); confirmations — [per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md) (3-state removed).
 
 ## Phases
 

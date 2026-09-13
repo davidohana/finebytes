@@ -30,8 +30,12 @@ Implemented. **Confirmation half superseded** by [per-dialog-confirmations.plan.
 
 ## Decisions (locked)
 
-- **Confirmation prompts** enum on `config.json` (`ui.confirmationPrompts`), default **`Normal`**. Replaces `ui.presets.confirmReplaceAppliedFiltersOnLoad` (delete `PresetsUiConfig`; no migration — unknown old key ignored; missing enum → Normal). **Historical** — current schema is `ui.suppressedConfirmations` (see superseding plan).
-- **Semantics:**
+### Confirmation half (historical — superseded)
+
+Shipped then removed. Current schema/UX: [per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md) (`ui.suppressedConfirmations`).
+
+- **Confirmation prompts** enum on `config.json` (`ui.confirmationPrompts`), default **`Normal`**. Replaced `ui.presets.confirmReplaceAppliedFiltersOnLoad` (deleted `PresetsUiConfig`; no migration).
+- **Semantics (3-state era):**
 
 | Level                | Go with preview errors | Replace Applied Filters on preset load | Clear Rename List / Remove All Filters | Reset / delete preset / overwrite preset |
 | -------------------- | ---------------------- | -------------------------------------- | -------------------------------------- | ---------------------------------------- |
@@ -39,11 +43,15 @@ Implemented. **Confirmation half superseded** by [per-dialog-confirmations.plan.
 | **Normal** (default) | confirm                | no                                     | no                                     | **always**                               |
 | **More**             | confirm                | confirm                                | confirm                                | **always**                               |
 
-- **Fewer skips Go-preview-errors** so the 3-state is meaningful; irreversible actions never follow Fewer.
-- **Double-click adds to Rename List** — `ui.doubleClickAddsToRenameList` bool, default **`false`** (MFR7 `DoubleClickToAddItem`). OFF → current `OpenSelected` (folder navigate / file default app). ON → run existing `AddSelectedCommand` (same as toolbar; respects add-mode / folder-contents). Affects **DoubleTapped only**; context-menu Open unchanged.
-- **Options UI:** keep single pane. Replace confirm checkbox with labeled radios (or compact combo) **Confirmation prompts: Fewer | Normal | More**; add checkbox **Double click in file list adds to Rename List**. Keep the two remember checkboxes.
-- **Policy helper:** small `ConfirmationPolicy` (Models or App.Ui) with `ShouldConfirm(ConfirmationKind)` reading `ConfigStore.Config.Ui.ConfirmationPrompts` — call sites do not switch on enum inline.
-- **Clear confirms:** gate only when list non-empty; messages short (“Clear the Rename List?” / “Remove all Applied Filters?”). Async confirm via view hooks (same style as Go preview-errors), not a second dialog framework.
+- **Fewer skipped Go-preview-errors** so the 3-state was meaningful; irreversible actions never followed Fewer.
+- **Options UI (then):** labeled radios **Confirmation prompts: Fewer | Normal | More** (replaced later by **Reset confirmations**).
+- **Policy helper (then):** `ConfirmationPolicy.ShouldConfirm(ConfirmationKind)` read `ConfirmationPrompts` — call sites did not switch on the level enum inline.
+
+### Double-click + clear confirms (still current)
+
+- **Double-click adds to Rename List** — `fileList.doubleClickAddsToRenameList` bool, default **`false`** (MFR7 `DoubleClickToAddItem`; moved off `ui` in flatten-config-store). OFF → `OpenSelected` (folder navigate / file default app). ON → `AddSelectedCommand` (same as toolbar; respects add-mode / folder-contents). Affects **DoubleTapped only**; context-menu Open unchanged.
+- **Options UI:** checkbox **Double click in file list adds to Rename List** (with remember ×2). Confirmation radios removed — see superseding plan.
+- **Clear confirms:** gate only when list non-empty; messages short (“Clear the Rename List?” / “Remove all Applied Filters?”). Async confirm via view hooks (same style as Go preview-errors), not a second dialog framework. Suppressible via Keep showing / `ui.suppressedConfirmations`.
 
 ## MFR7 reference brief
 
@@ -56,11 +64,11 @@ Implemented. **Confirmation half superseded** by [per-dialog-confirmations.plan.
 ### Behavior
 
 - Label: `Double click in file list adds to Rename List`; default off; off = `Process.Start`, on = add selected
-- No MFR7 confirmation-level Options UI (`ConfirmRenames` dead — do not port). finebytes 3-state is intentional new UX, not parity
+- No MFR7 confirmation-level Options UI (`ConfirmRenames` dead — do not port). finebytes 3-state was intentional new UX (not parity); **superseded** by [per-dialog-confirmations.plan.md](per-dialog-confirmations.plan.md)
 
 ### Parity gaps / intentional diffs
 
-- 3-state confirmations: finebytes-only
+- Confirmations: finebytes-only (3-state then per-dialog suppress list)
 - Add-mode in Options — **shipped** in [options-add-mode.plan.md](options-add-mode.plan.md)
 - Explorer shell still deferred; Undo & Log retention shipped in [undo.plan.md](undo.plan.md) P4
 
@@ -78,9 +86,9 @@ Implemented. **Confirmation half superseded** by [per-dialog-confirmations.plan.
 ```mermaid
 flowchart TD
   Opts["Options OK"] --> Cfg["ConfigStore.Save"]
-  Cfg --> Level["ui.confirmationPrompts"]
-  Cfg --> Dbl["ui.doubleClickAddsToRenameList"]
-  Level --> Policy["ConfirmationPolicy"]
+  Cfg --> Suppress["ui.suppressedConfirmations"]
+  Cfg --> Dbl["fileList.doubleClickAddsToRenameList"]
+  Suppress --> Policy["ConfirmationPolicy"]
   Policy --> Go["GO preview-errors"]
   Policy --> Load["Preset load replace"]
   Policy --> ClearRL["Clear Rename List"]
@@ -89,6 +97,8 @@ flowchart TD
   Tap -->|true| Add["AddSelectedCommand"]
   Tap -->|false| Open["OpenSelected"]
 ```
+
+> Confirmation nodes above match the **current** suppress-list model (see Status). Phases below remain a historical record of the 3-state implementation.
 
 ## Phases
 
