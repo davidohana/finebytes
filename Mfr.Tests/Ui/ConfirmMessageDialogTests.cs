@@ -7,14 +7,21 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Mfr.App.Ui.Views;
+using Mfr.App.Ui.Views.Controls;
 
 namespace Mfr.Tests.Ui
 {
     /// <summary>
     /// Headless smoke tests for the shared OK/Cancel confirmation dialog.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class ConfirmMessageDialogTests
     {
+        public ConfirmMessageDialogTests()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+        }
+
         /// <summary>
         /// Verifies the dialog constructs with title, message, and OK/Cancel footer.
         /// </summary>
@@ -50,6 +57,46 @@ namespace Mfr.Tests.Ui
             Assert.True(cancel.IsCancel);
             var cancelBrush = Assert.IsAssignableFrom<ISolidColorBrush>(cancel.Background);
             Assert.Equal(0, cancelBrush.Color.A);
+
+            dialog.Close(false);
+        }
+
+        /// <summary>
+        /// Verifies the keep-showing checkbox is hidden when no confirmation kind is supplied.
+        /// </summary>
+        [AvaloniaFact]
+        public void KeepShowing_checkbox_hidden_without_kind()
+        {
+            var dialog = new ConfirmMessageDialog("Confirmation", "Will restart.");
+            dialog.Show();
+            dialog.UpdateLayout();
+
+            var keepShowing = dialog.FindControl<CompactCheckBox>("KeepShowingCheckBox");
+            Assert.NotNull(keepShowing);
+            Assert.False(keepShowing.IsVisible);
+
+            dialog.Close(false);
+        }
+
+        /// <summary>
+        /// Verifies the keep-showing checkbox is visible, labeled, and checked by default when a kind is set.
+        /// </summary>
+        [AvaloniaFact]
+        public void KeepShowing_checkbox_visible_when_kind_set()
+        {
+            var dialog = new ConfirmMessageDialog(
+                title: "Clear Rename List",
+                message: "Clear all entries?",
+                kind: ConfirmationKind.ClearRenameList
+            );
+            dialog.Show();
+            dialog.UpdateLayout();
+
+            var keepShowing = dialog.FindControl<CompactCheckBox>("KeepShowingCheckBox");
+            Assert.NotNull(keepShowing);
+            Assert.True(keepShowing.IsVisible);
+            Assert.Equal("Keep showing this confirmation in the future", keepShowing.Content);
+            Assert.True(keepShowing.IsChecked);
 
             dialog.Close(false);
         }
@@ -122,6 +169,117 @@ namespace Mfr.Tests.Ui
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(await resultTask);
+            owner.Close();
+        }
+
+        /// <summary>
+        /// Verifies OK with keep-showing unchecked suppresses the kind and persists via Save.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Ok_unchecked_suppresses_and_saves()
+        {
+            var saved = false;
+            var owner = new Window();
+            owner.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var dialog = new ConfirmMessageDialog(
+                title: "Clear Rename List",
+                message: "Clear all entries?",
+                kind: ConfirmationKind.ClearRenameList
+            )
+            {
+                SaveConfig = () => saved = true,
+            };
+            var resultTask = dialog.ShowDialog<bool>(owner);
+            Dispatcher.UIThread.RunJobs();
+
+            var keepShowing = dialog.FindControl<CompactCheckBox>("KeepShowingCheckBox");
+            Assert.NotNull(keepShowing);
+            keepShowing.IsChecked = false;
+
+            var ok = ModalOkCancelFooterAccess.RequireAcceptButton(dialog);
+            ok.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(await resultTask);
+            Assert.True(saved);
+            Assert.False(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
+            Assert.Contains(ConfirmationKind.ClearRenameList, ConfigStore.Ui.SuppressedConfirmations);
+            owner.Close();
+        }
+
+        /// <summary>
+        /// Verifies OK with keep-showing still checked does not suppress or save.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Ok_checked_does_not_suppress_or_save()
+        {
+            var saved = false;
+            var owner = new Window();
+            owner.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var dialog = new ConfirmMessageDialog(
+                title: "Clear Rename List",
+                message: "Clear all entries?",
+                kind: ConfirmationKind.ClearRenameList
+            )
+            {
+                SaveConfig = () => saved = true,
+            };
+            var resultTask = dialog.ShowDialog<bool>(owner);
+            Dispatcher.UIThread.RunJobs();
+
+            var keepShowing = dialog.FindControl<CompactCheckBox>("KeepShowingCheckBox");
+            Assert.NotNull(keepShowing);
+            Assert.True(keepShowing.IsChecked);
+
+            var ok = ModalOkCancelFooterAccess.RequireAcceptButton(dialog);
+            ok.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(await resultTask);
+            Assert.False(saved);
+            Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
+            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            owner.Close();
+        }
+
+        /// <summary>
+        /// Verifies Cancel with keep-showing unchecked does not suppress or save.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Cancel_unchecked_does_not_suppress_or_save()
+        {
+            var saved = false;
+            var owner = new Window();
+            owner.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var dialog = new ConfirmMessageDialog(
+                title: "Clear Rename List",
+                message: "Clear all entries?",
+                kind: ConfirmationKind.ClearRenameList
+            )
+            {
+                SaveConfig = () => saved = true,
+            };
+            var resultTask = dialog.ShowDialog<bool>(owner);
+            Dispatcher.UIThread.RunJobs();
+
+            var keepShowing = dialog.FindControl<CompactCheckBox>("KeepShowingCheckBox");
+            Assert.NotNull(keepShowing);
+            keepShowing.IsChecked = false;
+
+            var cancel = ModalOkCancelFooterAccess.RequireCancelButton(dialog);
+            cancel.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(await resultTask);
+            Assert.False(saved);
+            Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
+            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
             owner.Close();
         }
     }

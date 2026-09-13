@@ -16,6 +16,15 @@
 >
   <DockPanel Margin="12">
     <controls:ModalOkCancelFooter x:Name="Footer" DockPanel.Dock="Bottom" Margin="0,14,0,0" />
-    <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
+    <StackPanel>
+      <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
+      <controls:CompactCheckBox
+        x:Name="KeepShowingCheckBox"
+        Margin="0,12,0,0"
+        IsVisible="False"
+        IsChecked="True"
+        Content="Keep showing this confirmation in the future"
+      />
+    </StackPanel>
   </DockPanel>
 </Window>
