@@ -138,6 +138,16 @@ namespace Mfr.Engine.RenameLog
         }
 
         /// <summary>
+        /// Builds the Rename Log list title for a commit time (MFR7 <c>dd/MM/yyyy HH:mm:ss</c> local).
+        /// </summary>
+        /// <param name="committedAt">Commit timestamp (typically UTC from <see cref="RenameLogModel.CommittedAt"/>).</param>
+        /// <returns>Local-time list title matching disk rows and the details pane date line.</returns>
+        public static string FormatListTitle(DateTimeOffset committedAt)
+        {
+            return committedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
+        }
+
+        /// <summary>
         /// Builds the Rename Log list title for a disk file (MFR7 <c>dd/MM/yyyy HH:mm:ss</c> from stamp).
         /// </summary>
         /// <param name="filePath">Absolute or relative <c>.mfrlog</c> path.</param>

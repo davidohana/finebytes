@@ -68,7 +68,11 @@ namespace Mfr.Tests.Ui.LogDialog
                 Assert.NotNull(dialog.FindControl<Button>("UndoButton"));
                 Assert.NotNull(dialog.FindControl<Button>("EraseButton"));
                 Assert.NotNull(dialog.FindControl<Button>("CloseButton"));
-                Assert.Contains("[Last Operation]", dialogVm.Items.Select(item => item.Title));
+                Assert.NotNull(RenameLogStore.LastOperation);
+                Assert.Contains(
+                    RenameLogStore.FormatListTitle(RenameLogStore.LastOperation.CommittedAt),
+                    dialogVm.Items.Select(item => item.Title)
+                );
                 Assert.Contains("b.txt", dialogVm.DetailsText);
             }
             finally

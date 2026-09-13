@@ -8,7 +8,7 @@ using Mfr.Utils;
 namespace Mfr.App.Ui.ViewModels.LogDialog
 {
     /// <summary>
-    /// One row in the Rename Log list ([Last Operation] or a disk <c>.mfrlog</c>).
+    /// One row in the Rename Log list (in-memory last op or a disk <c>.mfrlog</c>).
     /// </summary>
     public sealed class RenameLogListItem
     {
@@ -19,7 +19,7 @@ namespace Mfr.App.Ui.ViewModels.LogDialog
         public RenameLogListItem(RenameLog log)
         {
             ArgumentNullException.ThrowIfNull(log);
-            Title = "[Last Operation]";
+            Title = RenameLogStore.FormatListTitle(log.CommittedAt);
             IsLastOperation = true;
             FilePath = null;
             _cachedLog = log;
@@ -250,13 +250,22 @@ namespace Mfr.App.Ui.ViewModels.LogDialog
         {
             Items.Clear();
 
+            var diskPaths = RenameLogStore.ListDiskFilePaths(_directoryPath);
             var last = RenameLogStore.LastOperation;
             if (last is not null)
             {
-                Items.Add(new RenameLogListItem(last));
+                var isAlsoOnDisk = diskPaths.Any(path =>
+                {
+                    var diskLog = RenameLogStore.TryLoadFile(path);
+                    return diskLog is not null && diskLog.CommittedAt == last.CommittedAt;
+                });
+                if (!isAlsoOnDisk)
+                {
+                    Items.Add(new RenameLogListItem(last));
+                }
             }
 
-            foreach (var path in RenameLogStore.ListDiskFilePaths(_directoryPath))
+            foreach (var path in diskPaths)
             {
                 Items.Add(new RenameLogListItem(path));
             }

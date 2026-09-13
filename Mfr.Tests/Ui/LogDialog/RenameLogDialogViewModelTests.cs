@@ -26,7 +26,7 @@ namespace Mfr.Tests.Ui.LogDialog
         }
 
         /// <summary>
-        /// Verifies last operation appears first with details, followed by disk logs newest-first.
+        /// Verifies last operation appears first with a timestamp title, followed by disk logs newest-first.
         /// </summary>
         [Fact]
         public void Lists_LastOperation_Then_Disk_Newest_First()
@@ -57,11 +57,12 @@ namespace Mfr.Tests.Ui.LogDialog
                 directoryPath: logDir,
                 limit: 0
             );
+            Assert.NotNull(RenameLogStore.LastOperation);
 
             var viewModel = new RenameLogDialogViewModel(logDir);
 
             Assert.Equal(3, viewModel.Items.Count);
-            Assert.Equal("[Last Operation]", viewModel.Items[0].Title);
+            Assert.Equal(RenameLogStore.FormatListTitle(RenameLogStore.LastOperation.CommittedAt), viewModel.Items[0].Title);
             Assert.True(viewModel.Items[0].IsLastOperation);
             Assert.Equal(RenameLogStore.FormatDiskListTitle(newerPath), viewModel.Items[1].Title);
             Assert.Equal(RenameLogStore.FormatDiskListTitle(olderPath), viewModel.Items[2].Title);
@@ -69,6 +70,39 @@ namespace Mfr.Tests.Ui.LogDialog
             Assert.Contains("mem-new.txt", viewModel.DetailsText);
             Assert.True(viewModel.UndoCommand.CanExecute(null));
             Assert.True(viewModel.EraseCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies an in-memory last op already written to disk appears once (disk row only).
+        /// </summary>
+        [Fact]
+        public void Dedups_LastOperation_When_Also_On_Disk()
+        {
+            var logDir = _tempDirectoryFixture.CreateTempDir();
+            var written = RenameLogStore.CaptureFromCommit(
+                [
+                    new RenameResultItem(
+                        OriginalPath: TestPaths.Absolute("a.txt"),
+                        Status: RenameStatus.CommitOk,
+                        Error: null,
+                        Changes: [new RenamePropertyChange("Prefix", "a", "b")],
+                        DestinationPath: TestPaths.Absolute("b.txt"),
+                        IsFolder: false
+                    ),
+                ],
+                directoryPath: logDir,
+                limit: 100
+            );
+            Assert.NotNull(written);
+            Assert.NotNull(RenameLogStore.LastOperation);
+
+            var viewModel = new RenameLogDialogViewModel(logDir);
+
+            var item = Assert.Single(viewModel.Items);
+            Assert.False(item.IsLastOperation);
+            Assert.Equal(written, item.FilePath);
+            Assert.Equal(RenameLogStore.FormatDiskListTitle(written), item.Title);
+            Assert.Contains("b.txt", viewModel.DetailsText);
         }
 
         /// <summary>
