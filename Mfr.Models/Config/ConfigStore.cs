@@ -23,8 +23,9 @@ namespace Mfr.Models.Config
     /// </para>
     /// <para>
     /// When the default AppData file is missing, <see cref="EnsureDefaultFile"/> writes one with current
-    /// defaults so the user can hand-edit log settings. Options, session close-save, and filter-default
-    /// pin all persist via <see cref="Save"/> (whole document overwrite).
+    /// defaults so the user can hand-edit log settings. Empty <c>session</c> / <c>filterDefaults</c> are
+    /// omitted (same as first launch). Options, session close-save, and filter-default pin all persist via
+    /// <see cref="Save"/> (whole document overwrite). Null session properties are omitted on write.
     /// When a property is omitted, values still come from <see cref="MfrConfig"/> field initializers.
     /// </para>
     /// <para>
@@ -40,8 +41,8 @@ namespace Mfr.Models.Config
 
         private static readonly JsonSerializerOptions s_SessionJsonOptions = new()
         {
-            WriteIndented = true,
             PropertyNameCaseInsensitive = true,
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) },
         };
 
@@ -181,8 +182,16 @@ namespace Mfr.Models.Config
             }
 
             var root = ConfigJsonWriter.Write(Config);
-            root["session"] = JsonSerializer.SerializeToNode(Session, s_SessionJsonOptions);
-            root["filterDefaults"] = FilterDefaultsJson ?? [];
+            var sessionNode = JsonSerializer.SerializeToNode(Session, s_SessionJsonOptions);
+            if (sessionNode is JsonObject { Count: > 0 } sessionObject)
+            {
+                root["session"] = sessionObject;
+            }
+
+            if (FilterDefaultsJson is { Count: > 0 })
+            {
+                root["filterDefaults"] = FilterDefaultsJson;
+            }
 
             File.WriteAllText(path, root.ToJsonString(s_WriteOptions));
         }
@@ -210,7 +219,7 @@ namespace Mfr.Models.Config
         /// Writes defaults to JSON when the file is missing, so it can be hand-edited.
         /// <para>
         /// Existing files are left unchanged. Failures are swallowed so a missing AppData write does not
-        /// crash the app. Empty <c>session</c> / <c>filterDefaults</c> are written with the document.
+        /// crash the app. Empty <c>session</c> / <c>filterDefaults</c> are omitted until first real save.
         /// </para>
         /// </summary>
         /// <param name="configFilePath">
