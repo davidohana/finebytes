@@ -28,7 +28,7 @@ namespace Mfr.Models.Rename
             var builder = new StringBuilder();
             // Match Rename Log list titles (MFR7 dd/MM/yyyy HH:mm:ss), not culture "G".
             builder
-                .Append("Log Date: ")
+                .Append("Operation Date: ")
                 .Append(CommittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss"))
                 .AppendLine();
             builder.AppendLine();
