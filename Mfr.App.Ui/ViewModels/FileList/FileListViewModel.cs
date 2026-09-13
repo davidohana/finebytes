@@ -64,6 +64,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private readonly ISystemIconProvider _iconProvider;
         private readonly IFileShellOpener _shellOpener;
         private readonly IFileShellOperations _shellOperations;
+        private readonly Func<IntPtr> _ownerHwnd;
         private readonly ITextClipboard _clipboard;
         private readonly IFileClipboard _fileClipboard;
         private readonly FileListThumbnailSession _thumbnails = new();
@@ -94,18 +95,23 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="fileClipboard">
         /// Explorer file clipboard for Cut/Copy/Paste, or <see langword="null"/> to use the OS default.
         /// </param>
+        /// <param name="ownerHwnd">
+        /// Owner HWND for shell UI modality, or <see langword="null"/> to use the desktop main window.
+        /// </param>
         public FileListViewModel(
             ISystemIconProvider? iconProvider,
             string? initialPath,
             IFileShellOpener? shellOpener = null,
             ITextClipboard? clipboard = null,
             IFileShellOperations? shellOperations = null,
-            IFileClipboard? fileClipboard = null
+            IFileClipboard? fileClipboard = null,
+            Func<IntPtr>? ownerHwnd = null
         )
         {
             _iconProvider = iconProvider ?? SystemIconProvider.CreateDefault();
             _shellOpener = shellOpener ?? FileShellOpener.CreateDefault();
             _shellOperations = shellOperations ?? FileShellOperations.CreateDefault();
+            _ownerHwnd = ownerHwnd ?? ShellOwnerHwnd.TryGetMainWindowHandle;
             _clipboard = clipboard ?? new DesktopTextClipboard();
             _fileClipboard = fileClipboard ?? FileClipboard.CreateDefault();
             _fileClipboard.Changed += _OnFileClipboardChanged;
@@ -603,9 +609,10 @@ namespace Mfr.App.Ui.ViewModels.FileList
             }
 
             var itemCount = paste.Paths.Count;
+            var hwnd = _ownerHwnd();
             var result = paste.PreferMove
-                ? _shellOperations.Move(paste.Paths, CurrentPath)
-                : _shellOperations.Copy(paste.Paths, CurrentPath);
+                ? _shellOperations.Move(paste.Paths, CurrentPath, hwnd)
+                : _shellOperations.Copy(paste.Paths, CurrentPath, hwnd);
 
             if (result == FileShellOperationResult.Succeeded && paste.PreferMove)
             {
@@ -1025,7 +1032,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
             var paths = _selectedEntries.Select(entry => entry.FullPath).ToList();
             var itemCount = paths.Count;
-            var result = _shellOperations.Delete(paths, recycle);
+            var result = _shellOperations.Delete(paths, recycle, _ownerHwnd());
             Refresh();
             var successMessage = recycle
                 ? $"Deleted {itemCount} item(s)."

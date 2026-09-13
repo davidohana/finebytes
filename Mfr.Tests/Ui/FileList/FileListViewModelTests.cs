@@ -1314,8 +1314,27 @@ namespace Mfr.Tests.Ui.FileList
             var call = Assert.Single(ops.Deletes);
             Assert.Equal([alpha.FullPath, beta.FullPath], call.Paths);
             Assert.True(call.Recycle);
+            Assert.Equal(IntPtr.Zero, call.OwnerHwnd);
             Assert.Equal("Deleted 2 item(s).", viewModel.LastStatusMessage.ToPlainText());
             Assert.All(viewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
+        }
+
+        /// <summary>
+        /// Verifies Delete passes the injected owner HWND to shell operations.
+        /// </summary>
+        [Fact]
+        public void Delete_Passes_Owner_Hwnd_To_Shell_Operations()
+        {
+            var ops = new RecordingFileShellOperations();
+            var hwnd = new IntPtr(0x1234);
+            var dir = _CreateTree();
+            var viewModel = _CreateViewModel(dir, shellOperations: ops, ownerHwnd: () => hwnd);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+
+            viewModel.Delete();
+
+            Assert.Equal(hwnd, Assert.Single(ops.Deletes).OwnerHwnd);
         }
 
         /// <summary>
@@ -1541,8 +1560,14 @@ namespace Mfr.Tests.Ui.FileList
             var fileClipboard = new RecordingFileClipboard();
             var source = TestPaths.Absolute("from-elsewhere.txt");
             fileClipboard.SeedPaste([source], preferMove: false);
+            var hwnd = new IntPtr(0xABCD);
             var dir = _CreateTree();
-            var viewModel = _CreateViewModel(dir, shellOperations: ops, fileClipboard: fileClipboard);
+            var viewModel = _CreateViewModel(
+                dir,
+                shellOperations: ops,
+                fileClipboard: fileClipboard,
+                ownerHwnd: () => hwnd
+            );
 
             Assert.True(viewModel.PasteCommand.CanExecute(null));
             viewModel.Paste();
@@ -1550,6 +1575,7 @@ namespace Mfr.Tests.Ui.FileList
             var call = Assert.Single(ops.Copies);
             Assert.Equal([source], call.Paths);
             Assert.Equal(dir, call.DestinationDirectory);
+            Assert.Equal(hwnd, call.OwnerHwnd);
             Assert.Empty(ops.Moves);
             Assert.Equal("Pasted 1 item(s).", viewModel.LastStatusMessage.ToPlainText());
         }
@@ -1731,7 +1757,8 @@ namespace Mfr.Tests.Ui.FileList
             IFileShellOpener? shellOpener = null,
             ITextClipboard? clipboard = null,
             IFileShellOperations? shellOperations = null,
-            IFileClipboard? fileClipboard = null
+            IFileClipboard? fileClipboard = null,
+            Func<IntPtr>? ownerHwnd = null
         )
         {
             var viewModel = new FileListViewModel(
@@ -1740,7 +1767,8 @@ namespace Mfr.Tests.Ui.FileList
                 shellOpener ?? NullFileShellOpener.Instance,
                 clipboard ?? NullTextClipboard.Instance,
                 shellOperations ?? NullFileShellOperations.Instance,
-                fileClipboard ?? new NullFileClipboard()
+                fileClipboard ?? new NullFileClipboard(),
+                ownerHwnd
             );
             _viewModels.Add(viewModel);
             return viewModel;
