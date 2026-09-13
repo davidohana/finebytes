@@ -88,8 +88,8 @@ Parent: deferred from [rename-list-go.plan.md](rename-list-go.plan.md), [options
 
 ```mermaid
 flowchart TD
-  Go["GO CommitExecutor"] --> Capture["Build RenameLog from CommitOk + DestinationPath"]
-  Capture --> Memory["In-memory LastOperation"]
+  Go["GO CommitExecutor"] --> Capture["Build RenameLog from CommitOk + CommitError"]
+  Capture --> Memory["In-memory LastOperation when undoable"]
   Capture --> Disk["Save yyyyMMddHHmmss.mfrlog if limit gt 0"]
   UndoLast["Undo Last"] --> Memory
   LogUi["Log window Undo"] --> Pick["LastOperation or loaded .mfrlog"]
@@ -101,7 +101,7 @@ flowchart TD
 
 Hook points (shipped):
 
-- Capture: after [`CommitExecutor`](../../Mfr.Engine/Commit/CommitExecutor.cs) / [`RenameList.Commit`](../../Mfr.Engine/RenameList/RenameList.cs) — [`RenameResultItem`](../../Mfr.Models/Rename/RenameResultItem.cs) carries `DestinationPath` on success; rename-log DTO + [`RenameLogStore`](../../Mfr.Engine/RenameLog/RenameLogStore.cs) persist in-memory last op and optional `.mfrlog` disk history
+- Capture: after [`CommitExecutor`](../../Mfr.Engine/Commit/CommitExecutor.cs) / [`RenameList.Commit`](../../Mfr.Engine/RenameList/RenameList.cs) — [`RenameResultItem`](../../Mfr.Models/Rename/RenameResultItem.cs) carries `DestinationPath` on success (and on commit error when set); rename-log DTO + [`RenameLogStore`](../../Mfr.Engine/RenameLog/RenameLogStore.cs) persist **CommitOk + CommitError** rows, set in-memory last op only when undoable, and write optional `.mfrlog` disk history (including errors-only when retention > 0). See [rename-log-errors.plan.md](rename-log-errors.plan.md).
 - Reverse property map: invert [`RenamePropertyChangeBuilder`](../../Mfr.Engine/Preview/RenamePropertyChangeBuilder.cs) names (`Prefix`, `Extension`, `DirectoryPath`, attrs/dates, tag fields, `StripAllEmbeddedTagsOnCommit`) onto `FileMeta` / overlays
 - UI: [`MainWindowViewModel.UndoLast` / `ShowLog`](../../Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs) — live; `CanExecute` when last op undoable / always for Log
 - Prefs: `renameLog.limit` (0 / N / unlimited); Options Undo & Log section shipped in P4

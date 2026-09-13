@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-docs
     content: "P2: Update undo.plan.md capture note + debts.md Show Last Rename Errors cross-link"
-    status: pending
+    status: completed
 isProject: false
 ---
 
