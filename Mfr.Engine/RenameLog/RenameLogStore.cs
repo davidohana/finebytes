@@ -26,7 +26,8 @@ namespace Mfr.Engine.RenameLog
 
         private static readonly JsonSerializerOptions s_JsonOptions = new()
         {
-            WriteIndented = true,
+            // Compact JSON: large GO/Undo logs (thousands of entries) stay cheap to write and reload.
+            WriteIndented = false,
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             PropertyNameCaseInsensitive = true,
             DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -46,11 +47,24 @@ namespace Mfr.Engine.RenameLog
         public static RenameLogModel? LastOperation { get; private set; }
 
         /// <summary>
-        /// Clears <see cref="LastOperation"/> (tests / process reset).
+        /// Absolute path of the <c>.mfrlog</c> written for the current <see cref="LastOperation"/>, or
+        /// <see langword="null"/> when the last undoable capture skipped disk (limit 0) or none exists.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Used by the Rename Log dialog to dedupe the in-memory row without deserializing every retained
+        /// disk log, and to seed the matching disk row with the in-memory instance.
+        /// </para>
+        /// </remarks>
+        public static string? LastWrittenFilePath { get; private set; }
+
+        /// <summary>
+        /// Clears <see cref="LastOperation"/> and <see cref="LastWrittenFilePath"/> (tests / process reset).
         /// </summary>
         public static void ClearLastOperation()
         {
             LastOperation = null;
+            LastWrittenFilePath = null;
         }
 
         /// <summary>
@@ -92,8 +106,8 @@ namespace Mfr.Engine.RenameLog
                     return null;
                 }
 
-                var json = File.ReadAllText(filePath);
-                var log = JsonSerializer.Deserialize<RenameLogModel>(json, s_JsonOptions);
+                using var stream = File.OpenRead(filePath);
+                var log = JsonSerializer.Deserialize<RenameLogModel>(stream, s_JsonOptions);
                 if (log?.Entries is null)
                 {
                     Log.Warning("Rename log '{RenameLogPath}' is missing entries.", filePath);
@@ -244,6 +258,8 @@ namespace Mfr.Engine.RenameLog
             if (log.HasUndoableEntries)
             {
                 LastOperation = log;
+                // Cleared until a successful write below so limit-0 / failed writes do not keep a stale path.
+                LastWrittenFilePath = null;
             }
 
             var retention = limit ?? ConfigStore.RenameLog.Limit;
@@ -259,7 +275,13 @@ namespace Mfr.Engine.RenameLog
             }
 
             var resolvedDirectory = directoryPath.IsBlank() ? DefaultDirectoryPath : directoryPath.Trim();
-            return _SaveAndTrim(log, resolvedDirectory, retention);
+            var writtenPath = _SaveAndTrim(log, resolvedDirectory, retention);
+            if (writtenPath is not null && ReferenceEquals(LastOperation, log))
+            {
+                LastWrittenFilePath = writtenPath;
+            }
+
+            return writtenPath;
         }
 
         /// <summary>
@@ -389,8 +411,11 @@ namespace Mfr.Engine.RenameLog
             {
                 Directory.CreateDirectory(logDirectoryPath);
                 var filePath = _CreateUniqueFilePath(logDirectoryPath);
-                var json = JsonSerializer.Serialize(log, s_JsonOptions);
-                File.WriteAllText(filePath, json);
+                using (var stream = File.Create(filePath))
+                {
+                    JsonSerializer.Serialize(stream, log, s_JsonOptions);
+                }
+
                 PruneFiles(logDirectoryPath, retention);
                 Log.Debug("Wrote rename log '{RenameLogPath}'.", filePath);
                 return filePath;

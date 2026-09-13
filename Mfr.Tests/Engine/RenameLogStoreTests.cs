@@ -88,6 +88,7 @@ namespace Mfr.Tests.Engine
             Assert.True(File.Exists(writtenPath));
             Assert.EndsWith(RenameLogStore.FileExtension, writtenPath, StringComparison.OrdinalIgnoreCase);
             Assert.NotNull(RenameLogStore.LastOperation);
+            Assert.Equal(writtenPath, RenameLogStore.LastWrittenFilePath);
 
             using var doc = JsonDocument.Parse(File.ReadAllText(writtenPath));
             Assert.True(doc.RootElement.TryGetProperty("committedAt", out _));
@@ -401,6 +402,40 @@ namespace Mfr.Tests.Engine
             Assert.Contains("Item: " + TestPaths.Absolute("err-src.txt"), details, StringComparison.Ordinal);
             Assert.Contains("Error: not found", details, StringComparison.Ordinal);
             Assert.DoesNotContain("Item: " + TestPaths.Absolute("err-dest.txt"), details, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies FormatDetails truncates after <see cref="RenameLog.MaxDetailsEntries"/> and notes the remainder.
+        /// </summary>
+        [Fact]
+        public void FormatDetails_Truncates_Large_Logs()
+        {
+            var entries = Enumerable
+                .Range(0, RenameLog.MaxDetailsEntries + 25)
+                .Select(i => new RenameLogEntry(
+                    DestinationPath: TestPaths.Absolute($"new-{i}.txt"),
+                    OriginalPath: TestPaths.Absolute($"old-{i}.txt"),
+                    IsFolder: false,
+                    Changes: [new RenamePropertyChange("Prefix", $"old-{i}", $"new-{i}")]
+                ))
+                .ToList();
+            var log = new RenameLog(CommittedAt: DateTimeOffset.Parse("2026-01-15T12:00:00Z"), Entries: entries);
+
+            var details = log.FormatDetails();
+
+            Assert.Contains($"Processed {entries.Count} Items", details, StringComparison.Ordinal);
+            Assert.Contains("Item: " + TestPaths.Absolute("new-0.txt"), details, StringComparison.Ordinal);
+            Assert.Contains(
+                "Item: " + TestPaths.Absolute($"new-{RenameLog.MaxDetailsEntries - 1}.txt"),
+                details,
+                StringComparison.Ordinal
+            );
+            Assert.DoesNotContain(
+                "Item: " + TestPaths.Absolute($"new-{RenameLog.MaxDetailsEntries}.txt"),
+                details,
+                StringComparison.Ordinal
+            );
+            Assert.Contains("… and 25 more item(s).", details, StringComparison.Ordinal);
         }
 
         /// <summary>

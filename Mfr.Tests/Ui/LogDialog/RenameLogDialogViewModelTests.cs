@@ -104,7 +104,10 @@ namespace Mfr.Tests.Ui.LogDialog
             var item = Assert.Single(viewModel.Items);
             Assert.False(item.IsLastOperation);
             Assert.Equal(written, item.FilePath);
+            Assert.Equal(written, RenameLogStore.LastWrittenFilePath);
             Assert.Equal(RenameLogStore.FormatDiskListTitle(written), item.Title);
+            Assert.Same(RenameLogStore.LastOperation, item.TryGetLog(out var error));
+            Assert.Null(error);
             Assert.Contains("b.txt", viewModel.DetailsText);
         }
 

@@ -20,6 +20,17 @@ namespace Mfr.Models.Rename
     )
     {
         /// <summary>
+        /// Max per-item blocks shown in <see cref="FormatDetails"/> before a truncation note.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Large GO/Undo logs (thousands of rows) must not build multi-megabyte strings for the
+        /// details TextBox — that freezes the Rename Log dialog on open/select.
+        /// </para>
+        /// </remarks>
+        public const int MaxDetailsEntries = 100;
+
+        /// <summary>
         /// Whether Undo can reverse at least one row (non-error entry with a restorable property delta).
         /// </summary>
         /// <remarks>
@@ -32,9 +43,18 @@ namespace Mfr.Models.Rename
         /// <summary>
         /// Formats this log for the Rename Log details pane (date, GO/Undo, item count, per-item changes/errors).
         /// </summary>
+        /// <param name="maxEntries">
+        /// Max item blocks to include. When fewer than <see cref="Entries"/>.Count, appends a truncation note.
+        /// Defaults to <see cref="MaxDetailsEntries"/>.
+        /// </param>
         /// <returns>Multi-line plain text suitable for a read-only details box.</returns>
-        public string FormatDetails()
+        public string FormatDetails(int maxEntries = MaxDetailsEntries)
         {
+            if (maxEntries < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(maxEntries));
+            }
+
             var builder = new StringBuilder();
             // Match Rename Log list titles (MFR7 dd/MM/yyyy HH:mm:ss), not culture "G".
             builder
@@ -46,8 +66,10 @@ namespace Mfr.Models.Rename
             builder.Append("Processed ").Append(Entries.Count).Append(" Items").AppendLine();
             builder.AppendLine();
 
-            foreach (var entry in Entries)
+            var shownCount = Math.Min(maxEntries, Entries.Count);
+            for (var i = 0; i < shownCount; i++)
             {
+                var entry = Entries[i];
                 builder.Append("Item: ").Append(entry.DetailsItemPath).AppendLine();
                 foreach (var change in entry.Changes)
                 {
@@ -68,6 +90,16 @@ namespace Mfr.Models.Rename
                 }
 
                 builder.AppendLine();
+            }
+
+            var omittedCount = Entries.Count - shownCount;
+            if (omittedCount > 0)
+            {
+                builder
+                    .Append("… and ")
+                    .Append(omittedCount)
+                    .Append(" more item(s). Full history is in the saved .mfrlog file.")
+                    .AppendLine();
             }
 
             return builder.ToString();

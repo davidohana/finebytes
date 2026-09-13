@@ -29,13 +29,17 @@ namespace Mfr.App.Ui.ViewModels.LogDialog
         /// Initializes a disk log row.
         /// </summary>
         /// <param name="filePath">Absolute path to the <c>.mfrlog</c> file.</param>
-        public RenameLogListItem(string filePath)
+        /// <param name="cachedLog">
+        /// Optional already-loaded log (e.g. in-memory <see cref="RenameLogStore.LastOperation"/> for the
+        /// matching disk file) so the dialog can show details without re-reading a large file.
+        /// </param>
+        public RenameLogListItem(string filePath, RenameLog? cachedLog = null)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
             Title = RenameLogStore.FormatDiskListTitle(filePath);
             IsLastOperation = false;
             FilePath = filePath;
-            _cachedLog = null;
+            _cachedLog = cachedLog;
         }
 
         /// <summary>
@@ -252,22 +256,25 @@ namespace Mfr.App.Ui.ViewModels.LogDialog
 
             var diskPaths = RenameLogStore.ListDiskFilePaths(_directoryPath);
             var last = RenameLogStore.LastOperation;
-            if (last is not null)
+            var lastWrittenPath = RenameLogStore.LastWrittenFilePath;
+            var lastWrittenOnDisk =
+                !lastWrittenPath.IsBlank()
+                && diskPaths.Any(path => string.Equals(path, lastWrittenPath, StringComparison.OrdinalIgnoreCase));
+
+            // Prefer the disk row when last op was written (Erase deletes the file), but seed its cache
+            // with the in-memory log so opening the dialog after a large GO/Undo does not re-deserialize.
+            if (last is not null && !lastWrittenOnDisk)
             {
-                var isAlsoOnDisk = diskPaths.Any(path =>
-                {
-                    var diskLog = RenameLogStore.TryLoadFile(path);
-                    return diskLog is not null && diskLog.CommittedAt == last.CommittedAt;
-                });
-                if (!isAlsoOnDisk)
-                {
-                    Items.Add(new RenameLogListItem(last));
-                }
+                Items.Add(new RenameLogListItem(last));
             }
 
             foreach (var path in diskPaths)
             {
-                Items.Add(new RenameLogListItem(path));
+                var seedLastOp =
+                    lastWrittenOnDisk
+                    && last is not null
+                    && string.Equals(path, lastWrittenPath, StringComparison.OrdinalIgnoreCase);
+                Items.Add(seedLastOp ? new RenameLogListItem(path, cachedLog: last) : new RenameLogListItem(path));
             }
 
             SelectedItem = selectFirst && Items.Count > 0 ? Items[0] : null;
