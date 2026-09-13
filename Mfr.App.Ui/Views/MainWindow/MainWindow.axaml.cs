@@ -234,7 +234,6 @@ namespace Mfr.App.Ui.Views.MainWindow
                     else
                     {
                         PersistedConfigurationReset.Reset();
-                        viewModel.AppliedFiltersViewModel.ClearFilterDefaultsCache();
                     }
                 }
                 catch (Exception)
@@ -246,36 +245,49 @@ namespace Mfr.App.Ui.Views.MainWindow
                     return;
                 }
 
+                // Prefs file is gone; never write it back from this process, then always exit
+                // (restart is best-effort — user can relaunch if spawn fails).
                 viewModel.SuppressSessionSaveOnClose = true;
 
-                var exePath = hooks?.ResolveExecutablePath?.Invoke() ?? _ResolveExecutablePath();
-                if (string.IsNullOrWhiteSpace(exePath))
+                var restarted = false;
+                string? exePath =
+                    hooks?.ResolveExecutablePath is not null
+                        ? hooks.ResolveExecutablePath()
+                        : _ResolveExecutablePath();
+                if (!string.IsNullOrWhiteSpace(exePath))
                 {
-                    await new OkMessageDialog(
-                        title: "Magic File Renamer",
-                        message: "Failed to restart MFR program file."
-                    ).ShowDialog(this);
-                    return;
+                    try
+                    {
+                        if (hooks?.StartProcess is not null)
+                        {
+                            hooks.StartProcess(exePath);
+                        }
+                        else
+                        {
+                            Process.Start(new ProcessStartInfo { FileName = exePath, UseShellExecute = true });
+                        }
+
+                        restarted = true;
+                    }
+                    catch (Exception)
+                    {
+                        // Notify below, then still exit.
+                    }
                 }
 
-                try
+                if (!restarted)
                 {
-                    if (hooks?.StartProcess is not null)
+                    if (hooks?.NotifyRestartFailed is not null)
                     {
-                        hooks.StartProcess(exePath);
+                        await hooks.NotifyRestartFailed();
                     }
                     else
                     {
-                        Process.Start(new ProcessStartInfo { FileName = exePath, UseShellExecute = true });
+                        await new OkMessageDialog(
+                            title: "Magic File Renamer",
+                            message: "Failed to restart MFR program file."
+                        ).ShowDialog(this);
                     }
-                }
-                catch (Exception)
-                {
-                    await new OkMessageDialog(
-                        title: "Magic File Renamer",
-                        message: "Failed to restart MFR program file."
-                    ).ShowDialog(this);
-                    return;
                 }
 
                 if (hooks?.Shutdown is not null)

@@ -62,6 +62,7 @@ namespace Mfr.Tests.Ui.MainWindow
             var deleted = false;
             string? startedPath = null;
             var shutdown = false;
+            var restartFailedNotified = false;
             var viewModel = new MainWindowViewModel(persistSession: true);
             var window = new AppMainWindow
             {
@@ -74,6 +75,11 @@ namespace Mfr.Tests.Ui.MainWindow
                     DeletePersistedConfiguration = () => deleted = true,
                     ResolveExecutablePath = () => @"C:\fake\mfr.exe",
                     StartProcess = path => startedPath = path,
+                    NotifyRestartFailed = () =>
+                    {
+                        restartFailedNotified = true;
+                        return Task.CompletedTask;
+                    },
                     Shutdown = () => shutdown = true,
                 },
             };
@@ -88,6 +94,53 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.True(deleted);
             Assert.True(viewModel.SuppressSessionSaveOnClose);
             Assert.Equal(@"C:\fake\mfr.exe", startedPath);
+            Assert.False(restartFailedNotified);
+            Assert.True(shutdown);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies a failed restart still suppresses save and shuts down after delete.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task ResetConfiguration_RestartFailed_Still_Suppresses_And_Shuts_Down()
+        {
+            var deleted = false;
+            var started = false;
+            var shutdown = false;
+            var restartFailedNotified = false;
+            var viewModel = new MainWindowViewModel(persistSession: true);
+            var window = new AppMainWindow
+            {
+                DataContext = viewModel,
+                Width = 800,
+                Height = 600,
+                ResetConfigurationHooks = new ResetConfigurationHooks
+                {
+                    Confirm = () => Task.FromResult(true),
+                    DeletePersistedConfiguration = () => deleted = true,
+                    ResolveExecutablePath = () => null,
+                    StartProcess = _ => started = true,
+                    NotifyRestartFailed = () =>
+                    {
+                        restartFailedNotified = true;
+                        return Task.CompletedTask;
+                    },
+                    Shutdown = () => shutdown = true,
+                },
+            };
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            viewModel.ResetConfiguration();
+            Dispatcher.UIThread.RunJobs();
+            await Task.Yield();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(deleted);
+            Assert.False(started);
+            Assert.True(restartFailedNotified);
+            Assert.True(viewModel.SuppressSessionSaveOnClose);
             Assert.True(shutdown);
             window.Close();
         }

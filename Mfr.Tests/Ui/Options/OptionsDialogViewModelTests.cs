@@ -17,11 +17,7 @@ namespace Mfr.Tests.Ui.Options
         public void Constructor_loads_session_and_config_drafts()
         {
             ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
-            ConfigStore.FileList = new FileListPrefs
-            {
-                RememberLastFolder = false,
-                DoubleClickAddsToRenameList = true,
-            };
+            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = false, DoubleClickAddsToRenameList = true };
             ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
 
             var vm = new OptionsDialogViewModel();
@@ -36,11 +32,7 @@ namespace Mfr.Tests.Ui.Options
         public void Commit_writes_session_and_config_memory()
         {
             ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
-            ConfigStore.FileList = new FileListPrefs
-            {
-                RememberLastFolder = true,
-                DoubleClickAddsToRenameList = false,
-            };
+            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
             ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
 
             var vm = new OptionsDialogViewModel()

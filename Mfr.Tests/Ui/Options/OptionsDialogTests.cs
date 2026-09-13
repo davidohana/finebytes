@@ -139,11 +139,7 @@ namespace Mfr.Tests.Ui.Options
         public async Task ShowOptions_Ok_commits_and_saves_config()
         {
             ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
-            ConfigStore.FileList = new FileListPrefs
-            {
-                RememberLastFolder = true,
-                DoubleClickAddsToRenameList = false,
-            };
+            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
             ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
 
             var saved = false;
@@ -185,11 +181,7 @@ namespace Mfr.Tests.Ui.Options
         public async Task ShowOptions_Cancel_does_not_commit_or_save()
         {
             ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
-            ConfigStore.FileList = new FileListPrefs
-            {
-                RememberLastFolder = true,
-                DoubleClickAddsToRenameList = false,
-            };
+            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
             ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
 
             var saved = false;

@@ -201,7 +201,7 @@ namespace Mfr.Models.Config
 
         /// <summary>
         /// Deletes the config JSON file when it exists (Reset Configuration).
-        /// <para>Missing files are a no-op. Does not change in-memory prefs (see <see cref="ClearSessionAndFilterDefaults"/>).</para>
+        /// <para>Missing files are a no-op. Does not change in-memory prefs (UI exits after delete).</para>
         /// </summary>
         /// <param name="configFilePath">
         /// Path to JSON. When <c>null</c> or whitespace, <see cref="_ResolvePath"/> is used.
@@ -211,19 +211,6 @@ namespace Mfr.Models.Config
         {
             var path = _ResolvePath(configFilePath);
             AppDataFile.DeleteFileIfExists(path, "configuration file");
-        }
-
-        /// <summary>
-        /// Clears in-memory session sections and <see cref="FilterDefaultsJson"/> after Reset Configuration.
-        /// <para>Does not change <see cref="Log"/> / <see cref="Ui"/> or the active file path (app restarts after reset).</para>
-        /// </summary>
-        public static void ClearSessionAndFilterDefaults()
-        {
-            MainWindow = null;
-            FileList = null;
-            RenameList = null;
-            FilterEditor = null;
-            FilterDefaultsJson = [];
         }
 
         /// <summary>

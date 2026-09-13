@@ -76,14 +76,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private StyledTextDisplay _lastStatusMessage = StyledTextDisplay.Empty;
 
         /// <summary>
-        /// Clears in-memory per-type add defaults after Reset Configuration clears prefs.
-        /// </summary>
-        internal void ClearFilterDefaultsCache()
-        {
-            _filterDefaults.Clear();
-        }
-
-        /// <summary>
         /// Wires Rename List column capture/apply from the composition root (main window).
         /// <para>
         /// When unset, <see cref="CaptureRenameListColumns"/> returns an empty list and

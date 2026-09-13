@@ -6,13 +6,14 @@ namespace Mfr.Engine.Config
     /// Deletes the roaming prefs file that corresponds to MFR7 <c>mfrconfig.xml</c> (Reset Configuration).
     /// <para>
     /// Removes <c>config.json</c> only (log/ui + UI session sections + filterDefaults). Does not touch
-    /// <c>presets.json</c> or local logs.
+    /// <c>presets.json</c> or local logs. Does not clear in-memory prefs — the UI exits after delete
+    /// (with session save suppressed) so the next process soft-loads defaults.
     /// </para>
     /// </summary>
     public static class PersistedConfigurationReset
     {
         /// <summary>
-        /// Deletes the prefs file when present and clears in-memory session / filter-defaults.
+        /// Deletes the prefs file when present.
         /// </summary>
         /// <param name="configFilePath">
         /// Config path, or blank for the default AppData <c>config.json</c>.
@@ -21,8 +22,6 @@ namespace Mfr.Engine.Config
         public static void Reset(string? configFilePath = null)
         {
             ConfigStore.DeleteDefaultFile(configFilePath);
-
-            ConfigStore.ClearSessionAndFilterDefaults();
         }
     }
 }

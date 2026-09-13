@@ -11,7 +11,7 @@ namespace Mfr.App.Ui.Views
         public Func<Task<bool>>? Confirm { get; init; }
 
         /// <summary>
-        /// When set, replaces AppData file deletion (and in-memory defaults clear).
+        /// When set, replaces AppData prefs file deletion.
         /// </summary>
         public Action? DeletePersistedConfiguration { get; init; }
 
@@ -26,7 +26,12 @@ namespace Mfr.App.Ui.Views
         public Action<string>? StartProcess { get; init; }
 
         /// <summary>
-        /// When set, replaces app shutdown after a successful restart spawn.
+        /// When set, replaces the restart-failed dialog (delete already succeeded; exit still follows).
+        /// </summary>
+        public Func<Task>? NotifyRestartFailed { get; init; }
+
+        /// <summary>
+        /// When set, replaces app shutdown after delete (restart attempted).
         /// </summary>
         public Action? Shutdown { get; init; }
     }

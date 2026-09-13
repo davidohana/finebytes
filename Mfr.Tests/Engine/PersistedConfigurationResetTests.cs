@@ -1,4 +1,3 @@
-using System.Text.Json.Nodes;
 using Mfr.Engine.Config;
 using Mfr.Utils;
 
@@ -31,7 +30,6 @@ namespace Mfr.Tests.Engine
 
             ConfigStoreTestReset.LoadEmpty();
             ConfigStore.FileList = new FileListPrefs { FileMask = "*.mp3" };
-            ConfigStore.FilterDefaultsJson = new JsonObject { ["LettersCase"] = new JsonObject() };
             ConfigStore.Save(configPath);
             File.WriteAllText(
                 presetsPath, /*lang=json,strict*/
@@ -42,25 +40,19 @@ namespace Mfr.Tests.Engine
 
             Assert.False(File.Exists(configPath));
             Assert.True(File.Exists(presetsPath));
-            Assert.Null(ConfigStore.FileList);
-            Assert.Empty(ConfigStore.FilterDefaultsJson);
+            // In-memory prefs are intentionally left alone; UI exits after delete.
+            Assert.NotNull(ConfigStore.FileList);
         }
 
         /// <summary>
-        /// Verifies a missing prefs file does not throw and still clears in-memory session / filter-defaults.
+        /// Verifies a missing prefs file does not throw.
         /// </summary>
         [Fact]
-        public void Reset_missing_file_clears_memory()
+        public void Reset_missing_file_is_noop()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
-            ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.FileList = new FileListPrefs { FileMask = "*.wav" };
-            ConfigStore.FilterDefaultsJson = new JsonObject { ["LettersCase"] = new JsonObject() };
 
             PersistedConfigurationReset.Reset(dir.CombinePath("config.json"));
-
-            Assert.Null(ConfigStore.FileList);
-            Assert.Empty(ConfigStore.FilterDefaultsJson);
         }
     }
 }
