@@ -112,18 +112,13 @@
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Undo.png" />
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem Header="_Log" Command="{Binding ShowLogCommand}" InputGesture="{x:Static input:AppShortcuts.ShowLog}">
-          <MenuItem.Icon>
-            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Log.png" />
-          </MenuItem.Icon>
-        </MenuItem>
         <MenuItem
-          Header="_Options"
-          Command="{Binding ShowOptionsCommand}"
-          InputGesture="{x:Static input:AppShortcuts.ShowOptions}"
+          Header="Rename _Log"
+          Command="{Binding ShowLogCommand}"
+          InputGesture="{x:Static input:AppShortcuts.ShowLog}"
         >
           <MenuItem.Icon>
-            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Options.png" />
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Log.png" />
           </MenuItem.Icon>
         </MenuItem>
         <Separator />
@@ -442,6 +437,15 @@
         </MenuItem>
       </MenuItem>
       <MenuItem Header="_Tools">
+        <MenuItem
+          Header="_Options"
+          Command="{Binding ShowOptionsCommand}"
+          InputGesture="{x:Static input:AppShortcuts.ShowOptions}"
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/Options.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Reset _Configuration"
           Command="{Binding ResetConfigurationCommand}"

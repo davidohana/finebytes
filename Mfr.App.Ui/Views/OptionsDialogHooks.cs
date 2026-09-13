@@ -4,7 +4,7 @@ using Mfr.Models.Config;
 namespace Mfr.App.Ui.Views
 {
     /// <summary>
-    /// Optional overrides for MFR → Options (headless tests; leave null in production).
+    /// Optional overrides for Tools → Options (headless tests; leave null in production).
     /// </summary>
     internal sealed class OptionsDialogHooks
     {

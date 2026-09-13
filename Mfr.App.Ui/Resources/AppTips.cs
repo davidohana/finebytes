@@ -17,8 +17,8 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Toolbar tip for Undo Last.</summary>
         public const string UndoLast = "Undo last (Ctrl+Z)";
 
-        /// <summary>Toolbar tip for the log window.</summary>
-        public const string ShowLog = "Log (Ctrl+Shift+L)";
+        /// <summary>Toolbar tip for the Rename Log window.</summary>
+        public const string ShowLog = "Rename Log (Ctrl+Shift+L)";
 
         /// <summary>Toolbar tip for Options.</summary>
         public const string ShowOptions = "Options (Ctrl+,)";
@@ -75,7 +75,7 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Options: rename-log retention — Unlimited.</summary>
         public const string OptionsRenameLogUnlimited =
-            "Keep every on-disk rename log until you erase them in the Log window";
+            "Keep every on-disk rename log until you erase them in the Rename Log window";
 
         /// <summary>Tools → Reset Configuration menu tip (MFR7 ResetConfiguration).</summary>
         public const string ResetConfiguration = "Reset configuration to default values";

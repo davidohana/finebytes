@@ -12,15 +12,15 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 | -------------------- | --------------- |
 | GO                   | Ctrl+G          |
 | Undo last            | Ctrl+Z          |
-| Log                  | Ctrl+Shift+L    |
+| Rename Log           | Ctrl+Shift+L    |
 | Options              | Ctrl+,          |
 | Exit                 | Alt+F4          |
 | Refresh focused pane | F5              |
 | Go to address bar    | Ctrl+L or Alt+D |
 
-Undo last (Ctrl+Z) reverses the last GO when a rename log exists; Log (Ctrl+Shift+L) opens the Rename Log (disk history + last operation). Options (Ctrl+,) is live. GO previews the current list, warns before ignoring preview errors, and then applies valid renames.
+Undo last (Ctrl+Z) reverses the last GO when a rename log exists; Rename Log (Ctrl+Shift+L) opens the dialog (disk history + last operation). Options (Ctrl+,) is live. GO previews the current list, warns before ignoring preview errors, and then applies valid renames.
 
-Ctrl+L is the address bar (Explorer / Chrome). Log is Ctrl+Shift+L so the two do not clash. Alt+F4 is shown on **MFR → Exit** and is handled by the window manager on Windows, not as an extra app binding.
+Ctrl+L is the address bar (Explorer / Chrome). Rename Log is Ctrl+Shift+L so the two do not clash. Alt+F4 is shown on **MFR → Exit** and is handled by the window manager on Windows, not as an extra app binding.
 
 ### File List
 

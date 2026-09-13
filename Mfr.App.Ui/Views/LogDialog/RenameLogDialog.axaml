@@ -6,10 +6,10 @@
   x:DataType="vm:RenameLogDialogViewModel"
   Title="Rename Log"
   Icon="/Assets/mfr.ico"
-  Width="640"
-  Height="420"
-  MinWidth="480"
-  MinHeight="320"
+  Width="680"
+  Height="440"
+  MinWidth="520"
+  MinHeight="340"
   WindowStartupLocation="CenterOwner"
   ShowInTaskbar="False"
   CanResize="True"
@@ -17,17 +17,87 @@
   FontSize="{StaticResource AppChromeFontSize}"
   Foreground="{DynamicResource AppChromeForegroundBrush}"
 >
-  <DockPanel Margin="12">
+  <Window.Styles>
+    <Style Selector="TextBlock.rename-log-title">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.rename-log-subtitle">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.rename-log-section">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+    <Style Selector="ListBox.rename-log-list">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="4" />
+    </Style>
+    <Style Selector="ListBox.rename-log-list ListBoxItem">
+      <Setter Property="Padding" Value="8,5" />
+      <Setter Property="MinHeight" Value="26" />
+      <Setter Property="Margin" Value="0,0,0,2" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="TextBox.rename-log-details">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFixedWidthFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="12,10" />
+      <Setter Property="AcceptsReturn" Value="True" />
+      <Setter Property="IsReadOnly" Value="True" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+      <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+    </Style>
+    <Style
+      Selector="TextBox.rename-log-details /template/ Border#PART_BorderElement,
+                TextBox.rename-log-details:pointerover /template/ Border#PART_BorderElement,
+                TextBox.rename-log-details:focus /template/ Border#PART_BorderElement,
+                TextBox.rename-log-details:focus-within /template/ Border#PART_BorderElement"
+    >
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+    </Style>
+    <Style Selector="Button.rename-log-action">
+      <Setter Property="MinWidth" Value="72" />
+      <Setter Property="MinHeight" Value="28" />
+      <Setter Property="CornerRadius" Value="4" />
+    </Style>
+  </Window.Styles>
+
+  <DockPanel Margin="16">
+    <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
+      <TextBlock Classes="rename-log-title" Text="Rename Log" />
+      <TextBlock Classes="rename-log-subtitle" Text="Review past GO operations, undo a run, or erase saved logs." />
+    </StackPanel>
+
     <StackPanel
       DockPanel.Dock="Bottom"
       Orientation="Horizontal"
       HorizontalAlignment="Right"
       Spacing="8"
-      Margin="0,12,0,0"
+      Margin="0,14,0,0"
     >
       <Button
         x:Name="CloseButton"
-        Classes="message-dialog-footer"
+        Classes="message-dialog-footer rename-log-action"
         Content="Close"
         MinWidth="88"
         IsCancel="True"
@@ -35,53 +105,55 @@
       />
     </StackPanel>
 
-    <Grid RowDefinitions="Auto,*" ColumnDefinitions="180,4,*">
-      <TextBlock Grid.Row="0" Grid.Column="0" Text="Available Logs:" FontWeight="SemiBold" Margin="0,0,0,8" />
-      <DockPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,8" LastChildFill="True">
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="210,12,*">
+      <TextBlock Grid.Row="0" Grid.Column="0" Classes="rename-log-section" Text="Available Logs" />
+      <DockPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,6" LastChildFill="True">
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8" Margin="12,0,0,0">
           <Button
             x:Name="UndoButton"
-            Classes="message-dialog-footer"
+            Classes="message-dialog-footer rename-log-action"
             Content="Undo"
-            MinWidth="72"
             Command="{Binding UndoCommand}"
           />
           <Button
             x:Name="EraseButton"
-            Classes="message-dialog-footer"
+            Classes="message-dialog-footer rename-log-action"
             Content="Erase"
-            MinWidth="72"
             Command="{Binding EraseCommand}"
           />
         </StackPanel>
-        <TextBlock Text="Log Details:" FontWeight="SemiBold" VerticalAlignment="Center" />
+        <TextBlock Classes="rename-log-section" Text="Log Details" VerticalAlignment="Center" Margin="0" />
       </DockPanel>
 
       <ListBox
         x:Name="LogsList"
         Grid.Row="1"
         Grid.Column="0"
+        Classes="rename-log-list"
         ItemsSource="{Binding Items}"
         SelectedItem="{Binding SelectedItem}"
         KeyDown="_OnLogsListKeyDown"
       >
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:RenameLogListItem">
-            <TextBlock Text="{Binding Title}" />
+            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" FontWeight="Medium" />
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>
-      <GridSplitter Grid.Row="1" Grid.Column="1" ResizeDirection="Columns" Width="4" />
+      <GridSplitter
+        Grid.Row="1"
+        Grid.Column="1"
+        ResizeDirection="Columns"
+        Width="4"
+        HorizontalAlignment="Center"
+        Background="Transparent"
+      />
       <TextBox
         x:Name="DetailsBox"
         Grid.Row="1"
         Grid.Column="2"
+        Classes="rename-log-details"
         Text="{Binding DetailsText}"
-        IsReadOnly="True"
-        AcceptsReturn="True"
-        TextWrapping="NoWrap"
-        ScrollViewer.HorizontalScrollBarVisibility="Auto"
-        ScrollViewer.VerticalScrollBarVisibility="Auto"
       />
     </Grid>
   </DockPanel>

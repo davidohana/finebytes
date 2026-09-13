@@ -98,10 +98,7 @@
   <DockPanel Margin="16">
     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
       <TextBlock Classes="preset-manager-title" Text="Preset library" />
-      <TextBlock
-        Classes="preset-manager-subtitle"
-        Text="Load, reorder, or manage saved rename chains."
-      />
+      <TextBlock Classes="preset-manager-subtitle" Text="Load, reorder, or manage saved rename chains." />
     </StackPanel>
 
     <Grid ColumnDefinitions="*,12,Auto,12,*,14,Auto" RowDefinitions="Auto,*">

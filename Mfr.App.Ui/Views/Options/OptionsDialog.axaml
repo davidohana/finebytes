@@ -115,11 +115,11 @@
         </StackPanel>
       </controls:FieldsetGroup>
 
-      <controls:FieldsetGroup Header="Undo &amp; Log">
+      <controls:FieldsetGroup Header="Undo &amp; Rename Log">
         <StackPanel Spacing="6">
           <controls:CompactRadioButton
             GroupName="RenameLogRetention"
-            Content="Log disabled (Undo for last renaming operation only)"
+            Content="Rename Log disabled (Undo for last renaming operation only)"
             ToolTip.Tip="{x:Static resources:AppTips.OptionsRenameLogDisabled}"
             IsChecked="{Binding RenameLogRetentionMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:RenameLogRetentionMode.Disabled}, Mode=TwoWay}"
           />

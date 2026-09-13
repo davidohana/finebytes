@@ -319,7 +319,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         internal bool SuppressSessionSaveOnClose { get; set; }
 
         /// <summary>
-        /// Raised when the user chooses MFR → Options; the main window hosts the dialog.
+        /// Raised when the user chooses Tools → Options; the main window hosts the dialog.
         /// </summary>
         internal event EventHandler? OptionsRequested;
 

@@ -38,7 +38,7 @@ namespace Mfr.Tests.Ui.Options
 
         /// <summary>
         /// Verifies the Options dialog constructs Session, Confirmation, File List, Rename List,
-        /// and Undo &amp; Log retention controls.
+        /// and Undo &amp; Rename Log retention controls.
         /// </summary>
         [AvaloniaFact]
         public void OptionsDialog_shows_session_prompts_file_list_rename_list_and_undo_log()
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Files", radioLabels);
                 Assert.Contains("Folders", radioLabels);
                 Assert.Contains("Files and folders", radioLabels);
-                Assert.Contains("Log disabled (Undo for last renaming operation only)", radioLabels);
+                Assert.Contains("Rename Log disabled (Undo for last renaming operation only)", radioLabels);
                 Assert.Contains("Limited to:", radioLabels);
                 Assert.Contains("Unlimited", radioLabels);
 
@@ -86,7 +86,7 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Confirmation prompts", groupHeaders);
                 Assert.Contains("File List", groupHeaders);
                 Assert.Contains("Rename List", groupHeaders);
-                Assert.Contains("Undo & Log", groupHeaders);
+                Assert.Contains("Undo & Rename Log", groupHeaders);
 
                 var rowLabels = dialog
                     .GetVisualDescendants()

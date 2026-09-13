@@ -72,7 +72,7 @@ namespace Mfr.Models.Config
     /// <para>
     /// Separate from diagnostic Serilog <c>log</c> / <c>logs/</c>. Disk files live under
     /// <see cref="AppDataPaths.LocalRoot"/> + <c>rename-logs</c> as JSON <c>.mfrlog</c>.
-    /// Edited by the Options dialog Undo &amp; Log section (Disabled / Limited / Unlimited).
+    /// Edited by the Options dialog Undo &amp; Rename Log section (Disabled / Limited / Unlimited).
     /// </para>
     /// </summary>
     public sealed class RenameLogConfig
