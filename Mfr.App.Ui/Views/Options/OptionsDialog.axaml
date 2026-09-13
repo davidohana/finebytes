@@ -10,8 +10,8 @@
   x:DataType="vm:OptionsDialogViewModel"
   Title="Options"
   Icon="/Assets/mfr.ico"
-  Width="460"
-  MinWidth="400"
+  Width="480"
+  MinWidth="420"
   SizeToContent="Height"
   WindowStartupLocation="CenterOwner"
   ShowInTaskbar="False"
@@ -23,79 +23,97 @@
   <DockPanel Margin="12">
     <controls:ModalOkCancelFooter x:Name="Footer" DockPanel.Dock="Bottom" Margin="0,14,0,0" Spacing="12" />
 
-    <StackPanel Spacing="10">
-      <controls:CompactCheckBox
-        IsChecked="{Binding RememberLastFolder}"
-        Content="Save File List last position"
-        ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberLastFolder}"
-      />
-      <controls:CompactCheckBox
-        IsChecked="{Binding RememberWindowState}"
-        Content="Remember window size and position"
-        ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberWindowState}"
-      />
-      <StackPanel Orientation="Horizontal" Spacing="12">
-        <TextBlock Text="Confirmation prompts:" VerticalAlignment="Center" />
-        <controls:CompactRadioButton
-          GroupName="ConfirmationPrompts"
-          Content="Fewer"
-          ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationFewer}"
-          IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Fewer}, Mode=TwoWay}"
-        />
-        <controls:CompactRadioButton
-          GroupName="ConfirmationPrompts"
-          Content="Normal"
-          ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationNormal}"
-          IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Normal}, Mode=TwoWay}"
-        />
-        <controls:CompactRadioButton
-          GroupName="ConfirmationPrompts"
-          Content="More"
-          ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationMore}"
-          IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.More}, Mode=TwoWay}"
-        />
-      </StackPanel>
-      <StackPanel Orientation="Horizontal" Spacing="12">
-        <TextBlock Text="Double-click in file list:" VerticalAlignment="Center" />
-        <controls:CompactRadioButton
-          GroupName="DoubleClickInFileList"
-          Content="Open"
-          ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickOpen}"
-          IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.False}, Mode=TwoWay}"
-        />
-        <controls:CompactRadioButton
-          GroupName="DoubleClickInFileList"
-          Content="Add to Rename List"
-          ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickAdd}"
-          IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.True}, Mode=TwoWay}"
-        />
-      </StackPanel>
-      <StackPanel Orientation="Horizontal" Spacing="12">
-        <TextBlock Text="Add to Rename List:" VerticalAlignment="Center" />
-        <controls:CompactRadioButton
-          GroupName="RenameListAddMode"
-          Content="Files"
-          ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFiles}"
-          IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Files}, Mode=TwoWay}"
-        />
-        <controls:CompactRadioButton
-          GroupName="RenameListAddMode"
-          Content="Folders"
-          ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFolders}"
-          IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Folders}, Mode=TwoWay}"
-        />
-        <controls:CompactRadioButton
-          GroupName="RenameListAddMode"
-          Content="Files and folders"
-          ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFilesAndFolders}"
-          IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.FilesAndFolders}, Mode=TwoWay}"
-        />
-      </StackPanel>
-      <controls:CompactCheckBox
-        IsChecked="{Binding AddFolderContents}"
-        Content="Add folder contents"
-        ToolTip.Tip="{x:Static resources:AppTips.OptionsAddFolderContents}"
-      />
+    <StackPanel Spacing="10" Grid.IsSharedSizeScope="True">
+      <controls:FieldsetGroup Header="Session">
+        <StackPanel Spacing="6">
+          <controls:CompactCheckBox
+            IsChecked="{Binding RememberLastFolder}"
+            Content="Save File List last position"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberLastFolder}"
+          />
+          <controls:CompactCheckBox
+            IsChecked="{Binding RememberWindowState}"
+            Content="Remember window size and position"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberWindowState}"
+          />
+        </StackPanel>
+      </controls:FieldsetGroup>
+
+      <controls:FieldsetGroup Header="Confirmation prompts">
+        <StackPanel Orientation="Horizontal" Spacing="12">
+          <controls:CompactRadioButton
+            GroupName="ConfirmationPrompts"
+            Content="Fewer"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationFewer}"
+            IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Fewer}, Mode=TwoWay}"
+          />
+          <controls:CompactRadioButton
+            GroupName="ConfirmationPrompts"
+            Content="Normal"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationNormal}"
+            IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Normal}, Mode=TwoWay}"
+          />
+          <controls:CompactRadioButton
+            GroupName="ConfirmationPrompts"
+            Content="More"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationMore}"
+            IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.More}, Mode=TwoWay}"
+          />
+        </StackPanel>
+      </controls:FieldsetGroup>
+
+      <controls:FieldsetGroup Header="File List">
+        <controls:FilterEditorLabeledRow Label="Double-click:">
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <controls:CompactRadioButton
+              GroupName="DoubleClickInFileList"
+              Content="Open"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickOpen}"
+              IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.False}, Mode=TwoWay}"
+            />
+            <controls:CompactRadioButton
+              GroupName="DoubleClickInFileList"
+              Content="Add to Rename List"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickAdd}"
+              IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.True}, Mode=TwoWay}"
+            />
+          </StackPanel>
+        </controls:FilterEditorLabeledRow>
+      </controls:FieldsetGroup>
+
+      <controls:FieldsetGroup Header="Rename List">
+        <StackPanel Spacing="8">
+          <controls:FilterEditorLabeledRow Label="Add:">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <controls:CompactRadioButton
+                GroupName="RenameListAddMode"
+                Content="Files"
+                ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFiles}"
+                IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Files}, Mode=TwoWay}"
+              />
+              <controls:CompactRadioButton
+                GroupName="RenameListAddMode"
+                Content="Folders"
+                ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFolders}"
+                IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Folders}, Mode=TwoWay}"
+              />
+              <controls:CompactRadioButton
+                GroupName="RenameListAddMode"
+                Content="Files and folders"
+                ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFilesAndFolders}"
+                IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.FilesAndFolders}, Mode=TwoWay}"
+              />
+            </StackPanel>
+          </controls:FilterEditorLabeledRow>
+          <controls:FilterEditorLabeledRow Label="">
+            <controls:CompactCheckBox
+              IsChecked="{Binding AddFolderContents}"
+              Content="Add folder contents"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsAddFolderContents}"
+            />
+          </controls:FilterEditorLabeledRow>
+        </StackPanel>
+      </controls:FieldsetGroup>
     </StackPanel>
   </DockPanel>
 </Window>

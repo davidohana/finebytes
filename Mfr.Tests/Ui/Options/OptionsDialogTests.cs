@@ -74,8 +74,23 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Folders", radioLabels);
                 Assert.Contains("Files and folders", radioLabels);
 
-                var texts = dialog.GetVisualDescendants().OfType<TextBlock>().Select(block => block.Text).ToList();
-                Assert.Contains("Add to Rename List:", texts);
+                var groupHeaders = dialog
+                    .GetVisualDescendants()
+                    .OfType<FieldsetGroup>()
+                    .Select(group => group.Header?.ToString())
+                    .ToList();
+                Assert.Contains("Session", groupHeaders);
+                Assert.Contains("Confirmation prompts", groupHeaders);
+                Assert.Contains("File List", groupHeaders);
+                Assert.Contains("Rename List", groupHeaders);
+
+                var rowLabels = dialog
+                    .GetVisualDescendants()
+                    .OfType<FilterEditorLabeledRow>()
+                    .Select(row => row.Label)
+                    .ToList();
+                Assert.Contains("Double-click:", rowLabels);
+                Assert.Contains("Add:", rowLabels);
 
                 var checkTips = dialog
                     .GetVisualDescendants()
