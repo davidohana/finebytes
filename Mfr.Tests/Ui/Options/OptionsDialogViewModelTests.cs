@@ -163,5 +163,35 @@ namespace Mfr.Tests.Ui.Options
             Assert.Equal(RenameLogRetentionMode.Limited, vm.RenameLogRetentionMode);
             Assert.Equal(5, vm.RenameLogLimitedCount);
         }
+
+        [Fact]
+        public void ResetConfirmations_clears_draft_only()
+        {
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset];
+
+            var vm = new OptionsDialogViewModel();
+            Assert.Equal([ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset], vm.SuppressedConfirmations);
+
+            vm.ResetConfirmations();
+
+            Assert.Empty(vm.SuppressedConfirmations);
+            Assert.Equal(
+                [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset],
+                ConfigStore.Ui.SuppressedConfirmations
+            );
+        }
+
+        [Fact]
+        public void Commit_after_ResetConfirmations_writes_empty_suppress_list()
+        {
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
+            var vm = new OptionsDialogViewModel();
+
+            vm.ResetConfirmations();
+            vm.Commit();
+
+            Assert.Empty(vm.SuppressedConfirmations);
+            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+        }
     }
 }

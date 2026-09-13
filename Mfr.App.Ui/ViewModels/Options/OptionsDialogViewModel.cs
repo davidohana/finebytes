@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.ViewModels.Options
@@ -86,6 +87,18 @@ namespace Mfr.App.Ui.ViewModels.Options
         /// </summary>
         [ObservableProperty]
         private decimal _renameLogLimitedCount = DefaultLimitedCount;
+
+        /// <summary>
+        /// Clears the draft suppress list so all confirmation dialogs show again after OK.
+        /// <para>
+        /// Does not mutate <see cref="ConfigStore"/>; <see cref="Commit"/> writes the empty list.
+        /// </para>
+        /// </summary>
+        [RelayCommand]
+        public void ResetConfirmations()
+        {
+            SuppressedConfirmations = [];
+        }
 
         /// <summary>
         /// Writes draft values into live <see cref="ConfigStore"/> sections.

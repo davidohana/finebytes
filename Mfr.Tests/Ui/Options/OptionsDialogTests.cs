@@ -37,11 +37,11 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies the Options dialog constructs Session, Confirmation, File List, Rename List,
+        /// Verifies the Options dialog constructs Session, Confirmations, File List, Rename List,
         /// and Undo &amp; Rename Log retention controls.
         /// </summary>
         [AvaloniaFact]
-        public void OptionsDialog_shows_session_prompts_file_list_rename_list_and_undo_log()
+        public void OptionsDialog_shows_session_confirmations_file_list_rename_list_and_undo_log()
         {
             var dialogVm = new OptionsDialogViewModel();
             var dialog = new OptionsDialog(dialogVm);
@@ -88,11 +88,22 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Rename List", groupHeaders);
                 Assert.Contains("Undo & Rename Log", groupHeaders);
 
-                var texts = dialog.GetVisualDescendants().OfType<TextBlock>().Select(block => block.Text).ToList();
-                Assert.Contains(
-                    texts,
-                    text => text is not null && text.Contains("Per-dialog confirmation suppressions")
-                );
+                var confirmationsBlurb = dialog
+                    .GetVisualDescendants()
+                    .OfType<TextBlock>()
+                    .First(block =>
+                        block.Text is not null
+                        && block.Text.Contains(
+                            "Confirmation dialogs you chose not to see again",
+                            StringComparison.Ordinal
+                        )
+                    );
+                Assert.Equal(AppTips.OptionsConfirmations, ToolTip.GetTip(confirmationsBlurb)?.ToString());
+
+                var resetButton = dialog.FindControl<Button>("ResetConfirmationsButton");
+                Assert.NotNull(resetButton);
+                Assert.Equal("Reset confirmations", resetButton.Content?.ToString());
+                Assert.Equal(AppTips.OptionsResetConfirmations, ToolTip.GetTip(resetButton)?.ToString());
 
                 var rowLabels = dialog
                     .GetVisualDescendants()
@@ -126,6 +137,38 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains(AppTips.OptionsRenameLogDisabled, radioTips);
                 Assert.Contains(AppTips.OptionsRenameLogLimited, radioTips);
                 Assert.Contains(AppTips.OptionsRenameLogUnlimited, radioTips);
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        /// <summary>
+        /// Verifies Reset confirmations clears the draft suppress list without touching ConfigStore.
+        /// </summary>
+        [AvaloniaFact]
+        public void OptionsDialog_ResetConfirmations_clears_draft_only()
+        {
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearAppliedFilters];
+            var dialogVm = new OptionsDialogViewModel();
+            var dialog = new OptionsDialog(dialogVm);
+            dialog.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                Assert.Equal([ConfirmationKind.ClearAppliedFilters], dialogVm.SuppressedConfirmations);
+
+                var resetButton = dialog.FindControl<Button>("ResetConfirmationsButton");
+                Assert.NotNull(resetButton);
+                Assert.NotNull(resetButton.Command);
+                Assert.True(resetButton.Command.CanExecute(null));
+                resetButton.Command.Execute(null);
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.Empty(dialogVm.SuppressedConfirmations);
+                Assert.Equal([ConfirmationKind.ClearAppliedFilters], ConfigStore.Ui.SuppressedConfirmations);
             }
             finally
             {
@@ -199,6 +242,9 @@ namespace Mfr.Tests.Ui.Options
 
             Assert.NotNull(shown);
             Assert.True(saved);
+            Assert.NotNull(ConfigStore.FileList);
+            Assert.NotNull(ConfigStore.MainWindow);
+            Assert.NotNull(ConfigStore.RenameList);
             Assert.False(ConfigStore.FileList.RememberLastFolder);
             Assert.False(ConfigStore.MainWindow.RememberWindowState);
             Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
@@ -282,6 +328,9 @@ namespace Mfr.Tests.Ui.Options
             await _InvokeShowOptionsAsync(viewModel);
 
             Assert.False(saved);
+            Assert.NotNull(ConfigStore.FileList);
+            Assert.NotNull(ConfigStore.MainWindow);
+            Assert.NotNull(ConfigStore.RenameList);
             Assert.True(ConfigStore.FileList.RememberLastFolder);
             Assert.True(ConfigStore.MainWindow.RememberWindowState);
             Assert.Equal([ConfirmationKind.GoWithPreviewErrors], ConfigStore.Ui.SuppressedConfirmations);

@@ -31,6 +31,14 @@ namespace Mfr.App.Ui.Resources
         public const string OptionsRememberWindowState =
             "Restore main window size, position, and splitters next launch";
 
+        /// <summary>Options: Confirmations section — how suppressions work.</summary>
+        public const string OptionsConfirmations =
+            "Some confirmation dialogs can be hidden via Keep showing…; they stay hidden until reset";
+
+        /// <summary>Options: Reset confirmations button.</summary>
+        public const string OptionsResetConfirmations =
+            "Show all confirmation dialogs again (applies when you OK Options)";
+
         /// <summary>Options: double-click opens in File List.</summary>
         public const string OptionsDoubleClickOpen =
             "Double-click opens folders or launches files with the default application";

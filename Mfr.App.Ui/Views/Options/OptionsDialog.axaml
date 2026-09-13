@@ -40,8 +40,21 @@
       </controls:FieldsetGroup>
 
       <controls:FieldsetGroup Header="Confirmations">
-        <!-- P4 replaces this placeholder with Reset confirmations button. -->
-        <TextBlock Text="Per-dialog confirmation suppressions (reset control coming soon)." TextWrapping="Wrap" />
+        <StackPanel Spacing="6">
+          <TextBlock
+            Text="Confirmation dialogs you chose not to see again can be restored here."
+            TextWrapping="Wrap"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmations}"
+          />
+          <Button
+            x:Name="ResetConfirmationsButton"
+            HorizontalAlignment="Left"
+            Classes="message-dialog-footer"
+            Content="Reset confirmations"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsResetConfirmations}"
+            Command="{Binding ResetConfirmationsCommand}"
+          />
+        </StackPanel>
       </controls:FieldsetGroup>
 
       <controls:FieldsetGroup Header="File List">
