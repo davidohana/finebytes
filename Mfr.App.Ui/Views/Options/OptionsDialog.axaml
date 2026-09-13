@@ -70,6 +70,32 @@
           IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.True}, Mode=TwoWay}"
         />
       </StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <TextBlock Text="Add to Rename List:" VerticalAlignment="Center" />
+        <controls:CompactRadioButton
+          GroupName="RenameListAddMode"
+          Content="Files"
+          ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFiles}"
+          IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Files}, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          GroupName="RenameListAddMode"
+          Content="Folders"
+          ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFolders}"
+          IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Folders}, Mode=TwoWay}"
+        />
+        <controls:CompactRadioButton
+          GroupName="RenameListAddMode"
+          Content="Files and folders"
+          ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFilesAndFolders}"
+          IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.FilesAndFolders}, Mode=TwoWay}"
+        />
+      </StackPanel>
+      <controls:CompactCheckBox
+        IsChecked="{Binding AddFolderContents}"
+        Content="Add folder contents"
+        ToolTip.Tip="{x:Static resources:AppTips.OptionsAddFolderContents}"
+      />
     </StackPanel>
   </DockPanel>
 </Window>

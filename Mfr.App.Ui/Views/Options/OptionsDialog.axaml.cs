@@ -4,7 +4,7 @@ using Mfr.App.Ui.ViewModels.Options;
 namespace Mfr.App.Ui.Views.Options
 {
     /// <summary>
-    /// Modal dialog for app-wide Options (remember flags and preset confirm).
+    /// Modal dialog for app-wide Options (remember flags, confirms, double-click, Rename List add policy).
     /// </summary>
     public partial class OptionsDialog : Window
     {

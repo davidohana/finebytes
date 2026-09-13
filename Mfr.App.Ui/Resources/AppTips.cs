@@ -51,6 +51,20 @@ namespace Mfr.App.Ui.Resources
         public const string OptionsDoubleClickAdd =
             "Double-click adds the File List selection to the Rename List (same as Add Selected)";
 
+        /// <summary>Options: Add to Rename List — Files.</summary>
+        public const string OptionsAddModeFiles =
+            "Add file rows only (selected files, and files found under selected folders)";
+
+        /// <summary>Options: Add to Rename List — Folders.</summary>
+        public const string OptionsAddModeFolders = "Add folder rows only";
+
+        /// <summary>Options: Add to Rename List — Files and folders.</summary>
+        public const string OptionsAddModeFilesAndFolders = "Add both file and folder rows";
+
+        /// <summary>Options: recurse into folder sources when adding.</summary>
+        public const string OptionsAddFolderContents =
+            "When adding a folder, also include matching items from its subfolders";
+
         /// <summary>Tools → Reset Configuration menu tip (MFR7 ResetConfiguration).</summary>
         public const string ResetConfiguration = "Reset configuration to default values";
 

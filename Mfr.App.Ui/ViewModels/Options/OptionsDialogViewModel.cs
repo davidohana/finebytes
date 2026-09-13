@@ -17,6 +17,8 @@ namespace Mfr.App.Ui.ViewModels.Options
             RememberWindowState = ConfigStore.MainWindow?.RememberWindowState ?? true;
             ConfirmationPrompts = ConfigStore.Ui.ConfirmationPrompts;
             DoubleClickAddsToRenameList = ConfigStore.FileList?.DoubleClickAddsToRenameList ?? false;
+            AddMode = ConfigStore.RenameList?.AddMode ?? RenameListAddMode.Files;
+            AddFolderContents = ConfigStore.RenameList?.AddFolderContents ?? true;
         }
 
         /// <summary>
@@ -44,9 +46,21 @@ namespace Mfr.App.Ui.ViewModels.Options
         private bool _doubleClickAddsToRenameList;
 
         /// <summary>
+        /// Draft path kinds that become Rename List rows when adding from the File List.
+        /// </summary>
+        [ObservableProperty]
+        private RenameListAddMode _addMode;
+
+        /// <summary>
+        /// When <see langword="true"/>, folder sources recurse into subfolders when adding.
+        /// </summary>
+        [ObservableProperty]
+        private bool _addFolderContents;
+
+        /// <summary>
         /// Writes draft values into live <see cref="ConfigStore"/> sections.
         /// <para>Does not write <c>config.json</c>; the host calls <see cref="ConfigStore.Save"/>
-        /// (whole prefs document, including the mutated session flags).</para>
+        /// (whole prefs document, including the mutated sections).</para>
         /// </summary>
         public void Commit()
         {
@@ -55,6 +69,9 @@ namespace Mfr.App.Ui.ViewModels.Options
             fileList.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
             ConfigStore.EnsureMainWindow().RememberWindowState = RememberWindowState;
             ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts;
+            var renameList = ConfigStore.EnsureRenameList();
+            renameList.AddMode = AddMode;
+            renameList.AddFolderContents = AddFolderContents;
         }
     }
 }

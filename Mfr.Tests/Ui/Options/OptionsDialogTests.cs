@@ -37,10 +37,11 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies the Options dialog constructs remember checkboxes, prompts radios, and double-click radios.
+        /// Verifies the Options dialog constructs remember checkboxes, prompts radios, double-click radios,
+        /// and Rename List add-mode controls.
         /// </summary>
         [AvaloniaFact]
-        public void OptionsDialog_shows_remember_prompts_and_double_click()
+        public void OptionsDialog_shows_remember_prompts_double_click_and_add_mode()
         {
             var dialogVm = new OptionsDialogViewModel();
             var dialog = new OptionsDialog(dialogVm);
@@ -57,6 +58,7 @@ namespace Mfr.Tests.Ui.Options
 
                 Assert.Contains("Save File List last position", labels);
                 Assert.Contains("Remember window size and position", labels);
+                Assert.Contains("Add folder contents", labels);
 
                 var radioLabels = dialog
                     .GetVisualDescendants()
@@ -68,6 +70,12 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("More", radioLabels);
                 Assert.Contains("Open", radioLabels);
                 Assert.Contains("Add to Rename List", radioLabels);
+                Assert.Contains("Files", radioLabels);
+                Assert.Contains("Folders", radioLabels);
+                Assert.Contains("Files and folders", radioLabels);
+
+                var texts = dialog.GetVisualDescendants().OfType<TextBlock>().Select(block => block.Text).ToList();
+                Assert.Contains("Add to Rename List:", texts);
 
                 var checkTips = dialog
                     .GetVisualDescendants()
@@ -76,6 +84,7 @@ namespace Mfr.Tests.Ui.Options
                     .ToList();
                 Assert.Contains(AppTips.OptionsRememberLastFolder, checkTips);
                 Assert.Contains(AppTips.OptionsRememberWindowState, checkTips);
+                Assert.Contains(AppTips.OptionsAddFolderContents, checkTips);
 
                 var radioTips = dialog
                     .GetVisualDescendants()
@@ -87,6 +96,9 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains(AppTips.OptionsConfirmationMore, radioTips);
                 Assert.Contains(AppTips.OptionsDoubleClickOpen, radioTips);
                 Assert.Contains(AppTips.OptionsDoubleClickAdd, radioTips);
+                Assert.Contains(AppTips.OptionsAddModeFiles, radioTips);
+                Assert.Contains(AppTips.OptionsAddModeFolders, radioTips);
+                Assert.Contains(AppTips.OptionsAddModeFilesAndFolders, radioTips);
             }
             finally
             {
@@ -138,9 +150,7 @@ namespace Mfr.Tests.Ui.Options
         [AvaloniaFact]
         public async Task ShowOptions_Ok_commits_and_saves_config()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
-            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            _SeedOptionsPrefs();
 
             var saved = false;
             OptionsDialogViewModel? shown = null;
@@ -151,10 +161,7 @@ namespace Mfr.Tests.Ui.Options
                     Show = vm =>
                     {
                         shown = vm;
-                        vm.RememberLastFolder = false;
-                        vm.RememberWindowState = false;
-                        vm.ConfirmationPrompts = ConfirmationPrompts.More;
-                        vm.DoubleClickAddsToRenameList = true;
+                        _MutateDraftAwayFromSeed(vm);
                         return Task.FromResult<bool?>(true);
                     },
                     SaveConfig = () => saved = true,
@@ -169,20 +176,20 @@ namespace Mfr.Tests.Ui.Options
             Assert.False(ConfigStore.MainWindow.RememberWindowState);
             Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
+            Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
+            Assert.False(ConfigStore.RenameList.AddFolderContents);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
         }
 
         /// <summary>
-        /// Verifies Cancel leaves session/config and does not save.
+        /// Verifies Cancel leaves prefs memory and does not save.
         /// </summary>
         [AvaloniaFact]
         public async Task ShowOptions_Cancel_does_not_commit_or_save()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
-            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            _SeedOptionsPrefs();
 
             var saved = false;
             var (viewModel, window) = _ShowMainWindow(
@@ -191,9 +198,7 @@ namespace Mfr.Tests.Ui.Options
                 {
                     Show = vm =>
                     {
-                        vm.RememberLastFolder = false;
-                        vm.ConfirmationPrompts = ConfirmationPrompts.More;
-                        vm.DoubleClickAddsToRenameList = true;
+                        _MutateDraftAwayFromSeed(vm);
                         return Task.FromResult<bool?>(false);
                     },
                     SaveConfig = () => saved = true,
@@ -207,16 +212,18 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(ConfigStore.MainWindow.RememberWindowState);
             Assert.Equal(ConfirmationPrompts.Fewer, ConfigStore.Ui.ConfirmationPrompts);
             Assert.False(ConfigStore.FileList.DoubleClickAddsToRenameList);
+            Assert.Equal(RenameListAddMode.Files, ConfigStore.RenameList.AddMode);
+            Assert.True(ConfigStore.RenameList.AddFolderContents);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
         }
 
         /// <summary>
-        /// Verifies Options is a no-op when the window does not persist session.
+        /// Verifies Options is a no-op when <see cref="MainWindowViewModel.PersistSession"/> is false.
         /// </summary>
         [AvaloniaFact]
-        public async Task ShowOptions_without_session_is_noop()
+        public async Task ShowOptions_when_persist_session_false_is_noop()
         {
             var shown = false;
             var (viewModel, window) = _ShowMainWindow(
@@ -238,6 +245,34 @@ namespace Mfr.Tests.Ui.Options
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
+        }
+
+        /// <summary>
+        /// Seeds ConfigStore Options-related prefs to values distinct from the draft mutation used in OK/Cancel tests.
+        /// </summary>
+        private static void _SeedOptionsPrefs()
+        {
+            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
+            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
+            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.RenameList = new RenameListPrefs
+            {
+                AddMode = RenameListAddMode.Files,
+                AddFolderContents = true,
+            };
+        }
+
+        /// <summary>
+        /// Sets every Options draft away from <see cref="_SeedOptionsPrefs"/> so commit vs cancel is observable.
+        /// </summary>
+        private static void _MutateDraftAwayFromSeed(OptionsDialogViewModel vm)
+        {
+            vm.RememberLastFolder = false;
+            vm.RememberWindowState = false;
+            vm.ConfirmationPrompts = ConfirmationPrompts.More;
+            vm.DoubleClickAddsToRenameList = true;
+            vm.AddMode = RenameListAddMode.Folders;
+            vm.AddFolderContents = false;
         }
 
         private static (MainWindowViewModel ViewModel, AppMainWindow Window) _ShowMainWindow(
