@@ -180,11 +180,6 @@ namespace Mfr.Models.Config
                 Directory.CreateDirectory(directory);
             }
 
-            if (Session.Version <= 0)
-            {
-                Session.Version = 1;
-            }
-
             var root = ConfigJsonWriter.Write(Config);
             root["session"] = JsonSerializer.SerializeToNode(Session, s_SessionJsonOptions);
             root["filterDefaults"] = FilterDefaultsJson ?? [];
@@ -309,15 +304,8 @@ namespace Mfr.Models.Config
 
             try
             {
-                var state =
-                    JsonSerializer.Deserialize<SessionState>(sessionElement.GetRawText(), s_SessionJsonOptions)
+                return JsonSerializer.Deserialize<SessionState>(sessionElement.GetRawText(), s_SessionJsonOptions)
                     ?? new SessionState();
-                if (state.Version <= 0)
-                {
-                    state.Version = 1;
-                }
-
-                return state;
             }
             catch
             {

@@ -10,16 +10,6 @@ namespace Mfr.Models.Config
     public sealed class SessionState
     {
         /// <summary>
-        /// Schema version written with the current session shape.
-        /// <para>
-        /// Not used as a migrate/reject gate: unknown properties are ignored by the serializer, and missing
-        /// properties keep CLR defaults (same as first launch). Values <c>&lt;= 0</c> normalize to <c>1</c> on load/save.
-        /// </para>
-        /// </summary>
-        [JsonPropertyName("version")]
-        public int Version { get; set; } = 1;
-
-        /// <summary>
         /// Last main-window geometry and pane splitters, when remembered.
         /// </summary>
         [JsonPropertyName("mainWindow")]

@@ -19,7 +19,6 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStore.Load(path);
-                Assert.Equal(1, ConfigStore.Session.Version);
                 Assert.Null(ConfigStore.Session.MainWindow);
                 Assert.Null(ConfigStore.Session.FileList);
                 Assert.Null(ConfigStore.Session.RenameList);
@@ -53,30 +52,6 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void Load_non_positive_session_version_normalizes_to_one()
-        {
-            var path = Path.Combine(Path.GetTempPath(), "mfr-session-ver-" + Guid.NewGuid() + ".json");
-            try
-            {
-                File.WriteAllText(
-                    path, /*lang=json,strict*/
-                    """{"session":{"version":0}}"""
-                );
-                ConfigStore.Load(path);
-                Assert.Equal(1, ConfigStore.Session.Version);
-            }
-            finally
-            {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-
-                ConfigStoreTestReset.LoadEmpty();
-            }
-        }
-
-        [Fact]
         public void Save_and_Load_round_trip_session()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-round-" + Guid.NewGuid() + ".json");
@@ -85,7 +60,6 @@ namespace Mfr.Tests.Models
                 ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.Session = new SessionState
                 {
-                    Version = 1,
                     MainWindow = new SessionStateMainWindow
                     {
                         X = 12,
@@ -138,7 +112,6 @@ namespace Mfr.Tests.Models
                 ConfigStore.Load(path);
 
                 var loaded = ConfigStore.Session;
-                Assert.Equal(1, loaded.Version);
                 Assert.NotNull(loaded.MainWindow);
                 Assert.Equal(12, loaded.MainWindow.X);
                 Assert.Equal(34, loaded.MainWindow.Y);
