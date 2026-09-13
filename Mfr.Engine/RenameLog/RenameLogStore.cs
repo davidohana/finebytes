@@ -213,12 +213,16 @@ namespace Mfr.Engine.RenameLog
         /// <param name="limit">
         /// Override retention. When <see langword="null"/>, uses <see cref="ConfigStore.RenameLog"/>.Limit.
         /// </param>
+        /// <param name="isUndo">
+        /// When <see langword="true"/>, marks the log as an Undo operation (shown in details as Undo).
+        /// </param>
         /// <returns>The absolute path of the written <c>.mfrlog</c>, or <see langword="null"/> when not written.</returns>
         public static string? CaptureFromCommit(
             IReadOnlyList<RenameResultItem> results,
             bool dryRun = false,
             string? directoryPath = null,
-            int? limit = null
+            int? limit = null,
+            bool isUndo = false
         )
         {
             ArgumentNullException.ThrowIfNull(results);
@@ -228,7 +232,7 @@ namespace Mfr.Engine.RenameLog
                 return null;
             }
 
-            var log = TryBuildFromCommitResults(results);
+            var log = TryBuildFromCommitResults(results, isUndo: isUndo);
             if (log is null)
             {
                 return null;
@@ -256,8 +260,12 @@ namespace Mfr.Engine.RenameLog
         /// Builds a <see cref="RenameLogModel"/> from <see cref="RenameStatus.CommitOk"/> rows only.
         /// </summary>
         /// <param name="results">Per-item commit outcomes.</param>
+        /// <param name="isUndo">When <see langword="true"/>, sets <see cref="RenameLogModel.IsUndo"/>.</param>
         /// <returns>A log when at least one CommitOk row has a destination path; otherwise <see langword="null"/>.</returns>
-        public static RenameLogModel? TryBuildFromCommitResults(IReadOnlyList<RenameResultItem> results)
+        public static RenameLogModel? TryBuildFromCommitResults(
+            IReadOnlyList<RenameResultItem> results,
+            bool isUndo = false
+        )
         {
             ArgumentNullException.ThrowIfNull(results);
 
@@ -289,7 +297,7 @@ namespace Mfr.Engine.RenameLog
                 return null;
             }
 
-            return new RenameLogModel(CommittedAt: DateTimeOffset.UtcNow, Entries: entries);
+            return new RenameLogModel(CommittedAt: DateTimeOffset.UtcNow, Entries: entries, IsUndo: isUndo);
         }
 
         /// <summary>

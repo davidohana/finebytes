@@ -46,6 +46,7 @@ namespace Mfr.Tests.Engine
             Assert.False(File.Exists(sourcePath));
             Assert.True(File.Exists(renamedPath));
             Assert.NotNull(RenameLogStore.LastOperation);
+            Assert.False(RenameLogStore.LastOperation.IsUndo);
 
             var undoResults = renameList.Undo(RenameLogStore.LastOperation);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(undoResults).Status);
@@ -53,7 +54,9 @@ namespace Mfr.Tests.Engine
             Assert.False(File.Exists(renamedPath));
             Assert.Equal(sourcePath, Assert.Single(undoResults).DestinationPath);
             Assert.NotNull(RenameLogStore.LastOperation);
+            Assert.True(RenameLogStore.LastOperation.IsUndo);
             Assert.Equal(sourcePath, Assert.Single(RenameLogStore.LastOperation.Entries).DestinationPath);
+            Assert.Contains("Operation: Undo", RenameLogStore.LastOperation.FormatDetails(), StringComparison.Ordinal);
         }
 
         /// <summary>

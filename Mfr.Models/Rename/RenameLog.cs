@@ -7,7 +7,14 @@ namespace Mfr.Models.Rename
     /// </summary>
     /// <param name="CommittedAt">When the commit finished (UTC preferred).</param>
     /// <param name="Entries">Per-item outcomes included in this log (typically <see cref="RenameStatus.CommitOk"/> rows).</param>
-    public sealed record RenameLog(DateTimeOffset CommittedAt, IReadOnlyList<RenameLogEntry> Entries)
+    /// <param name="IsUndo">
+    /// Whether this log was produced by Undo (undo-of-undo) rather than GO. Missing in older files → GO.
+    /// </param>
+    public sealed record RenameLog(
+        DateTimeOffset CommittedAt,
+        IReadOnlyList<RenameLogEntry> Entries,
+        bool IsUndo = false
+    )
     {
         /// <summary>
         /// Whether Undo can reverse at least one row (non-error entry with a restorable property delta).
@@ -20,7 +27,7 @@ namespace Mfr.Models.Rename
         public bool HasUndoableEntries => Entries.Any(static entry => entry.IsUndoable);
 
         /// <summary>
-        /// Formats this log for the Rename Log details pane (date, item count, per-item changes/errors).
+        /// Formats this log for the Rename Log details pane (date, GO/Undo, item count, per-item changes/errors).
         /// </summary>
         /// <returns>Multi-line plain text suitable for a read-only details box.</returns>
         public string FormatDetails()
@@ -31,6 +38,7 @@ namespace Mfr.Models.Rename
                 .Append("Operation Date: ")
                 .Append(CommittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss"))
                 .AppendLine();
+            builder.Append("Operation: ").Append(IsUndo ? "Undo" : "GO").AppendLine();
             builder.AppendLine();
             builder.Append("Processed ").Append(Entries.Count).Append(" Items").AppendLine();
             builder.AppendLine();

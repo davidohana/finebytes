@@ -788,7 +788,8 @@ namespace Mfr.Engine.RenameList
                 failFast: failFast,
                 dryRun: false,
                 cancellationToken: cancellationToken,
-                progress: progress
+                progress: progress,
+                isUndo: true
             );
         }
 
@@ -806,6 +807,9 @@ namespace Mfr.Engine.RenameList
         /// </param>
         /// <param name="cancellationToken">When canceled, stops applying remaining items without throwing.</param>
         /// <param name="progress">Optional progress sink (processed count, total changed rows, last path).</param>
+        /// <param name="isUndo">
+        /// When <see langword="true"/>, the captured rename log is marked as Undo (details pane / undo-of-undo).
+        /// </param>
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="plan"/> is <c>null</c>.</exception>
         public IReadOnlyList<RenameResultItem> Commit(
@@ -814,7 +818,8 @@ namespace Mfr.Engine.RenameList
             bool dryRun = false,
             Func<RenameItem, bool>? confirmBeforeApply = null,
             CancellationToken cancellationToken = default,
-            IProgress<RenameListProgress>? progress = null
+            IProgress<RenameListProgress>? progress = null,
+            bool isUndo = false
         )
         {
             ArgumentNullException.ThrowIfNull(plan);
@@ -864,7 +869,7 @@ namespace Mfr.Engine.RenameList
                 commitErrorCount
             );
 
-            RenameLogStore.CaptureFromCommit(results, dryRun: dryRun);
+            RenameLogStore.CaptureFromCommit(results, dryRun: dryRun, isUndo: isUndo);
 
             return results;
         }

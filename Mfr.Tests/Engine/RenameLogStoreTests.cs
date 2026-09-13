@@ -54,6 +54,7 @@ namespace Mfr.Tests.Engine
             );
 
             Assert.NotNull(RenameLogStore.LastOperation);
+            Assert.False(RenameLogStore.LastOperation.IsUndo);
             var entry = Assert.Single(RenameLogStore.LastOperation.Entries);
             Assert.Equal(dir.CombinePath("new-name.txt"), entry.DestinationPath);
             Assert.Equal(sourcePath, entry.OriginalPath);
@@ -90,10 +91,84 @@ namespace Mfr.Tests.Engine
 
             using var doc = JsonDocument.Parse(File.ReadAllText(writtenPath));
             Assert.True(doc.RootElement.TryGetProperty("committedAt", out _));
+            Assert.False(doc.RootElement.GetProperty("isUndo").GetBoolean());
             Assert.Equal(
                 TestPaths.Absolute("new.txt"),
                 doc.RootElement.GetProperty("entries")[0].GetProperty("destinationPath").GetString()
             );
+        }
+
+        /// <summary>
+        /// Verifies CaptureFromCommit with <c>isUndo</c> persists the flag and details label Undo.
+        /// </summary>
+        [Fact]
+        public void CaptureFromCommit_IsUndo_Persists_And_Shows_In_Details()
+        {
+            var logDir = _tempDirectoryFixture.CreateTempDir();
+            var results = new[]
+            {
+                _CommitOkResult(
+                    originalPath: TestPaths.Absolute("new.txt"),
+                    destinationPath: TestPaths.Absolute("old.txt"),
+                    oldPrefix: "new",
+                    newPrefix: "old"
+                ),
+            };
+
+            var writtenPath = RenameLogStore.CaptureFromCommit(
+                results,
+                directoryPath: logDir,
+                limit: 10,
+                isUndo: true
+            );
+
+            Assert.NotNull(writtenPath);
+            Assert.True(RenameLogStore.LastOperation!.IsUndo);
+            Assert.Contains("Operation: Undo", RenameLogStore.LastOperation.FormatDetails(), StringComparison.Ordinal);
+
+            using var doc = JsonDocument.Parse(File.ReadAllText(writtenPath));
+            Assert.True(doc.RootElement.GetProperty("isUndo").GetBoolean());
+
+            var loaded = RenameLogStore.TryLoadFile(writtenPath);
+            Assert.NotNull(loaded);
+            Assert.True(loaded.IsUndo);
+            Assert.Contains("Operation: Undo", loaded.FormatDetails(), StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies JSON without <c>isUndo</c> soft-loads as GO.
+        /// </summary>
+        [Fact]
+        public void TryLoadFile_Missing_IsUndo_Defaults_To_Go()
+        {
+            var logDir = _tempDirectoryFixture.CreateTempDir();
+            var path = logDir.CombinePath($"20260101120000{RenameLogStore.FileExtension}");
+            var destinationPath = TestPaths.Absolute("a.txt");
+            var originalPath = TestPaths.Absolute("b.txt");
+            var destinationJson = JsonSerializer.Serialize(destinationPath);
+            var originalJson = JsonSerializer.Serialize(originalPath);
+            File.WriteAllText(
+                path,
+                $$"""
+                {
+                  "committedAt": "2026-01-01T12:00:00+00:00",
+                  "entries": [
+                    {
+                      "destinationPath": {{destinationJson}},
+                      "originalPath": {{originalJson}},
+                      "isFolder": false,
+                      "changes": [ { "property": "Prefix", "oldValue": "b", "newValue": "a" } ]
+                    }
+                  ]
+                }
+                """
+            );
+
+            var loaded = RenameLogStore.TryLoadFile(path);
+
+            Assert.NotNull(loaded);
+            Assert.False(loaded.IsUndo);
+            Assert.Contains("Operation: GO", loaded.FormatDetails(), StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -373,7 +448,9 @@ namespace Mfr.Tests.Engine
             var loaded = RenameLogStore.TryLoadFile(writtenPath);
             Assert.NotNull(loaded);
             Assert.True(loaded.HasUndoableEntries);
+            Assert.False(loaded.IsUndo);
             Assert.Equal(TestPaths.Absolute("new.txt"), Assert.Single(loaded.Entries).DestinationPath);
+            Assert.Contains("Operation: GO", loaded.FormatDetails(), StringComparison.Ordinal);
             Assert.Contains("Changed 'Prefix'", loaded.FormatDetails());
 
             Assert.True(RenameLogStore.TryDeleteFile(writtenPath));
