@@ -141,7 +141,7 @@ namespace Mfr.Utils.Config
                 return;
             }
 
-            if (!_TryGetObjectProperty(configObject, binding.JsonName, out var nestedObject))
+            if (!JsonObjectProperties.TryGetObjectProperty(configObject, binding.JsonName, out var nestedObject))
             {
                 return;
             }
@@ -199,45 +199,6 @@ namespace Mfr.Utils.Config
             var value = binding.Field.GetValue(target)!;
             ConfigValueReader.ReadEnum(configObject, binding.JsonName, binding.Field.FieldType, ref value);
             binding.Field.SetValue(target, value);
-        }
-
-        /// <summary>
-        /// When <paramref name="propertyName"/> matches a property on <paramref name="root"/>, returns true and sets
-        /// <paramref name="value"/> to that property's element. Missing properties and JSON null return false.
-        /// When the property exists but is not an object or null, throws <see cref="InvalidDataException"/>.
-        /// </summary>
-        private static bool _TryGetObjectProperty(JsonElement root, string propertyName, out JsonElement value)
-        {
-            if (root.ValueKind != JsonValueKind.Object)
-            {
-                throw new InvalidDataException("Root must be a JSON object.");
-            }
-
-            foreach (var prop in root.EnumerateObject())
-            {
-                if (!string.Equals(prop.Name, propertyName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                var kind = prop.Value.ValueKind;
-                if (kind == JsonValueKind.Null)
-                {
-                    value = default;
-                    return false;
-                }
-
-                if (kind != JsonValueKind.Object)
-                {
-                    throw new InvalidDataException($"'{propertyName}' must be a JSON object or null.");
-                }
-
-                value = prop.Value;
-                return true;
-            }
-
-            value = default;
-            return false;
         }
     }
 }

@@ -352,7 +352,7 @@ namespace Mfr.Models.Config
         private static T? _ReadSection<T>(JsonElement root, string propertyName)
             where T : class
         {
-            if (!_TryGetPropertyIgnoreCase(root, propertyName, out var sectionElement))
+            if (!JsonObjectProperties.TryGetPropertyIgnoreCase(root, propertyName, out var sectionElement))
             {
                 return null;
             }
@@ -406,7 +406,7 @@ namespace Mfr.Models.Config
         /// <returns>Filter-defaults JSON object (never null).</returns>
         private static JsonObject _ReadFilterDefaults(JsonElement root)
         {
-            if (!_TryGetPropertyIgnoreCase(root, "filterDefaults", out var defaultsElement))
+            if (!JsonObjectProperties.TryGetPropertyIgnoreCase(root, "filterDefaults", out var defaultsElement))
             {
                 return [];
             }
@@ -429,30 +429,6 @@ namespace Mfr.Models.Config
             {
                 return [];
             }
-        }
-
-        /// <summary>
-        /// Finds a property on <paramref name="root"/> by case-insensitive name.
-        /// </summary>
-        /// <param name="root">JSON object.</param>
-        /// <param name="propertyName">Property name to match.</param>
-        /// <param name="value">Matched element when found.</param>
-        /// <returns><see langword="true"/> when the property exists.</returns>
-        private static bool _TryGetPropertyIgnoreCase(JsonElement root, string propertyName, out JsonElement value)
-        {
-            foreach (var prop in root.EnumerateObject())
-            {
-                if (!string.Equals(prop.Name, propertyName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                value = prop.Value;
-                return true;
-            }
-
-            value = default;
-            return false;
         }
 
         /// <summary>

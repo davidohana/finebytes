@@ -45,7 +45,7 @@ namespace Mfr.Tests.Engine
 
             store.SetDefault(saved);
 
-            var reloaded = FilterDefaultsStore.OpenDefault();
+            var reloaded = FilterDefaultsStore.FromConfigStore();
             Assert.True(reloaded.TryGetDefault("LettersCase", out var loaded));
             var typed = Assert.IsType<LettersCaseFilter>(loaded);
             Assert.IsType<FileExtensionTarget>(typed.Target);

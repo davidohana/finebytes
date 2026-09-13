@@ -196,7 +196,7 @@ namespace Mfr.Tests.Models
                 ConfigStore.Load(path);
                 Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
                 Assert.Equal("*.flac", ConfigStore.FileList?.FileMask);
-                var reloaded = FilterDefaultsStore.OpenDefault();
+                var reloaded = FilterDefaultsStore.FromConfigStore();
                 Assert.True(reloaded.TryGetDefault("LettersCase", out var filter));
                 Assert.Equal(LettersCaseMode.UpperCase, Assert.IsType<LettersCaseFilter>(filter).Options.Mode);
             }

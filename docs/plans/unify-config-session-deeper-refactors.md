@@ -24,28 +24,14 @@ ______________________________________________________________________
 | MainWindow `ConfigFilePath` / `SaveOnClose` path plumbing                                          | **Done** — `ConfigStore` owns active path                                                                               |
 | `DeleteAppDataFiles` naming                                                                        | **Done** — `PersistedConfigurationReset.Reset`                                                                          |
 | Full in-memory clear on Reset / collapse `ClearSessionAndFilterDefaults`                           | **Superseded** — Reset is delete-only; UI always exits after delete (`SuppressSessionSaveOnClose`), restart best-effort |
+| Shared case-insensitive JSON property get                                                          | **Done** — `JsonObjectProperties` in Utils; ConfigStore / ConfigJsonApplier / ConfigValueReader                         |
+| Rename `FilterDefaultsStore.OpenDefault`                                                           | **Done** — `FromConfigStore` (vs file-backed `PresetManager.OpenDefault`)                                               |
 
 ______________________________________________________________________
 
 ## Still worth doing (best cost-to-value first)
 
-### 1. Shared case-insensitive JSON property get
-
-- **What:** `ConfigStore._TryGetPropertyIgnoreCase` and `ConfigJsonApplier._TryGetObjectProperty` both walk `JsonElement` properties case-insensitively (object/null/kind handling differs slightly).
-- **Why it hurts:** Two policies for “find property on object”; drift risk when soft-load rules change.
-- **Proposed direction:** One helper in `Mfr.Utils` (variants for “any value” vs “must be object”).
-- **Cost-to-value:** Small; low risk; 2–3 files.
-- **Suggested timing:** When next editing either lookup.
-- **Rank:** **medium** — opportunistic
-
-### 2. Rename `FilterDefaultsStore.OpenDefault`
-
-- **What:** `OpenDefault` no longer opens a defaults *file*; it loads from `ConfigStore.FilterDefaultsJson` after `ConfigStore.Load`.
-- **Why it hurts:** Name suggests AppData path ownership (misleading next to `PresetManager.OpenDefault`, which still is file-backed).
-- **Proposed direction:** e.g. `FromConfigStore` / `LoadFromConfig`; keep `CreateEmpty` for tests.
-- **Cost-to-value:** Rename churn across App + tests; no behavior change.
-- **Suggested timing:** Optional polish when already editing filter-defaults call sites.
-- **Rank:** **low**
+_(none — opportunistic items above are done)_
 
 ______________________________________________________________________
 
@@ -53,9 +39,9 @@ ______________________________________________________________________
 
 | #   | Item                                                                                                                       | Why skip / defer                                                                                                                 |
 | --- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| 3   | Split `ConfigStore` into separate prefs I/O type                                                                           | Flat `_ReadSection` / `_WriteSection` already landed; ~490 LOC is large but further split is churn unless the type keeps growing |
-| 4   | Collapse ConfigStore\* / FilterDefaults test fixtures                                                                      | Test-only boilerplate; no product win                                                                                            |
-| 5   | Rewrite historical plan prose elsewhere (`whole-codebase-review`, `applied-filter-editors`) for old `session.json` wording | Archive; leave as history                                                                                                        |
+| 1   | Split `ConfigStore` into separate prefs I/O type                                                                           | Flat `_ReadSection` / `_WriteSection` already landed; ~490 LOC is large but further split is churn unless the type keeps growing |
+| 2   | Collapse ConfigStore\* / FilterDefaults test fixtures                                                                      | Test-only boilerplate; no product win                                                                                            |
+| 3   | Rewrite historical plan prose elsewhere (`whole-codebase-review`, `applied-filter-editors`) for old `session.json` wording | Archive; leave as history                                                                                                        |
 
 ______________________________________________________________________
 

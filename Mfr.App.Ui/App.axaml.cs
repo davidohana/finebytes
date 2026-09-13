@@ -35,7 +35,7 @@ namespace Mfr.App.Ui
                     DataContext = new MainWindowViewModel(
                         initialFileListPath: initialFolder,
                         persistSession: true,
-                        filterDefaults: FilterDefaultsStore.OpenDefault(),
+                        filterDefaults: FilterDefaultsStore.FromConfigStore(),
                         presetManager: PresetManager.OpenDefault()
                     ),
                 };

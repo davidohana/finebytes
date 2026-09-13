@@ -194,28 +194,23 @@ namespace Mfr.Utils.Config
                 throw new InvalidDataException("Root must be a JSON object.");
             }
 
-            foreach (var prop in root.EnumerateObject())
+            if (!JsonObjectProperties.TryGetPropertyIgnoreCase(root, propertyName, out var prop))
             {
-                if (!string.Equals(prop.Name, propertyName, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue;
-                }
-
-                var kind = prop.Value.ValueKind;
-                if (kind == JsonValueKind.String)
-                {
-                    return prop.Value.GetString();
-                }
-
-                if (kind == JsonValueKind.Null)
-                {
-                    return null;
-                }
-
-                throw new InvalidDataException($"'{propertyName}' must be a JSON string or null.");
+                return null;
             }
 
-            return null;
+            var kind = prop.ValueKind;
+            if (kind == JsonValueKind.String)
+            {
+                return prop.GetString();
+            }
+
+            if (kind == JsonValueKind.Null)
+            {
+                return null;
+            }
+
+            throw new InvalidDataException($"'{propertyName}' must be a JSON string or null.");
         }
     }
 }

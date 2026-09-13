@@ -37,7 +37,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// </summary>
         /// <param name="filterDefaults">
         /// Per-type add defaults store. When null, uses an empty store that does not read AppData
-        /// (production passes <see cref="FilterDefaultsStore.OpenDefault"/>).
+        /// (production passes <see cref="FilterDefaultsStore.FromConfigStore"/>).
         /// </param>
         /// <param name="presetManager">
         /// Named presets store. When null, uses an empty manager that does not read AppData

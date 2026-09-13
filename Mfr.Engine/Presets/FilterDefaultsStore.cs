@@ -24,11 +24,11 @@ namespace Mfr.Engine.Presets
         private readonly Dictionary<string, BaseFilter> _typeToDefault = new(StringComparer.Ordinal);
 
         /// <summary>
-        /// Opens a store and loads typed defaults from <see cref="ConfigStore.FilterDefaultsJson"/>
+        /// Creates a store and loads typed defaults from <see cref="ConfigStore.FilterDefaultsJson"/>
         /// (call after <see cref="ConfigStore.Load"/>).
         /// </summary>
         /// <returns>A store ready for get/set.</returns>
-        public static FilterDefaultsStore OpenDefault()
+        public static FilterDefaultsStore FromConfigStore()
         {
             var store = new FilterDefaultsStore();
             store.TryLoad();
