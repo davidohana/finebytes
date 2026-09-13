@@ -44,18 +44,5 @@ namespace Mfr.App.Ui.Views.Presets
                 viewModel.SelectNone();
             }
         }
-
-        private void _OnImportClick(object? sender, RoutedEventArgs e)
-        {
-            if (DataContext is ImportSamplePresetsDialogViewModel { CanImport: true })
-            {
-                Close(true);
-            }
-        }
-
-        private void _OnCancelClick(object? sender, RoutedEventArgs e)
-        {
-            Close(false);
-        }
     }
 }

@@ -29,10 +29,12 @@ namespace Mfr.Tests.Ui.Presets
             viewModel.SelectNone();
             Assert.False(viewModel.CanImport);
             Assert.Empty(viewModel.SelectedNames());
+            Assert.Equal("0 of 2 selected", viewModel.SelectionSummary);
 
             viewModel.Items[1].IsSelected = true;
             Assert.True(viewModel.CanImport);
             Assert.Equal([viewModel.Items[1].Name], viewModel.SelectedNames());
+            Assert.Equal("1 of 2 selected", viewModel.SelectionSummary);
         }
 
         /// <summary>
@@ -47,19 +49,20 @@ namespace Mfr.Tests.Ui.Presets
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var import = dialog.FindControl<Button>("ImportButton");
+            var import = ModalOkCancelFooterAccess.RequireAcceptButton(dialog);
             var selectNone = dialog.FindControl<Button>("SelectNoneButton");
             var selectAll = dialog.FindControl<Button>("SelectAllButton");
-            Assert.NotNull(import);
             Assert.NotNull(selectNone);
             Assert.NotNull(selectAll);
             Assert.True(import.IsEnabled);
+            Assert.Equal("2 of 2 selected", viewModel.SelectionSummary);
 
             selectNone.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(viewModel.CanImport);
             Assert.False(import.IsEnabled);
+            Assert.Equal("0 of 2 selected", viewModel.SelectionSummary);
             Assert.All(
                 dialog.GetVisualDescendants().OfType<CompactCheckBox>(),
                 checkBox => Assert.False(checkBox.IsChecked)
@@ -70,6 +73,7 @@ namespace Mfr.Tests.Ui.Presets
 
             Assert.True(viewModel.CanImport);
             Assert.True(import.IsEnabled);
+            Assert.Equal("2 of 2 selected", viewModel.SelectionSummary);
             Assert.All(
                 dialog.GetVisualDescendants().OfType<CompactCheckBox>(),
                 checkBox => Assert.True(checkBox.IsChecked)

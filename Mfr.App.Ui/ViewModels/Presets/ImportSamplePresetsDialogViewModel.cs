@@ -26,7 +26,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
                     {
                         if (args.PropertyName == nameof(SamplePresetSelectionViewModel.IsSelected))
                         {
-                            OnPropertyChanged(nameof(CanImport));
+                            _NotifySelectionChanged();
                         }
                     };
                     return item;
@@ -43,6 +43,11 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// Gets whether at least one sample is checked.
         /// </summary>
         public bool CanImport => Items.Any(item => item.IsSelected);
+
+        /// <summary>
+        /// Gets a short selection count for the dialog header (e.g. <c>3 of 14 selected</c>).
+        /// </summary>
+        public string SelectionSummary => $"{Items.Count(item => item.IsSelected)} of {Items.Count} selected";
 
         /// <summary>
         /// Gets the exact names of the checked samples.
@@ -73,6 +78,12 @@ namespace Mfr.App.Ui.ViewModels.Presets
             {
                 item.IsSelected = false;
             }
+        }
+
+        private void _NotifySelectionChanged()
+        {
+            OnPropertyChanged(nameof(CanImport));
+            OnPropertyChanged(nameof(SelectionSummary));
         }
     }
 

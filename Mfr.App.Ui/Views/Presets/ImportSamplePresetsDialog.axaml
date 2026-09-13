@@ -7,10 +7,10 @@
   x:DataType="vm:ImportSamplePresetsDialogViewModel"
   Title="Import Sample Presets"
   Icon="/Assets/mfr.ico"
-  Width="560"
-  Height="520"
-  MinWidth="460"
-  MinHeight="360"
+  Width="600"
+  Height="560"
+  MinWidth="500"
+  MinHeight="400"
   WindowStartupLocation="CenterOwner"
   ShowInTaskbar="False"
   CanResize="True"
@@ -18,56 +18,166 @@
   FontSize="{StaticResource AppChromeFontSize}"
   Foreground="{DynamicResource AppChromeForegroundBrush}"
 >
-  <DockPanel Margin="12">
-    <StackPanel DockPanel.Dock="Bottom" Margin="0,12,0,0" Spacing="10">
-      <TextBlock
-        Text="Presets that already exist under the same name will be skipped."
-        TextWrapping="Wrap"
-        HorizontalAlignment="Center"
+  <Window.Styles>
+    <Style Selector="TextBlock.import-sample-title">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="15" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    </Style>
+    <Style Selector="TextBlock.import-sample-subtitle">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.import-sample-count">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="Margin" Value="0,0,12,0" />
+    </Style>
+    <Style Selector="Button.import-sample-chrome">
+      <Setter Property="MinHeight" Value="26" />
+      <Setter Property="MinWidth" Value="88" />
+      <Setter Property="Padding" Value="10,3" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="4" />
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.import-sample-chrome:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
+    </Style>
+    <Style Selector="Border.import-sample-list">
+      <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="6" />
+      <Setter Property="Padding" Value="8" />
+      <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+    <Style Selector="Border.import-sample-item">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="Margin" Value="0,0,0,6" />
+    </Style>
+    <Style Selector="Border.import-sample-item:pointerover">
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
+    </Style>
+    <Style Selector="Border.import-sample-item.selected">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+    </Style>
+    <Style Selector="Border.import-sample-item.selected:pointerover">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+    </Style>
+    <Style Selector="TextBlock.import-sample-name">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+    <Style Selector="TextBlock.import-sample-description">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="Margin" Value="0,3,0,0" />
+      <Setter Property="Opacity" Value="0.95" />
+      <Setter Property="LineHeight" Value="18" />
+    </Style>
+    <Style Selector="Border.import-sample-note">
+      <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="5" />
+      <Setter Property="Padding" Value="10,8" />
+      <Setter Property="Margin" Value="0,0,0,12" />
+    </Style>
+    <Style Selector="Border.import-sample-note TextBlock">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Setter Property="HorizontalAlignment" Value="Center" />
+      <Setter Property="TextAlignment" Value="Center" />
+    </Style>
+  </Window.Styles>
+
+  <DockPanel Margin="16">
+    <StackPanel DockPanel.Dock="Bottom" Margin="0,14,0,0">
+      <Border Classes="import-sample-note">
+        <TextBlock Text="Presets that already exist under the same name will be skipped." />
+      </Border>
+      <controls:ModalOkCancelFooter
+        x:Name="Footer"
+        AcceptContent="Import"
+        IsAcceptEnabled="{Binding CanImport}"
+        AcceptDisabledTip="Select at least one sample preset to import."
+        Spacing="10"
       />
-      <StackPanel x:Name="Footer" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-        <Button
-          x:Name="ImportButton"
-          Classes="message-dialog-footer"
-          Content="Import"
-          IsDefault="True"
-          IsEnabled="{Binding CanImport}"
-          Click="_OnImportClick"
-        />
-        <Button
-          x:Name="CancelButton"
-          Classes="message-dialog-footer"
-          Content="Cancel"
-          IsCancel="True"
-          Click="_OnCancelClick"
-        />
-      </StackPanel>
     </StackPanel>
 
     <Grid RowDefinitions="Auto,*">
-      <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
-        <TextBlock Text="Choose sample presets to import:" VerticalAlignment="Center" />
-        <Button x:Name="SelectAllButton" Content="Select all" Click="_OnSelectAllClick" />
-        <Button x:Name="SelectNoneButton" Content="Select none" Click="_OnSelectNoneClick" />
-      </StackPanel>
-      <Border
-        Grid.Row="1"
-        Background="{DynamicResource AppChromeSurfaceBrush}"
-        BorderBrush="{DynamicResource AppChromeBorderBrush}"
-        BorderThickness="1"
-        CornerRadius="3"
-        Padding="6"
-      >
+      <DockPanel Margin="0,0,0,12" LastChildFill="True">
+        <StackPanel
+          DockPanel.Dock="Right"
+          Orientation="Horizontal"
+          Spacing="6"
+          VerticalAlignment="Top"
+          Margin="12,0,0,0"
+        >
+          <TextBlock Classes="import-sample-count" Text="{Binding SelectionSummary}" />
+          <Button
+            x:Name="SelectAllButton"
+            Classes="import-sample-chrome"
+            Content="Select all"
+            Click="_OnSelectAllClick"
+          />
+          <Button
+            x:Name="SelectNoneButton"
+            Classes="import-sample-chrome"
+            Content="Select none"
+            Click="_OnSelectNoneClick"
+          />
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Classes="import-sample-title" Text="Choose sample presets" />
+          <TextBlock Classes="import-sample-subtitle" Text="Import curated rename chains into your preset library." />
+        </StackPanel>
+      </DockPanel>
+
+      <Border Grid.Row="1" Classes="import-sample-list">
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
           <ItemsControl ItemsSource="{Binding Items}">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <StackPanel />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
               <DataTemplate x:DataType="vm:SamplePresetSelectionViewModel">
-                <controls:CompactCheckBox IsChecked="{Binding IsSelected}" Margin="2,4">
-                  <StackPanel>
-                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
-                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Opacity="0.78" Margin="0,2,0,0" />
-                  </StackPanel>
-                </controls:CompactCheckBox>
+                <Border Classes="import-sample-item" Classes.selected="{Binding IsSelected}">
+                  <controls:CompactCheckBox IsChecked="{Binding IsSelected}" VerticalAlignment="Top" MinHeight="0">
+                    <StackPanel>
+                      <TextBlock Classes="import-sample-name" Text="{Binding Name}" />
+                      <TextBlock Classes="import-sample-description" Text="{Binding Description}" />
+                    </StackPanel>
+                  </controls:CompactCheckBox>
+                </Border>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
           </ItemsControl>
