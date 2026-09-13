@@ -1,7 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using Mfr.Filters.Case;
-using Mfr.Utils;
 
 namespace Mfr.Tests.Engine
 {
@@ -11,24 +10,12 @@ namespace Mfr.Tests.Engine
     [Collection(ConfigStoreCollection.Name)]
     public sealed class FilterDefaultsStoreTests : IDisposable
     {
-        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
-        private readonly string _configPath;
-
-        /// <summary>
-        /// Creates a temp <c>config.json</c> and loads it into <see cref="ConfigStore"/>.
-        /// </summary>
-        public FilterDefaultsStoreTests()
-        {
-            _configPath = _tempDirectoryFixture.CreateTempDir().CombinePath("config.json");
-            File.WriteAllText(_configPath, """{}""");
-            ConfigStore.Load(_configPath);
-        }
+        private readonly ConfigStoreTempFile _temp = ConfigStoreTempFile.CreateLoaded();
 
         /// <inheritdoc />
         public void Dispose()
         {
-            ConfigStoreTestReset.LoadEmpty();
-            _tempDirectoryFixture.Dispose();
+            _temp.Dispose();
         }
 
         /// <summary>
@@ -154,7 +141,7 @@ namespace Mfr.Tests.Engine
             var store = FilterDefaultsStore.CreateEmpty();
             store.SetDefault(new LettersCaseFilter());
 
-            using var doc = JsonDocument.Parse(File.ReadAllText(_configPath));
+            using var doc = JsonDocument.Parse(File.ReadAllText(_temp.Path));
             Assert.True(doc.RootElement.TryGetProperty("filterDefaults", out var defaults));
             Assert.True(defaults.TryGetProperty("LettersCase", out var entry));
             Assert.Equal("LettersCase", entry.GetProperty("type").GetString());

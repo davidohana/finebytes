@@ -3,6 +3,7 @@ namespace Mfr.Tests.Models
     /// <summary>
     /// Tests for <see cref="ConfigStore.DeleteDefaultFile"/>.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class ConfigStoreDeleteDefaultFileTests
     {
         /// <summary>
@@ -11,9 +12,9 @@ namespace Mfr.Tests.Models
         [Fact]
         public void DeleteDefaultFile_missing_is_noop()
         {
-            var path = Path.Combine(Path.GetTempPath(), "mfr-test-delete-missing-config-" + Guid.NewGuid() + ".json");
-            ConfigStore.DeleteDefaultFile(path);
-            Assert.False(File.Exists(path));
+            using var temp = ConfigStoreTempFile.Create();
+            ConfigStore.DeleteDefaultFile(temp.Path);
+            Assert.False(File.Exists(temp.Path));
         }
 
         /// <summary>
@@ -22,21 +23,10 @@ namespace Mfr.Tests.Models
         [Fact]
         public void DeleteDefaultFile_removes_existing_file()
         {
-            var path = Path.Combine(Path.GetTempPath(), "mfr-test-delete-config-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(path, "{}");
-            try
-            {
-                Assert.True(File.Exists(path));
-                ConfigStore.DeleteDefaultFile(path);
-                Assert.False(File.Exists(path));
-            }
-            finally
-            {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-            }
+            using var temp = ConfigStoreTempFile.CreateWithContent("{}");
+            Assert.True(File.Exists(temp.Path));
+            ConfigStore.DeleteDefaultFile(temp.Path);
+            Assert.False(File.Exists(temp.Path));
         }
     }
 }

@@ -7,38 +7,29 @@ namespace Mfr.Tests.Engine
     /// Tests for <see cref="PersistedConfigurationReset"/>.
     /// </summary>
     [Collection(ConfigStoreCollection.Name)]
-    public sealed class PersistedConfigurationResetTests : IDisposable
+    public sealed class PersistedConfigurationResetTests
     {
-        private readonly TempDirectoryFixture _tempDirectoryFixture = new();
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            ConfigStoreTestReset.LoadEmpty();
-            _tempDirectoryFixture.Dispose();
-        }
-
         /// <summary>
         /// Verifies only <c>config.json</c> is deleted and presets are left alone.
         /// </summary>
         [Fact]
         public void Reset_removes_config_not_presets()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var configPath = dir.CombinePath("config.json");
+            using var temp = ConfigStoreTempFile.CreateUnderNewDirectory("config.json");
+            ConfigStoreTestReset.LoadEmpty();
+            var dir = Path.GetDirectoryName(temp.Path)!;
             var presetsPath = dir.CombinePath("presets.json");
 
-            ConfigStoreTestReset.LoadEmpty();
             ConfigStore.FileList = new FileListPrefs { FileMask = "*.mp3" };
-            ConfigStore.Save(configPath);
+            ConfigStore.Save(temp.Path);
             File.WriteAllText(
                 presetsPath, /*lang=json,strict*/
                 """{"presets":[]}"""
             );
 
-            PersistedConfigurationReset.Reset(configPath);
+            PersistedConfigurationReset.Reset(temp.Path);
 
-            Assert.False(File.Exists(configPath));
+            Assert.False(File.Exists(temp.Path));
             Assert.True(File.Exists(presetsPath));
             // In-memory prefs are intentionally left alone; UI exits after delete.
             Assert.NotNull(ConfigStore.FileList);
@@ -50,9 +41,8 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Reset_missing_file_is_noop()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-
-            PersistedConfigurationReset.Reset(dir.CombinePath("config.json"));
+            using var temp = ConfigStoreTempFile.Create();
+            PersistedConfigurationReset.Reset(temp.Path);
         }
     }
 }

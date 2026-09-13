@@ -26,6 +26,7 @@ ______________________________________________________________________
 | Full in-memory clear on Reset / collapse `ClearSessionAndFilterDefaults`                           | **Superseded** — Reset is delete-only; UI always exits after delete (`SuppressSessionSaveOnClose`), restart best-effort |
 | Shared case-insensitive JSON property get                                                          | **Done** — `JsonObjectProperties` in Utils; ConfigStore / ConfigJsonApplier / ConfigValueReader                         |
 | Rename `FilterDefaultsStore.OpenDefault`                                                           | **Done** — `FromConfigStore` (vs file-backed `PresetManager.OpenDefault`)                                               |
+| Collapse ConfigStore\* / FilterDefaults test fixtures                                              | **Done** — `ConfigStoreTempFile`; Prefs Delete dupes removed (kept `ConfigStoreDeleteDefaultFileTests`)                 |
 
 ______________________________________________________________________
 
@@ -40,8 +41,7 @@ ______________________________________________________________________
 | #   | Item                                                                                                                       | Why skip / defer                                                                                                                 |
 | --- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | Split `ConfigStore` into separate prefs I/O type                                                                           | Flat `_ReadSection` / `_WriteSection` already landed; ~490 LOC is large but further split is churn unless the type keeps growing |
-| 2   | Collapse ConfigStore\* / FilterDefaults test fixtures                                                                      | Test-only boilerplate; no product win                                                                                            |
-| 3   | Rewrite historical plan prose elsewhere (`whole-codebase-review`, `applied-filter-editors`) for old `session.json` wording | Archive; leave as history                                                                                                        |
+| 2   | Rewrite historical plan prose elsewhere (`whole-codebase-review`, `applied-filter-editors`) for old `session.json` wording | Archive; leave as history                                                                                                        |
 
 ______________________________________________________________________
 

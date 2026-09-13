@@ -11,41 +11,28 @@ namespace Mfr.Tests.Models
         [Fact]
         public void EnsureDefaultFile_creates_missing_file_with_defaults()
         {
-            var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-ensure-config-" + Guid.NewGuid() + ".json");
-            try
-            {
-                ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.EnsureDefaultFile(configPath);
+            using var temp = ConfigStoreTempFile.CreateReady();
+            ConfigStore.EnsureDefaultFile(temp.Path);
 
-                Assert.True(File.Exists(configPath));
-                using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
-                Assert.False(doc.RootElement.TryGetProperty("filters", out _));
-                Assert.Equal("100", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
-                Assert.Equal(string.Empty, doc.RootElement.GetProperty("log").GetProperty("directoryPath").GetString());
-                Assert.Equal("session-", doc.RootElement.GetProperty("log").GetProperty("filePrefix").GetString());
-                Assert.Equal(
-                    "normal",
-                    doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString()
-                );
-                Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("doubleClickAddsToRenameList", out _));
-                Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("presets", out _));
-                Assert.False(doc.RootElement.TryGetProperty("session", out _));
-                Assert.False(doc.RootElement.TryGetProperty("mainWindow", out _));
-                Assert.False(doc.RootElement.TryGetProperty("fileList", out _));
-                Assert.False(doc.RootElement.TryGetProperty("filterDefaults", out _));
-            }
-            finally
-            {
-                File.Delete(configPath);
-            }
+            Assert.True(File.Exists(temp.Path));
+            using var doc = JsonDocument.Parse(File.ReadAllText(temp.Path));
+            Assert.False(doc.RootElement.TryGetProperty("filters", out _));
+            Assert.Equal("100", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
+            Assert.Equal(string.Empty, doc.RootElement.GetProperty("log").GetProperty("directoryPath").GetString());
+            Assert.Equal("session-", doc.RootElement.GetProperty("log").GetProperty("filePrefix").GetString());
+            Assert.Equal("normal", doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString());
+            Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("doubleClickAddsToRenameList", out _));
+            Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("presets", out _));
+            Assert.False(doc.RootElement.TryGetProperty("session", out _));
+            Assert.False(doc.RootElement.TryGetProperty("mainWindow", out _));
+            Assert.False(doc.RootElement.TryGetProperty("fileList", out _));
+            Assert.False(doc.RootElement.TryGetProperty("filterDefaults", out _));
         }
 
         [Fact]
         public void EnsureDefaultFile_does_not_overwrite_existing_file()
         {
-            var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-ensure-config-" + Guid.NewGuid() + ".json");
-            File.WriteAllText(
-                configPath,
+            using var temp = ConfigStoreTempFile.CreateWithContent(
                 // lang=json,strict
                 """
                 {
@@ -55,17 +42,10 @@ namespace Mfr.Tests.Models
                 }
                 """
             );
-            try
-            {
-                ConfigStore.EnsureDefaultFile(configPath);
-                using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
-                Assert.Equal("50", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
-                Assert.False(doc.RootElement.TryGetProperty("ui", out _));
-            }
-            finally
-            {
-                File.Delete(configPath);
-            }
+            ConfigStore.EnsureDefaultFile(temp.Path);
+            using var doc = JsonDocument.Parse(File.ReadAllText(temp.Path));
+            Assert.Equal("50", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
+            Assert.False(doc.RootElement.TryGetProperty("ui", out _));
         }
     }
 }
