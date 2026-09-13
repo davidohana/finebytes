@@ -180,32 +180,40 @@ namespace Mfr.App.Ui.Views.RenameList
                 ShowErrorAsync = _ShowExportErrorAsync,
                 PromptAsync = _PromptOverrideAsync,
                 ConfirmPreviewErrorsAsync = _ConfirmPreviewErrorsAsync,
+                ConfirmUndoRenameAsync = _ConfirmUndoRenameAsync,
                 ConfirmClearAsync = _ConfirmClearAsync,
             };
         }
 
         private async Task<bool> _ConfirmPreviewErrorsAsync(int errorCount)
         {
-            if (TopLevel.GetTopLevel(this) is not Window owner)
-            {
-                return false;
-            }
+            return await _ConfirmMessageAsync(
+                    title: "Preview Errors",
+                    message: $"{errorCount} items with preview errors will be ignored. Do you want to continue?"
+                )
+                .ConfigureAwait(true);
+        }
 
-            var dialog = new ConfirmMessageDialog(
-                title: "Preview Errors",
-                message: $"{errorCount} items with preview errors will be ignored. Do you want to continue?"
-            );
-            return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
+        private async Task<bool> _ConfirmUndoRenameAsync()
+        {
+            return await _ConfirmMessageAsync(title: "Undo Last", message: "Undo the last rename operation?")
+                .ConfigureAwait(true);
         }
 
         private async Task<bool> _ConfirmClearAsync()
+        {
+            return await _ConfirmMessageAsync(title: "Clear Rename List", message: "Clear the Rename List?")
+                .ConfigureAwait(true);
+        }
+
+        private async Task<bool> _ConfirmMessageAsync(string title, string message)
         {
             if (TopLevel.GetTopLevel(this) is not Window owner)
             {
                 return false;
             }
 
-            var dialog = new ConfirmMessageDialog(title: "Clear Rename List", message: "Clear the Rename List?");
+            var dialog = new ConfirmMessageDialog(title: title, message: message);
             return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
         }
 

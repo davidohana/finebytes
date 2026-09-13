@@ -4,6 +4,7 @@ using Mfr.Filters;
 using Mfr.Utils;
 using Serilog;
 using Serilog.Events;
+using RenameLogModel = Mfr.Models.Rename.RenameLog;
 
 namespace Mfr.Engine.RenameList
 {
@@ -700,6 +701,95 @@ namespace Mfr.Engine.RenameList
 
             var (changed, unchanged, errors) = CommitPlan.CountOutcomes(_renameItems);
             return commitPlan with { ChangedCount = changed, UnchangedCount = unchanged, ErrorCount = errors };
+        }
+
+        /// <summary>
+        /// Reverses a captured rename log by rebuilding this list at post-GO paths, applying OldValues to Preview, and committing.
+        /// </summary>
+        /// <param name="log">Rename operation to undo (typically <see cref="RenameLogStore.LastOperation"/>).</param>
+        /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
+        /// <param name="cancellationToken">When canceled, stops applying remaining items without throwing.</param>
+        /// <param name="progress">Optional progress sink for the undo commit phase.</param>
+        /// <returns>Per-item commit outcomes from the undo re-commit (also captured as a new last operation).</returns>
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="log"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// <para>
+        /// Clears the current list only when at least one row is undoable (MFR7 replace semantics).
+        /// Rows with errors or only unrestorable changes (e.g. Tag Remover strip) are skipped.
+        /// <c>StripAllEmbeddedTagsOnCommit</c> deltas on otherwise undoable rows are ignored when applying OldValues.
+        /// Hidden destinations are included so attribute undos can reopen them.
+        /// </para>
+        /// </remarks>
+        public IReadOnlyList<RenameResultItem> Undo(
+            RenameLogModel log,
+            bool failFast = false,
+            CancellationToken cancellationToken = default,
+            IProgress<RenameListProgress>? progress = null
+        )
+        {
+            ArgumentNullException.ThrowIfNull(log);
+
+            var undoableEntries = log.Entries.Where(static entry => entry.IsUndoable).ToList();
+            if (undoableEntries.Count == 0)
+            {
+                return [];
+            }
+
+            // Clear only after we know there is something to reverse — otherwise the current list is wiped for a no-op.
+            Clear();
+
+            var needsTagLib = undoableEntries.Any(entry =>
+                entry.Changes.Any(change => change.Property.StartsWith("AudioTag.", StringComparison.Ordinal))
+            );
+
+            AddSources(
+                sources: undoableEntries.Select(entry => entry.DestinationPath),
+                includeFiles: true,
+                includeFolders: true,
+                includeHidden: true,
+                cancellationToken: cancellationToken,
+                metadataRequirement: needsTagLib
+                    ? RenameListMetadataRequirement.TagLib
+                    : RenameListMetadataRequirement.None
+            );
+
+            var destinationPathToEntry = new Dictionary<string, RenameLogEntry>(PathComparers.Os);
+            foreach (var entry in undoableEntries)
+            {
+                destinationPathToEntry[NormalizePathKey(entry.DestinationPath)] = entry;
+            }
+
+            foreach (var item in _renameItems)
+            {
+                if (!destinationPathToEntry.TryGetValue(NormalizePathKey(item.Original.FullPath), out var logEntry))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    RenamePropertyOldValueApplier.Apply(item, logEntry.Changes);
+                    item.Status = RenameStatus.PreviewOk;
+                }
+                catch (Exception ex)
+                {
+                    item.SetPreviewError(message: ex.Message, cause: ex);
+                    Log.Warning(
+                        ex,
+                        "Failed to apply undo OldValues for '{DestinationPath}'.",
+                        logEntry.DestinationPath
+                    );
+                }
+            }
+
+            var plan = _CompletePreviewPlan(new RenameListProgressTracker(progress: null, cancellationToken));
+            return Commit(
+                plan,
+                failFast: failFast,
+                dryRun: false,
+                cancellationToken: cancellationToken,
+                progress: progress
+            );
         }
 
         /// <summary>

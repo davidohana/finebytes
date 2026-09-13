@@ -25,7 +25,7 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies Options is enabled while Undo/Log remain stubs.
+        /// Verifies Options is enabled while Log remains a stub and Undo Last stays disabled with no last op.
         /// </summary>
         [AvaloniaFact]
         public void ShowOptionsCommand_is_enabled()

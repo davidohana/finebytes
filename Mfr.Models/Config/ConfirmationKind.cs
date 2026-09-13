@@ -27,5 +27,10 @@ namespace Mfr.Models.Config
         /// Confirm before removing all Applied Filters.
         /// </summary>
         ClearAppliedFilters = 3,
+
+        /// <summary>
+        /// Confirm before Undo Last / Log-window Undo (re-commits OldValues).
+        /// </summary>
+        UndoRename = 4,
     }
 }

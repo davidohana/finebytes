@@ -10,6 +10,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Engine.Presets;
+using Mfr.Engine.RenameLog;
 using Mfr.Models.Config;
 using Mfr.Utils;
 
@@ -223,6 +224,40 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 return;
             }
 
+            UndoLastCommand.NotifyCanExecuteChanged();
+            await _RefreshFileListAfterRenameCommitAsync().ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// Undoes the last GO via the in-memory rename log (re-commits OldValues).
+        /// </summary>
+        /// <remarks>
+        /// Reloads the File List after undo so restored names appear without a manual refresh.
+        /// </remarks>
+        [RelayCommand(CanExecute = nameof(_CanUndoLast))]
+        public async Task UndoLastAsync()
+        {
+            await WaitForPendingPreviewAsync().ConfigureAwait(true);
+            if (RenameListViewModel.IsBusy)
+            {
+                return;
+            }
+
+            var undoStarted = await RenameListViewModel.UndoLastAsync().ConfigureAwait(true);
+            UndoLastCommand.NotifyCanExecuteChanged();
+            if (!undoStarted)
+            {
+                return;
+            }
+
+            await _RefreshFileListAfterRenameCommitAsync().ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// Reloads the File List after GO/Undo and re-previews when Auto-Preview is on.
+        /// </summary>
+        private async Task _RefreshFileListAfterRenameCommitAsync()
+        {
             FileListViewModel.Refresh();
 
             if (!RenameListViewModel.IsAutoPreview)
@@ -233,12 +268,6 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             _RequestPreview();
             await WaitForPendingPreviewAsync().ConfigureAwait(true);
         }
-
-        /// <summary>
-        /// Undoes the last GO. Placeholder until undo is implemented.
-        /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanExecuteUnimplemented))]
-        public void UndoLast() { }
 
         /// <summary>
         /// Opens the log window. Placeholder until the log is implemented.
@@ -323,6 +352,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             if (e.PropertyName is nameof(RenameListViewModel.IsBusy))
             {
                 GoCommand.NotifyCanExecuteChanged();
+                UndoLastCommand.NotifyCanExecuteChanged();
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.LastStatusMessage))
@@ -452,6 +482,12 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         private bool _CanGo()
         {
             return RenameListViewModel.ItemCount >= 1 && !RenameListViewModel.IsBusy;
+        }
+
+        private bool _CanUndoLast()
+        {
+            var last = RenameLogStore.LastOperation;
+            return last is { HasUndoableEntries: true } && !RenameListViewModel.IsBusy;
         }
 
         /// <summary>

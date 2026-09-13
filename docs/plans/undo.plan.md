@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-undo-last
     content: "P2: Engine undo via OldValues + re-Commit; wire UndoLast command, status, File List refresh"
-    status: pending
+    status: completed
   - id: p3-log-window
     content: "P3: Show Log dialog — list/details/Undo/Erase including disk history"
     status: pending

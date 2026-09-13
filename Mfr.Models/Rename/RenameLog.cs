@@ -5,7 +5,18 @@ namespace Mfr.Models.Rename
     /// </summary>
     /// <param name="CommittedAt">When the commit finished (UTC preferred).</param>
     /// <param name="Entries">Per-item outcomes included in this log (typically <see cref="RenameStatus.CommitOk"/> rows).</param>
-    public sealed record RenameLog(DateTimeOffset CommittedAt, IReadOnlyList<RenameLogEntry> Entries);
+    public sealed record RenameLog(DateTimeOffset CommittedAt, IReadOnlyList<RenameLogEntry> Entries)
+    {
+        /// <summary>
+        /// Whether Undo can reverse at least one row (non-error entry with a restorable property delta).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <c>StripAllEmbeddedTagsOnCommit</c> alone is not restorable (Tag Remover).
+        /// </para>
+        /// </remarks>
+        public bool HasUndoableEntries => Entries.Any(static entry => entry.IsUndoable);
+    }
 
     /// <summary>
     /// One file or folder row in a <see cref="RenameLog"/>.
@@ -21,5 +32,15 @@ namespace Mfr.Models.Rename
         bool IsFolder,
         IReadOnlyList<RenamePropertyChange> Changes,
         string? Error = null
-    );
+    )
+    {
+        /// <summary>
+        /// Whether Undo can reverse this row (no error, and at least one restorable change).
+        /// </summary>
+        public bool IsUndoable =>
+            Error is null
+            && Changes.Any(static change =>
+                !string.Equals(change.Property, "StripAllEmbeddedTagsOnCommit", StringComparison.Ordinal)
+            );
+    }
 }

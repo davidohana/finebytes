@@ -17,7 +17,9 @@ namespace Mfr.Models.Config
             var level = ConfigStore.Ui.ConfirmationPrompts;
             return kind switch
             {
-                ConfirmationKind.GoWithPreviewErrors => level is ConfirmationPrompts.Normal or ConfirmationPrompts.More,
+                ConfirmationKind.GoWithPreviewErrors or ConfirmationKind.UndoRename => level
+                    is ConfirmationPrompts.Normal
+                        or ConfirmationPrompts.More,
                 ConfirmationKind.ReplaceAppliedFiltersOnLoad
                 or ConfirmationKind.ClearRenameList
                 or ConfirmationKind.ClearAppliedFilters => level is ConfirmationPrompts.More,

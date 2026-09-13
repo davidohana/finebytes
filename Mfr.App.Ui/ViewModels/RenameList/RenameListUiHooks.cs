@@ -46,6 +46,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public Func<int, Task<bool>>? ConfirmPreviewErrorsAsync { get; init; }
 
         /// <summary>
+        /// Confirm before Undo Last when confirmation policy requires it.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Returns <see langword="true"/> to continue. When null while confirm is required, Undo aborts.
+        /// </para>
+        /// </remarks>
+        public Func<Task<bool>>? ConfirmUndoRenameAsync { get; init; }
+
+        /// <summary>
         /// Confirm before clearing a non-empty Rename List when confirmation policy requires it.
         /// </summary>
         /// <remarks>
