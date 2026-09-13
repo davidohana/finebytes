@@ -46,6 +46,11 @@ namespace Mfr.App.Ui.ViewModels.Presets
         public bool HasSingleSelection => _selectedPresets.Count == 1;
 
         /// <summary>
+        /// Gets the sole selected preset’s name, or empty when not exactly one is selected.
+        /// </summary>
+        public string SelectedName => HasSingleSelection ? _selectedPresets[0].Name : string.Empty;
+
+        /// <summary>
         /// Gets the sole selected preset’s description, or empty when not exactly one is selected.
         /// </summary>
         public string SelectedDescription =>
@@ -71,6 +76,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
             OnPropertyChanged(nameof(SelectedPresets));
             OnPropertyChanged(nameof(HasSelection));
             OnPropertyChanged(nameof(HasSingleSelection));
+            OnPropertyChanged(nameof(SelectedName));
             OnPropertyChanged(nameof(SelectedDescription));
             _NotifySelectionCommandsChanged();
         }
