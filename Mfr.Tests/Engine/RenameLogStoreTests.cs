@@ -115,12 +115,7 @@ namespace Mfr.Tests.Engine
                 ),
             };
 
-            var writtenPath = RenameLogStore.CaptureFromCommit(
-                results,
-                directoryPath: logDir,
-                limit: 10,
-                isUndo: true
-            );
+            var writtenPath = RenameLogStore.CaptureFromCommit(results, directoryPath: logDir, limit: 10, isUndo: true);
 
             Assert.NotNull(writtenPath);
             Assert.True(RenameLogStore.LastOperation!.IsUndo);
@@ -220,10 +215,10 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies a commit with no CommitOk rows leaves the previous last op unchanged.
+        /// Verifies a commit with no loggable rows leaves the previous last op unchanged.
         /// </summary>
         [Fact]
-        public void CaptureFromCommit_NoCommitOk_Leaves_LastOperation_Unchanged()
+        public void CaptureFromCommit_NoLoggableRows_Leaves_LastOperation_Unchanged()
         {
             var prior = new[]
             {
@@ -253,10 +248,10 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies non-CommitOk rows are omitted from the log.
+        /// Verifies skipped / preview-error rows are omitted and CommitError rows are included.
         /// </summary>
         [Fact]
-        public void TryBuildFromCommitResults_Skips_NonCommitOk()
+        public void TryBuildFromCommitResults_Includes_CommitError_Skips_NonApplied()
         {
             var results = new[]
             {
@@ -268,11 +263,17 @@ namespace Mfr.Tests.Engine
                     DestinationPath: null
                 ),
                 new RenameResultItem(
-                    OriginalPath: TestPaths.Absolute("err.txt"),
-                    Status: RenameStatus.CommitError,
-                    Error: "boom",
+                    OriginalPath: TestPaths.Absolute("preview.txt"),
+                    Status: RenameStatus.PreviewError,
+                    Error: "preview fail",
                     Changes: [],
-                    DestinationPath: TestPaths.Absolute("err-dest.txt")
+                    DestinationPath: null
+                ),
+                _CommitErrorResult(
+                    originalPath: TestPaths.Absolute("err.txt"),
+                    error: "boom",
+                    changes: [new RenamePropertyChange("Prefix", "a", "b")],
+                    destinationPath: TestPaths.Absolute("err-dest.txt")
                 ),
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("ok-old.txt"),
@@ -285,9 +286,118 @@ namespace Mfr.Tests.Engine
 
             var log = RenameLogStore.TryBuildFromCommitResults(results);
             Assert.NotNull(log);
-            var entry = Assert.Single(log.Entries);
-            Assert.Equal(TestPaths.Absolute("ok-new.txt"), entry.DestinationPath);
-            Assert.True(entry.IsFolder);
+            Assert.Equal(2, log.Entries.Count);
+
+            var errorEntry = log.Entries[0];
+            Assert.Equal(TestPaths.Absolute("err-dest.txt"), errorEntry.DestinationPath);
+            Assert.Equal(TestPaths.Absolute("err.txt"), errorEntry.OriginalPath);
+            Assert.Equal("boom", errorEntry.Error);
+            Assert.False(errorEntry.IsUndoable);
+
+            var okEntry = log.Entries[1];
+            Assert.Equal(TestPaths.Absolute("ok-new.txt"), okEntry.DestinationPath);
+            Assert.True(okEntry.IsFolder);
+            Assert.True(okEntry.IsUndoable);
+            Assert.True(log.HasUndoableEntries);
+        }
+
+        /// <summary>
+        /// Verifies mixed CommitOk + CommitError capture sets LastOperation and keeps both rows.
+        /// </summary>
+        [Fact]
+        public void CaptureFromCommit_Mixed_Includes_Error_And_Sets_LastOperation()
+        {
+            var results = new[]
+            {
+                _CommitOkResult(
+                    originalPath: TestPaths.Absolute("ok-old.txt"),
+                    destinationPath: TestPaths.Absolute("ok-new.txt"),
+                    oldPrefix: "ok-old",
+                    newPrefix: "ok-new"
+                ),
+                _CommitErrorResult(originalPath: TestPaths.Absolute("err.txt"), error: "disk full"),
+            };
+
+            Assert.Null(RenameLogStore.CaptureFromCommit(results, limit: 0));
+            Assert.NotNull(RenameLogStore.LastOperation);
+            Assert.Equal(2, RenameLogStore.LastOperation.Entries.Count);
+            Assert.True(RenameLogStore.LastOperation.HasUndoableEntries);
+
+            var errorEntry = RenameLogStore.LastOperation.Entries[1];
+            Assert.Equal("disk full", errorEntry.Error);
+            Assert.Equal(TestPaths.Absolute("err.txt"), errorEntry.DestinationPath);
+            Assert.False(errorEntry.IsUndoable);
+        }
+
+        /// <summary>
+        /// Verifies errors-only capture leaves prior LastOperation and still writes disk when retention &gt; 0.
+        /// </summary>
+        [Fact]
+        public void CaptureFromCommit_ErrorsOnly_Leaves_LastOperation_Writes_Disk()
+        {
+            var prior = new[]
+            {
+                _CommitOkResult(
+                    originalPath: TestPaths.Absolute("prior-old.txt"),
+                    destinationPath: TestPaths.Absolute("prior-new.txt"),
+                    oldPrefix: "prior-old",
+                    newPrefix: "prior-new"
+                ),
+            };
+            Assert.Null(RenameLogStore.CaptureFromCommit(prior, limit: 0));
+            Assert.NotNull(RenameLogStore.LastOperation);
+            var priorDestination = Assert.Single(RenameLogStore.LastOperation.Entries).DestinationPath;
+
+            var logDir = _tempDirectoryFixture.CreateTempDir();
+            var errorsOnly = new[]
+            {
+                _CommitErrorResult(originalPath: TestPaths.Absolute("err.txt"), error: "access denied"),
+            };
+
+            var writtenPath = RenameLogStore.CaptureFromCommit(errorsOnly, directoryPath: logDir, limit: 10);
+            Assert.NotNull(writtenPath);
+            Assert.True(File.Exists(writtenPath));
+            Assert.Equal(priorDestination, Assert.Single(RenameLogStore.LastOperation.Entries).DestinationPath);
+
+            var loaded = RenameLogStore.TryLoadFile(writtenPath);
+            Assert.NotNull(loaded);
+            Assert.False(loaded.HasUndoableEntries);
+            var errorEntry = Assert.Single(loaded.Entries);
+            Assert.Equal("access denied", errorEntry.Error);
+            Assert.Equal(TestPaths.Absolute("err.txt"), errorEntry.OriginalPath);
+        }
+
+        /// <summary>
+        /// Verifies FormatDetails uses OriginalPath for error rows and DestinationPath for OK rows.
+        /// </summary>
+        [Fact]
+        public void FormatDetails_Error_Uses_OriginalPath_As_Item()
+        {
+            var log = new RenameLog(
+                CommittedAt: DateTimeOffset.Parse("2026-01-15T12:00:00Z"),
+                Entries:
+                [
+                    new RenameLogEntry(
+                        DestinationPath: TestPaths.Absolute("ok-new.txt"),
+                        OriginalPath: TestPaths.Absolute("ok-old.txt"),
+                        IsFolder: false,
+                        Changes: [new RenamePropertyChange("Prefix", "old", "new")]
+                    ),
+                    new RenameLogEntry(
+                        DestinationPath: TestPaths.Absolute("err-dest.txt"),
+                        OriginalPath: TestPaths.Absolute("err-src.txt"),
+                        IsFolder: false,
+                        Changes: [],
+                        Error: "not found"
+                    ),
+                ]
+            );
+
+            var details = log.FormatDetails();
+            Assert.Contains("Item: " + TestPaths.Absolute("ok-new.txt"), details, StringComparison.Ordinal);
+            Assert.Contains("Item: " + TestPaths.Absolute("err-src.txt"), details, StringComparison.Ordinal);
+            Assert.Contains("Error: not found", details, StringComparison.Ordinal);
+            Assert.DoesNotContain("Item: " + TestPaths.Absolute("err-dest.txt"), details, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -473,6 +583,22 @@ namespace Mfr.Tests.Engine
                 Changes: [new RenamePropertyChange("Prefix", oldPrefix, newPrefix)],
                 DestinationPath: destinationPath,
                 IsFolder: isFolder
+            );
+        }
+
+        private static RenameResultItem _CommitErrorResult(
+            string originalPath,
+            string error,
+            IReadOnlyList<RenamePropertyChange>? changes = null,
+            string? destinationPath = null
+        )
+        {
+            return new RenameResultItem(
+                OriginalPath: originalPath,
+                Status: RenameStatus.CommitError,
+                Error: error,
+                Changes: changes ?? [],
+                DestinationPath: destinationPath
             );
         }
 

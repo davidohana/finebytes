@@ -62,7 +62,10 @@ namespace Mfr.Tests.Ui.LogDialog
             var viewModel = new RenameLogDialogViewModel(logDir);
 
             Assert.Equal(3, viewModel.Items.Count);
-            Assert.Equal(RenameLogStore.FormatListTitle(RenameLogStore.LastOperation.CommittedAt), viewModel.Items[0].Title);
+            Assert.Equal(
+                RenameLogStore.FormatListTitle(RenameLogStore.LastOperation.CommittedAt),
+                viewModel.Items[0].Title
+            );
             Assert.True(viewModel.Items[0].IsLastOperation);
             Assert.Equal(RenameLogStore.FormatDiskListTitle(newerPath), viewModel.Items[1].Title);
             Assert.Equal(RenameLogStore.FormatDiskListTitle(olderPath), viewModel.Items[2].Title);

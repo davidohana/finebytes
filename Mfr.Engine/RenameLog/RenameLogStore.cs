@@ -198,10 +198,13 @@ namespace Mfr.Engine.RenameLog
         }
 
         /// <summary>
-        /// Builds a log from successful commit rows, stores it as <see cref="LastOperation"/>, and optionally writes disk.
+        /// Builds a log from commit outcomes, stores undoable logs as <see cref="LastOperation"/>, and optionally writes disk.
         /// <para>
         /// No-op when <paramref name="dryRun"/> is <see langword="true"/>, or when there are no
-        /// <see cref="RenameStatus.CommitOk"/> rows (previous last op is left unchanged).
+        /// <see cref="RenameStatus.CommitOk"/> / <see cref="RenameStatus.CommitError"/> rows to log.
+        /// Assigns <see cref="LastOperation"/> only when the built log has at least one undoable entry
+        /// (errors-only captures leave a prior last op unchanged). When retention &gt; 0, still writes
+        /// <c>.mfrlog</c> for any non-null log, including errors-only.
         /// </para>
         /// </summary>
         /// <param name="results">Per-item commit outcomes from <c>RenameList.Commit</c>.</param>
@@ -238,7 +241,10 @@ namespace Mfr.Engine.RenameLog
                 return null;
             }
 
-            LastOperation = log;
+            if (log.HasUndoableEntries)
+            {
+                LastOperation = log;
+            }
 
             var retention = limit ?? ConfigStore.RenameLog.Limit;
             if (retention <= 0)
@@ -257,11 +263,15 @@ namespace Mfr.Engine.RenameLog
         }
 
         /// <summary>
-        /// Builds a <see cref="RenameLogModel"/> from <see cref="RenameStatus.CommitOk"/> rows only.
+        /// Builds a <see cref="RenameLogModel"/> from <see cref="RenameStatus.CommitOk"/> and
+        /// <see cref="RenameStatus.CommitError"/> rows (skips skipped / preview-error).
         /// </summary>
         /// <param name="results">Per-item commit outcomes.</param>
         /// <param name="isUndo">When <see langword="true"/>, sets <see cref="RenameLogModel.IsUndo"/>.</param>
-        /// <returns>A log when at least one CommitOk row has a destination path; otherwise <see langword="null"/>.</returns>
+        /// <returns>
+        /// A log when at least one CommitOk (non-blank destination) or CommitError row is present;
+        /// otherwise <see langword="null"/>.
+        /// </returns>
         public static RenameLogModel? TryBuildFromCommitResults(
             IReadOnlyList<RenameResultItem> results,
             bool isUndo = false
@@ -272,22 +282,37 @@ namespace Mfr.Engine.RenameLog
             var entries = new List<RenameLogEntry>();
             foreach (var result in results)
             {
-                if (result.Status != RenameStatus.CommitOk)
+                if (result.Status == RenameStatus.CommitOk)
+                {
+                    if (result.DestinationPath.IsBlank())
+                    {
+                        continue;
+                    }
+
+                    entries.Add(
+                        new RenameLogEntry(
+                            DestinationPath: result.DestinationPath,
+                            OriginalPath: result.OriginalPath,
+                            IsFolder: result.IsFolder,
+                            Changes: result.Changes
+                        )
+                    );
+                    continue;
+                }
+
+                if (result.Status != RenameStatus.CommitError)
                 {
                     continue;
                 }
 
-                if (result.DestinationPath.IsBlank())
-                {
-                    continue;
-                }
-
+                var destinationPath = result.DestinationPath.IsBlank() ? result.OriginalPath : result.DestinationPath;
                 entries.Add(
                     new RenameLogEntry(
-                        DestinationPath: result.DestinationPath,
+                        DestinationPath: destinationPath,
                         OriginalPath: result.OriginalPath,
                         IsFolder: result.IsFolder,
-                        Changes: result.Changes
+                        Changes: result.Changes,
+                        Error: result.Error
                     )
                 );
             }

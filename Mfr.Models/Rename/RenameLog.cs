@@ -6,7 +6,10 @@ namespace Mfr.Models.Rename
     /// One rename-commit operation recorded for Undo Last / Rename Log (JSON <c>.mfrlog</c>).
     /// </summary>
     /// <param name="CommittedAt">When the commit finished (UTC preferred).</param>
-    /// <param name="Entries">Per-item outcomes included in this log (typically <see cref="RenameStatus.CommitOk"/> rows).</param>
+    /// <param name="Entries">
+    /// Per-item outcomes included in this log (<see cref="RenameStatus.CommitOk"/> and
+    /// <see cref="RenameStatus.CommitError"/> rows).
+    /// </param>
     /// <param name="IsUndo">
     /// Whether this log was produced by Undo (undo-of-undo) rather than GO. Missing in older files → GO.
     /// </param>
@@ -45,7 +48,8 @@ namespace Mfr.Models.Rename
 
             foreach (var entry in Entries)
             {
-                builder.Append("Item: ").Append(entry.DestinationPath).AppendLine();
+                var itemPath = entry.Error is not null ? entry.OriginalPath : entry.DestinationPath;
+                builder.Append("Item: ").Append(itemPath).AppendLine();
                 foreach (var change in entry.Changes)
                 {
                     builder
@@ -74,8 +78,11 @@ namespace Mfr.Models.Rename
     /// <summary>
     /// One file or folder row in a <see cref="RenameLog"/>.
     /// </summary>
-    /// <param name="DestinationPath">Post-commit path on disk (undo opens this path).</param>
-    /// <param name="OriginalPath">Pre-commit path when known (audit / display).</param>
+    /// <param name="DestinationPath">
+    /// Post-commit path when successful (undo opens this path). For commit-error rows, the attempted
+    /// destination or <paramref name="OriginalPath"/> when destination was blank.
+    /// </param>
+    /// <param name="OriginalPath">Pre-commit path when known (audit / display; details <c>Item:</c> for errors).</param>
     /// <param name="IsFolder">Whether the entry is a directory.</param>
     /// <param name="Changes">Property-level Old→New deltas applied at commit.</param>
     /// <param name="Error">Optional commit-error message; undo skips rows with errors.</param>
