@@ -26,12 +26,14 @@ namespace Mfr.Engine.Commit
         /// </summary>
         /// <param name="OriginalPathBeforeCommit">The item's original path when the plan step ran.</param>
         /// <param name="DestinationPath">The item's preview path when the plan step ran.</param>
+        /// <param name="IsFolder">Whether the item is a directory.</param>
         /// <param name="Changes">Property-level changes captured before <see cref="RenameItem.Original"/> was overwritten.</param>
         /// <param name="Status">The status this item finished the plan walk with.</param>
         /// <param name="ErrorMessage">Optional error message when the plan step failed.</param>
         private sealed record PlanOutcome(
             string OriginalPathBeforeCommit,
             string DestinationPath,
+            bool IsFolder,
             IReadOnlyList<RenamePropertyChange> Changes,
             RenameStatus Status,
             string? ErrorMessage
@@ -248,6 +250,7 @@ namespace Mfr.Engine.Commit
                     outcomes: outcomes,
                     originalPathBeforeCommit: step.Item.Original.FullPath,
                     destinationPath: step.Item.Preview.FullPath,
+                    isFolder: step.Item.Original.Attributes.HasFlag(FileAttributes.Directory),
                     ex: ex
                 );
                 Log.Error(
@@ -273,6 +276,7 @@ namespace Mfr.Engine.Commit
             var destinationPath = item.Preview.FullPath;
             var originalSnapshot = item.Original;
             var previewSnapshot = item.Preview;
+            var isFolder = originalSnapshot.Attributes.HasFlag(FileAttributes.Directory);
 
             try
             {
@@ -306,6 +310,7 @@ namespace Mfr.Engine.Commit
                 outcomes[item] = new PlanOutcome(
                     OriginalPathBeforeCommit: originalPathBeforeCommit,
                     DestinationPath: destinationPath,
+                    IsFolder: isFolder,
                     Changes: changes,
                     Status: RenameStatus.CommitOk,
                     ErrorMessage: null
@@ -319,6 +324,7 @@ namespace Mfr.Engine.Commit
                     outcomes: outcomes,
                     originalPathBeforeCommit: originalPathBeforeCommit,
                     destinationPath: destinationPath,
+                    isFolder: isFolder,
                     ex: ex
                 );
                 Log.Error(
@@ -340,6 +346,7 @@ namespace Mfr.Engine.Commit
             Dictionary<RenameItem, PlanOutcome> outcomes,
             string originalPathBeforeCommit,
             string destinationPath,
+            bool isFolder,
             Exception ex
         )
         {
@@ -348,6 +355,7 @@ namespace Mfr.Engine.Commit
             outcomes[item] = new PlanOutcome(
                 OriginalPathBeforeCommit: originalPathBeforeCommit,
                 DestinationPath: destinationPath,
+                IsFolder: isFolder,
                 Changes: [],
                 Status: RenameStatus.CommitError,
                 ErrorMessage: ex.Message
@@ -365,7 +373,9 @@ namespace Mfr.Engine.Commit
                     OriginalPath: outcome.OriginalPathBeforeCommit,
                     Status: outcome.Status,
                     Error: outcome.ErrorMessage,
-                    Changes: outcome.Changes
+                    Changes: outcome.Changes,
+                    DestinationPath: outcome.DestinationPath,
+                    IsFolder: outcome.IsFolder
                 );
             }
 

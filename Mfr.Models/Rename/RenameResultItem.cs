@@ -40,10 +40,17 @@ namespace Mfr.Models.Rename
     /// <param name="Status">Outcome status for this row (including <see cref="RenameStatus.PreviewError"/> when commit did not apply preview-flagged errors).</param>
     /// <param name="Error">Optional error message when commit fails.</param>
     /// <param name="Changes">Property-level changes that were applied for this item.</param>
+    /// <param name="DestinationPath">
+    /// Preview / post-commit path when the plan step ran; set for <see cref="RenameStatus.CommitOk"/> and
+    /// <see cref="RenameStatus.CommitError"/>, otherwise <see langword="null"/>.
+    /// </param>
+    /// <param name="IsFolder">Whether the item is a directory (meaningful when <paramref name="DestinationPath"/> is set).</param>
     public sealed record RenameResultItem(
         string OriginalPath,
         RenameStatus Status,
         string? Error,
-        IReadOnlyList<RenamePropertyChange> Changes
+        IReadOnlyList<RenamePropertyChange> Changes,
+        string? DestinationPath = null,
+        bool IsFolder = false
     );
 }

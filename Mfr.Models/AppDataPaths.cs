@@ -5,9 +5,9 @@ namespace Mfr.Models
     /// <summary>
     /// Shared user-profile roots for MFR files under <c>finebytes/mfr</c>.
     /// <para>
-    /// Roaming holds <c>config.json</c> (prefs: log/ui/mainWindow/fileList/renameList/filterEditor/filterDefaults)
+    /// Roaming holds <c>config.json</c> (prefs: log/ui/renameLog/mainWindow/fileList/renameList/filterEditor/filterDefaults)
     /// and <c>presets.json</c>;
-    /// local holds diagnostic logs.
+    /// local holds diagnostic logs and rename-commit <c>.mfrlog</c> history.
     /// </para>
     /// </summary>
     public static class AppDataPaths

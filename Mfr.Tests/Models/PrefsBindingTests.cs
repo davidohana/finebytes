@@ -12,6 +12,7 @@ namespace Mfr.Tests.Models
         [Theory]
         [InlineData(typeof(LogConfig))]
         [InlineData(typeof(UiConfig))]
+        [InlineData(typeof(RenameLogConfig))]
         public void Every_public_instance_field_participates_in_config_binding(Type configType)
         {
             const BindingFlags flags = BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly;
@@ -62,6 +63,29 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
+        /// Verifies <c>renameLog.limit</c> binds from a JSON string leaf (including 0).
+        /// </summary>
+        [Fact]
+        public void RenameLog_limit_leaf_binds_from_json_string()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """
+                {
+                  "renameLog": {
+                    "limit": "0"
+                  }
+                }
+                """
+            );
+            var root = new PrefsRootForTest();
+            Assert.Equal(10, root.RenameLog.Limit);
+
+            ConfigJsonApplier.Apply(doc.RootElement, root);
+
+            Assert.Equal(0, root.RenameLog.Limit);
+        }
+
+        /// <summary>
         /// Verifies omitted <c>ui</c> leaves stay at their defaults.
         /// </summary>
         [Fact]
@@ -85,6 +109,9 @@ namespace Mfr.Tests.Models
 
             [ConfigSection]
             public UiConfig Ui = new();
+
+            [ConfigSection]
+            public RenameLogConfig RenameLog = new();
         }
     }
 }

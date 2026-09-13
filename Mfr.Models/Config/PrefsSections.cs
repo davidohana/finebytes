@@ -66,4 +66,24 @@ namespace Mfr.Models.Config
         public string FileOutputTemplate =
             "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
     }
+
+    /// <summary>
+    /// Rename-commit undo log retention from the <c>renameLog</c> section of the config file.
+    /// <para>
+    /// Separate from diagnostic Serilog <c>log</c> / <c>logs/</c>. Disk files live under
+    /// <see cref="AppDataPaths.LocalRoot"/> + <c>rename-logs</c> as JSON <c>.mfrlog</c>.
+    /// </para>
+    /// </summary>
+    public sealed class RenameLogConfig
+    {
+        /// <summary>
+        /// How many on-disk rename logs to keep.
+        /// <para>
+        /// <c>0</c> = disk off (in-memory last operation still captured for Undo Last);
+        /// <see cref="int.MaxValue"/> = unlimited; default <c>10</c>.
+        /// </para>
+        /// </summary>
+        [ConfigIntRange(0, int.MaxValue)]
+        public int Limit = 10;
+    }
 }

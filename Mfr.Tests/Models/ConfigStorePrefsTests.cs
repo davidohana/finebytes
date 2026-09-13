@@ -200,6 +200,40 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
+        public void Load_renameLog_limit_soft_skips_out_of_range()
+        {
+            using var temp = ConfigStoreTempFile.CreateWithContent(
+                /*lang=json,strict*/
+                """
+                {
+                  "renameLog": {
+                    "limit": "-1"
+                  }
+                }
+                """
+            );
+            ConfigStore.Load(temp.Path);
+            Assert.Equal(10, ConfigStore.RenameLog.Limit);
+        }
+
+        [Fact]
+        public void Load_renameLog_limit_zero()
+        {
+            using var temp = ConfigStoreTempFile.CreateWithContent(
+                /*lang=json,strict*/
+                """
+                {
+                  "renameLog": {
+                    "limit": "0"
+                  }
+                }
+                """
+            );
+            ConfigStore.Load(temp.Path);
+            Assert.Equal(0, ConfigStore.RenameLog.Limit);
+        }
+
+        [Fact]
         public void Load_ignores_nested_session_object()
         {
             using var temp = ConfigStoreTempFile.CreateWithContent(

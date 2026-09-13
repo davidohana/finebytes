@@ -1,4 +1,5 @@
 using System.Text;
+using Mfr.Engine.RenameLog;
 using Mfr.Filters;
 using Mfr.Utils;
 using Serilog;
@@ -772,6 +773,8 @@ namespace Mfr.Engine.RenameList
                 commitSkippedCount,
                 commitErrorCount
             );
+
+            RenameLogStore.CaptureFromCommit(results, dryRun: dryRun);
 
             return results;
         }
