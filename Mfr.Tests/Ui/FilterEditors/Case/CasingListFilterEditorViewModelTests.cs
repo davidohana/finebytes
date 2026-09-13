@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.Filters.Case;
 
@@ -9,6 +10,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
     /// </summary>
     public sealed class CasingListFilterEditorViewModelTests
     {
+        public CasingListFilterEditorViewModelTests()
+        {
+            FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds = 0;
+        }
+
         /// <summary>
         /// Verifies Casing List option edits replace the step filter options.
         /// </summary>

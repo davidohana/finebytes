@@ -80,9 +80,9 @@ namespace Mfr.Tests.Cli
                 "--set",
                 "log.maxSessionFiles=50",
                 "--set",
-                "filters.maxListFileLineLength=2000",
+                "ui.confirmationPrompts=more",
             ])!;
-            Assert.Equal(["log.maxSessionFiles=50", "filters.maxListFileLineLength=2000"], options.ConfigOverrides);
+            Assert.Equal(["log.maxSessionFiles=50", "ui.confirmationPrompts=more"], options.ConfigOverrides);
         }
 
         [Fact]

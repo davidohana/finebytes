@@ -11,7 +11,6 @@ namespace Mfr.Tests.Models
     {
         [Theory]
         [InlineData(typeof(MfrConfig))]
-        [InlineData(typeof(FilterConfig))]
         [InlineData(typeof(LogConfig))]
         [InlineData(typeof(UiConfig))]
         public void Every_public_instance_field_participates_in_config_binding(Type configType)
@@ -72,7 +71,7 @@ namespace Mfr.Tests.Models
         public void Ui_confirmation_leaves_default_when_omitted()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
-                """{"filters":{"maxListFileLineLength":"1000"}}"""
+                """{"log":{"maxSessionFiles":"100"}}"""
             );
             var config = new MfrConfig();
             ConfigJsonApplier.Apply(doc.RootElement, config);

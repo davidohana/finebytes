@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
 
@@ -9,6 +10,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
     /// </summary>
     public sealed class NameListFilterEditorViewModelTests
     {
+        public NameListFilterEditorViewModelTests()
+        {
+            FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds = 0;
+        }
+
         /// <summary>
         /// Verifies sync loads line text and templates from an existing filter.
         /// </summary>

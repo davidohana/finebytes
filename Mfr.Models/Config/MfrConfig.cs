@@ -3,21 +3,6 @@ using Mfr.Utils.Config;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Filter-related config loaded from the <c>filters</c> section of the config file.
-    /// </summary>
-    public sealed class FilterConfig
-    {
-        /// <summary>
-        /// Maximum length (characters) for list-based filter text.
-        /// <para>
-        /// Applies to each embedded name-list line, each casing-list word, and each replace-list search/replacement.
-        /// </para>
-        /// </summary>
-        [ConfigIntRange(1, 60000)]
-        public int MaxListFileLineLength = 1000;
-    }
-
-    /// <summary>
     /// UI prefs from the Options dialog, loaded from the <c>ui</c> section of the config file.
     /// <para>
     /// <see cref="ConfirmationPrompts"/> gates optional confirms via <see cref="ConfirmationPolicy"/>;
@@ -94,12 +79,6 @@ namespace Mfr.Models.Config
     /// </summary>
     public sealed class MfrConfig
     {
-        /// <summary>
-        /// Config for list-based filters (name, casing, replace lists).
-        /// </summary>
-        [ConfigSection]
-        public FilterConfig Filters = new();
-
         /// <summary>
         /// Diagnostic session-log options (CLI file/console and UI file).
         /// </summary>

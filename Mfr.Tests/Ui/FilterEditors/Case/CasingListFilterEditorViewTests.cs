@@ -3,9 +3,11 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Case;
+using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Tests.Ui.AppliedFilters;
 
@@ -16,6 +18,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
     /// </summary>
     public sealed class CasingListFilterEditorViewTests
     {
+        public CasingListFilterEditorViewTests()
+        {
+            FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds = 0;
+        }
+
         /// <summary>
         /// Verifies Casing List option edits persist on the applied step.
         /// </summary>
@@ -35,6 +42,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
             Assert.NotNull(words);
             Assert.NotNull(uppercase);
             Assert.Equal(TextWrapping.Wrap, words.TextWrapping);
+            Assert.Equal(ListEntryLength.DefaultEditorTextMaxLength, words.MaxLength);
             Assert.Equal(string.Empty, words.Text);
             Assert.True(uppercase.IsChecked);
 

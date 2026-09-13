@@ -69,7 +69,7 @@ Parent: [presets-ui.plan.md](presets-ui.plan.md) (confirm flag was out of scope 
 - Double-click-to-add preference — **done** in [options-confirmations-and-double-click.plan.md](options-confirmations-and-double-click.plan.md) (no longer deferred here)
 - Confirm-replace checkbox as a standalone Options control — **superseded** by Confirmation prompts in that follow-on plan
 - Undo & Log retention UI / renaming `.mfrlog` model
-- Exposing `filters.maxListFileLineLength` or `log.*` templates (hand-edit / CLI `--set` remains)
+- Exposing `log.*` templates (hand-edit / CLI `--set` remains)
 - Moving add-mode out of Rename List into Options
 - Changing Reset Configuration (already Tools → Reset)
 

@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.Filters.Replace;
 
@@ -9,6 +10,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
     /// </summary>
     public sealed class ReplaceListFilterEditorViewModelTests
     {
+        public ReplaceListFilterEditorViewModelTests()
+        {
+            FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds = 0;
+        }
+
         /// <summary>
         /// Verifies Replace List option edits replace the step filter options.
         /// </summary>

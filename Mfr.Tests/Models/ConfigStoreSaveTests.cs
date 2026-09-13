@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models
     public sealed class ConfigStoreSaveTests
     {
         [Fact]
-        public void Save_round_trips_mutated_ui_leaves_and_filter_leaf()
+        public void Save_round_trips_mutated_ui_leaves()
         {
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-save-config-" + Guid.NewGuid() + ".json");
             try
@@ -17,7 +17,6 @@ namespace Mfr.Tests.Models
                 ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.Config.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
                 ConfigStore.Config.Ui.DoubleClickAddsToRenameList = true;
-                ConfigStore.Config.Filters.MaxListFileLineLength = 2500;
                 ConfigStore.Save(configPath);
 
                 Assert.True(File.Exists(configPath));
@@ -31,16 +30,12 @@ namespace Mfr.Tests.Models
                         "true",
                         doc.RootElement.GetProperty("ui").GetProperty("doubleClickAddsToRenameList").GetString()
                     );
-                    Assert.Equal(
-                        "2500",
-                        doc.RootElement.GetProperty("filters").GetProperty("maxListFileLineLength").GetString()
-                    );
+                    Assert.False(doc.RootElement.TryGetProperty("filters", out _));
                 }
 
                 ConfigStore.Load(configPath);
                 Assert.Equal(ConfirmationPrompts.More, ConfigStore.Config.Ui.ConfirmationPrompts);
                 Assert.True(ConfigStore.Config.Ui.DoubleClickAddsToRenameList);
-                Assert.Equal(2500, ConfigStore.Config.Filters.MaxListFileLineLength);
             }
             finally
             {

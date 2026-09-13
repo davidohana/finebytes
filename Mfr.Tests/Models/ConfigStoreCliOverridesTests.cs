@@ -1,6 +1,3 @@
-using Mfr.Engine.Config;
-using Mfr.Filters;
-
 namespace Mfr.Tests.Models
 {
     /// <summary>
@@ -12,7 +9,6 @@ namespace Mfr.Tests.Models
         public ConfigStoreCliOverridesTests()
         {
             ConfigStoreTestReset.LoadEmpty();
-            FilterRuntimeConfig.SyncFromConfigStore();
         }
 
         [Fact]
@@ -46,15 +42,6 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void ApplyCliOverrides_Sets_Filters_Field()
-        {
-            ConfigStore.ApplyCliOverrides(["filters.maxListFileLineLength=2500"]);
-            Assert.Equal(2500, ConfigStore.Config.Filters.MaxListFileLineLength);
-            FilterRuntimeConfig.SyncFromConfigStore();
-            Assert.Equal(2500, ListEntryLength.MaxLength);
-        }
-
-        [Fact]
         public void ApplyCliOverrides_Last_Duplicate_Key_Wins()
         {
             ConfigStore.ApplyCliOverrides(["log.maxSessionFiles=50", "log.maxSessionFiles=60"]);
@@ -79,7 +66,7 @@ namespace Mfr.Tests.Models
         public void ApplyCliOverrides_Rejects_Unknown_Section()
         {
             var ex = Assert.Throws<InvalidDataException>(() =>
-                ConfigStore.ApplyCliOverrides(["unknownSection.maxListFileLineLength=1"])
+                ConfigStore.ApplyCliOverrides(["unknownSection.maxSessionFiles=1"])
             );
             Assert.Contains("Unknown config section 'unknownSection'", ex.Message, StringComparison.Ordinal);
         }

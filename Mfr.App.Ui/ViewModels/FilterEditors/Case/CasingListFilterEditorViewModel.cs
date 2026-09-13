@@ -31,9 +31,21 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         [ObservableProperty]
         private bool _uppercaseSentenceInitial = true;
 
-        partial void OnWordsTextChanged(string value) => _ApplyOptions();
+        partial void OnWordsTextChanged(string value)
+        {
+            if (IsLoading)
+            {
+                return;
+            }
 
-        partial void OnUppercaseSentenceInitialChanged(bool value) => _ApplyOptions();
+            ScheduleLiveListTextApply(_ApplyOptions);
+        }
+
+        partial void OnUppercaseSentenceInitialChanged(bool value)
+        {
+            FlushPendingLiveListTextApply();
+            _ApplyOptions();
+        }
 
         private void _SyncFromFilter()
         {

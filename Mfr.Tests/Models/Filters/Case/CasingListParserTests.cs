@@ -94,9 +94,21 @@ namespace Mfr.Tests.Models.Filters.Case
             var longWord = new string('x', ListEntryLength.DefaultMaxLength + 1);
 
             var ex = Assert.Throws<UserException>(() =>
-                CasingListParser.BuildMap([longWord], maxListFileLineLength: ListEntryLength.DefaultMaxLength)
+                CasingListParser.BuildMap([longWord], maxEntryLength: ListEntryLength.DefaultMaxLength)
             );
             Assert.Contains("exceeds maximum length", ex.Message, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies too many words are rejected.
+        /// </summary>
+        [Fact]
+        public void BuildMap_TooManyWords_Throws()
+        {
+            var words = Enumerable.Range(0, 3).Select(i => $"w{i}").ToArray();
+
+            var ex = Assert.Throws<UserException>(() => CasingListParser.BuildMap(words, maxEntryCount: 2));
+            Assert.Contains("too many entries", ex.Message, StringComparison.Ordinal);
         }
     }
 }

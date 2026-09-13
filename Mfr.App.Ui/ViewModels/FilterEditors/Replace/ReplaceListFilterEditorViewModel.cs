@@ -44,7 +44,15 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
                 _ => throw new ArgumentOutOfRangeException(nameof(Match.Mode), Match.Mode, null),
             };
 
-        partial void OnEntriesTextChanged(string value) => _ApplyOptions(parseEntries: true);
+        partial void OnEntriesTextChanged(string value)
+        {
+            if (IsLoading)
+            {
+                return;
+            }
+
+            ScheduleLiveListTextApply(() => _ApplyOptions(parseEntries: true));
+        }
 
         private void _SyncFromFilter()
         {
@@ -66,6 +74,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         private void _OnMatchChanged()
         {
             OnPropertyChanged(nameof(EntriesWatermark));
+            FlushPendingLiveListTextApply();
             _ApplyOptions(parseEntries: false);
         }
 

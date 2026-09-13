@@ -1,4 +1,3 @@
-using Mfr.Engine.Config;
 using Mfr.Utils;
 using Serilog;
 using Spectre.Console;
@@ -48,7 +47,6 @@ namespace Mfr.App.Cli
                 }
 
                 ConfigStore.ApplyCliOverrides(options.ConfigOverrides);
-                FilterRuntimeConfig.SyncFromConfigStore();
             }
             catch (InvalidDataException ex)
             {

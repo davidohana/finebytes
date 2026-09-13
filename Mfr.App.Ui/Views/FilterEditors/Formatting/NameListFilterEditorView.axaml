@@ -6,6 +6,7 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterEditors.Formatting"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
+  xmlns:filters="using:Mfr.Filters"
   mc:Ignorable="d"
   d:DesignWidth="640"
   d:DesignHeight="240"
@@ -36,6 +37,7 @@
           MinWidth="240"
           MinHeight="88"
           AcceptsReturn="True"
+          MaxLength="{x:Static filters:ListEntryLength.DefaultEditorTextMaxLength}"
           PlaceholderText="Alpha&#x0a;Beta&#x0a;Gamma"
           Text="{Binding EntriesText}"
         />

@@ -121,6 +121,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             if (oldValue is not null)
             {
                 oldValue.PropertyChanged -= _OnOptionsEditorPropertyChanged;
+                oldValue.FlushPendingLiveListTextApply();
             }
 
             if (newValue is null)

@@ -19,10 +19,7 @@ namespace Mfr.Tests.Models
 
                 Assert.True(File.Exists(configPath));
                 using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
-                Assert.Equal(
-                    "1000",
-                    doc.RootElement.GetProperty("filters").GetProperty("maxListFileLineLength").GetString()
-                );
+                Assert.False(doc.RootElement.TryGetProperty("filters", out _));
                 Assert.Equal("100", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
                 Assert.Equal(string.Empty, doc.RootElement.GetProperty("log").GetProperty("directoryPath").GetString());
                 Assert.Equal("session-", doc.RootElement.GetProperty("log").GetProperty("filePrefix").GetString());
@@ -51,8 +48,8 @@ namespace Mfr.Tests.Models
                 // lang=json,strict
                 """
                 {
-                  "filters": {
-                    "maxListFileLineLength": "2500"
+                  "log": {
+                    "maxSessionFiles": "50"
                   }
                 }
                 """
@@ -61,11 +58,8 @@ namespace Mfr.Tests.Models
             {
                 ConfigStore.EnsureDefaultFile(configPath);
                 using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
-                Assert.Equal(
-                    "2500",
-                    doc.RootElement.GetProperty("filters").GetProperty("maxListFileLineLength").GetString()
-                );
-                Assert.False(doc.RootElement.TryGetProperty("log", out _));
+                Assert.Equal("50", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
+                Assert.False(doc.RootElement.TryGetProperty("ui", out _));
             }
             finally
             {

@@ -18,13 +18,13 @@ namespace Mfr.Models.Config
     /// </para>
     /// <para>
     /// When the default AppData file is missing, <see cref="EnsureDefaultFile"/> writes one with current
-    /// defaults so the user can hand-edit filter and log settings. The Options dialog persists
+    /// defaults so the user can hand-edit log settings. The Options dialog persists
     /// <c>ui.confirmationPrompts</c> and <c>ui.doubleClickAddsToRenameList</c> via <see cref="Save"/>
     /// (overwrite); other leaves remain hand-edit / CLI <c>--set</c>.
     /// When a property is omitted, values still come from <see cref="MfrConfig"/> field initializers.
     /// </para>
     /// <para>
-    /// The document root must be a JSON object with nested sections (e.g. <c>filters</c>, <c>log</c>, <c>ui</c>). Each section is a JSON object;
+    /// The document root must be a JSON object with nested sections (e.g. <c>log</c>, <c>ui</c>). Each section is a JSON object;
     /// <see cref="ConfigJsonApplier.Apply"/> maps annotated fields on <see cref="MfrConfig"/> and nested section types using
     /// <see cref="ConfigValueReader"/>; every leaf value is read from a JSON <strong>string</strong>
     /// (including integers, e.g. <c>"1000"</c>, and booleans, e.g. <c>"true"</c>).

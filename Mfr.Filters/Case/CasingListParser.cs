@@ -21,8 +21,8 @@ namespace Mfr.Filters.Case
         /// Parses space-separated (any whitespace) words from the Filter Configuration editor.
         /// </summary>
         /// <remarks>
-        /// Does not throw; empty/whitespace-only text yields an empty list. Length and single-word
-        /// rules are enforced when the filter is set up.
+        /// Does not throw; empty/whitespace-only text yields an empty list. Length, count, and
+        /// single-word rules are enforced when the filter is set up.
         /// </remarks>
         /// <param name="text">Space-separated editor text.</param>
         /// <returns>Parsed words in order.</returns>
@@ -40,17 +40,23 @@ namespace Mfr.Filters.Case
         /// Builds a case-insensitive map from configured words (last duplicate wins).
         /// </summary>
         /// <param name="words">Canonical word spellings.</param>
-        /// <param name="maxListFileLineLength">
-        /// Maximum characters per word; defaults to <see cref="ListEntryLength.MaxLength"/>.
+        /// <param name="maxEntryLength">
+        /// Maximum characters per word; defaults to <see cref="ListEntryLength.DefaultMaxLength"/>.
+        /// </param>
+        /// <param name="maxEntryCount">
+        /// Maximum number of words; defaults to <see cref="ListEntryLength.DefaultMaxEntryCount"/>.
         /// </param>
         /// <returns>Map from lowercased word to canonical form; empty when <paramref name="words"/> is empty.</returns>
         internal static Dictionary<string, string> BuildMap(
             IReadOnlyList<string> words,
-            int? maxListFileLineLength = null
+            int? maxEntryLength = null,
+            int? maxEntryCount = null
         )
         {
             ArgumentNullException.ThrowIfNull(words);
-            var maxLen = maxListFileLineLength ?? ListEntryLength.MaxLength;
+            var maxLen = maxEntryLength ?? ListEntryLength.DefaultMaxLength;
+            var maxCount = maxEntryCount ?? ListEntryLength.DefaultMaxEntryCount;
+            ListEntryLength.ThrowIfTooManyEntries(words.Count, "Casing-list", maxCount);
 
             var lowerWordToCasing = new Dictionary<string, string>(StringComparer.Ordinal);
             for (var i = 0; i < words.Count; i++)

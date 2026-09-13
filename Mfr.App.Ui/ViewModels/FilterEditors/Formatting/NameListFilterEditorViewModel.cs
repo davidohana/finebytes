@@ -37,11 +37,27 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
         [ObservableProperty]
         private string _suffix = string.Empty;
 
-        partial void OnEntriesTextChanged(string value) => _ApplyOptions();
+        partial void OnEntriesTextChanged(string value)
+        {
+            if (IsLoading)
+            {
+                return;
+            }
 
-        partial void OnPrefixChanged(string value) => _ApplyOptions();
+            ScheduleLiveListTextApply(_ApplyEntriesAndTemplates);
+        }
 
-        partial void OnSuffixChanged(string value) => _ApplyOptions();
+        partial void OnPrefixChanged(string value)
+        {
+            FlushPendingLiveListTextApply();
+            _ApplyEntriesAndTemplates();
+        }
+
+        partial void OnSuffixChanged(string value)
+        {
+            FlushPendingLiveListTextApply();
+            _ApplyEntriesAndTemplates();
+        }
 
         private void _SyncFromFilter()
         {
@@ -58,7 +74,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
             });
         }
 
-        private void _ApplyOptions()
+        private void _ApplyEntriesAndTemplates()
         {
             if (IsLoading || Step.Filter is not NameListFilter filter)
             {

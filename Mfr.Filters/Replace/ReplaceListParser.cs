@@ -40,7 +40,7 @@ namespace Mfr.Filters.Replace
         /// <remarks>
         /// A line without the separator is search-only (strip). Empty search after split is skipped.
         /// Surrounding whitespace on each side is trimmed. Does not throw; empty search and length
-        /// limits are enforced when the filter is applied.
+        /// / count limits are enforced when the filter is applied.
         /// </remarks>
         /// <param name="text">Multiline editor text.</param>
         /// <returns>Parsed pairs in line order.</returns>
@@ -79,22 +79,30 @@ namespace Mfr.Filters.Replace
         /// </summary>
         /// <remarks>
         /// Empty list is allowed (no-op). Each search must be non-empty. Search and replacement may
-        /// contain whitespace. Replacement may be empty (strip). Search and replacement lengths are
-        /// limited to <paramref name="maxListFileLineLength"/> (or <see cref="ListEntryLength.MaxLength"/>
-        /// when omitted; default 1000).
+        /// contain whitespace. Replacement may be empty (strip). Entry count is capped at
+        /// <see cref="ListEntryLength.DefaultMaxEntryCount"/> (or <paramref name="maxEntryCount"/>).
+        /// Search and replacement lengths are limited to <paramref name="maxEntryLength"/> (or
+        /// <see cref="ListEntryLength.DefaultMaxLength"/>).
         /// </remarks>
         /// <param name="entries">Configured search/replace pairs in apply order.</param>
-        /// <param name="maxListFileLineLength">
-        /// Maximum characters per search/replacement; defaults to <see cref="ListEntryLength.MaxLength"/>.
+        /// <param name="maxEntryLength">
+        /// Maximum characters per search/replacement; defaults to
+        /// <see cref="ListEntryLength.DefaultMaxLength"/>.
+        /// </param>
+        /// <param name="maxEntryCount">
+        /// Maximum number of pairs; defaults to <see cref="ListEntryLength.DefaultMaxEntryCount"/>.
         /// </param>
         /// <returns>The same <paramref name="entries"/> list after checks succeed.</returns>
         internal static IReadOnlyList<ReplaceListEntry> Validate(
             IReadOnlyList<ReplaceListEntry> entries,
-            int? maxListFileLineLength = null
+            int? maxEntryLength = null,
+            int? maxEntryCount = null
         )
         {
             ArgumentNullException.ThrowIfNull(entries);
-            var maxLen = maxListFileLineLength ?? ListEntryLength.MaxLength;
+            var maxLen = maxEntryLength ?? ListEntryLength.DefaultMaxLength;
+            var maxCount = maxEntryCount ?? ListEntryLength.DefaultMaxEntryCount;
+            ListEntryLength.ThrowIfTooManyEntries(entries.Count, "Replace-list", maxCount);
 
             for (var i = 0; i < entries.Count; i++)
             {

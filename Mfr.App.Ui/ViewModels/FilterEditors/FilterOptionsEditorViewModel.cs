@@ -9,6 +9,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
     /// </summary>
     public abstract partial class FilterOptionsEditorViewModel : ViewModelBase
     {
+        private CancellationTokenSource? _liveListTextApplyCts;
+        private Action? _pendingLiveListTextApply;
+
+        /// <summary>
+        /// Delay before applying multiline list-editor text to the step.
+        /// <para>
+        /// Zero applies immediately (tests). Production default is 150 ms so large pastes do not
+        /// re-preview on every intermediate binding update.
+        /// </para>
+        /// </summary>
+        public static int LiveListTextApplyDebounceMilliseconds { get; set; } = 150;
+
         /// <summary>
         /// Initializes an options editor for one applied-filter step.
         /// </summary>
@@ -82,6 +94,91 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             }
 
             Step.SetFilter(updated);
+        }
+
+        /// <summary>
+        /// Schedules <paramref name="apply"/> after <see cref="LiveListTextApplyDebounceMilliseconds"/>.
+        /// <para>Supersedes any prior pending list-text apply for this editor.</para>
+        /// </summary>
+        /// <param name="apply">Writes the current list text onto the applied step.</param>
+        protected void ScheduleLiveListTextApply(Action apply)
+        {
+            ArgumentNullException.ThrowIfNull(apply);
+
+            _CancelLiveListTextApplyTimer();
+            _pendingLiveListTextApply = apply;
+
+            var delay = LiveListTextApplyDebounceMilliseconds;
+            if (delay <= 0)
+            {
+                _pendingLiveListTextApply = null;
+                apply();
+                return;
+            }
+
+            var cts = new CancellationTokenSource();
+            _liveListTextApplyCts = cts;
+            var context = SynchronizationContext.Current;
+            _ = _RunDebouncedLiveListTextApplyAsync(apply, delay, cts.Token, context);
+        }
+
+        /// <summary>
+        /// Runs a pending debounced list-text apply immediately (e.g. when the editor is replaced).
+        /// </summary>
+        internal void FlushPendingLiveListTextApply()
+        {
+            var pending = _pendingLiveListTextApply;
+            _CancelLiveListTextApplyTimer();
+            _pendingLiveListTextApply = null;
+            pending?.Invoke();
+        }
+
+        private void _CancelLiveListTextApplyTimer()
+        {
+            if (_liveListTextApplyCts is null)
+            {
+                return;
+            }
+
+            _liveListTextApplyCts.Cancel();
+            _liveListTextApplyCts.Dispose();
+            _liveListTextApplyCts = null;
+        }
+
+        private async Task _RunDebouncedLiveListTextApplyAsync(
+            Action apply,
+            int delayMilliseconds,
+            CancellationToken cancellationToken,
+            SynchronizationContext? context
+        )
+        {
+            try
+            {
+                await Task.Delay(delayMilliseconds, cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+
+            void Run()
+            {
+                if (!ReferenceEquals(_pendingLiveListTextApply, apply))
+                {
+                    return;
+                }
+
+                _pendingLiveListTextApply = null;
+                apply();
+            }
+
+            if (context is null)
+            {
+                Run();
+                return;
+            }
+
+            context.Post(_ => Run(), state: null);
         }
     }
 }

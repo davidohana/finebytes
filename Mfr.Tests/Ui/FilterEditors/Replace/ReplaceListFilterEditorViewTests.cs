@@ -2,10 +2,12 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Replace;
 using Mfr.App.Ui.Views.FormatEditor;
+using Mfr.Filters;
 using Mfr.Filters.Replace;
 using Mfr.Tests.Ui.AppliedFilters;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
@@ -17,6 +19,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
     /// </summary>
     public sealed class ReplaceListFilterEditorViewTests
     {
+        public ReplaceListFilterEditorViewTests()
+        {
+            FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds = 0;
+        }
+
         /// <summary>
         /// Verifies Replace List option edits persist on the applied step.
         /// </summary>
@@ -49,6 +56,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             Assert.NotNull(replaceAll);
             Assert.NotNull(wholeWord);
             Assert.True(entries.AcceptsReturn);
+            Assert.Equal(ListEntryLength.DefaultEditorTextMaxLength, entries.MaxLength);
             Assert.Equal(string.Empty, entries.Text);
             Assert.True(literal.IsChecked);
             Assert.Equal(". => _\nfeat. => feature.\nLive", entries.Watermark);

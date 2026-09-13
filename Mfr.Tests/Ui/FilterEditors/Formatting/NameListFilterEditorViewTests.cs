@@ -2,8 +2,10 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
+using Mfr.Filters;
 using Mfr.Filters.Formatting;
 using Mfr.Tests.Ui.AppliedFilters;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
@@ -15,6 +17,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
     /// </summary>
     public sealed class NameListFilterEditorViewTests
     {
+        public NameListFilterEditorViewTests()
+        {
+            FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds = 0;
+        }
+
         /// <summary>
         /// Verifies Name List option edits persist on the applied step.
         /// </summary>
@@ -36,6 +43,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             Assert.NotNull(prefix);
             Assert.NotNull(suffix);
             Assert.True(entries.AcceptsReturn);
+            Assert.Equal(ListEntryLength.DefaultEditorTextMaxLength, entries.MaxLength);
             Assert.False(prefix.AcceptsReturn);
             Assert.False(suffix.AcceptsReturn);
             Assert.Equal(string.Empty, entries.Text);

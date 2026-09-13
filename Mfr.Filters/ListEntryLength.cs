@@ -1,33 +1,24 @@
 namespace Mfr.Filters
 {
     /// <summary>
-    /// Enforces the list-line maximum for embedded name, replace, and casing lists.
+    /// Limits for embedded name, replace, and casing list entries (and their Filter Configuration editors).
     /// </summary>
-    /// <remarks>
-    /// Hosts sync <see cref="MaxLength"/> from process config via <see cref="Configure"/> after
-    /// config load / CLI overrides. Filters never read <c>ConfigStore</c>.
-    /// </remarks>
     public static class ListEntryLength
     {
         /// <summary>
-        /// Default maximum, matching <c>MfrConfig.FilterConfig.MaxListFileLineLength</c>.
+        /// Maximum characters per list entry (name line, casing word, or replace search/replacement).
         /// </summary>
-        public const int DefaultMaxLength = 1000;
+        public const int DefaultMaxLength = 2000;
 
         /// <summary>
-        /// Current maximum list-entry length used at apply/setup when callers omit an explicit max.
+        /// Maximum number of entries in an embedded list.
         /// </summary>
-        public static int MaxLength { get; private set; } = DefaultMaxLength;
+        public const int DefaultMaxEntryCount = 10_000;
 
         /// <summary>
-        /// Sets the Filters-owned maximum list-entry length.
+        /// Maximum characters in a list Filter Configuration text box (paste budget).
         /// </summary>
-        /// <param name="maxListFileLineLength">Maximum characters per list entry (at least 1).</param>
-        public static void Configure(int maxListFileLineLength)
-        {
-            ArgumentOutOfRangeException.ThrowIfLessThan(maxListFileLineLength, 1);
-            MaxLength = maxListFileLineLength;
-        }
+        public const int DefaultEditorTextMaxLength = 500_000;
 
         /// <summary>
         /// Throws <see cref="UserException"/> when <paramref name="value"/> exceeds
@@ -44,6 +35,23 @@ namespace Mfr.Filters
             }
 
             throw new UserException($"{messagePrefix} exceeds maximum length ({maxLen}).");
+        }
+
+        /// <summary>
+        /// Throws <see cref="UserException"/> when <paramref name="count"/> exceeds
+        /// <paramref name="maxCount"/>.
+        /// </summary>
+        /// <param name="count">Number of list entries.</param>
+        /// <param name="listLabel">List name used in the error (e.g. <c>Name-list</c>).</param>
+        /// <param name="maxCount">Maximum allowed entry count.</param>
+        internal static void ThrowIfTooManyEntries(int count, string listLabel, int maxCount)
+        {
+            if (count <= maxCount)
+            {
+                return;
+            }
+
+            throw new UserException($"{listLabel} has too many entries (maximum {maxCount}).");
         }
     }
 }
