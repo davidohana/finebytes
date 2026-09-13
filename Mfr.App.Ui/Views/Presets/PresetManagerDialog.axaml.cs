@@ -5,6 +5,7 @@ using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.Models;
+using Mfr.Models.Config;
 using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.Views.Presets
@@ -21,6 +22,11 @@ namespace Mfr.App.Ui.Views.Presets
         private readonly AppliedFiltersViewModel? _appliedFilters;
         private readonly Func<Task>? _importSamplesAsync;
         private readonly Func<FilterPreset, Task<bool>>? _tryLoadAsync;
+
+        /// <summary>
+        /// When set, replaces <see cref="ConfirmMessageDialog"/> for delete (tests).
+        /// </summary>
+        internal Func<string, string, Task<bool>>? ConfirmDeleteAsync { get; set; }
 
         /// <summary>
         /// Initializes an empty dialog (designer / XAML loader).
@@ -171,8 +177,7 @@ namespace Mfr.App.Ui.Views.Presets
                 names.Count == 1
                     ? $"Delete preset '{names[0]}'? This cannot be undone."
                     : $"Delete {names.Count} presets? This cannot be undone.";
-            var confirm = new ConfirmMessageDialog(title, message);
-            if (await confirm.ShowDialog<bool?>(this) != true)
+            if (!await _ConfirmDeleteAsync(title, message).ConfigureAwait(true))
             {
                 return;
             }
@@ -186,6 +191,30 @@ namespace Mfr.App.Ui.Views.Presets
             {
                 await _ShowErrorAsync(title, ex);
             }
+        }
+
+        /// <summary>
+        /// Confirms deleting selected presets when the confirmation policy requires it.
+        /// </summary>
+        /// <param name="title">Dialog title (singular or plural).</param>
+        /// <param name="message">Dialog body for the current selection.</param>
+        /// <returns>
+        /// <see langword="true"/> when delete may proceed; <see langword="false"/> when the user cancels.
+        /// </returns>
+        private async Task<bool> _ConfirmDeleteAsync(string title, string message)
+        {
+            if (!ConfirmationPolicy.ShouldConfirm(ConfirmationKind.DeletePreset))
+            {
+                return true;
+            }
+
+            if (ConfirmDeleteAsync is { } confirmHook)
+            {
+                return await confirmHook(title, message).ConfigureAwait(true);
+            }
+
+            var confirm = new ConfirmMessageDialog(title, message, kind: ConfirmationKind.DeletePreset);
+            return await confirm.ShowDialog<bool?>(this) == true;
         }
 
         private async void _OnRenameClick(object? sender, RoutedEventArgs e)

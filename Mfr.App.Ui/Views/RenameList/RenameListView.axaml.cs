@@ -11,6 +11,7 @@ using Mfr.App.Ui.Services;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.DragAndDrop;
+using Mfr.Models.Config;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -189,31 +190,49 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             return await _ConfirmMessageAsync(
                     title: "Preview Errors",
-                    message: $"{errorCount} items with preview errors will be ignored. Do you want to continue?"
+                    message: $"{errorCount} items with preview errors will be ignored. Do you want to continue?",
+                    kind: ConfirmationKind.GoWithPreviewErrors
                 )
                 .ConfigureAwait(true);
         }
 
         private async Task<bool> _ConfirmUndoRenameAsync()
         {
-            return await _ConfirmMessageAsync(title: "Undo", message: "Undo this rename operation?")
+            return await _ConfirmMessageAsync(
+                    title: "Undo",
+                    message: "Undo this rename operation?",
+                    kind: ConfirmationKind.UndoRename
+                )
                 .ConfigureAwait(true);
         }
 
         private async Task<bool> _ConfirmClearAsync()
         {
-            return await _ConfirmMessageAsync(title: "Clear Rename List", message: "Clear the Rename List?")
+            return await _ConfirmMessageAsync(
+                    title: "Clear Rename List",
+                    message: "Clear the Rename List?",
+                    kind: ConfirmationKind.ClearRenameList
+                )
                 .ConfigureAwait(true);
         }
 
-        private async Task<bool> _ConfirmMessageAsync(string title, string message)
+        /// <summary>
+        /// Shows a suppressible <see cref="ConfirmMessageDialog"/> for the given kind.
+        /// </summary>
+        /// <param name="title">Dialog title.</param>
+        /// <param name="message">Dialog body.</param>
+        /// <param name="kind">Confirmation kind for the keep-showing checkbox.</param>
+        /// <returns>
+        /// <see langword="true"/> when the user accepts; <see langword="false"/> when cancelled or no owner window.
+        /// </returns>
+        private async Task<bool> _ConfirmMessageAsync(string title, string message, ConfirmationKind kind)
         {
             if (TopLevel.GetTopLevel(this) is not Window owner)
             {
                 return false;
             }
 
-            var dialog = new ConfirmMessageDialog(title: title, message: message);
+            var dialog = new ConfirmMessageDialog(title: title, message: message, kind: kind);
             return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
         }
 

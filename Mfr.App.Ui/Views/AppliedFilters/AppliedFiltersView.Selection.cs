@@ -6,6 +6,7 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.Views.DragAndDrop;
+using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.Views.AppliedFilters
 {
@@ -96,7 +97,11 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return false;
             }
 
-            var dialog = new ConfirmMessageDialog(title: "Remove All Filters", message: "Remove all Applied Filters?");
+            var dialog = new ConfirmMessageDialog(
+                title: "Remove All Filters",
+                message: "Remove all Applied Filters?",
+                kind: ConfirmationKind.ClearAppliedFilters
+            );
             return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
         }
 

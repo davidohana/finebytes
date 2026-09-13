@@ -3,6 +3,7 @@ using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.App.Ui.Views.Presets;
 using Mfr.Models;
+using Mfr.Models.Config;
 using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.Views.AppliedFilters
@@ -13,6 +14,11 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         /// Gets the ▾ quick-pick flyout (tests).
         /// </summary>
         internal MenuFlyout PresetsQuickPickFlyout { get; } = new() { Placement = PlacementMode.BottomEdgeAlignedLeft };
+
+        /// <summary>
+        /// When set, replaces <see cref="ConfirmMessageDialog"/> for overwrite (tests).
+        /// </summary>
+        internal Func<string, Task<bool>>? ConfirmOverwriteAsync { get; set; }
 
         private void _WirePresetHandlers()
         {
@@ -197,17 +203,12 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             }
 
             var name = dialogVm.TrimmedName;
-            if (_viewModel.PresetManager.NameToPreset.ContainsKey(name))
+            if (
+                _viewModel.PresetManager.NameToPreset.ContainsKey(name)
+                && !await ConfirmOverwritePresetAsync(owner, name).ConfigureAwait(true)
+            )
             {
-                var confirm = new ConfirmMessageDialog(
-                    "Overwrite Preset",
-                    $"A preset named '{name}' already exists. Overwrite it?"
-                );
-                var overwrite = await confirm.ShowDialog<bool?>(owner);
-                if (overwrite != true)
-                {
-                    return;
-                }
+                return;
             }
 
             try
@@ -243,7 +244,36 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
             var confirm = new ConfirmMessageDialog(
                 "Replace Applied Filters",
-                "Loading this preset will replace the current Applied Filters list. Continue?"
+                "Loading this preset will replace the current Applied Filters list. Continue?",
+                kind: ConfirmationKind.ReplaceAppliedFiltersOnLoad
+            );
+            return await confirm.ShowDialog<bool?>(owner) == true;
+        }
+
+        /// <summary>
+        /// Confirms overwriting an existing preset when the confirmation policy requires it.
+        /// </summary>
+        /// <param name="owner">Owner window for the confirm dialog.</param>
+        /// <param name="name">Preset name that already exists.</param>
+        /// <returns>
+        /// <see langword="true"/> when save may proceed; <see langword="false"/> when the user cancels.
+        /// </returns>
+        internal async Task<bool> ConfirmOverwritePresetAsync(Window owner, string name)
+        {
+            if (!ConfirmationPolicy.ShouldConfirm(ConfirmationKind.OverwritePreset))
+            {
+                return true;
+            }
+
+            if (ConfirmOverwriteAsync is { } confirmHook)
+            {
+                return await confirmHook(name).ConfigureAwait(true);
+            }
+
+            var confirm = new ConfirmMessageDialog(
+                "Overwrite Preset",
+                $"A preset named '{name}' already exists. Overwrite it?",
+                kind: ConfirmationKind.OverwritePreset
             );
             return await confirm.ShowDialog<bool?>(owner) == true;
         }
