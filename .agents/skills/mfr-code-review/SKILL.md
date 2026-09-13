@@ -17,10 +17,6 @@ description: >-
 Default posture: **correctness first**, then **accurate names**, then **delete and collapse**,
 then **tests that earn their keep**. Prefer a smaller design over a compatible one.
 
-**Prioritize renames** when old symbols (types, methods, fields, params, files, test names)
-no longer match current behavior or ownership — apply them in-pass; do not leave a wrong name
-because rename churn feels large. A stale name is a correctness/clarity bug, not optional polish.
-
 Actively hunt **dedup and reuse** at every scope — local copy-paste, parallel types/views,
 shared policy in two layers, twin APIs, and test fixtures. **Always apply** high-confidence
 local wins in-pass (do not wait for the user to say simplify / auto-correct);
@@ -47,9 +43,9 @@ including plain “review” / “see if” prompts). Do **not** require action 
 simplify, minimize, cleanup, kiss, yagni, or auto-correct:
 
 - Bugs and incorrect edge cases
-- **Renames** when a symbol’s name is inaccurate vs current behavior/ownership (types,
-  methods, fields, params, files, AXAML `x:Class`, test method names) — do these early in the
-  pass so later cleanup uses the right names; rename churn alone is not a reason to propose-only
+- **Inaccurate symbols** — rename early when the name no longer matches behavior/ownership
+  (types, methods, fields, params, files, AXAML `x:Class`, test names). Churn alone is not
+  propose-only; do not park under deeper refactors unless it truly needs a dedicated pass
 - Dead code, unused parameters/flags, leftover APIs, unused wrappers
 - Dual fields/methods that always move together; stale predicates after a behavior change
 - Two names that are too close to tell apart
@@ -84,8 +80,6 @@ order or by how ambitious they sound.
 - **Cost** — behavior/regression **risk**, **LOC added** (net and temporary scaffolding),
   **churn** (files touched, AXAML/VM/test fan-out), test rewrite burden, blast radius
   outside the current feature, and whether the merge needs a dedicated pass vs rides along.
-  Do **not** count fixing an inaccurate symbol name as negative churn under this score —
-  those renames are always-apply, not deeper-refactor tradeoffs.
 
 Prefer a small, low-risk delete over a large elegant merge with high churn. Call out
 **negative** cost-to-value explicitly (high cost, weak payoff) and put those last or under
@@ -181,10 +175,6 @@ session, not process config.
 
 ### Naming and docs
 
-- **Rename first when inaccurate.** After any behavior or ownership change, hunt symbols whose
-  names still describe the old job (including files, namespaces, and test titles). Apply the
-  rename in-pass; do not keep the old symbol “for less churn” or park it under deeper refactors
-  unless the rename truly needs a dedicated multi-feature pass (then still list it high).
 - A name must match **current** behavior. Drop hedges (`Maybe`, `Effective`). Avoid jargon.
 - Two identifiers that cannot be told apart at a glance are too close — rename them.
 - Fields and params should name the type or unit, not a vague role.
@@ -225,7 +215,7 @@ Lead with a one-paragraph verdict. Then:
 
 ```markdown
 ## Correctness (fixed | found)
-## Naming / docs (renames applied | proposed — inaccurate old symbols first)
+## Naming / docs (applied | proposed)
 ## KISS / YAGNI (removed | proposed)
 ## Dedup / reuse (applied | proposed)
 ## Tests (added | consolidated | skipped)
@@ -233,9 +223,7 @@ Lead with a one-paragraph verdict. Then:
 ## What to keep / what not to simplify
 ```
 
-Be specific (type/method names). Separate **applied** from **proposed**. Under **Naming**,
-list inaccurate-symbol renames before cosmetic renames; if a wrong name was left unapplied,
-say why (findings-only, or true dedicated-pass blast radius).
+Be specific (type/method names). Separate **applied** from **proposed**.
 
 **Dedup / reuse** and **Deeper refactors** may overlap — use Dedup for concrete duplication
 found; use Deeper refactors for structural follow-ups (shared types, layer moves, multi-file
