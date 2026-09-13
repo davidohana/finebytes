@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: p5-docs-debt
     content: "P5: debts.md + keyboard-shortcuts verify; plan complete"
-    status: pending
+    status: completed
 isProject: false
 ---
 
