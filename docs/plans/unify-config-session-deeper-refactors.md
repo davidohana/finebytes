@@ -27,6 +27,7 @@ ______________________________________________________________________
 | Shared case-insensitive JSON property get                                                          | **Done** — `JsonObjectProperties` in Utils; ConfigStore / ConfigJsonApplier / ConfigValueReader                         |
 | Rename `FilterDefaultsStore.OpenDefault`                                                           | **Done** — `FromConfigStore` (vs file-backed `PresetManager.OpenDefault`)                                               |
 | Collapse ConfigStore\* / FilterDefaults test fixtures                                              | **Done** — `ConfigStoreTempFile`; Prefs Delete dupes removed (kept `ConfigStoreDeleteDefaultFileTests`)                 |
+| Split `ConfigStore` into separate prefs I/O type                                                   | **Rejected** — tried `ConfigPrefsDocument`; reverted; keep I/O on `ConfigStore`                                         |
 
 ______________________________________________________________________
 
@@ -38,10 +39,9 @@ ______________________________________________________________________
 
 ## Low / skip unless already touching that code
 
-| #   | Item                                                                                                                       | Why skip / defer                                                                                                                 |
-| --- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Split `ConfigStore` into separate prefs I/O type                                                                           | Flat `_ReadSection` / `_WriteSection` already landed; ~490 LOC is large but further split is churn unless the type keeps growing |
-| 2   | Rewrite historical plan prose elsewhere (`whole-codebase-review`, `applied-filter-editors`) for old `session.json` wording | Archive; leave as history                                                                                                        |
+| #   | Item                                                                                                                       | Why skip / defer          |
+| --- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| 1   | Rewrite historical plan prose elsewhere (`whole-codebase-review`, `applied-filter-editors`) for old `session.json` wording | Archive; leave as history |
 
 ______________________________________________________________________
 
@@ -51,3 +51,4 @@ ______________________________________________________________________
 - Opaque `JsonObject FilterDefaultsJson` in Models + typed cache in Engine (do not deserialize `BaseFilter` in Models for prefs).
 - Reset: delete `config.json` only → suppress session close-save → try restart → **always exit** (even if spawn fails). Do not clear in-memory prefs; next process soft-loads defaults. Do not drop suppress without fixing VM/store identity on a surviving process.
 - Do **not** reintroduce nested `session` wrapper, `SessionStore`, or readers for legacy `session.json` / `filter-defaults.json`.
+- Do **not** split `ConfigStore` into a separate prefs document I/O type.
