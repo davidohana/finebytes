@@ -230,13 +230,25 @@
     <Setter Property="AcceptsReturn" Value="False" />
     <Setter Property="VerticalContentAlignment" Value="Top" />
   </Style>
-  <!-- Line-oriented list editors (Name List, etc.): NoWrap avoids full reflow on huge pastes. -->
+  <!-- Line-oriented list editors (Name List, etc.): NoWrap + height cap; TextBox is not virtualized. -->
   <Style Selector="TextBox.filter-editor-field-multiline">
     <Setter Property="TextWrapping" Value="NoWrap" />
     <Setter Property="AcceptsReturn" Value="True" />
     <Setter Property="VerticalContentAlignment" Value="Top" />
+    <Setter Property="MaxHeight" Value="240" />
     <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto" />
     <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+  </Style>
+  <Style Selector="AvaloniaEdit|TextEditor.filter-list-editor">
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+    <Setter Property="BorderBrush" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Padding" Value="4,2" />
+    <Setter Property="HorizontalScrollBarVisibility" Value="Auto" />
+    <Setter Property="VerticalScrollBarVisibility" Value="Auto" />
   </Style>
   <Style Selector="TextBox.format-string-field">
     <Setter Property="FontFamily" Value="{DynamicResource AppChromeFixedWidthFont}" />

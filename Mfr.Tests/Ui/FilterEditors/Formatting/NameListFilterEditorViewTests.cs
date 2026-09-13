@@ -1,8 +1,8 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
-using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using AvaloniaEdit;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
@@ -37,15 +37,14 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             Assert.IsType<NameListFilterEditorViewModel>(mainViewModel.FilterEditorViewModel.OptionsEditor);
 
             var editor = editorView.GetVisualDescendants().OfType<NameListFilterEditorView>().Single();
-            var entries = editor.FindControl<TextBox>("EntriesBox");
+            var entries = editor.FindControl<TextEditor>("EntriesBox");
             var prefix = editor.FindControl<FormatEditorControl>("PrefixEditor");
             var suffix = editor.FindControl<FormatEditorControl>("SuffixEditor");
             Assert.NotNull(entries);
             Assert.NotNull(prefix);
             Assert.NotNull(suffix);
-            Assert.True(entries.AcceptsReturn);
-            Assert.Equal(TextWrapping.NoWrap, entries.TextWrapping);
-            Assert.Equal(ListEntryLength.DefaultEditorTextMaxLength, entries.MaxLength);
+            Assert.False(entries.WordWrap);
+            Assert.Equal(NameListFilterEditorView.EntriesMaxHeight, entries.MaxHeight);
             Assert.False(prefix.AcceptsReturn);
             Assert.False(suffix.AcceptsReturn);
             Assert.Equal(string.Empty, entries.Text);
@@ -62,6 +61,58 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             Assert.Equal(["Alpha", "Beta"], filter.Options.Entries);
             Assert.Equal("pre_", filter.Options.Prefix);
             Assert.Equal("_suf", filter.Options.Suffix);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies a large Name List document stays inside the editor ceiling instead of expanding
+        /// Filter Configuration's unconstrained <see cref="ScrollViewer"/>.
+        /// </summary>
+        [AvaloniaFact]
+        public void Large_entries_stay_within_max_height()
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("NameList"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<NameListFilterEditorView>().Single();
+            var entries = editor.FindControl<TextEditor>("EntriesBox");
+            Assert.NotNull(entries);
+
+            entries.Text = string.Join('\n', Enumerable.Range(0, 80).Select(i => $"name-{i}.mp3"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(entries.Bounds.Height <= NameListFilterEditorView.EntriesMaxHeight + 1);
+
+            var scroll = editorView.GetVisualDescendants().OfType<ScrollViewer>().First();
+            Assert.True(scroll.Extent.Height < 2000);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies the entries document is truncated to the paste budget without throwing.
+        /// </summary>
+        [AvaloniaFact]
+        public void Entries_paste_budget_truncates_document()
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("NameList"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<NameListFilterEditorView>().Single();
+            var entries = editor.FindControl<TextEditor>("EntriesBox");
+            Assert.NotNull(entries);
+
+            entries.Text = new string('a', ListEntryLength.DefaultEditorTextMaxLength + 50);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(ListEntryLength.DefaultEditorTextMaxLength, entries.Text.Length);
 
             window.Close();
         }
