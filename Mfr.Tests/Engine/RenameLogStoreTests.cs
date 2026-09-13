@@ -296,6 +296,74 @@ namespace Mfr.Tests.Engine
             Assert.Contains(written, remaining);
         }
 
+        /// <summary>
+        /// Verifies disk list is newest-first by filename and titles format from yyyyMMddHHmmss stamps.
+        /// </summary>
+        [Fact]
+        public void ListDiskFilePaths_Newest_First_And_FormatDiskListTitle()
+        {
+            var logDir = _tempDirectoryFixture.CreateTempDir();
+            var older = logDir.CombinePath($"20260101000000{RenameLogStore.FileExtension}");
+            var newer = logDir.CombinePath($"20260201120030{RenameLogStore.FileExtension}");
+            File.WriteAllText(older, "{}");
+            File.WriteAllText(newer, "{}");
+
+            var listed = RenameLogStore.ListDiskFilePaths(logDir);
+
+            Assert.Equal([newer, older], listed);
+            Assert.Equal("01/02/2026 12:00:30", RenameLogStore.FormatDiskListTitle(newer));
+            Assert.Equal(
+                "01/01/2026 00:00:00",
+                RenameLogStore.FormatDiskListTitle(
+                    logDir.CombinePath($"20260101000000-1{RenameLogStore.FileExtension}")
+                )
+            );
+        }
+
+        /// <summary>
+        /// Verifies TryLoadFile rejects JSON without an entries array (avoids null Entries NREs in the UI).
+        /// </summary>
+        [Fact]
+        public void TryLoadFile_Rejects_Missing_Entries()
+        {
+            var logDir = _tempDirectoryFixture.CreateTempDir();
+            var path = logDir.CombinePath($"20260101000000{RenameLogStore.FileExtension}");
+            File.WriteAllText(path, "{}");
+
+            Assert.Null(RenameLogStore.TryLoadFile(path));
+        }
+
+        /// <summary>
+        /// Verifies TryLoadFile round-trips CaptureFromCommit JSON and TryDeleteFile removes it.
+        /// </summary>
+        [Fact]
+        public void TryLoadFile_And_TryDeleteFile_RoundTrip()
+        {
+            var logDir = _tempDirectoryFixture.CreateTempDir();
+            var results = new[]
+            {
+                _CommitOkResult(
+                    originalPath: TestPaths.Absolute("old.txt"),
+                    destinationPath: TestPaths.Absolute("new.txt"),
+                    oldPrefix: "old",
+                    newPrefix: "new"
+                ),
+            };
+
+            var writtenPath = RenameLogStore.CaptureFromCommit(results, directoryPath: logDir, limit: 10);
+            Assert.NotNull(writtenPath);
+
+            var loaded = RenameLogStore.TryLoadFile(writtenPath);
+            Assert.NotNull(loaded);
+            Assert.True(loaded.HasUndoableEntries);
+            Assert.Equal(TestPaths.Absolute("new.txt"), Assert.Single(loaded.Entries).DestinationPath);
+            Assert.Contains("Changed 'Prefix'", loaded.FormatDetails());
+
+            Assert.True(RenameLogStore.TryDeleteFile(writtenPath));
+            Assert.False(File.Exists(writtenPath));
+            Assert.Null(RenameLogStore.TryLoadFile(writtenPath));
+        }
+
         private static RenameResultItem _CommitOkResult(
             string originalPath,
             string destinationPath,

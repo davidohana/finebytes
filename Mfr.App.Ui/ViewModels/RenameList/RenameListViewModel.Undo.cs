@@ -5,7 +5,7 @@ using Mfr.Models.Rename;
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Undo Last orchestration for <see cref="RenameListViewModel"/>.
+    /// Undo Last / Log-window Undo orchestration for <see cref="RenameListViewModel"/>.
     /// </summary>
     public sealed partial class RenameListViewModel
     {
@@ -16,15 +16,41 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <see langword="true"/> when the undo commit stage was reached; <see langword="false"/> when there was
         /// nothing to undo, confirm was declined, or the operation was refused while busy.
         /// </returns>
-        public async Task<bool> UndoLastAsync()
+        public Task<bool> UndoLastAsync()
         {
+            var log = RenameLogStore.LastOperation;
+            if (log is null || !log.HasUndoableEntries)
+            {
+                if (IsBusy)
+                {
+                    return Task.FromResult(false);
+                }
+
+                LastStatusMessage = StatusBarText.Warning("Nothing to undo.");
+                return Task.FromResult(false);
+            }
+
+            return UndoAsync(log);
+        }
+
+        /// <summary>
+        /// Confirms (when policy requires), rebuilds the list from <paramref name="log"/>, and re-commits OldValues.
+        /// </summary>
+        /// <param name="log">Rename operation to reverse (last op or a loaded disk log).</param>
+        /// <returns>
+        /// <see langword="true"/> when the undo commit stage was reached; <see langword="false"/> when there was
+        /// nothing to undo, confirm was declined, or the operation was refused while busy.
+        /// </returns>
+        public async Task<bool> UndoAsync(RenameLog log)
+        {
+            ArgumentNullException.ThrowIfNull(log);
+
             if (IsBusy)
             {
                 return false;
             }
 
-            var log = RenameLogStore.LastOperation;
-            if (log is null || !log.HasUndoableEntries)
+            if (!log.HasUndoableEntries)
             {
                 LastStatusMessage = StatusBarText.Warning("Nothing to undo.");
                 return false;

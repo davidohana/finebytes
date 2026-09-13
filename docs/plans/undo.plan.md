@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: p3-log-window
     content: "P3: Show Log dialog — list/details/Undo/Erase including disk history"
-    status: pending
+    status: completed
   - id: p4-options-retention
     content: "P4: Options Undo & Log retention UI for renameLog.limit"
     status: pending

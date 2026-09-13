@@ -12,6 +12,7 @@ using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Engine.Presets;
 using Mfr.Engine.RenameLog;
 using Mfr.Models.Config;
+using Mfr.Models.Rename;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels.MainWindow
@@ -254,6 +255,30 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
+        /// Undoes a rename log chosen in the Rename Log dialog (same confirm + re-commit as Undo Last).
+        /// </summary>
+        /// <param name="log">Log selected in the dialog (last op or disk).</param>
+        internal async Task UndoFromLogAsync(RenameLog log)
+        {
+            ArgumentNullException.ThrowIfNull(log);
+
+            await WaitForPendingPreviewAsync().ConfigureAwait(true);
+            if (RenameListViewModel.IsBusy)
+            {
+                return;
+            }
+
+            var undoStarted = await RenameListViewModel.UndoAsync(log).ConfigureAwait(true);
+            UndoLastCommand.NotifyCanExecuteChanged();
+            if (!undoStarted)
+            {
+                return;
+            }
+
+            await _RefreshFileListAfterRenameCommitAsync().ConfigureAwait(true);
+        }
+
+        /// <summary>
         /// Reloads the File List after GO/Undo and re-previews when Auto-Preview is on.
         /// </summary>
         private async Task _RefreshFileListAfterRenameCommitAsync()
@@ -270,10 +295,13 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Opens the log window. Placeholder until the log is implemented.
+        /// Opens the Rename Log dialog (disk history + last operation).
         /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanExecuteUnimplemented))]
-        public void ShowLog() { }
+        [RelayCommand]
+        public void ShowLog()
+        {
+            LogRequested?.Invoke(this, EventArgs.Empty);
+        }
 
         /// <summary>
         /// Opens the Options dialog (remember flags and preset confirm).
@@ -294,6 +322,11 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// Raised when the user chooses MFR → Options; the main window hosts the dialog.
         /// </summary>
         internal event EventHandler? OptionsRequested;
+
+        /// <summary>
+        /// Raised when the user chooses MFR → Log; the main window hosts the dialog.
+        /// </summary>
+        internal event EventHandler? LogRequested;
 
         /// <summary>
         /// Raised when the user chooses Tools → Reset Configuration; the main window confirms and restarts.
@@ -506,11 +539,6 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             }
 
             StatusHint = message;
-        }
-
-        private static bool _CanExecuteUnimplemented()
-        {
-            return false;
         }
 
         private static string _GetDisplayVersion()

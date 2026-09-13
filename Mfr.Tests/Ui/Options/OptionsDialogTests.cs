@@ -25,7 +25,7 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies Options is enabled while Log remains a stub and Undo Last stays disabled with no last op.
+        /// Verifies Options and Log are enabled while Undo Last stays disabled with no last op.
         /// </summary>
         [AvaloniaFact]
         public void ShowOptionsCommand_is_enabled()
@@ -33,7 +33,7 @@ namespace Mfr.Tests.Ui.Options
             var viewModel = new MainWindowViewModel(persistSession: true);
             Assert.True(viewModel.ShowOptionsCommand.CanExecute(null));
             Assert.False(viewModel.UndoLastCommand.CanExecute(null));
-            Assert.False(viewModel.ShowLogCommand.CanExecute(null));
+            Assert.True(viewModel.ShowLogCommand.CanExecute(null));
         }
 
         /// <summary>

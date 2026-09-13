@@ -4,8 +4,10 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Session;
+using Mfr.App.Ui.ViewModels.LogDialog;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.Options;
+using Mfr.App.Ui.Views.LogDialog;
 using Mfr.App.Ui.Views.Options;
 using Mfr.Engine.Config;
 using Mfr.Models.Config;
@@ -20,6 +22,7 @@ namespace Mfr.App.Ui.Views.MainWindow
         private MainWindowViewModel? _boundViewModel;
         private bool _resetConfigurationInProgress;
         private bool _optionsDialogInProgress;
+        private bool _logDialogInProgress;
 
         /// <summary>
         /// Initializes the main window.
@@ -40,6 +43,11 @@ namespace Mfr.App.Ui.Views.MainWindow
         /// Optional Options dialog overrides for headless tests; leave null in production.
         /// </summary>
         internal OptionsDialogHooks? OptionsDialogHooks { get; set; }
+
+        /// <summary>
+        /// Optional Rename Log dialog overrides for headless tests; leave null in production.
+        /// </summary>
+        internal RenameLogDialogHooks? RenameLogDialogHooks { get; set; }
 
         /// <summary>
         /// Builds the pane-grid handle used by session splitter restore/capture.
@@ -63,6 +71,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                 _boundViewModel.AppliedFiltersViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
                 _boundViewModel.AppliedFiltersViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
                 _boundViewModel.OptionsRequested -= _OnOptionsRequested;
+                _boundViewModel.LogRequested -= _OnLogRequested;
                 _boundViewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
                 _boundViewModel = null;
             }
@@ -76,6 +85,7 @@ namespace Mfr.App.Ui.Views.MainWindow
             viewModel.AppliedFiltersViewModel.FilterDefaultSaved += _OnFilterDefaultSaved;
             viewModel.AppliedFiltersViewModel.FilterHelpMissing += _OnFilterHelpMissing;
             viewModel.OptionsRequested += _OnOptionsRequested;
+            viewModel.LogRequested += _OnLogRequested;
             viewModel.ResetConfigurationRequested += _OnResetConfigurationRequested;
         }
 
@@ -92,6 +102,11 @@ namespace Mfr.App.Ui.Views.MainWindow
         private void _OnOptionsRequested(object? sender, EventArgs e)
         {
             Dispatcher.UIThread.Post(() => _ = _ShowOptionsAsync());
+        }
+
+        private void _OnLogRequested(object? sender, EventArgs e)
+        {
+            Dispatcher.UIThread.Post(() => _ = _ShowLogAsync());
         }
 
         private void _OnResetConfigurationRequested(object? sender, EventArgs e)
@@ -167,6 +182,50 @@ namespace Mfr.App.Ui.Views.MainWindow
             finally
             {
                 _optionsDialogInProgress = false;
+            }
+        }
+
+        /// <summary>
+        /// Hosts the Rename Log dialog; on Undo closes then runs the same undo path as Undo Last.
+        /// </summary>
+        private async Task _ShowLogAsync()
+        {
+            if (_logDialogInProgress)
+            {
+                return;
+            }
+
+            if (DataContext is not MainWindowViewModel viewModel)
+            {
+                return;
+            }
+
+            _logDialogInProgress = true;
+            try
+            {
+                var dialogVm = new RenameLogDialogViewModel();
+                var hooks = RenameLogDialogHooks;
+                bool? accepted;
+                if (hooks?.Show is not null)
+                {
+                    accepted = await hooks.Show(dialogVm);
+                }
+                else
+                {
+                    var dialog = new RenameLogDialog(dialogVm);
+                    accepted = await dialog.ShowDialog<bool?>(this);
+                }
+
+                if (accepted != true || dialogVm.LogToUndo is null)
+                {
+                    return;
+                }
+
+                await viewModel.UndoFromLogAsync(dialogVm.LogToUndo).ConfigureAwait(true);
+            }
+            finally
+            {
+                _logDialogInProgress = false;
             }
         }
 
@@ -335,6 +394,7 @@ namespace Mfr.App.Ui.Views.MainWindow
             viewModel.AppliedFiltersViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
             viewModel.AppliedFiltersViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
             viewModel.OptionsRequested -= _OnOptionsRequested;
+            viewModel.LogRequested -= _OnLogRequested;
             viewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
 
             if (viewModel.SuppressSessionSaveOnClose)

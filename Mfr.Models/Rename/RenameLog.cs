@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Mfr.Models.Rename
 {
     /// <summary>
@@ -16,6 +18,45 @@ namespace Mfr.Models.Rename
         /// </para>
         /// </remarks>
         public bool HasUndoableEntries => Entries.Any(static entry => entry.IsUndoable);
+
+        /// <summary>
+        /// Formats this log for the Rename Log details pane (date, item count, per-item changes/errors).
+        /// </summary>
+        /// <returns>Multi-line plain text suitable for a read-only details box.</returns>
+        public string FormatDetails()
+        {
+            var builder = new StringBuilder();
+            builder.Append("Log Date: ").Append(CommittedAt.ToLocalTime().ToString("G")).AppendLine();
+            builder.AppendLine();
+            builder.Append("Processed ").Append(Entries.Count).Append(" Items").AppendLine();
+            builder.AppendLine();
+
+            foreach (var entry in Entries)
+            {
+                builder.Append("Item: ").Append(entry.DestinationPath).AppendLine();
+                foreach (var change in entry.Changes)
+                {
+                    builder
+                        .Append("Changed '")
+                        .Append(change.Property)
+                        .Append("' from '")
+                        .Append(change.OldValue)
+                        .Append("' to '")
+                        .Append(change.NewValue)
+                        .Append('\'')
+                        .AppendLine();
+                }
+
+                if (entry.Error is not null)
+                {
+                    builder.Append("Error: ").Append(entry.Error).AppendLine();
+                }
+
+                builder.AppendLine();
+            }
+
+            return builder.ToString();
+        }
     }
 
     /// <summary>

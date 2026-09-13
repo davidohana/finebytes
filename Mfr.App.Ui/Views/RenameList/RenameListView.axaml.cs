@@ -196,7 +196,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
         private async Task<bool> _ConfirmUndoRenameAsync()
         {
-            return await _ConfirmMessageAsync(title: "Undo Last", message: "Undo the last rename operation?")
+            return await _ConfirmMessageAsync(title: "Undo", message: "Undo this rename operation?")
                 .ConfigureAwait(true);
         }
 
