@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: p3-cut-copy
     content: "P3: IFileClipboard CF_HDROP + DropEffect; Cut/Copy; ghosting"
-    status: pending
+    status: completed
   - id: p4-paste
     content: "P4: Paste into CurrentPath; Ctrl+V; Explorer round-trip"
     status: pending
@@ -133,7 +133,7 @@ flowchart LR
 ### P3 — Cut / Copy clipboard write + ghosting
 
 - **Scope:** `IFileClipboard` Win32 write (files + `Preferred DropEffect` Copy vs Move); menu **Cut** / **Copy**; Ctrl+X / Ctrl+C; cut-mark collection + AXAML opacity/style on matching rows; clear marks when clipboard replaced or SetCopy.
-- **Exit:** Cut/Copy enable with selection; Explorer can Paste a Copy from MFR; cut rows look ghosted in current listing.
+- **Exit:** Cut/Copy enable with selection; Explorer can Paste a Copy from MFR (**manual QA** on Windows — not automated); cut rows look ghosted in current listing.
 - **Tests:** fake clipboard; VM cut/copy; style/ghost unit or headless binding check. Explorer round-trip = manual QA note in phase exit.
 
 ### P4 — Paste into current folder

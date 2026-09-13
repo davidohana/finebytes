@@ -9,7 +9,7 @@ namespace Mfr.App.Ui.Input
     /// Window-level <see cref="KeyBinding"/>s use the members here, including File List
     /// view types (Ctrl+1 through Ctrl+6). Pane-local keys (Backspace, thumbnail zoom,
     /// address Enter/Esc, Applied Filters Del/Ctrl+Arrow, Properties Alt+Enter, File List
-    /// Del / Shift+Del) are handled in the pane views. Toolbar tip text lives in
+    /// Cut/Copy, Del / Shift+Del) are handled in the pane views. Toolbar tip text lives in
     /// <see cref="Resources.AppTips"/>.
     /// </para>
     /// </summary>
@@ -95,6 +95,12 @@ namespace Mfr.App.Ui.Input
 
         /// <summary>Shows the OS property sheet for the focused File List or Rename List item.</summary>
         public static KeyGesture ShowProperties { get; } = new(Key.Enter, KeyModifiers.Alt);
+
+        /// <summary>Cuts the File List selection to the Explorer file clipboard when the listing has focus.</summary>
+        public static KeyGesture FileListCut { get; } = new(Key.X, KeyModifiers.Control);
+
+        /// <summary>Copies the File List selection to the Explorer file clipboard when the listing has focus.</summary>
+        public static KeyGesture FileListCopy { get; } = new(Key.C, KeyModifiers.Control);
 
         /// <summary>Deletes the File List selection to the Recycle Bin when the listing has focus.</summary>
         public static KeyGesture FileListDelete { get; } = new(Key.Delete);

@@ -63,5 +63,17 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// Gets the file length in bytes used when sorting the Size column.
         /// </summary>
         public long? Length { get; init; }
+
+        /// <summary>
+        /// Gets or sets whether this row is dimmed because it is on the File List cut clipboard.
+        /// </summary>
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(DisplayOpacity))]
+        private bool _isCutMarked;
+
+        /// <summary>
+        /// Gets row opacity for cut ghosting (dimmed when <see cref="IsCutMarked"/>).
+        /// </summary>
+        public double DisplayOpacity => IsCutMarked ? 0.45 : 1.0;
     }
 }

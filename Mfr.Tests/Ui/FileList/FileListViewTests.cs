@@ -78,6 +78,8 @@ namespace Mfr.Tests.Ui.FileList
                 Assert.Contains("Add All", headers);
                 Assert.Contains("Show in Explorer", headers);
                 Assert.Contains("Properties", headers);
+                Assert.Contains("Cut", headers);
+                Assert.Contains("Copy", headers);
                 Assert.Contains("Copy path", headers);
                 Assert.Contains("Delete", headers);
                 Assert.Contains("Refresh", headers);
@@ -277,6 +279,88 @@ namespace Mfr.Tests.Ui.FileList
             var call = Assert.Single(ops.Deletes);
             Assert.Equal([alpha.FullPath], call.Paths);
             Assert.False(call.Recycle);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Ctrl+X on the Report grid cuts the selection via the file clipboard.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_Grid_Ctrl_X_Cuts_Selection()
+        {
+            var fileClipboard = new RecordingFileClipboard();
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance,
+                fileClipboard: fileClipboard
+            );
+            _viewModels.Add(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 560,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([alpha, beta], beta);
+            window.UpdateLayout();
+
+            var grid = view.FindControl<DataGrid>("ReportGrid");
+            Assert.NotNull(grid);
+            _RaiseKeyDown(grid, Key.X, KeyModifiers.Control);
+
+            Assert.Equal([alpha.FullPath, beta.FullPath], Assert.Single(fileClipboard.Cuts));
+            Assert.True(alpha.IsCutMarked);
+            Assert.Equal(0.45, alpha.DisplayOpacity);
+
+            var row = grid.GetVisualDescendants().OfType<DataGridRow>().FirstOrDefault(r => r.DataContext == alpha);
+            Assert.NotNull(row);
+            Assert.Equal(0.45, row.Opacity);
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Ctrl+C on the Report grid copies the selection via the file clipboard.
+        /// </summary>
+        [AvaloniaFact]
+        public void Report_Grid_Ctrl_C_Copies_Selection()
+        {
+            var fileClipboard = new RecordingFileClipboard();
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                _CreateSampleDir(),
+                NullFileShellOpener.Instance,
+                fileClipboard: fileClipboard
+            );
+            _viewModels.Add(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 560,
+                Height = 360,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+            window.UpdateLayout();
+
+            var grid = view.FindControl<DataGrid>("ReportGrid");
+            Assert.NotNull(grid);
+            _RaiseKeyDown(grid, Key.C, KeyModifiers.Control);
+
+            Assert.Equal([alpha.FullPath], Assert.Single(fileClipboard.Copies));
+            Assert.False(alpha.IsCutMarked);
             window.Close();
         }
 

@@ -65,6 +65,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private readonly IFileShellOpener _shellOpener;
         private readonly IFileShellOperations _shellOperations;
         private readonly ITextClipboard _clipboard;
+        private readonly IFileClipboard _fileClipboard;
         private readonly FileListThumbnailSession _thumbnails = new();
         private readonly List<FileListListedItem> _listedItems = [];
         private readonly List<FileListEntry> _selectedEntries = [];
@@ -90,18 +91,24 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="shellOperations">
         /// Shell delete/copy/move, or <see langword="null"/> to use the OS default.
         /// </param>
+        /// <param name="fileClipboard">
+        /// Explorer file clipboard for Cut/Copy, or <see langword="null"/> to use the OS default.
+        /// </param>
         public FileListViewModel(
             ISystemIconProvider? iconProvider,
             string? initialPath,
             IFileShellOpener? shellOpener = null,
             ITextClipboard? clipboard = null,
-            IFileShellOperations? shellOperations = null
+            IFileShellOperations? shellOperations = null,
+            IFileClipboard? fileClipboard = null
         )
         {
             _iconProvider = iconProvider ?? SystemIconProvider.CreateDefault();
             _shellOpener = shellOpener ?? FileShellOpener.CreateDefault();
             _shellOperations = shellOperations ?? FileShellOperations.CreateDefault();
             _clipboard = clipboard ?? new DesktopTextClipboard();
+            _fileClipboard = fileClipboard ?? FileClipboard.CreateDefault();
+            _fileClipboard.Changed += _OnFileClipboardChanged;
             Entries = [];
             MaskSuggestions = [.. _DefaultMasks];
             PathHistory = [];
@@ -241,6 +248,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
         [NotifyCanExecuteChangedFor(nameof(CopyPathCommand))]
         [NotifyCanExecuteChangedFor(nameof(ShowInExplorerCommand))]
         [NotifyCanExecuteChangedFor(nameof(ShowPropertiesCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CutCommand))]
+        [NotifyCanExecuteChangedFor(nameof(CopyCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeleteCommand))]
         [NotifyCanExecuteChangedFor(nameof(DeletePermanentCommand))]
         private FileListEntry? _selectedEntry;
@@ -251,7 +260,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public IReadOnlyList<FileListEntry> SelectedEntries => _selectedEntries;
 
         /// <summary>
-        /// Gets the most recent high-signal File List status-bar message (Copy path, Delete).
+        /// Gets the most recent high-signal File List status-bar message (Copy path, Cut/Copy, Delete).
         /// </summary>
         [ObservableProperty]
         private StyledTextDisplay _lastStatusMessage = StyledTextDisplay.Empty;
@@ -555,9 +564,27 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
+        /// Cuts the File List selection to the Explorer file clipboard (Preferred DropEffect Move).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanOperateOnSelection))]
+        public void Cut()
+        {
+            _WriteFileClipboard(cut: true);
+        }
+
+        /// <summary>
+        /// Copies the File List selection to the Explorer file clipboard (Preferred DropEffect Copy).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanOperateOnSelection))]
+        public void Copy()
+        {
+            _WriteFileClipboard(cut: false);
+        }
+
+        /// <summary>
         /// Deletes the File List selection to the Recycle Bin (shell UI confirms as needed).
         /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanDeleteSelection))]
+        [RelayCommand(CanExecute = nameof(_CanOperateOnSelection))]
         public void Delete()
         {
             _DeleteSelection(recycle: true);
@@ -566,7 +593,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <summary>
         /// Permanently deletes the File List selection (shell UI confirms; no app dialog).
         /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanDeleteSelection))]
+        [RelayCommand(CanExecute = nameof(_CanOperateOnSelection))]
         public void DeletePermanent()
         {
             _DeleteSelection(recycle: false);
@@ -639,6 +666,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         public void Dispose()
         {
+            _fileClipboard.Changed -= _OnFileClipboardChanged;
             _thumbnails.Dispose();
         }
 
@@ -883,9 +911,50 @@ namespace Mfr.App.Ui.ViewModels.FileList
             return SelectedEntry is not null;
         }
 
-        private bool _CanDeleteSelection()
+        /// <summary>
+        /// Gets whether Cut / Copy / Delete can run on the current File List selection.
+        /// </summary>
+        private bool _CanOperateOnSelection()
         {
             return _selectedEntries.Count > 0 && !FileListPath.IsComputerPath(CurrentPath);
+        }
+
+        /// <summary>
+        /// Writes the current selection to the file clipboard and publishes status.
+        /// <para>
+        /// Cut ghosting updates via <see cref="IFileClipboard.Changed"/>.
+        /// </para>
+        /// </summary>
+        /// <param name="cut">When <see langword="true"/>, Cut (Move); otherwise Copy.</param>
+        private void _WriteFileClipboard(bool cut)
+        {
+            if (!_CanOperateOnSelection())
+            {
+                return;
+            }
+
+            var paths = _selectedEntries.Select(entry => entry.FullPath).ToList();
+            var itemCount = paths.Count;
+            try
+            {
+                if (cut)
+                {
+                    _fileClipboard.SetCut(paths);
+                }
+                else
+                {
+                    _fileClipboard.SetCopy(paths);
+                }
+            }
+            catch (Exception ex)
+            {
+                LastStatusMessage = StatusBarText.Error(ex.Message);
+                return;
+            }
+
+            LastStatusMessage = StatusBarText.Neutral(
+                cut ? $"Cut {itemCount} item(s)." : $"Copied {itemCount} item(s)."
+            );
         }
 
         /// <summary>
@@ -894,7 +963,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="recycle">When <see langword="true"/>, Recycle Bin; otherwise permanent delete.</param>
         private void _DeleteSelection(bool recycle)
         {
-            if (!_CanDeleteSelection())
+            if (!_CanOperateOnSelection())
             {
                 return;
             }
@@ -931,12 +1000,31 @@ namespace Mfr.App.Ui.ViewModels.FileList
             return StatusBarText.Error($"{verb} failed.");
         }
 
+        private void _OnFileClipboardChanged(object? sender, EventArgs e)
+        {
+            _ApplyCutMarks();
+        }
+
+        /// <summary>
+        /// Syncs <see cref="FileListEntry.IsCutMarked"/> from the file clipboard cut set.
+        /// </summary>
+        private void _ApplyCutMarks()
+        {
+            var cutPaths = _fileClipboard.CutPaths;
+            foreach (var entry in Entries)
+            {
+                entry.IsCutMarked = cutPaths.Contains(entry.FullPath);
+            }
+        }
+
         private void _NotifySelectionCommandsChanged()
         {
             OpenSelectedCommand.NotifyCanExecuteChanged();
             CopyPathCommand.NotifyCanExecuteChanged();
             ShowInExplorerCommand.NotifyCanExecuteChanged();
             ShowPropertiesCommand.NotifyCanExecuteChanged();
+            CutCommand.NotifyCanExecuteChanged();
+            CopyCommand.NotifyCanExecuteChanged();
             DeleteCommand.NotifyCanExecuteChanged();
             DeletePermanentCommand.NotifyCanExecuteChanged();
         }
@@ -1033,6 +1121,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
             {
                 _thumbnails.BeginLoad(Entries);
             }
+
+            _ApplyCutMarks();
         }
 
         private FileListEntry _CreateEntry(FileListListedItem item)

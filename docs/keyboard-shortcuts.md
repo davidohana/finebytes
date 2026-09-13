@@ -41,6 +41,8 @@ Ctrl+L is the address bar (Explorer / Chrome). Log is Ctrl+Shift+L so the two do
 | First item            | Home                                               | File listing focused, not while typing |
 | Last item             | End                                                | File listing focused, not while typing |
 | Properties            | Alt+Enter                                          | File listing focused                   |
+| Cut                   | Ctrl+X                                             | File listing focused                   |
+| Copy                  | Ctrl+C                                             | File listing focused                   |
 | Delete to Recycle Bin | Del                                                | File listing focused                   |
 | Permanent delete      | Shift+Del                                          | File listing focused                   |
 | Commit typed path     | Enter                                              | Address bar edit                       |

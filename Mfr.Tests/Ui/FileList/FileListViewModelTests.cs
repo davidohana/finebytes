@@ -1425,6 +1425,112 @@ namespace Mfr.Tests.Ui.FileList
             Assert.Empty(ops.Deletes);
         }
 
+        /// <summary>
+        /// Verifies Cut writes the selection as PreferMove and marks rows for ghosting.
+        /// </summary>
+        [Fact]
+        public void Cut_Writes_Selection_And_Marks_Ghost_Rows()
+        {
+            var fileClipboard = new RecordingFileClipboard();
+            var viewModel = _CreateViewModel(_CreateTree(), fileClipboard: fileClipboard);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([alpha, beta], beta);
+
+            Assert.True(viewModel.CutCommand.CanExecute(null));
+            viewModel.Cut();
+
+            Assert.Equal([alpha.FullPath, beta.FullPath], Assert.Single(fileClipboard.Cuts));
+            Assert.True(alpha.IsCutMarked);
+            Assert.True(beta.IsCutMarked);
+            Assert.Equal(0.45, alpha.DisplayOpacity);
+            Assert.Equal("Cut 2 item(s).", viewModel.LastStatusMessage.ToPlainText());
+        }
+
+        /// <summary>
+        /// Verifies Copy writes PreferMove false and clears prior cut ghosting.
+        /// </summary>
+        [Fact]
+        public void Copy_Writes_Selection_And_Clears_Cut_Marks()
+        {
+            var fileClipboard = new RecordingFileClipboard();
+            var viewModel = _CreateViewModel(_CreateTree(), fileClipboard: fileClipboard);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            var beta = viewModel.Entries.First(entry => entry.Name == "beta.md");
+            viewModel.SetSelectedEntries([alpha], alpha);
+            viewModel.Cut();
+            Assert.True(alpha.IsCutMarked);
+
+            viewModel.SetSelectedEntries([beta], beta);
+            Assert.True(viewModel.CopyCommand.CanExecute(null));
+            viewModel.Copy();
+
+            Assert.Equal([beta.FullPath], Assert.Single(fileClipboard.Copies));
+            Assert.Empty(fileClipboard.CutPaths);
+            Assert.False(alpha.IsCutMarked);
+            Assert.False(beta.IsCutMarked);
+            Assert.Equal(1.0, alpha.DisplayOpacity);
+            Assert.Equal("Copied 1 item(s).", viewModel.LastStatusMessage.ToPlainText());
+        }
+
+        /// <summary>
+        /// Verifies Cut/Copy are disabled when nothing is selected.
+        /// </summary>
+        [Fact]
+        public void Cut_And_Copy_Disabled_When_Selection_Empty()
+        {
+            var viewModel = _CreateViewModel(_CreateTree());
+            viewModel.SetSelectedEntries([]);
+
+            Assert.False(viewModel.CutCommand.CanExecute(null));
+            Assert.False(viewModel.CopyCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Cut/Copy are disabled on This PC.
+        /// </summary>
+        [Fact]
+        public void Cut_And_Copy_Disabled_On_ThisPc()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var fileClipboard = new RecordingFileClipboard();
+            var viewModel = _CreateViewModel(_CreateTree(), fileClipboard: fileClipboard);
+            viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            Assert.NotEmpty(viewModel.Entries);
+            var drive = viewModel.Entries[0];
+            viewModel.SetSelectedEntries([drive], drive);
+
+            Assert.False(viewModel.CutCommand.CanExecute(null));
+            Assert.False(viewModel.CopyCommand.CanExecute(null));
+            viewModel.Cut();
+            Assert.Empty(fileClipboard.Cuts);
+        }
+
+        /// <summary>
+        /// Verifies clipboard write failures publish an error status.
+        /// </summary>
+        [Fact]
+        public void Cut_Clipboard_Failure_Sets_Error_LastStatusMessage()
+        {
+            var fileClipboard = new RecordingFileClipboard
+            {
+                ExceptionToThrow = new InvalidOperationException("clipboard unavailable"),
+            };
+            var viewModel = _CreateViewModel(_CreateTree(), fileClipboard: fileClipboard);
+            var alpha = viewModel.Entries.First(entry => entry.Name == "alpha.txt");
+            viewModel.SetSelectedEntries([alpha], alpha);
+
+            viewModel.Cut();
+
+            Assert.Equal("clipboard unavailable", viewModel.LastStatusMessage.ToPlainText());
+            Assert.Empty(fileClipboard.Cuts);
+            Assert.False(alpha.IsCutMarked);
+        }
+
         private static bool _IsDriveName(string name)
         {
             return name.Contains(':', StringComparison.Ordinal);
@@ -1454,7 +1560,8 @@ namespace Mfr.Tests.Ui.FileList
             string dir,
             IFileShellOpener? shellOpener = null,
             ITextClipboard? clipboard = null,
-            IFileShellOperations? shellOperations = null
+            IFileShellOperations? shellOperations = null,
+            IFileClipboard? fileClipboard = null
         )
         {
             var viewModel = new FileListViewModel(
@@ -1462,7 +1569,8 @@ namespace Mfr.Tests.Ui.FileList
                 dir,
                 shellOpener ?? NullFileShellOpener.Instance,
                 clipboard ?? NullTextClipboard.Instance,
-                shellOperations ?? NullFileShellOperations.Instance
+                shellOperations ?? NullFileShellOperations.Instance,
+                fileClipboard ?? new NullFileClipboard()
             );
             _viewModels.Add(viewModel);
             return viewModel;

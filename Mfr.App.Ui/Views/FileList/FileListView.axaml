@@ -32,6 +32,16 @@
           Command="{Binding ShowPropertiesCommand}"
           InputGesture="{x:Static input:AppShortcuts.ShowProperties}"
         />
+        <MenuItem
+          Header="Cut"
+          Command="{Binding CutCommand}"
+          InputGesture="{x:Static input:AppShortcuts.FileListCut}"
+        />
+        <MenuItem
+          Header="Copy"
+          Command="{Binding CopyCommand}"
+          InputGesture="{x:Static input:AppShortcuts.FileListCopy}"
+        />
         <MenuItem Header="Copy path" Command="{Binding CopyPathCommand}" />
         <MenuItem
           Header="Delete"
@@ -57,12 +67,13 @@
     <Style Selector="ListBox.file-icons">
       <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
     </Style>
-    <Style Selector="ListBox.file-list ListBoxItem">
+    <Style Selector="ListBox.file-list ListBoxItem" x:DataType="vm:FileListEntry">
       <Setter Property="MinHeight" Value="0" />
       <Setter Property="Padding" Value="3,1" />
       <Setter Property="Margin" Value="0" />
       <Setter Property="CornerRadius" Value="0" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Opacity" Value="{Binding DisplayOpacity}" />
     </Style>
     <Style Selector="ListBox.file-rows ListBoxItem">
       <Setter Property="HorizontalAlignment" Value="Stretch" />
@@ -127,11 +138,12 @@
       <Setter Property="SeparatorBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
       <Setter Property="AreSeparatorsVisible" Value="True" />
     </Style>
-    <Style Selector="DataGrid.file-report DataGridRow">
+    <Style Selector="DataGrid.file-report DataGridRow" x:DataType="vm:FileListEntry">
       <Setter Property="MinHeight" Value="20" />
       <Setter Property="Height" Value="20" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="Opacity" Value="{Binding DisplayOpacity}" />
     </Style>
     <Style Selector="DataGrid.file-report DataGridRow:nth-child(even)">
       <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
