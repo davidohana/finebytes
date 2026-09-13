@@ -41,7 +41,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
             var uppercase = editor.FindControl<CompactCheckBox>("UppercaseSentenceInitialCheckBox");
             Assert.NotNull(words);
             Assert.NotNull(uppercase);
-            Assert.Equal(TextWrapping.Wrap, words.TextWrapping);
+            Assert.Equal(TextWrapping.NoWrap, words.TextWrapping);
             Assert.Equal(ListEntryLength.DefaultEditorTextMaxLength, words.MaxLength);
             Assert.Equal(string.Empty, words.Text);
             Assert.True(uppercase.IsChecked);

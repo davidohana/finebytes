@@ -33,10 +33,9 @@
         </controls:MultilineEntriesFieldset.Tip>
         <TextBox
           x:Name="EntriesBox"
-          Classes="filter-editor-field-wrap"
+          Classes="filter-editor-field-multiline"
           MinWidth="240"
           MinHeight="88"
-          AcceptsReturn="True"
           MaxLength="{x:Static filters:ListEntryLength.DefaultEditorTextMaxLength}"
           PlaceholderText="Alpha&#x0a;Beta&#x0a;Gamma"
           Text="{Binding EntriesText}"

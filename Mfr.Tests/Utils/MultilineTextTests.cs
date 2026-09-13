@@ -40,5 +40,15 @@ namespace Mfr.Tests.Utils
 
             Assert.Equal(["Alpha", "Beta"], lines);
         }
+
+        /// <summary>
+        /// Verifies <see cref="MultilineText.ToLineList"/> matches <see cref="MultilineText.EnumerateLines"/>.
+        /// </summary>
+        [Fact]
+        public void ToLineList_matches_EnumerateLines()
+        {
+            const string text = "A\r\n\r\nB\nC\rD\n";
+            Assert.Equal(MultilineText.EnumerateLines(text), MultilineText.ToLineList(text));
+        }
     }
 }

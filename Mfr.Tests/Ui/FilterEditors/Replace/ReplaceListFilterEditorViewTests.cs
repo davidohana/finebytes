@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using AvaloniaEdit;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.Views.Controls;
@@ -56,6 +57,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             Assert.NotNull(replaceAll);
             Assert.NotNull(wholeWord);
             Assert.True(entries.AcceptsReturn);
+            Assert.False(entries.FindControl<TextEditor>("TemplateBox")!.WordWrap);
             Assert.Equal(ListEntryLength.DefaultEditorTextMaxLength, entries.MaxLength);
             Assert.Equal(string.Empty, entries.Text);
             Assert.True(literal.IsChecked);

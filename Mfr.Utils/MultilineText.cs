@@ -17,16 +17,55 @@ namespace Mfr.Utils
         /// <returns>Lines in order, without newline characters.</returns>
         public static IEnumerable<string> EnumerateLines(string? text)
         {
+            return ToLineList(text);
+        }
+
+        /// <summary>
+        /// Splits <paramref name="text"/> into lines (same rules as <see cref="EnumerateLines"/>).
+        /// </summary>
+        /// <param name="text">Multiline editor text.</param>
+        /// <returns>A list of lines; empty when <paramref name="text"/> is null or empty.</returns>
+        public static IReadOnlyList<string> ToLineList(string? text)
+        {
             if (string.IsNullOrEmpty(text))
             {
-                yield break;
+                return [];
             }
 
-            using var reader = new StringReader(text);
-            while (reader.ReadLine() is { } line)
+            var estimatedCount = 1;
+            for (var i = 0; i < text.Length; i++)
             {
-                yield return line;
+                if (text[i] == '\n')
+                {
+                    estimatedCount++;
+                }
             }
+
+            var lines = new List<string>(estimatedCount);
+            var start = 0;
+            for (var i = 0; i < text.Length; i++)
+            {
+                var c = text[i];
+                if (c is not ('\r' or '\n'))
+                {
+                    continue;
+                }
+
+                lines.Add(text[start..i]);
+                if (c == '\r' && i + 1 < text.Length && text[i + 1] == '\n')
+                {
+                    i++;
+                }
+
+                start = i + 1;
+            }
+
+            if (start < text.Length)
+            {
+                lines.Add(text[start..]);
+            }
+
+            return lines;
         }
     }
 }

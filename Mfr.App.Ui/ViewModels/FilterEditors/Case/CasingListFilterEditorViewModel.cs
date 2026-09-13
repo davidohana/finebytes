@@ -38,7 +38,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
                 return;
             }
 
-            ScheduleLiveListTextApply(_ApplyOptions);
+            ScheduleLiveListTextApply(_ApplyOptions, value.Length);
         }
 
         partial void OnUppercaseSentenceInitialChanged(bool value)
@@ -63,16 +63,31 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
 
         private void _ApplyOptions()
         {
-            if (IsLoading || Step.Filter is not CasingListFilter filter)
+            if (IsLoading || Step.Filter is not CasingListFilter)
             {
                 return;
             }
 
-            var options = new CasingListOptions(
-                Words: CasingListParser.ParseEditorText(WordsText),
-                UppercaseSentenceInitial: UppercaseSentenceInitial
+            var text = WordsText;
+            var uppercaseSentenceInitial = UppercaseSentenceInitial;
+            ParseListTextThenApply(
+                text,
+                getCurrentText: () => WordsText,
+                parse: CasingListParser.ParseEditorText,
+                applyParsed: words =>
+                {
+                    if (Step.Filter is not CasingListFilter filter)
+                    {
+                        return;
+                    }
+
+                    var options = new CasingListOptions(
+                        Words: words,
+                        UppercaseSentenceInitial: uppercaseSentenceInitial
+                    );
+                    ApplyIfChanged(filter, filter with { Options = options });
+                }
             );
-            ApplyIfChanged(filter, filter with { Options = options });
         }
     }
 }

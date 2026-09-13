@@ -585,8 +585,10 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             TemplateBox.ClearValue(HeightProperty);
             TemplateBox.MaxHeight = MultilineMaxHeight;
-            TemplateBox.WordWrap = true;
-            TemplateBox.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+            TemplateBox.WordWrap = !acceptsReturn;
+            TemplateBox.HorizontalScrollBarVisibility = acceptsReturn
+                ? ScrollBarVisibility.Auto
+                : ScrollBarVisibility.Disabled;
             // Auto only after the grow cap; otherwise AvaloniaEdit shows a thumb for tiny extent/viewport mismatch.
             TemplateBox.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
             TemplateBox.MinHeight = acceptsReturn ? MultilineMinHeight : SingleLineMinHeight;
@@ -616,8 +618,9 @@ namespace Mfr.App.Ui.Views.FormatEditor
         }
 
         /// <summary>
-        /// Grows the editor with wrapped content up to <see cref="MultilineMaxHeight"/> (Enter still
-        /// follows <see cref="AcceptsReturn"/>). Single-line hosts vertically center text in spare height.
+        /// Grows the editor with content up to <see cref="MultilineMaxHeight"/> (Enter still
+        /// follows <see cref="AcceptsReturn"/>). Multiline hosts keep logical lines (no wrap);
+        /// single-line hosts wrap and vertically center text in spare height.
         /// </summary>
         private void _UpdateAutoGrowHeight()
         {

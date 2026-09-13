@@ -44,7 +44,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
                 return;
             }
 
-            ScheduleLiveListTextApply(_ApplyEntriesAndTemplates);
+            ScheduleLiveListTextApply(_ApplyEntriesAndTemplates, value.Length);
         }
 
         partial void OnPrefixChanged(string value)
@@ -76,17 +76,29 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting
 
         private void _ApplyEntriesAndTemplates()
         {
-            if (IsLoading || Step.Filter is not NameListFilter filter)
+            if (IsLoading || Step.Filter is not NameListFilter)
             {
                 return;
             }
 
-            var options = new NameListOptions(
-                Entries: NameListParser.ParseEditorText(EntriesText),
-                Prefix: Prefix,
-                Suffix: Suffix
+            var text = EntriesText;
+            var prefix = Prefix;
+            var suffix = Suffix;
+            ParseListTextThenApply(
+                text,
+                getCurrentText: () => EntriesText,
+                parse: NameListParser.ParseEditorText,
+                applyParsed: entries =>
+                {
+                    if (Step.Filter is not NameListFilter filter)
+                    {
+                        return;
+                    }
+
+                    var options = new NameListOptions(Entries: entries, Prefix: prefix, Suffix: suffix);
+                    ApplyIfChanged(filter, filter with { Options = options });
+                }
             );
-            ApplyIfChanged(filter, filter with { Options = options });
         }
     }
 }

@@ -51,7 +51,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
                 return;
             }
 
-            ScheduleLiveListTextApply(() => _ApplyOptions(parseEntries: true));
+            ScheduleLiveListTextApply(() => _ApplyOptions(parseEntries: true), value.Length);
         }
 
         private void _SyncFromFilter()
@@ -92,9 +92,30 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
                 return;
             }
 
-            var entries = parseEntries ? ReplaceListParser.ParseEditorText(EntriesText) : filter.Options.Entries;
-            var options = new ReplaceListOptions(Entries: entries, Match: Match.ToOptions());
-            ApplyIfChanged(filter, filter with { Options = options });
+            if (!parseEntries)
+            {
+                var keepOptions = new ReplaceListOptions(Entries: filter.Options.Entries, Match: Match.ToOptions());
+                ApplyIfChanged(filter, filter with { Options = keepOptions });
+                return;
+            }
+
+            var text = EntriesText;
+            var match = Match.ToOptions();
+            ParseListTextThenApply(
+                text,
+                getCurrentText: () => EntriesText,
+                parse: ReplaceListParser.ParseEditorText,
+                applyParsed: parsedEntries =>
+                {
+                    if (Step.Filter is not ReplaceListFilter live)
+                    {
+                        return;
+                    }
+
+                    var options = new ReplaceListOptions(Entries: parsedEntries, Match: match);
+                    ApplyIfChanged(live, live with { Options = options });
+                }
+            );
         }
     }
 }

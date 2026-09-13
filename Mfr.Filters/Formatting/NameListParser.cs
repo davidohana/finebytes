@@ -43,7 +43,7 @@ namespace Mfr.Filters.Formatting
         /// <returns>Parsed names in line order.</returns>
         public static IReadOnlyList<string> ParseEditorText(string? text)
         {
-            return [.. MultilineText.EnumerateLines(text)];
+            return MultilineText.ToLineList(text);
         }
 
         /// <summary>

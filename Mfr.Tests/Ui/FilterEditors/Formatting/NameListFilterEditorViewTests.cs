@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors;
@@ -43,6 +44,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             Assert.NotNull(prefix);
             Assert.NotNull(suffix);
             Assert.True(entries.AcceptsReturn);
+            Assert.Equal(TextWrapping.NoWrap, entries.TextWrapping);
             Assert.Equal(ListEntryLength.DefaultEditorTextMaxLength, entries.MaxLength);
             Assert.False(prefix.AcceptsReturn);
             Assert.False(suffix.AcceptsReturn);

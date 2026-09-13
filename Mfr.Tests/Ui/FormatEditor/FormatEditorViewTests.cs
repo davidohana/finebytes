@@ -638,7 +638,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.NotNull(box);
             Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.MultilineMinHeight, box.MinHeight);
             Assert.Equal(App.Ui.Views.FormatEditor.FormatEditor.MultilineMaxHeight, box.MaxHeight);
-            Assert.True(box.WordWrap);
+            Assert.False(box.WordWrap);
 
             editor.Text = string.Concat(
                 Enumerable.Repeat("<file-name> <counter:initial=1,step=1> long-token-string ", 20)

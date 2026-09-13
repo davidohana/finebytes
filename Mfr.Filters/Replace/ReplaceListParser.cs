@@ -47,7 +47,7 @@ namespace Mfr.Filters.Replace
         public static IReadOnlyList<ReplaceListEntry> ParseEditorText(string? text)
         {
             var entries = new List<ReplaceListEntry>();
-            foreach (var line in MultilineText.EnumerateLines(text))
+            foreach (var line in MultilineText.ToLineList(text))
             {
                 if (string.IsNullOrWhiteSpace(line))
                 {

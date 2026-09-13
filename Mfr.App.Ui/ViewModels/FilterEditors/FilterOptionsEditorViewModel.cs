@@ -16,10 +16,27 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// Delay before applying multiline list-editor text to the step.
         /// <para>
         /// Zero applies immediately (tests). Production default is 150 ms so large pastes do not
-        /// re-preview on every intermediate binding update.
+        /// re-preview on every intermediate binding update. Pastes above
+        /// <see cref="LargeListTextDebounceThreshold"/> use at least
+        /// <see cref="LargeListTextApplyDebounceMilliseconds"/>.
         /// </para>
         /// </summary>
         public static int LiveListTextApplyDebounceMilliseconds { get; set; } = 150;
+
+        /// <summary>
+        /// Text length at which list editors use the longer apply debounce.
+        /// </summary>
+        public const int LargeListTextDebounceThreshold = 32_000;
+
+        /// <summary>
+        /// Minimum debounce for large list-editor pastes (ms).
+        /// </summary>
+        public const int LargeListTextApplyDebounceMilliseconds = 500;
+
+        /// <summary>
+        /// Text length at which list parse runs on a worker before applying on the UI context.
+        /// </summary>
+        public const int LargeListTextParseOffUiThreshold = 32_000;
 
         /// <summary>
         /// Initializes an options editor for one applied-filter step.
@@ -101,7 +118,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// <para>Supersedes any prior pending list-text apply for this editor.</para>
         /// </summary>
         /// <param name="apply">Writes the current list text onto the applied step.</param>
-        protected void ScheduleLiveListTextApply(Action apply)
+        /// <param name="textLength">
+        /// Current editor text length; large values stretch the debounce so Auto-Preview waits for the paste to settle.
+        /// </param>
+        protected void ScheduleLiveListTextApply(Action apply, int textLength = 0)
         {
             ArgumentNullException.ThrowIfNull(apply);
 
@@ -116,10 +136,66 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
                 return;
             }
 
+            if (textLength >= LargeListTextDebounceThreshold)
+            {
+                delay = Math.Max(delay, LargeListTextApplyDebounceMilliseconds);
+            }
+
             var cts = new CancellationTokenSource();
             _liveListTextApplyCts = cts;
             var context = SynchronizationContext.Current;
             _ = _RunDebouncedLiveListTextApplyAsync(apply, delay, cts.Token, context);
+        }
+
+        /// <summary>
+        /// Runs <paramref name="parse"/> on a worker when <paramref name="text"/> is large, then
+        /// <paramref name="applyParsed"/> on the captured synchronization context when the text is still current.
+        /// </summary>
+        /// <typeparam name="TParsed">Parsed list payload type.</typeparam>
+        /// <param name="text">Editor text snapshot used for parse and staleness checks.</param>
+        /// <param name="getCurrentText">Returns the live editor text (staleness guard).</param>
+        /// <param name="parse">Parses <paramref name="text"/> (may run off the UI thread).</param>
+        /// <param name="applyParsed">Applies the parse result on the UI / sync context.</param>
+        protected void ParseListTextThenApply<TParsed>(
+            string text,
+            Func<string> getCurrentText,
+            Func<string, TParsed> parse,
+            Action<TParsed> applyParsed
+        )
+        {
+            ArgumentNullException.ThrowIfNull(getCurrentText);
+            ArgumentNullException.ThrowIfNull(parse);
+            ArgumentNullException.ThrowIfNull(applyParsed);
+
+            if (text.Length < LargeListTextParseOffUiThreshold)
+            {
+                applyParsed(parse(text));
+                return;
+            }
+
+            var context = SynchronizationContext.Current;
+            _ = Task.Run(() =>
+            {
+                var parsed = parse(text);
+
+                void Commit()
+                {
+                    if (IsLoading || !string.Equals(getCurrentText(), text, StringComparison.Ordinal))
+                    {
+                        return;
+                    }
+
+                    applyParsed(parsed);
+                }
+
+                if (context is null)
+                {
+                    Commit();
+                    return;
+                }
+
+                context.Post(_ => Commit(), state: null);
+            });
         }
 
         /// <summary>
