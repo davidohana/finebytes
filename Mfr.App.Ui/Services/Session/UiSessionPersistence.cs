@@ -23,9 +23,8 @@ namespace Mfr.App.Ui.Services.Session
             ArgumentNullException.ThrowIfNull(panes);
 
             var windowRestored = false;
-            var mainWindow = ConfigStore.MainWindow ?? new SessionStateMainWindow();
 
-            if (mainWindow.RememberWindowState)
+            if (ConfigStore.MainWindow?.RememberWindowState ?? true)
             {
                 windowRestored = WindowSession.TryRestore(window, ConfigStore.MainWindow);
 
@@ -62,8 +61,8 @@ namespace Mfr.App.Ui.Services.Session
 
             try
             {
-                var rememberWindow = (ConfigStore.MainWindow ?? new SessionStateMainWindow()).RememberWindowState;
-                var rememberLastFolder = (ConfigStore.FileList ?? new SessionStateFileList()).RememberLastFolder;
+                var rememberWindow = ConfigStore.MainWindow?.RememberWindowState ?? true;
+                var rememberLastFolder = ConfigStore.FileList?.RememberLastFolder ?? true;
 
                 if (rememberWindow)
                 {
@@ -75,6 +74,7 @@ namespace Mfr.App.Ui.Services.Session
 
                 if (fileList is not null)
                 {
+                    // Merge layout fields only — Options-owned prefs (e.g. DoubleClickAddsToRenameList) stay.
                     var saved = ConfigStore.EnsureFileList();
                     saved.RememberLastFolder = rememberLastFolder;
 

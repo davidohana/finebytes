@@ -13,12 +13,10 @@ namespace Mfr.App.Ui.ViewModels.Options
         /// </summary>
         public OptionsDialogViewModel()
         {
-            var mainWindow = ConfigStore.MainWindow ?? new SessionStateMainWindow();
-            var fileList = ConfigStore.FileList ?? new SessionStateFileList();
-            RememberLastFolder = fileList.RememberLastFolder;
-            RememberWindowState = mainWindow.RememberWindowState;
+            RememberLastFolder = ConfigStore.FileList?.RememberLastFolder ?? true;
+            RememberWindowState = ConfigStore.MainWindow?.RememberWindowState ?? true;
             ConfirmationPrompts = ConfigStore.Ui.ConfirmationPrompts;
-            DoubleClickAddsToRenameList = fileList.DoubleClickAddsToRenameList;
+            DoubleClickAddsToRenameList = ConfigStore.FileList?.DoubleClickAddsToRenameList ?? false;
         }
 
         /// <summary>
@@ -52,9 +50,10 @@ namespace Mfr.App.Ui.ViewModels.Options
         /// </summary>
         public void Commit()
         {
-            ConfigStore.EnsureFileList().RememberLastFolder = RememberLastFolder;
+            var fileList = ConfigStore.EnsureFileList();
+            fileList.RememberLastFolder = RememberLastFolder;
+            fileList.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
             ConfigStore.EnsureMainWindow().RememberWindowState = RememberWindowState;
-            ConfigStore.EnsureFileList().DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
             ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts;
         }
     }

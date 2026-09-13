@@ -5,9 +5,9 @@ using Mfr.Utils.Config;
 namespace Mfr.Tests.Models
 {
     /// <summary>
-    /// Ensures every config field participates in JSON / CLI config binding.
+    /// Ensures every prefs field participates in JSON / CLI config binding.
     /// </summary>
-    public sealed class MfrConfigBindingTests
+    public sealed class PrefsBindingTests
     {
         [Theory]
         [InlineData(typeof(LogConfig))]

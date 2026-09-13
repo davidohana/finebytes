@@ -80,8 +80,9 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.EnsureRenameList().AddMode = RenameListAddMode.Folders;
-                ConfigStore.EnsureRenameList().UseFixedWidthFont = true;
+                var renameList = ConfigStore.EnsureRenameList();
+                renameList.AddMode = RenameListAddMode.Folders;
+                renameList.UseFixedWidthFont = true;
                 ConfigStore.TrySave(path);
 
                 ConfigStore.Load(path);

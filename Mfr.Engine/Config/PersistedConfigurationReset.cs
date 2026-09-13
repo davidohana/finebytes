@@ -5,7 +5,7 @@ namespace Mfr.Engine.Config
     /// <summary>
     /// Deletes the roaming prefs file that corresponds to MFR7 <c>mfrconfig.xml</c> (Reset Configuration).
     /// <para>
-    /// Removes <c>config.json</c> only (log/ui + session + filterDefaults). Does not touch
+    /// Removes <c>config.json</c> only (log/ui + UI session sections + filterDefaults). Does not touch
     /// <c>presets.json</c> or local logs.
     /// </para>
     /// </summary>

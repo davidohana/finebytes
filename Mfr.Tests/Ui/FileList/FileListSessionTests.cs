@@ -73,6 +73,8 @@ namespace Mfr.Tests.Ui.FileList
             Assert.Equal(dir, captured.LastOpenedDirectory);
             Assert.Equal(FileListViewMode.List, captured.ViewMode);
             Assert.Equal(ThumbnailSizes.Huge, captured.ThumbnailSize);
+            Assert.False(captured.DoubleClickAddsToRenameList);
+            Assert.True(captured.RememberLastFolder);
 
             var restored = _CreateViewModel(_tempDirectoryFixture.CreateTempDir());
             restored.ApplySession(captured);
