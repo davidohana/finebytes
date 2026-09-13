@@ -58,12 +58,12 @@ Parent: [docs/plans/options-dialog.plan.md](docs/plans/options-dialog.plan.md) (
 
 - 3-state confirmations: finebytes-only
 - Add-mode in Options — **shipped** in [options-add-mode.plan.md](options-add-mode.plan.md)
-- Explorer shell / Undo & Log still deferred
+- Explorer shell still deferred; Undo & Log retention shipped in [undo.plan.md](undo.plan.md) P4
 
 ## Non-goals
 
 - Explorer shell integrate
-- Undo / `.mfrlog` retention tab
+- Undo / `.mfrlog` retention — shipped in [undo.plan.md](undo.plan.md) P4 (was deferred here)
 - Per-item commit confirm (CLI only)
 - Add-mode Options UI — **shipped** in [options-add-mode.plan.md](options-add-mode.plan.md)
 - Migrating old `confirmReplaceAppliedFiltersOnLoad` values
@@ -114,7 +114,7 @@ flowchart TD
 
 ### P5 — Docs hygiene
 
-- **Scope:** Amend [options-dialog.plan.md](docs/plans/options-dialog.plan.md) deferred/non-goals (double-click + confirm checkbox superseded). Update [docs/debts.md](docs/debts.md) Options bullet (drop double-click; keep shell + Undo/Log). Touch MfrConfig remarks. No keyboard-shortcuts change unless Options wording needs it.
+- **Scope:** Amend [options-dialog.plan.md](docs/plans/options-dialog.plan.md) deferred/non-goals (double-click + confirm checkbox superseded). Update [docs/debts.md](docs/debts.md) Options bullet (drop double-click; keep shell — Undo/Log later shipped in [undo.plan.md](undo.plan.md) P4). Touch MfrConfig remarks. No keyboard-shortcuts change unless Options wording needs it.
 - **Exit:** debts/plan text match shipped behavior.
 
 ## Key files

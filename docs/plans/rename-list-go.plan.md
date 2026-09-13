@@ -13,7 +13,7 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 15 
 - **Post-apply status** — After Commit, set `LastGoStatus` for the main status bar (success and/or error counts; errors hint to right-click **Show Rename Error**). No summary dialog.
 - **Go CanExecute** — Enabled when rename list has ≥1 row and `!IsBusy` (empty list no-ops; no ChangeCount gate).
 - **Plum vs lavender** — Row class: `HasCommitError` → plum; else `HasPreviewError` → lavender.
-- **Out of scope** — Undo Log, trial, Contents warn, **Show Last Rename Errors** (note in [docs/debts.md](../debts.md)).
+- **Out of scope** — trial, Contents warn, **Show Last Rename Errors** (note in [docs/debts.md](../debts.md)). Undo / Rename Log shipped in [undo.plan.md](undo.plan.md).
 
 ## MFR7 reference brief
 
@@ -22,7 +22,7 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 15 
 - Help: `applychanges.html`, `renamelist.html` (Highlighting / Show Rename Error), `statusbar.html`
 - Hints: `hints.txt` `#GO`
 - Code: `Shld.MainForm_GoRequested`; `RenameItemList.Apply` / `ClearApplyErrors`; `ApplyProgressDialog`; `RenameGrid` plum; `PropStatus.ForceValue` PreviewStart/End
-- finebytes: engine Commit done; UI `Go()` stub
+- finebytes: engine Commit + UI GO shipped (this plan); Undo / Rename Log → [undo.plan.md](undo.plan.md)
 
 ### Behavior
 
@@ -33,12 +33,12 @@ Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) § Phase 15 
 ### Parity gaps (intentional)
 
 - Always Preview on GO (vs MFR7 skip when Auto-Preview on).
-- No Undo Log / Show Last Rename Errors in this plan.
+- Show Last Rename Errors not in this plan (still debts). Undo / Rename Log → [undo.plan.md](undo.plan.md).
 - Progress uses existing Rename List progress dialog, not MFR7 `ApplyProgressDialog` chrome.
 
 ## Non-goals
 
-- Phase 16 color legend; 14f drag-out (cut); Undo/Log/Options stubs; session persistence of commit errors; new error dialog type.
+- Phase 16 color legend; 14f drag-out (cut); session persistence of commit errors; new error dialog type. (Undo/Log/Options chrome: [undo.plan.md](undo.plan.md) / [options-dialog.plan.md](options-dialog.plan.md).)
 
 ## Phases
 

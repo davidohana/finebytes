@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: p5-docs-debts
     content: "P5: Update debts, shortcuts, parent plan cross-links"
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -51,7 +51,7 @@ Parent: deferred from [rename-list-go.plan.md](rename-list-go.plan.md), [options
 
 - Help: `undolast.html`, `log.html` (+ `Images/log.gif`), `optionswin.html#log`, `applychanges.html`; filter notes that Tag Remover cannot undo
 - Code: `Core/MfrLib/Items/Log.cs`, `RenameItemList.UndoLog` / `Apply`, `RenameItem.ApplyProperties`; GUI `Main.UndoLast`, `LogForm`, `Options` LogLimit; `Context.LogPath` = ProgramData `…\MFR\Logs`
-- finebytes status: chrome stubs only — `MainWindowViewModel.UndoLast` / `ShowLog` empty + `_CanExecuteUnimplemented`; GO commit fully live via `CommitExecutor` + `RenamePropertyChange` rows
+- finebytes status: **shipped** (this plan P1–P5) — Undo Last, Rename Log dialog, `.mfrlog` disk history, Options Undo & Log retention; GO commit via `CommitExecutor` + `RenamePropertyChange` rows
 
 ### Behavior
 
@@ -99,12 +99,12 @@ flowchart TD
   ReCommit --> Capture
 ```
 
-Hook points:
+Hook points (shipped):
 
-- Capture: after [`CommitExecutor`](../../Mfr.Engine/Commit/CommitExecutor.cs) / [`RenameList.Commit`](../../Mfr.Engine/RenameList/RenameList.cs) — today [`RenameResultItem`](../../Mfr.Models/Rename/RenameResultItem.cs) has `OriginalPath` + `Changes` but **not** `DestinationPath` (needed for undo); extend result or emit a dedicated log DTO from `PlanOutcome`
+- Capture: after [`CommitExecutor`](../../Mfr.Engine/Commit/CommitExecutor.cs) / [`RenameList.Commit`](../../Mfr.Engine/RenameList/RenameList.cs) — [`RenameResultItem`](../../Mfr.Models/Rename/RenameResultItem.cs) carries `DestinationPath` on success; rename-log DTO + [`RenameLogStore`](../../Mfr.Engine/RenameLog/RenameLogStore.cs) persist in-memory last op and optional `.mfrlog` disk history
 - Reverse property map: invert [`RenamePropertyChangeBuilder`](../../Mfr.Engine/Preview/RenamePropertyChangeBuilder.cs) names (`Prefix`, `Extension`, `DirectoryPath`, attrs/dates, tag fields, `StripAllEmbeddedTagsOnCommit`) onto `FileMeta` / overlays
-- UI stubs: [`MainWindowViewModel.UndoLast` / `ShowLog`](../../Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs); enable `CanExecute` when last op exists / always for Log
-- Prefs: new `renameLog.limit` (0 / N / unlimited); Options tab deferred from options-dialog
+- UI: [`MainWindowViewModel.UndoLast` / `ShowLog`](../../Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs) — live; `CanExecute` when last op undoable / always for Log
+- Prefs: `renameLog.limit` (0 / N / unlimited); Options Undo & Log section shipped in P4
 
 ## Phases
 
@@ -116,7 +116,7 @@ Hook points:
 
 ### P2 — Undo Last
 
-- Scope / files: engine `Undo(RenameLog)` → rebuild Rename List items, map OldValues → Preview, `Commit`; [`MainWindowViewModel.UndoLast`](../../Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs) + progress reuse; `CanExecute` when last op non-empty; before undo, `ConfirmationPolicy.ShouldConfirm(ConfirmationKind.UndoRename)` (add kind + Normal|More arm like GO preview errors); sticky status via `StatusBarText` (debts); refresh File List after; docs [`keyboard-shortcuts.md`](../keyboard-shortcuts.md)
+- Scope / files: engine `Undo(RenameLog)` → rebuild Rename List items, map OldValues → Preview, `Commit`; [`MainWindowViewModel.UndoLast`](../../Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs) + progress reuse; `CanExecute` when last op non-empty; before undo, `ConfirmationPolicy.ShouldConfirm(ConfirmationKind.UndoRename)` (add kind + Normal|More arm like GO preview errors); sticky status via `StatusBarText`; refresh File List after; docs [`keyboard-shortcuts.md`](../keyboard-shortcuts.md)
 - Exit criteria: Ctrl+Z / menu / toolbar undoes last GO (name move + a tag/attr case); confirm shows at Normal/More and is skipped at Fewer; “nothing to undo” when empty; Tag Remover strip still unrestorable
 - Tests: engine undo round-trip; VM/command enabled state; confirm gate by prompts level; status outcome
 

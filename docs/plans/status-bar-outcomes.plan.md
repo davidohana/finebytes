@@ -28,7 +28,7 @@ Parent: Rename List / main shell feedback ([rename-list-go.plan.md](rename-list-
 - **Dialogs stay for decisions/detail** — Unchanged.
 - **Export** — Neutral success sticky + reveal-in-Explorer; failures stay dialog-only.
 - **Clipboard** — File List `CopyPath` only.
-- **Undo Last** — Out of scope; debts note when Undo ships.
+- **Undo Last** — Out of scope for this plan; sticky Undo outcomes shipped in [undo.plan.md](undo.plan.md) P2.
 - **Selection count** — Removed after ship: `Selected: N` was ambiguous (File List vs Rename List).
 
 ## MFR7 reference brief
@@ -36,13 +36,13 @@ Parent: Rename List / main shell feedback ([rename-list-go.plan.md](rename-list-
 - **Sources:** `statusbar.html`; `renamelist.html`; `hints.txt` + `StatusMessage`; GO outcome via status.
 - **Behavior to match:** Left hint + counts; Preview Errors red when ≥1; Rename List cell value in status bar.
 - **finebytes extension:** Colored runs; last-write status hint (no overlay restore); selection count removed.
-- **Parity gaps:** No `hints.txt` / chrome status-bar hot hints (tooltips cover chrome); no navigate/filter/sort spam; no Undo Log; no green success.
+- **Parity gaps:** No `hints.txt` / chrome status-bar hot hints (tooltips cover chrome); no navigate/filter/sort spam; no green success. Undo / Rename Log shipped in [undo.plan.md](undo.plan.md).
 
 ## Non-goals
 
 - Chrome/toolbar/menu status-bar hover hints when a tooltip already exists.
 - Sticky status for navigate, remove/clear, filter chain edits, auto-sort, or clean refresh.
-- Undo Last until Undo exists.
+- Undo Last (shipped in [undo.plan.md](undo.plan.md); was deferred here).
 - Rename List clipboard commands.
 - Status text while a progress dialog is open.
 - Replacing confirm dialogs.
