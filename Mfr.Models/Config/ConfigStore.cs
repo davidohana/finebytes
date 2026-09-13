@@ -64,22 +64,22 @@ namespace Mfr.Models.Config
         /// <summary>
         /// Gets or sets the last main-window geometry and pane splitters, when remembered.
         /// </summary>
-        public static SessionStateMainWindow? MainWindow { get; set; }
+        public static MainWindowPrefs? MainWindow { get; set; }
 
         /// <summary>
         /// Gets or sets the last File List folder, masks, view, and double-click behavior.
         /// </summary>
-        public static SessionStateFileList? FileList { get; set; }
+        public static FileListPrefs? FileList { get; set; }
 
         /// <summary>
         /// Gets or sets the last Rename List Auto-Sort and related session fields.
         /// </summary>
-        public static SessionStateRenameList? RenameList { get; set; }
+        public static RenameListPrefs? RenameList { get; set; }
 
         /// <summary>
         /// Gets or sets Filter Configuration chrome (e.g. format-token picker collapse).
         /// </summary>
-        public static SessionStateFilterEditor? FilterEditor { get; set; }
+        public static FilterEditorPrefs? FilterEditor { get; set; }
 
         /// <summary>
         /// Gets or sets the opaque <c>filterDefaults</c> map (type discriminator → filter JSON object).
@@ -91,36 +91,36 @@ namespace Mfr.Models.Config
         /// Returns <see cref="MainWindow"/>, creating it when missing.
         /// </summary>
         /// <returns>The main-window session object.</returns>
-        public static SessionStateMainWindow EnsureMainWindow()
+        public static MainWindowPrefs EnsureMainWindow()
         {
-            return MainWindow ??= new SessionStateMainWindow();
+            return MainWindow ??= new MainWindowPrefs();
         }
 
         /// <summary>
         /// Returns <see cref="FileList"/>, creating it when missing.
         /// </summary>
         /// <returns>The File List session object.</returns>
-        public static SessionStateFileList EnsureFileList()
+        public static FileListPrefs EnsureFileList()
         {
-            return FileList ??= new SessionStateFileList();
+            return FileList ??= new FileListPrefs();
         }
 
         /// <summary>
         /// Returns <see cref="RenameList"/>, creating it when missing.
         /// </summary>
         /// <returns>The Rename List session object.</returns>
-        public static SessionStateRenameList EnsureRenameList()
+        public static RenameListPrefs EnsureRenameList()
         {
-            return RenameList ??= new SessionStateRenameList();
+            return RenameList ??= new RenameListPrefs();
         }
 
         /// <summary>
         /// Returns <see cref="FilterEditor"/>, creating it when missing.
         /// </summary>
         /// <returns>The Filter Configuration session object.</returns>
-        public static SessionStateFilterEditor EnsureFilterEditor()
+        public static FilterEditorPrefs EnsureFilterEditor()
         {
-            return FilterEditor ??= new SessionStateFilterEditor();
+            return FilterEditor ??= new FilterEditorPrefs();
         }
 
         /// <summary>
@@ -186,10 +186,10 @@ namespace Mfr.Models.Config
                 }
 
                 ConfigJsonApplier.ApplySoft(doc.RootElement, s_Prefs);
-                MainWindow = _ReadSection<SessionStateMainWindow>(doc.RootElement, "mainWindow");
-                FileList = _ReadSection<SessionStateFileList>(doc.RootElement, "fileList");
-                RenameList = _ReadSection<SessionStateRenameList>(doc.RootElement, "renameList");
-                FilterEditor = _ReadSection<SessionStateFilterEditor>(doc.RootElement, "filterEditor");
+                MainWindow = _ReadSection<MainWindowPrefs>(doc.RootElement, "mainWindow");
+                FileList = _ReadSection<FileListPrefs>(doc.RootElement, "fileList");
+                RenameList = _ReadSection<RenameListPrefs>(doc.RootElement, "renameList");
+                FilterEditor = _ReadSection<FilterEditorPrefs>(doc.RootElement, "filterEditor");
                 FilterDefaultsJson = _ReadFilterDefaults(doc.RootElement);
             }
             catch

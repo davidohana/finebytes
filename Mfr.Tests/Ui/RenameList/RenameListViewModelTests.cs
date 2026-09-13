@@ -1299,7 +1299,7 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             renameListViewModel.ApplySessionSection(
-                new SessionStateRenameList
+                new RenameListPrefs
                 {
                     AddMode = RenameListAddMode.Folders,
                     AddFolderContents = false,

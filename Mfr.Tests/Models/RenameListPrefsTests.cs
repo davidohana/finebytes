@@ -4,10 +4,10 @@ using Mfr.Tests.Ui.RenameList;
 namespace Mfr.Tests.Models
 {
     /// <summary>
-    /// Tests <see cref="SessionStateRenameList"/> sort/column session JSON shapes.
+    /// Tests <see cref="RenameListPrefs"/> sort/column session JSON shapes.
     /// </summary>
     [Collection(ConfigStoreCollection.Name)]
-    public sealed class SessionStateRenameListTests
+    public sealed class RenameListPrefsTests
     {
         [Fact]
         public void Sort_fields_round_trip_via_config_store_session()
@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.RenameList = new SessionStateRenameList
+                ConfigStore.RenameList = new RenameListPrefs
                 {
                     SortFields = [new RenameListSortKey(RenameListTestHelpers.ParentFolderKey, Descending: true)],
                 };
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models
                     ConfigStore.RenameList?.SortFields
                 );
 
-                ConfigStore.RenameList = new SessionStateRenameList { SortFields = [] };
+                ConfigStore.RenameList = new RenameListPrefs { SortFields = [] };
                 ConfigStore.Save(path);
                 ConfigStore.Load(path);
                 Assert.Empty(ConfigStore.RenameList.SortFields);
@@ -61,7 +61,7 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.RenameList = new SessionStateRenameList { VisibleColumns = sessionColumns };
+                ConfigStore.RenameList = new RenameListPrefs { VisibleColumns = sessionColumns };
                 ConfigStore.Save(path);
 
                 ConfigStore.Load(path);

@@ -832,7 +832,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// Restores mask, exclude-mask, suggestion, view-mode, and thumbnail-size fields from session.
         /// </summary>
         /// <param name="fileList">Persisted File List section, or <see langword="null"/> to keep defaults.</param>
-        internal void ApplySession(SessionStateFileList? fileList)
+        internal void ApplySession(FileListPrefs? fileList)
         {
             if (fileList is null)
             {
@@ -878,15 +878,15 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <summary>
         /// Captures current mask, exclude-mask, suggestion, view-mode, and thumbnail-size fields for session save.
         /// <para>
-        /// Omits Options-owned prefs (<see cref="SessionStateFileList.RememberLastFolder"/>,
-        /// <see cref="SessionStateFileList.DoubleClickAddsToRenameList"/>); close-save merges those from
+        /// Omits Options-owned prefs (<see cref="FileListPrefs.RememberLastFolder"/>,
+        /// <see cref="FileListPrefs.DoubleClickAddsToRenameList"/>); close-save merges those from
         /// <see cref="ConfigStore.FileList"/>.
         /// </para>
         /// </summary>
         /// <returns>File List session section matching the current view model.</returns>
-        internal SessionStateFileList CaptureSession()
+        internal FileListPrefs CaptureSession()
         {
-            return new SessionStateFileList
+            return new FileListPrefs
             {
                 LastOpenedDirectory = CurrentPath,
                 FileMask = Mask,

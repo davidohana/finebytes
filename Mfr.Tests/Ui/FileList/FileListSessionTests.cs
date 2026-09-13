@@ -31,7 +31,7 @@ namespace Mfr.Tests.Ui.FileList
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var viewModel = _CreateViewModel(dir);
-            var fileList = new SessionStateFileList
+            var fileList = new FileListPrefs
             {
                 LastOpenedDirectory = dir,
                 FileMask = "*.wav",
@@ -96,7 +96,7 @@ namespace Mfr.Tests.Ui.FileList
             var dir = _tempDirectoryFixture.CreateTempDir();
             var viewModel = _CreateViewModel(dir);
 
-            viewModel.ApplySession(new SessionStateFileList());
+            viewModel.ApplySession(new FileListPrefs());
 
             Assert.Equal("*", viewModel.Mask);
             Assert.False(viewModel.ExcludeMasksEnabled);
@@ -131,7 +131,7 @@ namespace Mfr.Tests.Ui.FileList
             var dir = _tempDirectoryFixture.CreateTempDir();
             var viewModel = _CreateViewModel(dir);
 
-            viewModel.ApplySession(new SessionStateFileList { ThumbnailSize = 100 });
+            viewModel.ApplySession(new FileListPrefs { ThumbnailSize = 100 });
 
             Assert.Equal(ThumbnailSizes.Medium, viewModel.ThumbnailSize);
         }
@@ -144,7 +144,7 @@ namespace Mfr.Tests.Ui.FileList
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var viewModel = _CreateViewModel(dir);
-            var fileList = new SessionStateFileList
+            var fileList = new FileListPrefs
             {
                 FileMask = "*.txt",
                 ExcludeMasks = [],

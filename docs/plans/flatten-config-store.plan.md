@@ -23,10 +23,10 @@ isProject: false
 ```csharp
 ConfigStore.Log                 // LogConfig
 ConfigStore.Ui                  // UiConfig (ConfirmationPrompts only)
-ConfigStore.MainWindow          // SessionStateMainWindow?
-ConfigStore.FileList            // SessionStateFileList? (+ DoubleClickAddsToRenameList)
-ConfigStore.RenameList          // SessionStateRenameList?
-ConfigStore.FilterEditor        // SessionStateFilterEditor?
+ConfigStore.MainWindow          // MainWindowPrefs?
+ConfigStore.FileList            // FileListPrefs? (+ DoubleClickAddsToRenameList)
+ConfigStore.RenameList          // RenameListPrefs?
+ConfigStore.FilterEditor        // FilterEditorPrefs?
 ConfigStore.FilterDefaultsJson  // JsonObject (unchanged)
 ```
 
@@ -44,10 +44,10 @@ ConfigStore.FilterDefaultsJson  // JsonObject (unchanged)
 }
 ```
 
-- **Double-click:** move from `UiConfig` → `SessionStateFileList.DoubleClickAddsToRenameList` (default `false`). Options still edits it; File List reads `ConfigStore.FileList`.
+- **Double-click:** move from `UiConfig` → `FileListPrefs.DoubleClickAddsToRenameList` (default `false`). Options still edits it; File List reads `ConfigStore.FileList`.
 - **ConfirmationPrompts:** stays on `UiConfig` / `ui.confirmationPrompts`.
 - **Applier constraint:** keep a **private** prefs root inside `ConfigStore` with `[ConfigSection] Log` + `Ui` for `ConfigJsonApplier` / `ConfigJsonWriter` / CLI `--set`. Public surface is `ConfigStore.Log` / `ConfigStore.Ui` aliases (no public `MfrConfig`).
-- **Section DTOs:** keep `SessionStateMainWindow` / `FileList` / `RenameList` / `FilterEditor` / `Splitters` as types in [`SessionSections.cs`](../../Mfr.Models/Config/SessionSections.cs); `Ensure*` helpers on `ConfigStore`.
+- **Section DTOs:** `MainWindowPrefs` / `FileListPrefs` / `RenameListPrefs` / `FilterEditorPrefs` / `MainWindowSplitters` in [`SessionPrefs.cs`](../../Mfr.Models/Config/SessionPrefs.cs); `Ensure*` helpers on `ConfigStore`.
 - **Omit empty sections on write:** null/empty UI sections omitted; empty `filterDefaults` omitted.
 
 ## Status

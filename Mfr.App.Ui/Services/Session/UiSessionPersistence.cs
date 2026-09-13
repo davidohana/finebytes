@@ -52,8 +52,8 @@ namespace Mfr.App.Ui.Services.Session
         public static void SaveOnClose(
             Window window,
             MainWindowPaneGrids panes,
-            SessionStateFileList? fileList,
-            SessionStateRenameList? renameList = null
+            FileListPrefs? fileList,
+            RenameListPrefs? renameList = null
         )
         {
             ArgumentNullException.ThrowIfNull(window);

@@ -69,7 +69,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void ApplySession_restores_format_token_picker_expanded()
         {
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false };
+            ConfigStore.FilterEditor = new FilterEditorPrefs { FormatTokenPickerExpanded = false };
             var editor = new FilterEditorViewModel();
 
             editor.ApplySession(persistSession: true);

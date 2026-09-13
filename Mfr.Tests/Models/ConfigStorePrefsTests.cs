@@ -58,14 +58,14 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.MainWindow = new SessionStateMainWindow
+                ConfigStore.MainWindow = new MainWindowPrefs
                 {
                     X = 12,
                     Y = 34,
                     Width = 1100,
                     Height = 720,
                     State = "Maximized",
-                    Splitters = new SessionStateSplitters
+                    Splitters = new MainWindowSplitters
                     {
                         FileList = 0.35,
                         AvailableApplied = 0.45,
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Models
                         TopPanes = 0.65,
                     },
                 };
-                ConfigStore.FileList = new SessionStateFileList
+                ConfigStore.FileList = new FileListPrefs
                 {
                     LastOpenedDirectory = Path.Combine(Path.GetTempPath(), "music"),
                     FileMask = "*.mp3",
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Models
                     ThumbnailSize = 128,
                     DoubleClickAddsToRenameList = true,
                 };
-                ConfigStore.RenameList = new SessionStateRenameList
+                ConfigStore.RenameList = new RenameListPrefs
                 {
                     SortFields = [new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true)],
                     VisibleColumns =
@@ -98,7 +98,7 @@ namespace Mfr.Tests.Models
                         ),
                     ],
                 };
-                ConfigStore.FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false };
+                ConfigStore.FilterEditor = new FilterEditorPrefs { FormatTokenPickerExpanded = false };
 
                 ConfigStore.Save(path);
                 ConfigStore.Load(path);
@@ -171,7 +171,7 @@ namespace Mfr.Tests.Models
             {
                 ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
-                ConfigStore.FileList = new SessionStateFileList { FileMask = "*.flac" };
+                ConfigStore.FileList = new FileListPrefs { FileMask = "*.flac" };
                 ConfigStore.Save(path);
 
                 var store = FilterDefaultsStore.CreateEmpty();
@@ -218,8 +218,8 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.FileList = new SessionStateFileList { DoubleClickAddsToRenameList = true };
-                ConfigStore.MainWindow = new SessionStateMainWindow { Width = 900 };
+                ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
+                ConfigStore.MainWindow = new MainWindowPrefs { Width = 900 };
                 ConfigStore.Save(path);
 
                 FilterDefaultsStore.CreateEmpty().SetDefault(new LettersCaseFilter());

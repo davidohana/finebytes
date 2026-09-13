@@ -16,8 +16,8 @@ namespace Mfr.Tests.Ui.Options
         [Fact]
         public void Constructor_loads_session_and_config_drafts()
         {
-            ConfigStore.MainWindow = new SessionStateMainWindow { RememberWindowState = false };
-            ConfigStore.FileList = new SessionStateFileList
+            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
+            ConfigStore.FileList = new FileListPrefs
             {
                 RememberLastFolder = false,
                 DoubleClickAddsToRenameList = true,
@@ -35,8 +35,8 @@ namespace Mfr.Tests.Ui.Options
         [Fact]
         public void Commit_writes_session_and_config_memory()
         {
-            ConfigStore.MainWindow = new SessionStateMainWindow { RememberWindowState = true };
-            ConfigStore.FileList = new SessionStateFileList
+            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
+            ConfigStore.FileList = new FileListPrefs
             {
                 RememberLastFolder = true,
                 DoubleClickAddsToRenameList = false,

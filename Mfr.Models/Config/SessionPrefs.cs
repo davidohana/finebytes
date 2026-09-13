@@ -6,7 +6,7 @@ namespace Mfr.Models.Config
     /// <summary>
     /// Saved Filter Configuration chrome shared across filter option editors.
     /// </summary>
-    public sealed class SessionStateFilterEditor
+    public sealed class FilterEditorPrefs
     {
         /// <summary>
         /// When true, the format-token picker catalog is visible; when false, only the Edit/collapse rail.
@@ -19,7 +19,7 @@ namespace Mfr.Models.Config
     /// <summary>
     /// Saved main-window size, position, state, and pane splitter ratios.
     /// </summary>
-    public sealed class SessionStateMainWindow
+    public sealed class MainWindowPrefs
     {
         /// <summary>
         /// Window left edge in screen pixels (used when <see cref="State"/> is <c>Normal</c>).
@@ -58,7 +58,7 @@ namespace Mfr.Models.Config
         /// Last main-window pane splitter ratios, when remembered.
         /// </summary>
         [JsonPropertyName("splitters")]
-        public SessionStateSplitters? Splitters { get; set; }
+        public MainWindowSplitters? Splitters { get; set; }
 
         /// <summary>
         /// When true, restore and save main-window size, position, maximized state, and pane splitters across launches.
@@ -70,7 +70,7 @@ namespace Mfr.Models.Config
     /// <summary>
     /// Saved File List folder, masks, view, and double-click behavior.
     /// </summary>
-    public sealed class SessionStateFileList
+    public sealed class FileListPrefs
     {
         /// <summary>
         /// Last File List directory path, when remembered.
@@ -133,7 +133,7 @@ namespace Mfr.Models.Config
     /// <summary>
     /// Saved Rename List session fields.
     /// </summary>
-    public sealed class SessionStateRenameList
+    public sealed class RenameListPrefs
     {
         /// <summary>
         /// Last Rename List Auto-Sort keys in priority order. Empty disables Auto-Sort (MFR7).
@@ -181,7 +181,7 @@ namespace Mfr.Models.Config
     /// Each ratio is firstPane / (firstPane + secondPane) in the range (0, 1). Null means leave XAML defaults.
     /// </para>
     /// </summary>
-    public sealed class SessionStateSplitters
+    public sealed class MainWindowSplitters
     {
         /// <summary>
         /// File List column share of File List + filter panes (horizontal).

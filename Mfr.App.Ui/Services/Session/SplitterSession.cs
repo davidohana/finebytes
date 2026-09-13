@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.Services.Session
         /// </summary>
         /// <param name="panes">Main window pane grids to update.</param>
         /// <param name="saved">Persisted splitter ratios, or null to skip.</param>
-        public static void TryRestore(MainWindowPaneGrids panes, SessionStateSplitters? saved)
+        public static void TryRestore(MainWindowPaneGrids panes, MainWindowSplitters? saved)
         {
             ArgumentNullException.ThrowIfNull(panes);
 
@@ -29,15 +29,15 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Builds a <see cref="SessionStateSplitters"/> from the current pane sizes.
+        /// Builds a <see cref="MainWindowSplitters"/> from the current pane sizes.
         /// </summary>
         /// <param name="panes">Pane grids whose sizes are captured.</param>
         /// <returns>Session payload ready to persist.</returns>
-        public static SessionStateSplitters Capture(MainWindowPaneGrids panes)
+        public static MainWindowSplitters Capture(MainWindowPaneGrids panes)
         {
             ArgumentNullException.ThrowIfNull(panes);
 
-            return new SessionStateSplitters
+            return new MainWindowSplitters
             {
                 FileList = _ColumnRatio(panes.TopPanes),
                 AvailableApplied = _ColumnRatio(panes.FilterLists),

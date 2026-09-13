@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models
             {
                 ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
-                ConfigStore.FileList = new SessionStateFileList { DoubleClickAddsToRenameList = true };
+                ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
                 ConfigStore.Save(configPath);
 
                 Assert.True(File.Exists(configPath));
@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models
             {
                 ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
-                ConfigStore.FileList = new SessionStateFileList { DoubleClickAddsToRenameList = true };
+                ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
                 ConfigStore.Save(configPath);
 
                 using var doc = JsonDocument.Parse(File.ReadAllText(configPath));
@@ -97,7 +97,7 @@ namespace Mfr.Tests.Models
             {
                 ConfigStoreTestReset.LoadEmpty();
                 ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
-                ConfigStore.FileList = new SessionStateFileList { DoubleClickAddsToRenameList = true };
+                ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
                 ConfigStore.Save(configPath);
 
                 Assert.True(File.Exists(configPath));

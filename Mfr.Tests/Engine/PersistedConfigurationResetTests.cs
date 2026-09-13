@@ -30,7 +30,7 @@ namespace Mfr.Tests.Engine
             var presetsPath = dir.CombinePath("presets.json");
 
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.FileList = new SessionStateFileList { FileMask = "*.mp3" };
+            ConfigStore.FileList = new FileListPrefs { FileMask = "*.mp3" };
             ConfigStore.FilterDefaultsJson = new JsonObject { ["LettersCase"] = new JsonObject() };
             ConfigStore.Save(configPath);
             File.WriteAllText(
@@ -54,7 +54,7 @@ namespace Mfr.Tests.Engine
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.FileList = new SessionStateFileList { FileMask = "*.wav" };
+            ConfigStore.FileList = new FileListPrefs { FileMask = "*.wav" };
             ConfigStore.FilterDefaultsJson = new JsonObject { ["LettersCase"] = new JsonObject() };
 
             PersistedConfigurationReset.Reset(dir.CombinePath("config.json"));

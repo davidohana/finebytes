@@ -27,13 +27,13 @@ namespace Mfr.Tests.Ui.Services.Session
             try
             {
                 ConfigStore.Load(configPath);
-                ConfigStore.FileList = new SessionStateFileList
+                ConfigStore.FileList = new FileListPrefs
                 {
                     RememberLastFolder = false,
                     DoubleClickAddsToRenameList = true,
                     FileMask = "*.old",
                 };
-                ConfigStore.MainWindow = new SessionStateMainWindow { RememberWindowState = false };
+                ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
 
                 var window = new AppMainWindow
                 {
@@ -44,7 +44,7 @@ namespace Mfr.Tests.Ui.Services.Session
                 window.Show();
                 window.UpdateLayout();
 
-                var capture = new SessionStateFileList
+                var capture = new FileListPrefs
                 {
                     LastOpenedDirectory = Path.GetTempPath(),
                     FileMask = "*.wav",

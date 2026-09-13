@@ -215,7 +215,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         public void FilterEditor_RestoresCollapsedTokenPickerFromSession()
         {
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.FilterEditor = new SessionStateFilterEditor { FormatTokenPickerExpanded = false };
+            ConfigStore.FilterEditor = new FilterEditorPrefs { FormatTokenPickerExpanded = false };
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(persistSession: true);
 
             Assert.False(mainViewModel.FilterEditorViewModel.FormatTokenPickerExpanded);

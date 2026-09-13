@@ -1,21 +1,25 @@
 ---
 name: mfr-code-review
 description: >-
-  Reviews finebytes/MFR changes for correctness, KISS, YAGNI, naming, stale
-  APIs, layering, leftover flags, fragile heuristics, dedup/reuse (local and
-  cross-file), and test coverage; always applies high-confidence cleanup and
-  worthwhile tests unless the user asks for findings-only; surfaces deeper
-  refactor/dedup options ranked by cost-to-value (risk, LOC, churn vs payoff);
-  may delegate to explore/bugbot/security-review when triggers match. Use when
-  the user asks for a code review, deep review, KISS/YAGNI pass,
-  simplify/minimize/cleanup/dedup, to review a plan phase or prior transcript,
+  Reviews finebytes/MFR changes for correctness, KISS, YAGNI, naming (prioritize
+  renames when old symbols are inaccurate), stale APIs, layering, leftover flags,
+  fragile heuristics, dedup/reuse (local and cross-file), and test coverage;
+  always applies high-confidence cleanup and worthwhile tests unless the user asks
+  for findings-only; surfaces deeper refactor/dedup options ranked by cost-to-value
+  (risk, LOC, churn vs payoff); may delegate to explore/bugbot/security-review when
+  triggers match. Use when the user asks for a code review, deep review, KISS/YAGNI
+  pass, simplify/minimize/cleanup/dedup, to review a plan phase or prior transcript,
   or says auto-correct things you are sure about.
 ---
 
 # MFR code review
 
-Default posture: **correctness first**, then **delete and collapse**, then **tests that earn
-their keep**. Prefer a smaller design over a compatible one.
+Default posture: **correctness first**, then **accurate names**, then **delete and collapse**,
+then **tests that earn their keep**. Prefer a smaller design over a compatible one.
+
+**Prioritize renames** when old symbols (types, methods, fields, params, files, test names)
+no longer match current behavior or ownership — apply them in-pass; do not leave a wrong name
+because rename churn feels large. A stale name is a correctness/clarity bug, not optional polish.
 
 Actively hunt **dedup and reuse** at every scope — local copy-paste, parallel types/views,
 shared policy in two layers, twin APIs, and test fixtures. **Always apply** high-confidence
@@ -43,9 +47,12 @@ including plain “review” / “see if” prompts). Do **not** require action 
 simplify, minimize, cleanup, kiss, yagni, or auto-correct:
 
 - Bugs and incorrect edge cases
+- **Renames** when a symbol’s name is inaccurate vs current behavior/ownership (types,
+  methods, fields, params, files, AXAML `x:Class`, test method names) — do these early in the
+  pass so later cleanup uses the right names; rename churn alone is not a reason to propose-only
 - Dead code, unused parameters/flags, leftover APIs, unused wrappers
 - Dual fields/methods that always move together; stale predicates after a behavior change
-- Names that no longer match behavior, or two names that are too close
+- Two names that are too close to tell apart
 - Second sources of truth
 - Local helpers that remove copy-paste in files already being touched
 - XML `<summary>` on non-obvious private methods (not a `//` comment)
@@ -75,8 +82,10 @@ order or by how ambitious they sound.
 - **Value** — lines / types deleted, drift surfaces closed, one source of truth, fewer future
   copies when the next similar feature lands, clearer ownership.
 - **Cost** — behavior/regression **risk**, **LOC added** (net and temporary scaffolding),
-  **churn** (files touched, renames, AXAML/VM/test fan-out), test rewrite burden, blast radius
+  **churn** (files touched, AXAML/VM/test fan-out), test rewrite burden, blast radius
   outside the current feature, and whether the merge needs a dedicated pass vs rides along.
+  Do **not** count fixing an inaccurate symbol name as negative churn under this score —
+  those renames are always-apply, not deeper-refactor tradeoffs.
 
 Prefer a small, low-risk delete over a large elegant merge with high churn. Call out
 **negative** cost-to-value explicitly (high cost, weak payoff) and put those last or under
@@ -172,6 +181,10 @@ session, not process config.
 
 ### Naming and docs
 
+- **Rename first when inaccurate.** After any behavior or ownership change, hunt symbols whose
+  names still describe the old job (including files, namespaces, and test titles). Apply the
+  rename in-pass; do not keep the old symbol “for less churn” or park it under deeper refactors
+  unless the rename truly needs a dedicated multi-feature pass (then still list it high).
 - A name must match **current** behavior. Drop hedges (`Maybe`, `Effective`). Avoid jargon.
 - Two identifiers that cannot be told apart at a glance are too close — rename them.
 - Fields and params should name the type or unit, not a vague role.
@@ -212,15 +225,17 @@ Lead with a one-paragraph verdict. Then:
 
 ```markdown
 ## Correctness (fixed | found)
+## Naming / docs (renames applied | proposed — inaccurate old symbols first)
 ## KISS / YAGNI (removed | proposed)
 ## Dedup / reuse (applied | proposed)
-## Naming / docs (if any)
 ## Tests (added | consolidated | skipped)
 ## Deeper refactors (not done — always include when duplication exists; ranked best cost-to-value first)
 ## What to keep / what not to simplify
 ```
 
-Be specific (type/method names). Separate **applied** from **proposed**.
+Be specific (type/method names). Separate **applied** from **proposed**. Under **Naming**,
+list inaccurate-symbol renames before cosmetic renames; if a wrong name was left unapplied,
+say why (findings-only, or true dedicated-pass blast radius).
 
 **Dedup / reuse** and **Deeper refactors** may overlap — use Dedup for concrete duplication
 found; use Deeper refactors for structural follow-ups (shared types, layer moves, multi-file

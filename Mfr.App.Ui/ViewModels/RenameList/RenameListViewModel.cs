@@ -56,7 +56,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private void _ApplySessionScalarDefaults()
         {
-            var section = new SessionStateRenameList();
+            var section = new RenameListPrefs();
             AddMode = section.AddMode;
             AddFolderContents = section.AddFolderContents;
             UseFixedWidthFont = section.UseFixedWidthFont;
@@ -69,9 +69,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="renameList">
         /// Saved Rename List section, or <see langword="null"/> for first-launch defaults.
         /// </param>
-        internal void ApplySessionSection(SessionStateRenameList? renameList)
+        internal void ApplySessionSection(RenameListPrefs? renameList)
         {
-            var section = renameList ?? new SessionStateRenameList();
+            var section = renameList ?? new RenameListPrefs();
             ApplySession(renameList?.SortFields);
             ApplyVisibleColumnSpecs(renameList?.VisibleColumns);
             AddMode = section.AddMode;
@@ -84,9 +84,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Captures sort, columns, add-policy, and display prefs for session save.
         /// </summary>
         /// <returns>Rename List session section matching the current view model.</returns>
-        internal SessionStateRenameList CaptureSession()
+        internal RenameListPrefs CaptureSession()
         {
-            return new SessionStateRenameList
+            return new RenameListPrefs
             {
                 SortFields = [.. CaptureSortFields()],
                 VisibleColumns = [.. CaptureVisibleColumnSpecs()],

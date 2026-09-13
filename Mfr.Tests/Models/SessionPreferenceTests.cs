@@ -13,9 +13,9 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.MainWindow = new SessionStateMainWindow { RememberWindowState = false };
-                ConfigStore.FileList = new SessionStateFileList { RememberLastFolder = false };
-                ConfigStore.RenameList = new SessionStateRenameList
+                ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
+                ConfigStore.FileList = new FileListPrefs { RememberLastFolder = false };
+                ConfigStore.RenameList = new RenameListPrefs
                 {
                     AddMode = RenameListAddMode.Folders,
                     AddFolderContents = false,

@@ -112,7 +112,7 @@ namespace Mfr.Tests.Ui.MainWindow
             var other = _ShowMainWindow();
             SplitterSession.TryRestore(
                 other.GetPaneGrids(),
-                new SessionStateSplitters { FileList = captured.FileList }
+                new MainWindowSplitters { FileList = captured.FileList }
             );
             other.UpdateLayout();
 
