@@ -32,7 +32,7 @@ namespace Mfr.App.Ui.ViewModels.Options
         {
             RememberLastFolder = ConfigStore.FileList?.RememberLastFolder ?? true;
             RememberWindowState = ConfigStore.MainWindow?.RememberWindowState ?? true;
-            ConfirmationPrompts = ConfigStore.Ui.ConfirmationPrompts;
+            SuppressedConfirmations = [.. ConfigStore.Ui.SuppressedConfirmations];
             DoubleClickAddsToRenameList = ConfigStore.FileList?.DoubleClickAddsToRenameList ?? false;
             AddMode = ConfigStore.RenameList?.AddMode ?? RenameListAddMode.Files;
             AddFolderContents = ConfigStore.RenameList?.AddFolderContents ?? true;
@@ -52,10 +52,10 @@ namespace Mfr.App.Ui.ViewModels.Options
         private bool _rememberWindowState;
 
         /// <summary>
-        /// Draft confirmation-prompts level for gated UI confirms.
+        /// Draft list of confirmation kinds the user chose not to see again.
         /// </summary>
         [ObservableProperty]
-        private ConfirmationPrompts _confirmationPrompts;
+        private List<ConfirmationKind> _suppressedConfirmations = [];
 
         /// <summary>
         /// When <see langword="true"/>, double-click in the File List adds the selection to the Rename List.
@@ -101,7 +101,7 @@ namespace Mfr.App.Ui.ViewModels.Options
             fileList.RememberLastFolder = RememberLastFolder;
             fileList.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
             ConfigStore.EnsureMainWindow().RememberWindowState = RememberWindowState;
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts;
+            ConfigStore.Ui.SuppressedConfirmations = [.. SuppressedConfirmations];
             var renameList = ConfigStore.EnsureRenameList();
             renameList.AddMode = AddMode;
             renameList.AddFolderContents = AddFolderContents;

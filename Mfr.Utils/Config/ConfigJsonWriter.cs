@@ -72,6 +72,9 @@ namespace Mfr.Utils.Config
                 case ConfigFieldKind.Enum:
                     _WriteEnumLeaf(root, configObject, binding, naming);
                     return;
+                case ConfigFieldKind.EnumList:
+                    _WriteEnumListLeaf(root, configObject, binding, naming);
+                    return;
                 default:
                     throw new InvalidOperationException($"Unhandled config field kind '{binding.Kind}'.");
             }
@@ -145,6 +148,36 @@ namespace Mfr.Utils.Config
         {
             var value = binding.Field.GetValue(configObject)!;
             root[binding.JsonName] = naming.ConvertName(value.ToString()!);
+        }
+
+        /// <summary>
+        /// Writes an unannotated enum-list leaf as a JSON array of camelCase (naming-policy) member names.
+        /// </summary>
+        private static void _WriteEnumListLeaf(
+            JsonObject root,
+            object configObject,
+            ConfigFieldBinding binding,
+            JsonNamingPolicy naming
+        )
+        {
+            if (binding.Field.GetValue(configObject) is not System.Collections.IEnumerable values)
+            {
+                root[binding.JsonName] = new JsonArray();
+                return;
+            }
+
+            JsonArray array = [];
+            foreach (var item in values)
+            {
+                if (item is null)
+                {
+                    continue;
+                }
+
+                array.Add(naming.ConvertName(item.ToString()!));
+            }
+
+            root[binding.JsonName] = array;
         }
     }
 }

@@ -112,6 +112,7 @@ namespace Mfr.Tests.Ui.RenameList
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
 
+            ConfirmationPolicy.Suppress(ConfirmationKind.ClearAppliedFilters);
             await applied.ClearCommand.ExecuteAsync(null);
 
             Assert.Equal("hello.txt", renameList.Entries[0].FullFileNamePreview);
@@ -210,6 +211,7 @@ namespace Mfr.Tests.Ui.RenameList
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             Assert.Equal(1, renameList.ChangeCount);
 
+            ConfirmationPolicy.Suppress(ConfirmationKind.ClearRenameList);
             await renameList.ClearCommand.ExecuteAsync(null);
 
             Assert.Empty(renameList.Entries);

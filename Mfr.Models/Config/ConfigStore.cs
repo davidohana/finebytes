@@ -16,9 +16,10 @@ namespace Mfr.Models.Config
     /// Soft-load dialect for the whole prefs file: missing default AppData file → in-memory defaults.
     /// Corrupt / unreadable → defaults (app continues). Missing keys → field initializers / null session
     /// sections / empty <see cref="FilterDefaultsJson"/>. Invalid <c>log</c>/<c>ui</c>/<c>renameLog</c>
-    /// leaf → that leaf is skipped. Bad <c>filterDefaults</c> entries are skipped later by
-    /// <c>FilterDefaultsStore</c> (Engine). Explicit <c>--config PATH</c> missing → hard-fail
-    /// (CLI typo). Explicit path corrupt → soft to defaults. Opposite of hard-fail
+    /// leaf → that leaf is skipped. Unknown members inside <c>ui.suppressedConfirmations</c> are skipped;
+    /// obsolete <c>ui.confirmationPrompts</c> is ignored (no migration). Bad <c>filterDefaults</c> entries
+    /// are skipped later by <c>FilterDefaultsStore</c> (Engine). Explicit <c>--config PATH</c> missing →
+    /// hard-fail (CLI typo). Explicit path corrupt → soft to defaults. Opposite of hard-fail
     /// <c>PresetManager</c> (Engine) and CLI <c>--set</c> (<see cref="ApplyCliOverrides"/>).
     /// </para>
     /// <para>
@@ -30,8 +31,8 @@ namespace Mfr.Models.Config
     /// <see cref="RenameLogConfig"/> field initializers.
     /// </para>
     /// <para>
-    /// Document shape: root object with <c>log</c>/<c>ui</c>/<c>renameLog</c> (string leaves via
-    /// <see cref="ConfigJsonApplier"/> / <see cref="ConfigJsonWriter"/>), sibling session sections
+    /// Document shape: root object with <c>log</c>/<c>ui</c>/<c>renameLog</c> (string leaves and enum-list
+    /// arrays via <see cref="ConfigJsonApplier"/> / <see cref="ConfigJsonWriter"/>), sibling session sections
     /// (<c>mainWindow</c>, <c>fileList</c>, <c>renameList</c>, <c>filterEditor</c> via STJ), and
     /// <c>filterDefaults</c> (opaque map of type → filter JSON; not nested under <c>defaults</c>).
     /// Nested <c>session</c> is not read (no migration).
@@ -57,7 +58,7 @@ namespace Mfr.Models.Config
         public static LogConfig Log => s_Prefs.Log;
 
         /// <summary>
-        /// Gets the UI options persisted by the Options dialog (<c>ui.confirmationPrompts</c>).
+        /// Gets the UI options persisted by the Options dialog (<c>ui.suppressedConfirmations</c>).
         /// </summary>
         public static UiConfig Ui => s_Prefs.Ui;
 
@@ -449,7 +450,7 @@ namespace Mfr.Models.Config
             public LogConfig Log = new();
 
             /// <summary>
-            /// UI options (<c>confirmationPrompts</c>).
+            /// UI options (<c>suppressedConfirmations</c>).
             /// </summary>
             [ConfigSection]
             public UiConfig Ui = new();

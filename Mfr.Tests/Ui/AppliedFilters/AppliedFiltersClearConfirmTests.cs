@@ -14,29 +14,27 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies replace-on-load confirm is required only for More with a non-empty stack.
+        /// Verifies replace-on-load confirm is required when not suppressed and the stack is non-empty.
         /// </summary>
         [Fact]
-        public void NeedsConfirmReplaceOnLoad_requires_More_and_nonempty_stack()
+        public void NeedsConfirmReplaceOnLoad_requires_unsuppressed_and_nonempty_stack()
         {
             var viewModel = new AppliedFiltersViewModel();
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             Assert.False(viewModel.NeedsConfirmReplaceOnLoad());
 
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             Assert.True(viewModel.NeedsConfirmReplaceOnLoad());
 
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Normal;
+            ConfirmationPolicy.Suppress(ConfirmationKind.ReplaceAppliedFiltersOnLoad);
             Assert.False(viewModel.NeedsConfirmReplaceOnLoad());
         }
 
         /// <summary>
-        /// Verifies More prompts before clearing a non-empty stack and clears when accepted.
+        /// Verifies clear confirms by default and clears when accepted.
         /// </summary>
         [Fact]
-        public async Task Clear_More_accept_clears_stack()
+        public async Task Clear_confirm_accept_clears_stack()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var viewModel = new AppliedFiltersViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             var asked = 0;
@@ -56,12 +54,11 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies More declines leave the Applied Filters stack unchanged.
+        /// Verifies decline leaves the Applied Filters stack unchanged.
         /// </summary>
         [Fact]
-        public async Task Clear_More_decline_keeps_stack()
+        public async Task Clear_confirm_decline_keeps_stack()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var viewModel = new AppliedFiltersViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.UiHooks = new AppliedFiltersUiHooks { ConfirmClearAsync = () => Task.FromResult(false) };
@@ -72,12 +69,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Normal clears without calling the confirm hook.
+        /// Verifies a suppressed ClearAppliedFilters skips the confirm hook.
         /// </summary>
         [Fact]
-        public async Task Clear_Normal_skips_confirm()
+        public async Task Clear_suppressed_skips_confirm()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Normal;
+            ConfirmationPolicy.Suppress(ConfirmationKind.ClearAppliedFilters);
             var viewModel = new AppliedFiltersViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             var asked = 0;
@@ -97,12 +94,11 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies More with a missing confirm hook aborts and leaves the stack unchanged.
+        /// Verifies a missing confirm hook aborts and leaves the stack unchanged.
         /// </summary>
         [Fact]
-        public async Task Clear_More_null_hook_aborts()
+        public async Task Clear_null_hook_aborts()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var viewModel = new AppliedFiltersViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 

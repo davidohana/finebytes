@@ -7,8 +7,8 @@ namespace Mfr.Utils.Config
     /// <para>
     /// Uses <see cref="ConfigSectionAttribute"/> for nested objects,
     /// <see cref="ConfigIntRangeAttribute"/> / <see cref="ConfigStringMaxLengthAttribute"/> for constrained leaves,
-    /// and unannotated <c>bool</c> / enum fields as leaves (via <see cref="ConfigValueReader"/>; leaf values are JSON strings,
-    /// including integers, booleans, and enum member names).
+    /// unannotated <c>bool</c> / enum fields as string leaves, and unannotated <c>List&lt;enum&gt;</c> fields as JSON
+    /// string arrays (via <see cref="ConfigValueReader"/>).
     /// </para>
     /// </summary>
     public static class ConfigJsonApplier
@@ -17,7 +17,8 @@ namespace Mfr.Utils.Config
         /// Binds <paramref name="configObject"/> onto <paramref name="target"/>.
         /// <para>
         /// <see cref="ConfigSectionAttribute"/> fields recurse into nested JSON objects. Leaf attributes and public
-        /// <c>bool</c> / enum fields read matching properties as JSON strings. Omitted properties and JSON null leave fields unchanged.
+        /// <c>bool</c> / enum fields read matching properties as JSON strings. Enum lists read JSON string arrays.
+        /// Omitted properties and JSON null leave fields unchanged.
         /// </para>
         /// </summary>
         /// <param name="configObject">A JSON object (typically the document root).</param>
@@ -119,6 +120,9 @@ namespace Mfr.Utils.Config
                 case ConfigFieldKind.Enum:
                     _ApplyEnumLeaf(configObject, target, binding);
                     return;
+                case ConfigFieldKind.EnumList:
+                    _ApplyEnumListLeaf(configObject, target, binding, softLeafSkip);
+                    return;
                 default:
                     throw new InvalidOperationException($"Unhandled config field kind '{binding.Kind}'.");
             }
@@ -199,6 +203,29 @@ namespace Mfr.Utils.Config
             var value = binding.Field.GetValue(target)!;
             ConfigValueReader.ReadEnum(configObject, binding.JsonName, binding.Field.FieldType, ref value);
             binding.Field.SetValue(target, value);
+        }
+
+        /// <summary>
+        /// Reads and assigns an unannotated enum-list leaf (JSON string array).
+        /// </summary>
+        private static void _ApplyEnumListLeaf(
+            JsonElement configObject,
+            object target,
+            ConfigFieldBinding binding,
+            bool softLeafSkip
+        )
+        {
+            var enumType = binding.Field.FieldType.GetGenericArguments()[0];
+            var list = ConfigValueReader.ReadEnumList(
+                configObject,
+                binding.JsonName,
+                enumType,
+                softSkipUnknownMembers: softLeafSkip
+            );
+            if (list is not null)
+            {
+                binding.Field.SetValue(target, list);
+            }
         }
     }
 }

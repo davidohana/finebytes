@@ -12,29 +12,68 @@ namespace Mfr.Tests.Models
         }
 
         [Theory]
-        [InlineData(ConfirmationPrompts.Fewer, ConfirmationKind.GoWithPreviewErrors, false)]
-        [InlineData(ConfirmationPrompts.Fewer, ConfirmationKind.UndoRename, false)]
-        [InlineData(ConfirmationPrompts.Fewer, ConfirmationKind.ReplaceAppliedFiltersOnLoad, false)]
-        [InlineData(ConfirmationPrompts.Fewer, ConfirmationKind.ClearRenameList, false)]
-        [InlineData(ConfirmationPrompts.Fewer, ConfirmationKind.ClearAppliedFilters, false)]
-        [InlineData(ConfirmationPrompts.Normal, ConfirmationKind.GoWithPreviewErrors, true)]
-        [InlineData(ConfirmationPrompts.Normal, ConfirmationKind.UndoRename, true)]
-        [InlineData(ConfirmationPrompts.Normal, ConfirmationKind.ReplaceAppliedFiltersOnLoad, false)]
-        [InlineData(ConfirmationPrompts.Normal, ConfirmationKind.ClearRenameList, false)]
-        [InlineData(ConfirmationPrompts.Normal, ConfirmationKind.ClearAppliedFilters, false)]
-        [InlineData(ConfirmationPrompts.More, ConfirmationKind.GoWithPreviewErrors, true)]
-        [InlineData(ConfirmationPrompts.More, ConfirmationKind.UndoRename, true)]
-        [InlineData(ConfirmationPrompts.More, ConfirmationKind.ReplaceAppliedFiltersOnLoad, true)]
-        [InlineData(ConfirmationPrompts.More, ConfirmationKind.ClearRenameList, true)]
-        [InlineData(ConfirmationPrompts.More, ConfirmationKind.ClearAppliedFilters, true)]
-        public void ShouldConfirm_matches_level_and_kind_table(
-            ConfirmationPrompts level,
-            ConfirmationKind kind,
-            bool expected
-        )
+        [InlineData(ConfirmationKind.GoWithPreviewErrors)]
+        [InlineData(ConfirmationKind.UndoRename)]
+        [InlineData(ConfirmationKind.ReplaceAppliedFiltersOnLoad)]
+        [InlineData(ConfirmationKind.ClearRenameList)]
+        [InlineData(ConfirmationKind.ClearAppliedFilters)]
+        [InlineData(ConfirmationKind.OverwritePreset)]
+        [InlineData(ConfirmationKind.DeletePreset)]
+        public void ShouldConfirm_true_by_default(ConfirmationKind kind)
         {
-            ConfigStore.Ui.ConfirmationPrompts = level;
-            Assert.Equal(expected, ConfirmationPolicy.ShouldConfirm(kind));
+            Assert.True(ConfirmationPolicy.ShouldConfirm(kind));
+        }
+
+        [Fact]
+        public void Suppress_skips_only_that_kind()
+        {
+            ConfirmationPolicy.Suppress(ConfirmationKind.ClearRenameList);
+
+            Assert.False(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
+            Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.GoWithPreviewErrors));
+            Assert.Contains(ConfirmationKind.ClearRenameList, ConfigStore.Ui.SuppressedConfirmations);
+        }
+
+        [Fact]
+        public void Suppress_is_idempotent()
+        {
+            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
+            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
+
+            Assert.Equal([ConfirmationKind.UndoRename], ConfigStore.Ui.SuppressedConfirmations);
+        }
+
+        [Fact]
+        public void ClearSuppressions_restores_show_by_default()
+        {
+            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
+            ConfirmationPolicy.Suppress(ConfirmationKind.DeletePreset);
+            ConfirmationPolicy.ClearSuppressions();
+
+            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.GoWithPreviewErrors));
+            Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.DeletePreset));
+        }
+
+        [Fact]
+        public void Load_ignores_obsolete_confirmationPrompts()
+        {
+            using var temp = ConfigStoreTempFile.CreateWithContent(
+                /*lang=json,strict*/
+                """
+                {
+                  "ui": {
+                    "confirmationPrompts": "fewer",
+                    "suppressedConfirmations": ["clearRenameList"]
+                  }
+                }
+                """
+            );
+            ConfigStore.Load(temp.Path);
+
+            Assert.Equal([ConfirmationKind.ClearRenameList], ConfigStore.Ui.SuppressedConfirmations);
+            Assert.False(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
+            Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.GoWithPreviewErrors));
         }
     }
 }

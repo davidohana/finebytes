@@ -80,9 +80,9 @@ namespace Mfr.Tests.Cli
                 "--set",
                 "log.maxSessionFiles=50",
                 "--set",
-                "ui.confirmationPrompts=more",
+                "ui.suppressedConfirmations=unused",
             ])!;
-            Assert.Equal(["log.maxSessionFiles=50", "ui.confirmationPrompts=more"], options.ConfigOverrides);
+            Assert.Equal(["log.maxSessionFiles=50", "ui.suppressedConfirmations=unused"], options.ConfigOverrides);
         }
 
         [Fact]

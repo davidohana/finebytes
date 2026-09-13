@@ -177,6 +177,113 @@ namespace Mfr.Utils.Config
         }
 
         /// <summary>
+        /// Reads an optional enum list from a JSON string array property.
+        /// <para>
+        /// When <paramref name="propertyName"/> is missing or JSON null, returns <see langword="null"/> (caller leaves
+        /// the field unchanged). When present, builds a new <see cref="List{T}"/> of defined members.
+        /// </para>
+        /// </summary>
+        /// <param name="configObject">A JSON object (typically a section object).</param>
+        /// <param name="propertyName">Object property name; matching is case-insensitive.</param>
+        /// <param name="enumType">Enum element type.</param>
+        /// <param name="softSkipUnknownMembers">
+        /// When <see langword="true"/>, unknown member names are omitted; when <see langword="false"/>, they throw.
+        /// </param>
+        /// <returns>A new list when the property is present; otherwise <see langword="null"/>.</returns>
+        /// <exception cref="ArgumentException"><paramref name="enumType"/> is not an enum.</exception>
+        /// <exception cref="InvalidDataException">
+        /// Thrown when <paramref name="configObject"/> is not an object, the property is neither a JSON array nor null,
+        /// an array element is not a string, or (hard mode) a string is not a defined member name.
+        /// </exception>
+        public static object? ReadEnumList(
+            JsonElement configObject,
+            string propertyName,
+            Type enumType,
+            bool softSkipUnknownMembers
+        )
+        {
+            ArgumentNullException.ThrowIfNull(enumType);
+            if (!enumType.IsEnum)
+            {
+                throw new ArgumentException($"Type '{enumType.FullName}' is not an enum.", nameof(enumType));
+            }
+
+            if (configObject.ValueKind != JsonValueKind.Object)
+            {
+                throw new InvalidDataException("Root must be a JSON object.");
+            }
+
+            if (!JsonObjectProperties.TryGetPropertyIgnoreCase(configObject, propertyName, out var prop))
+            {
+                return null;
+            }
+
+            if (prop.ValueKind == JsonValueKind.Null)
+            {
+                return null;
+            }
+
+            if (prop.ValueKind != JsonValueKind.Array)
+            {
+                throw new InvalidDataException($"'{propertyName}' must be a JSON array or null.");
+            }
+
+            var listType = typeof(List<>).MakeGenericType(enumType);
+            var list = (System.Collections.IList)Activator.CreateInstance(listType)!;
+            foreach (var element in prop.EnumerateArray())
+            {
+                if (element.ValueKind != JsonValueKind.String)
+                {
+                    throw new InvalidDataException($"'{propertyName}' array elements must be JSON strings.");
+                }
+
+                var raw = element.GetString();
+                if (raw.IsBlank())
+                {
+                    if (softSkipUnknownMembers)
+                    {
+                        continue;
+                    }
+
+                    throw new InvalidDataException(
+                        $"'{propertyName}' elements must be enum member names (got '{raw}')."
+                    );
+                }
+
+                if (!Enum.TryParse(enumType, raw, ignoreCase: true, out var parsed) || parsed is null)
+                {
+                    if (softSkipUnknownMembers)
+                    {
+                        continue;
+                    }
+
+                    throw new InvalidDataException(
+                        $"'{propertyName}' elements must be enum member names (got '{raw}')."
+                    );
+                }
+
+                if (!Enum.IsDefined(enumType, parsed))
+                {
+                    if (softSkipUnknownMembers)
+                    {
+                        continue;
+                    }
+
+                    throw new InvalidDataException(
+                        $"'{propertyName}' elements must be enum member names (got '{raw}')."
+                    );
+                }
+
+                if (!list.Contains(parsed))
+                {
+                    list.Add(parsed);
+                }
+            }
+
+            return list;
+        }
+
+        /// <summary>
         /// Reads a case-insensitive object property whose value must be a JSON string or null.
         /// </summary>
         /// <param name="root">A JSON object (config root or nested object).</param>

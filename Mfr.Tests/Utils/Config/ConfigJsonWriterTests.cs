@@ -19,6 +19,8 @@ namespace Mfr.Tests.Utils.Config
             public bool Enabled = true;
 
             public SampleLeafMode Mode = SampleLeafMode.Files;
+
+            public List<SampleLeafMode> Modes = [];
         }
 
         private sealed class SampleSectionRoot
@@ -50,6 +52,18 @@ namespace Mfr.Tests.Utils.Config
             Assert.Equal("false", root["enabled"]?.GetValue<string>());
             Assert.Equal("folders", root["mode"]?.GetValue<string>());
             Assert.Equal("ok", root["name"]?.GetValue<string>());
+            Assert.Empty(root["modes"]!.AsArray());
+        }
+
+        [Fact]
+        public void Write_writes_enum_list_as_camelCase_string_array()
+        {
+            var options = new SampleOptions { Modes = [SampleLeafMode.Folders, SampleLeafMode.Files] };
+
+            var root = ConfigJsonWriter.Write(options);
+            var modes = root["modes"]!.AsArray().Select(node => node!.GetValue<string>()).ToArray();
+
+            Assert.Equal(["folders", "files"], modes);
         }
 
         [Fact]
@@ -71,6 +85,7 @@ namespace Mfr.Tests.Utils.Config
                     Enabled = false,
                     Mode = SampleLeafMode.Folders,
                     Name = "ok",
+                    Modes = [SampleLeafMode.Files, SampleLeafMode.Folders],
                 },
             };
 
@@ -83,6 +98,7 @@ namespace Mfr.Tests.Utils.Config
             Assert.False(copy.Inner.Enabled);
             Assert.Equal(SampleLeafMode.Folders, copy.Inner.Mode);
             Assert.Equal("ok", copy.Inner.Name);
+            Assert.Equal([SampleLeafMode.Files, SampleLeafMode.Folders], copy.Inner.Modes);
         }
     }
 }

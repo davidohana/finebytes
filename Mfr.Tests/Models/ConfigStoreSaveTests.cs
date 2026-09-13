@@ -12,14 +12,20 @@ namespace Mfr.Tests.Models
         public void Save_round_trips_mutated_ui_and_file_list_leaves()
         {
             using var temp = ConfigStoreTempFile.CreateReady();
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset];
             ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
             ConfigStore.Save(temp.Path);
 
             Assert.True(File.Exists(temp.Path));
             using (var doc = JsonDocument.Parse(File.ReadAllText(temp.Path)))
             {
-                Assert.Equal("more", doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString());
+                var suppressed = doc
+                    .RootElement.GetProperty("ui")
+                    .GetProperty("suppressedConfirmations")
+                    .EnumerateArray()
+                    .Select(e => e.GetString()!)
+                    .ToArray();
+                Assert.Equal(["clearRenameList", "deletePreset"], suppressed);
                 Assert.True(
                     doc.RootElement.GetProperty("fileList").GetProperty("doubleClickAddsToRenameList").GetBoolean()
                 );
@@ -28,7 +34,10 @@ namespace Mfr.Tests.Models
             }
 
             ConfigStore.Load(temp.Path);
-            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Equal(
+                [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset],
+                ConfigStore.Ui.SuppressedConfirmations
+            );
             Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
         }
 
@@ -40,7 +49,7 @@ namespace Mfr.Tests.Models
                 """
                 {
                   "ui": {
-                    "confirmationPrompts": "fewer"
+                    "suppressedConfirmations": ["goWithPreviewErrors"]
                   },
                   "fileList": {
                     "doubleClickAddsToRenameList": false
@@ -49,12 +58,18 @@ namespace Mfr.Tests.Models
                 """
             );
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearRenameList];
             ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
             ConfigStore.Save(temp.Path);
 
             using var doc = JsonDocument.Parse(File.ReadAllText(temp.Path));
-            Assert.Equal("more", doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString());
+            var suppressed = doc
+                .RootElement.GetProperty("ui")
+                .GetProperty("suppressedConfirmations")
+                .EnumerateArray()
+                .Select(e => e.GetString()!)
+                .ToArray();
+            Assert.Equal(["clearRenameList"], suppressed);
             Assert.True(
                 doc.RootElement.GetProperty("fileList").GetProperty("doubleClickAddsToRenameList").GetBoolean()
             );
@@ -65,18 +80,18 @@ namespace Mfr.Tests.Models
         {
             using var temp = ConfigStoreTempFile.CreateUnderNewDirectory("nested", "config.json");
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.UndoRename];
             ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
             ConfigStore.Save(temp.Path);
 
             Assert.True(File.Exists(temp.Path));
             ConfigStore.Load(temp.Path);
-            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Equal([ConfirmationKind.UndoRename], ConfigStore.Ui.SuppressedConfirmations);
             Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
         }
 
         [Fact]
-        public void Load_ignores_unknown_old_ui_presets_key()
+        public void Load_ignores_unknown_old_ui_presets_and_confirmationPrompts()
         {
             using var temp = ConfigStoreTempFile.CreateWithContent(
                 // lang=json,strict
@@ -87,13 +102,14 @@ namespace Mfr.Tests.Models
                       "confirmReplaceAppliedFiltersOnLoad": "true"
                     },
                     "confirmationPrompts": "more",
-                    "doubleClickAddsToRenameList": "true"
+                    "doubleClickAddsToRenameList": "true",
+                    "suppressedConfirmations": ["overwritePreset"]
                   }
                 }
                 """
             );
             ConfigStore.Load(temp.Path);
-            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Equal([ConfirmationKind.OverwritePreset], ConfigStore.Ui.SuppressedConfirmations);
             Assert.Null(ConfigStore.FileList);
         }
     }

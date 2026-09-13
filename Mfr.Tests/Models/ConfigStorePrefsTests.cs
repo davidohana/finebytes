@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models
             using var temp = ConfigStoreTempFile.CreateWithContent("{ not-json");
             ConfigStore.Load(temp.Path);
             Assert.Null(ConfigStore.MainWindow);
-            Assert.Equal(ConfirmationPrompts.Normal, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
             Assert.Empty(ConfigStore.FilterDefaultsJson);
         }
 
@@ -135,7 +135,7 @@ namespace Mfr.Tests.Models
         public void Save_and_Load_round_trips_session_and_filter_default_in_one_file()
         {
             using var temp = ConfigStoreTempFile.CreateReady();
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearAppliedFilters];
             ConfigStore.FileList = new FileListPrefs { FileMask = "*.flac" };
             ConfigStore.Save(temp.Path);
 
@@ -146,14 +146,20 @@ namespace Mfr.Tests.Models
 
             using (var doc = JsonDocument.Parse(File.ReadAllText(temp.Path)))
             {
-                Assert.Equal("more", doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString());
+                var suppressed = doc
+                    .RootElement.GetProperty("ui")
+                    .GetProperty("suppressedConfirmations")
+                    .EnumerateArray()
+                    .Select(e => e.GetString()!)
+                    .ToArray();
+                Assert.Equal(["clearAppliedFilters"], suppressed);
                 Assert.Equal("*.flac", doc.RootElement.GetProperty("fileList").GetProperty("fileMask").GetString());
                 Assert.True(doc.RootElement.GetProperty("filterDefaults").TryGetProperty("LettersCase", out _));
                 Assert.False(doc.RootElement.GetProperty("filterDefaults").TryGetProperty("defaults", out _));
             }
 
             ConfigStore.Load(temp.Path);
-            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Equal([ConfirmationKind.ClearAppliedFilters], ConfigStore.Ui.SuppressedConfirmations);
             Assert.Equal("*.flac", ConfigStore.FileList?.FileMask);
             var reloaded = FilterDefaultsStore.FromConfigStore();
             Assert.True(reloaded.TryGetDefault("LettersCase", out var filter));
@@ -184,7 +190,7 @@ namespace Mfr.Tests.Models
                 """
                 {
                   "ui": {
-                    "confirmationPrompts": "more",
+                    "suppressedConfirmations": "not-an-array",
                     "doubleClickAddsToRenameList": "true"
                   },
                   "log": {
@@ -194,7 +200,7 @@ namespace Mfr.Tests.Models
                 """
             );
             ConfigStore.Load(temp.Path);
-            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
             Assert.Null(ConfigStore.FileList);
             Assert.Equal(50, ConfigStore.Log.MaxSessionFiles);
         }

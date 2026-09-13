@@ -39,27 +39,9 @@
         </StackPanel>
       </controls:FieldsetGroup>
 
-      <controls:FieldsetGroup Header="Confirmation prompts">
-        <StackPanel Orientation="Horizontal" Spacing="12">
-          <controls:CompactRadioButton
-            GroupName="ConfirmationPrompts"
-            Content="Fewer"
-            ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationFewer}"
-            IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Fewer}, Mode=TwoWay}"
-          />
-          <controls:CompactRadioButton
-            GroupName="ConfirmationPrompts"
-            Content="Normal"
-            ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationNormal}"
-            IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.Normal}, Mode=TwoWay}"
-          />
-          <controls:CompactRadioButton
-            GroupName="ConfirmationPrompts"
-            Content="More"
-            ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmationMore}"
-            IsChecked="{Binding ConfirmationPrompts, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:ConfirmationPrompts.More}, Mode=TwoWay}"
-          />
-        </StackPanel>
+      <controls:FieldsetGroup Header="Confirmations">
+        <!-- P4 replaces this placeholder with Reset confirmations button. -->
+        <TextBlock Text="Per-dialog confirmation suppressions (reset control coming soon)." TextWrapping="Wrap" />
       </controls:FieldsetGroup>
 
       <controls:FieldsetGroup Header="File List">

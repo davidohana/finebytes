@@ -1,30 +1,48 @@
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Reads <see cref="UiConfig.ConfirmationPrompts"/> from <see cref="ConfigStore.Ui"/> to decide whether a gated
-    /// confirm should show.
+    /// Reads and mutates <see cref="UiConfig.SuppressedConfirmations"/> on <see cref="ConfigStore.Ui"/> to decide
+    /// whether a gated confirm should show.
+    /// <para>
+    /// <see cref="Suppress"/> / <see cref="ClearSuppressions"/> update in-memory prefs only; callers persist via
+    /// <see cref="ConfigStore.Save"/> (or Options <c>Commit</c> then Save).
+    /// </para>
     /// </summary>
     public static class ConfirmationPolicy
     {
         /// <summary>
-        /// Returns whether the UI should confirm for <paramref name="kind"/> at the current prompts level.
+        /// Returns whether the UI should confirm for <paramref name="kind"/>.
         /// </summary>
-        /// <param name="kind">Gated confirmation kind (not always-confirm actions).</param>
-        /// <returns><see langword="true"/> when a confirm dialog should be shown.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="kind"/> is not a defined member.</exception>
+        /// <param name="kind">Suppressible confirmation kind.</param>
+        /// <returns>
+        /// <see langword="true"/> when <paramref name="kind"/> is not in the suppress list (show dialog).
+        /// </returns>
         public static bool ShouldConfirm(ConfirmationKind kind)
         {
-            var level = ConfigStore.Ui.ConfirmationPrompts;
-            return kind switch
+            return !ConfigStore.Ui.SuppressedConfirmations.Contains(kind);
+        }
+
+        /// <summary>
+        /// Adds <paramref name="kind"/> to the in-memory suppress list when not already present.
+        /// </summary>
+        /// <param name="kind">Confirmation kind to stop showing.</param>
+        public static void Suppress(ConfirmationKind kind)
+        {
+            var suppressed = ConfigStore.Ui.SuppressedConfirmations;
+            if (suppressed.Contains(kind))
             {
-                ConfirmationKind.GoWithPreviewErrors or ConfirmationKind.UndoRename => level
-                    is ConfirmationPrompts.Normal
-                        or ConfirmationPrompts.More,
-                ConfirmationKind.ReplaceAppliedFiltersOnLoad
-                or ConfirmationKind.ClearRenameList
-                or ConfirmationKind.ClearAppliedFilters => level is ConfirmationPrompts.More,
-                _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, message: null),
-            };
+                return;
+            }
+
+            suppressed.Add(kind);
+        }
+
+        /// <summary>
+        /// Clears the in-memory suppress list so all suppressible confirms show again.
+        /// </summary>
+        public static void ClearSuppressions()
+        {
+            ConfigStore.Ui.SuppressedConfirmations.Clear();
         }
     }
 }

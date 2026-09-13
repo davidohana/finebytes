@@ -85,6 +85,13 @@ namespace Mfr.Utils.Config
                         $"Unknown config field '{segments[0]}' under '{containerType.Name}'."
                     );
 
+                if (leaf.Kind == ConfigFieldKind.EnumList)
+                {
+                    throw new InvalidDataException(
+                        $"Config field '{leaf.JsonName}' is an enum list and cannot be set via --set."
+                    );
+                }
+
                 parent[leaf.JsonName] = value;
                 return;
             }

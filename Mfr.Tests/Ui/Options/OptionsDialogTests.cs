@@ -65,9 +65,9 @@ namespace Mfr.Tests.Ui.Options
                     .OfType<CompactRadioButton>()
                     .Select(radio => radio.Content?.ToString())
                     .ToList();
-                Assert.Contains("Fewer", radioLabels);
-                Assert.Contains("Normal", radioLabels);
-                Assert.Contains("More", radioLabels);
+                Assert.DoesNotContain("Fewer", radioLabels);
+                Assert.DoesNotContain("Normal", radioLabels);
+                Assert.DoesNotContain("More", radioLabels);
                 Assert.Contains("Open", radioLabels);
                 Assert.Contains("Add to Rename List", radioLabels);
                 Assert.Contains("Files", radioLabels);
@@ -83,10 +83,16 @@ namespace Mfr.Tests.Ui.Options
                     .Select(group => group.Header?.ToString())
                     .ToList();
                 Assert.Contains("Session", groupHeaders);
-                Assert.Contains("Confirmation prompts", groupHeaders);
+                Assert.Contains("Confirmations", groupHeaders);
                 Assert.Contains("File List", groupHeaders);
                 Assert.Contains("Rename List", groupHeaders);
                 Assert.Contains("Undo & Rename Log", groupHeaders);
+
+                var texts = dialog.GetVisualDescendants().OfType<TextBlock>().Select(block => block.Text).ToList();
+                Assert.Contains(
+                    texts,
+                    text => text is not null && text.Contains("Per-dialog confirmation suppressions")
+                );
 
                 var rowLabels = dialog
                     .GetVisualDescendants()
@@ -112,9 +118,6 @@ namespace Mfr.Tests.Ui.Options
                     .OfType<CompactRadioButton>()
                     .Select(radio => ToolTip.GetTip(radio)?.ToString())
                     .ToList();
-                Assert.Contains(AppTips.OptionsConfirmationFewer, radioTips);
-                Assert.Contains(AppTips.OptionsConfirmationNormal, radioTips);
-                Assert.Contains(AppTips.OptionsConfirmationMore, radioTips);
                 Assert.Contains(AppTips.OptionsDoubleClickOpen, radioTips);
                 Assert.Contains(AppTips.OptionsDoubleClickAdd, radioTips);
                 Assert.Contains(AppTips.OptionsAddModeFiles, radioTips);
@@ -198,7 +201,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(saved);
             Assert.False(ConfigStore.FileList.RememberLastFolder);
             Assert.False(ConfigStore.MainWindow.RememberWindowState);
-            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);
@@ -281,7 +284,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.False(saved);
             Assert.True(ConfigStore.FileList.RememberLastFolder);
             Assert.True(ConfigStore.MainWindow.RememberWindowState);
-            Assert.Equal(ConfirmationPrompts.Fewer, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Equal([ConfirmationKind.GoWithPreviewErrors], ConfigStore.Ui.SuppressedConfirmations);
             Assert.False(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Files, ConfigStore.RenameList.AddMode);
             Assert.True(ConfigStore.RenameList.AddFolderContents);
@@ -326,7 +329,7 @@ namespace Mfr.Tests.Ui.Options
         {
             ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
             ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
             ConfigStore.RenameList = new RenameListPrefs
             {
                 AddMode = RenameListAddMode.Files,
@@ -342,7 +345,7 @@ namespace Mfr.Tests.Ui.Options
         {
             vm.RememberLastFolder = false;
             vm.RememberWindowState = false;
-            vm.ConfirmationPrompts = ConfirmationPrompts.More;
+            vm.SuppressedConfirmations = [];
             vm.DoubleClickAddsToRenameList = true;
             vm.AddMode = RenameListAddMode.Folders;
             vm.AddFolderContents = false;

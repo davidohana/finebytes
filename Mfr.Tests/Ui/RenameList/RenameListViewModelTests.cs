@@ -950,6 +950,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(renameListViewModel.ClearCommand.CanExecute(null));
             Assert.Equal(2, renameListViewModel.ItemCount);
 
+            ConfirmationPolicy.Suppress(ConfirmationKind.ClearRenameList);
             await renameListViewModel.ClearCommand.ExecuteAsync(null);
 
             Assert.Empty(renameListViewModel.Entries);

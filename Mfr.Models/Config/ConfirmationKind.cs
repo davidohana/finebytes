@@ -1,9 +1,10 @@
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Confirmation gates controlled by <see cref="ConfirmationPrompts"/> via <see cref="ConfirmationPolicy"/>.
+    /// Suppressible confirmation gates controlled by <see cref="UiConfig.SuppressedConfirmations"/> via
+    /// <see cref="ConfirmationPolicy"/>.
     /// <para>
-    /// Irreversible always-confirm actions (reset / delete / overwrite preset) are not represented here.
+    /// Reset Configuration is not a kind — it always confirms and cannot be suppressed.
     /// </para>
     /// </summary>
     public enum ConfirmationKind
@@ -32,5 +33,15 @@ namespace Mfr.Models.Config
         /// Confirm before Undo Last / Log-window Undo (re-commits OldValues).
         /// </summary>
         UndoRename = 4,
+
+        /// <summary>
+        /// Confirm before overwriting an existing preset on save.
+        /// </summary>
+        OverwritePreset = 5,
+
+        /// <summary>
+        /// Confirm before deleting one or more presets.
+        /// </summary>
+        DeletePreset = 6,
     }
 }

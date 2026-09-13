@@ -20,8 +20,11 @@ namespace Mfr.Tests.Models
             Assert.Equal("100", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
             Assert.Equal(string.Empty, doc.RootElement.GetProperty("log").GetProperty("directoryPath").GetString());
             Assert.Equal("session-", doc.RootElement.GetProperty("log").GetProperty("filePrefix").GetString());
-            Assert.Equal("normal", doc.RootElement.GetProperty("ui").GetProperty("confirmationPrompts").GetString());
+            Assert.Empty(
+                doc.RootElement.GetProperty("ui").GetProperty("suppressedConfirmations").EnumerateArray().ToArray()
+            );
             Assert.Equal("10", doc.RootElement.GetProperty("renameLog").GetProperty("limit").GetString());
+            Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("confirmationPrompts", out _));
             Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("doubleClickAddsToRenameList", out _));
             Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("presets", out _));
             Assert.False(doc.RootElement.TryGetProperty("session", out _));

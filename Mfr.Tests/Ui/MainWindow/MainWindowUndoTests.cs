@@ -47,7 +47,11 @@ namespace Mfr.Tests.Ui.MainWindow
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
             viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
             viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Ui.SuppressedConfirmations =
+            [
+                ConfirmationKind.GoWithPreviewErrors,
+                ConfirmationKind.UndoRename,
+            ];
 
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
 
@@ -74,7 +78,11 @@ namespace Mfr.Tests.Ui.MainWindow
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
             viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
             viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Ui.SuppressedConfirmations =
+            [
+                ConfirmationKind.GoWithPreviewErrors,
+                ConfirmationKind.UndoRename,
+            ];
 
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
             Assert.True(File.Exists(destination));
@@ -91,10 +99,10 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies Normal prompts confirm Undo and decline aborts without filesystem changes.
+        /// Verifies confirm Undo when not suppressed and decline aborts without filesystem changes.
         /// </summary>
         [AvaloniaFact]
-        public async Task UndoLast_normal_confirm_decline_aborts()
+        public async Task UndoLast_confirm_decline_aborts()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var source = Path.Combine(dir, "alpha.txt");
@@ -105,10 +113,11 @@ namespace Mfr.Tests.Ui.MainWindow
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
             viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
             viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
+            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
 
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Normal;
+            ConfirmationPolicy.ClearSuppressions();
             var confirmCalls = 0;
             viewModel.RenameListViewModel.UiHooks = new RenameListUiHooks
             {
@@ -128,10 +137,10 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies Fewer skips the Undo confirm dialog.
+        /// Verifies a suppressed UndoRename skips the Undo confirm dialog.
         /// </summary>
         [AvaloniaFact]
-        public async Task UndoLast_fewer_skips_confirm()
+        public async Task UndoLast_suppressed_skips_confirm()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var source = Path.Combine(dir, "alpha.txt");
@@ -142,7 +151,8 @@ namespace Mfr.Tests.Ui.MainWindow
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
             viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
             viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
+            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
 
             var confirmCalls = 0;

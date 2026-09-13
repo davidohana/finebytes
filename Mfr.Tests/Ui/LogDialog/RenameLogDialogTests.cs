@@ -218,7 +218,8 @@ namespace Mfr.Tests.Ui.LogDialog
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
             viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
             viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
+            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
 
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
             Assert.True(File.Exists(destination));
@@ -255,7 +256,7 @@ namespace Mfr.Tests.Ui.LogDialog
         /// Verifies Log-window Undo uses the same confirmation gate as Undo Last.
         /// </summary>
         [AvaloniaFact]
-        public async Task UndoFromLog_normal_confirm_decline_aborts()
+        public async Task UndoFromLog_confirm_decline_aborts()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var source = Path.Combine(dir, "alpha.txt");
@@ -267,13 +268,14 @@ namespace Mfr.Tests.Ui.LogDialog
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
             viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
             viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
+            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
 
             var log = RenameLogStore.LastOperation;
             Assert.NotNull(log);
 
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Normal;
+            ConfirmationPolicy.ClearSuppressions();
             var confirmCalls = 0;
             viewModel.RenameListViewModel.UiHooks = new App.Ui.ViewModels.RenameList.RenameListUiHooks
             {

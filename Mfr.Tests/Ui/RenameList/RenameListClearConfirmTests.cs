@@ -22,12 +22,11 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies More prompts before clearing a non-empty list and clears when accepted.
+        /// Verifies clear confirms by default and clears when accepted.
         /// </summary>
         [Fact]
-        public async Task Clear_More_accept_clears_list()
+        public async Task Clear_confirm_accept_clears_list()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));
@@ -50,12 +49,11 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies More declines leave the Rename List unchanged.
+        /// Verifies decline leaves the Rename List unchanged.
         /// </summary>
         [Fact]
-        public async Task Clear_More_decline_keeps_list()
+        public async Task Clear_confirm_decline_keeps_list()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));
@@ -68,12 +66,12 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies Normal clears without calling the confirm hook.
+        /// Verifies a suppressed ClearRenameList skips the confirm hook.
         /// </summary>
         [Fact]
-        public async Task Clear_Normal_skips_confirm()
+        public async Task Clear_suppressed_skips_confirm()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Normal;
+            ConfirmationPolicy.Suppress(ConfirmationKind.ClearRenameList);
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));
@@ -96,12 +94,11 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies More with a missing confirm hook aborts and leaves the list unchanged.
+        /// Verifies a missing confirm hook aborts and leaves the list unchanged.
         /// </summary>
         [Fact]
-        public async Task Clear_More_null_hook_aborts()
+        public async Task Clear_null_hook_aborts()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));
@@ -113,12 +110,11 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies Alt+drag clear bypasses the More confirmation gate.
+        /// Verifies Alt+drag clear bypasses the confirmation gate.
         /// </summary>
         [Fact]
-        public async Task ClearWithoutConfirm_More_skips_hook()
+        public async Task ClearWithoutConfirm_skips_hook()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
             var dir = _context.CreateTempDir();
             await File.WriteAllTextAsync(Path.Combine(dir, "a.txt"), "a");
             var renameList = new RenameListViewModel(_context.CreateFileListViewModel(dir));

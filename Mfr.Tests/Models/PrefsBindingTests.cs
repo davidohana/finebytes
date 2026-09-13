@@ -23,43 +23,92 @@ namespace Mfr.Tests.Models
                 var hasStr = field.GetCustomAttribute<ConfigStringMaxLengthAttribute>() is not null;
                 var isBoolLeaf = field.FieldType == typeof(bool);
                 var isEnumLeaf = field.FieldType.IsEnum;
+                var isEnumListLeaf =
+                    field.FieldType.IsGenericType
+                    && field.FieldType.GetGenericTypeDefinition() == typeof(List<>)
+                    && field.FieldType.GetGenericArguments()[0].IsEnum;
                 var n =
                     (hasSection ? 1 : 0)
                     + (hasInt ? 1 : 0)
                     + (hasStr ? 1 : 0)
                     + (isBoolLeaf ? 1 : 0)
-                    + (isEnumLeaf ? 1 : 0);
+                    + (isEnumLeaf ? 1 : 0)
+                    + (isEnumListLeaf ? 1 : 0);
                 Assert.True(
                     n == 1,
                     $"{configType.Name}.{field.Name} must be a [{nameof(ConfigSectionAttribute)}] section, "
                         + $"a [{nameof(ConfigIntRangeAttribute)}] / [{nameof(ConfigStringMaxLengthAttribute)}] leaf, "
-                        + $"or an unannotated bool / enum leaf."
+                        + $"or an unannotated bool / enum / enum-list leaf."
                 );
             }
         }
 
         /// <summary>
-        /// Verifies <c>ui.confirmationPrompts</c> binds from a JSON string leaf.
+        /// Verifies <c>ui.suppressedConfirmations</c> binds from a JSON string array.
         /// </summary>
         [Fact]
-        public void Ui_confirmation_leaf_binds_from_json_string()
+        public void Ui_suppressed_confirmations_binds_from_json_array()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """
                 {
                   "ui": {
-                    "confirmationPrompts": "more"
+                    "suppressedConfirmations": ["clearRenameList", "deletePreset"]
                   }
                 }
                 """
             );
             var ui = new UiConfig();
-            Assert.Equal(ConfirmationPrompts.Normal, ui.ConfirmationPrompts);
+            Assert.Empty(ui.SuppressedConfirmations);
 
             var root = new PrefsRootForTest { Ui = ui };
             ConfigJsonApplier.Apply(doc.RootElement, root);
 
-            Assert.Equal(ConfirmationPrompts.More, ui.ConfirmationPrompts);
+            Assert.Equal([ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset], ui.SuppressedConfirmations);
+        }
+
+        /// <summary>
+        /// Verifies soft-load skips unknown enum members and keeps known ones.
+        /// </summary>
+        [Fact]
+        public void Ui_suppressed_confirmations_soft_skips_unknown_members()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """
+                {
+                  "ui": {
+                    "suppressedConfirmations": ["clearRenameList", "notARealKind", "undoRename"]
+                  }
+                }
+                """
+            );
+            var root = new PrefsRootForTest();
+            ConfigJsonApplier.ApplySoft(doc.RootElement, root);
+
+            Assert.Equal(
+                [ConfirmationKind.ClearRenameList, ConfirmationKind.UndoRename],
+                root.Ui.SuppressedConfirmations
+            );
+        }
+
+        /// <summary>
+        /// Verifies hard Apply rejects unknown enum-list members (CLI / strict binding).
+        /// </summary>
+        [Fact]
+        public void Ui_suppressed_confirmations_hard_rejects_unknown_members()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """
+                {
+                  "ui": {
+                    "suppressedConfirmations": ["clearRenameList", "notARealKind"]
+                  }
+                }
+                """
+            );
+            var root = new PrefsRootForTest();
+            Assert.Throws<InvalidDataException>(() => ConfigJsonApplier.Apply(doc.RootElement, root));
+            Assert.Empty(root.Ui.SuppressedConfirmations);
         }
 
         /// <summary>
@@ -89,14 +138,14 @@ namespace Mfr.Tests.Models
         /// Verifies omitted <c>ui</c> leaves stay at their defaults.
         /// </summary>
         [Fact]
-        public void Ui_confirmation_leaf_defaults_when_omitted()
+        public void Ui_suppressed_confirmations_defaults_when_omitted()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """{"log":{"maxSessionFiles":"100"}}"""
             );
             var root = new PrefsRootForTest();
             ConfigJsonApplier.Apply(doc.RootElement, root);
-            Assert.Equal(ConfirmationPrompts.Normal, root.Ui.ConfirmationPrompts);
+            Assert.Empty(root.Ui.SuppressedConfirmations);
         }
 
         /// <summary>

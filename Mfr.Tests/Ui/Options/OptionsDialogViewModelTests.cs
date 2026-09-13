@@ -20,7 +20,7 @@ namespace Mfr.Tests.Ui.Options
 
             Assert.True(vm.RememberLastFolder);
             Assert.True(vm.RememberWindowState);
-            Assert.Equal(ConfirmationPrompts.Normal, vm.ConfirmationPrompts);
+            Assert.Empty(vm.SuppressedConfirmations);
             Assert.False(vm.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Files, vm.AddMode);
             Assert.True(vm.AddFolderContents);
@@ -33,7 +33,7 @@ namespace Mfr.Tests.Ui.Options
         {
             ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
             ConfigStore.FileList = new FileListPrefs { RememberLastFolder = false, DoubleClickAddsToRenameList = true };
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.More;
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearRenameList];
             ConfigStore.RenameList = new RenameListPrefs
             {
                 AddMode = RenameListAddMode.Folders,
@@ -45,7 +45,7 @@ namespace Mfr.Tests.Ui.Options
 
             Assert.False(vm.RememberLastFolder);
             Assert.False(vm.RememberWindowState);
-            Assert.Equal(ConfirmationPrompts.More, vm.ConfirmationPrompts);
+            Assert.Equal([ConfirmationKind.ClearRenameList], vm.SuppressedConfirmations);
             Assert.True(vm.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, vm.AddMode);
             Assert.False(vm.AddFolderContents);
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Ui.Options
         {
             ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
             ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
             ConfigStore.RenameList = new RenameListPrefs
             {
                 AddMode = RenameListAddMode.Files,
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Ui.Options
             {
                 RememberLastFolder = false,
                 RememberWindowState = false,
-                ConfirmationPrompts = ConfirmationPrompts.More,
+                SuppressedConfirmations = [ConfirmationKind.DeletePreset],
                 DoubleClickAddsToRenameList = true,
                 AddMode = RenameListAddMode.FilesAndFolders,
                 AddFolderContents = false,
@@ -96,7 +96,7 @@ namespace Mfr.Tests.Ui.Options
 
             Assert.False(ConfigStore.FileList.RememberLastFolder);
             Assert.False(ConfigStore.MainWindow.RememberWindowState);
-            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Equal([ConfirmationKind.DeletePreset], ConfigStore.Ui.SuppressedConfirmations);
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.FilesAndFolders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);
@@ -106,13 +106,13 @@ namespace Mfr.Tests.Ui.Options
         [Fact]
         public void Commit_creates_missing_prefs_sections()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.UndoRename];
 
             var vm = new OptionsDialogViewModel()
             {
                 RememberLastFolder = false,
                 RememberWindowState = false,
-                ConfirmationPrompts = ConfirmationPrompts.More,
+                SuppressedConfirmations = [],
                 DoubleClickAddsToRenameList = true,
                 AddMode = RenameListAddMode.Folders,
                 AddFolderContents = false,
@@ -126,7 +126,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.NotNull(ConfigStore.RenameList);
             Assert.False(ConfigStore.FileList.RememberLastFolder);
             Assert.False(ConfigStore.MainWindow.RememberWindowState);
-            Assert.Equal(ConfirmationPrompts.More, ConfigStore.Ui.ConfirmationPrompts);
+            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);

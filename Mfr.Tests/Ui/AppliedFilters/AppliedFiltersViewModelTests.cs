@@ -151,6 +151,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
+            ConfirmationPolicy.Suppress(ConfirmationKind.ClearAppliedFilters);
             await viewModel.ClearCommand.ExecuteAsync(null);
 
             Assert.Empty(viewModel.Steps);

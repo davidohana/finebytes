@@ -142,12 +142,12 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies Fewer skips the preview-error dialog and still reaches the commit stage.
+        /// Verifies a suppressed GoWithPreviewErrors skips the preview-error dialog and still reaches the commit stage.
         /// </summary>
         [AvaloniaFact]
-        public async Task Go_preview_errors_fewer_skips_confirm_and_commits()
+        public async Task Go_preview_errors_suppressed_skips_confirm_and_commits()
         {
-            ConfigStore.Ui.ConfirmationPrompts = ConfirmationPrompts.Fewer;
+            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
 
             var dir = _tempDirectoryFixture.CreateTempDir();
             var okSource = Path.Combine(dir, "alpha.txt");
@@ -308,6 +308,7 @@ namespace Mfr.Tests.Ui.MainWindow
 
             Assert.Equal("Renamed 1 item(s).", viewModel.StatusHint.ToPlainText());
 
+            ConfirmationPolicy.Suppress(ConfirmationKind.ClearRenameList);
             await viewModel.RenameListViewModel.ClearCommand.ExecuteAsync(null);
 
             Assert.Equal(0, viewModel.ItemCount);

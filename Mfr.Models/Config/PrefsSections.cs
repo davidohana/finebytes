@@ -5,19 +5,20 @@ namespace Mfr.Models.Config
     /// <summary>
     /// UI prefs from the Options dialog, loaded from the <c>ui</c> section of the config file.
     /// <para>
-    /// <see cref="ConfirmationPrompts"/> gates optional confirms via <see cref="ConfirmationPolicy"/>.
+    /// <see cref="SuppressedConfirmations"/> gates optional confirms via <see cref="ConfirmationPolicy"/>.
+    /// Obsolete <c>ui.confirmationPrompts</c> is ignored on soft-load (no migration).
     /// </para>
     /// </summary>
     public sealed class UiConfig
     {
         /// <summary>
-        /// How often the UI asks for confirmation before gated actions (Fewer / Normal / More).
+        /// Confirmation kinds the user chose not to see again (empty = show all suppressible confirms).
         /// <para>
-        /// Default <see cref="ConfirmationPrompts.Normal"/>. Replaces the former
-        /// <c>ui.presets.confirmReplaceAppliedFiltersOnLoad</c> bool (no migration).
+        /// Persisted as <c>ui.suppressedConfirmations</c> (JSON array of camelCase enum names). Unknown members
+        /// are skipped on soft-load. Default empty.
         /// </para>
         /// </summary>
-        public ConfirmationPrompts ConfirmationPrompts = ConfirmationPrompts.Normal;
+        public List<ConfirmationKind> SuppressedConfirmations = [];
     }
 
     /// <summary>

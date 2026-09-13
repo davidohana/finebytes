@@ -25,7 +25,7 @@ namespace Mfr.Utils.Config
         /// </summary>
         /// <param name="type">Config type whose public instance fields are classified.</param>
         /// <param name="naming">JSON property naming policy.</param>
-        /// <returns>Mapped field bindings; unannotated non-bool/non-enum fields are omitted.</returns>
+        /// <returns>Mapped field bindings; unannotated non-bool/non-enum/non-enum-list fields are omitted.</returns>
         /// <exception cref="InvalidOperationException">A field has incompatible attributes or types.</exception>
         internal static IEnumerable<ConfigFieldBinding> Enumerate(Type type, JsonNamingPolicy naming)
         {
@@ -187,7 +187,43 @@ namespace Mfr.Utils.Config
                 return true;
             }
 
+            if (_TryGetEnumListElementType(field.FieldType, out _))
+            {
+                binding = new ConfigFieldBinding(
+                    field,
+                    ConfigFieldKind.EnumList,
+                    jsonName,
+                    IntRange: null,
+                    StringMax: null
+                );
+                return true;
+            }
+
             return false;
+        }
+
+        /// <summary>
+        /// Returns <see langword="true"/> when <paramref name="fieldType"/> is <see cref="List{T}"/> of an enum.
+        /// </summary>
+        /// <param name="fieldType">CLR field type.</param>
+        /// <param name="enumType">Element enum type when this method returns <see langword="true"/>.</param>
+        /// <returns>Whether the type is an enum list.</returns>
+        private static bool _TryGetEnumListElementType(Type fieldType, out Type enumType)
+        {
+            enumType = null!;
+            if (!fieldType.IsGenericType || fieldType.GetGenericTypeDefinition() != typeof(List<>))
+            {
+                return false;
+            }
+
+            var elementType = fieldType.GetGenericArguments()[0];
+            if (!elementType.IsEnum)
+            {
+                return false;
+            }
+
+            enumType = elementType;
+            return true;
         }
     }
 
@@ -210,6 +246,9 @@ namespace Mfr.Utils.Config
 
         /// <summary>Unannotated enum leaf.</summary>
         Enum,
+
+        /// <summary>Unannotated <see cref="List{T}"/> of enum values (JSON string array, not a string leaf).</summary>
+        EnumList,
     }
 
     /// <summary>

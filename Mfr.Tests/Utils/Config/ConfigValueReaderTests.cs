@@ -243,5 +243,71 @@ namespace Mfr.Tests.Utils.Config
                 ConfigValueReader.ReadEnum(doc.RootElement, "mode", typeof(SampleMode), ref value)
             );
         }
+
+        [Fact]
+        public void ReadEnumList_missing_property_returns_null()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                "{}"
+            );
+            Assert.Null(
+                ConfigValueReader.ReadEnumList(
+                    doc.RootElement,
+                    "modes",
+                    typeof(SampleMode),
+                    softSkipUnknownMembers: false
+                )
+            );
+        }
+
+        [Fact]
+        public void ReadEnumList_parses_members_and_dedupes()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"modes":["folders", "Files", "folders"]}"""
+            );
+            var list = Assert.IsType<List<SampleMode>>(
+                ConfigValueReader.ReadEnumList(
+                    doc.RootElement,
+                    "modes",
+                    typeof(SampleMode),
+                    softSkipUnknownMembers: false
+                )
+            );
+            Assert.Equal([SampleMode.Folders, SampleMode.Files], list);
+        }
+
+        [Fact]
+        public void ReadEnumList_soft_skips_unknown_members()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"modes":["folders", "nope", "files"]}"""
+            );
+            var list = Assert.IsType<List<SampleMode>>(
+                ConfigValueReader.ReadEnumList(
+                    doc.RootElement,
+                    "modes",
+                    typeof(SampleMode),
+                    softSkipUnknownMembers: true
+                )
+            );
+            Assert.Equal([SampleMode.Folders, SampleMode.Files], list);
+        }
+
+        [Fact]
+        public void ReadEnumList_hard_rejects_unknown_members()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """{"modes":["folders", "nope"]}"""
+            );
+            Assert.Throws<InvalidDataException>(() =>
+                ConfigValueReader.ReadEnumList(
+                    doc.RootElement,
+                    "modes",
+                    typeof(SampleMode),
+                    softSkipUnknownMembers: false
+                )
+            );
+        }
     }
 }
