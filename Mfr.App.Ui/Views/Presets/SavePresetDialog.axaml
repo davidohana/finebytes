@@ -8,11 +8,12 @@
   Title="Save Preset"
   Icon="/Assets/mfr.ico"
   Width="420"
+  Height="260"
   MinWidth="360"
-  SizeToContent="Height"
+  MinHeight="220"
   WindowStartupLocation="CenterOwner"
   ShowInTaskbar="False"
-  CanResize="False"
+  CanResize="True"
   FontFamily="{StaticResource AppChromeFont}"
   FontSize="{StaticResource AppChromeFontSize}"
   Foreground="{DynamicResource AppChromeForegroundBrush}"
@@ -26,7 +27,7 @@
       IsAcceptEnabled="{Binding CanSave}"
     />
 
-    <StackPanel Spacing="10" Grid.IsSharedSizeScope="True">
+    <Grid RowDefinitions="Auto,*,Auto" Grid.IsSharedSizeScope="True">
       <Grid>
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" SharedSizeGroup="SavePresetLabel" />
@@ -45,7 +46,7 @@
           Text="{Binding Name, Mode=TwoWay}"
         />
       </Grid>
-      <Grid>
+      <Grid Grid.Row="1" Margin="0,10">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="Auto" SharedSizeGroup="SavePresetLabel" />
           <ColumnDefinition Width="*" />
@@ -57,15 +58,16 @@
           Text="{Binding Description}"
           AcceptsReturn="True"
           TextWrapping="Wrap"
-          MinHeight="60"
-          Height="60"
+          MinHeight="100"
+          VerticalAlignment="Stretch"
         />
       </Grid>
       <controls:CompactCheckBox
+        Grid.Row="2"
         x:Name="SaveColumnsCheckBox"
         Content="Save Rename List columns"
         IsChecked="{Binding SaveRenameListColumns}"
       />
-    </StackPanel>
+    </Grid>
   </DockPanel>
 </Window>

@@ -45,6 +45,8 @@
     <Style Selector="TextBox">
       <Setter Property="SelectionBrush" Value="{DynamicResource TextSelectionBrush}" />
       <Setter Property="SelectionForegroundBrush" Value="{DynamicResource TextSelectionForegroundBrush}" />
+      <!-- Template binds AllowAutoHide from this attached property (defaults to overlay thumbs). -->
+      <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
     </Style>
     <Style Selector="TextBox /template/ TextPresenter#PART_TextPresenter">
       <Setter Property="SelectionBrush" Value="{DynamicResource TextSelectionBrush}" />
@@ -63,6 +65,9 @@
       <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
     </Style>
     <Style Selector="DataGrid">
+      <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="ComboBox">
       <Setter Property="ScrollViewer.AllowAutoHide" Value="False" />
     </Style>
     <!-- Fluent paints rows under the vertical scrollbar (ColumnSpan=3). Keep a real gutter.

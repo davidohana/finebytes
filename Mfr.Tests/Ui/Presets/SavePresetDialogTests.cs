@@ -34,6 +34,7 @@ namespace Mfr.Tests.Ui.Presets
 
             Assert.True(dialog.IsVisible);
             Assert.Equal("Save Preset", dialog.Title);
+            Assert.True(dialog.CanResize);
 
             var nameBox = dialog.FindControl<ComboBox>("NameBox");
             Assert.NotNull(nameBox);

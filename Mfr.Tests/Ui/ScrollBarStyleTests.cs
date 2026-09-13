@@ -9,8 +9,10 @@ using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.MainWindow;
+using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.App.Ui.Views.FileList;
 using Mfr.App.Ui.Views.FilterPalette;
+using Mfr.App.Ui.Views.Presets;
 using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Ui
@@ -105,6 +107,34 @@ namespace Mfr.Tests.Ui
             _AssertExpandedVerticalScrollBar(scrollBar);
 
             window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Save Preset description TextBox scrollbars use expanded Fluent chrome, not overlay thumbs.
+        /// </summary>
+        [AvaloniaFact]
+        public void SavePresetDescription_uses_expanded_vertical_scrollbar()
+        {
+            var viewModel = new SavePresetDialogViewModel
+            {
+                Description = string.Join(
+                    Environment.NewLine,
+                    Enumerable.Range(0, 20).Select(index => $"line {index} overflow text")
+                ),
+            };
+            var dialog = new SavePresetDialog(viewModel);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var descriptionBox = dialog.FindControl<TextBox>("DescriptionBox");
+            Assert.NotNull(descriptionBox);
+            Assert.False(descriptionBox.GetValue(ScrollViewer.AllowAutoHideProperty));
+
+            var scrollBar = _FindVisibleVerticalScrollBar(descriptionBox);
+            _AssertExpandedVerticalScrollBar(scrollBar);
+
+            dialog.Close();
         }
 
         private static (Window Window, DataGrid Grid, ScrollBar ScrollBar) _ShowOverflowReportGrid()
