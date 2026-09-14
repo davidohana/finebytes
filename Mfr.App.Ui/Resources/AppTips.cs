@@ -33,7 +33,7 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Options: Confirmations section — how suppressions work.</summary>
         public const string OptionsConfirmations =
-            "Some confirmation dialogs can be hidden via Keep showing…; they stay hidden until reset";
+            "Uncheck Keep showing… on a confirmation to hide it next time; reset below restores all";
 
         /// <summary>Options: Reset confirmations button.</summary>
         public const string OptionsResetConfirmations =
@@ -96,7 +96,7 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Rename List Manual Override Field menu tip.</summary>
         public const string ManualOverrideField =
-            "Override the focused field in the Rename List (F2). Files update on Go.";
+            "Override the focused field in the Rename List (F2). Files update on GO.";
 
         /// <summary>Rename List column header: clear overrides for this column on every row.</summary>
         public const string CancelManualOverrideColumn =
@@ -135,13 +135,13 @@ namespace Mfr.App.Ui.Resources
         public const string EditRenameListSortFields = "Choose Auto-Sort fields and order";
 
         /// <summary>Rename List Auto-Preview toolbar and menu tip (MFR7 AutoPreview).</summary>
-        public const string AutoPreview = "Auto-Preview. Push or unpush to change status.";
+        public const string AutoPreview = "Auto-Preview — click to turn on or off";
 
         /// <summary>Rename List color legend toolbar tip (MFR7 btnLegendEnabled).</summary>
-        public const string ColorLegend = "Show or Hide Rename List Color Legend Panel";
+        public const string ColorLegend = "Show or hide the Rename List color legend";
 
         /// <summary>Rename List color legend panel tip (MFR7 ColorLegend).</summary>
-        public const string ColorLegendPanel = "Rename List Color Legend Panel";
+        public const string ColorLegendPanel = "Explains Rename List cell and row colors";
 
         /// <summary>Color legend: Original Value swatch.</summary>
         public const string LegendOriginalValue = "Unchanged original or preview value";
@@ -170,7 +170,7 @@ namespace Mfr.App.Ui.Resources
         public const string Refresh = "Refresh (F5)";
 
         /// <summary>Address bar tip for focusing the typed path.</summary>
-        public const string GoToAddress = "Go to folder (Ctrl+L)";
+        public const string GoToAddress = "Go to folder (Ctrl+L or Alt+D)";
 
         /// <summary>Up button tip. Backspace is File List–focused, not a window hotkey.</summary>
         public const string GoUp = "Up (Backspace)";
@@ -179,22 +179,25 @@ namespace Mfr.App.Ui.Resources
         public const string AddressEdit = "Enter to go, Esc to cancel";
 
         /// <summary>Applied Filters add-from-palette shuttle tip.</summary>
-        public const string AddSelectedFilter = "Add selected filter to the Filter Apply List";
+        public const string AddSelectedFilter = "Add selected filter to Applied Filters";
 
         /// <summary>Applied Filters remove-selected shuttle tip.</summary>
-        public const string RemoveSelectedFilter = "Remove selected filter from the Filter Apply List";
+        public const string RemoveSelectedFilter = "Remove selected filter from Applied Filters (Del)";
 
         /// <summary>Applied Filters clear-all shuttle tip.</summary>
-        public const string RemoveAllFilters = "Clear Filter Apply List";
+        public const string RemoveAllFilters = "Clear Applied Filters";
 
         /// <summary>Applied Filters move-up shuttle tip.</summary>
-        public const string MoveFilterUp = "Move selected filter up in the apply list (to apply it sooner)";
+        public const string MoveFilterUp =
+            "Move selected filter up in Applied Filters (Ctrl+Up) — applies sooner";
 
         /// <summary>Applied Filters move-down shuttle tip.</summary>
-        public const string MoveFilterDown = "Move selected filter down in the apply list (to apply it later)";
+        public const string MoveFilterDown =
+            "Move selected filter down in Applied Filters (Ctrl+Down) — applies later";
 
         /// <summary>Applied Filters Filter Options shuttle tip.</summary>
-        public const string FilterOptions = "Filter Options — Edit filter name and Apply To options";
+        public const string FilterOptions =
+            "Filter Options — name, Apply To target, and where the filter runs (whole / substring / token)";
 
         /// <summary>Applied Filters / Filters menu: open Preset Manager (MFR7 PresetManager).</summary>
         public const string Presets = "Show Preset Manager window";

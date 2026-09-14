@@ -232,7 +232,7 @@
           Grid.Column="2"
           Classes="exclude-masks"
           Content="-"
-          ToolTip.Tip="Exclude masks"
+          ToolTip.Tip="Edit masks that hide matching file names from the File List"
           Click="_OnExcludeMasksClick"
         />
       </Grid>

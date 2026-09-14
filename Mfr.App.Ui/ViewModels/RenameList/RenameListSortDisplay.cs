@@ -10,7 +10,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Tooltip when Auto-Sort is off.
         /// </summary>
-        public const string AutoSortOffSummary = "Auto-Sort off. Push to activate.";
+        public const string AutoSortOffSummary = "Auto-Sort off. Click to turn on with the default keys.";
 
         /// <summary>
         /// Gets the catalog display name for a sort field key.
