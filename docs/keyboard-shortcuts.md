@@ -79,6 +79,8 @@ Shift+click a column header to append a sort key, toggle its direction, or remov
 
 Click the **Select Fields** toolbar button on the Rename List, or choose **Select Visible Fields...** or **Select Sort Fields...** from the **Rename List** menu, the grid right-click menu, or a column-header right-click menu, to open the field shuttle (visible columns and Auto-Sort tabs). Right-click a column header and choose **Hide Field** to hide that column. **Export Rename List (csv)...** on the **Rename List** menu (or **Export → Export Visible Columns (csv)** on a column header) writes a CSV of all visible columns.
 
+**Add Fields by Applied Filters** / **Replace Fields by Applied Filters** (Rename List menu, grid context menu, or column-header menu) infer columns from the full applied filter chain (write targets and format tokens). There is no dedicated keyboard shortcut in v1.
+
 ### Applied Filters
 
 | Action             | Shortcut | Where it works               |

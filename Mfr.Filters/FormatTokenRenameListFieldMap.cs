@@ -2,6 +2,10 @@ using System.Diagnostics;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Image;
+using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Media;
+using Mfr.Models.RenameList.Fields.Mpeg;
 
 namespace Mfr.Filters
 {
@@ -11,7 +15,7 @@ namespace Mfr.Filters
     /// <remarks>
     /// <para>
     /// Meta/session/generator tokens (<c>counter</c>, <c>substr</c>, <c>token</c>, <c>now</c>, …) are omitted.
-    /// Media / MPEG / Image / EXIF families are left for later coverage expansion.
+    /// Generic <c>exif</c> (tag-id lookup) is omitted — only named <c>exif-*</c> / <c>exif-date</c> map.
     /// </para>
     /// </remarks>
     internal static class FormatTokenRenameListFieldMap
@@ -73,6 +77,51 @@ namespace Mfr.Filters
             ["audio-mb-release-country"] = (AudioTagRenameListFields.Group, "MusicBrainzReleaseCountry"),
             ["audio-musicip-id"] = (AudioTagRenameListFields.Group, "MusicIpId"),
             ["audio-amazon-id"] = (AudioTagRenameListFields.Group, "AmazonId"),
+            // Media properties
+            ["media-mime"] = (MediaRenameListFields.Group, "MimeType"),
+            ["media-corrupt"] = (MediaRenameListFields.Group, "PossiblyCorrupt"),
+            ["media-duration"] = (MediaRenameListFields.Group, "Duration"),
+            ["media-duration-sec"] = (MediaRenameListFields.Group, "DurationSeconds"),
+            ["media-types"] = (MediaRenameListFields.Group, "MediaTypes"),
+            ["media-description"] = (MediaRenameListFields.Group, "Description"),
+            ["media-audio-bitrate"] = (MediaRenameListFields.Group, "AudioBitrate"),
+            ["media-samplerate"] = (MediaRenameListFields.Group, "AudioSampleRate"),
+            ["media-bits-per-sample"] = (MediaRenameListFields.Group, "BitsPerSample"),
+            ["media-channels"] = (MediaRenameListFields.Group, "AudioChannels"),
+            ["media-video-width"] = (MediaRenameListFields.Group, "VideoWidth"),
+            ["media-video-height"] = (MediaRenameListFields.Group, "VideoHeight"),
+            ["media-photo-width"] = (MediaRenameListFields.Group, "PhotoWidth"),
+            ["media-photo-height"] = (MediaRenameListFields.Group, "PhotoHeight"),
+            ["media-photo-quality"] = (MediaRenameListFields.Group, "PhotoQuality"),
+            // MPEG audio properties
+            ["mpeg-bitrate"] = (MpegRenameListFields.Group, "Bitrate"),
+            ["mpeg-copyright"] = (MpegRenameListFields.Group, "Copyright"),
+            ["mpeg-duration"] = (MpegRenameListFields.Group, "Duration"),
+            ["mpeg-duration-sec"] = (MpegRenameListFields.Group, "DurationSecs"),
+            ["mpeg-encoding"] = (MpegRenameListFields.Group, "VBR"),
+            ["mpeg-frequency"] = (MpegRenameListFields.Group, "Frequency"),
+            ["mpeg-layer"] = (MpegRenameListFields.Group, "Layer"),
+            ["mpeg-ver"] = (MpegRenameListFields.Group, "Level"),
+            ["mpeg-mode"] = (MpegRenameListFields.Group, "Mode"),
+            ["mpeg-original"] = (MpegRenameListFields.Group, "Original"),
+            ["mpeg-protection"] = (MpegRenameListFields.Group, "Protection"),
+            // Image properties
+            ["image-width"] = (ImageRenameListFields.Group, "Width"),
+            ["image-height"] = (ImageRenameListFields.Group, "Height"),
+            ["image-bit-depth"] = (ImageRenameListFields.Group, "BitDepth"),
+            ["image-format"] = (ImageRenameListFields.Group, "Format"),
+            ["image-horz-res"] = (ImageRenameListFields.Group, "HorzRes"),
+            ["image-vert-res"] = (ImageRenameListFields.Group, "VertRes"),
+            ["image-frame-count"] = (ImageRenameListFields.Group, "Frames"),
+            // EXIF / Jpeg Tag (named tokens + date; generic exif tag-id omitted)
+            ["exif-make"] = (JpegRenameListFields.Group, "ExifDirectory*271"),
+            ["exif-model"] = (JpegRenameListFields.Group, "ExifDirectory*272"),
+            ["exif-exposure"] = (JpegRenameListFields.Group, "ExifDirectory*33434"),
+            ["exif-fnumber"] = (JpegRenameListFields.Group, "ExifDirectory*33437"),
+            ["exif-iso"] = (JpegRenameListFields.Group, "ExifDirectory*34855"),
+            ["exif-focal"] = (JpegRenameListFields.Group, "ExifDirectory*37386"),
+            ["exif-focal-35"] = (JpegRenameListFields.Group, "ExifDirectory*41989"),
+            ["exif-date"] = (JpegRenameListFields.Group, "ExifDirectory*36867"),
         };
 
         /// <summary>

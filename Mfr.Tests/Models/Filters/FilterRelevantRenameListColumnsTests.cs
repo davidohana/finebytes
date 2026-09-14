@@ -7,6 +7,10 @@ using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Image;
+using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Media;
+using Mfr.Models.RenameList.Fields.Mpeg;
 
 namespace Mfr.Tests.Models.Filters
 {
@@ -303,6 +307,107 @@ namespace Mfr.Tests.Models.Filters
                 ],
                 keys
             );
+        }
+
+        /// <summary>
+        /// Verifies Media / MPEG / Image / named-EXIF tokens map to Original-only catalog columns.
+        /// </summary>
+        /// <param name="template">Formatter template containing one or more tokens under test.</param>
+        /// <param name="expectedGroupId">Catalog group for the first mapped token field.</param>
+        /// <param name="expectedPropertyKey">Catalog property key for the first mapped token field.</param>
+        [Theory]
+        [InlineData("<media-duration>", MediaRenameListFields.Group, "Duration")]
+        [InlineData("<mpeg-bitrate>", MpegRenameListFields.Group, "Bitrate")]
+        [InlineData("<mpeg-encoding>", MpegRenameListFields.Group, "VBR")]
+        [InlineData("<image-width>", ImageRenameListFields.Group, "Width")]
+        [InlineData("<exif-make>", JpegRenameListFields.Group, "ExifDirectory*271")]
+        [InlineData("<exif-date:yyyy-MM-dd>", JpegRenameListFields.Group, "ExifDirectory*36867")]
+        public void Collect_Formatter_MediaMpegImageExifTokens_MapOriginalCatalogColumns(
+            string template,
+            string expectedGroupId,
+            string expectedPropertyKey
+        )
+        {
+            var filter = new FormatterFilter(new FilePrefixTarget(), new FormatterOptions(template));
+
+            var keys = FilterRelevantRenameListColumns.Collect([filter]);
+            var expectedTokenKey = RenameListFieldKey.Original(expectedGroupId, expectedPropertyKey);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                    expectedTokenKey,
+                ],
+                keys
+            );
+            Assert.True(RenameListFieldCatalog.TryGetField(expectedTokenKey, out _));
+        }
+
+        /// <summary>
+        /// Verifies every Media / MPEG / Image / named-EXIF map entry resolves to a catalog field.
+        /// </summary>
+        [Fact]
+        public void TryMap_MediaMpegImageExifEntries_ResolveCatalogFields()
+        {
+            (string CanonicalName, string Args)[] cases =
+            [
+                ("media-mime", ""),
+                ("media-corrupt", ""),
+                ("media-duration", ""),
+                ("media-duration-sec", ""),
+                ("media-types", ""),
+                ("media-description", ""),
+                ("media-audio-bitrate", ""),
+                ("media-samplerate", ""),
+                ("media-bits-per-sample", ""),
+                ("media-channels", ""),
+                ("media-video-width", ""),
+                ("media-video-height", ""),
+                ("media-photo-width", ""),
+                ("media-photo-height", ""),
+                ("media-photo-quality", ""),
+                ("mpeg-bitrate", ""),
+                ("mpeg-copyright", ""),
+                ("mpeg-duration", ""),
+                ("mpeg-duration-sec", ""),
+                ("mpeg-encoding", ""),
+                ("mpeg-frequency", ""),
+                ("mpeg-layer", ""),
+                ("mpeg-ver", ""),
+                ("mpeg-mode", ""),
+                ("mpeg-original", ""),
+                ("mpeg-protection", ""),
+                ("image-width", ""),
+                ("image-height", ""),
+                ("image-bit-depth", ""),
+                ("image-format", ""),
+                ("image-horz-res", ""),
+                ("image-vert-res", ""),
+                ("image-frame-count", ""),
+                ("exif-make", ""),
+                ("exif-model", ""),
+                ("exif-exposure", ""),
+                ("exif-fnumber", ""),
+                ("exif-iso", ""),
+                ("exif-focal", ""),
+                ("exif-focal-35", ""),
+                ("exif-date", "yyyy-MM-dd"),
+            ];
+
+            foreach (var (canonicalName, args) in cases)
+            {
+                Assert.True(
+                    FormatTokenRenameListFieldMap.TryMap(canonicalName, args, out var groupId, out var propertyKey),
+                    $"unmapped token '{canonicalName}'"
+                );
+                Assert.True(
+                    RenameListFieldCatalog.TryGetField(groupId, propertyKey, out _),
+                    $"missing catalog field {groupId}/{propertyKey} for '{canonicalName}'"
+                );
+            }
+
+            Assert.False(FormatTokenRenameListFieldMap.TryMap("exif", "ExifSub,36867", out _, out _));
         }
     }
 }
