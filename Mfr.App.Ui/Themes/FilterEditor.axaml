@@ -43,17 +43,30 @@
   </Styles.Resources>
 
   <Style Selector="Border.filter-editor-title-bar">
-    <Setter Property="Background" Value="{DynamicResource FilterEditorTitleBarBrush}" />
+    <Setter Property="Background" Value="{DynamicResource AppChromeHeaderBrush}" />
     <Setter Property="MinHeight" Value="22" />
     <Setter Property="Padding" Value="6,0,4,0" />
+  </Style>
+  <Style Selector="Border.filter-editor-title-bar.has-selection">
+    <Setter Property="Background" Value="{DynamicResource FilterEditorTitleBarBrush}" />
   </Style>
   <Style Selector="TextBlock.filter-editor-title-bar">
     <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
     <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
     <Setter Property="FontWeight" Value="Bold" />
-    <Setter Property="Foreground" Value="{DynamicResource FilterEditorTitleBarForegroundBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeHeaderForegroundBrush}" />
     <Setter Property="VerticalAlignment" Value="Center" />
     <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+  </Style>
+  <Style Selector="Border.filter-editor-title-bar.has-selection TextBlock.filter-editor-title-bar">
+    <Setter Property="Foreground" Value="{DynamicResource FilterEditorTitleBarForegroundBrush}" />
+  </Style>
+  <Style Selector="TextBlock.filter-editor-empty-hint">
+    <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+    <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+    <Setter Property="Margin" Value="8,6,8,8" />
+    <Setter Property="TextWrapping" Value="Wrap" />
   </Style>
   <Style Selector="Button.filter-editor-title-bar-button">
     <Setter Property="Width" Value="18" />

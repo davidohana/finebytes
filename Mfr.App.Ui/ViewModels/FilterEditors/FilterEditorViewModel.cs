@@ -12,6 +12,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
     /// </summary>
     public sealed partial class FilterEditorViewModel : ViewModelBase
     {
+        /// <summary>
+        /// Title bar text when no Applied Filters row is selected.
+        /// </summary>
+        public const string EmptyTitleText = "Filter Configuration";
+
+        /// <summary>
+        /// Body hint when no Applied Filters row is selected.
+        /// </summary>
+        public const string EmptySelectionHint = "Select a filter in Applied Filters to configure it.";
+
         private bool _persistSession;
         private Func<IReadOnlyList<RenameItem>>? _resolveSampleRenameItems;
         private Func<string, RenameItem?>? _resolveRenameItemByFullPath;
@@ -23,10 +33,10 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         private bool _hasSelectedStep;
 
         /// <summary>
-        /// Gets the applied-filter title, e.g. <c>Applied Filter: Shrink Spaces</c>.
+        /// Gets the pane title: empty-state label, or <c>Applied Filter: …</c> when a row is selected.
         /// </summary>
         [ObservableProperty]
-        private string _titleText = string.Empty;
+        private string _titleText = EmptyTitleText;
 
         /// <summary>
         /// Gets the type-specific options editor for the selected filter, or <see langword="null"/> when none.
@@ -85,7 +95,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
 
             var step = selectedSteps.Count > 0 ? selectedSteps[0] : null;
             HasSelectedStep = step is not null;
-            TitleText = step is null ? string.Empty : $"Applied Filter: {step.DisplayName}";
+            TitleText = step is null ? EmptyTitleText : $"Applied Filter: {step.DisplayName}";
             OptionsEditor = step is null
                 ? null
                 : FilterOptionsEditorFactory.Create(step, _resolveSampleRenameItems, _resolveRenameItemByFullPath);

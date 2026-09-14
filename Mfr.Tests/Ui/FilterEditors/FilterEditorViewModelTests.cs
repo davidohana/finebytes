@@ -18,17 +18,17 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies an empty Applied selection clears the configuration title.
+        /// Verifies an empty Applied selection shows the Filter Configuration empty-state title.
         /// </summary>
         [Fact]
-        public void SyncSelection_with_no_selection_clears_title()
+        public void SyncSelection_with_no_selection_shows_empty_title()
         {
             var editor = new FilterEditorViewModel();
 
             editor.SyncSelection([]);
 
             Assert.False(editor.HasSelectedStep);
-            Assert.Equal(string.Empty, editor.TitleText);
+            Assert.Equal(FilterEditorViewModel.EmptyTitleText, editor.TitleText);
         }
 
         /// <summary>

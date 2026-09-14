@@ -4,6 +4,7 @@ using Avalonia.Controls.Presenters;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.Views.AppliedFilters;
@@ -24,15 +25,26 @@ namespace Mfr.Tests.Ui.FilterEditors
     public sealed class FilterEditorViewTests
     {
         /// <summary>
-        /// Verifies an empty Applied list leaves the configuration title hidden.
+        /// Verifies an empty Applied list shows the Filter Configuration empty state.
         /// </summary>
         [AvaloniaFact]
-        public void Empty_applied_list_hides_configuration_title()
+        public void Empty_applied_list_shows_empty_state()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
 
             Assert.False(mainViewModel.FilterEditorViewModel.HasSelectedStep);
-            Assert.Equal(string.Empty, _TitleText(editorView));
+            Assert.Equal(FilterEditorViewModel.EmptyTitleText, _TitleText(editorView));
+
+            var emptyHint = editorView.FindControl<TextBlock>("EmptySelectionHint");
+            Assert.NotNull(emptyHint);
+            Assert.True(emptyHint.IsVisible);
+            Assert.Equal(FilterEditorViewModel.EmptySelectionHint, emptyHint.Text);
+
+            var titleBar = editorView
+                .GetVisualDescendants()
+                .OfType<Border>()
+                .First(border => border.Classes.Contains("filter-editor-title-bar"));
+            Assert.DoesNotContain("has-selection", titleBar.Classes);
 
             window.Close();
         }
@@ -52,6 +64,7 @@ namespace Mfr.Tests.Ui.FilterEditors
 
             Assert.Equal("Applied Filter: Letters Case", mainViewModel.FilterEditorViewModel.TitleText);
             Assert.Equal("Applied Filter: Letters Case", _TitleText(editorView));
+            Assert.False(editorView.FindControl<TextBlock>("EmptySelectionHint")!.IsVisible);
 
             var list = _AppliedList(window);
             list.Focus();

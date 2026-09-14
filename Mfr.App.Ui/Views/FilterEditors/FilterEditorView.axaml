@@ -18,7 +18,11 @@
 >
   <Border Classes="pane">
     <DockPanel>
-      <Border DockPanel.Dock="Top" Classes="filter-editor-title-bar">
+      <Border
+        DockPanel.Dock="Top"
+        Classes="filter-editor-title-bar"
+        Classes.has-selection="{Binding HasSelectedStep}"
+      >
         <DockPanel>
           <Button
             x:Name="ShowFilterHelpButton"
@@ -50,8 +54,14 @@
           <TextBlock x:Name="AppliedFilterTitle" Classes="filter-editor-title-bar" Text="{Binding TitleText}" />
         </DockPanel>
       </Border>
-      <ScrollViewer>
-        <StackPanel Margin="8,6,8,8" IsVisible="{Binding HasSelectedStep}" Spacing="8">
+      <TextBlock
+        x:Name="EmptySelectionHint"
+        Classes="filter-editor-empty-hint"
+        Text="{x:Static editorVm:FilterEditorViewModel.EmptySelectionHint}"
+        IsVisible="{Binding !HasSelectedStep}"
+      />
+      <ScrollViewer IsVisible="{Binding HasSelectedStep}">
+        <StackPanel Margin="8,6,8,8" Spacing="8">
           <ContentControl x:Name="OptionsEditorSlot" Content="{Binding OptionsEditor}">
             <ContentControl.ContentTemplate>
               <local:FilterEditorViewLocator />
