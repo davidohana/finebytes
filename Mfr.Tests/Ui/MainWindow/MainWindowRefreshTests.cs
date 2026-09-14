@@ -25,11 +25,13 @@ namespace Mfr.Tests.Ui.MainWindow
             var dir = _tempDirectoryFixture.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, "a.txt"), "a");
             var viewModel = new MainWindowViewModel(dir);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             File.WriteAllText(Path.Combine(dir, "b.txt"), "b");
 
             Assert.DoesNotContain(viewModel.FileListViewModel.Entries, entry => entry.Name == "b.txt");
 
             await viewModel.RefreshFocusedPaneCommand.ExecuteAsync(null).ConfigureAwait(true);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
 
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "b.txt");
         }
@@ -43,10 +45,12 @@ namespace Mfr.Tests.Ui.MainWindow
             var dir = _tempDirectoryFixture.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, "a.txt"), "a");
             var viewModel = new MainWindowViewModel(dir);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             viewModel.RenameListViewModel.IsGridFocused = true;
             File.WriteAllText(Path.Combine(dir, "b.txt"), "b");
 
             await viewModel.RefreshFocusedPaneCommand.ExecuteAsync(null).ConfigureAwait(true);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
 
             Assert.DoesNotContain(viewModel.FileListViewModel.Entries, entry => entry.Name == "b.txt");
         }

@@ -86,3 +86,10 @@ sequenceDiagram
 
 - Status bar: [status-bar-outcomes.plan.md](docs/plans/status-bar-outcomes.plan.md) — navigate remains out of scope for sticky text.
 - Debt: none filed for this; improvement over MFR7 shell freeze.
+
+## Deeper follow-ups (done)
+
+- Defer constructor listing when `MainWindowViewModel` will `ApplySession` (`deferInitialListing`).
+- Shared `AvaloniaUiThread.Post` for File List VM + thumbnails.
+- `_RunWithoutListingReload` for batched mask/session property writes.
+- `FileListListingWait.CreateWithGatedList` / `GatedListing` for in-flight listing tests.

@@ -1,11 +1,10 @@
 using System.Collections.ObjectModel;
-using Avalonia;
 using Avalonia.Media;
-using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.Shell;
+using Mfr.App.Ui.Threading;
 using Mfr.Engine.Logging;
 using Mfr.Models.Config;
 using Mfr.Utils;
@@ -83,6 +82,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private readonly List<FileListEntry> _selectedEntries = [];
         private bool _suppressSelectionSync;
         private bool _suppressListingReload;
+        private bool _listingDeferred;
         private int _listingGeneration;
         private bool _isDisposed;
 
@@ -112,6 +112,11 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="ownerHwnd">
         /// Owner HWND for shell UI modality, or <see langword="null"/> to use the desktop main window.
         /// </param>
+        /// <param name="deferInitialListing">
+        /// When <see langword="true"/>, sets the start path without listing until
+        /// <see cref="ApplySession"/> (or the first explicit reload) runs — used when session masks
+        /// will be applied immediately after construction.
+        /// </param>
         public FileListViewModel(
             ISystemIconProvider? iconProvider,
             string? initialPath,
@@ -119,7 +124,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
             ITextClipboard? clipboard = null,
             IFileShellOperations? shellOperations = null,
             IFileClipboard? fileClipboard = null,
-            Func<IntPtr>? ownerHwnd = null
+            Func<IntPtr>? ownerHwnd = null,
+            bool deferInitialListing = false
         )
             : this(
                 iconProvider,
@@ -129,7 +135,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 shellOperations,
                 fileClipboard,
                 ownerHwnd,
-                listEntries: null
+                listEntries: null,
+                deferInitialListing
             ) { }
 
         /// <summary>
@@ -155,6 +162,10 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="listEntries">
         /// Folder listing function, or <see langword="null"/> to use <see cref="FileListCatalog.List"/>.
         /// </param>
+        /// <param name="deferInitialListing">
+        /// When <see langword="true"/>, sets the start path without listing until
+        /// <see cref="ApplySession"/> (or the first explicit reload) runs.
+        /// </param>
         internal FileListViewModel(
             ISystemIconProvider? iconProvider,
             string? initialPath,
@@ -163,7 +174,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
             IFileShellOperations? shellOperations,
             IFileClipboard? fileClipboard,
             Func<IntPtr>? ownerHwnd,
-            Func<string, string, bool, IReadOnlyList<string>, IEnumerable<string>, FileListCatalogResult>? listEntries
+            Func<string, string, bool, IReadOnlyList<string>, IEnumerable<string>, FileListCatalogResult>? listEntries,
+            bool deferInitialListing = false
         )
         {
             _iconProvider = iconProvider ?? SystemIconProvider.CreateDefault();
@@ -173,6 +185,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             _clipboard = clipboard ?? new DesktopTextClipboard();
             _fileClipboard = fileClipboard ?? FileClipboard.CreateDefault();
             _listEntries = listEntries ?? FileListCatalog.List;
+            _listingDeferred = deferInitialListing;
             _fileClipboard.Changed += _OnFileClipboardChanged;
             Entries = [];
             MaskSuggestions = [.. _DefaultMasks];
@@ -936,34 +949,33 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="editorText">Masks as typed in the dialog (one per line).</param>
         public void ApplyExcludeMasks(bool enabled, string? editorText)
         {
-            _suppressListingReload = true;
-            try
+            _RunWithoutListingReload(() =>
             {
                 ExcludeMasks = WildcardMask.NormalizeForStorage(editorText);
                 ExcludeMasksEnabled = enabled;
-            }
-            finally
-            {
-                _suppressListingReload = false;
-            }
+            });
 
             _ReloadEntries(preserveSelection: true);
         }
 
         /// <summary>
         /// Restores mask, exclude-mask, suggestion, view-mode, and thumbnail-size fields from session.
+        /// <para>
+        /// When construction used <c>deferInitialListing</c>, this always performs the first catalog list
+        /// (even when <paramref name="fileList"/> is null or only view settings change).
+        /// </para>
         /// </summary>
         /// <param name="fileList">Persisted File List section, or <see langword="null"/> to keep defaults.</param>
         internal void ApplySession(FileListPrefs? fileList)
         {
             if (fileList is null)
             {
+                _CompleteDeferredInitialListing();
                 return;
             }
 
             var needsReload = false;
-            _suppressListingReload = true;
-            try
+            _RunWithoutListingReload(() =>
             {
                 if (!string.IsNullOrEmpty(fileList.FileMask))
                 {
@@ -1002,16 +1014,44 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 {
                     SetThumbnailSize(thumbnailSize);
                 }
+            });
+
+            if (needsReload || _listingDeferred)
+            {
+                _listingDeferred = false;
+                _ReloadEntries(preserveSelection: true);
+            }
+        }
+
+        /// <summary>
+        /// Runs <paramref name="action"/> without property-change listing reloads.
+        /// </summary>
+        /// <param name="action">Property updates that would otherwise each call <see cref="_ReloadEntries"/>.</param>
+        private void _RunWithoutListingReload(Action action)
+        {
+            _suppressListingReload = true;
+            try
+            {
+                action();
             }
             finally
             {
                 _suppressListingReload = false;
             }
+        }
 
-            if (needsReload)
+        /// <summary>
+        /// Starts the deferred constructor listing when session restore had nothing to apply.
+        /// </summary>
+        private void _CompleteDeferredInitialListing()
+        {
+            if (!_listingDeferred)
             {
-                _ReloadEntries(preserveSelection: true);
+                return;
             }
+
+            _listingDeferred = false;
+            _ReloadEntries();
         }
 
         /// <summary>
@@ -1267,6 +1307,12 @@ namespace Mfr.App.Ui.ViewModels.FileList
             IsPathEditing = false;
             _RememberPath(PathText);
             _RebuildBreadcrumbs();
+            if (_listingDeferred)
+            {
+                _UpdateNavigationFlags();
+                return;
+            }
+
             _ReloadEntries();
             _UpdateNavigationFlags();
         }
@@ -1288,6 +1334,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         private void _ReloadEntries(bool preserveSelection = false)
         {
+            _listingDeferred = false;
             var generation = _BeginListingReload(preserveSelection);
             IsListing = true;
 
@@ -1301,7 +1348,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 () =>
                 {
                     var result = _ListEntriesSafe(path, mask, excludeEnabled, excludeMasks, pathHistory);
-                    _PostToUi(() => _ApplyListingResult(generation, result, preserveSelection));
+                    AvaloniaUiThread.Post(() => _ApplyListingResult(generation, result, preserveSelection));
                 },
                 CancellationToken.None,
                 TaskCreationOptions.LongRunning,
@@ -1374,18 +1421,18 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return;
             }
 
-            IsListing = false;
-
             if (result.Failure != FileListListingFailure.None)
             {
                 ListingError = FileListCatalog.FormatListingError(result.Failure);
                 _RebuildVisibleEntries(preserveSelection);
+                IsListing = false;
                 return;
             }
 
             _listedItems.AddRange(result.Items);
             FileListListingSort.Apply(_listedItems, SortMemberPath, IsSortAscending);
             _RebuildVisibleEntries(preserveSelection);
+            IsListing = false;
         }
 
         /// <summary>
@@ -1397,32 +1444,12 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="preserveSelection">Whether to restore selection paths after rebuild.</param>
         private void _ReloadEntriesSynchronous(bool preserveSelection = false)
         {
+            _listingDeferred = false;
             var generation = _BeginListingReload(preserveSelection);
             IsListing = false;
 
             var result = _ListEntriesSafe(CurrentPath, Mask, ExcludeMasksEnabled, ExcludeMasks, PathHistory);
             _ApplyListingResult(generation, result, preserveSelection);
-        }
-
-        /// <summary>
-        /// Marshals work to the UI thread, or runs inline when no Avalonia application is running (unit tests).
-        /// </summary>
-        /// <param name="action">Work to run on the UI thread.</param>
-        private static void _PostToUi(Action action)
-        {
-            if (Application.Current is null)
-            {
-                action();
-                return;
-            }
-
-            if (Dispatcher.UIThread.CheckAccess())
-            {
-                action();
-                return;
-            }
-
-            Dispatcher.UIThread.Post(action);
         }
 
         private void _RebuildVisibleEntries(bool preserveSelection)

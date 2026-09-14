@@ -57,7 +57,11 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 filterDefaults ?? FilterDefaultsStore.CreateEmpty(),
                 presetManager ?? PresetManager.CreateEmpty()
             );
-            FileListViewModel = new FileListViewModel(iconProvider: null, initialPath: initialFileListPath);
+            FileListViewModel = new FileListViewModel(
+                iconProvider: null,
+                initialPath: initialFileListPath,
+                deferInitialListing: persistSession
+            );
             RenameListViewModel = new RenameListViewModel(FileListViewModel, appliedFilters: AppliedFiltersViewModel);
             AppliedFiltersViewModel.SetRenameListColumnSource(
                 RenameListViewModel.CaptureVisibleColumnSpecs,

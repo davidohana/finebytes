@@ -84,6 +84,7 @@ namespace Mfr.Tests.Ui.MainWindow
             var destination = Path.Combine(dir, "renamed.txt");
             await File.WriteAllTextAsync(source, "alpha");
             var viewModel = new MainWindowViewModel(dir);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
             viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
@@ -92,6 +93,7 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "alpha.txt");
 
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
 
             Assert.False(File.Exists(source));
             Assert.True(File.Exists(destination));

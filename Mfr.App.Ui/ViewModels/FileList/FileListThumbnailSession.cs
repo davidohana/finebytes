@@ -1,7 +1,6 @@
-using Avalonia;
 using Avalonia.Media;
-using Avalonia.Threading;
 using Mfr.App.Ui.Services.FileList;
+using Mfr.App.Ui.Threading;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.ViewModels.FileList
@@ -134,7 +133,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                             return ValueTask.CompletedTask;
                         }
 
-                        _PostToUi(() => _Apply(entry, thumbnail, ct));
+                        AvaloniaUiThread.Post(() => _Apply(entry, thumbnail, ct));
                         return ValueTask.CompletedTask;
                     }
                 );
@@ -163,17 +162,6 @@ namespace Mfr.App.Ui.ViewModels.FileList
             {
                 disposable.Dispose();
             }
-        }
-
-        private static void _PostToUi(Action action)
-        {
-            if (Application.Current is null)
-            {
-                action();
-                return;
-            }
-
-            Dispatcher.UIThread.Post(action);
         }
     }
 }

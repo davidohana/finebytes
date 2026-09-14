@@ -85,10 +85,12 @@ namespace Mfr.Tests.Ui.MainWindow
             ];
 
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             Assert.True(File.Exists(destination));
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "renamed.txt");
 
             await viewModel.UndoLastCommand.ExecuteAsync(null).ConfigureAwait(true);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
 
             Assert.True(File.Exists(source));
             Assert.False(File.Exists(destination));

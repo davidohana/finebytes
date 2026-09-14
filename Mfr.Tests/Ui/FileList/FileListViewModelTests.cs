@@ -3,6 +3,7 @@ using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.Models.Config;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Ui.FileList
@@ -1218,38 +1219,13 @@ namespace Mfr.Tests.Ui.FileList
         public void IsListing_True_While_Slow_Catalog_Runs()
         {
             var dir = _CreateTree();
-            var started = new ManualResetEventSlim(false);
-            var release = new ManualResetEventSlim(false);
-
-            FileListCatalogResult ListSlow(
-                string currentPath,
-                string includeMask,
-                bool excludeMasksEnabled,
-                IReadOnlyList<string> excludeMasks,
-                IEnumerable<string> pathHistory
-            )
-            {
-                started.Set();
-                Assert.True(release.Wait(TimeSpan.FromSeconds(10)));
-                return FileListCatalog.List(currentPath, includeMask, excludeMasksEnabled, excludeMasks, pathHistory);
-            }
-
-            var viewModel = new FileListViewModel(
-                NullSystemIconProvider.Instance,
-                dir,
-                NullFileShellOpener.Instance,
-                clipboard: NullTextClipboard.Instance,
-                shellOperations: NullFileShellOperations.Instance,
-                fileClipboard: new NullFileClipboard(),
-                ownerHwnd: null,
-                listEntries: ListSlow
-            );
+            var viewModel = FileListListingWait.CreateWithGatedList(dir, out var gate);
             _viewModels.Add(viewModel);
 
-            Assert.True(started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(gate.Started.Wait(TimeSpan.FromSeconds(10)));
             Assert.True(viewModel.IsListing);
 
-            release.Set();
+            gate.Release.Set();
             FileListListingWait.WaitUntilIdle(viewModel);
 
             Assert.False(viewModel.IsListing);
@@ -1340,41 +1316,16 @@ namespace Mfr.Tests.Ui.FileList
         public void Dispose_Mid_Listing_Ignores_Late_Result()
         {
             var dir = _CreateTree();
-            var started = new ManualResetEventSlim(false);
-            var release = new ManualResetEventSlim(false);
-
-            FileListCatalogResult ListSlow(
-                string currentPath,
-                string includeMask,
-                bool excludeMasksEnabled,
-                IReadOnlyList<string> excludeMasks,
-                IEnumerable<string> pathHistory
-            )
-            {
-                started.Set();
-                Assert.True(release.Wait(TimeSpan.FromSeconds(10)));
-                return FileListCatalog.List(currentPath, includeMask, excludeMasksEnabled, excludeMasks, pathHistory);
-            }
-
-            var viewModel = new FileListViewModel(
-                NullSystemIconProvider.Instance,
-                dir,
-                NullFileShellOpener.Instance,
-                clipboard: NullTextClipboard.Instance,
-                shellOperations: NullFileShellOperations.Instance,
-                fileClipboard: new NullFileClipboard(),
-                ownerHwnd: null,
-                listEntries: ListSlow
-            );
+            var viewModel = FileListListingWait.CreateWithGatedList(dir, out var gate);
             _viewModels.Add(viewModel);
 
-            Assert.True(started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(gate.Started.Wait(TimeSpan.FromSeconds(10)));
             Assert.True(viewModel.IsListing);
 
             viewModel.Dispose();
             Assert.False(viewModel.IsListing);
 
-            release.Set();
+            gate.Release.Set();
             FileListListingWait.PumpUiDispatcher();
             Thread.Sleep(50);
             FileListListingWait.PumpUiDispatcher();
@@ -1391,48 +1342,17 @@ namespace Mfr.Tests.Ui.FileList
         {
             var dir = _CreateTree();
             var target = Path.Combine(dir, "alpha.txt");
-            var started = new ManualResetEventSlim(false);
-            var release = new ManualResetEventSlim(false);
-            var callCount = 0;
-
-            FileListCatalogResult ListControlled(
-                string currentPath,
-                string includeMask,
-                bool excludeMasksEnabled,
-                IReadOnlyList<string> excludeMasks,
-                IEnumerable<string> pathHistory
-            )
-            {
-                var call = Interlocked.Increment(ref callCount);
-                if (call == 1)
-                {
-                    started.Set();
-                    Assert.True(release.Wait(TimeSpan.FromSeconds(10)));
-                }
-
-                return FileListCatalog.List(currentPath, includeMask, excludeMasksEnabled, excludeMasks, pathHistory);
-            }
-
-            var viewModel = new FileListViewModel(
-                NullSystemIconProvider.Instance,
-                dir,
-                NullFileShellOpener.Instance,
-                clipboard: NullTextClipboard.Instance,
-                shellOperations: NullFileShellOperations.Instance,
-                fileClipboard: new NullFileClipboard(),
-                ownerHwnd: null,
-                listEntries: ListControlled
-            );
+            var viewModel = FileListListingWait.CreateWithGatedList(dir, out var gate);
             _viewModels.Add(viewModel);
 
-            Assert.True(started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(gate.Started.Wait(TimeSpan.FromSeconds(10)));
             Assert.True(viewModel.IsListing);
 
             Assert.True(viewModel.TryLocatePath(target));
             Assert.False(viewModel.IsListing);
             Assert.Equal("alpha.txt", viewModel.SelectedEntry?.Name);
 
-            release.Set();
+            gate.Release.Set();
             FileListListingWait.PumpUiDispatcher();
             Thread.Sleep(50);
             FileListListingWait.WaitUntilIdle(viewModel);
@@ -1495,10 +1415,33 @@ namespace Mfr.Tests.Ui.FileList
             File.WriteAllText(Path.Combine(dir, "b.txt"), "b");
             File.WriteAllText(Path.Combine(dir, "a.txt"), "a");
 
-            var started = new ManualResetEventSlim(false);
-            var release = new ManualResetEventSlim(false);
+            var viewModel = FileListListingWait.CreateWithGatedList(dir, out var gate);
+            _viewModels.Add(viewModel);
 
-            FileListCatalogResult ListSlow(
+            Assert.True(gate.Started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(viewModel.IsListing);
+
+            viewModel.SortByColumn(nameof(FileListEntry.Name));
+            Assert.True(viewModel.IsListing);
+            Assert.Empty(viewModel.Entries);
+
+            gate.Release.Set();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.Equal(["b.txt", "a.txt"], _Names(viewModel));
+            Assert.False(viewModel.IsSortAscending);
+        }
+
+        /// <summary>
+        /// Verifies deferred construction lists once after ApplySession with session masks.
+        /// </summary>
+        [Fact]
+        public void Deferred_Initial_Listing_Runs_Once_After_ApplySession()
+        {
+            var dir = _CreateTree();
+            var listCount = 0;
+
+            FileListCatalogResult ListCounting(
                 string currentPath,
                 string includeMask,
                 bool excludeMasksEnabled,
@@ -1506,8 +1449,7 @@ namespace Mfr.Tests.Ui.FileList
                 IEnumerable<string> pathHistory
             )
             {
-                started.Set();
-                Assert.True(release.Wait(TimeSpan.FromSeconds(10)));
+                Interlocked.Increment(ref listCount);
                 return FileListCatalog.List(currentPath, includeMask, excludeMasksEnabled, excludeMasks, pathHistory);
             }
 
@@ -1519,22 +1461,21 @@ namespace Mfr.Tests.Ui.FileList
                 shellOperations: NullFileShellOperations.Instance,
                 fileClipboard: new NullFileClipboard(),
                 ownerHwnd: null,
-                listEntries: ListSlow
+                listEntries: ListCounting,
+                deferInitialListing: true
             );
             _viewModels.Add(viewModel);
 
-            Assert.True(started.Wait(TimeSpan.FromSeconds(10)));
-            Assert.True(viewModel.IsListing);
-
-            viewModel.SortByColumn(nameof(FileListEntry.Name));
-            Assert.True(viewModel.IsListing);
+            Assert.Equal(0, listCount);
+            Assert.False(viewModel.IsListing);
             Assert.Empty(viewModel.Entries);
 
-            release.Set();
+            viewModel.ApplySession(new FileListPrefs { FileMask = "*.txt" });
             FileListListingWait.WaitUntilIdle(viewModel);
 
-            Assert.Equal(["b.txt", "a.txt"], _Names(viewModel));
-            Assert.False(viewModel.IsSortAscending);
+            Assert.Equal(1, listCount);
+            Assert.Contains(viewModel.Entries, entry => entry.Name == "alpha.txt");
+            Assert.DoesNotContain(viewModel.Entries, entry => entry.Name == "beta.md");
         }
 
         /// <summary>
