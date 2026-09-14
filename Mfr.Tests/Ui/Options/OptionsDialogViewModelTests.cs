@@ -21,6 +21,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(vm.RememberLastFolder);
             Assert.True(vm.RememberWindowState);
             Assert.Empty(vm.SuppressedConfirmations);
+            Assert.Equal("No confirmations are currently suppressed.", vm.SuppressedConfirmationsSummary);
             Assert.False(vm.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Files, vm.AddMode);
             Assert.True(vm.AddFolderContents);
@@ -46,6 +47,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.False(vm.RememberLastFolder);
             Assert.False(vm.RememberWindowState);
             Assert.Equal([ConfirmationKind.ClearRenameList], vm.SuppressedConfirmations);
+            Assert.Equal("1 confirmation is currently suppressed.", vm.SuppressedConfirmationsSummary);
             Assert.True(vm.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, vm.AddMode);
             Assert.False(vm.AddFolderContents);
@@ -171,10 +173,12 @@ namespace Mfr.Tests.Ui.Options
 
             var vm = new OptionsDialogViewModel();
             Assert.Equal([ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset], vm.SuppressedConfirmations);
+            Assert.Equal("2 confirmations are currently suppressed.", vm.SuppressedConfirmationsSummary);
 
             vm.ResetConfirmations();
 
             Assert.Empty(vm.SuppressedConfirmations);
+            Assert.Equal("No confirmations are currently suppressed.", vm.SuppressedConfirmationsSummary);
             Assert.Equal(
                 [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset],
                 ConfigStore.Ui.SuppressedConfirmations

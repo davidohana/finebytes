@@ -100,6 +100,10 @@ namespace Mfr.Tests.Ui.Options
                     );
                 Assert.Equal(AppTips.OptionsConfirmations, ToolTip.GetTip(confirmationsBlurb)?.ToString());
 
+                var summary = dialog.FindControl<TextBlock>("SuppressedConfirmationsSummaryText");
+                Assert.NotNull(summary);
+                Assert.Equal("No confirmations are currently suppressed.", summary.Text);
+
                 var resetButton = dialog.FindControl<Button>("ResetConfirmationsButton");
                 Assert.NotNull(resetButton);
                 Assert.Equal("Reset confirmations", resetButton.Content?.ToString());
@@ -159,6 +163,11 @@ namespace Mfr.Tests.Ui.Options
             try
             {
                 Assert.Equal([ConfirmationKind.ClearAppliedFilters], dialogVm.SuppressedConfirmations);
+                Assert.Equal("1 confirmation is currently suppressed.", dialogVm.SuppressedConfirmationsSummary);
+
+                var summary = dialog.FindControl<TextBlock>("SuppressedConfirmationsSummaryText");
+                Assert.NotNull(summary);
+                Assert.Equal("1 confirmation is currently suppressed.", summary.Text);
 
                 var resetButton = dialog.FindControl<Button>("ResetConfirmationsButton");
                 Assert.NotNull(resetButton);
@@ -168,6 +177,8 @@ namespace Mfr.Tests.Ui.Options
                 Dispatcher.UIThread.RunJobs();
 
                 Assert.Empty(dialogVm.SuppressedConfirmations);
+                Assert.Equal("No confirmations are currently suppressed.", dialogVm.SuppressedConfirmationsSummary);
+                Assert.Equal("No confirmations are currently suppressed.", summary.Text);
                 Assert.Equal([ConfirmationKind.ClearAppliedFilters], ConfigStore.Ui.SuppressedConfirmations);
             }
             finally

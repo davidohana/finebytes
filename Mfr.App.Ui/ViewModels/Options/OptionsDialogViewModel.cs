@@ -56,7 +56,30 @@ namespace Mfr.App.Ui.ViewModels.Options
         /// Draft list of confirmation kinds the user chose not to see again.
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(SuppressedConfirmationsSummary))]
         private List<ConfirmationKind> _suppressedConfirmations = [];
+
+        /// <summary>
+        /// Status line for how many confirmation kinds are suppressed in the draft.
+        /// </summary>
+        public string SuppressedConfirmationsSummary
+        {
+            get
+            {
+                var count = SuppressedConfirmations.Count;
+                if (count == 0)
+                {
+                    return "No confirmations are currently suppressed.";
+                }
+
+                if (count == 1)
+                {
+                    return "1 confirmation is currently suppressed.";
+                }
+
+                return $"{count} confirmations are currently suppressed.";
+            }
+        }
 
         /// <summary>
         /// When <see langword="true"/>, double-click in the File List adds the selection to the Rename List.

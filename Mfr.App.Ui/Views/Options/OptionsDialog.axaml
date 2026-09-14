@@ -46,6 +46,11 @@
             TextWrapping="Wrap"
             ToolTip.Tip="{x:Static resources:AppTips.OptionsConfirmations}"
           />
+          <TextBlock
+            x:Name="SuppressedConfirmationsSummaryText"
+            Text="{Binding SuppressedConfirmationsSummary}"
+            TextWrapping="Wrap"
+          />
           <Button
             x:Name="ResetConfirmationsButton"
             HorizontalAlignment="Left"
