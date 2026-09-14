@@ -539,15 +539,15 @@
 
     <Grid x:Name="MainPanesGrid" Background="{DynamicResource PaneChromeBrush}">
       <Grid.RowDefinitions>
-        <RowDefinition Height="2*" MinHeight="140" />
+        <RowDefinition Height="0.61*" MinHeight="140" />
         <RowDefinition Height="6" />
-        <RowDefinition Height="3*" MinHeight="120" />
+        <RowDefinition Height="0.39*" MinHeight="120" />
       </Grid.RowDefinitions>
       <Grid x:Name="TopPanesGrid" Grid.Row="0">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="2*" MinWidth="180" />
+          <ColumnDefinition Width="0.4*" MinWidth="180" />
           <ColumnDefinition Width="6" />
-          <ColumnDefinition Width="3*" MinWidth="280" />
+          <ColumnDefinition Width="0.6*" MinWidth="280" />
         </Grid.ColumnDefinitions>
         <filelistviews:FileListView
           Grid.Column="0"
@@ -566,15 +566,15 @@
         />
         <Grid x:Name="FilterPanesGrid" Grid.Column="2">
           <Grid.RowDefinitions>
-            <RowDefinition Height="*" MinHeight="80" />
+            <RowDefinition Height="0.3*" MinHeight="80" />
             <RowDefinition Height="6" />
-            <RowDefinition Height="*" MinHeight="80" />
+            <RowDefinition Height="0.7*" MinHeight="80" />
           </Grid.RowDefinitions>
           <Grid x:Name="FilterListsGrid" Grid.Row="0">
             <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="*" MinWidth="120" />
+              <ColumnDefinition Width="0.42*" MinWidth="120" />
               <ColumnDefinition Width="6" />
-              <ColumnDefinition Width="*" MinWidth="120" />
+              <ColumnDefinition Width="0.58*" MinWidth="120" />
             </Grid.ColumnDefinitions>
             <filterpaletteviews:FilterPaletteView
               Grid.Column="0"
