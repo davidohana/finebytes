@@ -59,6 +59,10 @@
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
+    <Style Selector="Button.applied-filter-toolbar:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+    </Style>
     <!-- Flush split after Presets (MFR7 16×24 dropdown abutting the Presets button). -->
     <Style Selector="Button.applied-filter-toolbar-split">
       <Setter Property="Width" Value="16" />
@@ -123,7 +127,7 @@
         <StackPanel Orientation="Vertical" Spacing="0" VerticalAlignment="Top">
           <Button
             x:Name="AddFromPaletteButton"
-            Classes="rename-list-action"
+            Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.AddSelectedFilter}"
             Command="{Binding AddFromPaletteCommand, ElementName=AppliedFiltersRoot}"
           >
@@ -131,7 +135,7 @@
           </Button>
           <Button
             x:Name="RemoveFromAppliedButton"
-            Classes="rename-list-action"
+            Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.RemoveSelectedFilter}"
             Command="{Binding RemoveSelectedCommand}"
           >
@@ -139,7 +143,7 @@
           </Button>
           <Button
             x:Name="ClearAppliedButton"
-            Classes="rename-list-action"
+            Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.RemoveAllFilters}"
             Command="{Binding ClearCommand}"
           >
@@ -147,7 +151,7 @@
           </Button>
           <Button
             x:Name="MoveAppliedUpButton"
-            Classes="rename-list-action"
+            Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.MoveFilterUp}"
             Command="{Binding MoveSelectedUpCommand}"
           >
@@ -155,7 +159,7 @@
           </Button>
           <Button
             x:Name="MoveAppliedDownButton"
-            Classes="rename-list-action"
+            Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.MoveFilterDown}"
             Command="{Binding MoveSelectedDownCommand}"
           >
@@ -163,7 +167,7 @@
           </Button>
           <Button
             x:Name="FilterOptionsButton"
-            Classes="rename-list-action"
+            Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.FilterOptions}"
             IsEnabled="{Binding CanShowFilterOptions}"
           >

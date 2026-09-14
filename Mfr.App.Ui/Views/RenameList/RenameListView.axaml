@@ -331,63 +331,63 @@
       <Border Grid.Column="0" Classes="pane-action-rail">
         <StackPanel Orientation="Vertical" Spacing="0" VerticalAlignment="Top">
           <Button
-            Classes="rename-list-action"
+            Classes="tool-action"
             Command="{Binding AddSelectedCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.AddSelected}"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
           </Button>
           <Button
-            Classes="rename-list-action"
+            Classes="tool-action"
             Command="{Binding AddAllCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.AddAll}"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddAll.png" />
           </Button>
           <Button
-            Classes="rename-list-action"
+            Classes="tool-action"
             Command="{Binding RemoveSelectedCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.RemoveSelected}"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/RemoveSelected.png" />
           </Button>
           <Button
-            Classes="rename-list-action"
+            Classes="tool-action"
             Command="{Binding ClearCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.ClearRenameList}"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Clear.png" />
           </Button>
           <Button
-            Classes="rename-list-action"
+            Classes="tool-action"
             Command="{Binding MoveSelectedUpCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.MoveSelectedUp}"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveUp.png" />
           </Button>
           <Button
-            Classes="rename-list-action"
+            Classes="tool-action"
             Command="{Binding MoveSelectedDownCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.MoveSelectedDown}"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
           </Button>
           <Button
-            Classes="rename-list-action"
+            Classes="tool-action"
             Command="{Binding RefreshCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.Refresh}"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Refresh.png" />
           </Button>
           <Button
-            Classes="rename-list-action"
+            Classes="tool-action"
             Command="{Binding OpenFieldShuttleCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/SelectFields.png" />
           </Button>
           <ToggleButton
-            Classes="rename-list-action"
+            Classes="tool-action"
             IsChecked="{Binding IsAutoSort, Mode=OneWay}"
             Command="{Binding ToggleAutoSortCommand}"
             ToolTip.Tip="{Binding SortSummaryText}"
@@ -396,7 +396,7 @@
           </ToggleButton>
           <ToggleButton
             x:Name="AutoPreviewToggle"
-            Classes="rename-list-action"
+            Classes="tool-action"
             IsChecked="{Binding IsAutoPreview, Mode=OneWay}"
             Command="{Binding ToggleAutoPreviewCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.AutoPreview}"
@@ -405,7 +405,7 @@
           </ToggleButton>
           <ToggleButton
             x:Name="BeforeAfterSideToggle"
-            Classes="rename-list-action"
+            Classes="tool-action"
             IsVisible="{Binding IsAbModeEnabled}"
             IsChecked="{Binding IsAbSidePreview, Mode=OneWay}"
             Command="{Binding ToggleAbSideCommand}"
@@ -418,7 +418,7 @@
           </ToggleButton>
           <ToggleButton
             x:Name="LegendToggle"
-            Classes="rename-list-action"
+            Classes="tool-action"
             IsChecked="{Binding IsLegendVisible, Mode=OneWay}"
             Command="{Binding ToggleLegendCommand}"
             ToolTip.Tip="{x:Static resources:AppTips.ColorLegend}"

@@ -113,8 +113,8 @@
     <Style Selector=":is(GridSplitter):pointerover /template/ Rectangle#Hairline">
       <Setter Property="Fill" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
     </Style>
-    <!-- Shared tool-button chrome (pane rails, main toolbar, File List tools, dialogs). -->
-    <Style Selector="Button.rename-list-action">
+    <!-- Shared icon tool-button chrome (pane rails, main toolbar, File List tools, dialogs). -->
+    <Style Selector="Button.tool-action, ToggleButton.tool-action">
       <Setter Property="Width" Value="28" />
       <Setter Property="Height" Value="28" />
       <Setter Property="MinWidth" Value="28" />
@@ -128,50 +128,18 @@
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
-    <Style Selector="Button.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="Button.tool-action /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     </Style>
-    <Style Selector="Button.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="Button.tool-action:pointerover /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
-    <Style Selector="Button.rename-list-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="Button.tool-action:pressed /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action:pressed /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action:checked /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
     </Style>
-    <Style Selector="Button.rename-list-action:disabled">
-      <Setter Property="Opacity" Value="0.4" />
-    </Style>
-    <Style Selector="ToggleButton.rename-list-action">
-      <Setter Property="Width" Value="28" />
-      <Setter Property="Height" Value="28" />
-      <Setter Property="MinWidth" Value="28" />
-      <Setter Property="MinHeight" Value="28" />
-      <Setter Property="Padding" Value="2" />
-      <Setter Property="Margin" Value="1" />
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="2" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
-    <Style Selector="ToggleButton.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-    </Style>
-    <Style Selector="ToggleButton.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
-    </Style>
-    <Style Selector="ToggleButton.rename-list-action:checked /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
-    </Style>
-    <Style Selector="ToggleButton.rename-list-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
-    </Style>
-    <Style Selector="ToggleButton.rename-list-action:disabled">
+    <Style Selector="Button.tool-action:disabled, ToggleButton.tool-action:disabled">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
 
@@ -183,14 +151,11 @@
       <Setter Property="Padding" Value="4" />
       <Setter Property="VerticalAlignment" Value="Stretch" />
     </Style>
-    <Style Selector="Border.pane-action-rail Button.rename-list-action">
-      <Setter Property="Margin" Value="0,0,0,2" />
-    </Style>
-    <Style Selector="Border.pane-action-rail ToggleButton.rename-list-action">
+    <Style Selector="Border.pane-action-rail Button.tool-action, Border.pane-action-rail ToggleButton.tool-action">
       <Setter Property="Margin" Value="0,0,0,2" />
     </Style>
 
-    <!-- Horizontal tool strip (main window GO/Undo/…). -->
+    <!-- Horizontal tool strip (main window GO/Undo/…, Filter Palette groups). -->
     <Style Selector="Border.pane-action-strip">
       <Setter Property="Background" Value="{DynamicResource AppChromeHeaderBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />

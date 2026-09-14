@@ -125,7 +125,7 @@
       <StackPanel Grid.Row="1" Grid.Column="2" Classes="preset-manager-reorder" Orientation="Vertical">
         <Button
           x:Name="MoveUpButton"
-          Classes="rename-list-action"
+          Classes="tool-action"
           ToolTip.Tip="Move up"
           Command="{Binding MoveSelectedUpCommand}"
         >
@@ -133,7 +133,7 @@
         </Button>
         <Button
           x:Name="MoveDownButton"
-          Classes="rename-list-action"
+          Classes="tool-action"
           ToolTip.Tip="Move down"
           Command="{Binding MoveSelectedDownCommand}"
         >
