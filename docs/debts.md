@@ -12,14 +12,13 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 
 ## Rename List
 
-- Show Last Rename Errors — row-level **Show Rename Error** is available; rename-log details include commit errors ([rename-log-errors.plan.md](plans/rename-log-errors.plan.md)); a list-wide history view is still deferred
-- Drag-out FileDrop to Explorer (selected rows) — cut from [rename-list-ui.plan.md](plans/rename-list-ui.plan.md) 14f; inbound drop + reorder already ship
+- Show Last Rename Errors — row-level **Show Rename Error** is available; rename-log details include commit errors; a list-wide history view is still deferred
+- Drag-out FileDrop to Explorer (selected rows) — cut from Rename List 14f; inbound drop + reorder already ship
 
 ## Avalonia / tooling
 
-- Avalonia **12** upgrade (breaking-change pass: packages, APIs, headless/UI tests) — still on 11.3.x
-- Official Avalonia **Hot Reload** (Plus license + Avalonia 12) — or evaluate community HotAvalonia on 11 if AXAML iteration pain justifies it
+- Official Avalonia **Hot Reload** (Plus license) — or evaluate community HotAvalonia if AXAML iteration pain justifies it
 
 ## Options dialog (deferred from v1)
 
-- Explorer shell integrate — see [options-dialog.plan.md](plans/options-dialog.plan.md) (double-click-to-add from [options-confirmations-and-double-click.plan.md](plans/options-confirmations-and-double-click.plan.md); per-dialog confirmations in [per-dialog-confirmations.plan.md](plans/per-dialog-confirmations.plan.md); Undo & Log retention shipped in [undo.plan.md](plans/undo.plan.md) P4)
+- Explorer shell integrate

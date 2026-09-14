@@ -16,7 +16,7 @@ isProject: false
 
 # Rename List preview-columns A/B toggle
 
-Parent: [docs/plans/rename-list-ui.plan.md](rename-list-ui.plan.md) (block 5 columns / shuttle — complete).
+Parent: Rename List UI block 5 columns / shuttle (shipped).
 
 ## Is this an additional mode?
 

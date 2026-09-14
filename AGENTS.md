@@ -11,7 +11,7 @@
 - Project skills live in `.agents/skills/` only (Cursor and Antigravity both load this path). Do not add a parallel `.cursor/skills/` tree.
 - Always-on agent constraints live in this file. On-demand workflows live in skills under `.agents/skills/`.
 - UI interaction tests: see skill `mfr-ui-headless-tests` and `Mfr.Tests/Ui/FileList/FileListViewTests.cs`.
-- Plans: save all implementation / feature plans under `docs/plans/` (kebab-case names, e.g. `docs/plans/rename-list-ui.plan.md`). Do not put project plans in `.cursor/plans/` or elsewhere.
+- Plans: save all implementation / feature plans under `docs/plans/` (kebab-case names, e.g. `docs/plans/rename-list-preview-columns-toggle.plan.md`). Do not put project plans in `.cursor/plans/` or elsewhere.
 - Put any temporary scripts or scratch files under `.tmp/` (gitignored). Do not write them at the repo root or into source trees. Prefer the Shell tool’s inline commands when a file is unnecessary; delete scratch when done if practical.
 
 ## C# code style
@@ -76,6 +76,5 @@ Cloud Agents run on Linux (Ubuntu 24.04), but Magic File Renamer is a Windows-ta
 - `docs/image-metadata-model.md` (lazy MetadataExtractor image properties + EXIF cache)
 - `docs/debts.md` (deferred / later-work list)
 - `docs/plans/` (implementation / feature plans)
-- `docs/plans/rename-list-ui.plan.md` (Rename List UI; complete — 14f drag-out cut)
 - `.editorconfig`
 - Skills: `.agents/skills/` — `mfr-code-review`, `mfr-feature-plan`, `mfr-implement-filter`, `mfr-implement-filter-editor`, `mfr-plan-phase`, `mfr7-reference`, `mfr-ui-headless-tests`

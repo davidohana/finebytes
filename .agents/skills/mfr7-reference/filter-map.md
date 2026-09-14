@@ -2,7 +2,7 @@
 
 Maps legacy `[FilterInfo]` entries to finebytes types.
 
-**finebytes Help (shipped):** repo-root `help/{Type}.html` (e.g. `SpaceCharacter.html`), copied beside the exe. Catalog sets `HelpFileName` by convention — see `docs/plans/filter-html-help.plan.md`.
+**finebytes Help (shipped):** repo-root `help/{Type}.html` (e.g. `SpaceCharacter.html`), copied beside the exe. Catalog sets `HelpFileName` by convention (`{Type}.html`).
 
 **MFR7 Help (legacy reference only):** install or `D:\Devl\mfr7\Site\finebytes\mfr\Help\`. Screenshots: `Help/Images/<stem>.gif` unless noted. The **Help file** column below is the MFR7 basename — do not use these names for finebytes shipped help.
 

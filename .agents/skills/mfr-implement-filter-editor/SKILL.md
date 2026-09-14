@@ -13,20 +13,20 @@ description: >-
 
 Adds the **Filter Configuration** options body for one applied-filter type (or one intentional shared group). Does **not** create/change `Mfr.Filters` records — use `mfr-implement-filter` for that.
 
-Canonical backlog / grouping rules: `docs/plans/applied-filter-editors.plan.md`.
+Grouping rules: see **Grouping** below (mirror `FilterGroup` folders under `FilterEditors/`).
 
 ## Workflow
 
 ```text
 Filter editor:
-- [ ] 1. Pick pass from plan (one filter, or one shared-options group)
+- [ ] 1. Pick pass (one filter, or one shared-options group)
 - [ ] 2. MFR7 reference brief (mfr7-reference skill) — editor + help + defaults
 - [ ] 3. Confirm options type / folder (FilterGroup) already exist in Mfr.Filters
 - [ ] 4. Add ViewModel under ViewModels/FilterEditors/<Group>/
 - [ ] 5. Add matching View under Views/FilterEditors/<Group>/
 - [ ] 6. Register in FilterOptionsEditorFactory
 - [ ] 7. Dedicated VM + headless tests under Ui/FilterEditors/<Group>/ (each filter type in the group)
-- [ ] 8. Mark plan todo done; format/lint touched files
+- [ ] 8. Format/lint touched files
 ```
 
 ## Grouping

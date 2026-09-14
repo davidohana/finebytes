@@ -20,7 +20,7 @@ Output path: `docs/plans/<kebab-case>.plan.md` only (never `.cursor/plans/`).
 
 ```text
 Feature plan:
-- [ ] 1. Parent plan — find related section (rename-list-ui, applied-filter-editors, …); note status
+- [ ] 1. Parent plan — find related open plan under `docs/plans/` if any; note status
 - [ ] 2. finebytes stubs — existing types, TODOs, nearest sibling UI
 - [ ] 3. MFR7 once — read mfr7-reference; paste capability brief into this plan (do not re-crawl later)
 - [ ] 4. Blocking decisions — ask at most 1–2 critical questions; lock answers in the plan

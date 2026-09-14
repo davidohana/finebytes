@@ -52,7 +52,7 @@ Add `Mfr.Filters/docs/<Group>/YourFilterType.md` (examples table per `Mfr.Filter
 
 ## User Help HTML
 
-When adding a filter, also ship Help next to the exe (see `docs/plans/filter-html-help.plan.md`):
+When adding a filter, also ship Help next to the exe:
 
 1. Add `help/{Type}.html` (flat under repo-root `help/`; display name = `FilterPalette` label; options use Filter Configuration UI labels). Help basename is convention: `{Type}.html` (no map).
 1. Link the page from `help/filters.html` under the right group.
