@@ -172,35 +172,54 @@
     <TabControl Classes="field-shuttle-tabs" SelectedIndex="{Binding SelectedTabIndex}">
       <TabItem Header="Columns">
         <Border Classes="field-shuttle-panel" Margin="0,8,0,0">
-          <Grid RowDefinitions="Auto,Auto,*,Auto">
+          <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
             <TextBlock
               Grid.Row="0"
               Classes="field-shuttle-hint"
+              Margin="0"
               Text="Select which fields to show as Rename List columns."
             />
-            <StackPanel Grid.Row="1" Spacing="4" Margin="0,0,0,10">
+            <StackPanel Grid.Row="1" Spacing="4">
               <controls:CompactCheckBox
                 x:Name="AbModeCheckBox"
-                Content="A/B Mode"
+                Content="Before/After Mode"
                 IsChecked="{Binding IsAbModeEnabled}"
               />
               <TextBlock
                 Classes="field-shuttle-hint"
                 Margin="0"
                 IsVisible="{Binding IsAbModeEnabled}"
-                Text="Original fields only. Use the Rename List Original/Preview control to switch views."
+                Text="Original fields only. Use the Rename List Before/After control to switch views."
               />
             </StackPanel>
-            <Grid Grid.Row="2" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="Auto,*">
-              <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-shuttle-label" Text="Groups:" />
+            <Grid Grid.Row="2" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="Auto,*" RowSpacing="4">
+              <TextBlock
+                Grid.Row="0"
+                Grid.Column="0"
+                Classes="field-shuttle-label"
+                Margin="0"
+                VerticalAlignment="Center"
+                Text="Groups:"
+              />
+              <!-- Before/After on: plain label (no lone radio). Off: Original|Preview subtabs. -->
+              <TextBlock
+                x:Name="OriginalFieldsAbModeLabel"
+                Grid.Row="0"
+                Grid.Column="1"
+                Classes="field-shuttle-label"
+                Margin="0"
+                VerticalAlignment="Center"
+                Text="Original Fields:"
+                IsVisible="{Binding IsAbModeEnabled}"
+              />
               <StackPanel
                 Grid.Row="0"
                 Grid.Column="1"
                 Orientation="Horizontal"
-                Margin="0,0,0,6"
                 Spacing="0"
                 MinHeight="22"
-                VerticalAlignment="Bottom"
+                VerticalAlignment="Center"
+                IsVisible="{Binding !IsAbModeEnabled}"
               >
                 <controls:CompactRadioButton
                   Classes="field-shuttle-subtab"
@@ -214,10 +233,16 @@
                   GroupName="ColumnAvailableFields"
                   Content="Preview Fields"
                   IsChecked="{Binding IsPreviewColumnsTab}"
-                  IsVisible="{Binding !IsAbModeEnabled}"
                 />
               </StackPanel>
-              <TextBlock Grid.Row="0" Grid.Column="3" Classes="field-shuttle-label" Text="Selected fields:" />
+              <TextBlock
+                Grid.Row="0"
+                Grid.Column="3"
+                Classes="field-shuttle-label"
+                Margin="0"
+                VerticalAlignment="Center"
+                Text="Selected fields:"
+              />
               <ListBox
                 x:Name="ColumnGroupsList"
                 Grid.Row="1"

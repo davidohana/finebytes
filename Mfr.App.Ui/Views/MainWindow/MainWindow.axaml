@@ -373,22 +373,29 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="_Original"
+          Header="Before/After Mode"
+          Command="{Binding RenameListViewModel.ToggleAbModeCommand}"
+          ToggleType="CheckBox"
+          IsChecked="{Binding RenameListViewModel.IsAbModeEnabled, Mode=OneWay}"
+          ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterMode}"
+        />
+        <MenuItem
+          Header="_Before"
           Command="{Binding RenameListViewModel.SetAbSideCommand}"
           CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSideOriginal}"
           ToggleType="Radio"
           IsChecked="{Binding RenameListViewModel.IsAbSideOriginal, Mode=OneWay}"
           IsEnabled="{Binding RenameListViewModel.IsAbModeEnabled}"
-          ToolTip.Tip="{x:Static resources:AppTips.AbModeSide}"
+          ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterSide}"
         />
         <MenuItem
-          Header="_Preview"
+          Header="_After"
           Command="{Binding RenameListViewModel.SetAbSideCommand}"
           CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSidePreview}"
           ToggleType="Radio"
           IsChecked="{Binding RenameListViewModel.IsAbSidePreview, Mode=OneWay}"
           IsEnabled="{Binding RenameListViewModel.IsAbModeEnabled}"
-          ToolTip.Tip="{x:Static resources:AppTips.AbModeSide}"
+          ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterSide}"
         />
         <MenuItem
           Header="Refresh"

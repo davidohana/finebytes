@@ -49,11 +49,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<RenameListVisibleColumn> VisibleColumns => _visibleColumns;
 
         /// <summary>
-        /// Gets the columns the grid / export should show for the current A/B Mode and side.
+        /// Gets the columns the grid / export should show for the current Before/After Mode and side.
         /// <para>
-        /// A/B off: same as <see cref="VisibleColumns"/>. Original side: originals only. Preview side:
-        /// each original followed by a derived preview companion when the field supports preview
-        /// (catalog default width; not persisted).
+        /// Mode off: same as <see cref="VisibleColumns"/>. Before: originals only. After: same fields in the
+        /// same order, using each field's preview key when <see cref="RenameListField.SupportsPreview"/>
+        /// (same column count; widths follow the stored originals).
         /// </para>
         /// </summary>
         public IReadOnlyList<RenameListVisibleColumn> ProjectedColumns
@@ -70,7 +70,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     return _visibleColumns;
                 }
 
-                return _DerivePreviewSideColumns(_visibleColumns);
+                return _DeriveAfterSideColumns(_visibleColumns);
             }
         }
 
@@ -227,7 +227,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Removes one visible column by field key.
         /// </summary>
-        /// <param name="key">Field key to hide.</param>
+        /// <param name="key">Field key to hide (After-side preview keys map to the stored original).</param>
         /// <remarks>
         /// <para>No-op when the key is absent or hiding would leave zero columns.</para>
         /// </remarks>
@@ -238,7 +238,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var index = _visibleColumns.FindIndex(column => column.Key == key);
+            var storedKey = _StoredColumnKey(key);
+            var index = _visibleColumns.FindIndex(column => column.Key == storedKey);
             if (index < 0)
             {
                 return;
@@ -250,11 +251,52 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Sets the A/B toolbar side (Original or Preview).
+        /// Toggles Before/After Mode (originals-only layout + Before/After side control).
         /// <para>
-        /// When A/B Mode is on and the side becomes Preview, hydrates metadata for
+        /// Enabling normalizes persisted columns to originals-only. When the remembered side is After,
+        /// hydrates metadata for the After projection before the grid sticks (same path as side flip).
+        /// </para>
+        /// </summary>
+        [RelayCommand]
+        public void ToggleAbMode()
+        {
+            if (IsAbModeEnabled)
+            {
+                IsAbModeEnabled = false;
+                return;
+            }
+
+            IsAbModeEnabled = true;
+            if (!IsAbSidePreview || IsBusy)
+            {
+                return;
+            }
+
+            var projected = _DeriveAfterSideColumns(_visibleColumns);
+            var requirement = _CombinedMetadataRequirement(projected, _sortKeys);
+            if (!_NeedsHydrate(requirement))
+            {
+                return;
+            }
+
+            _ = _HydrateThenSetAbSideAsync(AbSide, projected);
+        }
+
+        /// <summary>
+        /// Toggles the Before/After toolbar side (original values ↔ preview values for the same fields).
+        /// </summary>
+        [RelayCommand]
+        public void ToggleAbSide()
+        {
+            SetAbSide(IsAbSidePreview ? RenameListPrefs.AbSideOriginal : RenameListPrefs.AbSidePreview);
+        }
+
+        /// <summary>
+        /// Sets the Before/After toolbar side (Before = originals, After = preview values).
+        /// <para>
+        /// When Before/After Mode is on and the side becomes After, hydrates metadata for
         /// <see cref="ProjectedColumns"/> before the side sticks (same path as column apply).
-        /// Side is remembered while A/B Mode is off so re-enabling restores it.
+        /// Side is remembered while the mode is off so re-enabling restores it.
         /// </para>
         /// </summary>
         /// <param name="side">
@@ -282,7 +324,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var projected = _DerivePreviewSideColumns(_visibleColumns);
+            var projected = _DeriveAfterSideColumns(_visibleColumns);
             var requirement = _CombinedMetadataRequirement(projected, _sortKeys);
             if (_NeedsHydrate(requirement))
             {
@@ -453,13 +495,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <remarks>
         /// <para>
         /// Does not raise <see cref="VisibleColumns"/> change notifications to avoid rebuilding columns
-        /// mid-resize. No-op when <paramref name="key"/> is not in the persisted visible list (e.g. derived
-        /// Preview-side companions while A/B Mode is on).
+        /// mid-resize. While Before/After Mode After side shows a preview key, width updates apply to the
+        /// matching stored original. No-op when the key is not in the persisted visible list.
         /// </para>
         /// </remarks>
         internal void UpdateVisibleColumnWidth(RenameListFieldKey key, int width)
         {
-            var index = _visibleColumns.FindIndex(column => column.Key == key);
+            var storedKey = _StoredColumnKey(key);
+            var index = _visibleColumns.FindIndex(column => column.Key == storedKey);
             if (index < 0)
             {
                 return;
@@ -583,21 +626,34 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Builds Preview-side projection: each original followed by a catalog-default-width preview companion
-        /// when the field supports preview.
+        /// Maps a grid field key to the persisted originals-only key (After-side preview → original).
         /// </summary>
-        private static List<RenameListVisibleColumn> _DerivePreviewSideColumns(List<RenameListVisibleColumn> originals)
+        private RenameListFieldKey _StoredColumnKey(RenameListFieldKey key)
         {
-            var projected = new List<RenameListVisibleColumn>(capacity: originals.Count * 2);
+            if (!IsAbModeEnabled || !key.IsPreview)
+            {
+                return key;
+            }
+
+            return RenameListFieldKey.Original(key.GroupId, key.PropertyKey);
+        }
+
+        /// <summary>
+        /// Builds After-side projection: same fields/order/widths as <paramref name="originals"/>, swapping to
+        /// the preview key when the field supports preview.
+        /// </summary>
+        private static List<RenameListVisibleColumn> _DeriveAfterSideColumns(List<RenameListVisibleColumn> originals)
+        {
+            var projected = new List<RenameListVisibleColumn>(capacity: originals.Count);
             foreach (var column in originals)
             {
-                projected.Add(column);
                 if (!RenameListFieldCatalog.TryGetField(column.Key, out var field) || !field.SupportsPreview)
                 {
+                    projected.Add(column);
                     continue;
                 }
 
-                projected.Add(new RenameListVisibleColumn(field.PreviewKey));
+                projected.Add(new RenameListVisibleColumn(field.PreviewKey, column.Width));
             }
 
             return projected;

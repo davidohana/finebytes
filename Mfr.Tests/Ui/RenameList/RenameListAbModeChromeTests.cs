@@ -24,35 +24,31 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies the Original|Preview toolbar is hidden until A/B Mode is on.
+        /// Verifies the Before/After toolbar toggle is hidden until Before/After Mode is on.
         /// </summary>
         [AvaloniaFact]
         public async Task Ab_side_toolbar_hidden_when_ab_mode_off()
         {
             var (renameListViewModel, window, view) = await _ShowAsync();
-            var abSidePanel = view.FindControl<StackPanel>("AbSidePanel");
-            Assert.NotNull(abSidePanel);
+            var sideToggle = view.FindControl<ToggleButton>("BeforeAfterSideToggle");
+            Assert.NotNull(sideToggle);
             Assert.False(renameListViewModel.IsAbModeEnabled);
-            Assert.False(abSidePanel.IsVisible);
+            Assert.False(sideToggle.IsVisible);
 
             window.Close();
         }
 
         /// <summary>
-        /// Verifies clicking Original|Preview rebuilds the grid from ProjectedColumns.
+        /// Verifies the Before/After toolbar toggle rebuilds the grid from ProjectedColumns.
         /// </summary>
         [AvaloniaFact]
         public async Task Ab_side_toolbar_click_rebuilds_projected_grid_columns()
         {
             var (renameListViewModel, window, view) = await _ShowAsync();
             var grid = view.FindControl<DataGrid>("RenameGrid");
-            var abSidePanel = view.FindControl<StackPanel>("AbSidePanel");
-            var originalRadio = view.FindControl<ToggleButton>("AbSideOriginalRadio");
-            var previewRadio = view.FindControl<ToggleButton>("AbSidePreviewRadio");
+            var sideToggle = view.FindControl<ToggleButton>("BeforeAfterSideToggle");
             Assert.NotNull(grid);
-            Assert.NotNull(abSidePanel);
-            Assert.NotNull(originalRadio);
-            Assert.NotNull(previewRadio);
+            Assert.NotNull(sideToggle);
 
             var fullNameKey = RenameListFieldKey.Original(
                 BasicRenameListField.Group,
@@ -64,43 +60,44 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.True(abSidePanel.IsVisible);
-            Assert.Equal(3, grid.Columns.Count);
+            Assert.True(sideToggle.IsVisible);
+            Assert.True(sideToggle.IsChecked);
+            Assert.Equal(2, grid.Columns.Count);
             Assert.Equal(
-                [
-                    fullNameKey,
-                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
-                ],
+                [RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)],
                 RenameListGridColumns.GetDisplayedFieldKeys(grid)
             );
 
-            Assert.NotNull(originalRadio.Command);
-            Assert.True(originalRadio.Command.CanExecute(originalRadio.CommandParameter));
-            Assert.Equal(RenameListPrefs.AbSideOriginal, originalRadio.CommandParameter);
+            Assert.NotNull(sideToggle.Command);
+            Assert.True(sideToggle.Command.CanExecute(null));
 
-            // Bound Command path (headless pointer hits are unreliable on these text ToggleButtons).
-            originalRadio.Command.Execute(originalRadio.CommandParameter);
+            // Bound Command path (headless pointer hits are unreliable on these ToggleButtons).
+            sideToggle.Command.Execute(null);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(RenameListPrefs.AbSideOriginal, renameListViewModel.AbSide);
-            Assert.True(originalRadio.IsChecked);
+            Assert.False(sideToggle.IsChecked);
             Assert.Equal(2, grid.Columns.Count);
             Assert.Equal([fullNameKey], RenameListGridColumns.GetDisplayedFieldKeys(grid));
 
-            Assert.NotNull(previewRadio.Command);
-            previewRadio.Command.Execute(previewRadio.CommandParameter);
+            sideToggle.Command.Execute(null);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(RenameListPrefs.AbSidePreview, renameListViewModel.AbSide);
-            Assert.Equal(3, grid.Columns.Count);
+            Assert.True(sideToggle.IsChecked);
+            Assert.Equal(2, grid.Columns.Count);
+            Assert.Equal(
+                [RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)],
+                RenameListGridColumns.GetDisplayedFieldKeys(grid)
+            );
 
             window.Close();
         }
 
         /// <summary>
-        /// Verifies derived Preview headers omit Hide Field but keep Remove Unchanged and override Cancel.
+        /// Verifies After-side preview headers keep Hide Field, Remove Unchanged, and override Cancel.
         /// </summary>
         [AvaloniaFact]
         public async Task Derived_preview_header_omits_hide_keeps_remove_unchanged_and_cancel()
@@ -120,19 +117,12 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var originalHeader = grid.GetVisualDescendants()
-                .OfType<DataGridColumnHeader>()
-                .First(header => RenameListGridColumns.TryResolveFieldKey(header) == fullNameKey);
             var previewHeader = grid.GetVisualDescendants()
                 .OfType<DataGridColumnHeader>()
                 .First(header => RenameListGridColumns.TryResolveFieldKey(header) == previewKey);
 
-            _RaiseHeaderContextMenu(originalHeader);
-            Assert.Contains("Hide Field", _MenuHeaders(originalHeader.ContextMenu));
-            Assert.DoesNotContain("Remove Unchanged Items", _MenuHeaders(originalHeader.ContextMenu));
-
             _RaiseHeaderContextMenu(previewHeader);
-            Assert.DoesNotContain("Hide Field", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.Contains("Hide Field", _MenuHeaders(previewHeader.ContextMenu));
             Assert.Contains("Remove Unchanged Items", _MenuHeaders(previewHeader.ContextMenu));
             Assert.DoesNotContain("Cancel Manual Override", _MenuHeaders(previewHeader.ContextMenu));
 
@@ -142,6 +132,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(
                 [
                     "(Full File Name)",
+                    "Hide Field",
                     "Remove Unchanged Items",
                     "Select Fields...",
                     "Edit as Name List",
@@ -155,7 +146,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies original-side override blue stays on the original column across Preview flips.
+        /// Verifies Before/After flips keep the matching override blue on the on-screen column.
         /// </summary>
         [AvaloniaFact]
         public async Task Original_override_blue_survives_preview_side_flip()
@@ -180,7 +171,7 @@ namespace Mfr.Tests.Ui.RenameList
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Contains(
+            Assert.DoesNotContain(
                 grid.GetVisualDescendants().OfType<TextBlock>(),
                 text => text.Text == "original-forced" && text.Classes.Contains("rename-list-manual-override")
             );
@@ -199,7 +190,7 @@ namespace Mfr.Tests.Ui.RenameList
             );
             Assert.DoesNotContain(
                 grid.GetVisualDescendants().OfType<TextBlock>(),
-                text => text.Text == "preview-forced"
+                text => text.Text == "preview-forced" && text.Classes.Contains("rename-list-manual-override")
             );
 
             window.Close();

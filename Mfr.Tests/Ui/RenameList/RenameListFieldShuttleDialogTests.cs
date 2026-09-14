@@ -303,11 +303,14 @@ namespace Mfr.Tests.Ui.RenameList
 
             var abModeCheckBox = dialog.FindControl<CompactCheckBox>("AbModeCheckBox");
             var previewSubtab = dialog.FindControl<CompactRadioButton>("PreviewColumnsSubtab");
+            var abModeOriginalLabel = dialog.FindControl<TextBlock>("OriginalFieldsAbModeLabel");
             var selectedList = dialog.FindControl<ListBox>("SelectedColumnsList");
             Assert.NotNull(abModeCheckBox);
             Assert.NotNull(previewSubtab);
+            Assert.NotNull(abModeOriginalLabel);
             Assert.NotNull(selectedList);
-            Assert.True(previewSubtab.IsVisible);
+            Assert.True(previewSubtab.IsEffectivelyVisible);
+            Assert.False(abModeOriginalLabel.IsVisible);
             Assert.True(dialogVm.IsPreviewColumnsTab);
 
             abModeCheckBox.IsChecked = true;
@@ -315,7 +318,8 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(dialogVm.IsAbModeEnabled);
-            Assert.False(previewSubtab.IsVisible);
+            Assert.False(previewSubtab.IsEffectivelyVisible);
+            Assert.True(abModeOriginalLabel.IsVisible);
             Assert.False(dialogVm.IsPreviewColumnsTab);
             Assert.True(dialogVm.IsOriginalColumnsTab);
             Assert.Single(dialogVm.ResultColumns);
@@ -328,7 +332,8 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(dialogVm.IsAbModeEnabled);
-            Assert.True(previewSubtab.IsVisible);
+            Assert.True(previewSubtab.IsEffectivelyVisible);
+            Assert.False(abModeOriginalLabel.IsVisible);
             Assert.Single(dialogVm.ResultColumns);
             Assert.False(dialogVm.ResultColumns[0].Key.IsPreview);
 

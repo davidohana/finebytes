@@ -130,16 +130,19 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void ProjectedColumns_preview_side_derives_companions_with_catalog_default_width()
+        public void ProjectedColumns_after_side_swaps_previewable_fields_keeping_count_and_width()
         {
             var renameListViewModel = _context.CreateRenameListViewModel();
-            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            var itemTypeKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.ItemType
+            );
             var fullNameKey = RenameListFieldKey.Original(
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FullName
             );
             renameListViewModel.SetVisibleColumns([
-                new RenameListVisibleColumn(folderKey, Width: 180),
+                new RenameListVisibleColumn(itemTypeKey, Width: 120),
                 new RenameListVisibleColumn(fullNameKey, Width: 220),
             ]);
             renameListViewModel.IsAbModeEnabled = true;
@@ -148,23 +151,21 @@ namespace Mfr.Tests.Ui.RenameList
             var projected = renameListViewModel.ProjectedColumns;
             Assert.Equal(
                 [
-                    new RenameListVisibleColumn(folderKey, Width: 180),
+                    new RenameListVisibleColumn(itemTypeKey, Width: 120),
                     new RenameListVisibleColumn(
-                        RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Folder)
-                    ),
-                    new RenameListVisibleColumn(fullNameKey, Width: 220),
-                    new RenameListVisibleColumn(
-                        RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                        RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                        Width: 220
                     ),
                 ],
                 projected
             );
             Assert.Equal(2, renameListViewModel.VisibleColumns.Count);
+            Assert.Equal(2, projected.Count);
             Assert.All(renameListViewModel.VisibleColumns, column => Assert.False(column.Key.IsPreview));
         }
 
         [Fact]
-        public void UpdateVisibleColumnWidth_no_ops_for_derived_preview_key()
+        public void UpdateVisibleColumnWidth_maps_after_side_preview_key_to_stored_original()
         {
             var renameListViewModel = _context.CreateRenameListViewModel();
             var fullNameKey = RenameListFieldKey.Original(
@@ -178,12 +179,13 @@ namespace Mfr.Tests.Ui.RenameList
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
             renameListViewModel.UpdateVisibleColumnWidth(previewKey, 400);
 
-            Assert.Equal(200, renameListViewModel.VisibleColumns[0].Width);
-            Assert.Equal(RenameListVisibleColumn.UseCatalogDefaultWidth, renameListViewModel.ProjectedColumns[1].Width);
+            Assert.Equal(400, renameListViewModel.VisibleColumns[0].Width);
+            Assert.Equal(previewKey, renameListViewModel.ProjectedColumns[0].Key);
+            Assert.Equal(400, renameListViewModel.ProjectedColumns[0].Width);
         }
 
         [Fact]
-        public void ReorderVisibleColumns_maps_preview_side_key_superset_to_originals()
+        public void ReorderVisibleColumns_maps_after_side_preview_keys_to_originals()
         {
             var renameListViewModel = _context.CreateRenameListViewModel();
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
@@ -195,6 +197,7 @@ namespace Mfr.Tests.Ui.RenameList
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FullName
             );
+            var folderPreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
             renameListViewModel.SetVisibleColumns([
                 new RenameListVisibleColumn(folderKey, Width: 100),
                 new RenameListVisibleColumn(fullNameKey, Width: 200),
@@ -202,7 +205,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.IsAbModeEnabled = true;
             renameListViewModel.AbSide = RenameListPrefs.AbSidePreview;
 
-            renameListViewModel.ReorderVisibleColumns([fullNameKey, fullNamePreview, folderKey]);
+            renameListViewModel.ReorderVisibleColumns([fullNamePreview, folderPreview]);
 
             Assert.Equal(
                 [
@@ -337,6 +340,28 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal([new RenameListVisibleColumn(nameOriginal, Width: 120)], renameListViewModel.VisibleColumns);
         }
 
+        [Fact]
+        public void ToggleAbMode_enables_and_normalizes_preview_keys()
+        {
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            var fullNamePreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(fullNamePreview)]);
+            Assert.False(renameListViewModel.IsAbModeEnabled);
+
+            renameListViewModel.ToggleAbMode();
+
+            Assert.True(renameListViewModel.IsAbModeEnabled);
+            Assert.Single(renameListViewModel.VisibleColumns);
+            Assert.False(renameListViewModel.VisibleColumns[0].Key.IsPreview);
+            Assert.Equal(BasicRenameListFields.Key.FullName, renameListViewModel.VisibleColumns[0].Key.PropertyKey);
+
+            renameListViewModel.ToggleAbMode();
+            Assert.False(renameListViewModel.IsAbModeEnabled);
+        }
+
         [AvaloniaFact]
         public void IsAbSide_bindables_follow_AbSide()
         {
@@ -427,11 +452,11 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.ExportVisibleColumnsAsync();
 
             Assert.Equal(
-                $"Full File Name,Full File Name (Preview){Environment.NewLine}row.txt,row.txt{Environment.NewLine}",
+                $"Full File Name (Preview){Environment.NewLine}row.txt{Environment.NewLine}",
                 await File.ReadAllTextAsync(outPath)
             );
             Assert.Single(renameListViewModel.VisibleColumns);
-            Assert.Equal(2, renameListViewModel.ProjectedColumns.Count);
+            Assert.Single(renameListViewModel.ProjectedColumns);
         }
 
         [Fact]

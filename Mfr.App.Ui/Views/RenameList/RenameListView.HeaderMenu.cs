@@ -127,12 +127,16 @@ namespace Mfr.App.Ui.Views.RenameList
             menu.Items.Add(new MenuItem { Header = $"({field.DisplayName})", IsEnabled = false });
             menu.Items.Add(new Separator());
 
-            // Hide Field only for persisted layout keys (omit derived A/B Preview companions).
-            var isPersistedColumn = viewModel.VisibleColumns.Any(column => column.Key == fieldKey);
+            // Hide Field for persisted layout keys (After-side preview keys map to the stored original).
+            var hideKey =
+                viewModel.IsAbModeEnabled && fieldKey.IsPreview
+                    ? RenameListFieldKey.Original(fieldKey.GroupId, fieldKey.PropertyKey)
+                    : fieldKey;
+            var isPersistedColumn = viewModel.VisibleColumns.Any(column => column.Key == hideKey);
             if (isPersistedColumn)
             {
                 var hideField = new MenuItem { Header = "Hide Field", IsEnabled = viewModel.VisibleColumns.Count > 1 };
-                hideField.Click += (_, _) => viewModel.HideColumn(fieldKey);
+                hideField.Click += (_, _) => viewModel.HideColumn(hideKey);
                 menu.Items.Add(hideField);
             }
 
