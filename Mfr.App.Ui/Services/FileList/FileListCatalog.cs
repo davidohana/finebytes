@@ -20,11 +20,12 @@ namespace Mfr.App.Ui.Services.FileList
         };
 
         // Caps how long a disconnected UNC or mapped drive may block Exists/enumerate.
-        // The OS SMB timeout cannot be cancelled; this bound keeps the File List responsive.
-        private static readonly TimeSpan _NetworkProbeTimeout = TimeSpan.FromSeconds(3);
+        // The OS SMB timeout cannot be cancelled; this bound keeps File List from waiting forever
+        // after async listing already keeps the UI responsive.
+        private static readonly TimeSpan _NetworkProbeTimeout = TimeSpan.FromSeconds(15);
 
         // First contact with a UNC server (\\ohanas) is often slower than a share Exists check.
-        private static readonly TimeSpan _UncServerProbeTimeout = TimeSpan.FromSeconds(8);
+        private static readonly TimeSpan _UncServerProbeTimeout = TimeSpan.FromSeconds(30);
 
         private const int _VolumeListingGroup = 0;
         private const int _KnownPlaceListingGroup = 1;
