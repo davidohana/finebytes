@@ -113,6 +113,7 @@
     <Style Selector=":is(GridSplitter):pointerover /template/ Rectangle#Hairline">
       <Setter Property="Fill" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
     </Style>
+    <!-- Shared tool-button chrome (pane rails, main toolbar, File List tools, dialogs). -->
     <Style Selector="Button.rename-list-action">
       <Setter Property="Width" Value="28" />
       <Setter Property="Height" Value="28" />
@@ -120,16 +121,16 @@
       <Setter Property="MinHeight" Value="28" />
       <Setter Property="Padding" Value="2" />
       <Setter Property="Margin" Value="1" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="2" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="Button.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     </Style>
     <Style Selector="Button.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
@@ -148,16 +149,16 @@
       <Setter Property="MinHeight" Value="28" />
       <Setter Property="Padding" Value="2" />
       <Setter Property="Margin" Value="1" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="2" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="ToggleButton.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     </Style>
     <Style Selector="ToggleButton.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
@@ -183,36 +184,18 @@
       <Setter Property="VerticalAlignment" Value="Stretch" />
     </Style>
     <Style Selector="Border.pane-action-rail Button.rename-list-action">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="Margin" Value="0,0,0,2" />
-    </Style>
-    <Style Selector="Border.pane-action-rail Button.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-    </Style>
-    <Style Selector="Border.pane-action-rail Button.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="Border.pane-action-rail ToggleButton.rename-list-action">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="Margin" Value="0,0,0,2" />
     </Style>
-    <Style Selector="Border.pane-action-rail ToggleButton.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-    </Style>
-    <Style Selector="Border.pane-action-rail ToggleButton.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
-    </Style>
-    <Style Selector="Border.pane-action-rail ToggleButton.rename-list-action:checked /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
-    </Style>
-    <Style Selector="Border.pane-action-rail ToggleButton.rename-list-action:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+
+    <!-- Horizontal tool strip (main window GO/Undo/…). -->
+    <Style Selector="Border.pane-action-strip">
+      <Setter Property="Background" Value="{DynamicResource AppChromeHeaderBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
+      <Setter Property="BorderThickness" Value="0,0,0,1" />
+      <Setter Property="Padding" Value="4,2" />
     </Style>
   </Application.Styles>
 </Application>

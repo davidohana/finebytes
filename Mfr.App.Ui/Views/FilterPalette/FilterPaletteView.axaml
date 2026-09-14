@@ -20,16 +20,16 @@
       <Setter Property="MinHeight" Value="22" />
       <Setter Property="Padding" Value="2" />
       <Setter Property="Margin" Value="1" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
       <Setter Property="CornerRadius" Value="2" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="Button.filter-group /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="Transparent" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     </Style>
     <Style Selector="Button.filter-group:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
@@ -79,7 +79,7 @@
   </UserControl.Styles>
   <Border Classes="pane">
     <DockPanel>
-      <Border DockPanel.Dock="Top" Padding="4,4,4,4">
+      <Border DockPanel.Dock="Top" Background="{DynamicResource AppChromeHeaderBrush}" Padding="4,4,4,4">
         <ItemsControl ItemsSource="{Binding Groups}">
           <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>

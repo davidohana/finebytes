@@ -38,10 +38,10 @@
       <Setter Property="MinHeight" Value="26" />
       <Setter Property="Padding" Value="10,4" />
       <Setter Property="Margin" Value="0,0,4,0" />
-      <Setter Property="Background" Value="{DynamicResource PaneChromeBrush}" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
       <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="0" />
+      <Setter Property="CornerRadius" Value="2" />
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
       <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -49,6 +49,10 @@
     </Style>
     <Style Selector="Button.applied-filter-toolbar:disabled">
       <Setter Property="Opacity" Value="0.55" />
+    </Style>
+    <Style Selector="Button.applied-filter-toolbar /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
     </Style>
     <Style Selector="Button.applied-filter-toolbar:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />

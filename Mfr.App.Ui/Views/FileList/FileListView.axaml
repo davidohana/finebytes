@@ -201,14 +201,33 @@
     </Style>
     <Style Selector="Button.exclude-masks">
       <Setter Property="Width" Value="28" />
+      <Setter Property="Height" Value="28" />
       <Setter Property="MinWidth" Value="28" />
-      <Setter Property="MinHeight" Value="0" />
-      <Setter Property="Padding" Value="0" />
+      <Setter Property="MinHeight" Value="28" />
+      <Setter Property="Padding" Value="2" />
       <Setter Property="Margin" Value="6,0,0,0" />
-      <Setter Property="VerticalAlignment" Value="Stretch" />
+      <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="HorizontalContentAlignment" Value="Center" />
       <Setter Property="VerticalContentAlignment" Value="Center" />
       <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
+    </Style>
+    <Style Selector="Button.exclude-masks /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+    </Style>
+    <Style Selector="Button.exclude-masks:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
+    </Style>
+    <Style Selector="Button.exclude-masks:pressed /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+    </Style>
+    <Style Selector="Button.exclude-masks:disabled">
+      <Setter Property="Opacity" Value="0.4" />
     </Style>
   </UserControl.Styles>
   <Border Classes="pane">

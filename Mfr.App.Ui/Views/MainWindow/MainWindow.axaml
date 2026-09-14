@@ -492,7 +492,7 @@
       </MenuItem>
     </Menu>
 
-    <Border DockPanel.Dock="Top" Padding="4,2">
+    <Border DockPanel.Dock="Top" Classes="pane-action-strip">
       <Border.Styles>
         <!-- Room around opaque toolbar glyphs (e.g. Options) so hover chrome is visible. -->
         <Style Selector="Button.rename-list-action">
