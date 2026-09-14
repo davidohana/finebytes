@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.Views
         public Func<OptionsDialogViewModel, Task<bool?>>? Show { get; init; }
 
         /// <summary>
-        /// When set, replaces <see cref="ConfigStore.Save"/> after OK.
+        /// When set, replaces <see cref="ConfigStore.Save"/> after OK (via <see cref="ConfigStoreSave"/>).
         /// </summary>
         public Action? SaveConfig { get; init; }
 

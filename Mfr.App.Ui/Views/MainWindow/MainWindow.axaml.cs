@@ -175,14 +175,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                 viewModel.RenameListViewModel.NotifyAddPolicyChanged();
                 try
                 {
-                    if (hooks?.SaveConfig is not null)
-                    {
-                        hooks.SaveConfig();
-                    }
-                    else
-                    {
-                        ConfigStore.Save();
-                    }
+                    ConfigStoreSave.Invoke(hooks?.SaveConfig);
                 }
                 catch (Exception)
                 {

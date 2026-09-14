@@ -203,18 +203,15 @@ namespace Mfr.App.Ui.Views.Presets
         /// </returns>
         private async Task<bool> _ConfirmDeleteAsync(string title, string message)
         {
-            if (!ConfirmationPolicy.ShouldConfirm(ConfirmationKind.DeletePreset))
+            Func<Task<bool>>? confirmHook = null;
+            if (ConfirmDeleteAsync is { } hook)
             {
-                return true;
+                confirmHook = () => hook(title, message);
             }
 
-            if (ConfirmDeleteAsync is { } confirmHook)
-            {
-                return await confirmHook(title, message).ConfigureAwait(true);
-            }
-
-            var confirm = new ConfirmMessageDialog(title, message, kind: ConfirmationKind.DeletePreset);
-            return await confirm.ShowDialog<bool?>(this) == true;
+            return await SuppressibleConfirm
+                .ConfirmAsync(this, title, message, kind: ConfirmationKind.DeletePreset, confirmHook: confirmHook)
+                .ConfigureAwait(true);
         }
 
         private async void _OnRenameClick(object? sender, RoutedEventArgs e)

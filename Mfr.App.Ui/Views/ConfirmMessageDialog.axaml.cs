@@ -59,7 +59,7 @@ namespace Mfr.App.Ui.Views
         }
 
         /// <summary>
-        /// When set, replaces <see cref="ConfigStore.Save"/> after suppress on OK (headless tests).
+        /// When set, replaces <see cref="ConfigStore.Save"/> after suppress on OK (via <see cref="ConfigStoreSave"/>; headless tests).
         /// </summary>
         internal Action? SaveConfig { get; set; }
 
@@ -79,13 +79,7 @@ namespace Mfr.App.Ui.Views
             }
 
             ConfirmationPolicy.Suppress(kind);
-            if (SaveConfig is { } save)
-            {
-                save();
-                return;
-            }
-
-            ConfigStore.Save();
+            ConfigStoreSave.Invoke(SaveConfig);
         }
     }
 }

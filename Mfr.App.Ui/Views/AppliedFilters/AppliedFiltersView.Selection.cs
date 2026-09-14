@@ -97,12 +97,14 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return false;
             }
 
-            var dialog = new ConfirmMessageDialog(
-                title: "Remove All Filters",
-                message: "Remove all Applied Filters?",
-                kind: ConfirmationKind.ClearAppliedFilters
-            );
-            return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
+            return await SuppressibleConfirm
+                .ConfirmAsync(
+                    owner,
+                    title: "Remove All Filters",
+                    message: "Remove all Applied Filters?",
+                    kind: ConfirmationKind.ClearAppliedFilters
+                )
+                .ConfigureAwait(true);
         }
 
         private void _OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)

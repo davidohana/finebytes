@@ -242,12 +242,14 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return true;
             }
 
-            var confirm = new ConfirmMessageDialog(
-                "Replace Applied Filters",
-                "Loading this preset will replace the current Applied Filters list. Continue?",
-                kind: ConfirmationKind.ReplaceAppliedFiltersOnLoad
-            );
-            return await confirm.ShowDialog<bool?>(owner) == true;
+            return await SuppressibleConfirm
+                .ConfirmAsync(
+                    owner,
+                    title: "Replace Applied Filters",
+                    message: "Loading this preset will replace the current Applied Filters list. Continue?",
+                    kind: ConfirmationKind.ReplaceAppliedFiltersOnLoad
+                )
+                .ConfigureAwait(true);
         }
 
         /// <summary>
@@ -260,22 +262,21 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         /// </returns>
         internal async Task<bool> ConfirmOverwritePresetAsync(Window owner, string name)
         {
-            if (!ConfirmationPolicy.ShouldConfirm(ConfirmationKind.OverwritePreset))
+            Func<Task<bool>>? confirmHook = null;
+            if (ConfirmOverwriteAsync is { } hook)
             {
-                return true;
+                confirmHook = () => hook(name);
             }
 
-            if (ConfirmOverwriteAsync is { } confirmHook)
-            {
-                return await confirmHook(name).ConfigureAwait(true);
-            }
-
-            var confirm = new ConfirmMessageDialog(
-                "Overwrite Preset",
-                $"A preset named '{name}' already exists. Overwrite it?",
-                kind: ConfirmationKind.OverwritePreset
-            );
-            return await confirm.ShowDialog<bool?>(owner) == true;
+            return await SuppressibleConfirm
+                .ConfirmAsync(
+                    owner,
+                    title: "Overwrite Preset",
+                    message: $"A preset named '{name}' already exists. Overwrite it?",
+                    kind: ConfirmationKind.OverwritePreset,
+                    confirmHook: confirmHook
+                )
+                .ConfigureAwait(true);
         }
     }
 }

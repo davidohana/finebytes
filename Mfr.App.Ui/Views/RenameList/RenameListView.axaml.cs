@@ -232,8 +232,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 return false;
             }
 
-            var dialog = new ConfirmMessageDialog(title: title, message: message, kind: kind);
-            return await dialog.ShowDialog<bool>(owner).ConfigureAwait(true);
+            return await SuppressibleConfirm.ConfirmAsync(owner, title, message, kind).ConfigureAwait(true);
         }
 
         private static void _ClearUiHooks(RenameListViewModel viewModel)
