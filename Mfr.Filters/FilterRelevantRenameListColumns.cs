@@ -1,0 +1,409 @@
+using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
+using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
+using Mfr.Filters.Misc;
+using Mfr.Models.RenameList;
+using Mfr.Models.RenameList.Fields.AudioTag;
+using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Extended;
+
+namespace Mfr.Filters
+{
+    /// <summary>
+    /// Infers Rename List columns relevant to an applied filter chain (write targets and format tokens).
+    /// </summary>
+    public static class FilterRelevantRenameListColumns
+    {
+        private static readonly Dictionary<FilterTarget, RenameListField> _writeTargetToField = _BuildWriteTargetMap();
+
+        /// <summary>
+        /// Collects ordered unique Rename List field keys that the filter chain writes or reads via tokens.
+        /// </summary>
+        /// <param name="filters">Applied filter chain in order (disabled steps included).</param>
+        /// <returns>
+        /// Stable unique keys: chain order, write keys before token keys per filter, Original before Preview.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="filters"/> is null.</exception>
+        public static IReadOnlyList<RenameListFieldKey> Collect(IEnumerable<BaseFilter> filters)
+        {
+            ArgumentNullException.ThrowIfNull(filters);
+
+            var keys = new List<RenameListFieldKey>();
+            var keyToIsSeen = new HashSet<RenameListFieldKey>();
+
+            foreach (var filter in filters)
+            {
+                ArgumentNullException.ThrowIfNull(filter);
+
+                _CollectWriteKeys(filter, keys, keyToIsSeen);
+                _CollectTokenKeys(filter, keys, keyToIsSeen);
+            }
+
+            return keys;
+        }
+
+        /// <summary>
+        /// Adds write-side catalog keys for <paramref name="filter"/>.
+        /// </summary>
+        private static void _CollectWriteKeys(
+            BaseFilter filter,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            if (filter is StringTargetFilter stringTarget)
+            {
+                _AddFieldForWriteTarget(stringTarget.Target, keys, keyToIsSeen);
+                return;
+            }
+
+            if (filter is AudioTagSetterFilter audioTagSetter)
+            {
+                _AddAudioTagSetterWriteKeys(audioTagSetter.Options, keys, keyToIsSeen);
+                return;
+            }
+
+            if (filter is DateTimeSetterFilter dateTimeSetter)
+            {
+                _AddTimestampWriteKey(dateTimeSetter.Options.TimestampField, keys, keyToIsSeen);
+                return;
+            }
+
+            if (filter is TimeShifterFilter timeShifter)
+            {
+                _AddTimestampWriteKey(timeShifter.Options.TimestampField, keys, keyToIsSeen);
+                return;
+            }
+
+            if (filter is AttributesSetterFilter)
+            {
+                _AddCatalogField(ExtendedRenameListFields.Group, "Attrs", keys, keyToIsSeen);
+                return;
+            }
+
+            if (filter is PathMoverFilter)
+            {
+                _AddCatalogField(BasicRenameListField.Group, BasicRenameListFields.Key.Folder, keys, keyToIsSeen);
+            }
+        }
+
+        /// <summary>
+        /// Adds keys for non-null <see cref="AudioTagSetterOptions"/> semantic slots.
+        /// </summary>
+        private static void _AddAudioTagSetterWriteKeys(
+            AudioTagSetterOptions options,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            foreach (var (propertyKey, _) in _EnumerateAudioTagSetterSlots(options))
+            {
+                _AddCatalogField(AudioTagRenameListFields.Group, propertyKey, keys, keyToIsSeen);
+            }
+        }
+
+        /// <summary>
+        /// Adds the Extended date column for a filesystem timestamp field.
+        /// </summary>
+        private static void _AddTimestampWriteKey(
+            TimestampField timestampField,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            FormatTokenRenameListFieldMap.TryMapTimestampField(timestampField, out var groupId, out var propertyKey);
+            _AddCatalogField(groupId, propertyKey, keys, keyToIsSeen);
+        }
+
+        /// <summary>
+        /// Parses format templates on <paramref name="filter"/> and maps known tokens to catalog keys.
+        /// </summary>
+        private static void _CollectTokenKeys(
+            BaseFilter filter,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            foreach (var template in _EnumerateFormatTemplates(filter))
+            {
+                _CollectTokensFromTemplate(template, keys, keyToIsSeen);
+            }
+        }
+
+        /// <summary>
+        /// Yields format-template option strings known for <paramref name="filter"/>.
+        /// </summary>
+        private static IEnumerable<string> _EnumerateFormatTemplates(BaseFilter filter)
+        {
+            if (filter is FormatterFilter formatter)
+            {
+                yield return formatter.Options.Template;
+                yield break;
+            }
+
+            if (filter is InserterFilter inserter)
+            {
+                yield return inserter.Options.Text;
+                yield break;
+            }
+
+            if (filter is NameListFilter nameList)
+            {
+                yield return nameList.Options.Prefix;
+                yield return nameList.Options.Suffix;
+                yield break;
+            }
+
+            if (filter is PathMoverFilter pathMover)
+            {
+                yield return pathMover.Options.SubFolder;
+                yield break;
+            }
+
+            if (filter is Id3v2FieldSetterFilter id3v2FieldSetter)
+            {
+                yield return id3v2FieldSetter.Options.Text;
+                yield break;
+            }
+
+            if (filter is AudioTagSetterFilter audioTagSetter)
+            {
+                foreach (var text in _EnumerateAudioTagSetterTexts(audioTagSetter.Options))
+                {
+                    yield return text;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Yields non-null Audio Tag Setter field texts.
+        /// </summary>
+        private static IEnumerable<string> _EnumerateAudioTagSetterTexts(AudioTagSetterOptions options)
+        {
+            foreach (var (_, field) in _EnumerateAudioTagSetterSlots(options))
+            {
+                yield return field.Text;
+            }
+        }
+
+        /// <summary>
+        /// Yields non-null Audio Tag Setter slots as catalog property key + field options.
+        /// </summary>
+        private static IEnumerable<(
+            string PropertyKey,
+            AudioTagStringFieldOptions Field
+        )> _EnumerateAudioTagSetterSlots(AudioTagSetterOptions options)
+        {
+            if (options.Performers is not null)
+            {
+                yield return ("Performers", options.Performers);
+            }
+
+            if (options.AlbumArtists is not null)
+            {
+                yield return ("AlbumArtists", options.AlbumArtists);
+            }
+
+            if (options.Title is not null)
+            {
+                yield return ("Title", options.Title);
+            }
+
+            if (options.Album is not null)
+            {
+                yield return ("Album", options.Album);
+            }
+
+            if (options.Genre is not null)
+            {
+                yield return ("Genres", options.Genre);
+            }
+
+            if (options.Comment is not null)
+            {
+                yield return ("Comment", options.Comment);
+            }
+
+            if (options.Composers is not null)
+            {
+                yield return ("Composers", options.Composers);
+            }
+
+            if (options.Lyrics is not null)
+            {
+                yield return ("Lyrics", options.Lyrics);
+            }
+
+            if (options.Grouping is not null)
+            {
+                yield return ("Grouping", options.Grouping);
+            }
+
+            if (options.Copyright is not null)
+            {
+                yield return ("Copyright", options.Copyright);
+            }
+
+            if (options.Conductor is not null)
+            {
+                yield return ("Conductor", options.Conductor);
+            }
+
+            if (options.Year is not null)
+            {
+                yield return ("Year", options.Year);
+            }
+
+            if (options.BeatsPerMinute is not null)
+            {
+                yield return ("BeatsPerMinute", options.BeatsPerMinute);
+            }
+
+            if (options.Track is not null)
+            {
+                yield return ("Track", options.Track);
+            }
+
+            if (options.TrackCount is not null)
+            {
+                yield return ("TrackCount", options.TrackCount);
+            }
+
+            if (options.Disc is not null)
+            {
+                yield return ("Disc", options.Disc);
+            }
+
+            if (options.DiscCount is not null)
+            {
+                yield return ("DiscCount", options.DiscCount);
+            }
+        }
+
+        /// <summary>
+        /// Validates <paramref name="template"/> and appends mapped token fields (including nested arg tokens).
+        /// </summary>
+        private static void _CollectTokensFromTemplate(
+            string template,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            if (string.IsNullOrEmpty(template))
+            {
+                return;
+            }
+
+            var parse = FormatStringSyntax.TryValidate(template);
+            foreach (var span in parse.Tokens)
+            {
+                if (
+                    FormatTokenRenameListFieldMap.TryMap(
+                        span.CanonicalName,
+                        span.Args,
+                        out var groupId,
+                        out var propertyKey
+                    )
+                )
+                {
+                    _AddCatalogField(groupId, propertyKey, keys, keyToIsSeen);
+                }
+
+                // Nested tokens live in args (e.g. substr/token source=) and are not top-level spans.
+                if (!string.IsNullOrEmpty(span.Args) && FormatStringCompiler.ContainsLikelyFormatTokens(span.Args))
+                {
+                    _CollectTokensFromTemplate(span.Args, keys, keyToIsSeen);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Reverse-looks up a catalog write target and appends Original (+ Preview when supported).
+        /// </summary>
+        private static void _AddFieldForWriteTarget(
+            FilterTarget target,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            if (!_writeTargetToField.TryGetValue(target, out var field))
+            {
+                return;
+            }
+
+            _AddFieldKeys(field, keys, keyToIsSeen);
+        }
+
+        /// <summary>
+        /// Looks up a catalog field and appends Original (+ Preview when supported).
+        /// </summary>
+        private static void _AddCatalogField(
+            string groupId,
+            string propertyKey,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            if (!RenameListFieldCatalog.TryGetField(groupId, propertyKey, out var field))
+            {
+                return;
+            }
+
+            _AddFieldKeys(field, keys, keyToIsSeen);
+        }
+
+        /// <summary>
+        /// Appends Original, then Preview when <see cref="RenameListField.SupportsPreview"/>.
+        /// </summary>
+        private static void _AddFieldKeys(
+            RenameListField field,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            _TryAdd(field.OriginalKey, keys, keyToIsSeen);
+            if (field.SupportsPreview)
+            {
+                _TryAdd(field.PreviewKey, keys, keyToIsSeen);
+            }
+        }
+
+        /// <summary>
+        /// Appends <paramref name="key"/> when not already present.
+        /// </summary>
+        private static void _TryAdd(
+            RenameListFieldKey key,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            if (!keyToIsSeen.Add(key))
+            {
+                return;
+            }
+
+            keys.Add(key);
+        }
+
+        /// <summary>
+        /// Builds the reverse map from catalog <see cref="RenameListField.WriteTarget"/> values.
+        /// </summary>
+        private static Dictionary<FilterTarget, RenameListField> _BuildWriteTargetMap()
+        {
+            var targetToField = new Dictionary<FilterTarget, RenameListField>();
+            foreach (var field in RenameListFieldCatalog.All)
+            {
+                if (field.WriteTarget is not { } writeTarget)
+                {
+                    continue;
+                }
+
+                // First catalog hit wins when targets collide (none today).
+                targetToField.TryAdd(writeTarget, field);
+            }
+
+            return targetToField;
+        }
+    }
+}
