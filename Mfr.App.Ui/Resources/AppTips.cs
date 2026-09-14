@@ -137,6 +137,10 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List Auto-Preview toolbar and menu tip (MFR7 AutoPreview).</summary>
         public const string AutoPreview = "Auto-Preview — click to turn on or off";
 
+        /// <summary>Rename List A/B Mode Original|Preview toolbar and menu tip.</summary>
+        public const string AbModeSide =
+            "Show original or derived preview columns (A/B Mode — enable in Select Fields)";
+
         /// <summary>Rename List color legend toolbar tip (MFR7 btnLegendEnabled).</summary>
         public const string ColorLegend = "Show or hide the Rename List color legend";
 

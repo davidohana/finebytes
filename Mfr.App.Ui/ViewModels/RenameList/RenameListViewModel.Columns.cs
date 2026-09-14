@@ -25,7 +25,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <see cref="RenameListPrefs.AbSidePreview"/>.
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsAbSideOriginal))]
+        [NotifyPropertyChangedFor(nameof(IsAbSidePreview))]
         private string _abSide = RenameListPrefs.AbSidePreview;
+
+        /// <summary>
+        /// Gets whether the A/B toolbar/menu Original side is selected.
+        /// </summary>
+        public bool IsAbSideOriginal => string.Equals(AbSide, RenameListPrefs.AbSideOriginal, StringComparison.Ordinal);
+
+        /// <summary>
+        /// Gets whether the A/B toolbar/menu Preview side is selected.
+        /// </summary>
+        public bool IsAbSidePreview => string.Equals(AbSide, RenameListPrefs.AbSidePreview, StringComparison.Ordinal);
 
         /// <summary>
         /// Gets visible grid columns in left-to-right order.
@@ -235,6 +247,50 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var columns = _visibleColumns.ToList();
             columns.RemoveAt(index);
             SetVisibleColumns(columns);
+        }
+
+        /// <summary>
+        /// Sets the A/B toolbar side (Original or Preview).
+        /// <para>
+        /// When A/B Mode is on and the side becomes Preview, hydrates metadata for
+        /// <see cref="ProjectedColumns"/> before the side sticks (same path as column apply).
+        /// Side is remembered while A/B Mode is off so re-enabling restores it.
+        /// </para>
+        /// </summary>
+        /// <param name="side">
+        /// <see cref="RenameListPrefs.AbSideOriginal"/> or <see cref="RenameListPrefs.AbSidePreview"/>.
+        /// </param>
+        [RelayCommand]
+        public void SetAbSide(string side)
+        {
+            var normalized = RenameListPrefs.NormalizeAbSide(side);
+            if (string.Equals(AbSide, normalized, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            var flippingToPreview =
+                IsAbModeEnabled && string.Equals(normalized, RenameListPrefs.AbSidePreview, StringComparison.Ordinal);
+            if (!flippingToPreview)
+            {
+                AbSide = normalized;
+                return;
+            }
+
+            if (IsBusy)
+            {
+                return;
+            }
+
+            var projected = _DerivePreviewSideColumns(_visibleColumns);
+            var requirement = _CombinedMetadataRequirement(projected, _sortKeys);
+            if (_NeedsHydrate(requirement))
+            {
+                _ = _HydrateThenSetAbSideAsync(normalized, projected);
+                return;
+            }
+
+            AbSide = normalized;
         }
 
         /// <summary>

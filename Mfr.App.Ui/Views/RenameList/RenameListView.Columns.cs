@@ -67,10 +67,9 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 RenameGrid.Columns.Clear();
                 RenameGrid.Columns.Add(_CreateRowStatusColumn(_viewModel));
-                var visibleColumns = _viewModel.VisibleColumns;
-                foreach (var visibleColumn in visibleColumns)
+                foreach (var projectedColumn in _viewModel.ProjectedColumns)
                 {
-                    RenameGrid.Columns.Add(_CreateGridColumn(_viewModel, visibleColumn));
+                    RenameGrid.Columns.Add(_CreateGridColumn(_viewModel, projectedColumn));
                 }
             }
             finally

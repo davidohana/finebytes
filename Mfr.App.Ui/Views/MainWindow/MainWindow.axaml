@@ -373,6 +373,24 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
+          Header="_Original"
+          Command="{Binding RenameListViewModel.SetAbSideCommand}"
+          CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSideOriginal}"
+          ToggleType="Radio"
+          IsChecked="{Binding RenameListViewModel.IsAbSideOriginal, Mode=OneWay}"
+          IsEnabled="{Binding RenameListViewModel.IsAbModeEnabled}"
+          ToolTip.Tip="{x:Static resources:AppTips.AbModeSide}"
+        />
+        <MenuItem
+          Header="_Preview"
+          Command="{Binding RenameListViewModel.SetAbSideCommand}"
+          CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSidePreview}"
+          ToggleType="Radio"
+          IsChecked="{Binding RenameListViewModel.IsAbSidePreview, Mode=OneWay}"
+          IsEnabled="{Binding RenameListViewModel.IsAbModeEnabled}"
+          ToolTip.Tip="{x:Static resources:AppTips.AbModeSide}"
+        />
+        <MenuItem
           Header="Refresh"
           Command="{Binding RenameListViewModel.RefreshCommand}"
           InputGesture="{x:Static input:AppShortcuts.Refresh}"

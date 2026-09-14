@@ -110,23 +110,26 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Exports all visible columns' display text to a UTF-8 CSV file.
+        /// Exports on-screen columns' display text to a UTF-8 CSV file.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Column order matches <see cref="VisibleColumns"/>. No-op when there are no visible columns.
-        /// Uses <see cref="UiHooks"/> for the save dialog and error UI. On success, reveals the file in Explorer.
+        /// Column order matches <see cref="ProjectedColumns"/> (includes derived Preview companions while
+        /// A/B Mode Preview side is showing). Capture/preset still use persisted <see cref="VisibleColumns"/>.
+        /// No-op when there are no projected columns. Uses <see cref="UiHooks"/> for the save dialog and
+        /// error UI. On success, reveals the file in Explorer.
         /// </para>
         /// </remarks>
         [RelayCommand]
         public Task ExportVisibleColumnsAsync()
         {
-            if (VisibleColumns.Count == 0)
+            var projected = ProjectedColumns;
+            if (projected.Count == 0)
             {
                 return Task.CompletedTask;
             }
 
-            var keys = VisibleColumns.Select(column => column.Key).ToArray();
+            var keys = projected.Select(column => column.Key).ToArray();
             return _ExportAsync(
                 title: "Export as CSV",
                 defaultExtension: "csv",

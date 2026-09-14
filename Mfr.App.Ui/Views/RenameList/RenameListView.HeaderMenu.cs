@@ -112,7 +112,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <returns>A new context menu (caller opens it).</returns>
         /// <remarks>
         /// <para>
-        /// Order: title → Hide Field → (preview) Remove Unchanged → Select Fields →
+        /// Order: title → Hide Field (persisted keys only) → (preview) Remove Unchanged → Select Fields →
         /// Edit as Name List (writable) → Cancel Manual Override (when any row overridden) →
         /// Export submenu (This Column txt / Visible Columns csv).
         /// </para>
@@ -127,9 +127,14 @@ namespace Mfr.App.Ui.Views.RenameList
             menu.Items.Add(new MenuItem { Header = $"({field.DisplayName})", IsEnabled = false });
             menu.Items.Add(new Separator());
 
-            var hideField = new MenuItem { Header = "Hide Field", IsEnabled = viewModel.VisibleColumns.Count > 1 };
-            hideField.Click += (_, _) => viewModel.HideColumn(fieldKey);
-            menu.Items.Add(hideField);
+            // Hide Field only for persisted layout keys (omit derived A/B Preview companions).
+            var isPersistedColumn = viewModel.VisibleColumns.Any(column => column.Key == fieldKey);
+            if (isPersistedColumn)
+            {
+                var hideField = new MenuItem { Header = "Hide Field", IsEnabled = viewModel.VisibleColumns.Count > 1 };
+                hideField.Click += (_, _) => viewModel.HideColumn(fieldKey);
+                menu.Items.Add(hideField);
+            }
 
             if (fieldKey.IsPreview)
             {

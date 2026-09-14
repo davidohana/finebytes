@@ -6,6 +6,7 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.RenameList"
   xmlns:input="using:Mfr.App.Ui.Input"
   xmlns:resources="using:Mfr.App.Ui.Resources"
+  xmlns:config="using:Mfr.Models.Config"
   mc:Ignorable="d"
   d:DesignWidth="800"
   d:DesignHeight="240"
@@ -292,6 +293,33 @@
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
     </Style>
 
+    <!-- A/B Original|Preview side toggles (text; checked fill matches rename-list-action). -->
+    <Style Selector="ToggleButton.rename-list-ab-side">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Margin" Value="0,2,0,0" />
+      <Setter Property="Padding" Value="4,2" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="MinWidth" Value="0" />
+      <Setter Property="HorizontalAlignment" Value="Stretch" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
+    </Style>
+    <Style Selector="ToggleButton.rename-list-ab-side /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="Transparent" />
+    </Style>
+    <Style Selector="ToggleButton.rename-list-ab-side:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
+    </Style>
+    <Style Selector="ToggleButton.rename-list-ab-side:checked /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+    </Style>
+
     <Style Selector="Border.rename-list-legend">
       <Setter Property="Width" Value="132" />
       <Setter Property="Margin" Value="4,0,4,4" />
@@ -412,6 +440,31 @@
         >
           <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AutoPreview.png" />
         </ToggleButton>
+        <StackPanel
+          x:Name="AbSidePanel"
+          Orientation="Vertical"
+          Spacing="0"
+          Margin="0,4,0,0"
+          IsVisible="{Binding IsAbModeEnabled}"
+          ToolTip.Tip="{x:Static resources:AppTips.AbModeSide}"
+        >
+          <ToggleButton
+            x:Name="AbSideOriginalRadio"
+            Classes="rename-list-ab-side"
+            Content="Original"
+            IsChecked="{Binding IsAbSideOriginal, Mode=OneWay}"
+            Command="{Binding SetAbSideCommand}"
+            CommandParameter="{x:Static config:RenameListPrefs.AbSideOriginal}"
+          />
+          <ToggleButton
+            x:Name="AbSidePreviewRadio"
+            Classes="rename-list-ab-side"
+            Content="Preview"
+            IsChecked="{Binding IsAbSidePreview, Mode=OneWay}"
+            Command="{Binding SetAbSideCommand}"
+            CommandParameter="{x:Static config:RenameListPrefs.AbSidePreview}"
+          />
+        </StackPanel>
         <ToggleButton
           x:Name="LegendToggle"
           Classes="rename-list-action"

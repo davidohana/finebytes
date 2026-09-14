@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: p3-grid-chrome
     content: "P3: rebuild/export from ProjectedColumns; reorder/width/hydrate rules; toolbar Original|Preview; tips/docs"
-    status: pending
+    status: completed
 isProject: false
 ---
 

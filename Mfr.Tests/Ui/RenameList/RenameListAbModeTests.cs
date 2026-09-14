@@ -1,6 +1,8 @@
+using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Space;
+using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Tests.Ui.RenameList
@@ -333,6 +335,151 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddRelevantColumnsCommand.ExecuteAsync(null);
 
             Assert.Equal([new RenameListVisibleColumn(nameOriginal, Width: 120)], renameListViewModel.VisibleColumns);
+        }
+
+        [AvaloniaFact]
+        public void IsAbSide_bindables_follow_AbSide()
+        {
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            Assert.True(renameListViewModel.IsAbSidePreview);
+            Assert.False(renameListViewModel.IsAbSideOriginal);
+
+            renameListViewModel.AbSide = RenameListPrefs.AbSideOriginal;
+
+            Assert.True(renameListViewModel.IsAbSideOriginal);
+            Assert.False(renameListViewModel.IsAbSidePreview);
+        }
+
+        [Fact]
+        public void SetAbSide_updates_side_when_ab_mode_off()
+        {
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            Assert.False(renameListViewModel.IsAbModeEnabled);
+
+            renameListViewModel.SetAbSide(RenameListPrefs.AbSideOriginal);
+
+            Assert.Equal(RenameListPrefs.AbSideOriginal, renameListViewModel.AbSide);
+            Assert.True(renameListViewModel.IsAbSideOriginal);
+        }
+
+        [Fact]
+        public async Task SetAbSide_to_preview_hydrates_when_projected_requirement_grows()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "tagged.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "SideFlipTitle", album: null);
+
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(fullNameKey)]);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            renameListViewModel.IsAbModeEnabled = true;
+            renameListViewModel.AbSide = RenameListPrefs.AbSideOriginal;
+            // Bypass hydrate (unlike shuttle apply) so Preview flip must load TagLib.
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(titleKey),
+                new RenameListVisibleColumn(fullNameKey),
+            ]);
+
+            var entry = Assert.Single(renameListViewModel.Entries);
+            Assert.False(entry.EngineItem.TagLibLoadAttempted);
+
+            renameListViewModel.SetAbSide(RenameListPrefs.AbSidePreview);
+            await _WaitUntilAsync(() =>
+                    !renameListViewModel.IsBusy
+                    && renameListViewModel.AbSide == RenameListPrefs.AbSidePreview
+                    && entry.EngineItem.TagLibLoadAttempted
+                )
+                .ConfigureAwait(true);
+
+            Assert.Equal(RenameListPrefs.AbSidePreview, renameListViewModel.AbSide);
+            Assert.True(entry.EngineItem.TagLibLoadAttempted);
+            Assert.Equal("SideFlipTitle", entry.GetFieldText(titleKey));
+        }
+
+        [Fact]
+        public async Task ExportVisibleColumnsAsync_uses_projected_columns_on_preview_side()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+            var outPath = Path.Combine(dir, "projected.csv");
+
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]);
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(fullNameKey)]);
+            renameListViewModel.IsAbModeEnabled = true;
+            renameListViewModel.AbSide = RenameListPrefs.AbSidePreview;
+            renameListViewModel.UiHooks = new RenameListUiHooks
+            {
+                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
+            };
+
+            await renameListViewModel.ExportVisibleColumnsAsync();
+
+            Assert.Equal(
+                $"Full File Name,Full File Name (Preview){Environment.NewLine}row.txt,row.txt{Environment.NewLine}",
+                await File.ReadAllTextAsync(outPath)
+            );
+            Assert.Single(renameListViewModel.VisibleColumns);
+            Assert.Equal(2, renameListViewModel.ProjectedColumns.Count);
+        }
+
+        [Fact]
+        public async Task Overrides_persist_across_ab_side_flips()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "row.txt");
+            await File.WriteAllTextAsync(path, "x");
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]);
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(nameKey)]);
+            renameListViewModel.IsAbModeEnabled = true;
+            renameListViewModel.AbSide = RenameListPrefs.AbSideOriginal;
+
+            var entry = Assert.Single(renameListViewModel.Entries);
+            entry.EngineItem.SetOverride(nameKey, "original-forced");
+            entry.EngineItem.SetOverride(namePreview, "preview-forced");
+
+            Assert.True(entry.IsOverridden(nameKey));
+            Assert.True(entry.IsOverridden(namePreview));
+            Assert.Equal("original-forced", entry.GetFieldText(nameKey));
+
+            renameListViewModel.SetAbSide(RenameListPrefs.AbSidePreview);
+            Assert.Equal("original-forced", entry.GetFieldText(nameKey));
+            Assert.Equal("preview-forced", entry.GetFieldText(namePreview));
+            Assert.True(entry.IsOverridden(nameKey));
+            Assert.True(entry.IsOverridden(namePreview));
+
+            renameListViewModel.SetAbSide(RenameListPrefs.AbSideOriginal);
+            Assert.Equal("original-forced", entry.GetFieldText(nameKey));
+            Assert.True(entry.IsOverridden(namePreview));
+        }
+
+        private static async Task _WaitUntilAsync(Func<bool> condition, int timeoutMs = 10_000)
+        {
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+            while (!condition())
+            {
+                if (stopwatch.ElapsedMilliseconds > timeoutMs)
+                {
+                    throw new TimeoutException("Condition was not met in time.");
+                }
+
+                await Task.Delay(20).ConfigureAwait(true);
+            }
         }
     }
 }

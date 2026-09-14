@@ -28,20 +28,41 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            // Normalize before hydrate so cancel leaves AbMode and columns untouched. Commit AbMode before
-            // SetVisibleColumns so an A/B-off draft can keep preview keys (SetVisibleColumns normalizes only
-            // while AbMode is already on).
+            // Normalize before hydrate so cancel leaves AbMode and columns untouched.
             var columnsToApply = abModeEnabled ? RenameListVisibleColumn.NormalizeToOriginals(columns) : columns;
+            if (
+                abModeEnabled == IsAbModeEnabled
+                && columnsToApply.SequenceEqual(_visibleColumns)
+                && sortKeys.SequenceEqual(_sortKeys)
+            )
+            {
+                return;
+            }
 
             if (!await _HydrateForColumnsAndSortAsync(columnsToApply, sortKeys).ConfigureAwait(true))
             {
                 return;
             }
 
-            IsAbModeEnabled = abModeEnabled;
-            if (!columnsToApply.SequenceEqual(_visibleColumns))
+            // Commit without flashing the pre-draft layout when enabling A/B:
+            // - On: apply draft columns first (AbMode still off → no normalize), then set AbMode.
+            // - Off: clear AbMode first so SetVisibleColumns can keep preview keys.
+            if (abModeEnabled)
             {
-                SetVisibleColumns(columnsToApply);
+                if (!columnsToApply.SequenceEqual(_visibleColumns))
+                {
+                    SetVisibleColumns(columnsToApply);
+                }
+
+                IsAbModeEnabled = true;
+            }
+            else
+            {
+                IsAbModeEnabled = false;
+                if (!columnsToApply.SequenceEqual(_visibleColumns))
+                {
+                    SetVisibleColumns(columnsToApply);
+                }
             }
 
             SetSortKeys(sortKeys);
@@ -58,17 +79,35 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            if (!await _HydrateForColumnsAndSortAsync(columns, _sortKeys).ConfigureAwait(true))
-            {
-                return;
-            }
-
             if (columns.SequenceEqual(_visibleColumns))
             {
                 return;
             }
 
+            if (!await _HydrateForColumnsAndSortAsync(columns, _sortKeys).ConfigureAwait(true))
+            {
+                return;
+            }
+
             SetVisibleColumns(columns);
+        }
+
+        /// <summary>
+        /// Hydrates for a Preview-side projection, then commits <paramref name="side"/> when hydrate succeeds.
+        /// </summary>
+        /// <param name="side">Normalized A/B side to apply after hydrate.</param>
+        /// <param name="projectedColumns">Preview-side columns used for the metadata requirement.</param>
+        private async Task _HydrateThenSetAbSideAsync(
+            string side,
+            IReadOnlyList<RenameListVisibleColumn> projectedColumns
+        )
+        {
+            if (!await _HydrateForColumnsAndSortAsync(projectedColumns, _sortKeys).ConfigureAwait(true))
+            {
+                return;
+            }
+
+            AbSide = side;
         }
 
         /// <summary>

@@ -618,7 +618,7 @@ namespace Mfr.Tests.Ui.RenameList
             )
             {
                 IsPreviewColumnsTab = true,
-                IsAbModeEnabled = true
+                IsAbModeEnabled = true,
             };
 
             Assert.True(dialogVm.IsAbModeEnabled);
@@ -650,7 +650,7 @@ namespace Mfr.Tests.Ui.RenameList
                 SelectedAvailablePreviewField = RenameListFieldCatalog.GetField(
                     BasicRenameListField.Group,
                     BasicRenameListFields.Key.FullName
-                )
+                ),
             };
 
             Assert.False(dialogVm.AddSelectedPreviewFieldCommand.CanExecute(null));
@@ -681,7 +681,7 @@ namespace Mfr.Tests.Ui.RenameList
                 []
             )
             {
-                IsAbModeEnabled = true
+                IsAbModeEnabled = true,
             };
             Assert.Single(dialogVm.ResultColumns);
             Assert.False(dialogVm.ResultColumns[0].Key.IsPreview);

@@ -874,7 +874,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 _ApplyDropMarkVisuals();
             }
 
-            if (e.PropertyName is nameof(RenameListViewModel.VisibleColumns))
+            if (e.PropertyName is nameof(RenameListViewModel.ProjectedColumns))
             {
                 _RebuildColumns();
             }
