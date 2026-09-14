@@ -18,7 +18,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var items = keys.Select(key => new RenameListVisibleColumn(key));
+            var items = _KeysAllowedInSelectedColumns(keys).Select(key => new RenameListVisibleColumn(key));
             if (_columns.TryInsertMany(index, items) == 0)
             {
                 return;

@@ -85,7 +85,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var relevantKeys = _RelevantKeysForColumnApply();
+            var relevantKeys = CollectRelevantFieldKeysForApply();
             var keyToIsVisible = _visibleColumns.Select(column => column.Key).ToHashSet();
             var merged = _visibleColumns.ToList();
             if (!_AppendMissingRelevantColumns(merged, relevantKeys, keyToIsVisible))
@@ -113,7 +113,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var relevantKeys = _RelevantKeysForColumnApply();
+            var relevantKeys = CollectRelevantFieldKeysForApply();
             var columns = RenameListVisibleColumn.CreateDefaults().ToList();
             var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
             _AppendMissingRelevantColumns(columns, relevantKeys, keyToIsPresent);
@@ -473,10 +473,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Chain-relevant keys for Add/Replace; originals-only when A/B Mode is on so preview companions
-        /// are not treated as missing columns.
+        /// Chain-relevant keys for Add/Replace and the field shuttle; originals-only when A/B Mode is on so
+        /// preview companions are not treated as missing columns.
         /// </summary>
-        private IReadOnlyList<RenameListFieldKey> _RelevantKeysForColumnApply()
+        /// <returns>Relevant field keys, normalized for the current A/B Mode.</returns>
+        internal IReadOnlyList<RenameListFieldKey> CollectRelevantFieldKeysForApply()
         {
             var relevantKeys = CollectRelevantFieldKeys();
             if (!IsAbModeEnabled)

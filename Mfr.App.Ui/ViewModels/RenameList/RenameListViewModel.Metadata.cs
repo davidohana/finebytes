@@ -9,13 +9,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Applies shuttle draft columns and sort keys, hydrating metadata off the UI thread when needed.
+        /// Applies shuttle draft columns, sort keys, and A/B Mode, hydrating metadata off the UI thread when needed.
         /// </summary>
         /// <param name="columns">Draft visible columns in grid order.</param>
         /// <param name="sortKeys">Draft Auto-Sort keys in priority order.</param>
+        /// <param name="abModeEnabled">Draft A/B Mode from the field shuttle (committed on OK).</param>
         internal async Task ApplyFieldShuttleAsync(
             IReadOnlyList<RenameListVisibleColumn> columns,
-            IReadOnlyList<RenameListSortKey> sortKeys
+            IReadOnlyList<RenameListSortKey> sortKeys,
+            bool abModeEnabled = false
         )
         {
             ArgumentNullException.ThrowIfNull(columns);
@@ -26,14 +28,20 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            if (!await _HydrateForColumnsAndSortAsync(columns, sortKeys).ConfigureAwait(true))
+            // Normalize before hydrate so cancel leaves AbMode and columns untouched. Commit AbMode before
+            // SetVisibleColumns so an A/B-off draft can keep preview keys (SetVisibleColumns normalizes only
+            // while AbMode is already on).
+            var columnsToApply = abModeEnabled ? RenameListVisibleColumn.NormalizeToOriginals(columns) : columns;
+
+            if (!await _HydrateForColumnsAndSortAsync(columnsToApply, sortKeys).ConfigureAwait(true))
             {
                 return;
             }
 
-            if (!columns.SequenceEqual(_visibleColumns))
+            IsAbModeEnabled = abModeEnabled;
+            if (!columnsToApply.SequenceEqual(_visibleColumns))
             {
-                SetVisibleColumns(columns);
+                SetVisibleColumns(columnsToApply);
             }
 
             SetSortKeys(sortKeys);

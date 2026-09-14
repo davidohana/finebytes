@@ -240,6 +240,11 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (ReferenceEquals(sourceList, AvailablePreviewFieldsList))
             {
+                if (_ViewModel?.IsAbModeEnabled == true)
+                {
+                    return null;
+                }
+
                 return _BuildAvailablePayload(_ReadSelectedFields(AvailablePreviewFieldsList), usePreviewKeys: true);
             }
 
@@ -371,6 +376,10 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 ShuttleDragKind.AvailableField
                     when ReferenceEquals(targetList, SelectedColumnsList)
+                        && _ViewModel?.IsAbModeEnabled == true
+                        && _PayloadHasOnlyPreviewKeys(payload) => DragDropEffects.None,
+                ShuttleDragKind.AvailableField
+                    when ReferenceEquals(targetList, SelectedColumnsList)
                         || ReferenceEquals(targetList, SelectedSortList) => DragDropEffects.Copy,
                 ShuttleDragKind.SelectedColumn
                     when ReferenceEquals(targetList, AvailableOriginalFieldsList)
@@ -382,6 +391,27 @@ namespace Mfr.App.Ui.Views.RenameList
                 ShuttleDragKind.SelectedSort when ReferenceEquals(targetList, SelectedSortList) => DragDropEffects.Move,
                 _ => DragDropEffects.None,
             };
+        }
+
+        private static bool _PayloadHasOnlyPreviewKeys(ShuttleDragPayload payload)
+        {
+            var hasAny = false;
+            foreach (var encoded in payload.Keys)
+            {
+                var key = ShuttleFieldKeyCodec.Decode(encoded);
+                if (!key.HasValue)
+                {
+                    continue;
+                }
+
+                hasAny = true;
+                if (!key.Value.IsPreview)
+                {
+                    return false;
+                }
+            }
+
+            return hasAny;
         }
     }
 }

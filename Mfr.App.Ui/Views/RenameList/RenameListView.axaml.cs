@@ -91,8 +91,9 @@ namespace Mfr.App.Ui.Views.RenameList
                 _viewModel.VisibleColumns,
                 _viewModel.SortKeys,
                 tab,
-                relevantFieldKeys: _viewModel.CollectRelevantFieldKeys(),
-                canUseAppliedFilters: _viewModel.CanApplyRelevantColumns
+                relevantFieldKeys: _viewModel.CollectRelevantFieldKeysForApply(),
+                canUseAppliedFilters: _viewModel.CanApplyRelevantColumns,
+                abModeEnabled: _viewModel.IsAbModeEnabled
             );
             var dialog = new RenameListFieldShuttleDialog(dialogVm);
             _fieldShuttleDialog = dialog;
@@ -105,7 +106,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
 
                 await _viewModel
-                    .ApplyFieldShuttleAsync(dialogVm.ResultColumns, dialogVm.ResultSortKeys)
+                    .ApplyFieldShuttleAsync(dialogVm.ResultColumns, dialogVm.ResultSortKeys, dialogVm.IsAbModeEnabled)
                     .ConfigureAwait(true);
             }
             finally

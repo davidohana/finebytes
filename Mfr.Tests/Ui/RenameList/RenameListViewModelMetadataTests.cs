@@ -168,7 +168,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies canceling shuttle hydrate leaves columns unchanged.
+        /// Verifies canceling shuttle hydrate leaves columns and A/B Mode unchanged.
         /// </summary>
         [Fact]
         public async Task ApplyFieldShuttleAsync_Cancel_Does_Not_Apply_Columns()
@@ -189,6 +189,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync(paths).ConfigureAwait(true);
 
             var originalColumns = renameListViewModel.VisibleColumns.ToList();
+            Assert.False(renameListViewModel.IsAbModeEnabled);
             var shuttle = renameListViewModel.ApplyFieldShuttleAsync(
                 [
                     new RenameListVisibleColumn(titleKey),
@@ -196,15 +197,96 @@ namespace Mfr.Tests.Ui.RenameList
                         RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
                     ),
                 ],
-                []
+                [],
+                abModeEnabled: true
             );
 
             await _WaitUntilAsync(() => renameListViewModel.IsBusy).ConfigureAwait(true);
             renameListViewModel.Progress.CancelCommand.Execute(null);
             await shuttle.ConfigureAwait(true);
 
+            Assert.False(renameListViewModel.IsAbModeEnabled);
             Assert.Equal(originalColumns, renameListViewModel.VisibleColumns);
             Assert.DoesNotContain(renameListViewModel.VisibleColumns, column => column.Key == titleKey);
+        }
+
+        /// <summary>
+        /// Verifies shuttle OK commits A/B Mode with normalized columns.
+        /// </summary>
+        [Fact]
+        public async Task ApplyFieldShuttleAsync_Commits_AbMode_And_Normalizes_Columns()
+        {
+            var dir = _context.CreateTempDir();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            Assert.False(renameListViewModel.IsAbModeEnabled);
+
+            var fullNamePreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            await renameListViewModel
+                .ApplyFieldShuttleAsync(
+                    [new RenameListVisibleColumn(fullNamePreview), new RenameListVisibleColumn(nameOriginal)],
+                    [],
+                    abModeEnabled: true
+                )
+                .ConfigureAwait(true);
+
+            Assert.True(renameListViewModel.IsAbModeEnabled);
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    nameOriginal,
+                ],
+                renameListViewModel.VisibleColumns.Select(column => column.Key)
+            );
+            Assert.DoesNotContain(renameListViewModel.VisibleColumns, column => column.Key.IsPreview);
+        }
+
+        /// <summary>
+        /// Verifies turning A/B Mode off via shuttle OK can restore mixed original/preview columns.
+        /// </summary>
+        [Fact]
+        public async Task ApplyFieldShuttleAsync_Turning_AbMode_Off_Allows_Preview_Columns()
+        {
+            var dir = _context.CreateTempDir();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.IsAbModeEnabled = true;
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                ),
+            ]);
+
+            var fullNamePreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            await renameListViewModel
+                .ApplyFieldShuttleAsync(
+                    [
+                        new RenameListVisibleColumn(
+                            RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                        ),
+                        new RenameListVisibleColumn(fullNamePreview),
+                        new RenameListVisibleColumn(nameOriginal),
+                    ],
+                    [],
+                    abModeEnabled: false
+                )
+                .ConfigureAwait(true);
+
+            Assert.False(renameListViewModel.IsAbModeEnabled);
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    fullNamePreview,
+                    nameOriginal,
+                ],
+                renameListViewModel.VisibleColumns.Select(column => column.Key)
+            );
         }
 
         /// <summary>

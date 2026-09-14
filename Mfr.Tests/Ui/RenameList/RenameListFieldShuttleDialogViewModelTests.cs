@@ -604,6 +604,150 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(expected, dialogVm.ResultColumns.Select(column => column.Key));
         }
 
+        [Fact]
+        public void AbMode_check_normalizes_preview_only_selection_to_originals()
+        {
+            var fullNamePreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [new RenameListVisibleColumn(fullNamePreview), new RenameListVisibleColumn(namePreview)],
+                []
+            )
+            {
+                IsPreviewColumnsTab = true,
+                IsAbModeEnabled = true
+            };
+
+            Assert.True(dialogVm.IsAbModeEnabled);
+            Assert.False(dialogVm.IsPreviewColumnsTab);
+            Assert.True(dialogVm.IsOriginalColumnsTab);
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                ],
+                dialogVm.ResultColumns.Select(column => column.Key)
+            );
+            Assert.DoesNotContain(dialogVm.ResultColumns, column => column.Key.IsPreview);
+        }
+
+        [Fact]
+        public void AbMode_on_blocks_adding_preview_keys()
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
+                    ),
+                ],
+                [],
+                abModeEnabled: true
+            )
+            {
+                SelectedAvailablePreviewField = RenameListFieldCatalog.GetField(
+                    BasicRenameListField.Group,
+                    BasicRenameListFields.Key.FullName
+                )
+            };
+
+            Assert.False(dialogVm.AddSelectedPreviewFieldCommand.CanExecute(null));
+            Assert.False(dialogVm.AddAllPreviewFieldsCommand.CanExecute(null));
+
+            dialogVm.AddSelectedPreviewFieldCommand.Execute(null);
+            dialogVm.InsertColumnsAt(
+                [RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)],
+                index: 0
+            );
+
+            Assert.DoesNotContain(dialogVm.ResultColumns, column => column.Key.IsPreview);
+            Assert.Single(dialogVm.ResultColumns);
+        }
+
+        [Fact]
+        public void AbMode_off_keeps_originals_and_allows_preview_subtab()
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                    ),
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+                    ),
+                ],
+                []
+            )
+            {
+                IsAbModeEnabled = true
+            };
+            Assert.Single(dialogVm.ResultColumns);
+            Assert.False(dialogVm.ResultColumns[0].Key.IsPreview);
+
+            dialogVm.IsAbModeEnabled = false;
+
+            Assert.False(dialogVm.IsAbModeEnabled);
+            Assert.Single(dialogVm.ResultColumns);
+            Assert.False(dialogVm.ResultColumns[0].Key.IsPreview);
+            dialogVm.IsPreviewColumnsTab = true;
+            Assert.True(dialogVm.IsPreviewColumnsTab);
+            Assert.True(dialogVm.AddAllPreviewFieldsCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void AbMode_AddFieldsByAppliedFilters_normalizes_preview_keys()
+        {
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
+                    ),
+                ],
+                [],
+                relevantFieldKeys: [nameKey, namePreview],
+                canUseAppliedFilters: true,
+                abModeEnabled: true
+            );
+
+            dialogVm.AddFieldsByAppliedFiltersCommand.Execute(null);
+
+            Assert.Contains(dialogVm.ResultColumns, column => column.Key == nameKey);
+            Assert.DoesNotContain(dialogVm.ResultColumns, column => column.Key.IsPreview);
+        }
+
+        [Fact]
+        public void AbMode_ReplaceFieldsByAppliedFilters_normalizes_defaults_preview()
+        {
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
+                    ),
+                ],
+                [],
+                relevantFieldKeys: [nameKey, namePreview],
+                canUseAppliedFilters: true,
+                abModeEnabled: true
+            );
+
+            dialogVm.ReplaceFieldsByAppliedFiltersCommand.Execute(null);
+
+            Assert.Contains(dialogVm.ResultColumns, column => column.Key == nameKey);
+            Assert.DoesNotContain(dialogVm.ResultColumns, column => column.Key.IsPreview);
+            Assert.Contains(
+                dialogVm.ResultColumns,
+                column =>
+                    column.Key
+                    == RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
+            );
+        }
+
         private static RenameListFieldShuttleDialogViewModel _CreateDefaultDialog()
         {
             return new RenameListFieldShuttleDialogViewModel(

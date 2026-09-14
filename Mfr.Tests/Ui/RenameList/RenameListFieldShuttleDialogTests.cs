@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
@@ -277,6 +278,113 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             DropInsertLineAssert.IsCleared(selectedList);
+
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies checking A/B Mode hides the Preview Fields subtab and normalizes selected columns.
+        /// </summary>
+        [AvaloniaFact]
+        public void AbMode_checkbox_hides_preview_subtab_and_normalizes_selection()
+        {
+            var fullNamePreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var dialogVm = new RenameListFieldShuttleDialogViewModel([new RenameListVisibleColumn(fullNamePreview)], [])
+            {
+                IsPreviewColumnsTab = true,
+            };
+            var dialog = new RenameListFieldShuttleDialog(dialogVm) { Width = 900, Height = 700 };
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var abModeCheckBox = dialog.FindControl<CompactCheckBox>("AbModeCheckBox");
+            var previewSubtab = dialog.FindControl<CompactRadioButton>("PreviewColumnsSubtab");
+            var selectedList = dialog.FindControl<ListBox>("SelectedColumnsList");
+            Assert.NotNull(abModeCheckBox);
+            Assert.NotNull(previewSubtab);
+            Assert.NotNull(selectedList);
+            Assert.True(previewSubtab.IsVisible);
+            Assert.True(dialogVm.IsPreviewColumnsTab);
+
+            abModeCheckBox.IsChecked = true;
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(dialogVm.IsAbModeEnabled);
+            Assert.False(previewSubtab.IsVisible);
+            Assert.False(dialogVm.IsPreviewColumnsTab);
+            Assert.True(dialogVm.IsOriginalColumnsTab);
+            Assert.Single(dialogVm.ResultColumns);
+            Assert.False(dialogVm.ResultColumns[0].Key.IsPreview);
+            Assert.Equal(BasicRenameListFields.Key.FullName, dialogVm.ResultColumns[0].Key.PropertyKey);
+            Assert.Equal(1, selectedList.ItemCount);
+
+            abModeCheckBox.IsChecked = false;
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(dialogVm.IsAbModeEnabled);
+            Assert.True(previewSubtab.IsVisible);
+            Assert.Single(dialogVm.ResultColumns);
+            Assert.False(dialogVm.ResultColumns[0].Key.IsPreview);
+
+            dialog.Close();
+        }
+
+        /// <summary>
+        /// Verifies A/B Mode rejects preview-key drops onto Selected fields (no insert line, no insert).
+        /// </summary>
+        [AvaloniaFact]
+        public void AbMode_rejects_preview_key_drop_onto_selected_columns()
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                [
+                    new RenameListVisibleColumn(
+                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)
+                    ),
+                ],
+                [],
+                abModeEnabled: true
+            );
+            var dialog = new RenameListFieldShuttleDialog(dialogVm) { Width = 900, Height = 700 };
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var selectedList = dialog.FindControl<ListBox>("SelectedColumnsList");
+            Assert.NotNull(selectedList);
+
+            var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var payload = new ShuttleDragPayload(
+                ShuttleDragKind.AvailableField,
+                [ShuttleFieldKeyCodec.Encode(previewKey)]
+            );
+            var dataTransfer = payload.CreateTransfer();
+
+            var firstItem = selectedList.ContainerFromIndex(0) as ListBoxItem;
+            Assert.NotNull(firstItem);
+            var position = firstItem.TranslatePoint(new Point(8, 4), selectedList) ?? new Point(8, 4);
+
+            selectedList.RaiseEvent(
+                new DragEventArgs(DragDrop.DragOverEvent, dataTransfer, selectedList, position, KeyModifiers.None)
+            );
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            DropInsertLineAssert.IsCleared(selectedList);
+
+            selectedList.RaiseEvent(
+                new DragEventArgs(DragDrop.DropEvent, dataTransfer, selectedList, default, KeyModifiers.None)
+            );
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.DoesNotContain(dialogVm.ResultColumns, column => column.Key.IsPreview);
+            Assert.Single(dialogVm.ResultColumns);
 
             dialog.Close();
         }

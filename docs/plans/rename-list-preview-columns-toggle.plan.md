@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-shuttle
     content: "P2: A/B checkbox in shuttle; hide Preview subtab; normalize/block preview keys; OK commits abMode; call-site originals-only relevant columns"
-    status: pending
+    status: completed
   - id: p3-grid-chrome
     content: "P3: rebuild/export from ProjectedColumns; reorder/width/hydrate rules; toolbar Original|Preview; tips/docs"
     status: pending

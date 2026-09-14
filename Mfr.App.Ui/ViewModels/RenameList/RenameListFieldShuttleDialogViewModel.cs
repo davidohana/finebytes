@@ -13,6 +13,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private readonly IReadOnlyList<RenameListFieldKey> _relevantFieldKeys;
         private readonly bool _canUseAppliedFilters;
         private bool _suppressSelectionSync;
+        private bool _isAbModeEnabled;
 
         /// <summary>
         /// Initializes the shuttle from the Rename List's current column layout and sort keys.
@@ -26,29 +27,63 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="canUseAppliedFilters">
         /// When <see langword="true"/>, Add/Replace by applied filters are enabled (non-empty chain).
         /// </param>
+        /// <param name="abModeEnabled">
+        /// Initial A/B Mode draft (session value). When <see langword="true"/>, columns are normalized to
+        /// originals-only and the Preview Fields subtab stays hidden until the draft is turned off.
+        /// </param>
         public RenameListFieldShuttleDialogViewModel(
             IReadOnlyList<RenameListVisibleColumn> visibleColumns,
             IReadOnlyList<RenameListSortKey> sortKeys,
             RenameListFieldShuttleTab initialTab = RenameListFieldShuttleTab.Columns,
             IReadOnlyList<RenameListFieldKey>? relevantFieldKeys = null,
-            bool canUseAppliedFilters = false
+            bool canUseAppliedFilters = false,
+            bool abModeEnabled = false
         )
         {
             ArgumentNullException.ThrowIfNull(visibleColumns);
             ArgumentNullException.ThrowIfNull(sortKeys);
 
-            _columns = new OrderedDraft<RenameListFieldKey, RenameListVisibleColumn>(
-                visibleColumns,
-                column => column.Key
-            );
+            var columns = abModeEnabled ? RenameListVisibleColumn.NormalizeToOriginals(visibleColumns) : visibleColumns;
+            _columns = new OrderedDraft<RenameListFieldKey, RenameListVisibleColumn>(columns, column => column.Key);
             _sortKeys = new OrderedDraft<RenameListFieldKey, RenameListSortKey>(sortKeys, key => key.FieldKey);
             _relevantFieldKeys = relevantFieldKeys ?? [];
             _canUseAppliedFilters = canUseAppliedFilters;
+            _isAbModeEnabled = abModeEnabled;
 
             Groups = _BuildGroups();
             SelectedGroup = Groups.Count > 0 ? Groups[0] : null;
             SelectedTabIndex = (int)initialTab;
             _RefreshLists();
+        }
+
+        /// <summary>
+        /// Gets or sets the draft A/B Mode flag. Committed with columns/sort on OK; discarded on Cancel.
+        /// <para>
+        /// When turned on, the selected list is normalized to originals-only, the Preview Fields subtab is
+        /// hidden, and preview keys cannot be added until the draft is turned off.
+        /// </para>
+        /// </summary>
+        public bool IsAbModeEnabled
+        {
+            get => _isAbModeEnabled;
+            set
+            {
+                if (_isAbModeEnabled == value)
+                {
+                    return;
+                }
+
+                _isAbModeEnabled = value;
+                OnPropertyChanged();
+                if (value)
+                {
+                    IsPreviewColumnsTab = false;
+                    _NormalizeSelectedColumnsToOriginals();
+                }
+
+                AddSelectedPreviewFieldCommand.NotifyCanExecuteChanged();
+                AddAllPreviewFieldsCommand.NotifyCanExecuteChanged();
+            }
         }
 
         /// <summary>
@@ -102,6 +137,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             get;
             set
             {
+                if (value && IsAbModeEnabled)
+                {
+                    value = false;
+                }
+
                 if (field == value)
                 {
                     return;
@@ -385,7 +425,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var items = _relevantFieldKeys.Select(key => new RenameListVisibleColumn(key)).ToList();
+            var items = _ColumnsForRelevantKeys(_relevantFieldKeys);
             if (items.Count == 0)
             {
                 return;
@@ -420,6 +460,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 }
 
                 columns.Add(new RenameListVisibleColumn(key));
+            }
+
+            if (IsAbModeEnabled)
+            {
+                columns = [.. RenameListVisibleColumn.NormalizeToOriginals(columns)];
             }
 
             _columns.Clear();
@@ -525,7 +570,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddSelectedPreviewField()
         {
-            return SelectedAvailablePreviewFields.Count > 0;
+            return !IsAbModeEnabled && SelectedAvailablePreviewFields.Count > 0;
         }
 
         private bool _HasAvailableOriginalFields()
@@ -535,7 +580,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _HasAvailablePreviewFields()
         {
-            return AvailablePreviewFields.Count > 0;
+            return !IsAbModeEnabled && AvailablePreviewFields.Count > 0;
         }
 
         private bool _CanRemoveSelectedColumn()
@@ -596,7 +641,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private void _AddColumns(IEnumerable<RenameListFieldKey> keys)
         {
             var insertIndex = _columns.GetInsertIndexBelow();
-            var items = keys.Select(key => new RenameListVisibleColumn(key)).ToList();
+            var items = _KeysAllowedInSelectedColumns(keys).Select(key => new RenameListVisibleColumn(key)).ToList();
             if (items.Count == 0)
             {
                 return;
@@ -608,6 +653,44 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _RefreshLists();
+        }
+
+        /// <summary>
+        /// Rewrites the draft selected list to originals-only (preview→original + dedupe).
+        /// </summary>
+        private void _NormalizeSelectedColumnsToOriginals()
+        {
+            var normalized = RenameListVisibleColumn.NormalizeToOriginals(_columns.Items);
+            if (normalized.SequenceEqual(_columns.Items))
+            {
+                return;
+            }
+
+            _columns.Clear();
+            _ = _columns.TryInsertMany(0, normalized);
+            _RefreshLists();
+        }
+
+        /// <summary>
+        /// Keys that may be inserted into Selected fields: drops preview keys while A/B Mode draft is on.
+        /// </summary>
+        private IEnumerable<RenameListFieldKey> _KeysAllowedInSelectedColumns(IEnumerable<RenameListFieldKey> keys)
+        {
+            return IsAbModeEnabled ? keys.Where(key => !key.IsPreview) : keys;
+        }
+
+        /// <summary>
+        /// Builds draft columns for applied-filter keys; originals-only when A/B Mode draft is on.
+        /// </summary>
+        private List<RenameListVisibleColumn> _ColumnsForRelevantKeys(IReadOnlyList<RenameListFieldKey> keys)
+        {
+            var columns = keys.Select(key => new RenameListVisibleColumn(key)).ToList();
+            if (!IsAbModeEnabled || columns.Count == 0)
+            {
+                return columns;
+            }
+
+            return [.. RenameListVisibleColumn.NormalizeToOriginals(columns)];
         }
 
         private void _AddSortKeys(IEnumerable<RenameListFieldKey> fieldKeys)
