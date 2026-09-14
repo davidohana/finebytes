@@ -44,7 +44,7 @@ namespace Mfr.Tests.Ui.FileList
             var dir = _tempDirectoryFixture.CreateTempDir();
             File.WriteAllText(Path.Combine(dir, "a.txt"), "x");
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
@@ -99,7 +99,7 @@ namespace Mfr.Tests.Ui.FileList
             File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
 
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             viewModel.SetViewMode(FileListViewMode.List);
 
             var view = new FileListView { DataContext = viewModel };
@@ -141,7 +141,7 @@ namespace Mfr.Tests.Ui.FileList
             File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
 
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             viewModel.SetViewMode(FileListViewMode.List);
 
             var view = new FileListView { DataContext = viewModel };
@@ -181,7 +181,7 @@ namespace Mfr.Tests.Ui.FileList
         {
             var shell = new RecordingFileShellOpener();
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, _CreateSampleDir(), shell);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
@@ -217,7 +217,7 @@ namespace Mfr.Tests.Ui.FileList
                 NullFileShellOpener.Instance,
                 shellOperations: ops
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
@@ -257,7 +257,7 @@ namespace Mfr.Tests.Ui.FileList
                 NullFileShellOpener.Instance,
                 shellOperations: ops
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
@@ -296,7 +296,7 @@ namespace Mfr.Tests.Ui.FileList
                 NullFileShellOpener.Instance,
                 fileClipboard: fileClipboard
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
@@ -340,7 +340,7 @@ namespace Mfr.Tests.Ui.FileList
                 NullFileShellOpener.Instance,
                 fileClipboard: fileClipboard
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
@@ -383,7 +383,7 @@ namespace Mfr.Tests.Ui.FileList
                 shellOperations: ops,
                 fileClipboard: fileClipboard
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
@@ -420,7 +420,7 @@ namespace Mfr.Tests.Ui.FileList
                 NullFileShellOpener.Instance,
                 fileClipboard: fileClipboard
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
@@ -458,7 +458,7 @@ namespace Mfr.Tests.Ui.FileList
             File.WriteAllText(Path.Combine(dir, "short.txt"), "y");
 
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             viewModel.SetViewMode(FileListViewMode.Tiles);
 
             var view = new FileListView { DataContext = viewModel };
@@ -502,7 +502,7 @@ namespace Mfr.Tests.Ui.FileList
             Directory.CreateDirectory(Path.Combine(dir, "Documents"));
 
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             viewModel.SetViewMode(FileListViewMode.LargeIcons);
 
             var view = new FileListView { DataContext = viewModel };
@@ -613,7 +613,7 @@ namespace Mfr.Tests.Ui.FileList
             File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
 
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             viewModel.SetViewMode(FileListViewMode.List);
 
             var view = new FileListView { DataContext = viewModel };
@@ -653,7 +653,7 @@ namespace Mfr.Tests.Ui.FileList
             File.WriteAllText(Path.Combine(dir, "beta.md"), "b");
 
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             Assert.True(viewModel.IsReportView);
 
             var view = new FileListView { DataContext = viewModel };
@@ -986,7 +986,7 @@ namespace Mfr.Tests.Ui.FileList
                 _CreateSampleDir(),
                 NullFileShellOpener.Instance
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
 
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
@@ -1031,7 +1031,7 @@ namespace Mfr.Tests.Ui.FileList
         {
             var dir = _CreateSampleDir();
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             viewModel.SetViewMode(FileListViewMode.Thumbnails);
 
             var view = new FileListView { DataContext = viewModel };
@@ -1075,7 +1075,7 @@ namespace Mfr.Tests.Ui.FileList
                 NullFileShellOpener.Instance,
                 shellOperations: NullFileShellOperations.Instance
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             Assert.True(viewModel.IsReportView);
 
             var view = new FileListView { DataContext = viewModel };
@@ -1101,7 +1101,7 @@ namespace Mfr.Tests.Ui.FileList
                 _CreateSampleDir(),
                 NullFileShellOpener.Instance
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             viewModel.SetViewMode(FileListViewMode.List);
 
             var view = new FileListView { DataContext = viewModel };
@@ -1123,7 +1123,7 @@ namespace Mfr.Tests.Ui.FileList
                 _CreateSampleDir(),
                 NullFileShellOpener.Instance
             );
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             viewModel.SetViewMode(FileListViewMode.Tiles);
 
             var view = new FileListView { DataContext = viewModel };
@@ -1240,6 +1240,44 @@ namespace Mfr.Tests.Ui.FileList
             return windowPoint.Value;
         }
 
+        /// <summary>
+        /// Verifies the Loading overlay is visible while <see cref="FileListViewModel.IsListing"/> is true.
+        /// </summary>
+        [AvaloniaFact]
+        public void Loading_Overlay_Visible_When_IsListing()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
+            _Track(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 400,
+                Height = 300,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+
+            var busyText = view.FindControl<TextBlock>("ListingBusyText");
+            Assert.NotNull(busyText);
+
+            viewModel.IsListing = true;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(busyText.IsEffectivelyVisible);
+            Assert.Equal("Loading…", busyText.Text);
+
+            viewModel.IsListing = false;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(busyText.IsEffectivelyVisible);
+            window.Close();
+        }
+
         private FileListViewModel _CreateThumbnailsViewModel(int folderCount)
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
@@ -1250,9 +1288,19 @@ namespace Mfr.Tests.Ui.FileList
             }
 
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
-            _viewModels.Add(viewModel);
+            _Track(viewModel);
             viewModel.SetViewMode(FileListViewMode.Thumbnails);
             return viewModel;
+        }
+
+        /// <summary>
+        /// Tracks a view model for dispose and waits until listing is idle.
+        /// </summary>
+        /// <param name="viewModel">File List under test.</param>
+        private void _Track(FileListViewModel viewModel)
+        {
+            _viewModels.Add(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
         }
 
         private static (Window Window, ListBox List) _ShowThumbnails(FileListViewModel viewModel)

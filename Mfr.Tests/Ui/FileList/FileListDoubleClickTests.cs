@@ -123,6 +123,7 @@ namespace Mfr.Tests.Ui.FileList
 
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, shell);
             _viewModels.Add(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
             viewModel.SetViewMode(FileListViewMode.List);
 
             var view = new FileListView { DataContext = viewModel, AddSelectedCommand = addSelectedCommand };

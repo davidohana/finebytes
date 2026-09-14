@@ -144,6 +144,7 @@ namespace Mfr.Tests.Ui
                 _CreateOverflowDir(),
                 NullFileShellOpener.Instance
             );
+            FileListListingWait.WaitUntilIdle(viewModel);
             var view = new FileListView { DataContext = viewModel };
             var window = new Window
             {

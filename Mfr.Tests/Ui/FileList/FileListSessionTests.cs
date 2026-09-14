@@ -162,6 +162,7 @@ namespace Mfr.Tests.Ui.FileList
         {
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, path, NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
             return viewModel;
         }
     }

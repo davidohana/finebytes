@@ -321,6 +321,7 @@ namespace Mfr.Tests.Ui.FileList
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            FileListListingWait.WaitUntilIdle(viewModel);
 
             Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
             var network = Assert.Single(viewModel.Entries, entry => entry.Name == FileListViewModel.NetworkDisplayName);
@@ -329,6 +330,7 @@ namespace Mfr.Tests.Ui.FileList
 
             viewModel.SelectedEntry = network;
             viewModel.OpenSelected();
+            FileListListingWait.WaitUntilIdle(viewModel);
 
             Assert.Equal(FileListViewModel.NetworkPath, viewModel.CurrentPath);
             Assert.Equal(FileListViewModel.NetworkDisplayName, viewModel.PathText);
@@ -339,6 +341,7 @@ namespace Mfr.Tests.Ui.FileList
             );
 
             viewModel.GoUp();
+            FileListListingWait.WaitUntilIdle(viewModel);
             Assert.Equal(FileListViewModel.ComputerPath, viewModel.CurrentPath);
         }
 
@@ -414,6 +417,7 @@ namespace Mfr.Tests.Ui.FileList
 
             var viewModel = _CreateViewModel(_CreateTree());
             viewModel.NavigateTo(@"\\wsl");
+            FileListListingWait.WaitUntilIdle(viewModel);
 
             Assert.True(PathRelations.IsSamePath(liveRoot, viewModel.CurrentPath));
             Assert.Equal(liveRoot, viewModel.PathText);
@@ -433,6 +437,7 @@ namespace Mfr.Tests.Ui.FileList
             }
 
             viewModel.GoUp();
+            FileListListingWait.WaitUntilIdle(viewModel);
             Assert.Equal(FileListViewModel.NetworkPath, viewModel.CurrentPath);
             Assert.Contains(liveRoot[2..], _Names(viewModel));
         }
@@ -573,6 +578,7 @@ namespace Mfr.Tests.Ui.FileList
             {
                 var viewModel = _CreateViewModel(parent);
                 viewModel.NavigateTo(deniedFolder);
+                FileListListingWait.WaitUntilIdle(viewModel);
 
                 Assert.Equal(deniedFolder, viewModel.CurrentPath);
                 Assert.Empty(viewModel.Entries);
@@ -607,6 +613,7 @@ namespace Mfr.Tests.Ui.FileList
                 Assert.True(viewModel.HasListingError);
 
                 viewModel.NavigateTo(parent);
+                FileListListingWait.WaitUntilIdle(viewModel);
 
                 Assert.False(viewModel.HasListingError);
                 Assert.Equal(string.Empty, viewModel.ListingError);
@@ -720,13 +727,16 @@ namespace Mfr.Tests.Ui.FileList
             viewModel.SetThumbnailSize(ThumbnailSizes.ExtraLarge);
 
             viewModel.Refresh();
+            FileListListingWait.WaitUntilIdle(viewModel);
             Assert.Equal(ThumbnailSizes.ExtraLarge, viewModel.ThumbnailSize);
 
             viewModel.SelectedEntry = viewModel.Entries.First(entry => entry.IsDirectory);
             viewModel.OpenSelected();
+            FileListListingWait.WaitUntilIdle(viewModel);
             Assert.Equal(ThumbnailSizes.ExtraLarge, viewModel.ThumbnailSize);
 
             viewModel.GoUp();
+            FileListListingWait.WaitUntilIdle(viewModel);
             Assert.Equal(ThumbnailSizes.ExtraLarge, viewModel.ThumbnailSize);
             Assert.Equal(dir, viewModel.CurrentPath);
         }
@@ -894,6 +904,7 @@ namespace Mfr.Tests.Ui.FileList
             var provider = new RecordingIconProvider();
             var viewModel = new FileListViewModel(provider, _CreateTree(), NullFileShellOpener.Instance);
             _viewModels.Add(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
 
             provider.RequestedSizes.Clear();
             viewModel.ViewMode = FileListViewMode.Thumbnails;
@@ -1195,8 +1206,238 @@ namespace Mfr.Tests.Ui.FileList
             var viewModel = _CreateViewModel(dir);
 
             viewModel.NavigateTo(child);
+            FileListListingWait.WaitUntilIdle(viewModel);
 
             Assert.True(viewModel.LastStatusMessage.IsEmpty);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="FileListViewModel.IsListing"/> stays true until a slow catalog finishes.
+        /// </summary>
+        [Fact]
+        public void IsListing_True_While_Slow_Catalog_Runs()
+        {
+            var dir = _CreateTree();
+            var started = new ManualResetEventSlim(false);
+            var release = new ManualResetEventSlim(false);
+
+            FileListCatalogResult ListSlow(
+                string currentPath,
+                string includeMask,
+                bool excludeMasksEnabled,
+                IReadOnlyList<string> excludeMasks,
+                IEnumerable<string> pathHistory
+            )
+            {
+                started.Set();
+                Assert.True(release.Wait(TimeSpan.FromSeconds(10)));
+                return FileListCatalog.List(currentPath, includeMask, excludeMasksEnabled, excludeMasks, pathHistory);
+            }
+
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                dir,
+                NullFileShellOpener.Instance,
+                clipboard: NullTextClipboard.Instance,
+                shellOperations: NullFileShellOperations.Instance,
+                fileClipboard: new NullFileClipboard(),
+                ownerHwnd: null,
+                listEntries: ListSlow
+            );
+            _viewModels.Add(viewModel);
+
+            Assert.True(started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(viewModel.IsListing);
+
+            release.Set();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.False(viewModel.IsListing);
+            Assert.Equal(["zeta-folder", "alpha.txt", "beta.md"], _Names(viewModel));
+        }
+
+        /// <summary>
+        /// Verifies a superseded listing generation is ignored when a newer reload finishes first.
+        /// </summary>
+        [Fact]
+        public void Superseded_Listing_Generation_Is_Ignored()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+
+            var call1Started = new ManualResetEventSlim(false);
+            var call2Started = new ManualResetEventSlim(false);
+            var releaseCall1 = new ManualResetEventSlim(false);
+            var releaseCall2 = new ManualResetEventSlim(false);
+            var callCount = 0;
+
+            FileListCatalogResult ListControlled(
+                string currentPath,
+                string includeMask,
+                bool excludeMasksEnabled,
+                IReadOnlyList<string> excludeMasks,
+                IEnumerable<string> pathHistory
+            )
+            {
+                var call = Interlocked.Increment(ref callCount);
+                var label = call == 1 ? "from-first.txt" : "from-second.txt";
+                if (call == 1)
+                {
+                    call1Started.Set();
+                    Assert.True(releaseCall1.Wait(TimeSpan.FromSeconds(10)));
+                }
+                else if (call == 2)
+                {
+                    call2Started.Set();
+                    Assert.True(releaseCall2.Wait(TimeSpan.FromSeconds(10)));
+                }
+
+                return FileListCatalogResult.Ok([
+                    new FileListListedItem(
+                        Path.Combine(currentPath, label),
+                        label,
+                        IsDirectory: false,
+                        Length: 1,
+                        LastWriteTime: DateTime.UtcNow
+                    ),
+                ]);
+            }
+
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                dir,
+                NullFileShellOpener.Instance,
+                clipboard: NullTextClipboard.Instance,
+                shellOperations: NullFileShellOperations.Instance,
+                fileClipboard: new NullFileClipboard(),
+                ownerHwnd: null,
+                listEntries: ListControlled
+            );
+            _viewModels.Add(viewModel);
+
+            Assert.True(call1Started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(viewModel.IsListing);
+
+            viewModel.Refresh();
+            Assert.True(call2Started.Wait(TimeSpan.FromSeconds(10)));
+
+            releaseCall2.Set();
+            FileListListingWait.WaitUntilIdle(viewModel);
+            Assert.Equal(["from-second.txt"], _Names(viewModel));
+
+            releaseCall1.Set();
+            FileListListingWait.PumpUiDispatcher();
+            Thread.Sleep(50);
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.Equal(["from-second.txt"], _Names(viewModel));
+            Assert.DoesNotContain(viewModel.Entries, entry => entry.Name == "from-first.txt");
+        }
+
+        /// <summary>
+        /// Verifies Dispose mid-listing clears busy state and ignores a late catalog result.
+        /// </summary>
+        [Fact]
+        public void Dispose_Mid_Listing_Ignores_Late_Result()
+        {
+            var dir = _CreateTree();
+            var started = new ManualResetEventSlim(false);
+            var release = new ManualResetEventSlim(false);
+
+            FileListCatalogResult ListSlow(
+                string currentPath,
+                string includeMask,
+                bool excludeMasksEnabled,
+                IReadOnlyList<string> excludeMasks,
+                IEnumerable<string> pathHistory
+            )
+            {
+                started.Set();
+                Assert.True(release.Wait(TimeSpan.FromSeconds(10)));
+                return FileListCatalog.List(currentPath, includeMask, excludeMasksEnabled, excludeMasks, pathHistory);
+            }
+
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                dir,
+                NullFileShellOpener.Instance,
+                clipboard: NullTextClipboard.Instance,
+                shellOperations: NullFileShellOperations.Instance,
+                fileClipboard: new NullFileClipboard(),
+                ownerHwnd: null,
+                listEntries: ListSlow
+            );
+            _viewModels.Add(viewModel);
+
+            Assert.True(started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(viewModel.IsListing);
+
+            viewModel.Dispose();
+            Assert.False(viewModel.IsListing);
+
+            release.Set();
+            FileListListingWait.PumpUiDispatcher();
+            Thread.Sleep(50);
+            FileListListingWait.PumpUiDispatcher();
+
+            Assert.Empty(viewModel.Entries);
+            Assert.False(viewModel.IsListing);
+        }
+
+        /// <summary>
+        /// Verifies locating a path in the current folder while listing still runs finishes sync and selects the row.
+        /// </summary>
+        [Fact]
+        public void TryLocatePath_Same_Folder_While_Listing_Selects_Row()
+        {
+            var dir = _CreateTree();
+            var target = Path.Combine(dir, "alpha.txt");
+            var started = new ManualResetEventSlim(false);
+            var release = new ManualResetEventSlim(false);
+            var callCount = 0;
+
+            FileListCatalogResult ListControlled(
+                string currentPath,
+                string includeMask,
+                bool excludeMasksEnabled,
+                IReadOnlyList<string> excludeMasks,
+                IEnumerable<string> pathHistory
+            )
+            {
+                var call = Interlocked.Increment(ref callCount);
+                if (call == 1)
+                {
+                    started.Set();
+                    Assert.True(release.Wait(TimeSpan.FromSeconds(10)));
+                }
+
+                return FileListCatalog.List(currentPath, includeMask, excludeMasksEnabled, excludeMasks, pathHistory);
+            }
+
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                dir,
+                NullFileShellOpener.Instance,
+                clipboard: NullTextClipboard.Instance,
+                shellOperations: NullFileShellOperations.Instance,
+                fileClipboard: new NullFileClipboard(),
+                ownerHwnd: null,
+                listEntries: ListControlled
+            );
+            _viewModels.Add(viewModel);
+
+            Assert.True(started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(viewModel.IsListing);
+
+            Assert.True(viewModel.TryLocatePath(target));
+            Assert.False(viewModel.IsListing);
+            Assert.Equal("alpha.txt", viewModel.SelectedEntry?.Name);
+
+            release.Set();
+            FileListListingWait.PumpUiDispatcher();
+            Thread.Sleep(50);
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.Equal("alpha.txt", viewModel.SelectedEntry?.Name);
         }
 
         /// <summary>
@@ -1434,6 +1675,7 @@ namespace Mfr.Tests.Ui.FileList
             var ops = new RecordingFileShellOperations();
             var viewModel = _CreateViewModel(_CreateTree(), shellOperations: ops);
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            FileListListingWait.WaitUntilIdle(viewModel);
             Assert.NotEmpty(viewModel.Entries);
             var drive = viewModel.Entries[0];
             viewModel.SetSelectedEntries([drive], drive);
@@ -1519,6 +1761,7 @@ namespace Mfr.Tests.Ui.FileList
             var fileClipboard = new RecordingFileClipboard();
             var viewModel = _CreateViewModel(_CreateTree(), fileClipboard: fileClipboard);
             viewModel.NavigateTo(FileListViewModel.ComputerDisplayName);
+            FileListListingWait.WaitUntilIdle(viewModel);
             Assert.NotEmpty(viewModel.Entries);
             var drive = viewModel.Entries[0];
             viewModel.SetSelectedEntries([drive], drive);
@@ -1700,6 +1943,7 @@ namespace Mfr.Tests.Ui.FileList
             var fileClipboard = new RecordingFileClipboard();
             var viewModel = _CreateViewModel(_CreateTree(), shellOperations: ops, fileClipboard: fileClipboard);
             viewModel.NavigateTo(FileListViewModel.NetworkDisplayName);
+            FileListListingWait.WaitUntilIdle(viewModel);
             Assert.NotEmpty(viewModel.Entries);
             var entry = viewModel.Entries[0];
             viewModel.SetSelectedEntries([entry], entry);
@@ -1771,11 +2015,13 @@ namespace Mfr.Tests.Ui.FileList
                 ownerHwnd
             );
             _viewModels.Add(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
             return viewModel;
         }
 
         private static List<string> _Names(FileListViewModel viewModel)
         {
+            FileListListingWait.WaitUntilIdle(viewModel);
             return [.. viewModel.Entries.Select(entry => entry.Name)];
         }
 

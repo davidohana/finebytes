@@ -1,5 +1,7 @@
 using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Media;
+using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
@@ -7,6 +9,7 @@ using Mfr.App.Ui.Services.Shell;
 using Mfr.Engine.Logging;
 using Mfr.Models.Config;
 using Mfr.Utils;
+using Serilog;
 
 namespace Mfr.App.Ui.ViewModels.FileList
 {
@@ -67,10 +70,20 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private readonly Func<IntPtr> _ownerHwnd;
         private readonly ITextClipboard _clipboard;
         private readonly IFileClipboard _fileClipboard;
+        private readonly Func<
+            string,
+            string,
+            bool,
+            IReadOnlyList<string>,
+            IEnumerable<string>,
+            FileListCatalogResult
+        > _listEntries;
         private readonly FileListThumbnailSession _thumbnails = new();
         private readonly List<FileListListedItem> _listedItems = [];
         private readonly List<FileListEntry> _selectedEntries = [];
         private bool _suppressSelectionSync;
+        private int _listingGeneration;
+        private bool _isDisposed;
 
         /// <summary>
         /// Initializes the File List at the user profile folder with the default icon provider.
@@ -107,6 +120,50 @@ namespace Mfr.App.Ui.ViewModels.FileList
             IFileClipboard? fileClipboard = null,
             Func<IntPtr>? ownerHwnd = null
         )
+            : this(
+                iconProvider,
+                initialPath,
+                shellOpener,
+                clipboard,
+                shellOperations,
+                fileClipboard,
+                ownerHwnd,
+                listEntries: null
+            ) { }
+
+        /// <summary>
+        /// Initializes the File List with an optional catalog list function (tests).
+        /// </summary>
+        /// <param name="iconProvider">Shell icons, or <see langword="null"/> to use the OS default.</param>
+        /// <param name="initialPath">Directory to open, or <see langword="null"/> for the user profile.</param>
+        /// <param name="shellOpener">
+        /// Opens paths with the OS shell, or <see langword="null"/> to use the OS default.
+        /// </param>
+        /// <param name="clipboard">
+        /// Clipboard for Copy path, or <see langword="null"/> to use the desktop main-window clipboard.
+        /// </param>
+        /// <param name="shellOperations">
+        /// Shell delete/copy/move, or <see langword="null"/> to use the OS default.
+        /// </param>
+        /// <param name="fileClipboard">
+        /// Explorer file clipboard for Cut/Copy/Paste, or <see langword="null"/> to use the OS default.
+        /// </param>
+        /// <param name="ownerHwnd">
+        /// Owner HWND for shell UI modality, or <see langword="null"/> to use the desktop main window.
+        /// </param>
+        /// <param name="listEntries">
+        /// Folder listing function, or <see langword="null"/> to use <see cref="FileListCatalog.List"/>.
+        /// </param>
+        internal FileListViewModel(
+            ISystemIconProvider? iconProvider,
+            string? initialPath,
+            IFileShellOpener? shellOpener,
+            ITextClipboard? clipboard,
+            IFileShellOperations? shellOperations,
+            IFileClipboard? fileClipboard,
+            Func<IntPtr>? ownerHwnd,
+            Func<string, string, bool, IReadOnlyList<string>, IEnumerable<string>, FileListCatalogResult>? listEntries
+        )
         {
             _iconProvider = iconProvider ?? SystemIconProvider.CreateDefault();
             _shellOpener = shellOpener ?? FileShellOpener.CreateDefault();
@@ -114,6 +171,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             _ownerHwnd = ownerHwnd ?? ShellOwnerHwnd.TryGetMainWindowHandle;
             _clipboard = clipboard ?? new DesktopTextClipboard();
             _fileClipboard = fileClipboard ?? FileClipboard.CreateDefault();
+            _listEntries = listEntries ?? FileListCatalog.List;
             _fileClipboard.Changed += _OnFileClipboardChanged;
             Entries = [];
             MaskSuggestions = [.. _DefaultMasks];
@@ -206,6 +264,12 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// Gets whether <see cref="ListingError"/> should be shown in the listing pane.
         /// </summary>
         public bool HasListingError => !string.IsNullOrEmpty(ListingError);
+
+        /// <summary>
+        /// Gets whether a folder listing is in progress (in-pane Loading overlay).
+        /// </summary>
+        [ObservableProperty]
+        private bool _isListing;
 
         /// <summary>
         /// Gets whether the listing-error empty state may offer revealing the session log file.
@@ -709,9 +773,20 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         /// <summary>
         /// Cancels in-flight thumbnail decoding and disposes cached preview bitmaps.
+        /// <para>
+        /// Also invalidates any in-flight listing so a late catalog result is ignored.
+        /// </para>
         /// </summary>
         public void Dispose()
         {
+            if (_isDisposed)
+            {
+                return;
+            }
+
+            _isDisposed = true;
+            Interlocked.Increment(ref _listingGeneration);
+            IsListing = false;
             _fileClipboard.Changed -= _OnFileClipboardChanged;
             _thumbnails.Dispose();
         }
@@ -758,6 +833,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         /// <summary>
         /// Navigates the File List to <paramref name="fullPath"/>'s folder and selects that item.
+        /// <para>
+        /// When the folder must change, listing runs synchronously so the row can be selected before return.
+        /// </para>
         /// </summary>
         /// <param name="fullPath">Full file or folder path to locate.</param>
         /// <returns><see langword="true"/> when the row was found in the current listing.</returns>
@@ -781,7 +859,19 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
             if (!PathComparers.Os.Equals(resolvedDirectory, CurrentPath))
             {
-                _Navigate(resolvedDirectory);
+                // Locate needs the row immediately; load this folder synchronously and cancel any in-flight list.
+                CurrentPath = resolvedDirectory;
+                PathText = FileListPath.ToDisplayPath(resolvedDirectory);
+                IsPathEditing = false;
+                _RememberPath(PathText);
+                _RebuildBreadcrumbs();
+                _ReloadEntriesSynchronous();
+                _UpdateNavigationFlags();
+            }
+            else if (IsListing)
+            {
+                // Same folder is still loading asynchronously — finish listing before selecting.
+                _ReloadEntriesSynchronous();
             }
 
             var match = Entries.FirstOrDefault(entry => PathComparers.Os.Equals(entry.FullPath, fullPath));
@@ -1143,6 +1233,34 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         private void _ReloadEntries(bool preserveSelection = false)
         {
+            var generation = _BeginListingReload(preserveSelection);
+            IsListing = true;
+
+            var path = CurrentPath;
+            var mask = Mask;
+            var excludeEnabled = ExcludeMasksEnabled;
+            var excludeMasks = ExcludeMasks;
+            var pathHistory = PathHistory.ToList();
+
+            _ = Task.Factory.StartNew(
+                () =>
+                {
+                    var result = _ListEntriesSafe(path, mask, excludeEnabled, excludeMasks, pathHistory);
+                    _PostToUi(() => _ApplyListingResult(generation, result, preserveSelection));
+                },
+                CancellationToken.None,
+                TaskCreationOptions.LongRunning,
+                TaskScheduler.Default
+            );
+        }
+
+        /// <summary>
+        /// Clears listing UI state and bumps generation so in-flight applies are ignored.
+        /// </summary>
+        /// <param name="preserveSelection">Whether to keep selection paths for restore after rebuild.</param>
+        /// <returns>Generation token for this reload.</returns>
+        private int _BeginListingReload(bool preserveSelection)
+        {
             _thumbnails.CancelLoad();
             if (!preserveSelection)
             {
@@ -1153,8 +1271,52 @@ namespace Mfr.App.Ui.ViewModels.FileList
             _listedItems.Clear();
             _thumbnails.ClearCache();
             ListingError = string.Empty;
+            return Interlocked.Increment(ref _listingGeneration);
+        }
 
-            var result = FileListCatalog.List(CurrentPath, Mask, ExcludeMasksEnabled, ExcludeMasks, PathHistory);
+        /// <summary>
+        /// Invokes the catalog list function, mapping unexpected exceptions to an unavailable failure.
+        /// </summary>
+        /// <param name="path">Folder to list.</param>
+        /// <param name="mask">Include mask.</param>
+        /// <param name="excludeEnabled">Whether exclude masks apply.</param>
+        /// <param name="excludeMasks">Exclude mask patterns.</param>
+        /// <param name="pathHistory">Recent paths for Network listing.</param>
+        /// <returns>Catalog rows or a failure result.</returns>
+        private FileListCatalogResult _ListEntriesSafe(
+            string path,
+            string mask,
+            bool excludeEnabled,
+            IReadOnlyList<string> excludeMasks,
+            IEnumerable<string> pathHistory
+        )
+        {
+            try
+            {
+                return _listEntries(path, mask, excludeEnabled, excludeMasks, pathHistory);
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to list folder {Path}.", path);
+                return FileListCatalogResult.Failed(FileListListingFailure.Unavailable);
+            }
+        }
+
+        /// <summary>
+        /// Applies a catalog result when it still matches the latest listing generation.
+        /// </summary>
+        /// <param name="generation">Generation captured when the load started.</param>
+        /// <param name="result">Catalog rows or failure.</param>
+        /// <param name="preserveSelection">Whether to restore selection paths after rebuild.</param>
+        private void _ApplyListingResult(int generation, FileListCatalogResult result, bool preserveSelection)
+        {
+            if (_isDisposed || generation != Volatile.Read(ref _listingGeneration))
+            {
+                return;
+            }
+
+            IsListing = false;
+
             if (result.Failure != FileListListingFailure.None)
             {
                 ListingError = FileListCatalog.FormatListingError(result.Failure);
@@ -1165,6 +1327,43 @@ namespace Mfr.App.Ui.ViewModels.FileList
             _listedItems.AddRange(result.Items);
             FileListListingSort.Apply(_listedItems, SortMemberPath, IsSortAscending);
             _RebuildVisibleEntries(preserveSelection);
+        }
+
+        /// <summary>
+        /// Lists the current folder on the calling thread and cancels any in-flight async listing.
+        /// <para>
+        /// Used by <see cref="TryLocatePath"/> so selection can run immediately after a folder change.
+        /// </para>
+        /// </summary>
+        /// <param name="preserveSelection">Whether to restore selection paths after rebuild.</param>
+        private void _ReloadEntriesSynchronous(bool preserveSelection = false)
+        {
+            var generation = _BeginListingReload(preserveSelection);
+            IsListing = false;
+
+            var result = _ListEntriesSafe(CurrentPath, Mask, ExcludeMasksEnabled, ExcludeMasks, PathHistory);
+            _ApplyListingResult(generation, result, preserveSelection);
+        }
+
+        /// <summary>
+        /// Marshals work to the UI thread, or runs inline when no Avalonia application is running (unit tests).
+        /// </summary>
+        /// <param name="action">Work to run on the UI thread.</param>
+        private static void _PostToUi(Action action)
+        {
+            if (Application.Current is null)
+            {
+                action();
+                return;
+            }
+
+            if (Dispatcher.UIThread.CheckAccess())
+            {
+                action();
+                return;
+            }
+
+            Dispatcher.UIThread.Post(action);
         }
 
         private void _RebuildVisibleEntries(bool preserveSelection)

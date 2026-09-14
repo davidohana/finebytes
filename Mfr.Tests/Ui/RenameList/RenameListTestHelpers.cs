@@ -235,6 +235,7 @@ namespace Mfr.Tests.Ui.RenameList
                 shellOperations: NullFileShellOperations.Instance
             );
             _fileListViewModels.Add(fileListViewModel);
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
             return fileListViewModel;
         }
 

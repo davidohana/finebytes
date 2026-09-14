@@ -58,6 +58,7 @@ namespace Mfr.Tests.Ui.FileList
                 );
                 _viewModels.Add(viewModel);
                 viewModel.NavigateTo(deniedFolder);
+                FileListListingWait.WaitUntilIdle(viewModel);
 
                 Assert.True(viewModel.CanShowLogInExplorer);
                 Assert.True(viewModel.ShowLogInExplorerCommand.CanExecute(null));

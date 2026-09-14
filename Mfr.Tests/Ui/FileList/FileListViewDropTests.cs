@@ -208,6 +208,7 @@ namespace Mfr.Tests.Ui.FileList
                 NullFileShellOpener.Instance
             );
             _viewModels.Add(fileListViewModel);
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
             fileListViewModel.SetViewMode(FileListViewMode.List);
 
             var renameListViewModel = new RenameListViewModel(fileListViewModel);

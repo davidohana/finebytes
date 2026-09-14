@@ -74,6 +74,7 @@ namespace Mfr.Tests.Ui.RenameList
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _context.CreateFileListViewModel(parent);
             fileListViewModel.Mask = "*.mp3";
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             await renameListViewModel.AddPathsAsync([albumPath]);
@@ -157,6 +158,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dir = _CreateSampleFolder();
             var fileListViewModel = _context.CreateFileListViewModel(dir);
             fileListViewModel.Mask = "*.txt";
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             Assert.Contains(fileListViewModel.Entries, entry => entry.Name == "alpha.txt");
@@ -179,6 +181,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dir = _CreateSampleFolder();
             var fileListViewModel = _context.CreateFileListViewModel(dir);
             fileListViewModel.ApplyExcludeMasks(enabled: true, editorText: "*.txt");
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             Assert.DoesNotContain(fileListViewModel.Entries, entry => entry.Name == "alpha.txt");
@@ -201,6 +204,7 @@ namespace Mfr.Tests.Ui.RenameList
             var dir = _CreateSampleFolder();
             var fileListViewModel = _context.CreateFileListViewModel(dir);
             fileListViewModel.Mask = "*.txt";
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             Assert.Empty(fileListViewModel.SelectedEntries);
@@ -283,6 +287,7 @@ namespace Mfr.Tests.Ui.RenameList
             var (parent, albumPath) = _CreateAlbumTree();
             var fileListViewModel = _context.CreateFileListViewModel(albumPath);
             fileListViewModel.Mask = "*.mp3";
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             Assert.Contains(fileListViewModel.Entries, entry => entry.Name == "disc1" && entry.IsDirectory);
@@ -1408,6 +1413,7 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = new RenameListViewModel(fileListViewModel);
 
             fileListViewModel.NavigateTo(parent);
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
             fileListViewModel.SetSelectedEntries([_FolderEntry(albumPath)]);
             await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
 
@@ -1438,6 +1444,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.SetSelectedEntries([renameListViewModel.Entries[0]]);
 
             fileListViewModel.Mask = "*.md";
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
             renameListViewModel.LocateInFileListCommand.Execute(null);
 
             Assert.Contains("Failed to locate", renameListViewModel.LastStatusMessage.ToPlainText());
