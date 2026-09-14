@@ -38,7 +38,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var relevantKeys = _CollectRelevantFieldKeys();
+            var relevantKeys = CollectRelevantFieldKeys();
             var keyToIsVisible = _visibleColumns.Select(column => column.Key).ToHashSet();
             var merged = _visibleColumns.ToList();
             if (!_AppendMissingRelevantColumns(merged, relevantKeys, keyToIsVisible))
@@ -65,7 +65,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var relevantKeys = _CollectRelevantFieldKeys();
+            var relevantKeys = CollectRelevantFieldKeys();
             var columns = RenameListVisibleColumn.CreateDefaults().ToList();
             var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
             _AppendMissingRelevantColumns(columns, relevantKeys, keyToIsPresent);
@@ -211,6 +211,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return !IsBusy && _appliedFilters is not null && _appliedFilters.Count > 0;
         }
 
+        /// <summary>
+        /// Gets whether Add/Replace by applied filters can run (non-empty applied chain, not busy).
+        /// </summary>
+        internal bool CanApplyRelevantColumns => _CanApplyRelevantColumns();
+
         private void _NotifyRelevantColumnsCommandsChanged()
         {
             AddRelevantColumnsCommand.NotifyCanExecuteChanged();
@@ -220,9 +225,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Collects field keys for the entire applied stack (disabled steps included).
         /// </summary>
-        private IReadOnlyList<RenameListFieldKey> _CollectRelevantFieldKeys()
+        internal IReadOnlyList<RenameListFieldKey> CollectRelevantFieldKeys()
         {
-            var filters = _appliedFilters!.Steps.Select(step => step.Filter);
+            if (_appliedFilters is null || _appliedFilters.Count == 0)
+            {
+                return [];
+            }
+
+            var filters = _appliedFilters.Steps.Select(step => step.Filter);
             return FilterRelevantRenameListColumns.Collect(filters);
         }
 

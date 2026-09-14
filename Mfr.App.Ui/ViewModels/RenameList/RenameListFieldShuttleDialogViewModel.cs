@@ -10,6 +10,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     {
         private readonly OrderedDraft<RenameListFieldKey, RenameListVisibleColumn> _columns;
         private readonly OrderedDraft<RenameListFieldKey, RenameListSortKey> _sortKeys;
+        private readonly IReadOnlyList<RenameListFieldKey> _relevantFieldKeys;
+        private readonly bool _canUseAppliedFilters;
         private bool _suppressSelectionSync;
 
         /// <summary>
@@ -18,10 +20,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="visibleColumns">Current visible columns in grid order.</param>
         /// <param name="sortKeys">Current Auto-Sort keys in priority order.</param>
         /// <param name="initialTab">Tab to show when the dialog opens.</param>
+        /// <param name="relevantFieldKeys">
+        /// Snapshot of field keys inferred from the applied filter chain (may be empty).
+        /// </param>
+        /// <param name="canUseAppliedFilters">
+        /// When <see langword="true"/>, Add/Replace by applied filters are enabled (non-empty chain).
+        /// </param>
         public RenameListFieldShuttleDialogViewModel(
             IReadOnlyList<RenameListVisibleColumn> visibleColumns,
             IReadOnlyList<RenameListSortKey> sortKeys,
-            RenameListFieldShuttleTab initialTab = RenameListFieldShuttleTab.Columns
+            RenameListFieldShuttleTab initialTab = RenameListFieldShuttleTab.Columns,
+            IReadOnlyList<RenameListFieldKey>? relevantFieldKeys = null,
+            bool canUseAppliedFilters = false
         )
         {
             ArgumentNullException.ThrowIfNull(visibleColumns);
@@ -32,6 +42,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 column => column.Key
             );
             _sortKeys = new OrderedDraft<RenameListFieldKey, RenameListSortKey>(sortKeys, key => key.FieldKey);
+            _relevantFieldKeys = relevantFieldKeys ?? [];
+            _canUseAppliedFilters = canUseAppliedFilters;
 
             Groups = _BuildGroups();
             SelectedGroup = Groups.Count > 0 ? Groups[0] : null;
@@ -363,6 +375,64 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Merges applied-filter-relevant keys into the draft Selected fields list (missing keys only).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanUseAppliedFilters))]
+        public void AddFieldsByAppliedFilters()
+        {
+            if (!_canUseAppliedFilters)
+            {
+                return;
+            }
+
+            var items = _relevantFieldKeys.Select(key => new RenameListVisibleColumn(key)).ToList();
+            if (items.Count == 0)
+            {
+                return;
+            }
+
+            if (_columns.TryInsertMany(_columns.Items.Count, items) == 0)
+            {
+                return;
+            }
+
+            _RefreshLists();
+        }
+
+        /// <summary>
+        /// Replaces the draft Selected fields with catalog defaults, then appends remaining relevant keys.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanUseAppliedFilters))]
+        public void ReplaceFieldsByAppliedFilters()
+        {
+            if (!_canUseAppliedFilters)
+            {
+                return;
+            }
+
+            var columns = RenameListVisibleColumn.CreateDefaults().ToList();
+            var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
+            foreach (var key in _relevantFieldKeys)
+            {
+                if (!keyToIsPresent.Add(key))
+                {
+                    continue;
+                }
+
+                columns.Add(new RenameListVisibleColumn(key));
+            }
+
+            _columns.Clear();
+            if (_columns.TryInsertMany(0, columns) == 0)
+            {
+                _RefreshLists();
+                return;
+            }
+
+            _RefreshLists();
+        }
+
+        /// <summary>
         /// Adds the selected available sort field to the sort-key list.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanAddSelectedSortField))]
@@ -516,6 +586,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private bool _HasSelectedSortKeys()
         {
             return _sortKeys.HasItems;
+        }
+
+        private bool _CanUseAppliedFilters()
+        {
+            return _canUseAppliedFilters;
         }
 
         private void _AddColumns(IEnumerable<RenameListFieldKey> keys)

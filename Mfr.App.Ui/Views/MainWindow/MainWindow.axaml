@@ -315,7 +315,7 @@
         </MenuItem>
         <Separator />
         <MenuItem
-          Header="Select Visible Fields..."
+          Header="Select Fields..."
           Command="{Binding RenameListViewModel.OpenFieldShuttleCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
         >

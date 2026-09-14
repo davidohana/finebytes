@@ -112,10 +112,9 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <returns>A new context menu (caller opens it).</returns>
         /// <remarks>
         /// <para>
-        /// Order: title → Hide Field → (preview) Remove Unchanged → Select Visible Fields →
-        /// Add / Replace Fields by Applied Filters → Select Sort Fields → Edit as Name List
-        /// (writable) → Cancel Manual Override (when any row overridden) → Export submenu
-        /// (This Column txt / Visible Columns csv).
+        /// Order: title → Hide Field → (preview) Remove Unchanged → Select Fields →
+        /// Edit as Name List (writable) → Cancel Manual Override (when any row overridden) →
+        /// Export submenu (This Column txt / Visible Columns csv).
         /// </para>
         /// </remarks>
         private static ContextMenu _BuildColumnHeaderContextMenu(
@@ -145,30 +144,9 @@ namespace Mfr.App.Ui.Views.RenameList
 
             menu.Items.Add(
                 _CreateCommandMenuItem(
-                    "Select Visible Fields...",
+                    "Select Fields...",
                     AppTips.SelectRenameListFields,
                     viewModel.OpenFieldShuttleCommand
-                )
-            );
-            menu.Items.Add(
-                _CreateCommandMenuItem(
-                    "Add Fields by Applied Filters",
-                    AppTips.AddFieldsByAppliedFilters,
-                    viewModel.AddRelevantColumnsCommand
-                )
-            );
-            menu.Items.Add(
-                _CreateCommandMenuItem(
-                    "Replace Fields by Applied Filters",
-                    AppTips.ReplaceFieldsByAppliedFilters,
-                    viewModel.ReplaceWithRelevantColumnsCommand
-                )
-            );
-            menu.Items.Add(
-                _CreateCommandMenuItem(
-                    "Select Sort Fields...",
-                    AppTips.EditRenameListSortFields,
-                    viewModel.OpenEditSortFieldsCommand
                 )
             );
             menu.Items.Add(new Separator());

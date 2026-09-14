@@ -90,7 +90,9 @@ namespace Mfr.App.Ui.Views.RenameList
             var dialogVm = new RenameListFieldShuttleDialogViewModel(
                 _viewModel.VisibleColumns,
                 _viewModel.SortKeys,
-                tab
+                tab,
+                relevantFieldKeys: _viewModel.CollectRelevantFieldKeys(),
+                canUseAppliedFilters: _viewModel.CanApplyRelevantColumns
             );
             var dialog = new RenameListFieldShuttleDialog(dialogVm);
             _fieldShuttleDialog = dialog;

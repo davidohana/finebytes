@@ -250,10 +250,7 @@ namespace Mfr.Tests.Ui.RenameList
                 [
                     "(Parent Directory)",
                     "Hide Field",
-                    "Select Visible Fields...",
-                    "Add Fields by Applied Filters",
-                    "Replace Fields by Applied Filters",
-                    "Select Sort Fields...",
+                    "Select Fields...",
                     "Edit as Name List",
                     "Export",
                 ],
@@ -270,10 +267,7 @@ namespace Mfr.Tests.Ui.RenameList
                     "(Full File Name)",
                     "Hide Field",
                     "Remove Unchanged Items",
-                    "Select Visible Fields...",
-                    "Add Fields by Applied Filters",
-                    "Replace Fields by Applied Filters",
-                    "Select Sort Fields...",
+                    "Select Fields...",
                     "Edit as Name List",
                     "Export",
                 ],
@@ -313,10 +307,7 @@ namespace Mfr.Tests.Ui.RenameList
                     "(Full File Name)",
                     "Hide Field",
                     "Remove Unchanged Items",
-                    "Select Visible Fields...",
-                    "Add Fields by Applied Filters",
-                    "Replace Fields by Applied Filters",
-                    "Select Sort Fields...",
+                    "Select Fields...",
                     "Edit as Name List",
                     "Cancel Manual Override",
                     "Export",
@@ -362,15 +353,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             _RaiseHeaderContextMenu(lengthHeader);
             Assert.Equal(
-                [
-                    "(File Name Length)",
-                    "Hide Field",
-                    "Select Visible Fields...",
-                    "Add Fields by Applied Filters",
-                    "Replace Fields by Applied Filters",
-                    "Select Sort Fields...",
-                    "Export",
-                ],
+                ["(File Name Length)", "Hide Field", "Select Fields...", "Export"],
                 _MenuHeaders(lengthHeader.ContextMenu)
             );
             Assert.DoesNotContain("Edit as Name List", _MenuHeaders(lengthHeader.ContextMenu));

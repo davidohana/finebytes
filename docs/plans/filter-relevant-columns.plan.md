@@ -11,7 +11,7 @@ Parent: [rename-list-ui.plan.md](rename-list-ui.plan.md) (block 5 columns / shut
 ## Decisions (locked)
 
 - **Modes:** two commands — **Add** (merge missing relevant keys at end; keep existing order/widths) and **Replace** (set visible columns to catalog defaults, then append any relevant keys not already in defaults).
-- **Menu labels:** **Add Fields by Applied Filters** / **Replace Fields by Applied Filters** (not “for”).
+- **Menu / UI:** main menu keeps **Add Fields by Applied Filters** / **Replace Fields by Applied Filters**; field shuttle Columns tab has **Add** / **Replace** (draft until OK). Context menus only open **Select Fields...** (Sort via main menu or shuttle Sort tab).
 - **Scope:** always the **entire applied filter chain** (`AppliedFiltersViewModel` → `ToChain()` / all steps), not the Applied Filters selection.
 - **Sources of relevance:** (1) write **Apply-To / setter fields**, (2) **format tokens** parsed from filter option templates.
 - **Key sides:** write-mapped fields → Original + Preview when `SupportsPreview`; token-mapped fields → Original always, plus Preview when `SupportsPreview`.
@@ -69,12 +69,11 @@ Extend `RenameListViewModel` (already has `_appliedFilters`):
 - Replace: `CreateDefaults()` then append remaining relevant keys
 - After change: same metadata hydrate path as field-shuttle apply
 
-**UX entry points** (next to Select Visible Fields):
+**UX entry points:**
 
-- Rename List menu in `MainWindow.axaml`
-- Rename List header / grid context menus
-- Labels: **Add Fields by Applied Filters** / **Replace Fields by Applied Filters**
-- Tips in `AppTips`; note in `docs/keyboard-shortcuts.md` (no dedicated shortcut in v1)
+- Main menu: **Add Fields by Applied Filters** / **Replace Fields by Applied Filters** (apply immediately) and **Select Sort Fields...**
+- Field shuttle Columns tab: **Add** / **Replace** (draft Selected fields until OK)
+- Context menus: **Select Fields...** only (no Add/Replace/Select Sort)
 
 ## Non-goals
 

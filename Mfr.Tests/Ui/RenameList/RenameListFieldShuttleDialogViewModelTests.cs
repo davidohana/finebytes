@@ -544,6 +544,63 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Empty(dialogVm.AvailablePreviewFields);
         }
 
+        [Fact]
+        public void Applied_filters_commands_disabled_when_chain_empty()
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                RenameListVisibleColumn.CreateDefaults(),
+                RenameListSortKey.DefaultKeys,
+                relevantFieldKeys: [],
+                canUseAppliedFilters: false
+            );
+
+            Assert.False(dialogVm.AddFieldsByAppliedFiltersCommand.CanExecute(null));
+            Assert.False(dialogVm.ReplaceFieldsByAppliedFiltersCommand.CanExecute(null));
+        }
+
+        [Fact]
+        public void AddFieldsByAppliedFilters_merges_missing_keys_into_draft()
+        {
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                RenameListVisibleColumn.CreateDefaults(),
+                RenameListSortKey.DefaultKeys,
+                relevantFieldKeys: [nameKey, namePreview],
+                canUseAppliedFilters: true
+            );
+
+            Assert.True(dialogVm.AddFieldsByAppliedFiltersCommand.CanExecute(null));
+            dialogVm.AddFieldsByAppliedFiltersCommand.Execute(null);
+
+            Assert.Contains(dialogVm.ResultColumns, column => column.Key == nameKey);
+            Assert.Contains(dialogVm.ResultColumns, column => column.Key == namePreview);
+            Assert.Equal(RenameListVisibleColumn.CreateDefaults().Count + 2, dialogVm.ResultColumns.Count);
+        }
+
+        [Fact]
+        public void ReplaceFieldsByAppliedFilters_defaults_then_appends_relevant()
+        {
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Title);
+            var onlyName = new[]
+            {
+                new RenameListVisibleColumn(
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
+                ),
+            };
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                onlyName,
+                RenameListSortKey.DefaultKeys,
+                relevantFieldKeys: [titleKey],
+                canUseAppliedFilters: true
+            );
+
+            dialogVm.ReplaceFieldsByAppliedFiltersCommand.Execute(null);
+
+            var expected = RenameListVisibleColumn.CreateDefaults().Select(column => column.Key).Append(titleKey);
+            Assert.Equal(expected, dialogVm.ResultColumns.Select(column => column.Key));
+        }
+
         private static RenameListFieldShuttleDialogViewModel _CreateDefaultDialog()
         {
             return new RenameListFieldShuttleDialogViewModel(

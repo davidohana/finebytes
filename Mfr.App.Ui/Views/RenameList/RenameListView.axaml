@@ -77,24 +77,9 @@
         />
         <Separator />
         <MenuItem
-          Header="Select Visible Fields..."
+          Header="Select Fields..."
           Command="{Binding OpenFieldShuttleCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
-        />
-        <MenuItem
-          Header="Add Fields by Applied Filters"
-          Command="{Binding AddRelevantColumnsCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.AddFieldsByAppliedFilters}"
-        />
-        <MenuItem
-          Header="Replace Fields by Applied Filters"
-          Command="{Binding ReplaceWithRelevantColumnsCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.ReplaceFieldsByAppliedFilters}"
-        />
-        <MenuItem
-          Header="Select Sort Fields..."
-          Command="{Binding OpenEditSortFieldsCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"
         />
         <Separator />
         <MenuItem
