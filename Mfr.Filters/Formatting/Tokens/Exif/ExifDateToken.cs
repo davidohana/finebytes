@@ -1,3 +1,4 @@
+using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.Exif
@@ -17,10 +18,18 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         "Date Picture Taken field from EXIF tag in Jpeg file",
         "exif-date:yyyy-MM-dd"
     )]
-    internal sealed class ExifDateToken : IFormatToken
+    internal sealed class ExifDateToken : IFormatToken, IRenameListMappedFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["exif-date"];
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = JpegRenameListFields.Group;
+            propertyKey = JpegRenameListFields.Key.DateTaken;
+            return true;
+        }
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the format string is missing or blank.</exception>

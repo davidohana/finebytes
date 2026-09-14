@@ -1,4 +1,5 @@
 using Mfr.Models.RenameList;
+using Mfr.Models.RenameList.Fields.Extended;
 
 namespace Mfr.Filters.Formatting.Tokens.FileProperties
 {
@@ -17,10 +18,18 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
         "Use the count of files in the item's folder",
         "file-count"
     )]
-    internal sealed class FileCountToken : IFormatToken
+    internal sealed class FileCountToken : IFormatToken, IRenameListMappedFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["file-count"];
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = ExtendedRenameListFields.Group;
+            propertyKey = ExtendedRenameListFields.Key.FileCount;
+            return true;
+        }
 
         /// <inheritdoc />
         /// <exception cref="InvalidOperationException">Thrown when arguments are supplied.</exception>

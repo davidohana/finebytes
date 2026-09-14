@@ -18,6 +18,30 @@ namespace Mfr.Models.RenameList.Fields.Extended
         public const string GroupLabel = "File Properties";
 
         /// <summary>
+        /// Property keys within <see cref="Group"/>.
+        /// </summary>
+        public static class Key
+        {
+            /// <summary>Creation timestamp column.</summary>
+            public const string CreationDate = "CreationDate";
+
+            /// <summary>Last-write timestamp column.</summary>
+            public const string LastWriteDate = "LastWriteDate";
+
+            /// <summary>Last-access timestamp column.</summary>
+            public const string LastAccessDate = "LastAccessDate";
+
+            /// <summary>File size column.</summary>
+            public const string Size = "Size";
+
+            /// <summary>Filesystem attributes column.</summary>
+            public const string Attrs = "Attrs";
+
+            /// <summary>Folder file-count column.</summary>
+            public const string FileCount = "FileCount";
+        }
+
+        /// <summary>
         /// Extended group fields in catalog order.
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
@@ -57,9 +81,15 @@ namespace Mfr.Models.RenameList.Fields.Extended
         );
 
     internal sealed class ExtendedCreationDateField()
-        : ExtendedRenameListField(CreationDateKey, "Creation Date", defaultWidth: 110, supportsPreview: true)
+        : ExtendedRenameListField(
+            ExtendedRenameListFields.Key.CreationDate,
+            "Creation Date",
+            defaultWidth: 110,
+            supportsPreview: true
+        )
     {
-        public const string CreationDateKey = "CreationDate";
+        /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.CreationDate"/>.</summary>
+        public const string CreationDateKey = ExtendedRenameListFields.Key.CreationDate;
 
         public override string Resolve(FileMeta meta)
         {
@@ -74,9 +104,15 @@ namespace Mfr.Models.RenameList.Fields.Extended
     }
 
     internal sealed class ExtendedLastWriteDateField()
-        : ExtendedRenameListField(LastWriteDateKey, "Last Write Date", defaultWidth: 110, supportsPreview: true)
+        : ExtendedRenameListField(
+            ExtendedRenameListFields.Key.LastWriteDate,
+            "Last Write Date",
+            defaultWidth: 110,
+            supportsPreview: true
+        )
     {
-        public const string LastWriteDateKey = "LastWriteDate";
+        /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.LastWriteDate"/>.</summary>
+        public const string LastWriteDateKey = ExtendedRenameListFields.Key.LastWriteDate;
 
         public override string Resolve(FileMeta meta)
         {
@@ -91,9 +127,15 @@ namespace Mfr.Models.RenameList.Fields.Extended
     }
 
     internal sealed class ExtendedLastAccessDateField()
-        : ExtendedRenameListField(LastAccessDateKey, "Last Access Date", defaultWidth: 110, supportsPreview: true)
+        : ExtendedRenameListField(
+            ExtendedRenameListFields.Key.LastAccessDate,
+            "Last Access Date",
+            defaultWidth: 110,
+            supportsPreview: true
+        )
     {
-        public const string LastAccessDateKey = "LastAccessDate";
+        /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.LastAccessDate"/>.</summary>
+        public const string LastAccessDateKey = ExtendedRenameListFields.Key.LastAccessDate;
 
         public override string Resolve(FileMeta meta)
         {
@@ -107,9 +149,11 @@ namespace Mfr.Models.RenameList.Fields.Extended
         }
     }
 
-    internal sealed class ExtendedSizeField() : ExtendedRenameListField(SizeKey, "Size", defaultWidth: 75)
+    internal sealed class ExtendedSizeField()
+        : ExtendedRenameListField(ExtendedRenameListFields.Key.Size, "Size", defaultWidth: 75)
     {
-        public const string SizeKey = "Size";
+        /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.Size"/>.</summary>
+        public const string SizeKey = ExtendedRenameListFields.Key.Size;
 
         public override string Resolve(FileMeta meta)
         {
@@ -124,9 +168,15 @@ namespace Mfr.Models.RenameList.Fields.Extended
     }
 
     internal sealed class ExtendedAttributesField()
-        : ExtendedRenameListField(AttributesKey, "Attributes", defaultWidth: 65, supportsPreview: true)
+        : ExtendedRenameListField(
+            ExtendedRenameListFields.Key.Attrs,
+            "Attributes",
+            defaultWidth: 65,
+            supportsPreview: true
+        )
     {
-        public const string AttributesKey = "Attrs";
+        /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.Attrs"/>.</summary>
+        public const string AttributesKey = ExtendedRenameListFields.Key.Attrs;
 
         public override string Resolve(FileMeta meta)
         {
@@ -135,9 +185,10 @@ namespace Mfr.Models.RenameList.Fields.Extended
     }
 
     internal sealed class ExtendedFileCountField()
-        : ExtendedRenameListField(FileCountKey, "Folder File Count", defaultWidth: 65)
+        : ExtendedRenameListField(ExtendedRenameListFields.Key.FileCount, "Folder File Count", defaultWidth: 65)
     {
-        public const string FileCountKey = "FileCount";
+        /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.FileCount"/>.</summary>
+        public const string FileCountKey = ExtendedRenameListFields.Key.FileCount;
 
         public override string Resolve(FileMeta meta)
         {

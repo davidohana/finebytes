@@ -77,6 +77,36 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies shuttle apply with unchanged columns still updates sort keys.
+        /// </summary>
+        [Fact]
+        public async Task ApplyFieldShuttleAsync_Same_Columns_Updates_SortKeys()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "tagged.wav");
+            TaggedMinimalWav.WriteTagged(path, title: "SortOnly", album: null);
+
+            var fullNameKey = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var columns = new[] { new RenameListVisibleColumn(fullNameKey), new RenameListVisibleColumn(nameKey) };
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            renameListViewModel.SetVisibleColumns(columns);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+            Assert.Empty(renameListViewModel.SortKeys);
+
+            var sortKeys = new[] { new RenameListSortKey(fullNameKey, Descending: true) };
+            await renameListViewModel.ApplyFieldShuttleAsync(columns, sortKeys).ConfigureAwait(true);
+
+            Assert.Equal(columns, renameListViewModel.VisibleColumns);
+            Assert.Equal(sortKeys, renameListViewModel.SortKeys);
+            Assert.True(renameListViewModel.IsAutoSort);
+        }
+
+        /// <summary>
         /// Verifies GetFieldText does not open files; the grid reads memory only.
         /// </summary>
         [Fact]

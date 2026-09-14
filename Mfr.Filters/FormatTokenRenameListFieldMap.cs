@@ -1,11 +1,7 @@
 using System.Diagnostics;
-using Mfr.Models.RenameList.Fields.AudioTag;
-using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Filters.Formatting.FormatString;
+using Mfr.Filters.Formatting.Tokens;
 using Mfr.Models.RenameList.Fields.Extended;
-using Mfr.Models.RenameList.Fields.Image;
-using Mfr.Models.RenameList.Fields.Jpeg;
-using Mfr.Models.RenameList.Fields.Media;
-using Mfr.Models.RenameList.Fields.Mpeg;
 
 namespace Mfr.Filters
 {
@@ -15,115 +11,12 @@ namespace Mfr.Filters
     /// <remarks>
     /// <para>
     /// Meta/session/generator tokens (<c>counter</c>, <c>substr</c>, <c>token</c>, <c>now</c>, …) are omitted.
-    /// Generic <c>exif</c> (tag-id lookup) is omitted — only named <c>exif-*</c> / <c>exif-date</c> map.
+    /// Generic <c>exif</c> (tag-id lookup) is omitted — only named <c>exif-*</c> / <c>exif-date</c> map via
+    /// <see cref="IRenameListMappedFormatToken"/>.
     /// </para>
     /// </remarks>
     internal static class FormatTokenRenameListFieldMap
     {
-        /// <summary>
-        /// Case-insensitive <c>file-date</c> date-kind keywords (same as <c>FileDateToken</c> / preset JSON).
-        /// </summary>
-        private static readonly Dictionary<string, TimestampField> _fileDateKindToField = new(
-            StringComparer.OrdinalIgnoreCase
-        )
-        {
-            ["creation"] = TimestampField.Creation,
-            ["lastWrite"] = TimestampField.LastWrite,
-            ["lastAccess"] = TimestampField.LastAccess,
-        };
-
-        private static readonly Dictionary<string, (string GroupId, string PropertyKey)> _canonicalNameToField = new(
-            StringComparer.Ordinal
-        )
-        {
-            // Basic / file name
-            ["file-or-folder"] = (BasicRenameListField.Group, BasicRenameListFields.Key.ItemType),
-            ["file-name"] = (BasicRenameListField.Group, BasicRenameListFields.Key.Name),
-            ["file-extension"] = (BasicRenameListField.Group, BasicRenameListFields.Key.Extension),
-            ["full-name"] = (BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
-            ["full-path"] = (BasicRenameListField.Group, BasicRenameListFields.Key.FullPath),
-            ["parent-folder"] = (BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
-            ["file-name-numeric-value"] = (BasicRenameListField.Group, BasicRenameListFields.Key.FileNameNumeric),
-            ["file-name-length"] = (BasicRenameListField.Group, BasicRenameListFields.Key.FileNameLength),
-            ["full-path-length"] = (BasicRenameListField.Group, BasicRenameListFields.Key.FullPathLength),
-            // Extended / file properties (except file-date, which needs args)
-            ["file-size"] = (ExtendedRenameListFields.Group, "Size"),
-            ["file-count"] = (ExtendedRenameListFields.Group, "FileCount"),
-            // Audio tag semantic fields
-            ["audio-title"] = (AudioTagRenameListFields.Group, "Title"),
-            ["audio-artist"] = (AudioTagRenameListFields.Group, "Performers"),
-            ["audio-album-artist"] = (AudioTagRenameListFields.Group, "AlbumArtists"),
-            ["audio-album"] = (AudioTagRenameListFields.Group, "Album"),
-            ["audio-year"] = (AudioTagRenameListFields.Group, "Year"),
-            ["audio-genre"] = (AudioTagRenameListFields.Group, "Genres"),
-            ["audio-track"] = (AudioTagRenameListFields.Group, "Track"),
-            ["audio-track-count"] = (AudioTagRenameListFields.Group, "TrackCount"),
-            ["audio-disc"] = (AudioTagRenameListFields.Group, "Disc"),
-            ["audio-disc-count"] = (AudioTagRenameListFields.Group, "DiscCount"),
-            ["audio-comment"] = (AudioTagRenameListFields.Group, "Comment"),
-            ["audio-composer"] = (AudioTagRenameListFields.Group, "Composers"),
-            ["audio-lyrics"] = (AudioTagRenameListFields.Group, "Lyrics"),
-            ["audio-copyright"] = (AudioTagRenameListFields.Group, "Copyright"),
-            ["audio-grouping"] = (AudioTagRenameListFields.Group, "Grouping"),
-            ["audio-bpm"] = (AudioTagRenameListFields.Group, "BeatsPerMinute"),
-            ["audio-conductor"] = (AudioTagRenameListFields.Group, "Conductor"),
-            ["audio-mb-artist-id"] = (AudioTagRenameListFields.Group, "MusicBrainzArtistId"),
-            ["audio-mb-release-id"] = (AudioTagRenameListFields.Group, "MusicBrainzReleaseId"),
-            ["audio-mb-release-artist-id"] = (AudioTagRenameListFields.Group, "MusicBrainzReleaseArtistId"),
-            ["audio-mb-track-id"] = (AudioTagRenameListFields.Group, "MusicBrainzTrackId"),
-            ["audio-mb-disc-id"] = (AudioTagRenameListFields.Group, "MusicBrainzDiscId"),
-            ["audio-mb-release-status"] = (AudioTagRenameListFields.Group, "MusicBrainzReleaseStatus"),
-            ["audio-mb-release-type"] = (AudioTagRenameListFields.Group, "MusicBrainzReleaseType"),
-            ["audio-mb-release-country"] = (AudioTagRenameListFields.Group, "MusicBrainzReleaseCountry"),
-            ["audio-musicip-id"] = (AudioTagRenameListFields.Group, "MusicIpId"),
-            ["audio-amazon-id"] = (AudioTagRenameListFields.Group, "AmazonId"),
-            // Media properties
-            ["media-mime"] = (MediaRenameListFields.Group, "MimeType"),
-            ["media-corrupt"] = (MediaRenameListFields.Group, "PossiblyCorrupt"),
-            ["media-duration"] = (MediaRenameListFields.Group, "Duration"),
-            ["media-duration-sec"] = (MediaRenameListFields.Group, "DurationSeconds"),
-            ["media-types"] = (MediaRenameListFields.Group, "MediaTypes"),
-            ["media-description"] = (MediaRenameListFields.Group, "Description"),
-            ["media-audio-bitrate"] = (MediaRenameListFields.Group, "AudioBitrate"),
-            ["media-samplerate"] = (MediaRenameListFields.Group, "AudioSampleRate"),
-            ["media-bits-per-sample"] = (MediaRenameListFields.Group, "BitsPerSample"),
-            ["media-channels"] = (MediaRenameListFields.Group, "AudioChannels"),
-            ["media-video-width"] = (MediaRenameListFields.Group, "VideoWidth"),
-            ["media-video-height"] = (MediaRenameListFields.Group, "VideoHeight"),
-            ["media-photo-width"] = (MediaRenameListFields.Group, "PhotoWidth"),
-            ["media-photo-height"] = (MediaRenameListFields.Group, "PhotoHeight"),
-            ["media-photo-quality"] = (MediaRenameListFields.Group, "PhotoQuality"),
-            // MPEG audio properties
-            ["mpeg-bitrate"] = (MpegRenameListFields.Group, "Bitrate"),
-            ["mpeg-copyright"] = (MpegRenameListFields.Group, "Copyright"),
-            ["mpeg-duration"] = (MpegRenameListFields.Group, "Duration"),
-            ["mpeg-duration-sec"] = (MpegRenameListFields.Group, "DurationSecs"),
-            ["mpeg-encoding"] = (MpegRenameListFields.Group, "VBR"),
-            ["mpeg-frequency"] = (MpegRenameListFields.Group, "Frequency"),
-            ["mpeg-layer"] = (MpegRenameListFields.Group, "Layer"),
-            ["mpeg-ver"] = (MpegRenameListFields.Group, "Level"),
-            ["mpeg-mode"] = (MpegRenameListFields.Group, "Mode"),
-            ["mpeg-original"] = (MpegRenameListFields.Group, "Original"),
-            ["mpeg-protection"] = (MpegRenameListFields.Group, "Protection"),
-            // Image properties
-            ["image-width"] = (ImageRenameListFields.Group, "Width"),
-            ["image-height"] = (ImageRenameListFields.Group, "Height"),
-            ["image-bit-depth"] = (ImageRenameListFields.Group, "BitDepth"),
-            ["image-format"] = (ImageRenameListFields.Group, "Format"),
-            ["image-horz-res"] = (ImageRenameListFields.Group, "HorzRes"),
-            ["image-vert-res"] = (ImageRenameListFields.Group, "VertRes"),
-            ["image-frame-count"] = (ImageRenameListFields.Group, "Frames"),
-            // EXIF / Jpeg Tag (named tokens + date; generic exif tag-id omitted)
-            ["exif-make"] = (JpegRenameListFields.Group, "ExifDirectory*271"),
-            ["exif-model"] = (JpegRenameListFields.Group, "ExifDirectory*272"),
-            ["exif-exposure"] = (JpegRenameListFields.Group, "ExifDirectory*33434"),
-            ["exif-fnumber"] = (JpegRenameListFields.Group, "ExifDirectory*33437"),
-            ["exif-iso"] = (JpegRenameListFields.Group, "ExifDirectory*34855"),
-            ["exif-focal"] = (JpegRenameListFields.Group, "ExifDirectory*37386"),
-            ["exif-focal-35"] = (JpegRenameListFields.Group, "ExifDirectory*41989"),
-            ["exif-date"] = (JpegRenameListFields.Group, "ExifDirectory*36867"),
-        };
-
         /// <summary>
         /// Resolves a validated formatter token to a catalog field when mapped.
         /// </summary>
@@ -139,10 +32,12 @@ namespace Mfr.Filters
                 return _TryMapFileDate(args, out groupId, out propertyKey);
             }
 
-            if (_canonicalNameToField.TryGetValue(canonicalName, out var mapped))
+            if (
+                FormatTokenRegistry.NameToToken.TryGetValue(canonicalName, out var token)
+                && token is IRenameListMappedFormatToken mapped
+                && mapped.TryGetFixedField(out groupId, out propertyKey)
+            )
             {
-                groupId = mapped.GroupId;
-                propertyKey = mapped.PropertyKey;
                 return true;
             }
 
@@ -168,9 +63,9 @@ namespace Mfr.Filters
             groupId = ExtendedRenameListFields.Group;
             propertyKey = timestampField switch
             {
-                TimestampField.Creation => "CreationDate",
-                TimestampField.LastWrite => "LastWriteDate",
-                TimestampField.LastAccess => "LastAccessDate",
+                TimestampField.Creation => ExtendedRenameListFields.Key.CreationDate,
+                TimestampField.LastWrite => ExtendedRenameListFields.Key.LastWriteDate,
+                TimestampField.LastAccess => ExtendedRenameListFields.Key.LastAccessDate,
                 _ => throw new UnreachableException(),
             };
             return true;
@@ -195,7 +90,7 @@ namespace Mfr.Filters
             }
 
             var dateKind = args[(lastComma + 1)..].Trim();
-            if (!_fileDateKindToField.TryGetValue(dateKind, out var timestampField))
+            if (!TimestampFieldKeywords.TryParse(dateKind, out var timestampField))
             {
                 return false;
             }

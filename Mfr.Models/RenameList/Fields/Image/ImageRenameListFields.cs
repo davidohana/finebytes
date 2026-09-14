@@ -16,25 +16,52 @@ namespace Mfr.Models.RenameList.Fields.Image
         public const string GroupLabel = "Image";
 
         /// <summary>
+        /// Property keys within <see cref="Group"/>.
+        /// </summary>
+        public static class Key
+        {
+            /// <summary>Image format.</summary>
+            public const string Format = "Format";
+
+            /// <summary>Width in pixels.</summary>
+            public const string Width = "Width";
+
+            /// <summary>Height in pixels.</summary>
+            public const string Height = "Height";
+
+            /// <summary>Bit depth.</summary>
+            public const string BitDepth = "BitDepth";
+
+            /// <summary>Horizontal resolution (DPI).</summary>
+            public const string HorzRes = "HorzRes";
+
+            /// <summary>Vertical resolution (DPI).</summary>
+            public const string VertRes = "VertRes";
+
+            /// <summary>Frame count.</summary>
+            public const string Frames = "Frames";
+        }
+
+        /// <summary>
         /// Image group fields in catalog order.
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
-            new ImagePropertyRenameListField("Format", "Format", ImageRenameListProperty.Format, defaultWidth: 60),
-            new ImagePropertyRenameListField("Width", "Width", ImageRenameListProperty.Width),
-            new ImagePropertyRenameListField("Height", "Height", ImageRenameListProperty.Height),
-            new ImagePropertyRenameListField("BitDepth", "Bit Depth", ImageRenameListProperty.BitDepth),
+            new ImagePropertyRenameListField(Key.Format, "Format", ImageRenameListProperty.Format, defaultWidth: 60),
+            new ImagePropertyRenameListField(Key.Width, "Width", ImageRenameListProperty.Width),
+            new ImagePropertyRenameListField(Key.Height, "Height", ImageRenameListProperty.Height),
+            new ImagePropertyRenameListField(Key.BitDepth, "Bit Depth", ImageRenameListProperty.BitDepth),
             new ImagePropertyRenameListField(
-                "HorzRes",
+                Key.HorzRes,
                 "Horizontal Resolution",
                 ImageRenameListProperty.HorizontalResolutionDpi
             ),
             new ImagePropertyRenameListField(
-                "VertRes",
+                Key.VertRes,
                 "Vertical Resolution",
                 ImageRenameListProperty.VerticalResolutionDpi
             ),
-            new ImagePropertyRenameListField("Frames", "Frames Count", ImageRenameListProperty.FrameCount),
+            new ImagePropertyRenameListField(Key.Frames, "Frames Count", ImageRenameListProperty.FrameCount),
         ];
     }
 }

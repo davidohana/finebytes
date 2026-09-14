@@ -1,3 +1,4 @@
+using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.FileName
@@ -18,10 +19,18 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         PathFieldTips.FileNameNumericValue,
         "file-name-numeric-value"
     )]
-    internal sealed class FileNameNumericValueToken : IFormatToken
+    internal sealed class FileNameNumericValueToken : IFormatToken, IRenameListMappedFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["file-name-numeric-value"];
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = BasicRenameListField.Group;
+            propertyKey = BasicRenameListFields.Key.FileNameNumeric;
+            return true;
+        }
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when arguments are supplied.</exception>

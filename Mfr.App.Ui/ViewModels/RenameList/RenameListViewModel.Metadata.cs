@@ -31,7 +31,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            SetVisibleColumns(columns);
+            if (!columns.SequenceEqual(_visibleColumns))
+            {
+                SetVisibleColumns(columns);
+            }
+
             SetSortKeys(sortKeys);
         }
 

@@ -1,3 +1,5 @@
+using Mfr.Models.RenameList.Fields.Basic;
+
 namespace Mfr.Filters.Formatting.Tokens.FileName
 {
     /// <summary>
@@ -9,10 +11,18 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         "Use the filename extension",
         "file-extension"
     )]
-    internal sealed class FileExtensionToken : IFormatToken
+    internal sealed class FileExtensionToken : IFormatToken, IRenameListMappedFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["file-extension", "ext"];
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = BasicRenameListField.Group;
+            propertyKey = BasicRenameListFields.Key.Extension;
+            return true;
+        }
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when arguments are supplied.</exception>

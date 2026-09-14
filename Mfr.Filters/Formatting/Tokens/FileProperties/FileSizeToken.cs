@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Globalization;
+using Mfr.Models.RenameList.Fields.Extended;
 
 namespace Mfr.Filters.Formatting.Tokens.FileProperties
 {
@@ -25,7 +26,7 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     /// </para>
     /// </remarks>
     [FormatTokenInfo("Size", "File Properties", "Use the file's size", "file-size")]
-    internal sealed class FileSizeToken : IFormatToken
+    internal sealed class FileSizeToken : IFormatToken, IRenameListMappedFormatToken
     {
         private const double Kb = 1024;
         private const double Mb = 1024 * 1024;
@@ -67,6 +68,14 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["file-size"];
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = ExtendedRenameListFields.Group;
+            propertyKey = ExtendedRenameListFields.Key.Size;
+            return true;
+        }
 
         /// <inheritdoc />
         /// <exception cref="NotSupportedException">Thrown when an unrecognized unit is supplied.</exception>

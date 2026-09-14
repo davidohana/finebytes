@@ -1,13 +1,23 @@
+using Mfr.Models.RenameList.Fields.Basic;
+
 namespace Mfr.Filters.Formatting.Tokens.FileName
 {
     /// <summary>
     /// Resolves the <c>&lt;full-path&gt;</c> token to the preview full file path.
     /// </summary>
     [FormatTokenInfo(PathFieldLabels.FullPath, PathFieldLabels.FileName, "Preview full path of the file", "full-path")]
-    internal sealed class FullPathToken : IFormatToken
+    internal sealed class FullPathToken : IFormatToken, IRenameListMappedFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["full-path"];
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = BasicRenameListField.Group;
+            propertyKey = BasicRenameListFields.Key.FullPath;
+            return true;
+        }
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when arguments are supplied.</exception>

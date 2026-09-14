@@ -2,6 +2,12 @@ using Mfr.Filters;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
+using Mfr.Filters.Formatting.Tokens;
+using Mfr.Filters.Formatting.Tokens.Exif;
+using Mfr.Filters.Formatting.Tokens.Image;
+using Mfr.Filters.Formatting.Tokens.Media;
+using Mfr.Filters.Formatting.Tokens.Mpeg;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
@@ -84,8 +90,8 @@ namespace Mfr.Tests.Models.Filters
                 [
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
                     RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
-                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title"),
-                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, "Title"),
+                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Title),
+                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Title),
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Extension),
                     RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Extension),
                 ],
@@ -134,8 +140,14 @@ namespace Mfr.Tests.Models.Filters
                 [
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
                     RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
-                    RenameListFieldKey.Original(ExtendedRenameListFields.Group, "CreationDate"),
-                    RenameListFieldKey.Preview(ExtendedRenameListFields.Group, "CreationDate"),
+                    RenameListFieldKey.Original(
+                        ExtendedRenameListFields.Group,
+                        ExtendedRenameListFields.Key.CreationDate
+                    ),
+                    RenameListFieldKey.Preview(
+                        ExtendedRenameListFields.Group,
+                        ExtendedRenameListFields.Key.CreationDate
+                    ),
                 ],
                 keys
             );
@@ -159,12 +171,12 @@ namespace Mfr.Tests.Models.Filters
 
             Assert.Equal(
                 [
-                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title"),
-                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, "Title"),
-                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Genres"),
-                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, "Genres"),
-                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Track"),
-                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, "Track"),
+                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Title),
+                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Title),
+                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Genres),
+                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Genres),
+                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Track),
+                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Track),
                 ],
                 keys
             );
@@ -184,8 +196,8 @@ namespace Mfr.Tests.Models.Filters
 
             Assert.Equal(
                 [
-                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title"),
-                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, "Title"),
+                    RenameListFieldKey.Original(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Title),
+                    RenameListFieldKey.Preview(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Title),
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
                     RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
                 ],
@@ -222,8 +234,14 @@ namespace Mfr.Tests.Models.Filters
 
             Assert.Equal(
                 [
-                    RenameListFieldKey.Original(ExtendedRenameListFields.Group, "LastAccessDate"),
-                    RenameListFieldKey.Preview(ExtendedRenameListFields.Group, "LastAccessDate"),
+                    RenameListFieldKey.Original(
+                        ExtendedRenameListFields.Group,
+                        ExtendedRenameListFields.Key.LastAccessDate
+                    ),
+                    RenameListFieldKey.Preview(
+                        ExtendedRenameListFields.Group,
+                        ExtendedRenameListFields.Key.LastAccessDate
+                    ),
                 ],
                 keys
             );
@@ -239,8 +257,8 @@ namespace Mfr.Tests.Models.Filters
 
             Assert.Equal(
                 [
-                    RenameListFieldKey.Original(ExtendedRenameListFields.Group, "Attrs"),
-                    RenameListFieldKey.Preview(ExtendedRenameListFields.Group, "Attrs"),
+                    RenameListFieldKey.Original(ExtendedRenameListFields.Group, ExtendedRenameListFields.Key.Attrs),
+                    RenameListFieldKey.Preview(ExtendedRenameListFields.Group, ExtendedRenameListFields.Key.Attrs),
                 ],
                 keys
             );
@@ -316,12 +334,12 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="expectedGroupId">Catalog group for the first mapped token field.</param>
         /// <param name="expectedPropertyKey">Catalog property key for the first mapped token field.</param>
         [Theory]
-        [InlineData("<media-duration>", MediaRenameListFields.Group, "Duration")]
-        [InlineData("<mpeg-bitrate>", MpegRenameListFields.Group, "Bitrate")]
-        [InlineData("<mpeg-encoding>", MpegRenameListFields.Group, "VBR")]
-        [InlineData("<image-width>", ImageRenameListFields.Group, "Width")]
-        [InlineData("<exif-make>", JpegRenameListFields.Group, "ExifDirectory*271")]
-        [InlineData("<exif-date:yyyy-MM-dd>", JpegRenameListFields.Group, "ExifDirectory*36867")]
+        [InlineData("<media-duration>", MediaRenameListFields.Group, MediaRenameListFields.Key.Duration)]
+        [InlineData("<mpeg-bitrate>", MpegRenameListFields.Group, MpegRenameListFields.Key.Bitrate)]
+        [InlineData("<mpeg-encoding>", MpegRenameListFields.Group, MpegRenameListFields.Key.VBR)]
+        [InlineData("<image-width>", ImageRenameListFields.Group, ImageRenameListFields.Key.Width)]
+        [InlineData("<exif-make>", JpegRenameListFields.Group, JpegRenameListFields.Key.Make)]
+        [InlineData("<exif-date:yyyy-MM-dd>", JpegRenameListFields.Group, JpegRenameListFields.Key.DateTaken)]
         public void Collect_Formatter_MediaMpegImageExifTokens_MapOriginalCatalogColumns(
             string template,
             string expectedGroupId,
@@ -345,62 +363,38 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
-        /// Verifies every Media / MPEG / Image / named-EXIF map entry resolves to a catalog field.
+        /// Verifies every Media / MPEG / Image / named-EXIF mapped token resolves to a catalog field.
         /// </summary>
         [Fact]
-        public void TryMap_MediaMpegImageExifEntries_ResolveCatalogFields()
+        public void TryMap_MappedMediaMpegImageExifTokens_ResolveCatalogFields()
         {
-            (string CanonicalName, string Args)[] cases =
-            [
-                ("media-mime", ""),
-                ("media-corrupt", ""),
-                ("media-duration", ""),
-                ("media-duration-sec", ""),
-                ("media-types", ""),
-                ("media-description", ""),
-                ("media-audio-bitrate", ""),
-                ("media-samplerate", ""),
-                ("media-bits-per-sample", ""),
-                ("media-channels", ""),
-                ("media-video-width", ""),
-                ("media-video-height", ""),
-                ("media-photo-width", ""),
-                ("media-photo-height", ""),
-                ("media-photo-quality", ""),
-                ("mpeg-bitrate", ""),
-                ("mpeg-copyright", ""),
-                ("mpeg-duration", ""),
-                ("mpeg-duration-sec", ""),
-                ("mpeg-encoding", ""),
-                ("mpeg-frequency", ""),
-                ("mpeg-layer", ""),
-                ("mpeg-ver", ""),
-                ("mpeg-mode", ""),
-                ("mpeg-original", ""),
-                ("mpeg-protection", ""),
-                ("image-width", ""),
-                ("image-height", ""),
-                ("image-bit-depth", ""),
-                ("image-format", ""),
-                ("image-horz-res", ""),
-                ("image-vert-res", ""),
-                ("image-frame-count", ""),
-                ("exif-make", ""),
-                ("exif-model", ""),
-                ("exif-exposure", ""),
-                ("exif-fnumber", ""),
-                ("exif-iso", ""),
-                ("exif-focal", ""),
-                ("exif-focal-35", ""),
-                ("exif-date", "yyyy-MM-dd"),
-            ];
+            var mappedTokens = FormatTokenRegistry
+                .NameToToken.Values.Distinct()
+                .OfType<IRenameListMappedFormatToken>()
+                .Where(static token =>
+                    token
+                        is MediaPropertyTokenBase
+                            or MpegAudioPropertyTokenBase
+                            or ImagePropertyTokenBase
+                            or ExifPropertyTokenBase
+                            or ExifDateToken
+                )
+                .ToList();
 
-            foreach (var (canonicalName, args) in cases)
+            Assert.NotEmpty(mappedTokens);
+
+            foreach (var mapped in mappedTokens)
             {
+                Assert.True(mapped.TryGetFixedField(out var expectedGroupId, out var expectedPropertyKey));
+                var token = (IFormatToken)mapped;
+                var canonicalName = token.Names[0];
+
                 Assert.True(
-                    FormatTokenRenameListFieldMap.TryMap(canonicalName, args, out var groupId, out var propertyKey),
+                    FormatTokenRenameListFieldMap.TryMap(canonicalName, args: "", out var groupId, out var propertyKey),
                     $"unmapped token '{canonicalName}'"
                 );
+                Assert.Equal(expectedGroupId, groupId);
+                Assert.Equal(expectedPropertyKey, propertyKey);
                 Assert.True(
                     RenameListFieldCatalog.TryGetField(groupId, propertyKey, out _),
                     $"missing catalog field {groupId}/{propertyKey} for '{canonicalName}'"

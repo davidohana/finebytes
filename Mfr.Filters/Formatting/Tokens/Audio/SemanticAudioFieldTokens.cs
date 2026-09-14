@@ -1,3 +1,4 @@
+using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.Tags;
 
 namespace Mfr.Filters.Formatting.Tokens.Audio
@@ -6,7 +7,8 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// Shared implementation for formatter tokens backed by <see cref="SemanticAudioField"/> projection.
     /// </summary>
     internal abstract class SemanticAudioFieldTokenBase(IReadOnlyList<string> names, SemanticAudioField semanticField)
-        : IFormatToken
+        : IFormatToken,
+            IRenameListMappedFormatToken
     {
         /// <summary>
         /// Gets the semantic field this token formats (catalog display via <see cref="SemanticAudioFieldLabels"/>).
@@ -15,6 +17,13 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
 
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = AudioTagRenameListFields.Group;
+            return AudioTagRenameListFields.TryGetSemanticPropertyKey(semanticField, out propertyKey);
+        }
 
         /// <inheritdoc />
         public Formatter Compile(string tokenArgs)

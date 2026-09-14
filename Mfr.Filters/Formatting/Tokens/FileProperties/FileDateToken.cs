@@ -23,18 +23,6 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
     internal sealed class FileDateToken : IFormatToken
     {
         /// <summary>
-        /// Case-insensitive keywords aligned with preset <c>timestampField</c> JSON names (<see cref="TimestampField"/>).
-        /// </summary>
-        private static readonly Dictionary<string, TimestampField> _keywordToTimestampField = new(
-            StringComparer.OrdinalIgnoreCase
-        )
-        {
-            ["creation"] = TimestampField.Creation,
-            ["lastWrite"] = TimestampField.LastWrite,
-            ["lastAccess"] = TimestampField.LastAccess,
-        };
-
-        /// <summary>
         /// Parsed arguments for <c>&lt;file-date&gt;</c>.
         /// </summary>
         /// <param name="Format">.NET date format string.</param>
@@ -93,34 +81,20 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
             Require.That(
                 dateKindPart.Length > 0,
-                $"{tokenDisplayName} date-kind must not be empty after the comma (expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToTimestampField.Keys)}).",
+                $"{tokenDisplayName} date-kind must not be empty after the comma (expected {FormatOptionsParsing.FormatExpectedKeywords(TimestampFieldKeywords.Keywords)}).",
                 nameof(tokenArgs)
             );
 
-            if (!_TryParseFileDateKindKeyword(dateKindPart, out var timestampField))
+            if (!TimestampFieldKeywords.TryParse(dateKindPart, out var timestampField))
             {
                 throw new ArgumentException(
                     $"{tokenDisplayName} invalid date-kind '{dateKindPart}' "
-                        + $"(expected {FormatOptionsParsing.FormatExpectedKeywords(_keywordToTimestampField.Keys)}).",
+                        + $"(expected {FormatOptionsParsing.FormatExpectedKeywords(TimestampFieldKeywords.Keywords)}).",
                     nameof(tokenArgs)
                 );
             }
 
             return new Options(Format: formatPart, TimestampField: timestampField);
-        }
-
-        /// <summary>
-        /// Maps a case-insensitive <see cref="TimestampField"/> keyword (preset <c>timestampField</c> strings).
-        /// </summary>
-        private static bool _TryParseFileDateKindKeyword(string raw, out TimestampField timestampField)
-        {
-            timestampField = default;
-            if (string.IsNullOrWhiteSpace(raw))
-            {
-                return false;
-            }
-
-            return _keywordToTimestampField.TryGetValue(raw.Trim(), out timestampField);
         }
     }
 }

@@ -1,4 +1,5 @@
 using System.Globalization;
+using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.FileName
@@ -19,10 +20,18 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         PathFieldTips.ParentFolder,
         "parent-folder"
     )]
-    internal sealed class ParentFolderToken : IFormatToken
+    internal sealed class ParentFolderToken : IFormatToken, IRenameListMappedFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["parent-folder"];
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = BasicRenameListField.Group;
+            propertyKey = BasicRenameListFields.Key.Folder;
+            return true;
+        }
 
         /// <inheritdoc />
         public Formatter Compile(string tokenArgs)

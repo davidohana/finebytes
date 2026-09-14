@@ -1,12 +1,40 @@
+using System.Diagnostics;
+using Mfr.Models.RenameList.Fields.Image;
+
 namespace Mfr.Filters.Formatting.Tokens.Image
 {
     /// <summary>
     /// Shared implementation for no-arg <c>image-*</c> formatter tokens.
     /// </summary>
-    internal abstract class ImagePropertyTokenBase(IReadOnlyList<string> names, ImagePropertyField field) : IFormatToken
+    internal abstract class ImagePropertyTokenBase(IReadOnlyList<string> names, ImagePropertyField propertyField)
+        : IFormatToken,
+            IRenameListMappedFormatToken
     {
+        /// <summary>
+        /// Gets the image property this token formats.
+        /// </summary>
+        internal ImagePropertyField Field => propertyField;
+
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = ImageRenameListFields.Group;
+            propertyKey = propertyField switch
+            {
+                ImagePropertyField.Format => ImageRenameListFields.Key.Format,
+                ImagePropertyField.Width => ImageRenameListFields.Key.Width,
+                ImagePropertyField.Height => ImageRenameListFields.Key.Height,
+                ImagePropertyField.BitDepth => ImageRenameListFields.Key.BitDepth,
+                ImagePropertyField.HorizontalResolutionDpi => ImageRenameListFields.Key.HorzRes,
+                ImagePropertyField.VerticalResolutionDpi => ImageRenameListFields.Key.VertRes,
+                ImagePropertyField.FrameCount => ImageRenameListFields.Key.Frames,
+                _ => throw new UnreachableException(),
+            };
+            return true;
+        }
 
         /// <inheritdoc />
         public Formatter Compile(string tokenArgs)
@@ -16,7 +44,7 @@ namespace Mfr.Filters.Formatting.Tokens.Image
             return item =>
             {
                 item.EnsureImagePropertiesLoaded();
-                return ImagePropertiesFormatting.Format(item.Original.Image, field);
+                return ImagePropertiesFormatting.Format(item.Original.Image, propertyField);
             };
         }
     }

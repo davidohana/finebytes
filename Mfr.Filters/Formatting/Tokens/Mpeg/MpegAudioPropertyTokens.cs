@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Mfr.Models.RenameList.Fields.Mpeg;
 
 namespace Mfr.Filters.Formatting.Tokens.Mpeg
@@ -5,11 +6,40 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     /// <summary>
     /// Shared implementation for no-arg <c>mpeg-*</c> formatter tokens.
     /// </summary>
-    internal abstract class MpegAudioPropertyTokenBase(IReadOnlyList<string> names, MpegAudioPropertyField field)
-        : IFormatToken
+    internal abstract class MpegAudioPropertyTokenBase(
+        IReadOnlyList<string> names,
+        MpegAudioPropertyField propertyField
+    ) : IFormatToken, IRenameListMappedFormatToken
     {
+        /// <summary>
+        /// Gets the MPEG audio property this token formats.
+        /// </summary>
+        internal MpegAudioPropertyField Field => propertyField;
+
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = MpegRenameListFields.Group;
+            propertyKey = propertyField switch
+            {
+                MpegAudioPropertyField.Bitrate => MpegRenameListFields.Key.Bitrate,
+                MpegAudioPropertyField.Copyright => MpegRenameListFields.Key.Copyright,
+                MpegAudioPropertyField.Duration => MpegRenameListFields.Key.Duration,
+                MpegAudioPropertyField.DurationSec => MpegRenameListFields.Key.DurationSecs,
+                MpegAudioPropertyField.Encoding => MpegRenameListFields.Key.VBR,
+                MpegAudioPropertyField.Frequency => MpegRenameListFields.Key.Frequency,
+                MpegAudioPropertyField.Layer => MpegRenameListFields.Key.Layer,
+                MpegAudioPropertyField.MpegVer => MpegRenameListFields.Key.Level,
+                MpegAudioPropertyField.Mode => MpegRenameListFields.Key.Mode,
+                MpegAudioPropertyField.Original => MpegRenameListFields.Key.Original,
+                MpegAudioPropertyField.Protection => MpegRenameListFields.Key.Protection,
+                _ => throw new UnreachableException(),
+            };
+            return true;
+        }
 
         /// <inheritdoc />
         public Formatter Compile(string tokenArgs)
@@ -19,7 +49,7 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
             return item =>
             {
                 item.EnsureTagLibLoaded();
-                return MpegAudioPropertiesFormatting.Format(item.Original.Media?.Mpeg, field);
+                return MpegAudioPropertiesFormatting.Format(item.Original.Media?.Mpeg, propertyField);
             };
         }
     }

@@ -16,81 +16,136 @@ namespace Mfr.Models.RenameList.Fields.Media
         public const string GroupLabel = "Media Properties";
 
         /// <summary>
+        /// Property keys within <see cref="Group"/>.
+        /// </summary>
+        public static class Key
+        {
+            /// <summary>MIME type.</summary>
+            public const string MimeType = "MimeType";
+
+            /// <summary>Possibly-corrupt flag.</summary>
+            public const string PossiblyCorrupt = "PossiblyCorrupt";
+
+            /// <summary>Duration text.</summary>
+            public const string Duration = "Duration";
+
+            /// <summary>Duration in seconds.</summary>
+            public const string DurationSeconds = "DurationSeconds";
+
+            /// <summary>Media type flags text.</summary>
+            public const string MediaTypes = "MediaTypes";
+
+            /// <summary>Codec description.</summary>
+            public const string Description = "Description";
+
+            /// <summary>Audio bitrate.</summary>
+            public const string AudioBitrate = "AudioBitrate";
+
+            /// <summary>Audio channel count.</summary>
+            public const string AudioChannels = "AudioChannels";
+
+            /// <summary>Audio sample rate.</summary>
+            public const string AudioSampleRate = "AudioSampleRate";
+
+            /// <summary>Bits per sample.</summary>
+            public const string BitsPerSample = "BitsPerSample";
+
+            /// <summary>Video width.</summary>
+            public const string VideoWidth = "VideoWidth";
+
+            /// <summary>Video height.</summary>
+            public const string VideoHeight = "VideoHeight";
+
+            /// <summary>Photo width.</summary>
+            public const string PhotoWidth = "PhotoWidth";
+
+            /// <summary>Photo height.</summary>
+            public const string PhotoHeight = "PhotoHeight";
+
+            /// <summary>Photo quality.</summary>
+            public const string PhotoQuality = "PhotoQuality";
+        }
+
+        /// <summary>
         /// Media Properties group fields in catalog order (identity, duration, audio, video, photo).
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
-            new MediaPropertyRenameListField("MimeType", "MIME Type", MediaRenameListProperty.MimeType),
+            new MediaPropertyRenameListField(Key.MimeType, "MIME Type", MediaRenameListProperty.MimeType),
             new MediaPropertyRenameListField(
-                "PossiblyCorrupt",
+                Key.PossiblyCorrupt,
                 "Possibly Corrupt",
                 MediaRenameListProperty.PossiblyCorrupt,
                 defaultWidth: 40,
                 tip: MediaRenameListFieldTips.PossiblyCorrupt
             ),
             new MediaPropertyRenameListField(
-                "Duration",
+                Key.Duration,
                 "Duration",
                 MediaRenameListProperty.Duration,
                 tip: MediaRenameListFieldTips.Duration
             ),
             new MediaPropertyRenameListField(
-                "DurationSeconds",
+                Key.DurationSeconds,
                 "Duration (Seconds)",
                 MediaRenameListProperty.DurationSeconds,
                 tip: MediaRenameListFieldTips.DurationSeconds
             ),
-            new MediaPropertyRenameListField("MediaTypes", "Media Types", MediaRenameListProperty.MediaTypes),
+            new MediaPropertyRenameListField(Key.MediaTypes, "Media Types", MediaRenameListProperty.MediaTypes),
             new MediaPropertyRenameListField(
-                "Description",
+                Key.Description,
                 "Description",
                 MediaRenameListProperty.Description,
                 defaultWidth: 220
             ),
             new MediaPropertyRenameListField(
-                "AudioBitrate",
+                Key.AudioBitrate,
                 "Audio Bitrate",
                 MediaRenameListProperty.AudioBitrate,
                 defaultWidth: 40
             ),
             new MediaPropertyRenameListField(
-                "AudioChannels",
+                Key.AudioChannels,
                 "Audio Channels",
                 MediaRenameListProperty.AudioChannels,
                 defaultWidth: 40
             ),
             new MediaPropertyRenameListField(
-                "AudioSampleRate",
+                Key.AudioSampleRate,
                 "Audio Sample Rate",
                 MediaRenameListProperty.AudioSampleRate
             ),
-            new MediaPropertyRenameListField("BitsPerSample", "Bits Per Sample", MediaRenameListProperty.BitsPerSample),
             new MediaPropertyRenameListField(
-                "VideoWidth",
+                Key.BitsPerSample,
+                "Bits Per Sample",
+                MediaRenameListProperty.BitsPerSample
+            ),
+            new MediaPropertyRenameListField(
+                Key.VideoWidth,
                 "Video Width",
                 MediaRenameListProperty.VideoWidth,
                 tip: MediaRenameListFieldTips.VideoWidth
             ),
             new MediaPropertyRenameListField(
-                "VideoHeight",
+                Key.VideoHeight,
                 "Video Height",
                 MediaRenameListProperty.VideoHeight,
                 tip: MediaRenameListFieldTips.VideoHeight
             ),
             new MediaPropertyRenameListField(
-                "PhotoWidth",
+                Key.PhotoWidth,
                 "Photo Width",
                 MediaRenameListProperty.PhotoWidth,
                 tip: MediaRenameListFieldTips.PhotoWidth
             ),
             new MediaPropertyRenameListField(
-                "PhotoHeight",
+                Key.PhotoHeight,
                 "Photo Height",
                 MediaRenameListProperty.PhotoHeight,
                 tip: MediaRenameListFieldTips.PhotoHeight
             ),
             new MediaPropertyRenameListField(
-                "PhotoQuality",
+                Key.PhotoQuality,
                 "Photo Quality",
                 MediaRenameListProperty.PhotoQuality,
                 defaultWidth: 40

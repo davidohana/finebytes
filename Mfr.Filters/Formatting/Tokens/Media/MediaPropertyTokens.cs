@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Mfr.Models.RenameList.Fields.Media;
 
 namespace Mfr.Filters.Formatting.Tokens.Media
@@ -5,10 +6,43 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     /// <summary>
     /// Shared implementation for no-arg <c>media-*</c> formatter tokens.
     /// </summary>
-    internal abstract class MediaPropertyTokenBase(IReadOnlyList<string> names, MediaPropertyField field) : IFormatToken
+    internal abstract class MediaPropertyTokenBase(IReadOnlyList<string> names, MediaPropertyField propertyField)
+        : IFormatToken,
+            IRenameListMappedFormatToken
     {
+        /// <summary>
+        /// Gets the media property this token formats.
+        /// </summary>
+        internal MediaPropertyField Field => propertyField;
+
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = MediaRenameListFields.Group;
+            propertyKey = propertyField switch
+            {
+                MediaPropertyField.MimeType => MediaRenameListFields.Key.MimeType,
+                MediaPropertyField.Corrupt => MediaRenameListFields.Key.PossiblyCorrupt,
+                MediaPropertyField.Duration => MediaRenameListFields.Key.Duration,
+                MediaPropertyField.DurationSec => MediaRenameListFields.Key.DurationSeconds,
+                MediaPropertyField.MediaTypes => MediaRenameListFields.Key.MediaTypes,
+                MediaPropertyField.Description => MediaRenameListFields.Key.Description,
+                MediaPropertyField.AudioBitrate => MediaRenameListFields.Key.AudioBitrate,
+                MediaPropertyField.SampleRate => MediaRenameListFields.Key.AudioSampleRate,
+                MediaPropertyField.BitsPerSample => MediaRenameListFields.Key.BitsPerSample,
+                MediaPropertyField.Channels => MediaRenameListFields.Key.AudioChannels,
+                MediaPropertyField.VideoWidth => MediaRenameListFields.Key.VideoWidth,
+                MediaPropertyField.VideoHeight => MediaRenameListFields.Key.VideoHeight,
+                MediaPropertyField.PhotoWidth => MediaRenameListFields.Key.PhotoWidth,
+                MediaPropertyField.PhotoHeight => MediaRenameListFields.Key.PhotoHeight,
+                MediaPropertyField.PhotoQuality => MediaRenameListFields.Key.PhotoQuality,
+                _ => throw new UnreachableException(),
+            };
+            return true;
+        }
 
         /// <inheritdoc />
         public Formatter Compile(string tokenArgs)
@@ -18,7 +52,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
             return item =>
             {
                 item.EnsureTagLibLoaded();
-                return MediaPropertiesFormatting.Format(item.Original.Media, field);
+                return MediaPropertiesFormatting.Format(item.Original.Media, propertyField);
             };
         }
     }

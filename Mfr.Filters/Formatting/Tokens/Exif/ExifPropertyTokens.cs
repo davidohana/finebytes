@@ -1,12 +1,40 @@
+using System.Diagnostics;
+using Mfr.Models.RenameList.Fields.Jpeg;
+
 namespace Mfr.Filters.Formatting.Tokens.Exif
 {
     /// <summary>
     /// Shared implementation for no-arg <c>exif-*</c> formatter tokens.
     /// </summary>
-    internal abstract class ExifPropertyTokenBase(IReadOnlyList<string> names, ExifPropertyField field) : IFormatToken
+    internal abstract class ExifPropertyTokenBase(IReadOnlyList<string> names, ExifPropertyField propertyField)
+        : IFormatToken,
+            IRenameListMappedFormatToken
     {
+        /// <summary>
+        /// Gets the EXIF property this token formats.
+        /// </summary>
+        internal ExifPropertyField Field => propertyField;
+
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = JpegRenameListFields.Group;
+            propertyKey = propertyField switch
+            {
+                ExifPropertyField.Make => JpegRenameListFields.Key.Make,
+                ExifPropertyField.Model => JpegRenameListFields.Key.Model,
+                ExifPropertyField.Exposure => JpegRenameListFields.Key.Exposure,
+                ExifPropertyField.FNumber => JpegRenameListFields.Key.FNumber,
+                ExifPropertyField.Iso => JpegRenameListFields.Key.Iso,
+                ExifPropertyField.FocalLength => JpegRenameListFields.Key.FocalLength,
+                ExifPropertyField.FocalLength35mm => JpegRenameListFields.Key.FocalLength35mm,
+                _ => throw new UnreachableException(),
+            };
+            return true;
+        }
 
         /// <inheritdoc />
         public Formatter Compile(string tokenArgs)
@@ -16,7 +44,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
             return item =>
             {
                 item.EnsureImagePropertiesLoaded();
-                return ExifDataFormatting.Format(item.Original.Exif, field);
+                return ExifDataFormatting.Format(item.Original.Exif, propertyField);
             };
         }
     }

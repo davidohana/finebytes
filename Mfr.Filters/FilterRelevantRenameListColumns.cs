@@ -7,6 +7,7 @@ using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.Tags;
 
 namespace Mfr.Filters
 {
@@ -78,7 +79,7 @@ namespace Mfr.Filters
 
             if (filter is AttributesSetterFilter)
             {
-                _AddCatalogField(ExtendedRenameListFields.Group, "Attrs", keys, keyToIsSeen);
+                _AddCatalogField(ExtendedRenameListFields.Group, ExtendedRenameListFields.Key.Attrs, keys, keyToIsSeen);
                 return;
             }
 
@@ -195,89 +196,108 @@ namespace Mfr.Filters
             AudioTagStringFieldOptions Field
         )> _EnumerateAudioTagSetterSlots(AudioTagSetterOptions options)
         {
+            foreach (var (semanticField, field) in _EnumerateAudioTagSetterSemanticSlots(options))
+            {
+                if (!AudioTagRenameListFields.TryGetSemanticPropertyKey(semanticField, out var propertyKey))
+                {
+                    continue;
+                }
+
+                yield return (propertyKey, field);
+            }
+        }
+
+        /// <summary>
+        /// Yields non-null Audio Tag Setter slots as semantic field + field options.
+        /// </summary>
+        private static IEnumerable<(
+            SemanticAudioField SemanticField,
+            AudioTagStringFieldOptions Field
+        )> _EnumerateAudioTagSetterSemanticSlots(AudioTagSetterOptions options)
+        {
             if (options.Performers is not null)
             {
-                yield return ("Performers", options.Performers);
+                yield return (SemanticAudioField.Performers, options.Performers);
             }
 
             if (options.AlbumArtists is not null)
             {
-                yield return ("AlbumArtists", options.AlbumArtists);
+                yield return (SemanticAudioField.AlbumArtists, options.AlbumArtists);
             }
 
             if (options.Title is not null)
             {
-                yield return ("Title", options.Title);
+                yield return (SemanticAudioField.Title, options.Title);
             }
 
             if (options.Album is not null)
             {
-                yield return ("Album", options.Album);
+                yield return (SemanticAudioField.Album, options.Album);
             }
 
             if (options.Genre is not null)
             {
-                yield return ("Genres", options.Genre);
+                yield return (SemanticAudioField.Genre, options.Genre);
             }
 
             if (options.Comment is not null)
             {
-                yield return ("Comment", options.Comment);
+                yield return (SemanticAudioField.Comment, options.Comment);
             }
 
             if (options.Composers is not null)
             {
-                yield return ("Composers", options.Composers);
+                yield return (SemanticAudioField.Composers, options.Composers);
             }
 
             if (options.Lyrics is not null)
             {
-                yield return ("Lyrics", options.Lyrics);
+                yield return (SemanticAudioField.Lyrics, options.Lyrics);
             }
 
             if (options.Grouping is not null)
             {
-                yield return ("Grouping", options.Grouping);
+                yield return (SemanticAudioField.Grouping, options.Grouping);
             }
 
             if (options.Copyright is not null)
             {
-                yield return ("Copyright", options.Copyright);
+                yield return (SemanticAudioField.Copyright, options.Copyright);
             }
 
             if (options.Conductor is not null)
             {
-                yield return ("Conductor", options.Conductor);
+                yield return (SemanticAudioField.Conductor, options.Conductor);
             }
 
             if (options.Year is not null)
             {
-                yield return ("Year", options.Year);
+                yield return (SemanticAudioField.Year, options.Year);
             }
 
             if (options.BeatsPerMinute is not null)
             {
-                yield return ("BeatsPerMinute", options.BeatsPerMinute);
+                yield return (SemanticAudioField.BeatsPerMinute, options.BeatsPerMinute);
             }
 
             if (options.Track is not null)
             {
-                yield return ("Track", options.Track);
+                yield return (SemanticAudioField.Track, options.Track);
             }
 
             if (options.TrackCount is not null)
             {
-                yield return ("TrackCount", options.TrackCount);
+                yield return (SemanticAudioField.TrackCount, options.TrackCount);
             }
 
             if (options.Disc is not null)
             {
-                yield return ("Disc", options.Disc);
+                yield return (SemanticAudioField.Disc, options.Disc);
             }
 
             if (options.DiscCount is not null)
             {
-                yield return ("DiscCount", options.DiscCount);
+                yield return (SemanticAudioField.DiscCount, options.DiscCount);
             }
         }
 

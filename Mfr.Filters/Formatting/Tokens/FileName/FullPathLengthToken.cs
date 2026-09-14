@@ -1,4 +1,5 @@
 using System.Globalization;
+using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.Filters.Formatting.Tokens.FileName
 {
@@ -16,10 +17,18 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         "Character length of the preview full path",
         "full-path-length"
     )]
-    internal sealed class FullPathLengthToken : IFormatToken
+    internal sealed class FullPathLengthToken : IFormatToken, IRenameListMappedFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["full-path-length"];
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = BasicRenameListField.Group;
+            propertyKey = BasicRenameListFields.Key.FullPathLength;
+            return true;
+        }
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when arguments are supplied.</exception>

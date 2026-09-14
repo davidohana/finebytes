@@ -1,3 +1,4 @@
+using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.FileName
@@ -11,10 +12,18 @@ namespace Mfr.Filters.Formatting.Tokens.FileName
         "Whether the item is a file or a folder",
         "file-or-folder"
     )]
-    internal sealed class FileOrFolderToken : IFormatToken
+    internal sealed class FileOrFolderToken : IFormatToken, IRenameListMappedFormatToken
     {
         /// <inheritdoc />
         public IReadOnlyList<string> Names { get; } = ["file-or-folder"];
+
+        /// <inheritdoc />
+        public bool TryGetFixedField(out string groupId, out string propertyKey)
+        {
+            groupId = BasicRenameListField.Group;
+            propertyKey = BasicRenameListFields.Key.ItemType;
+            return true;
+        }
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when arguments are supplied.</exception>
