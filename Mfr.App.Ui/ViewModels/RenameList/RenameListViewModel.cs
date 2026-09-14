@@ -48,6 +48,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _fileListViewModel = fileListViewModel;
             _shellOpener = shellOpener ?? FileShellOpener.CreateDefault();
             _appliedFilters = appliedFilters;
+            appliedFilters?.ChainChanged += (_, _) => _NotifyRelevantColumnsCommandsChanged();
+
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;
             Progress.PropertyChanged += _OnProgressPropertyChanged;
@@ -372,6 +374,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _NotifyManualOverrideCommandsChanged();
             _NotifyRowErrorCommandsChanged();
             _NotifyRefreshChanged();
+            _NotifyRelevantColumnsCommandsChanged();
         }
 
         private void _OnFileListPropertyChanged(object? sender, PropertyChangedEventArgs e)

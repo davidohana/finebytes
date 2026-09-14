@@ -324,6 +324,16 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
+          Header="Add Fields by Applied Filters"
+          Command="{Binding RenameListViewModel.AddRelevantColumnsCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.AddFieldsByAppliedFilters}"
+        />
+        <MenuItem
+          Header="Replace Fields by Applied Filters"
+          Command="{Binding RenameListViewModel.ReplaceWithRelevantColumnsCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.ReplaceFieldsByAppliedFilters}"
+        />
+        <MenuItem
           Header="Select Sort Fields..."
           Command="{Binding RenameListViewModel.OpenEditSortFieldsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
+using Mfr.Filters;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -19,6 +20,58 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Raised when the view should open the unified field shuttle dialog.
         /// </summary>
         public event EventHandler<RenameListFieldShuttleTab>? FieldShuttleRequested;
+
+        /// <summary>
+        /// Appends Rename List columns inferred from the entire applied filter chain (missing keys only).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Merges at the end with <see cref="RenameListVisibleColumn.UseCatalogDefaultWidth"/>.
+        /// No-op when every relevant key is already visible. Hydrates metadata like field-shuttle apply.
+        /// </para>
+        /// </remarks>
+        [RelayCommand(CanExecute = nameof(_CanApplyRelevantColumns))]
+        public async Task AddRelevantColumnsAsync()
+        {
+            if (!_CanApplyRelevantColumns())
+            {
+                return;
+            }
+
+            var relevantKeys = _CollectRelevantFieldKeys();
+            var keyToIsVisible = _visibleColumns.Select(column => column.Key).ToHashSet();
+            var merged = _visibleColumns.ToList();
+            if (!_AppendMissingRelevantColumns(merged, relevantKeys, keyToIsVisible))
+            {
+                return;
+            }
+
+            await _ApplyVisibleColumnsWithHydrateAsync(merged).ConfigureAwait(true);
+        }
+
+        /// <summary>
+        /// Replaces visible columns with catalog defaults, then appends remaining chain-relevant keys.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When the chain maps to nothing, applies defaults only. Hydrates metadata like field-shuttle apply.
+        /// </para>
+        /// </remarks>
+        [RelayCommand(CanExecute = nameof(_CanApplyRelevantColumns))]
+        public async Task ReplaceWithRelevantColumnsAsync()
+        {
+            if (!_CanApplyRelevantColumns())
+            {
+                return;
+            }
+
+            var relevantKeys = _CollectRelevantFieldKeys();
+            var columns = RenameListVisibleColumn.CreateDefaults().ToList();
+            var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
+            _AppendMissingRelevantColumns(columns, relevantKeys, keyToIsPresent);
+
+            await _ApplyVisibleColumnsWithHydrateAsync(columns).ConfigureAwait(true);
+        }
 
         /// <summary>
         /// Replaces the visible column list.
@@ -151,6 +204,51 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private void _RequestFieldShuttle(RenameListFieldShuttleTab tab)
         {
             FieldShuttleRequested?.Invoke(this, tab);
+        }
+
+        private bool _CanApplyRelevantColumns()
+        {
+            return !IsBusy && _appliedFilters is not null && _appliedFilters.Count > 0;
+        }
+
+        private void _NotifyRelevantColumnsCommandsChanged()
+        {
+            AddRelevantColumnsCommand.NotifyCanExecuteChanged();
+            ReplaceWithRelevantColumnsCommand.NotifyCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Collects field keys for the entire applied stack (disabled steps included).
+        /// </summary>
+        private IReadOnlyList<RenameListFieldKey> _CollectRelevantFieldKeys()
+        {
+            var filters = _appliedFilters!.Steps.Select(step => step.Filter);
+            return FilterRelevantRenameListColumns.Collect(filters);
+        }
+
+        /// <summary>
+        /// Appends catalog-default-width columns for keys not already in <paramref name="keyToIsPresent"/>.
+        /// </summary>
+        /// <returns><see langword="true"/> when at least one column was appended.</returns>
+        private static bool _AppendMissingRelevantColumns(
+            List<RenameListVisibleColumn> columns,
+            IReadOnlyList<RenameListFieldKey> relevantKeys,
+            HashSet<RenameListFieldKey> keyToIsPresent
+        )
+        {
+            var addedAny = false;
+            foreach (var key in relevantKeys)
+            {
+                if (!keyToIsPresent.Add(key))
+                {
+                    continue;
+                }
+
+                columns.Add(new RenameListVisibleColumn(key));
+                addedAny = true;
+            }
+
+            return addedAny;
         }
 
         /// <summary>

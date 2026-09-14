@@ -5,7 +5,7 @@ Parent: [rename-list-ui.plan.md](rename-list-ui.plan.md) (block 5 columns / shut
 ## Status
 
 - [x] P1 — Collect + map API
-- [ ] P2 — Rename List Add / Replace commands
+- [x] P2 — Rename List Add / Replace commands
 - [ ] P3 — Docs + tips/shortcuts + broaden token map coverage
 
 ## Decisions (locked)

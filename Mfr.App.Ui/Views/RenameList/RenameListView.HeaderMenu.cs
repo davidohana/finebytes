@@ -113,8 +113,9 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <remarks>
         /// <para>
         /// Order: title → Hide Field → (preview) Remove Unchanged → Select Visible Fields →
-        /// Select Sort Fields → Edit as Name List (writable) → Cancel Manual Override (when any row
-        /// overridden) → Export submenu (This Column txt / Visible Columns csv).
+        /// Add / Replace Fields by Applied Filters → Select Sort Fields → Edit as Name List
+        /// (writable) → Cancel Manual Override (when any row overridden) → Export submenu
+        /// (This Column txt / Visible Columns csv).
         /// </para>
         /// </remarks>
         private static ContextMenu _BuildColumnHeaderContextMenu(
@@ -147,6 +148,20 @@ namespace Mfr.App.Ui.Views.RenameList
                     "Select Visible Fields...",
                     AppTips.SelectRenameListFields,
                     viewModel.OpenFieldShuttleCommand
+                )
+            );
+            menu.Items.Add(
+                _CreateCommandMenuItem(
+                    "Add Fields by Applied Filters",
+                    AppTips.AddFieldsByAppliedFilters,
+                    viewModel.AddRelevantColumnsCommand
+                )
+            );
+            menu.Items.Add(
+                _CreateCommandMenuItem(
+                    "Replace Fields by Applied Filters",
+                    AppTips.ReplaceFieldsByAppliedFilters,
+                    viewModel.ReplaceWithRelevantColumnsCommand
                 )
             );
             menu.Items.Add(

@@ -26,14 +26,49 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var requirement = _CombinedMetadataRequirement(columns, sortKeys);
-            if (!await _HydrateIfNeededAsync(requirement).ConfigureAwait(true))
+            if (!await _HydrateForColumnsAndSortAsync(columns, sortKeys).ConfigureAwait(true))
             {
                 return;
             }
 
             SetVisibleColumns(columns);
             SetSortKeys(sortKeys);
+        }
+
+        /// <summary>
+        /// Applies visible columns after the same metadata hydrate path as field-shuttle apply.
+        /// </summary>
+        /// <param name="columns">New visible columns in grid order.</param>
+        private async Task _ApplyVisibleColumnsWithHydrateAsync(IReadOnlyList<RenameListVisibleColumn> columns)
+        {
+            if (IsBusy)
+            {
+                return;
+            }
+
+            if (!await _HydrateForColumnsAndSortAsync(columns, _sortKeys).ConfigureAwait(true))
+            {
+                return;
+            }
+
+            if (columns.SequenceEqual(_visibleColumns))
+            {
+                return;
+            }
+
+            SetVisibleColumns(columns);
+        }
+
+        /// <summary>
+        /// Hydrates metadata required by <paramref name="columns"/> and <paramref name="sortKeys"/>.
+        /// </summary>
+        private async Task<bool> _HydrateForColumnsAndSortAsync(
+            IEnumerable<RenameListVisibleColumn> columns,
+            IEnumerable<RenameListSortKey> sortKeys
+        )
+        {
+            var requirement = _CombinedMetadataRequirement(columns, sortKeys);
+            return await _HydrateIfNeededAsync(requirement).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -85,8 +120,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private async Task _HydrateThenSetSortKeysAsync(IReadOnlyList<RenameListSortKey> keys, bool resort)
         {
-            var requirement = _CombinedMetadataRequirement(_visibleColumns, keys);
-            if (!await _HydrateIfNeededAsync(requirement).ConfigureAwait(true))
+            if (!await _HydrateForColumnsAndSortAsync(_visibleColumns, keys).ConfigureAwait(true))
             {
                 return;
             }
