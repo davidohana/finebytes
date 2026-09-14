@@ -39,6 +39,29 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies toolbar view toggles keep Auto-Preview → Before/After → Color Legend order.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Toolbar_view_toggle_order_auto_preview_before_after_legend()
+        {
+            var (_, window, view) = await _ShowAsync();
+            var autoPreview = view.FindControl<ToggleButton>("AutoPreviewToggle");
+            var beforeAfter = view.FindControl<ToggleButton>("BeforeAfterSideToggle");
+            var legend = view.FindControl<ToggleButton>("LegendToggle");
+            Assert.NotNull(autoPreview);
+            Assert.NotNull(beforeAfter);
+            Assert.NotNull(legend);
+
+            var rail = Assert.IsType<StackPanel>(autoPreview.Parent);
+            var children = rail.Children.ToList();
+            Assert.True(children.IndexOf(autoPreview) < children.IndexOf(beforeAfter));
+            Assert.True(children.IndexOf(beforeAfter) < children.IndexOf(legend));
+            Assert.Equal(legend, children[^1]);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies the Before/After toolbar toggle rebuilds the grid from ProjectedColumns.
         /// </summary>
         [AvaloniaFact]

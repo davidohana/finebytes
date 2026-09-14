@@ -290,11 +290,7 @@
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/Clear.png" />
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem
-          Header="Locate in File List"
-          Command="{Binding RenameListViewModel.LocateInFileListCommand}"
-          InputGesture="{x:Static input:AppShortcuts.LocateInFileList}"
-        />
+        <Separator />
         <MenuItem
           Header="Move Selected Up"
           Command="{Binding RenameListViewModel.MoveSelectedUpCommand}"
@@ -311,6 +307,20 @@
         >
           <MenuItem.Icon>
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/MoveDown.png" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem
+          Header="Locate in File List"
+          Command="{Binding RenameListViewModel.LocateInFileListCommand}"
+          InputGesture="{x:Static input:AppShortcuts.LocateInFileList}"
+        />
+        <MenuItem
+          Header="Refresh"
+          Command="{Binding RenameListViewModel.RefreshCommand}"
+          InputGesture="{x:Static input:AppShortcuts.Refresh}"
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/Refresh.png" />
           </MenuItem.Icon>
         </MenuItem>
         <Separator />
@@ -385,7 +395,7 @@
           CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSideOriginal}"
           ToggleType="Radio"
           IsChecked="{Binding RenameListViewModel.IsAbSideOriginal, Mode=OneWay}"
-          IsEnabled="{Binding RenameListViewModel.IsAbModeEnabled}"
+          IsVisible="{Binding RenameListViewModel.IsAbModeEnabled}"
           ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterSide}"
         />
         <MenuItem
@@ -394,18 +404,9 @@
           CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSidePreview}"
           ToggleType="Radio"
           IsChecked="{Binding RenameListViewModel.IsAbSidePreview, Mode=OneWay}"
-          IsEnabled="{Binding RenameListViewModel.IsAbModeEnabled}"
+          IsVisible="{Binding RenameListViewModel.IsAbModeEnabled}"
           ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterSide}"
         />
-        <MenuItem
-          Header="Refresh"
-          Command="{Binding RenameListViewModel.RefreshCommand}"
-          InputGesture="{x:Static input:AppShortcuts.Refresh}"
-        >
-          <MenuItem.Icon>
-            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/Refresh.png" />
-          </MenuItem.Icon>
-        </MenuItem>
       </MenuItem>
       <MenuItem Header="F_ilters">
         <MenuItem Header="Add Selected Filter" Command="{Binding AddSelectedFilterFromPaletteCommand}">

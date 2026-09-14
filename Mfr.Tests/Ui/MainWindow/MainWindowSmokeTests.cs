@@ -158,15 +158,91 @@ namespace Mfr.Tests.Ui.MainWindow
             var window = new AppMainWindow { DataContext = viewModel };
             window.Show();
 
-            var renameListMenu = window
-                .GetVisualDescendants()
-                .OfType<MenuItem>()
-                .Single(item => item.Header?.ToString() == "_Rename List");
+            var renameListMenu = _RenameListMenu(window);
             var exportItem = renameListMenu
                 .Items.OfType<MenuItem>()
                 .Single(item => item.Header?.ToString() == "Export Rename List (csv)...");
 
             Assert.Same(viewModel.RenameListViewModel.ExportVisibleColumnsCommand, exportItem.Command);
+        }
+
+        /// <summary>
+        /// Verifies Rename List menu groups membership → navigate → columns → options.
+        /// </summary>
+        [AvaloniaFact]
+        public void MainWindow_RenameList_menu_order_matches_groups()
+        {
+            var window = new AppMainWindow { DataContext = new MainWindowViewModel() };
+            window.Show();
+
+            var headers = _RenameListMenu(window)
+                .Items.OfType<MenuItem>()
+                .Select(item => item.Header?.ToString())
+                .Where(header => header is not null)
+                .Cast<string>()
+                .ToList();
+
+            Assert.Equal(
+                [
+                    "Add Selected",
+                    "Add All",
+                    "Remove",
+                    "Remove All But Selected",
+                    "Clear",
+                    "Move Selected Up",
+                    "Move Selected Down",
+                    "Locate in File List",
+                    "Refresh",
+                    "Select Fields...",
+                    "Add Fields by Applied Filters",
+                    "Replace Fields by Applied Filters",
+                    "Select Sort Fields...",
+                    "Export Rename List (csv)...",
+                    "Use Fixed-Width Font",
+                    "Auto-Sort",
+                    "Auto-Preview",
+                    "Before/After Mode",
+                    "_Before",
+                    "_After",
+                ],
+                headers
+            );
+        }
+
+        /// <summary>
+        /// Verifies Before/After menu radios are hidden until Before/After Mode is on.
+        /// </summary>
+        [AvaloniaFact]
+        public void MainWindow_RenameList_before_after_radios_hidden_when_mode_off()
+        {
+            var viewModel = new MainWindowViewModel();
+            var window = new AppMainWindow { DataContext = viewModel };
+            window.Show();
+
+            var renameListMenu = _RenameListMenu(window);
+            var beforeItem = renameListMenu
+                .Items.OfType<MenuItem>()
+                .Single(item => item.Header?.ToString() == "_Before");
+            var afterItem = renameListMenu
+                .Items.OfType<MenuItem>()
+                .Single(item => item.Header?.ToString() == "_After");
+
+            Assert.False(viewModel.RenameListViewModel.IsAbModeEnabled);
+            Assert.False(beforeItem.IsVisible);
+            Assert.False(afterItem.IsVisible);
+
+            viewModel.RenameListViewModel.IsAbModeEnabled = true;
+
+            Assert.True(beforeItem.IsVisible);
+            Assert.True(afterItem.IsVisible);
+        }
+
+        private static MenuItem _RenameListMenu(AppMainWindow window)
+        {
+            return window
+                .GetVisualDescendants()
+                .OfType<MenuItem>()
+                .Single(item => item.Header?.ToString() == "_Rename List");
         }
     }
 }
