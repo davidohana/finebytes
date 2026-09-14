@@ -71,7 +71,8 @@ namespace Mfr.Tests.Ui.Services.Session
         }
 
         /// <summary>
-        /// Verifies close-save keeps Options-owned Rename List add policy when merging a pane capture.
+        /// Verifies close-save keeps Options-owned Rename List add policy when merging a pane capture,
+        /// and writes pane-owned Before/After Mode fields from the capture.
         /// </summary>
         [AvaloniaFact]
         public void SaveOnClose_Preserves_RenameList_Add_Policy()
@@ -87,6 +88,8 @@ namespace Mfr.Tests.Ui.Services.Session
                     AddFolderContents = false,
                     UseFixedWidthFont = true,
                     PreviewEnabled = true,
+                    AbModeEnabled = false,
+                    AbSide = RenameListPrefs.AbSideOriginal,
                 };
                 ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
 
@@ -105,6 +108,8 @@ namespace Mfr.Tests.Ui.Services.Session
                     AddFolderContents = true,
                     UseFixedWidthFont = false,
                     PreviewEnabled = false,
+                    AbModeEnabled = true,
+                    AbSide = RenameListPrefs.AbSidePreview,
                     SortFields = [],
                 };
 
@@ -114,6 +119,8 @@ namespace Mfr.Tests.Ui.Services.Session
                 Assert.False(ConfigStore.RenameList?.AddFolderContents);
                 Assert.False(ConfigStore.RenameList?.UseFixedWidthFont);
                 Assert.False(ConfigStore.RenameList?.PreviewEnabled);
+                Assert.True(ConfigStore.RenameList?.AbModeEnabled);
+                Assert.Equal(RenameListPrefs.AbSidePreview, ConfigStore.RenameList?.AbSide);
                 Assert.NotNull(ConfigStore.RenameList?.SortFields);
                 Assert.Empty(ConfigStore.RenameList.SortFields);
             }

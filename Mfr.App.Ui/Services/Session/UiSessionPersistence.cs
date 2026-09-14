@@ -103,6 +103,8 @@ namespace Mfr.App.Ui.Services.Session
                     saved.VisibleColumns = renameList.VisibleColumns is null ? null : [.. renameList.VisibleColumns];
                     saved.UseFixedWidthFont = renameList.UseFixedWidthFont;
                     saved.PreviewEnabled = renameList.PreviewEnabled;
+                    saved.AbModeEnabled = renameList.AbModeEnabled;
+                    saved.AbSide = RenameListPrefs.NormalizeAbSide(renameList.AbSide);
                 }
 
                 ConfigStore.TrySave();
