@@ -497,7 +497,12 @@
           />
         </StackPanel>
 
-        <StackPanel Margin="24" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding IsListing}">
+        <StackPanel
+          Margin="24"
+          HorizontalAlignment="Center"
+          VerticalAlignment="Center"
+          IsVisible="{Binding ShowListingBusy}"
+        >
           <TextBlock
             x:Name="ListingBusyText"
             TextAlignment="Center"

@@ -85,6 +85,12 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private bool _listingDeferred;
         private int _listingGeneration;
         private bool _isDisposed;
+        private CancellationTokenSource? _listingBusyDelayCts;
+
+        /// <summary>
+        /// Delay before showing the Loading overlay; fast lists that finish sooner never flash.
+        /// </summary>
+        private static readonly TimeSpan _ListingBusyDelay = TimeSpan.FromMilliseconds(150);
 
         /// <summary>
         /// Initializes the File List at the user profile folder with the default icon provider.
@@ -280,10 +286,19 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public bool HasListingError => !string.IsNullOrEmpty(ListingError);
 
         /// <summary>
-        /// Gets whether a folder listing is in progress (in-pane Loading overlay).
+        /// Gets whether a folder listing is in progress.
         /// </summary>
         [ObservableProperty]
         private bool _isListing;
+
+        /// <summary>
+        /// Gets whether the in-pane Loading overlay should show.
+        /// <para>
+        /// Delayed after <see cref="IsListing"/> becomes true so fast local folders do not flash.
+        /// </para>
+        /// </summary>
+        [ObservableProperty]
+        private bool _showListingBusy;
 
         /// <summary>
         /// Gets whether the listing-error empty state may offer revealing the session log file.
@@ -800,6 +815,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
             _isDisposed = true;
             Interlocked.Increment(ref _listingGeneration);
+            _CancelListingBusyDelay();
+            ShowListingBusy = false;
             IsListing = false;
             _fileClipboard.Changed -= _OnFileClipboardChanged;
             _thumbnails.Dispose();
@@ -1336,7 +1353,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         {
             _listingDeferred = false;
             var generation = _BeginListingReload(preserveSelection);
-            IsListing = true;
+            _BeginListingBusy(generation);
 
             var path = CurrentPath;
             var mask = Mask;
@@ -1425,14 +1442,14 @@ namespace Mfr.App.Ui.ViewModels.FileList
             {
                 ListingError = FileListCatalog.FormatListingError(result.Failure);
                 _RebuildVisibleEntries(preserveSelection);
-                IsListing = false;
+                _EndListingBusy();
                 return;
             }
 
             _listedItems.AddRange(result.Items);
             FileListListingSort.Apply(_listedItems, SortMemberPath, IsSortAscending);
             _RebuildVisibleEntries(preserveSelection);
-            IsListing = false;
+            _EndListingBusy();
         }
 
         /// <summary>
@@ -1446,10 +1463,76 @@ namespace Mfr.App.Ui.ViewModels.FileList
         {
             _listingDeferred = false;
             var generation = _BeginListingReload(preserveSelection);
-            IsListing = false;
+            _EndListingBusy();
 
             var result = _ListEntriesSafe(CurrentPath, Mask, ExcludeMasksEnabled, ExcludeMasks, PathHistory);
             _ApplyListingResult(generation, result, preserveSelection);
+        }
+
+        /// <summary>
+        /// Marks listing busy and schedules the Loading overlay after <see cref="_ListingBusyDelay"/>.
+        /// </summary>
+        /// <param name="generation">Generation for this reload.</param>
+        private void _BeginListingBusy(int generation)
+        {
+            IsListing = true;
+            ShowListingBusy = false;
+            _CancelListingBusyDelay();
+            var cts = new CancellationTokenSource();
+            _listingBusyDelayCts = cts;
+            var token = cts.Token;
+            _ = Task.Run(
+                async () =>
+                {
+                    try
+                    {
+                        await Task.Delay(_ListingBusyDelay, token).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        return;
+                    }
+
+                    AvaloniaUiThread.Post(() =>
+                    {
+                        if (
+                            _isDisposed
+                            || token.IsCancellationRequested
+                            || generation != Volatile.Read(ref _listingGeneration)
+                            || !IsListing
+                        )
+                        {
+                            return;
+                        }
+
+                        ShowListingBusy = true;
+                    });
+                },
+                CancellationToken.None
+            );
+        }
+
+        /// <summary>
+        /// Clears listing busy state and hides the Loading overlay.
+        /// </summary>
+        private void _EndListingBusy()
+        {
+            _CancelListingBusyDelay();
+            ShowListingBusy = false;
+            IsListing = false;
+        }
+
+        private void _CancelListingBusyDelay()
+        {
+            var cts = _listingBusyDelayCts;
+            _listingBusyDelayCts = null;
+            if (cts is null)
+            {
+                return;
+            }
+
+            cts.Cancel();
+            cts.Dispose();
         }
 
         private void _RebuildVisibleEntries(bool preserveSelection)

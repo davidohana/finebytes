@@ -1241,10 +1241,10 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
-        /// Verifies the Loading overlay is visible while <see cref="FileListViewModel.IsListing"/> is true.
+        /// Verifies the Loading overlay is visible while <see cref="FileListViewModel.ShowListingBusy"/> is true.
         /// </summary>
         [AvaloniaFact]
-        public void Loading_Overlay_Visible_When_IsListing()
+        public void Loading_Overlay_Visible_When_ShowListingBusy()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, dir, NullFileShellOpener.Instance);
@@ -1263,14 +1263,14 @@ namespace Mfr.Tests.Ui.FileList
             var busyText = view.FindControl<TextBlock>("ListingBusyText");
             Assert.NotNull(busyText);
 
-            viewModel.IsListing = true;
+            viewModel.ShowListingBusy = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(busyText.IsEffectivelyVisible);
             Assert.Equal("Loading…", busyText.Text);
 
-            viewModel.IsListing = false;
+            viewModel.ShowListingBusy = false;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

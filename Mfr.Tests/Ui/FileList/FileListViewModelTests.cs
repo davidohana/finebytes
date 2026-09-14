@@ -1213,7 +1213,8 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
-        /// Verifies <see cref="FileListViewModel.IsListing"/> stays true until a slow catalog finishes.
+        /// Verifies <see cref="FileListViewModel.IsListing"/> stays true until a slow catalog finishes,
+        /// and the Loading overlay appears only after the busy delay.
         /// </summary>
         [Fact]
         public void IsListing_True_While_Slow_Catalog_Runs()
@@ -1224,11 +1225,18 @@ namespace Mfr.Tests.Ui.FileList
 
             Assert.True(gate.Started.Wait(TimeSpan.FromSeconds(10)));
             Assert.True(viewModel.IsListing);
+            Assert.False(viewModel.ShowListingBusy);
+
+            Thread.Sleep(200);
+            FileListListingWait.PumpUiDispatcher();
+            Assert.True(viewModel.IsListing);
+            Assert.True(viewModel.ShowListingBusy);
 
             gate.Release.Set();
             FileListListingWait.WaitUntilIdle(viewModel);
 
             Assert.False(viewModel.IsListing);
+            Assert.False(viewModel.ShowListingBusy);
             Assert.Equal(["zeta-folder", "alpha.txt", "beta.md"], _Names(viewModel));
         }
 

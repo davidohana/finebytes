@@ -17,7 +17,7 @@ todos:
 - **UX:** In-pane overlay in the listing area (same host as `ListingError`) — centered “Loading…” text; no modal dialog, no wait cursor, no status-bar “Loading…” (status-bar plan keeps navigate silent).
 - **Concurrency:** Path/breadcrumbs update immediately; list clears; background `List`; **latest navigate/refresh/mask reload wins** via generation token (cancel prior apply, not OS SMB).
 - **Gating:** Do **not** add Rename List–style global `IsBusy` that blocks Cut/Copy/Paste/Delete. Selection is already empty during load. Navigate/Refresh/mask/exclude always allowed; they bump generation and restart. Shell ops that still run use current `CurrentPath` / empty selection as today.
-- **When to show:** Set `IsListing` as soon as a reload starts; clear when that generation completes (success, failure → `ListingError`, or superseded). Fast local folders may flash briefly — acceptable; no delay threshold in v1 (YAGNI).
+- **When to show:** Track `IsListing` immediately; show overlay via `ShowListingBusy` only after **150ms** so fast local folders do not flash “Loading…”.
 - **MFR7:** No parity requirement for busy chrome (shell view had none). This is a finebytes improvement for sync-UI freezes on network/large dirs.
 
 ## MFR7 reference brief
