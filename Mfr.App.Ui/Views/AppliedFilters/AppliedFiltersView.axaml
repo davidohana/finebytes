@@ -66,25 +66,6 @@
     <Style Selector="Button.applied-filter-toolbar-split:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Padding" Value="0" />
     </Style>
-    <Style Selector="Border.applied-filter-shuttle-rail">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHeaderBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />
-      <Setter Property="BorderThickness" Value="0,0,1,0" />
-      <Setter Property="Padding" Value="4" />
-      <Setter Property="VerticalAlignment" Value="Stretch" />
-    </Style>
-    <Style Selector="Border.applied-filter-shuttle-rail Button.rename-list-action">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="Margin" Value="0,0,0,2" />
-    </Style>
-    <Style Selector="Border.applied-filter-shuttle-rail Button.rename-list-action /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-    </Style>
-    <Style Selector="Border.applied-filter-shuttle-rail Button.rename-list-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
-    </Style>
     <Style Selector="ListBox.applied-filters">
       <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderThickness" Value="0" />
@@ -134,7 +115,7 @@
   </UserControl.Styles>
   <Border Classes="pane">
     <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,*">
-      <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Classes="applied-filter-shuttle-rail">
+      <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Classes="pane-action-rail">
         <StackPanel Orientation="Vertical" Spacing="0" VerticalAlignment="Top">
           <Button
             x:Name="AddFromPaletteButton"
