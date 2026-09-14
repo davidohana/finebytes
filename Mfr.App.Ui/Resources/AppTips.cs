@@ -120,8 +120,8 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List header / main menu: Export Visible Columns (CSV).</summary>
         public const string ExportVisibleColumns = "Export all visible columns to a CSV file";
 
-        /// <summary>Rename List field shuttle: visible columns (toolbar, context menu, main menu).</summary>
-        public const string SelectRenameListFields = "Choose visible Rename List columns";
+        /// <summary>Rename List field shuttle (toolbar, context menu, main menu).</summary>
+        public const string SelectRenameListFields = "Select Rename List columns and Auto-Sort fields";
 
         /// <summary>Rename List field shuttle / main menu: add columns inferred from the applied filter chain.</summary>
         public const string AddFieldsByAppliedFilters =
