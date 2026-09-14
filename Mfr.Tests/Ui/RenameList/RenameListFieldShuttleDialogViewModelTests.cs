@@ -581,7 +581,10 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void ReplaceFieldsByAppliedFilters_defaults_then_appends_relevant()
         {
-            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, AudioTagRenameListFields.Key.Title);
+            var titleKey = RenameListFieldKey.Original(
+                AudioTagRenameListFields.Group,
+                AudioTagRenameListFields.Key.Title
+            );
             var onlyName = new[]
             {
                 new RenameListVisibleColumn(

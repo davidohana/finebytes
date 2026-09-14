@@ -26,6 +26,57 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Maps a mixed original/preview column list to originals-only for A/B Mode.
+        /// </summary>
+        /// <param name="columns">Columns in left-to-right order (may include preview keys).</param>
+        /// <returns>
+        /// Originals-only list: each preview key becomes its matching original; first-seen order; widths prefer
+        /// an existing original entry, else the preview width, else <see cref="UseCatalogDefaultWidth"/>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="columns"/> is null.</exception>
+        public static IReadOnlyList<RenameListVisibleColumn> NormalizeToOriginals(
+            IReadOnlyList<RenameListVisibleColumn> columns
+        )
+        {
+            ArgumentNullException.ThrowIfNull(columns);
+
+            var keyToPreferredWidth = new Dictionary<RenameListFieldKey, int>();
+            foreach (var column in columns)
+            {
+                var originalKey = column.Key.IsPreview
+                    ? RenameListFieldKey.Original(column.Key.GroupId, column.Key.PropertyKey)
+                    : column.Key;
+                if (column.Key.IsPreview)
+                {
+                    keyToPreferredWidth.TryAdd(originalKey, column.Width);
+                    continue;
+                }
+
+                keyToPreferredWidth[originalKey] = column.Width;
+            }
+
+            var normalized = new List<RenameListVisibleColumn>();
+            var keyToIsSeen = new HashSet<RenameListFieldKey>();
+            foreach (var column in columns)
+            {
+                var originalKey = column.Key.IsPreview
+                    ? RenameListFieldKey.Original(column.Key.GroupId, column.Key.PropertyKey)
+                    : column.Key;
+                if (!keyToIsSeen.Add(originalKey))
+                {
+                    continue;
+                }
+
+                var width = keyToPreferredWidth.TryGetValue(originalKey, out var preferredWidth)
+                    ? preferredWidth
+                    : UseCatalogDefaultWidth;
+                normalized.Add(new RenameListVisibleColumn(originalKey, width));
+            }
+
+            return normalized;
+        }
+
+        /// <summary>
         /// Resolves an optional catalog width override for this column.
         /// </summary>
         /// <returns>

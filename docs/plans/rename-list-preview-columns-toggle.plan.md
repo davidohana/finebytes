@@ -4,7 +4,7 @@ overview: A/B Mode is a checkbox in the field shuttle. When on, the layout is or
 todos:
   - id: p1-prefs-vm
     content: "P1: abModeEnabled + abSide prefs; originals-only when on; ProjectedColumns derive Preview side; normalize helper; session tests"
-    status: pending
+    status: completed
   - id: p2-shuttle
     content: "P2: A/B checkbox in shuttle; hide Preview subtab; normalize/block preview keys; OK commits abMode; call-site originals-only relevant columns"
     status: pending
@@ -26,12 +26,12 @@ It does **not** replace Select Fields, Auto-Preview, or File List view modes.
 
 Mental model:
 
-| Control | Where | Question it answers |
-|---------|-------|---------------------|
-| **A/B Mode** | Field shuttle (Columns tab) | Is my column layout originals-only, with preview derived for compare? |
-| **Select Fields** | Same shuttle | Which **original** fields are in the layout? (preview not choosable in A/B) |
-| **Original \| Preview** | RL toolbar (only when A/B on) | Which side am I viewing right now? |
-| **Auto-Preview** | RL toolbar | Recalculate preview when filters/list change? |
+| Control                 | Where                         | Question it answers                                                         |
+| ----------------------- | ----------------------------- | --------------------------------------------------------------------------- |
+| **A/B Mode**            | Field shuttle (Columns tab)   | Is my column layout originals-only, with preview derived for compare?       |
+| **Select Fields**       | Same shuttle                  | Which **original** fields are in the layout? (preview not choosable in A/B) |
+| **Original \| Preview** | RL toolbar (only when A/B on) | Which side am I viewing right now?                                          |
+| **Auto-Preview**        | RL toolbar                    | Recalculate preview when filters/list change?                               |
 
 ## UX
 
@@ -91,10 +91,10 @@ Enabling A/B does **not** invent fields and does **not** drop field identity: Ti
 
 Existing model (14d) already has **two slots per `(group, property)`** on each item — `_originalOverrides` vs `_previewOverrides` — selected by `RenameListFieldKey.IsPreview`. A/B does **not** change storage or the PreviewStart/PreviewEnd pipeline; it only changes which column keys are on screen.
 
-| Side (toolbar) | Columns shown | Override edit / Cancel / blue |
-|----------------|---------------|-------------------------------|
-| **Original** | Original keys only | Targets **original** slot only. Blue (`rename-list-manual-override`) on that cell. Prompt: initial value (before filters). |
-| **Preview** | Original + derived Preview companions | Same as today’s mixed grid: original columns → original slot; derived preview columns use `Preview(...)` keys → **preview** slot. Blue on the edited cell; red “changed” still suppressed when overridden. Prompt follows `IsPreview`. |
+| Side (toolbar) | Columns shown                         | Override edit / Cancel / blue                                                                                                                                                                                                          |
+| -------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Original**   | Original keys only                    | Targets **original** slot only. Blue (`rename-list-manual-override`) on that cell. Prompt: initial value (before filters).                                                                                                             |
+| **Preview**    | Original + derived Preview companions | Same as today’s mixed grid: original columns → original slot; derived preview columns use `Preview(...)` keys → **preview** slot. Blue on the edited cell; red “changed” still suppressed when overridden. Prompt follows `IsPreview`. |
 
 **Persistence across side flips:** overrides stay on the item. Flip Original → Preview and any preview-slot override reappears as blue on the derived preview column; original-slot blue stays on the original column. Flip back and preview-column blue is simply not displayed (slot still active).
 

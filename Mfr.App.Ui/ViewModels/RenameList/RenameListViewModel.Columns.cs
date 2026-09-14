@@ -1,5 +1,7 @@
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Filters;
+using Mfr.Models.Config;
 using Mfr.Models.RenameList;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -12,9 +14,53 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private List<RenameListVisibleColumn> _visibleColumns = [.. RenameListVisibleColumn.CreateDefaults()];
 
         /// <summary>
+        /// When true, <see cref="VisibleColumns"/> stay originals-only and <see cref="ProjectedColumns"/>
+        /// follows <see cref="AbSide"/>.
+        /// </summary>
+        [ObservableProperty]
+        private bool _isAbModeEnabled;
+
+        /// <summary>
+        /// Toolbar A/B side: <see cref="RenameListPrefs.AbSideOriginal"/> or
+        /// <see cref="RenameListPrefs.AbSidePreview"/>.
+        /// </summary>
+        [ObservableProperty]
+        private string _abSide = RenameListPrefs.AbSidePreview;
+
+        /// <summary>
         /// Gets visible grid columns in left-to-right order.
+        /// <para>
+        /// While A/B Mode is on, this list is originals-only (persisted layout). Use
+        /// <see cref="ProjectedColumns"/> for on-screen / export column order.
+        /// </para>
         /// </summary>
         public IReadOnlyList<RenameListVisibleColumn> VisibleColumns => _visibleColumns;
+
+        /// <summary>
+        /// Gets the columns the grid / export should show for the current A/B Mode and side.
+        /// <para>
+        /// A/B off: same as <see cref="VisibleColumns"/>. Original side: originals only. Preview side:
+        /// each original followed by a derived preview companion when the field supports preview
+        /// (catalog default width; not persisted).
+        /// </para>
+        /// </summary>
+        public IReadOnlyList<RenameListVisibleColumn> ProjectedColumns
+        {
+            get
+            {
+                if (!IsAbModeEnabled)
+                {
+                    return _visibleColumns;
+                }
+
+                if (string.Equals(AbSide, RenameListPrefs.AbSideOriginal, StringComparison.Ordinal))
+                {
+                    return _visibleColumns;
+                }
+
+                return _DerivePreviewSideColumns(_visibleColumns);
+            }
+        }
 
         /// <summary>
         /// Raised when the view should open the unified field shuttle dialog.
@@ -28,6 +74,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <para>
         /// Merges at the end with <see cref="RenameListVisibleColumn.UseCatalogDefaultWidth"/>.
         /// No-op when every relevant key is already visible. Hydrates metadata like field-shuttle apply.
+        /// While A/B Mode is on, normalizes the merged list to originals-only at this call site.
         /// </para>
         /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanApplyRelevantColumns))]
@@ -38,7 +85,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var relevantKeys = CollectRelevantFieldKeys();
+            var relevantKeys = _RelevantKeysForColumnApply();
             var keyToIsVisible = _visibleColumns.Select(column => column.Key).ToHashSet();
             var merged = _visibleColumns.ToList();
             if (!_AppendMissingRelevantColumns(merged, relevantKeys, keyToIsVisible))
@@ -46,7 +93,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            await _ApplyVisibleColumnsWithHydrateAsync(merged).ConfigureAwait(true);
+            await _ApplyVisibleColumnsWithHydrateAsync(_NormalizeColumnsIfAbMode(merged)).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -55,6 +102,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <remarks>
         /// <para>
         /// When the chain maps to nothing, applies defaults only. Hydrates metadata like field-shuttle apply.
+        /// While A/B Mode is on, normalizes to originals-only at this call site (defaults include a preview key).
         /// </para>
         /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanApplyRelevantColumns))]
@@ -65,12 +113,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var relevantKeys = CollectRelevantFieldKeys();
+            var relevantKeys = _RelevantKeysForColumnApply();
             var columns = RenameListVisibleColumn.CreateDefaults().ToList();
             var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
             _AppendMissingRelevantColumns(columns, relevantKeys, keyToIsPresent);
 
-            await _ApplyVisibleColumnsWithHydrateAsync(columns).ConfigureAwait(true);
+            await _ApplyVisibleColumnsWithHydrateAsync(_NormalizeColumnsIfAbMode(columns)).ConfigureAwait(true);
         }
 
         /// <summary>
@@ -109,14 +157,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 }
             }
 
-            _visibleColumns = [.. columns];
-            OnPropertyChanged(nameof(VisibleColumns));
+            var toApply = _NormalizeColumnsIfAbMode(columns);
+            _visibleColumns = [.. toApply];
+            _NotifyVisibleAndProjectedColumnsChanged();
         }
 
         /// <summary>
         /// Reorders visible columns to match a new left-to-right key sequence.
         /// </summary>
-        /// <param name="orderedKeys">Field keys in grid order; must match the current visible set.</param>
+        /// <param name="orderedKeys">
+        /// Field keys in grid order. When A/B Preview side shows derived companions, pass the projected
+        /// key sequence; preview keys are mapped to stored originals before reorder.
+        /// </param>
         /// <exception cref="ArgumentNullException"><paramref name="orderedKeys"/> is null.</exception>
         /// <exception cref="ArgumentException">
         /// <paramref name="orderedKeys"/> is empty, duplicates a key, or does not match the current visible columns.
@@ -129,9 +181,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 throw new ArgumentException("At least one visible column is required.", nameof(orderedKeys));
             }
 
-            var uniqueKeyCount = orderedKeys.ToHashSet().Count;
+            var keysToApply = _MapReorderKeysToStoredOriginals(orderedKeys);
+
+            var uniqueKeyCount = keysToApply.ToHashSet().Count;
             var hasWrongCountOrDuplicates =
-                orderedKeys.Count != _visibleColumns.Count || uniqueKeyCount != orderedKeys.Count;
+                keysToApply.Count != _visibleColumns.Count || uniqueKeyCount != keysToApply.Count;
             if (hasWrongCountOrDuplicates)
             {
                 throw new ArgumentException(
@@ -141,7 +195,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var keyToColumn = _visibleColumns.ToDictionary(column => column.Key);
-            if (orderedKeys.Any(key => !keyToColumn.ContainsKey(key)))
+            if (keysToApply.Any(key => !keyToColumn.ContainsKey(key)))
             {
                 throw new ArgumentException(
                     "Reordered keys must match the currently visible columns.",
@@ -149,13 +203,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 );
             }
 
-            if (orderedKeys.SequenceEqual(_visibleColumns.Select(column => column.Key)))
+            if (keysToApply.SequenceEqual(_visibleColumns.Select(column => column.Key)))
             {
                 return;
             }
 
-            _visibleColumns = [.. orderedKeys.Select(key => keyToColumn[key])];
-            OnPropertyChanged(nameof(VisibleColumns));
+            _visibleColumns = [.. keysToApply.Select(key => keyToColumn[key])];
+            _NotifyVisibleAndProjectedColumnsChanged();
         }
 
         /// <summary>
@@ -271,8 +325,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             if (columns is null)
             {
-                _visibleColumns = [.. RenameListVisibleColumn.CreateDefaults()];
-                OnPropertyChanged(nameof(VisibleColumns));
+                _visibleColumns = [.. _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())];
+                _NotifyVisibleAndProjectedColumnsChanged();
                 return;
             }
 
@@ -290,8 +344,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             if (validColumns.Count == 0)
             {
-                _visibleColumns = [.. RenameListVisibleColumn.CreateDefaults()];
-                OnPropertyChanged(nameof(VisibleColumns));
+                _visibleColumns = [.. _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())];
+                _NotifyVisibleAndProjectedColumnsChanged();
                 return;
             }
 
@@ -341,7 +395,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="key">Field key for the resized column.</param>
         /// <param name="width">New width in pixels.</param>
         /// <remarks>
-        /// <para>Does not raise <see cref="VisibleColumns"/> change notifications to avoid rebuilding columns mid-resize.</para>
+        /// <para>
+        /// Does not raise <see cref="VisibleColumns"/> change notifications to avoid rebuilding columns
+        /// mid-resize. No-op when <paramref name="key"/> is not in the persisted visible list (e.g. derived
+        /// Preview-side companions while A/B Mode is on).
+        /// </para>
         /// </remarks>
         internal void UpdateVisibleColumnWidth(RenameListFieldKey key, int width)
         {
@@ -360,6 +418,138 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var updated = _visibleColumns.ToList();
             updated[index] = column with { Width = width };
             _visibleColumns = updated;
+        }
+
+        partial void OnIsAbModeEnabledChanged(bool value)
+        {
+            if (value)
+            {
+                _NormalizeVisibleColumnsForAbMode();
+            }
+
+            OnPropertyChanged(nameof(ProjectedColumns));
+        }
+
+        partial void OnAbSideChanged(string value)
+        {
+            var normalized = RenameListPrefs.NormalizeAbSide(value);
+            if (!string.Equals(normalized, value, StringComparison.Ordinal))
+            {
+                AbSide = normalized;
+                return;
+            }
+
+            OnPropertyChanged(nameof(ProjectedColumns));
+        }
+
+        /// <summary>
+        /// Rewrites persisted <see cref="_visibleColumns"/> to originals-only when A/B Mode turns on.
+        /// </summary>
+        private void _NormalizeVisibleColumnsForAbMode()
+        {
+            var normalized = RenameListVisibleColumn.NormalizeToOriginals(_visibleColumns);
+            if (normalized.SequenceEqual(_visibleColumns))
+            {
+                return;
+            }
+
+            _visibleColumns = [.. normalized];
+            OnPropertyChanged(nameof(VisibleColumns));
+        }
+
+        /// <summary>
+        /// Returns <paramref name="columns"/> unchanged when A/B Mode is off; otherwise originals-only.
+        /// </summary>
+        private IReadOnlyList<RenameListVisibleColumn> _NormalizeColumnsIfAbMode(
+            IReadOnlyList<RenameListVisibleColumn> columns
+        )
+        {
+            if (!IsAbModeEnabled)
+            {
+                return columns;
+            }
+
+            return RenameListVisibleColumn.NormalizeToOriginals(columns);
+        }
+
+        /// <summary>
+        /// Chain-relevant keys for Add/Replace; originals-only when A/B Mode is on so preview companions
+        /// are not treated as missing columns.
+        /// </summary>
+        private IReadOnlyList<RenameListFieldKey> _RelevantKeysForColumnApply()
+        {
+            var relevantKeys = CollectRelevantFieldKeys();
+            if (!IsAbModeEnabled)
+            {
+                return relevantKeys;
+            }
+
+            return _ToOriginalKeysFirstSeen(relevantKeys);
+        }
+
+        /// <summary>
+        /// Maps a Preview-side projected key sequence to the stored originals-only order (first-seen).
+        /// </summary>
+        private IReadOnlyList<RenameListFieldKey> _MapReorderKeysToStoredOriginals(
+            IReadOnlyList<RenameListFieldKey> orderedKeys
+        )
+        {
+            var isPreviewSideProjection =
+                IsAbModeEnabled && string.Equals(AbSide, RenameListPrefs.AbSidePreview, StringComparison.Ordinal);
+            if (!isPreviewSideProjection)
+            {
+                return orderedKeys;
+            }
+
+            return _ToOriginalKeysFirstSeen(orderedKeys);
+        }
+
+        /// <summary>
+        /// Maps each key to its original form and drops later duplicates, preserving first-seen order.
+        /// </summary>
+        private static List<RenameListFieldKey> _ToOriginalKeysFirstSeen(IReadOnlyList<RenameListFieldKey> keys)
+        {
+            var mappedKeys = new List<RenameListFieldKey>();
+            var keyToIsSeen = new HashSet<RenameListFieldKey>();
+            foreach (var key in keys)
+            {
+                var originalKey = key.IsPreview ? RenameListFieldKey.Original(key.GroupId, key.PropertyKey) : key;
+                if (!keyToIsSeen.Add(originalKey))
+                {
+                    continue;
+                }
+
+                mappedKeys.Add(originalKey);
+            }
+
+            return mappedKeys;
+        }
+
+        /// <summary>
+        /// Builds Preview-side projection: each original followed by a catalog-default-width preview companion
+        /// when the field supports preview.
+        /// </summary>
+        private static List<RenameListVisibleColumn> _DerivePreviewSideColumns(List<RenameListVisibleColumn> originals)
+        {
+            var projected = new List<RenameListVisibleColumn>(capacity: originals.Count * 2);
+            foreach (var column in originals)
+            {
+                projected.Add(column);
+                if (!RenameListFieldCatalog.TryGetField(column.Key, out var field) || !field.SupportsPreview)
+                {
+                    continue;
+                }
+
+                projected.Add(new RenameListVisibleColumn(field.PreviewKey));
+            }
+
+            return projected;
+        }
+
+        private void _NotifyVisibleAndProjectedColumnsChanged()
+        {
+            OnPropertyChanged(nameof(VisibleColumns));
+            OnPropertyChanged(nameof(ProjectedColumns));
         }
     }
 

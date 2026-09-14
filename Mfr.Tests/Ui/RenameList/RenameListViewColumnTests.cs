@@ -247,13 +247,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             _RaiseHeaderContextMenu(originalHeader);
             Assert.Equal(
-                [
-                    "(Parent Directory)",
-                    "Hide Field",
-                    "Select Fields...",
-                    "Edit as Name List",
-                    "Export",
-                ],
+                ["(Parent Directory)", "Hide Field", "Select Fields...", "Edit as Name List", "Export"],
                 _MenuHeaders(originalHeader.ContextMenu)
             );
             Assert.Equal(

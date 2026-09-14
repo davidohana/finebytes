@@ -188,12 +188,10 @@ namespace Mfr.App.Ui.Resources
         public const string RemoveAllFilters = "Clear Applied Filters";
 
         /// <summary>Applied Filters move-up shuttle tip.</summary>
-        public const string MoveFilterUp =
-            "Move selected filter up in Applied Filters (Ctrl+Up) — applies sooner";
+        public const string MoveFilterUp = "Move selected filter up in Applied Filters (Ctrl+Up) — applies sooner";
 
         /// <summary>Applied Filters move-down shuttle tip.</summary>
-        public const string MoveFilterDown =
-            "Move selected filter down in Applied Filters (Ctrl+Down) — applies later";
+        public const string MoveFilterDown = "Move selected filter down in Applied Filters (Ctrl+Down) — applies later";
 
         /// <summary>Applied Filters Filter Options shuttle tip.</summary>
         public const string FilterOptions =

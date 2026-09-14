@@ -173,6 +173,44 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("previewEnabled")]
         public bool PreviewEnabled { get; set; } = true;
+
+        /// <summary>
+        /// When true, visible columns are originals-only and the toolbar Original|Preview side control is active.
+        /// </summary>
+        [JsonPropertyName("abModeEnabled")]
+        public bool AbModeEnabled { get; set; }
+
+        /// <summary>
+        /// Toolbar A/B side while mode is on: <see cref="AbSideOriginal"/> or <see cref="AbSidePreview"/>.
+        /// <para>Invalid or missing values soft-load to <see cref="AbSidePreview"/> via <see cref="NormalizeAbSide"/>.</para>
+        /// </summary>
+        [JsonPropertyName("abSide")]
+        public string AbSide { get; set; } = AbSidePreview;
+
+        /// <summary>
+        /// Persisted <see cref="AbSide"/> value for the Original toolbar side.
+        /// </summary>
+        public const string AbSideOriginal = "original";
+
+        /// <summary>
+        /// Persisted <see cref="AbSide"/> value for the Preview toolbar side (default).
+        /// </summary>
+        public const string AbSidePreview = "preview";
+
+        /// <summary>
+        /// Maps a persisted A/B side string to a known value.
+        /// </summary>
+        /// <param name="abSide">Raw side from prefs, or <see langword="null"/>.</param>
+        /// <returns><see cref="AbSideOriginal"/> or <see cref="AbSidePreview"/> (default).</returns>
+        public static string NormalizeAbSide(string? abSide)
+        {
+            if (string.Equals(abSide, AbSideOriginal, StringComparison.Ordinal))
+            {
+                return AbSideOriginal;
+            }
+
+            return AbSidePreview;
+        }
     }
 
     /// <summary>

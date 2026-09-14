@@ -61,13 +61,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var section = new RenameListPrefs();
             UseFixedWidthFont = section.UseFixedWidthFont;
             IsAutoPreview = section.PreviewEnabled;
+            IsAbModeEnabled = section.AbModeEnabled;
+            AbSide = RenameListPrefs.NormalizeAbSide(section.AbSide);
         }
 
         /// <summary>
         /// Restores sort, columns, and display prefs from a session section.
         /// <para>
         /// Add policy (<see cref="RenameListPrefs.AddMode"/> / <see cref="RenameListPrefs.AddFolderContents"/>)
-        /// is Options-owned on <see cref="ConfigStore"/> — not applied here.
+        /// is Options-owned on <see cref="ConfigStore"/> — not applied here. A/B Mode is applied before
+        /// columns so leftover preview keys normalize to originals when mode is on.
         /// </para>
         /// </summary>
         /// <param name="renameList">
@@ -76,6 +79,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         internal void ApplySessionSection(RenameListPrefs? renameList)
         {
             var section = renameList ?? new RenameListPrefs();
+            IsAbModeEnabled = section.AbModeEnabled;
+            AbSide = RenameListPrefs.NormalizeAbSide(section.AbSide);
             ApplySession(renameList?.SortFields);
             ApplyVisibleColumnSpecs(renameList?.VisibleColumns);
             UseFixedWidthFont = section.UseFixedWidthFont;
@@ -86,6 +91,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Captures sort, columns, and display prefs for session save.
         /// <para>
         /// Omits Options-owned add policy; close-save merges those from <see cref="ConfigStore.RenameList"/>.
+        /// When A/B Mode is on, <see cref="RenameListPrefs.VisibleColumns"/> are originals-only.
         /// </para>
         /// </summary>
         /// <returns>Rename List session section matching the current view model.</returns>
@@ -97,6 +103,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 VisibleColumns = [.. CaptureVisibleColumnSpecs()],
                 UseFixedWidthFont = UseFixedWidthFont,
                 PreviewEnabled = IsAutoPreview,
+                AbModeEnabled = IsAbModeEnabled,
+                AbSide = RenameListPrefs.NormalizeAbSide(AbSide),
             };
         }
 

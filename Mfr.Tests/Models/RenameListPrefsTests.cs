@@ -85,5 +85,56 @@ namespace Mfr.Tests.Models
                 ConfigStoreTestReset.LoadEmpty();
             }
         }
+
+        [Fact]
+        public void Ab_mode_prefs_round_trip_defaults_and_values()
+        {
+            var path = Path.Combine(Path.GetTempPath(), "mfr-session-ab-" + Guid.NewGuid() + ".json");
+            try
+            {
+                ConfigStoreTestReset.LoadEmpty();
+                Assert.False(new RenameListPrefs().AbModeEnabled);
+                Assert.Equal(RenameListPrefs.AbSidePreview, new RenameListPrefs().AbSide);
+
+                ConfigStore.RenameList = new RenameListPrefs
+                {
+                    AbModeEnabled = true,
+                    AbSide = RenameListPrefs.AbSideOriginal,
+                };
+                ConfigStore.Save(path);
+
+                ConfigStore.Load(path);
+                Assert.True(ConfigStore.RenameList?.AbModeEnabled);
+                Assert.Equal(RenameListPrefs.AbSideOriginal, ConfigStore.RenameList?.AbSide);
+
+                File.WriteAllText(
+                    path, /*lang=json,strict*/
+                    """{"renameList":{}}"""
+                );
+                ConfigStore.Load(path);
+                Assert.False(ConfigStore.RenameList?.AbModeEnabled);
+                Assert.Equal(RenameListPrefs.AbSidePreview, ConfigStore.RenameList?.AbSide);
+            }
+            finally
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                ConfigStoreTestReset.LoadEmpty();
+            }
+        }
+
+        [Fact]
+        public void NormalizeAbSide_maps_invalid_to_preview()
+        {
+            Assert.Equal(RenameListPrefs.AbSideOriginal, RenameListPrefs.NormalizeAbSide("original"));
+            Assert.Equal(RenameListPrefs.AbSidePreview, RenameListPrefs.NormalizeAbSide("preview"));
+            Assert.Equal(RenameListPrefs.AbSidePreview, RenameListPrefs.NormalizeAbSide(null));
+            Assert.Equal(RenameListPrefs.AbSidePreview, RenameListPrefs.NormalizeAbSide(""));
+            Assert.Equal(RenameListPrefs.AbSidePreview, RenameListPrefs.NormalizeAbSide("bogus"));
+            Assert.Equal(RenameListPrefs.AbSidePreview, RenameListPrefs.NormalizeAbSide("Original"));
+        }
     }
 }
