@@ -35,5 +35,14 @@ namespace Mfr.Models.RenameList
         {
             return new RenameListFieldKey(groupId, propertyKey, IsPreview: true);
         }
+
+        /// <summary>
+        /// Returns this key when it is already original; otherwise the matching original key.
+        /// </summary>
+        /// <returns>An original (non-preview) field key for the same group and property.</returns>
+        public RenameListFieldKey AsOriginal()
+        {
+            return IsPreview ? Original(GroupId, PropertyKey) : this;
+        }
     }
 }

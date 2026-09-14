@@ -91,6 +91,41 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void AsOriginal_returns_self_for_original_and_maps_preview()
+        {
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+
+            Assert.Equal(nameOriginal, nameOriginal.AsOriginal());
+            Assert.Equal(nameOriginal, namePreview.AsOriginal());
+            Assert.False(namePreview.AsOriginal().IsPreview);
+        }
+
+        [Fact]
+        public void ToOriginalKeysFirstSeen_maps_and_dedupes_preserving_order()
+        {
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var folderPreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Folder
+            );
+            var folderOriginal = RenameListFieldKey.Original(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Folder
+            );
+
+            var mapped = RenameListVisibleColumn.ToOriginalKeysFirstSeen([
+                namePreview,
+                folderPreview,
+                nameOriginal,
+                folderOriginal,
+            ]);
+
+            Assert.Equal([nameOriginal, folderOriginal], mapped);
+        }
+
+        [Fact]
         public void ProjectedColumns_off_matches_visible_including_preview_keys()
         {
             var renameListViewModel = _context.CreateRenameListViewModel();

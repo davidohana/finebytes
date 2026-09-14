@@ -43,9 +43,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var keyToPreferredWidth = new Dictionary<RenameListFieldKey, int>();
             foreach (var column in columns)
             {
-                var originalKey = column.Key.IsPreview
-                    ? RenameListFieldKey.Original(column.Key.GroupId, column.Key.PropertyKey)
-                    : column.Key;
+                var originalKey = column.Key.AsOriginal();
                 if (column.Key.IsPreview)
                 {
                     keyToPreferredWidth.TryAdd(originalKey, column.Width);
@@ -59,9 +57,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var keyToIsSeen = new HashSet<RenameListFieldKey>();
             foreach (var column in columns)
             {
-                var originalKey = column.Key.IsPreview
-                    ? RenameListFieldKey.Original(column.Key.GroupId, column.Key.PropertyKey)
-                    : column.Key;
+                var originalKey = column.Key.AsOriginal();
                 if (!keyToIsSeen.Add(originalKey))
                 {
                     continue;
@@ -74,6 +70,32 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return normalized;
+        }
+
+        /// <summary>
+        /// Maps each key to its original form and drops later duplicates, preserving first-seen order.
+        /// </summary>
+        /// <param name="keys">Keys in left-to-right order (may include preview keys).</param>
+        /// <returns>Originals-only keys, first-seen order.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="keys"/> is null.</exception>
+        public static IReadOnlyList<RenameListFieldKey> ToOriginalKeysFirstSeen(IReadOnlyList<RenameListFieldKey> keys)
+        {
+            ArgumentNullException.ThrowIfNull(keys);
+
+            var mappedKeys = new List<RenameListFieldKey>();
+            var keyToIsSeen = new HashSet<RenameListFieldKey>();
+            foreach (var key in keys)
+            {
+                var originalKey = key.AsOriginal();
+                if (!keyToIsSeen.Add(originalKey))
+                {
+                    continue;
+                }
+
+                mappedKeys.Add(originalKey);
+            }
+
+            return mappedKeys;
         }
 
         /// <summary>

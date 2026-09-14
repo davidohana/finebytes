@@ -128,10 +128,7 @@ namespace Mfr.App.Ui.Views.RenameList
             menu.Items.Add(new Separator());
 
             // Hide Field for persisted layout keys (After-side preview keys map to the stored original).
-            var hideKey =
-                viewModel.IsAbModeEnabled && fieldKey.IsPreview
-                    ? RenameListFieldKey.Original(fieldKey.GroupId, fieldKey.PropertyKey)
-                    : fieldKey;
+            var hideKey = viewModel.IsAbModeEnabled ? fieldKey.AsOriginal() : fieldKey;
             var isPersistedColumn = viewModel.VisibleColumns.Any(column => column.Key == hideKey);
             if (isPersistedColumn)
             {

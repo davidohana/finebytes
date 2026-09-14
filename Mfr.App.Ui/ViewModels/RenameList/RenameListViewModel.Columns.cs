@@ -584,7 +584,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return relevantKeys;
             }
 
-            return _ToOriginalKeysFirstSeen(relevantKeys);
+            return RenameListVisibleColumn.ToOriginalKeysFirstSeen(relevantKeys);
         }
 
         /// <summary>
@@ -601,28 +601,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return orderedKeys;
             }
 
-            return _ToOriginalKeysFirstSeen(orderedKeys);
-        }
-
-        /// <summary>
-        /// Maps each key to its original form and drops later duplicates, preserving first-seen order.
-        /// </summary>
-        private static List<RenameListFieldKey> _ToOriginalKeysFirstSeen(IReadOnlyList<RenameListFieldKey> keys)
-        {
-            var mappedKeys = new List<RenameListFieldKey>();
-            var keyToIsSeen = new HashSet<RenameListFieldKey>();
-            foreach (var key in keys)
-            {
-                var originalKey = key.IsPreview ? RenameListFieldKey.Original(key.GroupId, key.PropertyKey) : key;
-                if (!keyToIsSeen.Add(originalKey))
-                {
-                    continue;
-                }
-
-                mappedKeys.Add(originalKey);
-            }
-
-            return mappedKeys;
+            return RenameListVisibleColumn.ToOriginalKeysFirstSeen(orderedKeys);
         }
 
         /// <summary>
@@ -630,12 +609,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         private RenameListFieldKey _StoredColumnKey(RenameListFieldKey key)
         {
-            if (!IsAbModeEnabled || !key.IsPreview)
-            {
-                return key;
-            }
-
-            return RenameListFieldKey.Original(key.GroupId, key.PropertyKey);
+            return IsAbModeEnabled ? key.AsOriginal() : key;
         }
 
         /// <summary>

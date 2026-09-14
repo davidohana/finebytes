@@ -684,13 +684,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         private List<RenameListVisibleColumn> _ColumnsForRelevantKeys(IReadOnlyList<RenameListFieldKey> keys)
         {
-            var columns = keys.Select(key => new RenameListVisibleColumn(key)).ToList();
-            if (!IsAbModeEnabled || columns.Count == 0)
-            {
-                return columns;
-            }
-
-            return [.. RenameListVisibleColumn.NormalizeToOriginals(columns)];
+            var keysToAdd = IsAbModeEnabled ? RenameListVisibleColumn.ToOriginalKeysFirstSeen(keys) : keys;
+            return [.. keysToAdd.Select(key => new RenameListVisibleColumn(key))];
         }
 
         private void _AddSortKeys(IEnumerable<RenameListFieldKey> fieldKeys)
