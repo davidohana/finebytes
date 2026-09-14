@@ -22,6 +22,7 @@
   </Style>
   <Style Selector="RadioButton.compact-radio /template/ ContentPresenter#PART_ContentPresenter">
     <Setter Property="RecognizesAccessKey" Value="False" />
+    <Setter Property="VerticalAlignment" Value="Center" />
   </Style>
 
   <Style Selector="CheckBox.compact-check">

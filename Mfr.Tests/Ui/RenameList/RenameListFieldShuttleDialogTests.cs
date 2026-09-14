@@ -320,6 +320,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(dialogVm.IsAbModeEnabled);
             Assert.False(previewSubtab.IsEffectivelyVisible);
             Assert.True(abModeOriginalLabel.IsVisible);
+            Assert.Equal("Fields:", abModeOriginalLabel.Text);
             Assert.False(dialogVm.IsPreviewColumnsTab);
             Assert.True(dialogVm.IsOriginalColumnsTab);
             Assert.Single(dialogVm.ResultColumns);

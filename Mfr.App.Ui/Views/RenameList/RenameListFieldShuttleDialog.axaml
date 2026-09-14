@@ -10,15 +10,15 @@
   xmlns:resources="using:Mfr.App.Ui.Resources"
   mc:Ignorable="d"
   d:DesignWidth="720"
-  d:DesignHeight="440"
+  d:DesignHeight="490"
   x:Class="Mfr.App.Ui.Views.RenameList.RenameListFieldShuttleDialog"
   x:DataType="vm:RenameListFieldShuttleDialogViewModel"
   Title="Rename List Fields"
   Icon="/Assets/mfr.ico"
   Width="720"
-  Height="440"
+  Height="490"
   MinWidth="640"
-  MinHeight="400"
+  MinHeight="450"
   WindowStartupLocation="CenterOwner"
   CanResize="True"
   ShowInTaskbar="False"
@@ -35,9 +35,8 @@
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
       <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
-      <Setter Property="Margin" Value="0,0,0,6" />
-      <Setter Property="MinHeight" Value="22" />
-      <Setter Property="VerticalAlignment" Value="Bottom" />
+      <Setter Property="Margin" Value="0" />
+      <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
     <Style Selector="TextBlock.field-shuttle-hint">
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
@@ -56,6 +55,9 @@
       <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
       <Setter Property="Margin" Value="0,0,12,0" />
+      <Setter Property="MinHeight" Value="22" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="ListBox.field-shuttle-list">
       <Setter Property="MinHeight" Value="180" />
@@ -156,49 +158,49 @@
     </Style>
   </Window.Styles>
   <DockPanel Margin="12">
-    <Grid DockPanel.Dock="Bottom" Margin="0,14,0,0" ColumnDefinitions="*,Auto,*">
-      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
-        <Button
-          Classes="field-shuttle-footer"
-          Content="OK"
-          IsDefault="True"
-          IsEnabled="{Binding CanConfirm}"
-          Click="_OnOkClick"
-        />
-        <Button Classes="field-shuttle-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
-      </StackPanel>
-    </Grid>
+    <StackPanel
+      DockPanel.Dock="Bottom"
+      Orientation="Horizontal"
+      Spacing="10"
+      Margin="0,14,0,0"
+      HorizontalAlignment="Right"
+    >
+      <Button
+        Classes="field-shuttle-footer"
+        Content="OK"
+        IsDefault="True"
+        IsEnabled="{Binding CanConfirm}"
+        Click="_OnOkClick"
+      />
+      <Button Classes="field-shuttle-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
+    </StackPanel>
 
     <TabControl Classes="field-shuttle-tabs" SelectedIndex="{Binding SelectedTabIndex}">
       <TabItem Header="Columns">
         <Border Classes="field-shuttle-panel" Margin="0,8,0,0">
-          <Grid RowDefinitions="Auto,Auto,*,Auto" RowSpacing="10">
-            <TextBlock
-              Grid.Row="0"
-              Classes="field-shuttle-hint"
-              Margin="0"
-              Text="Select which fields to show as Rename List columns."
-            />
-            <StackPanel Grid.Row="1" Spacing="4">
-              <controls:CompactCheckBox
-                x:Name="AbModeCheckBox"
-                Content="Before/After Mode"
-                IsChecked="{Binding IsAbModeEnabled}"
-              />
+          <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+            <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
               <TextBlock
+                Grid.Column="0"
                 Classes="field-shuttle-hint"
                 Margin="0"
-                IsVisible="{Binding IsAbModeEnabled}"
-                Text="Original fields only. Use the Rename List Before/After control to switch views."
+                VerticalAlignment="Center"
+                Text="Select which fields to show as Rename List columns."
               />
-            </StackPanel>
-            <Grid Grid.Row="2" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="Auto,*" RowSpacing="4">
+              <controls:CompactCheckBox
+                Grid.Column="1"
+                x:Name="AbModeCheckBox"
+                Content="Before/After Mode"
+                VerticalAlignment="Center"
+                IsChecked="{Binding IsAbModeEnabled}"
+                ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterMode}"
+              />
+            </Grid>
+            <Grid Grid.Row="1" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="Auto,*" RowSpacing="4">
               <TextBlock
                 Grid.Row="0"
                 Grid.Column="0"
                 Classes="field-shuttle-label"
-                Margin="0"
-                VerticalAlignment="Center"
                 Text="Groups:"
               />
               <!-- Before/After on: plain label (no lone radio). Off: Original|Preview subtabs. -->
@@ -207,9 +209,7 @@
                 Grid.Row="0"
                 Grid.Column="1"
                 Classes="field-shuttle-label"
-                Margin="0"
-                VerticalAlignment="Center"
-                Text="Original Fields:"
+                Text="Fields:"
                 IsVisible="{Binding IsAbModeEnabled}"
               />
               <StackPanel
@@ -239,8 +239,6 @@
                 Grid.Row="0"
                 Grid.Column="3"
                 Classes="field-shuttle-label"
-                Margin="0"
-                VerticalAlignment="Center"
                 Text="Selected fields:"
               />
               <ListBox
@@ -375,7 +373,13 @@
                 </ListBox.ItemTemplate>
               </ListBox>
             </Grid>
-            <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8" Margin="0,10,0,0" VerticalAlignment="Center">
+            <StackPanel
+              Grid.Row="2"
+              Orientation="Horizontal"
+              Spacing="8"
+              HorizontalAlignment="Right"
+              VerticalAlignment="Center"
+            >
               <TextBlock
                 Classes="field-shuttle-label"
                 Margin="0"
@@ -407,7 +411,7 @@
         <Border Classes="field-shuttle-panel" Margin="0,8,0,0">
           <Grid RowDefinitions="Auto,*">
             <TextBlock Grid.Row="0" Classes="field-shuttle-hint" Text="Select fields to sort Rename List by." />
-            <Grid Grid.Row="1" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="Auto,*">
+            <Grid Grid.Row="1" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="Auto,*" RowSpacing="4">
               <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-shuttle-label" Text="Groups:" />
               <TextBlock Grid.Row="0" Grid.Column="3" Classes="field-shuttle-label" Text="Selected fields:" />
               <ListBox

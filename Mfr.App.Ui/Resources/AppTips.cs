@@ -139,7 +139,7 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Rename List Before/After Mode tip (shuttle checkbox and Rename List menu).</summary>
         public const string BeforeAfterMode =
-            "Before/After mode — originals-only columns; switch Before/After for original or preview values";
+            "Use a Before/After toggle for original vs preview values instead of side-by-side columns";
 
         /// <summary>Rename List Before/After side tip (toolbar toggle and menu radios).</summary>
         public const string BeforeAfterSide =
