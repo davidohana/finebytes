@@ -27,7 +27,7 @@
             >
               <Button
                 Name="PART_EditButton"
-                Classes="filter-editor-button format-editor-tool"
+                Classes="tool-chrome filter-editor-button format-editor-tool"
                 DockPanel.Dock="Top"
                 HorizontalAlignment="Center"
                 ToolTip.Tip="Edit formatting parameter under caret in the active format field"
@@ -37,7 +37,7 @@
               </Button>
               <Button
                 Name="PART_CollapseButton"
-                Classes="format-token-collapse-grip"
+                Classes="tool-chrome format-token-collapse-grip"
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 ToolTip.Tip="{TemplateBinding CollapseToolTip}"

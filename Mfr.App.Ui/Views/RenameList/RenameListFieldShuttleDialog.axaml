@@ -98,29 +98,10 @@
     <Style Selector="Button.field-shuttle-action:disabled">
       <Setter Property="Opacity" Value="0.4" />
     </Style>
-    <Style Selector="Button.field-shuttle-footer">
+    <Style Selector="Button.message-dialog-footer">
       <Setter Property="MinHeight" Value="28" />
       <Setter Property="MinWidth" Value="88" />
       <Setter Property="Padding" Value="12,4" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="3" />
-      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
-      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
-    <Style Selector="Button.field-shuttle-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
-    </Style>
-    <Style Selector="Button.field-shuttle-footer[IsDefault=True]">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
-    </Style>
-    <Style Selector="Button.field-shuttle-footer:disabled">
-      <Setter Property="Opacity" Value="0.45" />
     </Style>
     <Style Selector="Border.field-shuttle-priority">
       <Setter Property="Background" Value="{DynamicResource AppChromeSortGlyphBackgroundBrush}" />
@@ -166,13 +147,13 @@
       HorizontalAlignment="Right"
     >
       <Button
-        Classes="field-shuttle-footer"
+        Classes="message-dialog-footer"
         Content="OK"
         IsDefault="True"
         IsEnabled="{Binding CanConfirm}"
         Click="_OnOkClick"
       />
-      <Button Classes="field-shuttle-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
+      <Button Classes="message-dialog-footer" Content="Cancel" IsCancel="True" Click="_OnCancelClick" />
     </StackPanel>
 
     <TabControl Classes="field-shuttle-tabs" SelectedIndex="{Binding SelectedTabIndex}">
@@ -387,7 +368,7 @@
                 Text="From applied filters:"
               />
               <Button
-                Classes="field-shuttle-footer"
+                Classes="message-dialog-footer"
                 MinWidth="72"
                 Content="Add"
                 ToolTip.Tip="{x:Static resources:AppTips.AddFieldsByAppliedFilters}"
@@ -395,7 +376,7 @@
                 Command="{Binding AddFieldsByAppliedFiltersCommand}"
               />
               <Button
-                Classes="field-shuttle-footer"
+                Classes="message-dialog-footer"
                 MinWidth="72"
                 Content="Replace"
                 ToolTip.Tip="{x:Static resources:AppTips.ReplaceFieldsByAppliedFilters}"

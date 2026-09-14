@@ -21,4 +21,7 @@
   <Style Selector="Button.message-dialog-footer:pointerover /template/ ContentPresenter#PART_ContentPresenter">
     <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
   </Style>
+  <Style Selector="Button.message-dialog-footer:disabled">
+    <Setter Property="Opacity" Value="0.45" />
+  </Style>
 </Styles>

@@ -38,30 +38,11 @@
       <Setter Property="MinHeight" Value="26" />
       <Setter Property="Padding" Value="10,4" />
       <Setter Property="Margin" Value="0,0,4,0" />
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="2" />
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
       <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
     <Style Selector="Button.applied-filter-toolbar:disabled">
       <Setter Property="Opacity" Value="0.55" />
-    </Style>
-    <Style Selector="Button.applied-filter-toolbar /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-    </Style>
-    <Style Selector="Button.applied-filter-toolbar:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-    </Style>
-    <Style Selector="Button.applied-filter-toolbar:pressed /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
     </Style>
     <!-- Flush split after Presets (MFR7 16×24 dropdown abutting the Presets button). -->
     <Style Selector="Button.applied-filter-toolbar-split">
@@ -179,7 +160,7 @@
         <Button
           Grid.Column="0"
           x:Name="PresetsButton"
-          Classes="applied-filter-toolbar"
+          Classes="tool-chrome applied-filter-toolbar"
           Margin="0"
           ToolTip.Tip="{x:Static resources:AppTips.Presets}"
         >
@@ -197,7 +178,7 @@
         <Button
           Grid.Column="1"
           x:Name="PresetsQuickPickButton"
-          Classes="applied-filter-toolbar applied-filter-toolbar-split"
+          Classes="tool-chrome applied-filter-toolbar applied-filter-toolbar-split"
           ToolTip.Tip="{x:Static resources:AppTips.PresetsQuickPick}"
         >
           <Path
@@ -213,7 +194,7 @@
         <Button
           Grid.Column="2"
           x:Name="SavePresetButton"
-          Classes="applied-filter-toolbar"
+          Classes="tool-chrome applied-filter-toolbar"
           ToolTip.Tip="{x:Static resources:AppTips.SavePreset}"
         >
           <StackPanel Orientation="Horizontal" Spacing="6">

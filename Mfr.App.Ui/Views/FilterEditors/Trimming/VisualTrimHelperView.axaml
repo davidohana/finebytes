@@ -17,7 +17,7 @@
       <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
         <Button
           x:Name="TrimHelperPreviousButton"
-          Classes="filter-editor-button format-editor-tool"
+          Classes="tool-chrome filter-editor-button format-editor-tool"
           Content="▲"
           Command="{Binding GoPreviousCommand}"
           IsEnabled="{Binding CanGoPrevious}"
@@ -34,7 +34,7 @@
         </Border>
         <Button
           x:Name="TrimHelperNextButton"
-          Classes="filter-editor-button format-editor-tool"
+          Classes="tool-chrome filter-editor-button format-editor-tool"
           Content="▼"
           Command="{Binding GoNextCommand}"
           IsEnabled="{Binding CanGoNext}"

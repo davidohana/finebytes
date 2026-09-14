@@ -43,7 +43,7 @@
           <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Top">
             <Button
               x:Name="PreviewPreviousButton"
-              Classes="filter-editor-button format-editor-tool"
+              Classes="tool-chrome filter-editor-button format-editor-tool"
               Content="▲"
               Command="{Binding GoPreviousCommand}"
               IsEnabled="{Binding CanGoPrevious}"
@@ -59,7 +59,7 @@
             </Border>
             <Button
               x:Name="PreviewNextButton"
-              Classes="filter-editor-button format-editor-tool"
+              Classes="tool-chrome filter-editor-button format-editor-tool"
               Content="▼"
               Command="{Binding GoNextCommand}"
               IsEnabled="{Binding CanGoNext}"

@@ -42,7 +42,7 @@
     >
       <Button
         x:Name="InsertButton"
-        Classes="filter-editor-button format-editor-tool"
+        Classes="tool-chrome filter-editor-button format-editor-tool"
         ToolTip.Tip="Insert formatting parameter"
         IsVisible="{Binding ShowInsertButton, ElementName=Root}"
       >
@@ -61,7 +61,7 @@
       </Button>
       <Button
         x:Name="EditButton"
-        Classes="filter-editor-button format-editor-tool"
+        Classes="tool-chrome filter-editor-button format-editor-tool"
         ToolTip.Tip="Edit formatting parameter under caret"
         Command="{Binding EditCommand}"
         IsVisible="{Binding ShowEditButton, ElementName=Root}"

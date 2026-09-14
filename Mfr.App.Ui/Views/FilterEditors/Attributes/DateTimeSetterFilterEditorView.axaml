@@ -51,7 +51,7 @@
           <Button
             Grid.Column="2"
             x:Name="CurrentButton"
-            Classes="filter-editor-button"
+            Classes="tool-chrome filter-editor-button"
             Content="Current"
             Command="{Binding SetCurrentCommand}"
           >

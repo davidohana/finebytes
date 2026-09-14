@@ -39,22 +39,10 @@
       <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="Margin" Value="0,0,12,0" />
     </Style>
-    <Style Selector="Button.import-sample-chrome">
+    <Style Selector="Button.message-dialog-footer">
       <Setter Property="MinHeight" Value="26" />
       <Setter Property="MinWidth" Value="88" />
       <Setter Property="Padding" Value="10,3" />
-      <Setter Property="Background" Value="Transparent" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="4" />
-      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
-      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
-      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
-    <Style Selector="Button.import-sample-chrome:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
     <Style Selector="Border.import-sample-list">
       <Setter Property="Background" Value="{DynamicResource AppChromeAltSurfaceBrush}" />
@@ -143,13 +131,13 @@
           <TextBlock Classes="import-sample-count" Text="{Binding SelectionSummary}" />
           <Button
             x:Name="SelectAllButton"
-            Classes="import-sample-chrome"
+            Classes="message-dialog-footer"
             Content="Select all"
             Click="_OnSelectAllClick"
           />
           <Button
             x:Name="SelectNoneButton"
-            Classes="import-sample-chrome"
+            Classes="message-dialog-footer"
             Content="Select none"
             Click="_OnSelectNoneClick"
           />

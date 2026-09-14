@@ -113,7 +113,32 @@
     <Style Selector=":is(GridSplitter):pointerover /template/ Rectangle#Hairline">
       <Setter Property="Fill" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
     </Style>
-    <!-- Shared icon tool-button chrome (pane rails, main toolbar, File List tools, dialogs). -->
+    <!-- Shared surface chrome (compose with layout classes such as tool-action / applied-filter-toolbar). -->
+    <Style Selector="Button.tool-chrome, ToggleButton.tool-chrome, Button.tool-action, ToggleButton.tool-action">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+      <Setter Property="BorderThickness" Value="1" />
+      <Setter Property="CornerRadius" Value="2" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="HorizontalContentAlignment" Value="Center" />
+      <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.tool-chrome /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-chrome /template/ ContentPresenter#PART_ContentPresenter, Button.tool-action /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
+    </Style>
+    <Style Selector="Button.tool-chrome:pointerover /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-chrome:pointerover /template/ ContentPresenter#PART_ContentPresenter, Button.tool-action:pointerover /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
+    </Style>
+    <Style Selector="Button.tool-chrome:pressed /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-chrome:pressed /template/ ContentPresenter#PART_ContentPresenter, Button.tool-action:pressed /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action:pressed /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-chrome:checked /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action:checked /template/ ContentPresenter#PART_ContentPresenter">
+      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
+      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
+    </Style>
+    <Style Selector="Button.tool-chrome:disabled, ToggleButton.tool-chrome:disabled, Button.tool-action:disabled, ToggleButton.tool-action:disabled">
+      <Setter Property="Opacity" Value="0.4" />
+    </Style>
+
+    <!-- Icon tool size (includes tool-chrome via selectors above). -->
     <Style Selector="Button.tool-action, ToggleButton.tool-action">
       <Setter Property="Width" Value="28" />
       <Setter Property="Height" Value="28" />
@@ -121,26 +146,6 @@
       <Setter Property="MinHeight" Value="28" />
       <Setter Property="Padding" Value="2" />
       <Setter Property="Margin" Value="1" />
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-      <Setter Property="BorderThickness" Value="1" />
-      <Setter Property="CornerRadius" Value="2" />
-      <Setter Property="HorizontalContentAlignment" Value="Center" />
-      <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
-    <Style Selector="Button.tool-action /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />
-    </Style>
-    <Style Selector="Button.tool-action:pointerover /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
-    </Style>
-    <Style Selector="Button.tool-action:pressed /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action:pressed /template/ ContentPresenter#PART_ContentPresenter, ToggleButton.tool-action:checked /template/ ContentPresenter#PART_ContentPresenter">
-      <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
-      <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
-    </Style>
-    <Style Selector="Button.tool-action:disabled, ToggleButton.tool-action:disabled">
-      <Setter Property="Opacity" Value="0.4" />
     </Style>
 
     <!-- Shared vertical action rail (Rename List, Applied Filters). -->
