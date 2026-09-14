@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-races
     content: "P2: Mask/exclude/sort/Dispose race hardening + stale-result ignore tests"
-    status: pending
+    status: completed
 ---
 
 # File List loading indicator plan

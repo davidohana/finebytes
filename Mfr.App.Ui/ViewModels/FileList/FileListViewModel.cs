@@ -82,6 +82,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private readonly List<FileListListedItem> _listedItems = [];
         private readonly List<FileListEntry> _selectedEntries = [];
         private bool _suppressSelectionSync;
+        private bool _suppressListingReload;
         private int _listingGeneration;
         private bool _isDisposed;
 
@@ -814,6 +815,12 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 IsSortAscending = true;
             }
 
+            // In-flight list is empty; the pending apply sorts with these settings.
+            if (IsListing)
+            {
+                return;
+            }
+
             FileListListingSort.Apply(_listedItems, SortMemberPath, IsSortAscending);
             _RebuildVisibleEntries(preserveSelection: true);
         }
@@ -894,16 +901,31 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         partial void OnMaskChanged(string value)
         {
+            if (_suppressListingReload)
+            {
+                return;
+            }
+
             _ReloadEntries(preserveSelection: true);
         }
 
         partial void OnExcludeMasksChanged(IReadOnlyList<string> value)
         {
+            if (_suppressListingReload)
+            {
+                return;
+            }
+
             _ReloadEntries(preserveSelection: true);
         }
 
         partial void OnExcludeMasksEnabledChanged(bool value)
         {
+            if (_suppressListingReload)
+            {
+                return;
+            }
+
             _ReloadEntries(preserveSelection: true);
         }
 
@@ -914,8 +936,18 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <param name="editorText">Masks as typed in the dialog (one per line).</param>
         public void ApplyExcludeMasks(bool enabled, string? editorText)
         {
-            ExcludeMasks = WildcardMask.NormalizeForStorage(editorText);
-            ExcludeMasksEnabled = enabled;
+            _suppressListingReload = true;
+            try
+            {
+                ExcludeMasks = WildcardMask.NormalizeForStorage(editorText);
+                ExcludeMasksEnabled = enabled;
+            }
+            finally
+            {
+                _suppressListingReload = false;
+            }
+
+            _ReloadEntries(preserveSelection: true);
         }
 
         /// <summary>
@@ -929,39 +961,56 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return;
             }
 
-            if (!string.IsNullOrEmpty(fileList.FileMask))
+            var needsReload = false;
+            _suppressListingReload = true;
+            try
             {
-                Mask = fileList.FileMask;
-            }
-
-            // Null means unset: keep the defaults. An empty list means the user cleared them.
-            if (fileList.ExcludeMasks is not null)
-            {
-                ExcludeMasks = [.. fileList.ExcludeMasks];
-            }
-
-            if (fileList.ExcludeMasksEnabled is { } excludeEnabled)
-            {
-                ExcludeMasksEnabled = excludeEnabled;
-            }
-
-            if (fileList.MaskSuggestions is { Count: > 0 })
-            {
-                MaskSuggestions.Clear();
-                foreach (var mask in fileList.MaskSuggestions)
+                if (!string.IsNullOrEmpty(fileList.FileMask))
                 {
-                    MaskSuggestions.Add(mask);
+                    Mask = fileList.FileMask;
+                    needsReload = true;
+                }
+
+                // Null means unset: keep the defaults. An empty list means the user cleared them.
+                if (fileList.ExcludeMasks is not null)
+                {
+                    ExcludeMasks = [.. fileList.ExcludeMasks];
+                    needsReload = true;
+                }
+
+                if (fileList.ExcludeMasksEnabled is { } excludeEnabled)
+                {
+                    ExcludeMasksEnabled = excludeEnabled;
+                    needsReload = true;
+                }
+
+                if (fileList.MaskSuggestions is { Count: > 0 })
+                {
+                    MaskSuggestions.Clear();
+                    foreach (var mask in fileList.MaskSuggestions)
+                    {
+                        MaskSuggestions.Add(mask);
+                    }
+                }
+
+                if (fileList.ViewMode is { } viewMode)
+                {
+                    SetViewMode(viewMode);
+                }
+
+                if (fileList.ThumbnailSize is { } thumbnailSize)
+                {
+                    SetThumbnailSize(thumbnailSize);
                 }
             }
-
-            if (fileList.ViewMode is { } viewMode)
+            finally
             {
-                SetViewMode(viewMode);
+                _suppressListingReload = false;
             }
 
-            if (fileList.ThumbnailSize is { } thumbnailSize)
+            if (needsReload)
             {
-                SetThumbnailSize(thumbnailSize);
+                _ReloadEntries(preserveSelection: true);
             }
         }
 
@@ -990,6 +1039,12 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         partial void OnViewModeChanged(FileListViewMode value)
         {
+            // In-flight list is empty; the pending apply rebuilds with the new view mode.
+            if (IsListing)
+            {
+                return;
+            }
+
             _RebuildVisibleEntries(preserveSelection: true);
         }
 
@@ -1256,6 +1311,10 @@ namespace Mfr.App.Ui.ViewModels.FileList
 
         /// <summary>
         /// Clears listing UI state and bumps generation so in-flight applies are ignored.
+        /// <para>
+        /// Does not cancel OS/SMB I/O for a superseded generation; that work may still finish in the
+        /// background and is discarded when <see cref="_ApplyListingResult"/> sees a stale generation.
+        /// </para>
         /// </summary>
         /// <param name="preserveSelection">Whether to keep selection paths for restore after rebuild.</param>
         /// <returns>Generation token for this reload.</returns>

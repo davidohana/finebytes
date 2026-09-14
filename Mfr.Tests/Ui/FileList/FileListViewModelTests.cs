@@ -1441,6 +1441,103 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
+        /// Verifies ApplyExcludeMasks triggers a single catalog list (not one per property).
+        /// </summary>
+        [Fact]
+        public void ApplyExcludeMasks_Lists_Once()
+        {
+            var dir = _CreateTree();
+            var listCount = 0;
+
+            FileListCatalogResult ListCounting(
+                string currentPath,
+                string includeMask,
+                bool excludeMasksEnabled,
+                IReadOnlyList<string> excludeMasks,
+                IEnumerable<string> pathHistory
+            )
+            {
+                Interlocked.Increment(ref listCount);
+                return FileListCatalog.List(currentPath, includeMask, excludeMasksEnabled, excludeMasks, pathHistory);
+            }
+
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                dir,
+                NullFileShellOpener.Instance,
+                clipboard: NullTextClipboard.Instance,
+                shellOperations: NullFileShellOperations.Instance,
+                fileClipboard: new NullFileClipboard(),
+                ownerHwnd: null,
+                listEntries: ListCounting
+            );
+            _viewModels.Add(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
+            var afterCreate = listCount;
+
+            viewModel.ApplyExcludeMasks(enabled: true, editorText: "*.txt\n*.bak");
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.Equal(afterCreate + 1, listCount);
+            Assert.DoesNotContain(
+                viewModel.Entries,
+                entry => entry.Name.EndsWith(".txt", StringComparison.OrdinalIgnoreCase)
+            );
+        }
+
+        /// <summary>
+        /// Verifies sorting while a listing is in flight applies when that listing completes.
+        /// </summary>
+        [Fact]
+        public void SortByColumn_While_Listing_Applies_On_Complete()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            File.WriteAllText(Path.Combine(dir, "b.txt"), "b");
+            File.WriteAllText(Path.Combine(dir, "a.txt"), "a");
+
+            var started = new ManualResetEventSlim(false);
+            var release = new ManualResetEventSlim(false);
+
+            FileListCatalogResult ListSlow(
+                string currentPath,
+                string includeMask,
+                bool excludeMasksEnabled,
+                IReadOnlyList<string> excludeMasks,
+                IEnumerable<string> pathHistory
+            )
+            {
+                started.Set();
+                Assert.True(release.Wait(TimeSpan.FromSeconds(10)));
+                return FileListCatalog.List(currentPath, includeMask, excludeMasksEnabled, excludeMasks, pathHistory);
+            }
+
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                dir,
+                NullFileShellOpener.Instance,
+                clipboard: NullTextClipboard.Instance,
+                shellOperations: NullFileShellOperations.Instance,
+                fileClipboard: new NullFileClipboard(),
+                ownerHwnd: null,
+                listEntries: ListSlow
+            );
+            _viewModels.Add(viewModel);
+
+            Assert.True(started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(viewModel.IsListing);
+
+            viewModel.SortByColumn(nameof(FileListEntry.Name));
+            Assert.True(viewModel.IsListing);
+            Assert.Empty(viewModel.Entries);
+
+            release.Set();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.Equal(["b.txt", "a.txt"], _Names(viewModel));
+            Assert.False(viewModel.IsSortAscending);
+        }
+
+        /// <summary>
         /// Verifies Copy path is disabled when nothing is selected.
         /// </summary>
         [Fact]
