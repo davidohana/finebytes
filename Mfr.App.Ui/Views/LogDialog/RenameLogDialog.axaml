@@ -93,7 +93,10 @@
   <DockPanel Margin="16">
     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
       <TextBlock Classes="rename-log-title" Text="Rename Log" />
-      <TextBlock Classes="rename-log-subtitle" Text="Review past GO and Undo operations, undo a run, or erase saved logs." />
+      <TextBlock
+        Classes="rename-log-subtitle"
+        Text="Review past GO and Undo operations, undo a run, or erase saved logs."
+      />
     </StackPanel>
 
     <StackPanel

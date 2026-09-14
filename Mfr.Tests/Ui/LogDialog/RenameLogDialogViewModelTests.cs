@@ -67,10 +67,7 @@ namespace Mfr.Tests.Ui.LogDialog
                 RenameLogDisplay.FormatListTitle(RenameLogStore.LastOperation.CommittedAt),
                 viewModel.Items[0].Title
             );
-            Assert.Equal(
-                RenameLogDisplay.FormatListSummary(RenameLogStore.LastOperation),
-                viewModel.Items[0].Summary
-            );
+            Assert.Equal(RenameLogDisplay.FormatListSummary(RenameLogStore.LastOperation), viewModel.Items[0].Summary);
             Assert.True(viewModel.Items[0].IsLastOperation);
             Assert.Equal(RenameLogDisplay.FormatDiskListTitle(newerPath), viewModel.Items[1].Title);
             Assert.Equal("GO · 1 item", viewModel.Items[1].Summary);

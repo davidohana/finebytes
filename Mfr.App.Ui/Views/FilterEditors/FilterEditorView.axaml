@@ -18,11 +18,7 @@
 >
   <Border Classes="pane">
     <DockPanel>
-      <Border
-        DockPanel.Dock="Top"
-        Classes="filter-editor-title-bar"
-        Classes.has-selection="{Binding HasSelectedStep}"
-      >
+      <Border DockPanel.Dock="Top" Classes="filter-editor-title-bar" Classes.has-selection="{Binding HasSelectedStep}">
         <DockPanel>
           <Button
             x:Name="ShowFilterHelpButton"
