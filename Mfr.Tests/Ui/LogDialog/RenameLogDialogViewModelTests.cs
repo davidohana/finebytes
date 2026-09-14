@@ -67,9 +67,15 @@ namespace Mfr.Tests.Ui.LogDialog
                 RenameLogDisplay.FormatListTitle(RenameLogStore.LastOperation.CommittedAt),
                 viewModel.Items[0].Title
             );
+            Assert.Equal(
+                RenameLogDisplay.FormatListSummary(RenameLogStore.LastOperation),
+                viewModel.Items[0].Summary
+            );
             Assert.True(viewModel.Items[0].IsLastOperation);
             Assert.Equal(RenameLogDisplay.FormatDiskListTitle(newerPath), viewModel.Items[1].Title);
+            Assert.Equal("GO · 1 item", viewModel.Items[1].Summary);
             Assert.Equal(RenameLogDisplay.FormatDiskListTitle(olderPath), viewModel.Items[2].Title);
+            Assert.Equal("GO · 1 item", viewModel.Items[2].Summary);
             Assert.Same(viewModel.Items[0], viewModel.SelectedItem);
             Assert.Contains("mem-new.txt", viewModel.DetailsText);
             Assert.True(viewModel.UndoCommand.CanExecute(null));
@@ -107,6 +113,7 @@ namespace Mfr.Tests.Ui.LogDialog
             Assert.Equal(written, item.FilePath);
             Assert.Equal(written, RenameLogStore.LastWrittenFilePath);
             Assert.Equal(RenameLogDisplay.FormatDiskListTitle(written), item.Title);
+            Assert.Equal(RenameLogDisplay.FormatListSummary(RenameLogStore.LastOperation), item.Summary);
             Assert.Same(RenameLogStore.LastOperation, item.TryGetLog(out var error));
             Assert.Null(error);
             Assert.Contains("b.txt", viewModel.DetailsText);

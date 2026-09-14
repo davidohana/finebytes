@@ -126,6 +126,7 @@ namespace Mfr.Tests.Engine
                 RenameLogDisplay.FormatDetails(RenameLogStore.LastOperation),
                 StringComparison.Ordinal
             );
+            Assert.Equal("Undo · 1 item", RenameLogDisplay.FormatListSummary(RenameLogStore.LastOperation));
 
             using var doc = JsonDocument.Parse(File.ReadAllText(writtenPath));
             Assert.True(doc.RootElement.GetProperty("isUndo").GetBoolean());
@@ -441,6 +442,48 @@ namespace Mfr.Tests.Engine
                 StringComparison.Ordinal
             );
             Assert.Contains("… and 25 more item(s).", details, StringComparison.Ordinal);
+        }
+
+        /// <summary>
+        /// Verifies list summary shows GO/Undo and singular/plural item counts.
+        /// </summary>
+        [Fact]
+        public void FormatListSummary_Shows_Operation_And_Count()
+        {
+            var goOne = new RenameLog(
+                CommittedAt: DateTimeOffset.Parse("2026-01-15T12:00:00Z"),
+                Entries:
+                [
+                    new RenameLogEntry(
+                        DestinationPath: TestPaths.Absolute("a.txt"),
+                        OriginalPath: TestPaths.Absolute("b.txt"),
+                        IsFolder: false,
+                        Changes: [new RenamePropertyChange("Prefix", "b", "a")]
+                    ),
+                ]
+            );
+            var undoMany = new RenameLog(
+                CommittedAt: DateTimeOffset.Parse("2026-01-15T13:00:00Z"),
+                Entries:
+                [
+                    new RenameLogEntry(
+                        DestinationPath: TestPaths.Absolute("1.txt"),
+                        OriginalPath: TestPaths.Absolute("1a.txt"),
+                        IsFolder: false,
+                        Changes: [new RenamePropertyChange("Prefix", "1a", "1")]
+                    ),
+                    new RenameLogEntry(
+                        DestinationPath: TestPaths.Absolute("2.txt"),
+                        OriginalPath: TestPaths.Absolute("2a.txt"),
+                        IsFolder: false,
+                        Changes: [new RenamePropertyChange("Prefix", "2a", "2")]
+                    ),
+                ],
+                IsUndo: true
+            );
+
+            Assert.Equal("GO · 1 item", RenameLogDisplay.FormatListSummary(goOne));
+            Assert.Equal("Undo · 2 items", RenameLogDisplay.FormatListSummary(undoMany));
         }
 
         /// <summary>

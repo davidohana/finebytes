@@ -32,6 +32,24 @@ namespace Mfr.App.Ui.Services.RenameLog
         }
 
         /// <summary>
+        /// Builds the Rename Log list subtitle (GO/Undo and entry count) for a loaded log.
+        /// </summary>
+        /// <param name="log">Log whose operation kind and entry count are shown.</param>
+        /// <returns>
+        /// Compact summary such as <c>GO · 3 items</c> or <c>Undo · 1 item</c>, matching the
+        /// details-pane Operation / Processed lines.
+        /// </returns>
+        public static string FormatListSummary(RenameLogModel log)
+        {
+            ArgumentNullException.ThrowIfNull(log);
+
+            var operation = log.IsUndo ? "Undo" : "GO";
+            var count = log.Entries.Count;
+            var itemsLabel = count == 1 ? "item" : "items";
+            return $"{operation} · {count} {itemsLabel}";
+        }
+
+        /// <summary>
         /// Builds the Rename Log list title for a disk file (MFR7 <c>dd/MM/yyyy HH:mm:ss</c> from stamp).
         /// </summary>
         /// <param name="filePath">Absolute or relative <c>.mfrlog</c> path.</param>

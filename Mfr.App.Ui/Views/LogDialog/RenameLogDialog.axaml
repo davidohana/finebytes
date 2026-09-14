@@ -1,6 +1,7 @@
 <Window
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:converters="using:Avalonia.Data.Converters"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.LogDialog"
   x:Class="Mfr.App.Ui.Views.LogDialog.RenameLogDialog"
   x:DataType="vm:RenameLogDialogViewModel"
@@ -47,9 +48,16 @@
     </Style>
     <Style Selector="ListBox.rename-log-list ListBoxItem">
       <Setter Property="Padding" Value="8,5" />
-      <Setter Property="MinHeight" Value="26" />
+      <Setter Property="MinHeight" Value="40" />
       <Setter Property="Margin" Value="0,0,0,2" />
       <Setter Property="CornerRadius" Value="4" />
+    </Style>
+    <Style Selector="TextBlock.rename-log-list-summary">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+      <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+      <Setter Property="Margin" Value="0,1,0,0" />
     </Style>
     <Style Selector="TextBox.rename-log-details">
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFixedWidthFont}" />
@@ -85,7 +93,7 @@
   <DockPanel Margin="16">
     <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
       <TextBlock Classes="rename-log-title" Text="Rename Log" />
-      <TextBlock Classes="rename-log-subtitle" Text="Review past GO operations, undo a run, or erase saved logs." />
+      <TextBlock Classes="rename-log-subtitle" Text="Review past GO and Undo operations, undo a run, or erase saved logs." />
     </StackPanel>
 
     <StackPanel
@@ -105,7 +113,7 @@
       />
     </StackPanel>
 
-    <Grid RowDefinitions="Auto,*" ColumnDefinitions="210,12,*">
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="230,12,*">
       <TextBlock Grid.Row="0" Grid.Column="0" Classes="rename-log-section" Text="Available Logs" />
       <DockPanel Grid.Row="0" Grid.Column="2" Margin="0,0,0,6" LastChildFill="True">
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="8" Margin="12,0,0,0">
@@ -136,7 +144,14 @@
       >
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="vm:RenameLogListItem">
-            <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" FontWeight="Medium" />
+            <StackPanel Spacing="0">
+              <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" FontWeight="Medium" />
+              <TextBlock
+                Classes="rename-log-list-summary"
+                Text="{Binding Summary}"
+                IsVisible="{Binding Summary, Converter={x:Static converters:StringConverters.IsNotNullOrEmpty}}"
+              />
+            </StackPanel>
           </DataTemplate>
         </ListBox.ItemTemplate>
       </ListBox>

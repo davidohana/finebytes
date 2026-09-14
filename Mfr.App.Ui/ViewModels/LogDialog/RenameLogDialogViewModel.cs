@@ -20,10 +20,11 @@ namespace Mfr.App.Ui.ViewModels.LogDialog
         public RenameLogListItem(RenameLog log)
         {
             ArgumentNullException.ThrowIfNull(log);
-            Title = RenameLogDisplay.FormatListTitle(log.CommittedAt);
             IsLastOperation = true;
             FilePath = null;
             _cachedLog = log;
+            Title = RenameLogDisplay.FormatListTitle(log.CommittedAt);
+            Summary = RenameLogDisplay.FormatListSummary(log);
         }
 
         /// <summary>
@@ -37,16 +38,25 @@ namespace Mfr.App.Ui.ViewModels.LogDialog
         public RenameLogListItem(string filePath, RenameLog? cachedLog = null)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
-            Title = RenameLogDisplay.FormatDiskListTitle(filePath);
             IsLastOperation = false;
             FilePath = filePath;
             _cachedLog = cachedLog;
+            Title = RenameLogDisplay.FormatDiskListTitle(filePath);
+
+            // Resolve once so the left list can show GO/Undo and item count without selecting.
+            var log = TryGetLog(out _);
+            Summary = log is not null ? RenameLogDisplay.FormatListSummary(log) : string.Empty;
         }
 
         /// <summary>
-        /// Gets the list display text.
+        /// Gets the list date line (MFR7 <c>dd/MM/yyyy HH:mm:ss</c> local).
         /// </summary>
         public string Title { get; }
+
+        /// <summary>
+        /// Gets the list subtitle (GO/Undo and entry count), or empty when the log could not be loaded.
+        /// </summary>
+        public string Summary { get; }
 
         /// <summary>
         /// Whether this row is the in-memory last operation (not a disk file).
