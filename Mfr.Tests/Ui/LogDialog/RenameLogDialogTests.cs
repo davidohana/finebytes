@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Mfr.App.Ui.Services.RenameLog;
 using Mfr.App.Ui.ViewModels.LogDialog;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views;
@@ -70,7 +71,7 @@ namespace Mfr.Tests.Ui.LogDialog
                 Assert.NotNull(dialog.FindControl<Button>("CloseButton"));
                 Assert.NotNull(RenameLogStore.LastOperation);
                 Assert.Contains(
-                    RenameLogStore.FormatListTitle(RenameLogStore.LastOperation.CommittedAt),
+                    RenameLogDisplay.FormatListTitle(RenameLogStore.LastOperation.CommittedAt),
                     dialogVm.Items.Select(item => item.Title)
                 );
                 Assert.Contains("b.txt", dialogVm.DetailsText);

@@ -1,5 +1,3 @@
-using System.Text;
-
 namespace Mfr.Models.Rename
 {
     /// <summary>
@@ -20,90 +18,14 @@ namespace Mfr.Models.Rename
     )
     {
         /// <summary>
-        /// Max per-item blocks shown in <see cref="FormatDetails"/> before a truncation note.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Large GO/Undo logs (thousands of rows) must not build multi-megabyte strings for the
-        /// details TextBox — that freezes the Rename Log dialog on open/select.
-        /// </para>
-        /// </remarks>
-        public const int MaxDetailsEntries = 100;
-
-        /// <summary>
         /// Whether Undo can reverse at least one row (non-error entry with a restorable property delta).
         /// </summary>
         /// <remarks>
         /// <para>
-        /// <c>StripAllEmbeddedTagsOnCommit</c> alone is not restorable (Tag Remover).
+        /// <see cref="RenamePropertyNames.StripAllEmbeddedTagsOnCommit"/> alone is not restorable (Tag Remover).
         /// </para>
         /// </remarks>
         public bool HasUndoableEntries => Entries.Any(static entry => entry.IsUndoable);
-
-        /// <summary>
-        /// Formats this log for the Rename Log details pane (date, GO/Undo, item count, per-item changes/errors).
-        /// </summary>
-        /// <param name="maxEntries">
-        /// Max item blocks to include. When fewer than <see cref="Entries"/>.Count, appends a truncation note.
-        /// Defaults to <see cref="MaxDetailsEntries"/>.
-        /// </param>
-        /// <returns>Multi-line plain text suitable for a read-only details box.</returns>
-        public string FormatDetails(int maxEntries = MaxDetailsEntries)
-        {
-            if (maxEntries < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(maxEntries));
-            }
-
-            var builder = new StringBuilder();
-            // Match Rename Log list titles (MFR7 dd/MM/yyyy HH:mm:ss), not culture "G".
-            builder
-                .Append("Operation Date: ")
-                .Append(CommittedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss"))
-                .AppendLine();
-            builder.Append("Operation: ").Append(IsUndo ? "Undo" : "GO").AppendLine();
-            builder.AppendLine();
-            builder.Append("Processed ").Append(Entries.Count).Append(" Items").AppendLine();
-            builder.AppendLine();
-
-            var shownCount = Math.Min(maxEntries, Entries.Count);
-            for (var i = 0; i < shownCount; i++)
-            {
-                var entry = Entries[i];
-                builder.Append("Item: ").Append(entry.DetailsItemPath).AppendLine();
-                foreach (var change in entry.Changes)
-                {
-                    builder
-                        .Append("Changed '")
-                        .Append(change.Property)
-                        .Append("' from '")
-                        .Append(change.OldValue)
-                        .Append("' to '")
-                        .Append(change.NewValue)
-                        .Append('\'')
-                        .AppendLine();
-                }
-
-                if (entry.Error is not null)
-                {
-                    builder.Append("Error: ").Append(entry.Error).AppendLine();
-                }
-
-                builder.AppendLine();
-            }
-
-            var omittedCount = Entries.Count - shownCount;
-            if (omittedCount > 0)
-            {
-                builder
-                    .Append("… and ")
-                    .Append(omittedCount)
-                    .Append(" more item(s). Full history is in the saved .mfrlog file.")
-                    .AppendLine();
-            }
-
-            return builder.ToString();
-        }
     }
 
     /// <summary>
@@ -137,7 +59,11 @@ namespace Mfr.Models.Rename
         public bool IsUndoable =>
             Error is null
             && Changes.Any(static change =>
-                !string.Equals(change.Property, "StripAllEmbeddedTagsOnCommit", StringComparison.Ordinal)
+                !string.Equals(
+                    change.Property,
+                    RenamePropertyNames.StripAllEmbeddedTagsOnCommit,
+                    StringComparison.Ordinal
+                )
             );
     }
 }

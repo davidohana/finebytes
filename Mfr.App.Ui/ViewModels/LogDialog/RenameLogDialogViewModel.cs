@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.Services.RenameLog;
 using Mfr.Engine.RenameLog;
 using Mfr.Models.Rename;
 using Mfr.Utils;
@@ -19,7 +20,7 @@ namespace Mfr.App.Ui.ViewModels.LogDialog
         public RenameLogListItem(RenameLog log)
         {
             ArgumentNullException.ThrowIfNull(log);
-            Title = RenameLogStore.FormatListTitle(log.CommittedAt);
+            Title = RenameLogDisplay.FormatListTitle(log.CommittedAt);
             IsLastOperation = true;
             FilePath = null;
             _cachedLog = log;
@@ -36,7 +37,7 @@ namespace Mfr.App.Ui.ViewModels.LogDialog
         public RenameLogListItem(string filePath, RenameLog? cachedLog = null)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
-            Title = RenameLogStore.FormatDiskListTitle(filePath);
+            Title = RenameLogDisplay.FormatDiskListTitle(filePath);
             IsLastOperation = false;
             FilePath = filePath;
             _cachedLog = cachedLog;
@@ -295,7 +296,7 @@ namespace Mfr.App.Ui.ViewModels.LogDialog
                 return;
             }
 
-            DetailsText = log.FormatDetails();
+            DetailsText = RenameLogDisplay.FormatDetails(log);
         }
     }
 }

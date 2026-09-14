@@ -25,7 +25,6 @@ namespace Mfr.Engine.Preview
     {
         private const string _Absent = "absent";
         private const string _Present = "present";
-        private const string _AudioTagBlockPrefix = "AudioTag.Block.";
 
         /// <summary>
         /// Mutates <paramref name="item"/>.<see cref="RenameItem.Preview"/> (and strip flag) from OldValues.
@@ -48,31 +47,31 @@ namespace Mfr.Engine.Preview
             var property = change.Property;
             var oldValue = change.OldValue;
 
-            if (property == "Prefix")
+            if (property == RenamePropertyNames.Prefix)
             {
                 item.Preview.Prefix = oldValue;
                 return;
             }
 
-            if (property == "Extension")
+            if (property == RenamePropertyNames.Extension)
             {
                 item.Preview.Extension = oldValue;
                 return;
             }
 
-            if (property == "DirectoryPath")
+            if (property == RenamePropertyNames.DirectoryPath)
             {
                 item.Preview.DirectoryPath = oldValue;
                 return;
             }
 
-            if (property == "Attributes")
+            if (property == RenamePropertyNames.Attributes)
             {
                 item.Preview.Attributes = Enum.Parse<FileAttributes>(oldValue);
                 return;
             }
 
-            if (property == "CreationTime")
+            if (property == RenamePropertyNames.CreationTime)
             {
                 item.Preview.CreationTime = DateTime.Parse(
                     oldValue,
@@ -82,7 +81,7 @@ namespace Mfr.Engine.Preview
                 return;
             }
 
-            if (property == "LastWriteTime")
+            if (property == RenamePropertyNames.LastWriteTime)
             {
                 item.Preview.LastWriteTime = DateTime.Parse(
                     oldValue,
@@ -92,7 +91,7 @@ namespace Mfr.Engine.Preview
                 return;
             }
 
-            if (property == "LastAccessTime")
+            if (property == RenamePropertyNames.LastAccessTime)
             {
                 item.Preview.LastAccessTime = DateTime.Parse(
                     oldValue,
@@ -102,15 +101,19 @@ namespace Mfr.Engine.Preview
                 return;
             }
 
-            if (property == "StripAllEmbeddedTagsOnCommit")
+            if (property == RenamePropertyNames.StripAllEmbeddedTagsOnCommit)
             {
                 // Unrestorable — strip already removed tags from disk.
                 return;
             }
 
-            if (property.StartsWith(_AudioTagBlockPrefix, StringComparison.Ordinal))
+            if (property.StartsWith(RenamePropertyNames.AudioTagBlockPrefix, StringComparison.Ordinal))
             {
-                _ApplyAudioTagProperty(item.Preview.AudioTagOverlay, property[_AudioTagBlockPrefix.Length..], oldValue);
+                _ApplyAudioTagProperty(
+                    item.Preview.AudioTagOverlay,
+                    property[RenamePropertyNames.AudioTagBlockPrefix.Length..],
+                    oldValue
+                );
                 return;
             }
 
@@ -128,43 +131,43 @@ namespace Mfr.Engine.Preview
 
             var blockName = blockRelative[..firstDot];
             var fieldKey = blockRelative[(firstDot + 1)..];
-            if (blockName == "Id3v1")
+            if (blockName == RenamePropertyNames.Id3v1)
             {
                 _ApplyId3v1Field(overlay, fieldKey, oldValue);
                 return;
             }
 
-            if (blockName == "Id3v2")
+            if (blockName == RenamePropertyNames.Id3v2)
             {
                 _ApplyId3v2Field(overlay, fieldKey, oldValue);
                 return;
             }
 
-            if (blockName == "Xiph")
+            if (blockName == RenamePropertyNames.Xiph)
             {
                 _ApplyXiphField(overlay, fieldKey, oldValue);
                 return;
             }
 
-            if (blockName == "Ape")
+            if (blockName == RenamePropertyNames.Ape)
             {
                 _ApplyApeField(overlay, fieldKey, oldValue);
                 return;
             }
 
-            if (blockName == "RiffInfo")
+            if (blockName == RenamePropertyNames.RiffInfo)
             {
                 _ApplyRiffInfoField(overlay, fieldKey, oldValue);
                 return;
             }
 
-            if (blockName == "Apple")
+            if (blockName == RenamePropertyNames.Apple)
             {
                 _ApplyAppleField(overlay, fieldKey, oldValue);
                 return;
             }
 
-            if (blockName == "Asf")
+            if (blockName == RenamePropertyNames.Asf)
             {
                 _ApplyAsfField(overlay, fieldKey, oldValue);
             }

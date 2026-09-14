@@ -384,7 +384,7 @@ namespace Mfr.Tests.Ui.Options
                 AddMode = RenameListAddMode.Files,
                 AddFolderContents = true,
             };
-            ConfigStore.RenameLog.Limit = 10;
+            ConfigStore.RenameLog.Limit = RenameLogConfig.DefaultLimit;
         }
 
         /// <summary>

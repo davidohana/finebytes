@@ -119,26 +119,25 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         private static StyledTextDisplay _FormatGoOutcome(int renamedCount, int errorCount, bool stopped)
         {
+            var primary = _FormatSuccessPrimary(
+                successCount: renamedCount,
+                stopped: stopped,
+                successPastVerb: "Renamed"
+            );
+
             if (stopped)
             {
-                var stoppedPart =
-                    renamedCount > 0
-                        ? StatusBarText.Warning($"Stopped. Renamed {renamedCount} item(s).")
-                        : StatusBarText.Warning("Stopped.");
                 if (errorCount == 0)
                 {
-                    return stoppedPart;
+                    return primary!;
                 }
 
-                return StatusBarText.Combine(
-                    stoppedPart,
-                    StatusBarText.Neutral(" "),
-                    _FormatCouldNotRenameHint(errorCount, itemSuffix: false)
-                );
+                return _CombineStatusParts([primary!, _FormatCouldNotRenameHint(errorCount, itemSuffix: false)]);
             }
 
             if (errorCount > 0 && renamedCount > 0)
             {
+                // Trailing space is intentional (no separator run between success and hint).
                 return StatusBarText.Combine(
                     StatusBarText.Neutral($"Renamed {renamedCount} item(s). "),
                     _FormatCouldNotRenameHint(errorCount, itemSuffix: false)
@@ -150,12 +149,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return _FormatCouldNotRenameHint(errorCount, itemSuffix: true);
             }
 
-            if (renamedCount > 0)
-            {
-                return StatusBarText.Neutral($"Renamed {renamedCount} item(s).");
-            }
-
-            return StatusBarText.Neutral("No items were renamed.");
+            return primary ?? StatusBarText.Neutral("No items were renamed.");
         }
 
         /// <summary>

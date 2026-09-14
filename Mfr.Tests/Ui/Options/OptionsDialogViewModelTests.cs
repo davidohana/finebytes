@@ -78,7 +78,7 @@ namespace Mfr.Tests.Ui.Options
                 AddMode = RenameListAddMode.Files,
                 AddFolderContents = true,
             };
-            ConfigStore.RenameLog.Limit = 10;
+            ConfigStore.RenameLog.Limit = RenameLogConfig.DefaultLimit;
 
             var vm = new OptionsDialogViewModel()
             {
@@ -143,7 +143,7 @@ namespace Mfr.Tests.Ui.Options
             int expectedLimit
         )
         {
-            ConfigStore.RenameLog.Limit = 10;
+            ConfigStore.RenameLog.Limit = RenameLogConfig.DefaultLimit;
             var vm = new OptionsDialogViewModel { RenameLogLimitedCount = limitedCount, RenameLogRetentionMode = mode };
 
             vm.Commit();

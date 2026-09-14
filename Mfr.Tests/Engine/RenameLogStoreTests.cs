@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Mfr.App.Ui.Services.RenameLog;
 using Mfr.Filters.Formatting;
 using Mfr.Utils;
 
@@ -120,7 +121,11 @@ namespace Mfr.Tests.Engine
 
             Assert.NotNull(writtenPath);
             Assert.True(RenameLogStore.LastOperation!.IsUndo);
-            Assert.Contains("Operation: Undo", RenameLogStore.LastOperation.FormatDetails(), StringComparison.Ordinal);
+            Assert.Contains(
+                "Operation: Undo",
+                RenameLogDisplay.FormatDetails(RenameLogStore.LastOperation),
+                StringComparison.Ordinal
+            );
 
             using var doc = JsonDocument.Parse(File.ReadAllText(writtenPath));
             Assert.True(doc.RootElement.GetProperty("isUndo").GetBoolean());
@@ -128,7 +133,7 @@ namespace Mfr.Tests.Engine
             var loaded = RenameLogStore.TryLoadFile(writtenPath);
             Assert.NotNull(loaded);
             Assert.True(loaded.IsUndo);
-            Assert.Contains("Operation: Undo", loaded.FormatDetails(), StringComparison.Ordinal);
+            Assert.Contains("Operation: Undo", RenameLogDisplay.FormatDetails(loaded), StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -164,7 +169,7 @@ namespace Mfr.Tests.Engine
 
             Assert.NotNull(loaded);
             Assert.False(loaded.IsUndo);
-            Assert.Contains("Operation: GO", loaded.FormatDetails(), StringComparison.Ordinal);
+            Assert.Contains("Operation: GO", RenameLogDisplay.FormatDetails(loaded), StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -397,7 +402,7 @@ namespace Mfr.Tests.Engine
             Assert.Equal(TestPaths.Absolute("ok-new.txt"), log.Entries[0].DetailsItemPath);
             Assert.Equal(TestPaths.Absolute("err-src.txt"), log.Entries[1].DetailsItemPath);
 
-            var details = log.FormatDetails();
+            var details = RenameLogDisplay.FormatDetails(log);
             Assert.Contains("Item: " + TestPaths.Absolute("ok-new.txt"), details, StringComparison.Ordinal);
             Assert.Contains("Item: " + TestPaths.Absolute("err-src.txt"), details, StringComparison.Ordinal);
             Assert.Contains("Error: not found", details, StringComparison.Ordinal);
@@ -405,13 +410,13 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies FormatDetails truncates after <see cref="RenameLog.MaxDetailsEntries"/> and notes the remainder.
+        /// Verifies FormatDetails truncates after <see cref="RenameLogDisplay.MaxDetailsEntries"/> and notes the remainder.
         /// </summary>
         [Fact]
         public void FormatDetails_Truncates_Large_Logs()
         {
             var entries = Enumerable
-                .Range(0, RenameLog.MaxDetailsEntries + 25)
+                .Range(0, RenameLogDisplay.MaxDetailsEntries + 25)
                 .Select(i => new RenameLogEntry(
                     DestinationPath: TestPaths.Absolute($"new-{i}.txt"),
                     OriginalPath: TestPaths.Absolute($"old-{i}.txt"),
@@ -421,17 +426,17 @@ namespace Mfr.Tests.Engine
                 .ToList();
             var log = new RenameLog(CommittedAt: DateTimeOffset.Parse("2026-01-15T12:00:00Z"), Entries: entries);
 
-            var details = log.FormatDetails();
+            var details = RenameLogDisplay.FormatDetails(log);
 
             Assert.Contains($"Processed {entries.Count} Items", details, StringComparison.Ordinal);
             Assert.Contains("Item: " + TestPaths.Absolute("new-0.txt"), details, StringComparison.Ordinal);
             Assert.Contains(
-                "Item: " + TestPaths.Absolute($"new-{RenameLog.MaxDetailsEntries - 1}.txt"),
+                "Item: " + TestPaths.Absolute($"new-{RenameLogDisplay.MaxDetailsEntries - 1}.txt"),
                 details,
                 StringComparison.Ordinal
             );
             Assert.DoesNotContain(
-                "Item: " + TestPaths.Absolute($"new-{RenameLog.MaxDetailsEntries}.txt"),
+                "Item: " + TestPaths.Absolute($"new-{RenameLogDisplay.MaxDetailsEntries}.txt"),
                 details,
                 StringComparison.Ordinal
             );
@@ -551,10 +556,10 @@ namespace Mfr.Tests.Engine
             var listed = RenameLogStore.ListDiskFilePaths(logDir);
 
             Assert.Equal([newer, older], listed);
-            Assert.Equal("01/02/2026 12:00:30", RenameLogStore.FormatDiskListTitle(newer));
+            Assert.Equal("01/02/2026 12:00:30", RenameLogDisplay.FormatDiskListTitle(newer));
             Assert.Equal(
                 "01/01/2026 00:00:00",
-                RenameLogStore.FormatDiskListTitle(
+                RenameLogDisplay.FormatDiskListTitle(
                     logDir.CombinePath($"20260101000000-1{RenameLogStore.FileExtension}")
                 )
             );
@@ -598,8 +603,8 @@ namespace Mfr.Tests.Engine
             Assert.True(loaded.HasUndoableEntries);
             Assert.False(loaded.IsUndo);
             Assert.Equal(TestPaths.Absolute("new.txt"), Assert.Single(loaded.Entries).DestinationPath);
-            Assert.Contains("Operation: GO", loaded.FormatDetails(), StringComparison.Ordinal);
-            Assert.Contains("Changed 'Prefix'", loaded.FormatDetails());
+            Assert.Contains("Operation: GO", RenameLogDisplay.FormatDetails(loaded), StringComparison.Ordinal);
+            Assert.Contains("Changed 'Prefix'", RenameLogDisplay.FormatDetails(loaded));
 
             Assert.True(RenameLogStore.TryDeleteFile(writtenPath));
             Assert.False(File.Exists(writtenPath));

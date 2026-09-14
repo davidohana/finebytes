@@ -132,42 +132,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             bool stopped
         )
         {
-            if (stopped)
-            {
-                return _CombineUndoParts(
-                    primary: undoneCount > 0
-                        ? StatusBarText.Warning($"Stopped. Undid {undoneCount} item(s).")
-                        : StatusBarText.Warning("Stopped."),
-                    errorCount: errorCount,
-                    notLoadedCount: notLoadedCount
-                );
-            }
-
-            if (undoneCount == 0 && errorCount == 0 && notLoadedCount > 0)
+            if (!stopped && undoneCount == 0 && errorCount == 0 && notLoadedCount > 0)
             {
                 return StatusBarText.Warning($"Could not load {notLoadedCount} item(s) for undo (paths missing).");
             }
 
-            if (undoneCount == 0 && errorCount == 0 && notLoadedCount == 0)
-            {
-                return StatusBarText.Neutral("No items were undone.");
-            }
-
-            StyledTextDisplay? primary = null;
-            if (undoneCount > 0)
-            {
-                primary = StatusBarText.Neutral($"Undid {undoneCount} item(s).");
-            }
-
-            return _CombineUndoParts(primary: primary, errorCount: errorCount, notLoadedCount: notLoadedCount);
-        }
-
-        private static StyledTextDisplay _CombineUndoParts(
-            StyledTextDisplay? primary,
-            int errorCount,
-            int notLoadedCount
-        )
-        {
+            var primary = _FormatSuccessPrimary(successCount: undoneCount, stopped: stopped, successPastVerb: "Undid");
             var parts = new List<StyledTextDisplay>();
             if (primary is not null)
             {
@@ -187,6 +157,50 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             if (parts.Count == 0)
             {
                 return StatusBarText.Neutral("No items were undone.");
+            }
+
+            return _CombineStatusParts(parts);
+        }
+
+        /// <summary>
+        /// Builds the stopped or success primary fragment shared by GO and Undo status lines.
+        /// </summary>
+        /// <param name="successCount">CommitOk count (renamed / undone).</param>
+        /// <param name="stopped">Whether the operation was canceled mid-commit.</param>
+        /// <param name="successPastVerb">Past-tense verb (<c>Renamed</c> / <c>Undid</c>).</param>
+        /// <returns>
+        /// Warning when stopped; Neutral success when <paramref name="successCount"/> &gt; 0 and not stopped;
+        /// otherwise <see langword="null"/>.
+        /// </returns>
+        private static StyledTextDisplay? _FormatSuccessPrimary(int successCount, bool stopped, string successPastVerb)
+        {
+            if (stopped)
+            {
+                return successCount > 0
+                    ? StatusBarText.Warning($"Stopped. {successPastVerb} {successCount} item(s).")
+                    : StatusBarText.Warning("Stopped.");
+            }
+
+            if (successCount > 0)
+            {
+                return StatusBarText.Neutral($"{successPastVerb} {successCount} item(s).");
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Space-joins non-empty status fragments (single part returned as-is).
+        /// </summary>
+        /// <param name="parts">Ordered fragments to combine.</param>
+        /// <returns>Combined display.</returns>
+        private static StyledTextDisplay _CombineStatusParts(List<StyledTextDisplay> parts)
+        {
+            ArgumentNullException.ThrowIfNull(parts);
+
+            if (parts.Count == 0)
+            {
+                return StatusBarText.Neutral(string.Empty);
             }
 
             if (parts.Count == 1)

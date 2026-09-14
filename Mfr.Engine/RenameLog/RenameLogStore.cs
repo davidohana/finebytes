@@ -152,66 +152,6 @@ namespace Mfr.Engine.RenameLog
         }
 
         /// <summary>
-        /// Builds the Rename Log list title for a commit time (MFR7 <c>dd/MM/yyyy HH:mm:ss</c> local).
-        /// </summary>
-        /// <param name="committedAt">Commit timestamp (typically UTC from <see cref="RenameLogModel.CommittedAt"/>).</param>
-        /// <returns>Local-time list title matching disk rows and the details pane date line.</returns>
-        public static string FormatListTitle(DateTimeOffset committedAt)
-        {
-            return committedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss");
-        }
-
-        /// <summary>
-        /// Builds the Rename Log list title for a disk file (MFR7 <c>dd/MM/yyyy HH:mm:ss</c> from stamp).
-        /// </summary>
-        /// <param name="filePath">Absolute or relative <c>.mfrlog</c> path.</param>
-        /// <returns>Formatted stamp when the stem is <c>yyyyMMddHHmmss</c> (optional <c>-N</c>); otherwise the stem.</returns>
-        public static string FormatDiskListTitle(string filePath)
-        {
-            ArgumentException.ThrowIfNullOrWhiteSpace(filePath);
-
-            var stem = Path.GetFileNameWithoutExtension(filePath);
-            var stamp = stem;
-            var dashIndex = stem.IndexOf('-');
-            if (dashIndex > 0)
-            {
-                stamp = stem[..dashIndex];
-            }
-
-            if (stamp.Length != 14 || !stamp.All(char.IsDigit))
-            {
-                return stem;
-            }
-
-            return string.Create(
-                19,
-                stamp,
-                static (span, value) =>
-                {
-                    span[0] = value[6];
-                    span[1] = value[7];
-                    span[2] = '/';
-                    span[3] = value[4];
-                    span[4] = value[5];
-                    span[5] = '/';
-                    span[6] = value[0];
-                    span[7] = value[1];
-                    span[8] = value[2];
-                    span[9] = value[3];
-                    span[10] = ' ';
-                    span[11] = value[8];
-                    span[12] = value[9];
-                    span[13] = ':';
-                    span[14] = value[10];
-                    span[15] = value[11];
-                    span[16] = ':';
-                    span[17] = value[12];
-                    span[18] = value[13];
-                }
-            );
-        }
-
-        /// <summary>
         /// Builds a log from commit outcomes, stores undoable logs as <see cref="LastOperation"/>, and optionally writes disk.
         /// <para>
         /// No-op when <paramref name="dryRun"/> is <see langword="true"/>, or when there are no
@@ -364,40 +304,19 @@ namespace Mfr.Engine.RenameLog
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(logDirectoryPath);
 
-            if (!Directory.Exists(logDirectoryPath) || maxFiles == int.MaxValue)
+            if (maxFiles == int.MaxValue)
             {
                 return;
             }
 
-            var keepCount = Math.Max(0, maxFiles);
-            var logFilePaths = Directory
-                .EnumerateFiles(logDirectoryPath, $"*{FileExtension}", SearchOption.TopDirectoryOnly)
-                .Select(path => new FileInfo(path))
-                .OrderByDescending(fileInfo => fileInfo.CreationTimeUtc)
-                .ThenByDescending(fileInfo => fileInfo.Name, StringComparer.Ordinal)
-                .ToList();
-
-            if (logFilePaths.Count <= keepCount)
-            {
-                return;
-            }
-
-            foreach (var fileInfo in logFilePaths.Skip(keepCount))
-            {
-                try
-                {
-                    fileInfo.Delete();
-                    Log.Information("Deleted old rename log '{RenameLogPath}' during pruning.", fileInfo.FullName);
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning(
-                        ex,
-                        "Failed to delete old rename log '{RenameLogPath}' during pruning.",
-                        fileInfo.FullName
-                    );
-                }
-            }
+            NewestFilesPruner.PruneByCreationTimeUtc(
+                directoryPath: logDirectoryPath,
+                keepCount: Math.Max(0, maxFiles),
+                searchPattern: $"*{FileExtension}",
+                onDeleted: path => Log.Information("Deleted old rename log '{RenameLogPath}' during pruning.", path),
+                onFailed: (path, ex) =>
+                    Log.Warning(ex, "Failed to delete old rename log '{RenameLogPath}' during pruning.", path)
+            );
         }
 
         /// <summary>

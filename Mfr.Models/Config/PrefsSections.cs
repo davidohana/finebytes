@@ -79,14 +79,19 @@ namespace Mfr.Models.Config
     public sealed class RenameLogConfig
     {
         /// <summary>
+        /// Default Limited retention count (Options spinner + field initializer).
+        /// </summary>
+        public const int DefaultLimit = 10;
+
+        /// <summary>
         /// How many on-disk rename logs to keep.
         /// <para>
         /// <c>0</c> = disk off (in-memory last operation still captured for Undo Last);
-        /// <see cref="int.MaxValue"/> = unlimited; default <c>10</c>. Options maps these to
+        /// <see cref="int.MaxValue"/> = unlimited; default <see cref="DefaultLimit"/>. Options maps these to
         /// Disabled / Unlimited / Limited radios and prunes on OK when the limit shrinks.
         /// </para>
         /// </summary>
         [ConfigIntRange(0, int.MaxValue)]
-        public int Limit = 10;
+        public int Limit = DefaultLimit;
     }
 }

@@ -1,3 +1,4 @@
+using Mfr.App.Ui.Services.RenameLog;
 using Mfr.App.Ui.ViewModels.LogDialog;
 using Mfr.Utils;
 
@@ -63,12 +64,12 @@ namespace Mfr.Tests.Ui.LogDialog
 
             Assert.Equal(3, viewModel.Items.Count);
             Assert.Equal(
-                RenameLogStore.FormatListTitle(RenameLogStore.LastOperation.CommittedAt),
+                RenameLogDisplay.FormatListTitle(RenameLogStore.LastOperation.CommittedAt),
                 viewModel.Items[0].Title
             );
             Assert.True(viewModel.Items[0].IsLastOperation);
-            Assert.Equal(RenameLogStore.FormatDiskListTitle(newerPath), viewModel.Items[1].Title);
-            Assert.Equal(RenameLogStore.FormatDiskListTitle(olderPath), viewModel.Items[2].Title);
+            Assert.Equal(RenameLogDisplay.FormatDiskListTitle(newerPath), viewModel.Items[1].Title);
+            Assert.Equal(RenameLogDisplay.FormatDiskListTitle(olderPath), viewModel.Items[2].Title);
             Assert.Same(viewModel.Items[0], viewModel.SelectedItem);
             Assert.Contains("mem-new.txt", viewModel.DetailsText);
             Assert.True(viewModel.UndoCommand.CanExecute(null));
@@ -105,7 +106,7 @@ namespace Mfr.Tests.Ui.LogDialog
             Assert.False(item.IsLastOperation);
             Assert.Equal(written, item.FilePath);
             Assert.Equal(written, RenameLogStore.LastWrittenFilePath);
-            Assert.Equal(RenameLogStore.FormatDiskListTitle(written), item.Title);
+            Assert.Equal(RenameLogDisplay.FormatDiskListTitle(written), item.Title);
             Assert.Same(RenameLogStore.LastOperation, item.TryGetLog(out var error));
             Assert.Null(error);
             Assert.Contains("b.txt", viewModel.DetailsText);

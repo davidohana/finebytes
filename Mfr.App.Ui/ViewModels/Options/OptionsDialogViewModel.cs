@@ -10,9 +10,9 @@ namespace Mfr.App.Ui.ViewModels.Options
     public sealed partial class OptionsDialogViewModel : ViewModelBase
     {
         /// <summary>
-        /// Default limited retention count (matches <see cref="RenameLogConfig.Limit"/> default).
+        /// Default limited retention count (matches <see cref="RenameLogConfig.DefaultLimit"/>).
         /// </summary>
-        public const int DefaultLimitedCount = 10;
+        public const int DefaultLimitedCount = RenameLogConfig.DefaultLimit;
 
         /// <summary>
         /// Minimum value for the Limited spinner (MFR7 parity).

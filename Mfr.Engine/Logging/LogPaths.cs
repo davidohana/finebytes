@@ -80,37 +80,21 @@ namespace Mfr.Engine.Logging
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(logDirectoryPath);
 
-            if (!Directory.Exists(logDirectoryPath) || maxSessionFiles < 1)
+            if (maxSessionFiles < 1)
             {
                 return;
             }
 
             var prefix = sessionLogPrefix ?? string.Empty;
             var extension = sessionLogExtension ?? string.Empty;
-            var sessionLogFilePaths = Directory
-                .EnumerateFiles(logDirectoryPath, $"{prefix}*{extension}", SearchOption.TopDirectoryOnly)
-                .Select(path => new FileInfo(path))
-                .OrderByDescending(fileInfo => fileInfo.CreationTimeUtc)
-                .ThenByDescending(fileInfo => fileInfo.Name, StringComparer.Ordinal)
-                .ToList();
-
-            if (sessionLogFilePaths.Count <= maxSessionFiles)
-            {
-                return;
-            }
-
-            foreach (var fileInfo in sessionLogFilePaths.Skip(maxSessionFiles))
-            {
-                try
-                {
-                    fileInfo.Delete();
-                    Log.Information("Deleted old log file '{LogFilePath}' during pruning.", fileInfo.FullName);
-                }
-                catch (Exception ex)
-                {
-                    Log.Warning(ex, "Failed to delete old log file '{LogFilePath}' during pruning.", fileInfo.FullName);
-                }
-            }
+            NewestFilesPruner.PruneByCreationTimeUtc(
+                directoryPath: logDirectoryPath,
+                keepCount: maxSessionFiles,
+                searchPattern: $"{prefix}*{extension}",
+                onDeleted: path => Log.Information("Deleted old log file '{LogFilePath}' during pruning.", path),
+                onFailed: (path, ex) =>
+                    Log.Warning(ex, "Failed to delete old log file '{LogFilePath}' during pruning.", path)
+            );
         }
 
         /// <summary>

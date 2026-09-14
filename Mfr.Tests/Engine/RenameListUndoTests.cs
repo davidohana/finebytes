@@ -1,5 +1,8 @@
+using Mfr.App.Ui.Services.RenameLog;
 using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
+using Mfr.Metadata;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Engine
@@ -57,7 +60,46 @@ namespace Mfr.Tests.Engine
             Assert.NotNull(RenameLogStore.LastOperation);
             Assert.True(RenameLogStore.LastOperation.IsUndo);
             Assert.Equal(sourcePath, Assert.Single(RenameLogStore.LastOperation.Entries).DestinationPath);
-            Assert.Contains("Operation: Undo", RenameLogStore.LastOperation.FormatDetails(), StringComparison.Ordinal);
+            Assert.Contains(
+                "Operation: Undo",
+                RenameLogDisplay.FormatDetails(RenameLogStore.LastOperation),
+                StringComparison.Ordinal
+            );
+        }
+
+        /// <summary>
+        /// Verifies Undo restores an AudioTagSetter title change on FLAC via OldValues + Commit.
+        /// </summary>
+        [Fact]
+        public void Undo_restores_audio_tag_title_on_flac()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "metaflac.flac");
+            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
+            var sourcePath = dir.CombinePath("undo-flac.flac");
+            File.Copy(fixturePath, sourcePath, overwrite: false);
+
+            var originalTitle = AudioTagPersistence.Read(sourcePath).Semantic().Title;
+
+            var renameList = new RenameList();
+            renameList.AddSources([sourcePath]);
+            var goPlan = renameList.Preview(
+                FilterChain.CreateAllEnabled([
+                    new AudioTagSetterFilter(
+                        new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "UndoFlacTitle"))
+                    ),
+                ])
+            );
+            var goResults = renameList.Commit(goPlan, failFast: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(goResults).Status);
+            Assert.Equal("UndoFlacTitle", AudioTagPersistence.Read(sourcePath).Semantic().Title);
+            Assert.NotEqual("UndoFlacTitle", originalTitle);
+            Assert.NotNull(RenameLogStore.LastOperation);
+
+            var undoResult = renameList.Undo(RenameLogStore.LastOperation);
+            Assert.Equal(0, undoResult.NotLoadedCount);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(undoResult.Results).Status);
+            Assert.Equal(originalTitle, AudioTagPersistence.Read(sourcePath).Semantic().Title);
         }
 
         /// <summary>
@@ -108,7 +150,7 @@ namespace Mfr.Tests.Engine
                         Changes:
                         [
                             new RenamePropertyChange(
-                                Property: "StripAllEmbeddedTagsOnCommit",
+                                Property: RenamePropertyNames.StripAllEmbeddedTagsOnCommit,
                                 OldValue: "false",
                                 NewValue: "true"
                             ),
@@ -190,7 +232,7 @@ namespace Mfr.Tests.Engine
                 [
                     .. entry.Changes,
                     new RenamePropertyChange(
-                        Property: "StripAllEmbeddedTagsOnCommit",
+                        Property: RenamePropertyNames.StripAllEmbeddedTagsOnCommit,
                         OldValue: "false",
                         NewValue: "true"
                     ),

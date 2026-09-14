@@ -52,14 +52,14 @@ namespace Mfr.Engine.Preview
         {
             _AddRenamePropertyChangeIfStringDiffers(
                 changes,
-                propertyName: "Prefix",
+                propertyName: RenamePropertyNames.Prefix,
                 oldValue: original.Prefix,
                 newValue: preview.Prefix,
                 comparison: StringComparison.Ordinal
             );
             _AddRenamePropertyChangeIfStringDiffers(
                 changes,
-                propertyName: "Extension",
+                propertyName: RenamePropertyNames.Extension,
                 oldValue: original.Extension,
                 newValue: preview.Extension,
                 comparison: StringComparison.Ordinal
@@ -68,7 +68,7 @@ namespace Mfr.Engine.Preview
             // and must appear in change rows, matching IsPreviewPathUnchanged / HasPreviewChanges.
             _AddRenamePropertyChangeIfStringDiffers(
                 changes,
-                propertyName: "DirectoryPath",
+                propertyName: RenamePropertyNames.DirectoryPath,
                 oldValue: original.DirectoryPath,
                 newValue: preview.DirectoryPath,
                 comparison: StringComparison.Ordinal
@@ -87,7 +87,7 @@ namespace Mfr.Engine.Preview
             {
                 changes.Add(
                     new RenamePropertyChange(
-                        Property: "Attributes",
+                        Property: RenamePropertyNames.Attributes,
                         OldValue: original.Attributes.ToString(),
                         NewValue: preview.Attributes.ToString()
                     )
@@ -96,19 +96,19 @@ namespace Mfr.Engine.Preview
 
             _AddRenamePropertyChangeIfLocalTimestampDiffers(
                 changes,
-                propertyName: "CreationTime",
+                propertyName: RenamePropertyNames.CreationTime,
                 originalValue: original.CreationTime,
                 previewValue: preview.CreationTime
             );
             _AddRenamePropertyChangeIfLocalTimestampDiffers(
                 changes,
-                propertyName: "LastWriteTime",
+                propertyName: RenamePropertyNames.LastWriteTime,
                 originalValue: original.LastWriteTime,
                 previewValue: preview.LastWriteTime
             );
             _AddRenamePropertyChangeIfLocalTimestampDiffers(
                 changes,
-                propertyName: "LastAccessTime",
+                propertyName: RenamePropertyNames.LastAccessTime,
                 originalValue: original.LastAccessTime,
                 previewValue: preview.LastAccessTime
             );
@@ -117,7 +117,7 @@ namespace Mfr.Engine.Preview
             {
                 changes.Add(
                     new RenamePropertyChange(
-                        Property: "StripAllEmbeddedTagsOnCommit",
+                        Property: RenamePropertyNames.StripAllEmbeddedTagsOnCommit,
                         OldValue: JsonSerializer.Serialize(false),
                         NewValue: JsonSerializer.Serialize(true)
                     )
@@ -156,41 +156,53 @@ namespace Mfr.Engine.Preview
 
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Block.Id3v1",
+                RenamePropertyNames.AudioTagBlock(RenamePropertyNames.Id3v1),
                 original.Id3v1,
                 preview.Id3v1,
                 _DiffId3v1Fields
             );
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Block.Id3v2",
+                RenamePropertyNames.AudioTagBlock(RenamePropertyNames.Id3v2),
                 original.Id3v2,
                 preview.Id3v2,
                 _DiffId3v2Fields
             );
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Block.Xiph",
+                RenamePropertyNames.AudioTagBlock(RenamePropertyNames.Xiph),
                 original.Xiph,
                 preview.Xiph,
                 _DiffXiphFields
             );
-            _AppendBlockPresenceAndFieldDiffs(changes, "AudioTag.Block.Ape", original.Ape, preview.Ape, _DiffApeFields);
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Block.RiffInfo",
+                RenamePropertyNames.AudioTagBlock(RenamePropertyNames.Ape),
+                original.Ape,
+                preview.Ape,
+                _DiffApeFields
+            );
+            _AppendBlockPresenceAndFieldDiffs(
+                changes,
+                RenamePropertyNames.AudioTagBlock(RenamePropertyNames.RiffInfo),
                 original.RiffInfo,
                 preview.RiffInfo,
                 _DiffRiffInfoFields
             );
             _AppendBlockPresenceAndFieldDiffs(
                 changes,
-                "AudioTag.Block.Apple",
+                RenamePropertyNames.AudioTagBlock(RenamePropertyNames.Apple),
                 original.Apple,
                 preview.Apple,
                 _DiffAppleFields
             );
-            _AppendBlockPresenceAndFieldDiffs(changes, "AudioTag.Block.Asf", original.Asf, preview.Asf, _DiffAsfFields);
+            _AppendBlockPresenceAndFieldDiffs(
+                changes,
+                RenamePropertyNames.AudioTagBlock(RenamePropertyNames.Asf),
+                original.Asf,
+                preview.Asf,
+                _DiffAsfFields
+            );
         }
 
         private static void _AppendBlockPresenceAndFieldDiffs<T>(
