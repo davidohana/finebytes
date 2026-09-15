@@ -7,7 +7,7 @@ using Mfr.Tests.Ui.AppliedFilters;
 namespace Mfr.Tests.Ui.MainWindow
 {
     /// <summary>
-    /// Main-window Undo Last command enablement, confirm gate, and status outcomes.
+    /// Main-window Undo Last command enablement, confirm gate, and prepare-session outcomes.
     /// </summary>
     [Collection(ConfigStoreCollection.Name)]
     public sealed class MainWindowUndoTests : IDisposable
@@ -64,10 +64,10 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies Undo Last restores the prior name, refreshes the File List, and publishes status.
+        /// Verifies Undo Last prepares a preview session without changing disk or refreshing the File List.
         /// </summary>
         [AvaloniaFact]
-        public async Task UndoLast_restores_rename_and_refreshes_file_list()
+        public async Task UndoLast_prepares_session_without_commit_or_file_list_refresh()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var source = Path.Combine(dir, "alpha.txt");
@@ -88,16 +88,99 @@ namespace Mfr.Tests.Ui.MainWindow
             FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             Assert.True(File.Exists(destination));
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "renamed.txt");
+            Assert.Single(viewModel.AppliedFiltersViewModel.Steps);
 
             await viewModel.UndoLastCommand.ExecuteAsync(null).ConfigureAwait(true);
+
+            Assert.True(File.Exists(destination));
+            Assert.False(File.Exists(source));
+            Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "renamed.txt");
+            Assert.DoesNotContain(viewModel.FileListViewModel.Entries, entry => entry.Name == "alpha.txt");
+            Assert.Empty(viewModel.AppliedFiltersViewModel.Steps);
+            Assert.Contains("Prepared undo", viewModel.StatusHint.ToPlainText());
+            Assert.Contains("press GO", viewModel.StatusHint.ToPlainText());
+            Assert.Equal(RenameListProgressOperation.Add, viewModel.RenameListViewModel.Progress.Operation);
+
+            var prepared = Assert.Single(viewModel.RenameListViewModel.Entries);
+            Assert.Equal(destination, prepared.EngineItem.Original.FullPath);
+            Assert.Equal(source, prepared.EngineItem.Preview.FullPath);
+            Assert.NotNull(RenameLogStore.LastOperation);
+            Assert.True(RenameLogStore.LastOperation.HasUndoableEntries);
+        }
+
+        /// <summary>
+        /// Verifies prepare with Auto-Preview on still clears filters and keeps sticky reverse paths.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task UndoLast_with_auto_preview_clears_filters_and_keeps_sticky_preview()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = Path.Combine(dir, "alpha.txt");
+            var destination = Path.Combine(dir, "renamed.txt");
+            await File.WriteAllTextAsync(source, "alpha");
+            var viewModel = new MainWindowViewModel(dir);
+            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
+            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
+            ConfigStore.Ui.SuppressedConfirmations =
+            [
+                ConfirmationKind.GoWithPreviewErrors,
+                ConfirmationKind.UndoRename,
+            ];
+
+            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            Assert.True(File.Exists(destination));
+            Assert.True(viewModel.RenameListViewModel.IsAutoPreview);
+
+            await viewModel.UndoLastCommand.ExecuteAsync(null).ConfigureAwait(true);
+            await viewModel.WaitForPendingPreviewAsync().ConfigureAwait(true);
+
+            Assert.True(File.Exists(destination));
+            Assert.False(File.Exists(source));
+            Assert.Empty(viewModel.AppliedFiltersViewModel.Steps);
+            Assert.Contains("Prepared undo", viewModel.StatusHint.ToPlainText());
+
+            var prepared = Assert.Single(viewModel.RenameListViewModel.Entries);
+            Assert.Equal(destination, prepared.EngineItem.Original.FullPath);
+            Assert.Equal(source, prepared.EngineItem.Preview.FullPath);
+        }
+
+        /// <summary>
+        /// Verifies GO after PrepareUndo restores the prior name and refreshes the File List.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task UndoLast_then_Go_restores_rename_and_refreshes_file_list()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var source = Path.Combine(dir, "alpha.txt");
+            var destination = Path.Combine(dir, "renamed.txt");
+            await File.WriteAllTextAsync(source, "alpha");
+            var viewModel = new MainWindowViewModel(dir);
+            viewModel.RenameListViewModel.DisableAutoPreview();
+            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
+            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
+            ConfigStore.Ui.SuppressedConfirmations =
+            [
+                ConfirmationKind.GoWithPreviewErrors,
+                ConfirmationKind.UndoRename,
+            ];
+
+            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+            Assert.True(File.Exists(destination));
+
+            await viewModel.UndoLastCommand.ExecuteAsync(null).ConfigureAwait(true);
+            Assert.True(File.Exists(destination));
+
+            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
             FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
 
             Assert.True(File.Exists(source));
             Assert.False(File.Exists(destination));
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "alpha.txt");
             Assert.DoesNotContain(viewModel.FileListViewModel.Entries, entry => entry.Name == "renamed.txt");
-            Assert.Contains("Undid", viewModel.StatusHint.ToPlainText());
-            Assert.Equal(RenameListProgressOperation.Commit, viewModel.RenameListViewModel.Progress.Operation);
+            Assert.True(RenameLogStore.LastOperation!.IsUndo);
         }
 
         /// <summary>
@@ -130,7 +213,7 @@ namespace Mfr.Tests.Ui.MainWindow
                 },
             };
 
-            var started = await viewModel.RenameListViewModel.UndoLastAsync().ConfigureAwait(true);
+            var started = await viewModel.RenameListViewModel.PrepareUndoLastAsync().ConfigureAwait(true);
 
             Assert.False(started);
             Assert.Equal(1, confirmCalls);
@@ -170,8 +253,9 @@ namespace Mfr.Tests.Ui.MainWindow
             await viewModel.UndoLastCommand.ExecuteAsync(null).ConfigureAwait(true);
 
             Assert.Equal(0, confirmCalls);
-            Assert.True(File.Exists(source));
-            Assert.False(File.Exists(destination));
+            Assert.True(File.Exists(destination));
+            Assert.False(File.Exists(source));
+            Assert.Contains("Prepared undo", viewModel.StatusHint.ToPlainText());
         }
 
         /// <summary>
@@ -184,7 +268,7 @@ namespace Mfr.Tests.Ui.MainWindow
             viewModel.RenameListViewModel.DisableAutoPreview();
             RenameLogStore.ClearLastOperation();
 
-            var started = await viewModel.RenameListViewModel.UndoLastAsync().ConfigureAwait(true);
+            var started = await viewModel.RenameListViewModel.PrepareUndoLastAsync().ConfigureAwait(true);
 
             Assert.False(started);
             Assert.Equal("Nothing to undo.", viewModel.RenameListViewModel.LastStatusMessage.ToPlainText());
@@ -215,7 +299,7 @@ namespace Mfr.Tests.Ui.MainWindow
                 ]
             );
 
-            var started = await viewModel.RenameListViewModel.UndoAsync(log).ConfigureAwait(true);
+            var started = await viewModel.RenameListViewModel.PrepareUndoAsync(log).ConfigureAwait(true);
 
             Assert.True(started);
             Assert.Equal(

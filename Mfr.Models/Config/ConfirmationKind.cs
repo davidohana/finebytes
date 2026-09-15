@@ -30,7 +30,7 @@ namespace Mfr.Models.Config
         ClearAppliedFilters = 3,
 
         /// <summary>
-        /// Confirm before Undo Last / Log-window Undo (re-commits OldValues).
+        /// Confirm before Undo Last / Log-window Undo (prepare preview session; user presses GO to apply).
         /// </summary>
         UndoRename = 4,
 

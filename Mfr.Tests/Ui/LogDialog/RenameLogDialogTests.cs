@@ -203,10 +203,10 @@ namespace Mfr.Tests.Ui.LogDialog
         }
 
         /// <summary>
-        /// Verifies undoing a loaded disk log restores the prior name (same path as Log-window Undo).
+        /// Verifies Log-window Undo prepares a session; GO then restores the prior name.
         /// </summary>
         [AvaloniaFact]
-        public async Task UndoFromLog_disk_log_restores_rename()
+        public async Task UndoFromLog_disk_log_prepares_then_Go_restores_rename()
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var logDir = _tempDirectoryFixture.CreateTempDir();
@@ -248,9 +248,16 @@ namespace Mfr.Tests.Ui.LogDialog
 
             await viewModel.UndoFromLogAsync(diskLog).ConfigureAwait(true);
 
+            Assert.True(File.Exists(destination));
+            Assert.False(File.Exists(source));
+            Assert.Empty(viewModel.AppliedFiltersViewModel.Steps);
+            Assert.Contains("Prepared undo", viewModel.StatusHint.ToPlainText());
+
+            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+
             Assert.True(File.Exists(source));
             Assert.False(File.Exists(destination));
-            Assert.Contains("Undid", viewModel.StatusHint.ToPlainText());
+            Assert.True(RenameLogStore.LastOperation!.IsUndo);
         }
 
         /// <summary>

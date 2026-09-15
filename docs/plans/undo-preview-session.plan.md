@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: p3-ui-prepare-session
     content: "P3: Wire Undo Last/Log to prepare; clear filters; status; confirm copy; no File List refresh; update UI tests"
-    status: pending
+    status: completed
   - id: p4-columns-overrides
     content: "P4: Replace visible columns from undo fields + SetOverride mirror for writable keys"
     status: pending
@@ -110,7 +110,7 @@ Hook points:
 - Exit criteria: PrepareUndo loads destinations, Preview shows OldValues, no filesystem change, re-preview with empty filters keeps OldValues; strip-only skipped
 - Tests: rewrite [`Mfr.Tests/Engine/RenameListUndoTests.cs`](Mfr.Tests/Engine/RenameListUndoTests.cs) for prepare (not disk restore); round-trip = PrepareUndo + Commit
 
-### P3 — UI: Undo Last / Log → prepare session
+### P3 — UI: Undo Last / Log → prepare session — done
 
 - Scope / files: [`RenameListViewModel.Undo.cs`](Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Undo.cs), MainWindow undo/log handlers, confirm string in [`RenameListView.axaml.cs`](Mfr.App.Ui/Views/RenameList/RenameListView.axaml.cs) (warn: list replaced + filters cleared + press GO), status (“Prepared undo of N items — press GO to apply”); clear filters via `ReplaceFromChain`; **no** File List refresh on prepare
 - Exit criteria: Ctrl+Z / Log Undo fills list + clears filters; disk unchanged until GO; GO restores files and writes undo log; confirm still gated by policy

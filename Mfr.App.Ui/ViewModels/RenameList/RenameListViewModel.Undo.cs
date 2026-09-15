@@ -1,6 +1,7 @@
 using Mfr.Engine.RenameList;
 using Mfr.Engine.RenameLog;
 using Mfr.Models.Config;
+using Mfr.Models.Filters;
 using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
@@ -11,13 +12,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         /// <summary>
-        /// Confirms (when policy requires), rebuilds the list from the last GO, and re-commits OldValues.
+        /// Confirms (when policy requires) and prepares an undo session from the last GO (no Commit).
         /// </summary>
         /// <returns>
-        /// <see langword="true"/> when the undo commit stage was reached; <see langword="false"/> when there was
-        /// nothing to undo, confirm was declined, or the operation was refused while busy.
+        /// <see langword="true"/> when prepare finished (including zero loaded rows); <see langword="false"/> when
+        /// there was nothing to undo, confirm was declined, or the operation was refused while busy.
         /// </returns>
-        public Task<bool> UndoLastAsync()
+        public Task<bool> PrepareUndoLastAsync()
         {
             var log = RenameLogStore.LastOperation;
             if (log is null || !log.HasUndoableEntries)
@@ -31,18 +32,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return Task.FromResult(false);
             }
 
-            return UndoAsync(log);
+            return PrepareUndoAsync(log);
         }
 
         /// <summary>
-        /// Confirms (when policy requires), rebuilds the list from <paramref name="log"/>, and re-commits OldValues.
+        /// Confirms (when policy requires), rebuilds the list from <paramref name="log"/> as a preview-only
+        /// undo session, and clears Applied Filters. User presses GO to apply.
         /// </summary>
         /// <param name="log">Rename operation to reverse (last op or a loaded disk log).</param>
         /// <returns>
-        /// <see langword="true"/> when the undo commit stage was reached; <see langword="false"/> when there was
-        /// nothing to undo, confirm was declined, or the operation was refused while busy.
+        /// <see langword="true"/> when prepare finished (including zero loaded rows); <see langword="false"/> when
+        /// there was nothing to undo, confirm was declined, or the operation was refused while busy.
         /// </returns>
-        public async Task<bool> UndoAsync(RenameLog log)
+        public async Task<bool> PrepareUndoAsync(RenameLog log)
         {
             ArgumentNullException.ThrowIfNull(log);
 
@@ -63,35 +65,36 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             RenameListPrepareUndoResult? prepareResult = null;
-            IReadOnlyList<RenameResultItem>? results = null;
-            var commitCompleted = await _RunProgressAsync(
-                    RenameListProgressOperation.Commit,
+            var prepareCompleted = await _RunProgressAsync(
+                    RenameListProgressOperation.Add,
                     (token, progress) =>
                     {
                         prepareResult = _renameList.PrepareUndo(log, cancellationToken: token, progress: progress);
-                        results = _renameList.Commit(
-                            prepareResult.Plan,
-                            failFast: false,
-                            dryRun: false,
-                            cancellationToken: token,
-                            progress: progress
-                        );
                     }
                 )
                 .ConfigureAwait(true);
 
+            // Clear filters before replacing Entries so MembershipChanged Auto-Preview sees an empty chain
+            // (not the pre-undo filters). Undo confirm already warned filters will be cleared.
+            _appliedFilters?.ReplaceFromChain(new FilterChain { Steps = [] });
             _ReplaceEntriesFromEngine();
-            _ClearPreviewCounts();
-            _RefreshFieldDisplay();
 
-            var undoneCount = results?.Count(item => item.Status == RenameStatus.CommitOk) ?? 0;
-            var commitErrorCount = results?.Count(item => item.Status == RenameStatus.CommitError) ?? 0;
+            if (prepareResult is not null)
+            {
+                _ApplyPreviewPlan(prepareResult.Plan);
+            }
+            else
+            {
+                _ClearPreviewCounts();
+                _RefreshFieldDisplay();
+            }
+
+            var preparedCount = prepareResult?.PreparedCount ?? 0;
             var notLoadedCount = prepareResult?.NotLoadedCount ?? 0;
-            LastStatusMessage = _FormatUndoOutcome(
-                undoneCount: undoneCount,
-                errorCount: commitErrorCount,
+            LastStatusMessage = _FormatPrepareUndoOutcome(
+                preparedCount: preparedCount,
                 notLoadedCount: notLoadedCount,
-                stopped: !commitCompleted
+                stopped: !prepareCompleted
             );
 
             return true;
@@ -114,7 +117,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Rebuilds <see cref="Entries"/> to match the engine after Undo replaces the list.
+        /// Rebuilds <see cref="Entries"/> to match the engine after PrepareUndo replaces the list.
         /// </summary>
         private void _ReplaceEntriesFromEngine()
         {
@@ -125,30 +128,27 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Builds the status-bar message after an Undo commit (or Stop mid-undo).
+        /// Builds the status-bar message after PrepareUndo (or Stop mid-prepare).
         /// </summary>
-        private static StyledTextDisplay _FormatUndoOutcome(
-            int undoneCount,
-            int errorCount,
-            int notLoadedCount,
-            bool stopped
-        )
+        private static StyledTextDisplay _FormatPrepareUndoOutcome(int preparedCount, int notLoadedCount, bool stopped)
         {
-            if (!stopped && undoneCount == 0 && errorCount == 0 && notLoadedCount > 0)
+            if (!stopped && preparedCount == 0 && notLoadedCount > 0)
             {
                 return StatusBarText.Warning($"Could not load {notLoadedCount} item(s) for undo (paths missing).");
             }
 
-            var primary = _FormatSuccessPrimary(successCount: undoneCount, stopped: stopped, successPastVerb: "Undid");
             var parts = new List<StyledTextDisplay>();
-            if (primary is not null)
+            if (stopped)
             {
-                parts.Add(primary);
+                parts.Add(
+                    preparedCount > 0
+                        ? StatusBarText.Warning($"Stopped. Prepared undo of {preparedCount} item(s).")
+                        : StatusBarText.Warning("Stopped.")
+                );
             }
-
-            if (errorCount > 0)
+            else if (preparedCount > 0)
             {
-                parts.Add(StatusBarText.Error($"{errorCount} error(s) during undo."));
+                parts.Add(StatusBarText.Neutral($"Prepared undo of {preparedCount} item(s) — press GO to apply."));
             }
 
             if (notLoadedCount > 0)
@@ -158,18 +158,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             if (parts.Count == 0)
             {
-                return StatusBarText.Neutral("No items were undone.");
+                return StatusBarText.Neutral("No items were prepared for undo.");
             }
 
             return _CombineStatusParts(parts);
         }
 
         /// <summary>
-        /// Builds the stopped or success primary fragment shared by GO and Undo status lines.
+        /// Builds the stopped or success primary fragment for GO status lines.
         /// </summary>
-        /// <param name="successCount">CommitOk count (renamed / undone).</param>
-        /// <param name="stopped">Whether the operation was canceled mid-commit.</param>
-        /// <param name="successPastVerb">Past-tense verb (<c>Renamed</c> / <c>Undid</c>).</param>
+        /// <param name="successCount">CommitOk count.</param>
+        /// <param name="stopped">Whether the operation was canceled mid-progress.</param>
+        /// <param name="successPastVerb">Past-tense verb (<c>Renamed</c>).</param>
         /// <returns>
         /// Warning when stopped; Neutral success when <paramref name="successCount"/> &gt; 0 and not stopped;
         /// otherwise <see langword="null"/>.

@@ -237,10 +237,10 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Undoes the last GO via the in-memory rename log (re-commits OldValues).
+        /// Prepares an undo session from the last GO (preview only; user presses GO to apply).
         /// </summary>
         /// <remarks>
-        /// Reloads the File List after undo so restored names appear without a manual refresh.
+        /// Does not refresh the File List — disk is unchanged until a later GO.
         /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanUndoLast))]
         public async Task UndoLastAsync()
@@ -251,18 +251,12 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 return;
             }
 
-            var undoStarted = await RenameListViewModel.UndoLastAsync().ConfigureAwait(true);
+            await RenameListViewModel.PrepareUndoLastAsync().ConfigureAwait(true);
             UndoLastCommand.NotifyCanExecuteChanged();
-            if (!undoStarted)
-            {
-                return;
-            }
-
-            await _RefreshFileListAfterRenameCommitAsync().ConfigureAwait(true);
         }
 
         /// <summary>
-        /// Undoes a rename log chosen in the Rename Log dialog (same confirm + re-commit as Undo Last).
+        /// Prepares an undo session from a rename log chosen in the Rename Log dialog (same confirm as Undo Last).
         /// </summary>
         /// <param name="log">Log selected in the dialog (last op or disk).</param>
         internal async Task UndoFromLogAsync(RenameLog log)
@@ -275,18 +269,12 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 return;
             }
 
-            var undoStarted = await RenameListViewModel.UndoAsync(log).ConfigureAwait(true);
+            await RenameListViewModel.PrepareUndoAsync(log).ConfigureAwait(true);
             UndoLastCommand.NotifyCanExecuteChanged();
-            if (!undoStarted)
-            {
-                return;
-            }
-
-            await _RefreshFileListAfterRenameCommitAsync().ConfigureAwait(true);
         }
 
         /// <summary>
-        /// Reloads the File List after GO/Undo and re-previews when Auto-Preview is on.
+        /// Reloads the File List after GO and re-previews when Auto-Preview is on.
         /// </summary>
         private async Task _RefreshFileListAfterRenameCommitAsync()
         {

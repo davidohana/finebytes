@@ -203,7 +203,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             return await _ConfirmMessageAsync(
                     title: "Undo",
-                    message: "Undo this rename operation?",
+                    message: "Replace the Rename List with this undo session and clear Applied Filters? Press GO to apply.",
                     kind: ConfirmationKind.UndoRename
                 )
                 .ConfigureAwait(true);
