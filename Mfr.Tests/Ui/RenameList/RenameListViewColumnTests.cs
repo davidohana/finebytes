@@ -9,6 +9,7 @@ using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
+using Mfr.Models.Rename;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.Tags;
@@ -947,10 +948,51 @@ namespace Mfr.Tests.Ui.RenameList
 
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.True(entry.HasPreviewError);
+            Assert.True(entry.HasStatusError);
 
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
             Assert.Contains("rename-list-preview-error", row.Classes);
+            _AssertRowErrorGlyphVisible(row, shouldBeVisible: true);
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies commit-error rows show the status-column glyph (in addition to plum highlight).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Grid_shows_row_error_glyph_for_commit_error()
+        {
+            var dir = _context.CreateTempDir();
+            var path = Path.Combine(dir, "note.txt");
+            File.WriteAllText(path, "plain text");
+
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
+
+            var entry = Assert.Single(renameListViewModel.Entries);
+            entry.EngineItem.CommitError = new RenameItemError("The destination could not be written.");
+            Assert.True(entry.HasCommitError);
+            Assert.True(entry.HasStatusError);
+
+            var view = new RenameListView { DataContext = renameListViewModel };
+            var window = new Window
+            {
+                Width = 800,
+                Height = 180,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Dispatcher.UIThread.InvokeAsync(() => { }, DispatcherPriority.Loaded);
+            Dispatcher.UIThread.RunJobs();
+
+            var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
+            var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
+            Assert.Contains("rename-list-commit-error", row.Classes);
+            _AssertRowErrorGlyphVisible(row, shouldBeVisible: true);
 
             window.Close();
         }
@@ -1210,6 +1252,7 @@ namespace Mfr.Tests.Ui.RenameList
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.True(entry.HasRowError);
+            Assert.True(entry.HasStatusError);
 
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
             _AssertRowErrorGlyphVisible(row, shouldBeVisible: true);
@@ -1252,6 +1295,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(2, grid.Columns.Count);
             var entry = Assert.Single(renameListViewModel.Entries);
             Assert.False(entry.HasRowError);
+            Assert.False(entry.HasStatusError);
 
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
             _AssertRowErrorGlyphVisible(row, shouldBeVisible: false);

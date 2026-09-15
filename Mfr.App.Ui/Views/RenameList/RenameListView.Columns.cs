@@ -114,7 +114,7 @@ namespace Mfr.App.Ui.Views.RenameList
         /// <summary>
         /// Builds the centered "!" status-column header with its tooltip.
         /// </summary>
-        private static Control _CreateRowStatusHeader()
+        private static TextBlock _CreateRowStatusHeader()
         {
             var header = new TextBlock
             {

@@ -66,6 +66,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool HasCommitError => EngineItem.CommitError is not null;
 
         /// <summary>
+        /// Returns whether the status column should show the error glyph.
+        /// <para>
+        /// True for commit, preview, or load/missing errors. Priority for tips matches row highlight:
+        /// commit, then preview, then load/missing.
+        /// </para>
+        /// </summary>
+        public bool HasStatusError => HasCommitError || HasPreviewError || HasRowError;
+
+        /// <summary>
         /// Returns whether this row path is missing from disk (whole-row gray; not a metadata load error).
         /// </summary>
         public bool IsMissingFromDisk => RenameListDiskPaths.IsMissingFromDisk(EngineItem);

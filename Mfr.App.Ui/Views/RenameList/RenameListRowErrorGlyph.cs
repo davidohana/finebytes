@@ -44,17 +44,41 @@ namespace Mfr.App.Ui.Views.RenameList
                 VerticalAlignment = VerticalAlignment.Center,
             };
 
-            void ApplyVisibility()
+            void ApplyState()
             {
-                mark.IsVisible = mark.DataContext is RenameListEntry { HasRowError: true };
+                if (mark.DataContext is not RenameListEntry entry || !entry.HasStatusError)
+                {
+                    mark.IsVisible = false;
+                    ToolTip.SetTip(mark, null);
+                    return;
+                }
+
+                mark.IsVisible = true;
+                ToolTip.SetTip(mark, RichToolTip.Wrap(_TipFor(entry)));
             }
 
-            mark.DataContextChanged += (_, _) => ApplyVisibility();
-            RenameListView.ListenToFieldDisplayRevision(mark, listViewModel, ApplyVisibility);
-            ApplyVisibility();
-
-            ToolTip.SetTip(mark, RichToolTip.Wrap(AppTips.RenameListRowErrorGlyph));
+            mark.DataContextChanged += (_, _) => ApplyState();
+            RenameListView.ListenToFieldDisplayRevision(mark, listViewModel, ApplyState);
+            ApplyState();
             return mark;
+        }
+
+        /// <summary>
+        /// Picks the glyph tip for the highest-priority error on <paramref name="entry"/>.
+        /// </summary>
+        private static string _TipFor(RenameListEntry entry)
+        {
+            if (entry.HasCommitError)
+            {
+                return AppTips.RenameListCommitErrorGlyph;
+            }
+
+            if (entry.HasPreviewError)
+            {
+                return AppTips.RenameListPreviewErrorGlyph;
+            }
+
+            return AppTips.RenameListRowErrorGlyph;
         }
     }
 }
