@@ -1,3 +1,4 @@
+using System.Globalization;
 using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
@@ -5,15 +6,15 @@ using Mfr.Models.RenameList.Fields.Extended;
 namespace Mfr.Models.Rename
 {
     /// <summary>
-    /// Maps rename-log <see cref="RenamePropertyChange.Property"/> names to preview-side Rename List field keys.
+    /// Path and filesystem rename-log properties: preview field keys and OldValue apply onto <see cref="FileMeta"/>.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Used by PrepareUndo for column replace and writable ForceValue mirrors. Unrestorable strip and
-    /// <c>AudioTag.Block.*</c> properties are unmapped (sticky OldValue seed remains the fidelity path).
+    /// Shared by PrepareUndo column replace, ForceValue mirrors, and undo OldValue seeding. Unrestorable strip and
+    /// <c>AudioTag.Block.*</c> stay outside this map (sticky fidelity / dedicated appliers).
     /// </para>
     /// </remarks>
-    public static class RenamePropertyFieldKeys
+    public static class RenamePropertyFileMeta
     {
         /// <summary>
         /// Tries to map a logged property name to its preview-side catalog field key.
@@ -85,6 +86,64 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Applies a logged OldValue onto <paramref name="preview"/> for path/filesystem properties.
+        /// </summary>
+        /// <param name="preview">Preview snapshot to mutate.</param>
+        /// <param name="property">Canonical <see cref="RenamePropertyNames"/> value.</param>
+        /// <param name="oldValue">Logged OldValue string.</param>
+        /// <returns><see langword="true"/> when <paramref name="property"/> was handled here.</returns>
+        public static bool TryApplyOldValue(FileMeta preview, string property, string oldValue)
+        {
+            ArgumentNullException.ThrowIfNull(preview);
+            ArgumentNullException.ThrowIfNull(property);
+            ArgumentNullException.ThrowIfNull(oldValue);
+
+            if (property == RenamePropertyNames.Prefix)
+            {
+                preview.Prefix = oldValue;
+                return true;
+            }
+
+            if (property == RenamePropertyNames.Extension)
+            {
+                preview.Extension = oldValue;
+                return true;
+            }
+
+            if (property == RenamePropertyNames.DirectoryPath)
+            {
+                preview.DirectoryPath = oldValue;
+                return true;
+            }
+
+            if (property == RenamePropertyNames.Attributes)
+            {
+                preview.Attributes = Enum.Parse<FileAttributes>(oldValue);
+                return true;
+            }
+
+            if (property == RenamePropertyNames.CreationTime)
+            {
+                preview.CreationTime = _ParseRoundtripLocal(oldValue);
+                return true;
+            }
+
+            if (property == RenamePropertyNames.LastWriteTime)
+            {
+                preview.LastWriteTime = _ParseRoundtripLocal(oldValue);
+                return true;
+            }
+
+            if (property == RenamePropertyNames.LastAccessTime)
+            {
+                preview.LastAccessTime = _ParseRoundtripLocal(oldValue);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Collects distinct preview field keys for mapped properties across <paramref name="changes"/> (first-seen order).
         /// </summary>
         /// <param name="changes">Logged property deltas.</param>
@@ -120,6 +179,11 @@ namespace Mfr.Models.Rename
             return CollectPreviewKeys(
                 log.Entries.Where(static entry => entry.IsUndoable).SelectMany(static entry => entry.Changes)
             );
+        }
+
+        private static DateTime _ParseRoundtripLocal(string oldValue)
+        {
+            return DateTime.Parse(oldValue, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
         }
     }
 }

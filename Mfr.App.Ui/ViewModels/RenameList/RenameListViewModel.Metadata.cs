@@ -47,8 +47,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             // Commit without flashing the pre-draft layout when enabling A/B:
             // - On: apply draft columns first (AbMode still off → no normalize), then set AbMode.
-            // - Off: clear AbMode first (expands current originals with preview companions) so
-            //   SetVisibleColumns can keep preview keys from the draft.
+            // - Off: clear AbMode without companion expand, then apply draft (shuttle already expanded).
             if (abModeEnabled)
             {
                 if (!columnsToApply.SequenceEqual(_visibleColumns))
@@ -60,7 +59,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
             else
             {
-                IsAbModeEnabled = false;
+                _DisableAbModeWithoutCompanionExpand();
                 if (!columnsToApply.SequenceEqual(_visibleColumns))
                 {
                     SetVisibleColumns(columnsToApply);

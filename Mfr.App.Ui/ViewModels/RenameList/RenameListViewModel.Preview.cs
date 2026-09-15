@@ -29,6 +29,42 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private bool _isAutoPreview = true;
 
         /// <summary>
+        /// Nesting count while prepare (or similar) batches membership/filter changes without Auto-Preview drains.
+        /// </summary>
+        private int _previewInputSuspendCount;
+
+        /// <summary>
+        /// Gets whether the shell should ignore membership/filter preview-input notifications.
+        /// </summary>
+        internal bool ArePreviewInputsSuspended => _previewInputSuspendCount > 0;
+
+        /// <summary>
+        /// Suppresses Auto-Preview input notifications until the returned scope is disposed.
+        /// </summary>
+        /// <returns>Scope that resumes notifications on dispose.</returns>
+        internal PreviewInputSuspendScope SuspendPreviewInputs()
+        {
+            _previewInputSuspendCount++;
+            return new PreviewInputSuspendScope(this);
+        }
+
+        /// <summary>
+        /// Scope returned by <see cref="SuspendPreviewInputs"/>.
+        /// </summary>
+        /// <param name="owner">Rename List that owns the suspend count.</param>
+        internal readonly struct PreviewInputSuspendScope(RenameListViewModel owner) : IDisposable
+        {
+            /// <inheritdoc />
+            public void Dispose()
+            {
+                if (owner._previewInputSuspendCount > 0)
+                {
+                    owner._previewInputSuspendCount--;
+                }
+            }
+        }
+
+        /// <summary>
         /// Toggles Auto-Preview. Turning it on notifies so the shell re-previews.
         /// </summary>
         [RelayCommand]

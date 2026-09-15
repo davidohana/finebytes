@@ -541,8 +541,44 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _visibleColumns = updated;
         }
 
+        /// <summary>
+        /// When true, Before/After Mode column normalize/expand is skipped (caller replaces columns).
+        /// </summary>
+        private bool _suppressAbModeColumnRewrite;
+
+        /// <summary>
+        /// Turns Before/After Mode off without inserting preview companions.
+        /// <para>
+        /// Use when the caller immediately replaces <see cref="VisibleColumns"/> (undo prepare, shuttle OK).
+        /// Toggle-off still expands companions via <see cref="IsAbModeEnabled"/>.
+        /// </para>
+        /// </summary>
+        private void _DisableAbModeWithoutCompanionExpand()
+        {
+            if (!IsAbModeEnabled)
+            {
+                return;
+            }
+
+            _suppressAbModeColumnRewrite = true;
+            try
+            {
+                IsAbModeEnabled = false;
+            }
+            finally
+            {
+                _suppressAbModeColumnRewrite = false;
+            }
+        }
+
         partial void OnIsAbModeEnabledChanged(bool value)
         {
+            if (_suppressAbModeColumnRewrite)
+            {
+                OnPropertyChanged(nameof(ProjectedColumns));
+                return;
+            }
+
             if (value)
             {
                 _NormalizeVisibleColumnsForAbMode();

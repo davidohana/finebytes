@@ -1,10 +1,10 @@
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.Filters.Replace;
 using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Ui.MainWindow
 {
@@ -39,7 +39,6 @@ namespace Mfr.Tests.Ui.MainWindow
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var source = Path.Combine(dir, "alpha.txt");
-            var destination = Path.Combine(dir, "renamed.txt");
             await File.WriteAllTextAsync(source, "alpha");
             var viewModel = new MainWindowViewModel(dir);
             viewModel.RenameListViewModel.DisableAutoPreview();
@@ -48,7 +47,7 @@ namespace Mfr.Tests.Ui.MainWindow
 
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
             viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
+            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(UndoPrepareTestUi.PrefixReplacer("alpha", "renamed"));
             ConfigStore.Ui.SuppressedConfirmations =
             [
                 ConfirmationKind.GoWithPreviewErrors,
@@ -57,7 +56,6 @@ namespace Mfr.Tests.Ui.MainWindow
 
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
 
-            Assert.True(File.Exists(destination));
             Assert.True(viewModel.UndoLastCommand.CanExecute(null));
 
             RenameLogStore.ClearLastOperation();
@@ -71,22 +69,9 @@ namespace Mfr.Tests.Ui.MainWindow
         [AvaloniaFact]
         public async Task UndoLast_prepares_session_without_commit_or_file_list_refresh()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var source = Path.Combine(dir, "alpha.txt");
-            var destination = Path.Combine(dir, "renamed.txt");
-            await File.WriteAllTextAsync(source, "alpha");
-            var viewModel = new MainWindowViewModel(dir);
-            viewModel.RenameListViewModel.DisableAutoPreview();
-            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.SuppressedConfirmations =
-            [
-                ConfirmationKind.GoWithPreviewErrors,
-                ConfirmationKind.UndoRename,
-            ];
-
-            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            var (viewModel, source, destination) = await UndoPrepareTestUi
+                .GoPrefixRenameAsync(_tempDirectoryFixture)
+                .ConfigureAwait(true);
             FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             Assert.True(File.Exists(destination));
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "renamed.txt");
@@ -130,21 +115,9 @@ namespace Mfr.Tests.Ui.MainWindow
         [AvaloniaFact]
         public async Task UndoLast_with_auto_preview_clears_filters_and_keeps_sticky_preview()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var source = Path.Combine(dir, "alpha.txt");
-            var destination = Path.Combine(dir, "renamed.txt");
-            await File.WriteAllTextAsync(source, "alpha");
-            var viewModel = new MainWindowViewModel(dir);
-            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.SuppressedConfirmations =
-            [
-                ConfirmationKind.GoWithPreviewErrors,
-                ConfirmationKind.UndoRename,
-            ];
-
-            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            var (viewModel, source, destination) = await UndoPrepareTestUi
+                .GoPrefixRenameAsync(_tempDirectoryFixture, disableAutoPreview: false)
+                .ConfigureAwait(true);
             Assert.True(File.Exists(destination));
             Assert.True(viewModel.RenameListViewModel.IsAutoPreview);
 
@@ -167,22 +140,9 @@ namespace Mfr.Tests.Ui.MainWindow
         [AvaloniaFact]
         public async Task UndoLast_then_Go_restores_rename_and_refreshes_file_list()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var source = Path.Combine(dir, "alpha.txt");
-            var destination = Path.Combine(dir, "renamed.txt");
-            await File.WriteAllTextAsync(source, "alpha");
-            var viewModel = new MainWindowViewModel(dir);
-            viewModel.RenameListViewModel.DisableAutoPreview();
-            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.SuppressedConfirmations =
-            [
-                ConfirmationKind.GoWithPreviewErrors,
-                ConfirmationKind.UndoRename,
-            ];
-
-            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            var (viewModel, source, destination) = await UndoPrepareTestUi
+                .GoPrefixRenameAsync(_tempDirectoryFixture)
+                .ConfigureAwait(true);
             FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             Assert.True(File.Exists(destination));
 
@@ -200,23 +160,46 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
+        /// Verifies prepare under Before/After Mode replaces columns without leaving companion expand.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task UndoLast_with_ab_mode_replaces_columns_without_companion_expand()
+        {
+            var (viewModel, _, destination) = await UndoPrepareTestUi
+                .GoPrefixRenameAsync(_tempDirectoryFixture)
+                .ConfigureAwait(true);
+            Assert.True(File.Exists(destination));
+
+            viewModel.RenameListViewModel.IsAbModeEnabled = true;
+            Assert.True(viewModel.RenameListViewModel.IsAbModeEnabled);
+            Assert.All(viewModel.RenameListViewModel.VisibleColumns, column => Assert.False(column.Key.IsPreview));
+
+            await viewModel.UndoLastCommand.ExecuteAsync(null).ConfigureAwait(true);
+
+            Assert.False(viewModel.RenameListViewModel.IsAbModeEnabled);
+            var visibleKeys = viewModel.RenameListViewModel.VisibleColumns.Select(column => column.Key).ToList();
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType),
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                ],
+                visibleKeys
+            );
+            Assert.DoesNotContain(
+                visibleKeys,
+                key => key == RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
+            );
+        }
+
+        /// <summary>
         /// Verifies confirm Undo when not suppressed and decline aborts without filesystem changes.
         /// </summary>
         [AvaloniaFact]
         public async Task UndoLast_confirm_decline_aborts()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var source = Path.Combine(dir, "alpha.txt");
-            var destination = Path.Combine(dir, "renamed.txt");
-            await File.WriteAllTextAsync(source, "alpha");
-            var viewModel = new MainWindowViewModel(dir);
-            viewModel.RenameListViewModel.DisableAutoPreview();
-            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
-            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
-            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            var (viewModel, source, destination) = await UndoPrepareTestUi
+                .GoPrefixRenameAsync(_tempDirectoryFixture)
+                .ConfigureAwait(true);
 
             ConfirmationPolicy.ClearSuppressions();
             var confirmCalls = 0;
@@ -243,18 +226,9 @@ namespace Mfr.Tests.Ui.MainWindow
         [AvaloniaFact]
         public async Task UndoLast_suppressed_skips_confirm()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var source = Path.Combine(dir, "alpha.txt");
-            var destination = Path.Combine(dir, "renamed.txt");
-            await File.WriteAllTextAsync(source, "alpha");
-            var viewModel = new MainWindowViewModel(dir);
-            viewModel.RenameListViewModel.DisableAutoPreview();
-            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
-            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
-            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            var (viewModel, source, destination) = await UndoPrepareTestUi
+                .GoPrefixRenameAsync(_tempDirectoryFixture)
+                .ConfigureAwait(true);
 
             var confirmCalls = 0;
             viewModel.RenameListViewModel.UiHooks = new RenameListUiHooks
@@ -321,23 +295,6 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Equal(
                 "Could not load 1 item(s) for undo (paths missing).",
                 viewModel.RenameListViewModel.LastStatusMessage.ToPlainText()
-            );
-        }
-
-        private static ReplacerFilter _PrefixReplacer(string find, string replacement)
-        {
-            return new ReplacerFilter(
-                Target: new FilePrefixTarget(),
-                Options: new ReplacerOptions(
-                    Find: find,
-                    Replacement: replacement,
-                    Match: new ReplacerMatchOptions(
-                        Mode: ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: false,
-                        WholeWord: false
-                    )
-                )
             );
         }
     }

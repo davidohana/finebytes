@@ -66,40 +66,43 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            RenameListPrepareUndoResult? prepareResult = null;
-            var prepareCompleted = await _RunProgressAsync(
-                    RenameListProgressOperation.Add,
-                    (token, progress) =>
-                    {
-                        prepareResult = _renameList.PrepareUndo(log, cancellationToken: token, progress: progress);
-                    }
-                )
-                .ConfigureAwait(true);
-
-            // Clear filters before replacing Entries so MembershipChanged Auto-Preview sees an empty chain
-            // (not the pre-undo filters). Undo confirm already warned filters will be cleared.
-            _appliedFilters?.ReplaceFromChain(new FilterChain { Steps = [] });
-            _ReplaceEntriesFromEngine();
-
-            if (prepareResult is not null)
+            using (SuspendPreviewInputs())
             {
-                _ApplyPreviewPlan(prepareResult.Plan);
-            }
-            else
-            {
-                _ClearPreviewCounts();
-                _RefreshFieldDisplay();
-            }
+                RenameListPrepareUndoResult? prepareResult = null;
+                var prepareCompleted = await _RunProgressAsync(
+                        RenameListProgressOperation.Add,
+                        (token, progress) =>
+                        {
+                            prepareResult = _renameList.PrepareUndo(log, cancellationToken: token, progress: progress);
+                        }
+                    )
+                    .ConfigureAwait(true);
 
-            await _ReplaceVisibleColumnsForUndoAsync(log).ConfigureAwait(true);
+                // Clear filters before replacing Entries so a later Auto-Preview sees an empty chain
+                // (not the pre-undo filters). Undo confirm already warned filters will be cleared.
+                _appliedFilters?.ReplaceFromChain(new FilterChain { Steps = [] });
+                _ReplaceEntriesFromEngine();
 
-            var preparedCount = prepareResult?.PreparedCount ?? 0;
-            var notLoadedCount = prepareResult?.NotLoadedCount ?? 0;
-            LastStatusMessage = _FormatPrepareUndoOutcome(
-                preparedCount: preparedCount,
-                notLoadedCount: notLoadedCount,
-                stopped: !prepareCompleted
-            );
+                if (prepareResult is not null)
+                {
+                    _ApplyPreviewPlan(prepareResult.Plan);
+                }
+                else
+                {
+                    _ClearPreviewCounts();
+                    _RefreshFieldDisplay();
+                }
+
+                await _ReplaceVisibleColumnsForUndoAsync(log).ConfigureAwait(true);
+
+                var preparedCount = prepareResult?.PreparedCount ?? 0;
+                var notLoadedCount = prepareResult?.NotLoadedCount ?? 0;
+                LastStatusMessage = _FormatPrepareUndoOutcome(
+                    preparedCount: preparedCount,
+                    notLoadedCount: notLoadedCount,
+                    stopped: !prepareCompleted
+                );
+            }
 
             return true;
         }
@@ -110,17 +113,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="log">Prepared undo log (undoable entries only contribute mapped keys).</param>
         private async Task _ReplaceVisibleColumnsForUndoAsync(RenameLog log)
         {
-            var previewKeys = RenamePropertyFieldKeys.CollectPreviewKeysFromLog(log);
+            var previewKeys = RenamePropertyFileMeta.CollectPreviewKeysFromLog(log);
             if (previewKeys.Count == 0)
             {
                 return;
             }
 
-            // Preview-side undo columns must not be stripped by A/B originals-only normalize.
-            if (IsAbModeEnabled)
-            {
-                IsAbModeEnabled = false;
-            }
+            // Preview-side undo columns must not be stripped by Before/After originals-only normalize.
+            // Disable without companion expand — that product path is for Toggle/shuttle cancel; here we replace.
+            _DisableAbModeWithoutCompanionExpand();
 
             var columns = new List<RenameListVisibleColumn>
             {

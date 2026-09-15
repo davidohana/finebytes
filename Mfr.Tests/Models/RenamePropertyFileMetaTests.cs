@@ -5,9 +5,9 @@ using Mfr.Models.RenameList.Fields.Extended;
 namespace Mfr.Tests.Models
 {
     /// <summary>
-    /// Maps rename-log property names to preview-side Rename List field keys.
+    /// Path/filesystem rename-log property map and OldValue apply.
     /// </summary>
-    public sealed class RenamePropertyFieldKeysTests
+    public sealed class RenamePropertyFileMetaTests
     {
         /// <summary>
         /// Verifies path and Extended properties map to preview catalog keys.
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Models
         )]
         public void TryMapPreview_maps_path_and_extended(string property, string groupId, string propertyKey)
         {
-            Assert.True(RenamePropertyFieldKeys.TryMapPreview(property, out var key));
+            Assert.True(RenamePropertyFileMeta.TryMapPreview(property, out var key));
             Assert.Equal(RenameListFieldKey.Preview(groupId, propertyKey), key);
             Assert.True(RenameListFieldCatalog.TryGetField(key, out var field));
             Assert.True(field.SupportsWrite);
@@ -49,7 +49,45 @@ namespace Mfr.Tests.Models
         [InlineData("")]
         public void TryMapPreview_skips_unmapped(string property)
         {
-            Assert.False(RenamePropertyFieldKeys.TryMapPreview(property, out _));
+            Assert.False(RenamePropertyFileMeta.TryMapPreview(property, out _));
+        }
+
+        /// <summary>
+        /// Verifies TryApplyOldValue writes path and filesystem scalars onto Preview.
+        /// </summary>
+        [Fact]
+        public void TryApplyOldValue_writes_path_and_file_meta()
+        {
+            var preview = new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: @"C:\old",
+                prefix: "a",
+                extension: "txt",
+                attributes: FileAttributes.Normal,
+                creationTime: new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Local),
+                lastWriteTime: new DateTime(2020, 1, 2, 0, 0, 0, DateTimeKind.Local),
+                lastAccessTime: new DateTime(2020, 1, 3, 0, 0, 0, DateTimeKind.Local)
+            );
+
+            Assert.True(RenamePropertyFileMeta.TryApplyOldValue(preview, RenamePropertyNames.Prefix, "b"));
+            Assert.True(RenamePropertyFileMeta.TryApplyOldValue(preview, RenamePropertyNames.Extension, "bak"));
+            Assert.True(RenamePropertyFileMeta.TryApplyOldValue(preview, RenamePropertyNames.DirectoryPath, @"C:\new"));
+            Assert.True(RenamePropertyFileMeta.TryApplyOldValue(preview, RenamePropertyNames.Attributes, "Hidden"));
+            Assert.True(
+                RenamePropertyFileMeta.TryApplyOldValue(
+                    preview,
+                    RenamePropertyNames.CreationTime,
+                    "2021-02-03T04:05:06.0000000"
+                )
+            );
+
+            Assert.Equal("b", preview.Prefix);
+            Assert.Equal("bak", preview.Extension);
+            Assert.Equal(@"C:\new", preview.DirectoryPath);
+            Assert.Equal(FileAttributes.Hidden, preview.Attributes);
+            Assert.Equal(2021, preview.CreationTime.Year);
+            Assert.False(RenamePropertyFileMeta.TryApplyOldValue(preview, "AudioTag.Block.Xiph.TITLE", "x"));
         }
 
         /// <summary>
@@ -58,7 +96,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void CollectPreviewKeys_dedupes_and_skips_unmapped()
         {
-            var keys = RenamePropertyFieldKeys.CollectPreviewKeys([
+            var keys = RenamePropertyFileMeta.CollectPreviewKeys([
                 new RenamePropertyChange(RenamePropertyNames.Prefix, "a", "b"),
                 new RenamePropertyChange(RenamePropertyNames.StripAllEmbeddedTagsOnCommit, "false", "true"),
                 new RenamePropertyChange(RenamePropertyNames.Prefix, "a", "c"),
@@ -115,7 +153,7 @@ namespace Mfr.Tests.Models
                     RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
                     RenameListFieldKey.Preview(ExtendedRenameListFields.Group, ExtendedRenameListFields.Key.Attrs),
                 ],
-                RenamePropertyFieldKeys.CollectPreviewKeysFromLog(log)
+                RenamePropertyFileMeta.CollectPreviewKeysFromLog(log)
             );
         }
     }

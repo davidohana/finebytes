@@ -432,6 +432,11 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// </summary>
         private void _OnPreviewInputsChanged(object? sender, EventArgs e)
         {
+            if (RenameListViewModel.ArePreviewInputsSuspended)
+            {
+                return;
+            }
+
             _RequestPreview();
             FilterEditorViewModel.RefreshTrimHelperRenameItems();
         }

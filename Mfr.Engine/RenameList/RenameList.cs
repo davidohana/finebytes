@@ -715,7 +715,7 @@ namespace Mfr.Engine.RenameList
         /// <param name="changes">Sticky property deltas (already known non-empty).</param>
         private static void _MirrorStickyWritableOverrides(RenameItem item, IReadOnlyList<RenamePropertyChange> changes)
         {
-            foreach (var key in RenamePropertyFieldKeys.CollectPreviewKeys(changes))
+            foreach (var key in RenamePropertyFileMeta.CollectPreviewKeys(changes))
             {
                 if (!RenameListFieldCatalog.TryGetField(key, out var field) || field.WriteTarget is null)
                 {

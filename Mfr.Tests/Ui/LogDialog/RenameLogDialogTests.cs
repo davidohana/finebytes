@@ -7,8 +7,7 @@ using Mfr.App.Ui.ViewModels.LogDialog;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.LogDialog;
-using Mfr.Filters.Replace;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.RenameList;
 using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
 
 namespace Mfr.Tests.Ui.LogDialog
@@ -208,21 +207,10 @@ namespace Mfr.Tests.Ui.LogDialog
         [AvaloniaFact]
         public async Task UndoFromLog_disk_log_prepares_then_Go_restores_rename()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
             var logDir = _tempDirectoryFixture.CreateTempDir();
-            var source = Path.Combine(dir, "alpha.txt");
-            var destination = Path.Combine(dir, "renamed.txt");
-            await File.WriteAllTextAsync(source, "alpha");
-
-            var viewModel = new MainWindowViewModel(dir);
-            viewModel.RenameListViewModel.DisableAutoPreview();
-            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
-            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
-
-            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            var (viewModel, source, destination) = await UndoPrepareTestUi
+                .GoPrefixRenameAsync(_tempDirectoryFixture)
+                .ConfigureAwait(true);
             Assert.True(File.Exists(destination));
             Assert.NotNull(RenameLogStore.LastOperation);
 
@@ -266,19 +254,9 @@ namespace Mfr.Tests.Ui.LogDialog
         [AvaloniaFact]
         public async Task UndoFromLog_confirm_decline_aborts()
         {
-            var dir = _tempDirectoryFixture.CreateTempDir();
-            var source = Path.Combine(dir, "alpha.txt");
-            var destination = Path.Combine(dir, "renamed.txt");
-            await File.WriteAllTextAsync(source, "alpha");
-
-            var viewModel = new MainWindowViewModel(dir);
-            viewModel.RenameListViewModel.DisableAutoPreview();
-            await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
-            ConfirmationPolicy.Suppress(ConfirmationKind.GoWithPreviewErrors);
-            ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
-            await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);
+            var (viewModel, source, destination) = await UndoPrepareTestUi
+                .GoPrefixRenameAsync(_tempDirectoryFixture)
+                .ConfigureAwait(true);
 
             var log = RenameLogStore.LastOperation;
             Assert.NotNull(log);
@@ -299,23 +277,6 @@ namespace Mfr.Tests.Ui.LogDialog
             Assert.Equal(1, confirmCalls);
             Assert.True(File.Exists(destination));
             Assert.False(File.Exists(source));
-        }
-
-        private static ReplacerFilter _PrefixReplacer(string find, string replacement)
-        {
-            return new ReplacerFilter(
-                Target: new FilePrefixTarget(),
-                Options: new ReplacerOptions(
-                    Find: find,
-                    Replacement: replacement,
-                    Match: new ReplacerMatchOptions(
-                        Mode: ReplacerMode.Literal,
-                        CaseSensitive: true,
-                        ReplaceAll: false,
-                        WholeWord: false
-                    )
-                )
-            );
         }
     }
 }

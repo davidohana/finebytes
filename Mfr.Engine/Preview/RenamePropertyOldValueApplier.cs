@@ -47,57 +47,8 @@ namespace Mfr.Engine.Preview
             var property = change.Property;
             var oldValue = change.OldValue;
 
-            if (property == RenamePropertyNames.Prefix)
+            if (RenamePropertyFileMeta.TryApplyOldValue(item.Preview, property, oldValue))
             {
-                item.Preview.Prefix = oldValue;
-                return;
-            }
-
-            if (property == RenamePropertyNames.Extension)
-            {
-                item.Preview.Extension = oldValue;
-                return;
-            }
-
-            if (property == RenamePropertyNames.DirectoryPath)
-            {
-                item.Preview.DirectoryPath = oldValue;
-                return;
-            }
-
-            if (property == RenamePropertyNames.Attributes)
-            {
-                item.Preview.Attributes = Enum.Parse<FileAttributes>(oldValue);
-                return;
-            }
-
-            if (property == RenamePropertyNames.CreationTime)
-            {
-                item.Preview.CreationTime = DateTime.Parse(
-                    oldValue,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind
-                );
-                return;
-            }
-
-            if (property == RenamePropertyNames.LastWriteTime)
-            {
-                item.Preview.LastWriteTime = DateTime.Parse(
-                    oldValue,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind
-                );
-                return;
-            }
-
-            if (property == RenamePropertyNames.LastAccessTime)
-            {
-                item.Preview.LastAccessTime = DateTime.Parse(
-                    oldValue,
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.RoundtripKind
-                );
                 return;
             }
 
