@@ -2,6 +2,8 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
+using Mfr.App.Ui.Services.FileList;
+using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
@@ -148,6 +150,29 @@ namespace Mfr.Tests.Ui.MainWindow
             ConfirmationPolicy.Suppress(ConfirmationKind.ClearRenameList);
             await renameListViewModel.ClearCommand.ExecuteAsync(null);
             Assert.Equal(0, viewModel.ItemCount);
+        }
+
+        /// <summary>
+        /// Verifies a missing remembered File List folder seeds the main status bar at construction.
+        /// </summary>
+        [AvaloniaFact]
+        public void MainWindow_Missing_Remembered_Folder_Seeds_StatusHint()
+        {
+            var remembered = Path.Combine(_tempDirectoryFixture.CreateTempDir(), "remembered-gone");
+            Directory.CreateDirectory(remembered);
+            Directory.Delete(remembered);
+
+            var viewModel = new MainWindowViewModel(remembered);
+            var expectedStart = viewModel.FileListViewModel.CurrentPath;
+
+            Assert.Equal(
+                $"Last folder unavailable — opened {FileListPath.ToDisplayPath(expectedStart)}.",
+                viewModel.StatusHint.ToPlainText()
+            );
+            Assert.Equal(
+                StatusBarText.WarningForegroundResourceKey,
+                viewModel.StatusHint.Runs[0].ForegroundResourceKey
+            );
         }
 
         /// <summary>

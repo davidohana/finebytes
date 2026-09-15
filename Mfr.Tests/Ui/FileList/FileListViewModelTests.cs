@@ -539,7 +539,7 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
-        /// Verifies a deleted remembered start folder falls back and sets a neutral status naming the fallback folder.
+        /// Verifies a deleted remembered start folder falls back and sets a warning status naming the fallback folder.
         /// </summary>
         [Fact]
         public void Constructor_Missing_Remembered_Directory_Sets_Fallback_Status()
@@ -564,10 +564,13 @@ namespace Mfr.Tests.Ui.FileList
 
             Assert.Equal(expectedStart, viewModel.CurrentPath);
             Assert.Equal(
-                $"Opened {FileListPath.ToDisplayPath(expectedStart)}.",
+                $"Last folder unavailable — opened {FileListPath.ToDisplayPath(expectedStart)}.",
                 viewModel.LastStatusMessage.ToPlainText()
             );
-            Assert.All(viewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
+            Assert.Equal(
+                StatusBarText.WarningForegroundResourceKey,
+                viewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
         }
 
         /// <summary>

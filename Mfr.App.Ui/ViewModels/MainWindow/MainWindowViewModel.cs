@@ -91,6 +91,9 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             AppliedFiltersViewModel.ChainChanged += _OnPreviewInputsChanged;
             FileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             FilterPaletteViewModel.PropertyChanged += _OnFilterPalettePropertyChanged;
+            // File List may set LastStatusMessage during construction (e.g. remembered folder fallback)
+            // before this handler was wired — seed the bar once.
+            _ApplyStatusHintIfPresent(FileListViewModel.LastStatusMessage);
             ItemCount = RenameListViewModel.ItemCount;
             FilterCount = AppliedFiltersViewModel.Count;
             ChangeCount = RenameListViewModel.ChangeCount;

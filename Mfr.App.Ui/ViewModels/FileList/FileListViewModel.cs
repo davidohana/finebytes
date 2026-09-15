@@ -201,7 +201,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
             _Navigate(startPath);
             if (usedFallback)
             {
-                LastStatusMessage = StatusBarText.Neutral($"Opened {FileListPath.ToDisplayPath(startPath)}.");
+                LastStatusMessage = StatusBarText.Warning(
+                    $"Last folder unavailable ({FileListPath.ToDisplayPath(initialPath!)}) — opened {FileListPath.ToDisplayPath(startPath)}."
+                );
             }
         }
 

@@ -10,7 +10,7 @@ Parent / related: [file-list-cut-copy-paste-delete.plan.md](file-list-cut-copy-p
 - Recovery buttons show for **all** `ListingError` kinds (not only `NotFound`).
 - **Go Up** climbs to the first existing ancestor (or computer/network sentinel), not only the immediate parent.
 - Typed missing path: keep current non-navigate behavior; set a one-line `LastStatusMessage` error.
-- Startup: keep `ResolveStartPath` fallback; when remembered path was unusable, set one **neutral** status note naming the fallback folder.
+- Startup: keep `ResolveStartPath` fallback; when remembered path was unusable, set one **warning** status (`Last folder unavailable — opened …`) and seed main `StatusHint` after PropertyChanged is wired (ctor status alone is missed).
 - Close-save: keep `_IsPersistableFolder` (`Directory.Exists`); no schema change. Do not clear prefs beyond that.
 - Non-goals: `FileSystemWatcher`, refresh-on-focus, New Folder (does not exist), Rename List–style per-row missing gray, toast spam.
 
