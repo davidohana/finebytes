@@ -6,6 +6,10 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 
 - View mode radios on the context menu — already on the File List menu
 
+## File List listing
+
+- Auto-detect current folder deleted/unavailable (`FileSystemWatcher` or refresh-on-focus) — manual F5 / navigate for now (`file-list-missing-current-folder` plan)
+
 ## FormatEditor
 
 - Nested `FormatEditor` in token `source=` fields + nested error/caret spans (high cost; soft Source text boxes are enough for now)
