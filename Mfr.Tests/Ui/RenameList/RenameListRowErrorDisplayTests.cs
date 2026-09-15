@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void FormatCopyText_includes_summary_path_user_message_and_technical()
         {
-            var content = RenameListPreviewErrorDisplay.Create(@"D:\a.txt", "failed", "System.Exception: boom");
+            var content = RenameListRowErrorDisplay.CreatePreview(@"D:\a.txt", "failed", "System.Exception: boom");
             var copy = RenameListRowErrorDisplay.FormatCopyText(content);
             Assert.Contains(content.Summary, copy, StringComparison.Ordinal);
             Assert.Contains(@"D:\a.txt", copy, StringComparison.Ordinal);

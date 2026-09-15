@@ -126,7 +126,7 @@ namespace Mfr.Tests.Ui.RenameList
             menuItem.RaiseEvent(new RoutedEventArgs(MenuItem.ClickEvent));
 
             Assert.NotNull(content);
-            Assert.Equal(RenameListCommitErrorDisplay.DialogTitle, content.Title);
+            Assert.Equal(RenameListRowErrorDisplay.CommitDialogTitle, content.Title);
             Assert.Equal("commit failed", content.UserMessage);
             window.Close();
         }

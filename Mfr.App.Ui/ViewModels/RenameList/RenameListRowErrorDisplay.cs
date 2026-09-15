@@ -3,10 +3,55 @@ using System.Text;
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
-    /// Shared copy helpers for the Rename List row-error dialog.
+    /// Shared copy helpers for the Rename List row-error dialog (load, preview, and rename).
     /// </summary>
     internal static class RenameListRowErrorDisplay
     {
+        /// <summary>Window title for Show Preview Error.</summary>
+        internal const string PreviewDialogTitle = "Preview Error";
+
+        /// <summary>Short summary for Show Preview Error.</summary>
+        internal const string PreviewSummary =
+            "Preview failed for this item. It will be skipped when applying changes.";
+
+        /// <summary>Window title for Show Rename Error.</summary>
+        internal const string CommitDialogTitle = "Rename Error";
+
+        /// <summary>Short summary for Show Rename Error.</summary>
+        internal const string CommitSummary = "This item could not be renamed.";
+
+        /// <summary>
+        /// Builds dialog content for Show Preview Error.
+        /// </summary>
+        /// <param name="filePath">Absolute path of the errored row.</param>
+        /// <param name="message">User-facing preview error message.</param>
+        /// <param name="technicalDetails">Optional exception text for the Technical details expander.</param>
+        /// <returns>Title, summary, path, user message, and optional technical details.</returns>
+        internal static RenameListRowErrorDialogContent CreatePreview(
+            string filePath,
+            string message,
+            string? technicalDetails
+        )
+        {
+            return _CreateSingleError(PreviewDialogTitle, PreviewSummary, filePath, message, technicalDetails);
+        }
+
+        /// <summary>
+        /// Builds dialog content for Show Rename Error.
+        /// </summary>
+        /// <param name="filePath">Absolute path of the errored row.</param>
+        /// <param name="message">User-facing commit error message.</param>
+        /// <param name="technicalDetails">Optional exception text for the Technical details expander.</param>
+        /// <returns>Title, summary, path, user message, and optional technical details.</returns>
+        internal static RenameListRowErrorDialogContent CreateCommit(
+            string filePath,
+            string message,
+            string? technicalDetails
+        )
+        {
+            return _CreateSingleError(CommitDialogTitle, CommitSummary, filePath, message, technicalDetails);
+        }
+
         /// <summary>
         /// Builds the primary details box text (file path and user message).
         /// </summary>
@@ -55,6 +100,26 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var builder = new StringBuilder();
             _AppendException(builder, exception);
             return builder.ToString().TrimEnd();
+        }
+
+        /// <summary>
+        /// Builds single-message dialog content (preview or rename).
+        /// </summary>
+        private static RenameListRowErrorDialogContent _CreateSingleError(
+            string title,
+            string summary,
+            string filePath,
+            string message,
+            string? technicalDetails
+        )
+        {
+            return new RenameListRowErrorDialogContent(
+                title,
+                summary,
+                filePath,
+                message,
+                string.IsNullOrWhiteSpace(technicalDetails) ? null : technicalDetails
+            );
         }
 
         private static void _AppendException(StringBuilder builder, Exception exception)

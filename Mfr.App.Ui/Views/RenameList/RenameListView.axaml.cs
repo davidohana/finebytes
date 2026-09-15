@@ -781,15 +781,14 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
-        /// Applies commit-error plum before preview-error lavender for the row.
+        /// Applies row highlight from <see cref="RenameListEntry.HighestStatusError"/>
+        /// (commit plum before preview lavender; load/missing has no row class).
         /// </summary>
         private static void _ApplyErrorRowClasses(DataGridRow row)
         {
-            var entry = row.DataContext as RenameListEntry;
-            var hasCommitError = entry?.HasCommitError == true;
-            var hasPreviewError = !hasCommitError && entry?.HasPreviewError == true;
-            row.Classes.Set("rename-list-commit-error", hasCommitError);
-            row.Classes.Set("rename-list-preview-error", hasPreviewError);
+            var kind = (row.DataContext as RenameListEntry)?.HighestStatusError ?? RenameListStatusErrorKind.None;
+            row.Classes.Set("rename-list-commit-error", kind == RenameListStatusErrorKind.Commit);
+            row.Classes.Set("rename-list-preview-error", kind == RenameListStatusErrorKind.Preview);
         }
 
         private void _ApplyDropMarkVisuals()

@@ -109,7 +109,7 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies a preview-side override survives the mandatory GO preview and is committed.
+        /// Verifies a preview-side override is committed, then cleared (MFR7 post-apply Reload).
         /// </summary>
         [Fact]
         public void Preview_override_is_included_in_commit_plan()
@@ -120,7 +120,9 @@ namespace Mfr.Tests.Engine
             renameList.AddSources([path]);
             var item = renameList.RenameItems[0];
 
+            var originalName = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             var previewName = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            item.SetOverride(originalName, "org");
             item.SetOverride(previewName, "forced");
 
             var plan = renameList.Preview(FilterChain.CreateAllEnabled([]));
@@ -129,6 +131,55 @@ namespace Mfr.Tests.Engine
             Assert.False(File.Exists(path));
             Assert.True(File.Exists(destination));
             Assert.Equal(RenameStatus.CommitOk, item.Status);
+            Assert.False(item.IsOverridden(originalName));
+            Assert.False(item.IsOverridden(previewName));
+        }
+
+        /// <summary>
+        /// Verifies preview-error rows keep manual overrides after commit (MFR7 no Reload).
+        /// </summary>
+        [Fact]
+        public void Commit_keeps_overrides_on_preview_error_rows()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "hello.txt");
+            var renameList = new RenameList();
+            renameList.AddSources([path]);
+            var item = renameList.RenameItems[0];
+
+            var previewPath = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullPath
+            );
+            item.SetOverride(previewPath, "not-a-full-path");
+
+            var plan = renameList.Preview(FilterChain.CreateAllEnabled([]));
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+
+            renameList.Commit(plan, failFast: false);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.True(item.IsOverridden(previewPath));
+        }
+
+        /// <summary>
+        /// Verifies confirm-skipped rows keep manual overrides after commit.
+        /// </summary>
+        [Fact]
+        public void Commit_keeps_overrides_on_confirm_skipped_rows()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "hello.txt");
+            var renameList = new RenameList();
+            renameList.AddSources([path]);
+            var item = renameList.RenameItems[0];
+
+            var previewName = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            item.SetOverride(previewName, "forced");
+
+            var plan = renameList.Preview(FilterChain.CreateAllEnabled([]));
+            renameList.Commit(plan, failFast: false, confirmBeforeApply: _ => false);
+
+            Assert.Equal(RenameStatus.CommitSkipped, item.Status);
+            Assert.True(item.IsOverridden(previewName));
         }
 
         /// <summary>

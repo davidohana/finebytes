@@ -41,8 +41,8 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.ShowCommitErrorCommand.Execute(null);
 
             Assert.NotNull(content);
-            Assert.Equal(RenameListCommitErrorDisplay.DialogTitle, content.Title);
-            Assert.Equal(RenameListCommitErrorDisplay.Summary, content.Summary);
+            Assert.Equal(RenameListRowErrorDisplay.CommitDialogTitle, content.Title);
+            Assert.Equal(RenameListRowErrorDisplay.CommitSummary, content.Summary);
             Assert.Equal(path, content.FilePath);
             Assert.Equal("The destination could not be written.", content.UserMessage);
             var technicalDetails = Assert.IsType<string>(content.TechnicalDetails);

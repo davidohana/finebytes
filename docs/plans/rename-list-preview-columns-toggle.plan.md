@@ -102,7 +102,7 @@ Existing model (14d) already has **two slots per `(group, property)`** on each i
 
 **Derived columns:** Manual Override / Cancel / header Cancel use the column’s full key from `GetFieldKey` (derived preview → `IsPreview: true`). No new override API.
 
-**F5 / clear:** still `ClearAllOverrides()` both sides — independent of A/B.
+**F5 / clear:** still `ClearAllOverrides()` both sides — independent of A/B. GO also clears overrides on `CommitOk` / `CommitError` rows (MFR7 post-apply Reload).
 
 **A/B off:** override UX unchanged (whichever original/preview columns are in the layout).
 

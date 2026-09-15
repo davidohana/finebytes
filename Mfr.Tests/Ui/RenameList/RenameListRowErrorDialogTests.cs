@@ -86,7 +86,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public void Dialog_shows_preview_message_and_collapsed_technical_details()
         {
-            var content = RenameListPreviewErrorDisplay.Create(
+            var content = RenameListRowErrorDisplay.CreatePreview(
                 @"D:\Music\album",
                 "Cannot apply audio tags to a directory.",
                 "Type: System.InvalidOperationException\nMessage: directory"
@@ -104,8 +104,8 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(technicalExpander);
             Assert.NotNull(technicalDetailsText);
 
-            Assert.Equal(RenameListPreviewErrorDisplay.DialogTitle, dialog.Title);
-            Assert.Equal(RenameListPreviewErrorDisplay.Summary, summaryText.Text);
+            Assert.Equal(RenameListRowErrorDisplay.PreviewDialogTitle, dialog.Title);
+            Assert.Equal(RenameListRowErrorDisplay.PreviewSummary, summaryText.Text);
             Assert.Contains(@"D:\Music\album", primaryDetailsText.Text, StringComparison.Ordinal);
             Assert.Contains(
                 "Cannot apply audio tags to a directory.",
@@ -125,7 +125,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public void Dialog_shows_rename_error_content()
         {
-            var content = RenameListCommitErrorDisplay.Create(
+            var content = RenameListRowErrorDisplay.CreateCommit(
                 @"D:\Music\song.mp3",
                 "Access to the destination was denied.",
                 "Type: System.UnauthorizedAccessException"
@@ -141,8 +141,8 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(primaryDetailsText);
             Assert.NotNull(technicalExpander);
 
-            Assert.Equal(RenameListCommitErrorDisplay.DialogTitle, dialog.Title);
-            Assert.Equal(RenameListCommitErrorDisplay.Summary, summaryText.Text);
+            Assert.Equal(RenameListRowErrorDisplay.CommitDialogTitle, dialog.Title);
+            Assert.Equal(RenameListRowErrorDisplay.CommitSummary, summaryText.Text);
             Assert.Contains(@"D:\Music\song.mp3", primaryDetailsText.Text, StringComparison.Ordinal);
             Assert.Contains("destination was denied", primaryDetailsText.Text, StringComparison.Ordinal);
             Assert.True(technicalExpander.IsVisible);
@@ -155,7 +155,7 @@ namespace Mfr.Tests.Ui.RenameList
         [AvaloniaFact]
         public void Dialog_hides_technical_expander_without_technical_details()
         {
-            var content = RenameListPreviewErrorDisplay.Create(
+            var content = RenameListRowErrorDisplay.CreatePreview(
                 @"D:\Music\note.txt",
                 "Destination path already in use.",
                 technicalDetails: null

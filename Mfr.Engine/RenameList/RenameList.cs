@@ -823,6 +823,14 @@ namespace Mfr.Engine.RenameList
         /// When <see langword="true"/>, the captured rename log is marked as Undo (details pane / undo-of-undo).
         /// </param>
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
+        /// <remarks>
+        /// <para>
+        /// After the plan walk, clears preview snapshots and metadata caches on every item.
+        /// Manual overrides clear on <see cref="RenameStatus.CommitOk"/> /
+        /// <see cref="RenameStatus.CommitError"/> (MFR7 post-apply <c>Reload</c>); they remain on
+        /// preview-error and skipped rows.
+        /// </para>
+        /// </remarks>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="plan"/> is <c>null</c>.</exception>
         public IReadOnlyList<RenameResultItem> Commit(
             CommitPlan plan,
@@ -864,10 +872,13 @@ namespace Mfr.Engine.RenameList
             foreach (var item in _renameItems)
             {
                 item.ClearPreview();
-            }
 
-            foreach (var item in _renameItems)
-            {
+                // MFR7 ApplyProperties → Reload(true) clears ForceValue after an apply attempt.
+                if (item.Status is RenameStatus.CommitOk or RenameStatus.CommitError)
+                {
+                    item.ClearAllOverrides();
+                }
+
                 item.ClearMetadataCaches();
             }
 

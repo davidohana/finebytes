@@ -37,7 +37,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.ShowPreviewErrorCommand.Execute(null);
 
             Assert.NotNull(content);
-            Assert.Equal(RenameListPreviewErrorDisplay.DialogTitle, content.Title);
+            Assert.Equal(RenameListRowErrorDisplay.PreviewDialogTitle, content.Title);
             Assert.Equal(path, content.FilePath);
             Assert.False(string.IsNullOrWhiteSpace(content.UserMessage));
             Assert.DoesNotContain("Stack Trace:", content.UserMessage, StringComparison.Ordinal);
