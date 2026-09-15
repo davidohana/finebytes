@@ -648,8 +648,8 @@ namespace Mfr.Engine.RenameList
         /// <para>
         /// MFR7 <c>PreviewStart</c> (original overrides) runs inside <see cref="FilterChain.ApplyFilters"/>
         /// after <see cref="RenameItem.ClearPreview"/>. MFR7 <c>PreviewEnd</c> (preview overrides) runs here
-        /// after filters succeed; sticky undo OldValues reapply after PreviewEnd so empty-chain re-preview
-        /// keeps the prepared reverse plan.
+        /// after filters succeed; sticky undo OldValues + ForceValue mirrors reapply after PreviewEnd so
+        /// empty-chain re-preview (and post-CommitError retry) keeps the prepared reverse plan.
         /// </para>
         /// </remarks>
         private void _ApplyPreviewFilters(FilterChain chain, RenameListProgressTracker tracker)
@@ -672,7 +672,7 @@ namespace Mfr.Engine.RenameList
                         && RenameListFieldOverrides.TryApplyToPreview(renameItem, isPreview: true)
                     )
                     {
-                        _TryApplyStickyUndoSeed(renameItem);
+                        _ReapplyStickyUndo(renameItem);
                         renameItem.Status = RenameStatus.PreviewOk;
                     }
                 }
@@ -687,10 +687,16 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Reapplies sticky undo OldValues onto Preview when a prepare seed is present.
+        /// Reapplies sticky undo OldValues onto Preview and remirrors writable ForceValue overrides.
         /// </summary>
         /// <param name="item">Row that may carry <see cref="RenameItem.StickyUndoChanges"/>.</param>
-        private static void _TryApplyStickyUndoSeed(RenameItem item)
+        /// <remarks>
+        /// <para>
+        /// Remirror is required on every re-preview: CommitError clears overrides while keeping the sticky
+        /// seed so a later Preview can restore ForceValue chrome without re-running PrepareUndo.
+        /// </para>
+        /// </remarks>
+        private static void _ReapplyStickyUndo(RenameItem item)
         {
             var changes = item.StickyUndoChanges;
             if (changes is null || changes.Count == 0)
@@ -699,6 +705,25 @@ namespace Mfr.Engine.RenameList
             }
 
             RenamePropertyOldValueApplier.Apply(item, changes);
+            _MirrorStickyWritableOverrides(item, changes);
+        }
+
+        /// <summary>
+        /// Mirrors sticky OldValues onto preview-side ForceValue overrides for writable mapped fields.
+        /// </summary>
+        /// <param name="item">Row whose Preview already has sticky OldValues applied.</param>
+        /// <param name="changes">Sticky property deltas (already known non-empty).</param>
+        private static void _MirrorStickyWritableOverrides(RenameItem item, IReadOnlyList<RenamePropertyChange> changes)
+        {
+            foreach (var key in RenamePropertyFieldKeys.CollectPreviewKeys(changes))
+            {
+                if (!RenameListFieldCatalog.TryGetField(key, out var field) || field.WriteTarget is null)
+                {
+                    continue;
+                }
+
+                item.SetOverride(key, item.Preview.GetTargetString(field.WriteTarget));
+            }
         }
 
         /// <summary>
@@ -814,7 +839,7 @@ namespace Mfr.Engine.RenameList
                 try
                 {
                     item.SetStickyUndoChanges(logEntry.Changes);
-                    _TryApplyStickyUndoSeed(item);
+                    _ReapplyStickyUndo(item);
                     item.Status = RenameStatus.PreviewOk;
                     preparedCount++;
                 }

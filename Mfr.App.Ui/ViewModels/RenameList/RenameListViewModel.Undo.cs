@@ -3,6 +3,8 @@ using Mfr.Engine.RenameLog;
 using Mfr.Models.Config;
 using Mfr.Models.Filters;
 using Mfr.Models.Rename;
+using Mfr.Models.RenameList;
+using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -89,6 +91,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 _RefreshFieldDisplay();
             }
 
+            await _ReplaceVisibleColumnsForUndoAsync(log).ConfigureAwait(true);
+
             var preparedCount = prepareResult?.PreparedCount ?? 0;
             var notLoadedCount = prepareResult?.NotLoadedCount ?? 0;
             LastStatusMessage = _FormatPrepareUndoOutcome(
@@ -98,6 +102,36 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             );
 
             return true;
+        }
+
+        /// <summary>
+        /// Replaces visible columns with ItemType plus preview keys for properties changed in the undo log.
+        /// </summary>
+        /// <param name="log">Prepared undo log (undoable entries only contribute mapped keys).</param>
+        private async Task _ReplaceVisibleColumnsForUndoAsync(RenameLog log)
+        {
+            var previewKeys = RenamePropertyFieldKeys.CollectPreviewKeysFromLog(log);
+            if (previewKeys.Count == 0)
+            {
+                return;
+            }
+
+            // Preview-side undo columns must not be stripped by A/B originals-only normalize.
+            if (IsAbModeEnabled)
+            {
+                IsAbModeEnabled = false;
+            }
+
+            var columns = new List<RenameListVisibleColumn>
+            {
+                new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)),
+            };
+            foreach (var key in previewKeys)
+            {
+                columns.Add(new RenameListVisibleColumn(key));
+            }
+
+            await _ApplyVisibleColumnsWithHydrateAsync(columns).ConfigureAwait(true);
         }
 
         private async Task<bool> _ConfirmUndoRenameAsync()

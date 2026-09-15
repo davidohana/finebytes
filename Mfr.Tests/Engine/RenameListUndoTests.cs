@@ -3,6 +3,9 @@ using Mfr.Filters.Attributes;
 using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
 using Mfr.Metadata;
+using Mfr.Models.RenameList;
+using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Engine
@@ -63,6 +66,11 @@ namespace Mfr.Tests.Engine
             Assert.Equal(sourcePath, item.Preview.FullPath);
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.NotNull(item.StickyUndoChanges);
+            Assert.True(
+                item.IsOverridden(
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
+                )
+            );
         }
 
         /// <summary>
@@ -133,11 +141,54 @@ namespace Mfr.Tests.Engine
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
             Assert.False(File.Exists(sourcePath));
             Assert.True(File.Exists(renamedPath));
+            Assert.True(
+                item.IsOverridden(
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
+                )
+            );
         }
 
         /// <summary>
-        /// Verifies PrepareUndo + Commit restores an AudioTagSetter title change on FLAC.
+        /// Verifies ForceValue mirrors rematerialize on re-preview after overrides were cleared (CommitError).
         /// </summary>
+        [Fact]
+        public void PrepareUndo_repreview_remirrors_force_value_after_overrides_cleared()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("old-name.txt");
+            var renamedPath = dir.CombinePath("new-name.txt");
+            File.WriteAllText(sourcePath, "x");
+
+            var renameList = new RenameList();
+            renameList.AddSources([sourcePath]);
+            Assert.Equal(
+                RenameStatus.CommitOk,
+                Assert
+                    .Single(
+                        renameList.Commit(
+                            renameList.Preview(_PrefixFormatterPreset("go", "new-name").Chain),
+                            failFast: false
+                        )
+                    )
+                    .Status
+            );
+
+            renameList.PrepareUndo(RenameLogStore.LastOperation!);
+            var item = Assert.Single(renameList.RenameItems);
+            var nameKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            Assert.True(item.IsOverridden(nameKey));
+
+            item.ClearAllOverrides();
+            Assert.False(item.IsOverridden(nameKey));
+            Assert.NotNull(item.StickyUndoChanges);
+
+            renameList.Preview(FilterChain.CreateAllEnabled([]));
+
+            Assert.Equal(sourcePath, item.Preview.FullPath);
+            Assert.True(item.IsOverridden(nameKey));
+            Assert.Equal(RenameStatus.PreviewOk, item.Status);
+        }
+
         [Fact]
         public void PrepareUndo_then_Commit_restores_audio_tag_title_on_flac()
         {
@@ -189,6 +240,13 @@ namespace Mfr.Tests.Engine
 
             var prepare = renameList.PrepareUndo(RenameLogStore.LastOperation);
             Assert.True(File.GetAttributes(path).HasFlag(FileAttributes.Hidden));
+            Assert.True(
+                Assert
+                    .Single(renameList.RenameItems)
+                    .IsOverridden(
+                        RenameListFieldKey.Preview(ExtendedRenameListFields.Group, ExtendedRenameListFields.Key.Attrs)
+                    )
+            );
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(renameList.Commit(prepare.Plan, failFast: false)).Status);
             Assert.False(File.GetAttributes(path).HasFlag(FileAttributes.Hidden));
         }

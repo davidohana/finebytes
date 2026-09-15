@@ -2,6 +2,8 @@ using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Replace;
+using Mfr.Models.RenameList;
+using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.MainWindow
@@ -106,6 +108,20 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Equal(source, prepared.EngineItem.Preview.FullPath);
             Assert.NotNull(RenameLogStore.LastOperation);
             Assert.True(RenameLogStore.LastOperation.HasUndoableEntries);
+
+            var visibleKeys = viewModel.RenameListViewModel.VisibleColumns.Select(column => column.Key).ToList();
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType),
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                ],
+                visibleKeys
+            );
+            Assert.True(
+                prepared.EngineItem.IsOverridden(
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
+                )
+            );
         }
 
         /// <summary>

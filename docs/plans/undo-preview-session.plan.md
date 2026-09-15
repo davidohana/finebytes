@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: p4-columns-overrides
     content: "P4: Replace visible columns from undo fields + SetOverride mirror for writable keys"
-    status: pending
+    status: completed
   - id: p5-docs
     content: "P5: Amend undo.plan.md + keyboard-shortcuts for prepare+GO"
     status: pending
@@ -116,7 +116,7 @@ Hook points:
 - Exit criteria: Ctrl+Z / Log Undo fills list + clears filters; disk unchanged until GO; GO restores files and writes undo log; confirm still gated by policy
 - Tests: [`MainWindowUndoTests`](Mfr.Tests/Ui/MainWindow/MainWindowUndoTests.cs), [`RenameLogDialogTests`](Mfr.Tests/Ui/LogDialog/RenameLogDialogTests.cs)
 
-### P4 — Columns + SetOverride mirror
+### P4 — Columns + SetOverride mirror — done
 
 - Scope / files: replace visible columns from log-property → field-key map (dedupe across entries; status/required first) + metadata hydrate; after OldValueApplier, `SetOverride` for writable preview keys (path + Extended from P1 + semantic audio where mapped)
 - Exit criteria: undoing name/dir/attr/date/tag ops **replaces** column set with those preview columns; path/Extended overrides show as ForceValue and survive re-preview
