@@ -163,10 +163,10 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies prepare under Before/After Mode replaces columns without leaving companion expand.
+        /// Verifies prepare under Before/After Mode keeps A/B on and stores originals-only (like Replace filter fields).
         /// </summary>
         [AvaloniaFact]
-        public async Task UndoLast_with_ab_mode_replaces_columns_without_companion_expand()
+        public async Task UndoLast_with_ab_mode_keeps_ab_and_stores_originals_only()
         {
             var (viewModel, _, destination) = await UndoPrepareTestUi
                 .GoPrefixRenameAsync(_tempDirectoryFixture)
@@ -179,22 +179,18 @@ namespace Mfr.Tests.Ui.MainWindow
 
             await viewModel.UndoLastCommand.ExecuteAsync(null).ConfigureAwait(true);
 
-            Assert.False(viewModel.RenameListViewModel.IsAbModeEnabled);
+            Assert.True(viewModel.RenameListViewModel.IsAbModeEnabled);
             var visibleKeys = viewModel.RenameListViewModel.VisibleColumns.Select(column => column.Key).ToList();
             Assert.Equal(
                 [
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType),
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
-                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
-                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
                 ],
                 visibleKeys
             );
-            Assert.DoesNotContain(
-                visibleKeys,
-                key => key == RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
-            );
+            Assert.All(visibleKeys, key => Assert.False(key.IsPreview));
         }
 
         /// <summary>

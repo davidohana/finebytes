@@ -106,27 +106,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Replaces visible columns with catalog defaults, then appends preview keys for properties changed in the undo log.
+        /// Replaces visible columns with catalog defaults, then appends keys for properties changed in the undo log.
         /// </summary>
         /// <param name="log">Prepared undo log (undoable entries only contribute mapped keys).</param>
         /// <remarks>
         /// <para>
-        /// Same base as <see cref="ReplaceWithRelevantColumnsAsync"/> (defaults first, then missing relevant keys).
-        /// Preview-side undo columns must not be stripped by Before/After originals-only normalize, so A/B Mode is
-        /// disabled without companion expand before apply.
+        /// Same path as <see cref="ReplaceWithRelevantColumnsAsync"/>: defaults first, then missing relevant keys,
+        /// originals-only normalize while Before/After Mode is on (A/B stays enabled; Preview side shows companions).
         /// </para>
         /// </remarks>
         private async Task _ReplaceVisibleColumnsForUndoAsync(RenameLog log)
         {
-            // Preview-side undo columns must not be stripped by Before/After originals-only normalize.
-            // Disable without companion expand — that product path is for Toggle/shuttle cancel; here we replace.
-            _DisableAbModeWithoutCompanionExpand();
+            var undoKeys = RenamePropertyFileMeta.CollectPreviewKeysFromLog(log);
+            if (IsAbModeEnabled)
+            {
+                undoKeys = RenameListVisibleColumn.ToOriginalKeysFirstSeen(undoKeys);
+            }
 
             var columns = RenameListVisibleColumn.CreateDefaults().ToList();
             var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
-            _AppendMissingRelevantColumns(columns, RenamePropertyFileMeta.CollectPreviewKeysFromLog(log), keyToIsPresent);
+            _AppendMissingRelevantColumns(columns, undoKeys, keyToIsPresent);
 
-            await _ApplyVisibleColumnsWithHydrateAsync(columns).ConfigureAwait(true);
+            await _ApplyVisibleColumnsWithHydrateAsync(_NormalizeColumnsIfAbMode(columns)).ConfigureAwait(true);
         }
 
         private async Task<bool> _ConfirmUndoRenameAsync()
