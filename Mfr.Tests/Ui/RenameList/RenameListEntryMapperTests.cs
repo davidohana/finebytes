@@ -1,4 +1,5 @@
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Models.Rename;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Models.Filters;
 
@@ -46,6 +47,32 @@ namespace Mfr.Tests.Ui.RenameList
                     RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
                 )
             );
+        }
+
+        /// <summary>
+        /// Verifies status-column error priority is commit, then preview, then load/missing.
+        /// </summary>
+        [Fact]
+        public void HighestStatusError_prefers_commit_then_preview_then_load()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(prefix: "row", extension: "txt");
+            var entry = RenameListEntry.ToEntry(item);
+
+            Assert.Equal(RenameListStatusErrorKind.None, entry.HighestStatusError);
+            Assert.False(entry.HasStatusError);
+
+            item.PreviewError = new RenameItemError("preview failed");
+            Assert.Equal(RenameListStatusErrorKind.Preview, entry.HighestStatusError);
+            Assert.True(entry.HasStatusError);
+
+            item.CommitError = new RenameItemError("commit failed");
+            Assert.Equal(RenameListStatusErrorKind.Commit, entry.HighestStatusError);
+
+            item.CommitError = null;
+            item.PreviewError = null;
+            item.SetMissingFromDisk(true);
+            Assert.True(entry.HasLoadError);
+            Assert.Equal(RenameListStatusErrorKind.LoadOrMissing, entry.HighestStatusError);
         }
     }
 }

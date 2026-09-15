@@ -54,7 +54,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 }
 
                 mark.IsVisible = true;
-                ToolTip.SetTip(mark, RichToolTip.Wrap(_TipFor(entry)));
+                ToolTip.SetTip(mark, RichToolTip.Wrap(_TipFor(entry.HighestStatusError)));
             }
 
             mark.DataContextChanged += (_, _) => ApplyState();
@@ -64,21 +64,22 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
-        /// Picks the glyph tip for the highest-priority error on <paramref name="entry"/>.
+        /// Maps <see cref="RenameListStatusErrorKind"/> to the matching glyph tip.
         /// </summary>
-        private static string _TipFor(RenameListEntry entry)
+        private static string _TipFor(RenameListStatusErrorKind kind)
         {
-            if (entry.HasCommitError)
+            return kind switch
             {
-                return AppTips.RenameListCommitErrorGlyph;
-            }
-
-            if (entry.HasPreviewError)
-            {
-                return AppTips.RenameListPreviewErrorGlyph;
-            }
-
-            return AppTips.RenameListRowErrorGlyph;
+                RenameListStatusErrorKind.Commit => AppTips.RenameListCommitErrorGlyph,
+                RenameListStatusErrorKind.Preview => AppTips.RenameListPreviewErrorGlyph,
+                RenameListStatusErrorKind.LoadOrMissing => AppTips.RenameListLoadErrorGlyph,
+                RenameListStatusErrorKind.None => throw new ArgumentOutOfRangeException(
+                    nameof(kind),
+                    kind,
+                    "Status glyph tip requires a status error."
+                ),
+                _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Unknown status error kind."),
+            };
         }
     }
 }

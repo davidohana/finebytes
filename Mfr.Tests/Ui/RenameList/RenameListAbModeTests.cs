@@ -510,6 +510,20 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void SetAbSideCommand_disabled_when_ab_mode_off()
+        {
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            Assert.False(renameListViewModel.IsAbModeEnabled);
+            Assert.False(renameListViewModel.SetAbSideCommand.CanExecute(RenameListPrefs.AbSideOriginal));
+            Assert.False(renameListViewModel.ToggleAbSideCommand.CanExecute(null));
+
+            renameListViewModel.IsAbModeEnabled = true;
+
+            Assert.True(renameListViewModel.SetAbSideCommand.CanExecute(RenameListPrefs.AbSideOriginal));
+            Assert.True(renameListViewModel.ToggleAbSideCommand.CanExecute(null));
+        }
+
+        [Fact]
         public async Task SetAbSide_to_preview_hydrates_when_projected_requirement_grows()
         {
             var dir = _context.CreateTempDir();

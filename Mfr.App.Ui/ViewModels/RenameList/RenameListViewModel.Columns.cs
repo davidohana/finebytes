@@ -18,6 +18,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// follows <see cref="AbSide"/>.
         /// </summary>
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(SetAbSideCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ToggleAbSideCommand))]
         private bool _isAbModeEnabled;
 
         /// <summary>
@@ -298,7 +300,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Toggles the Before/After toolbar side (original values ↔ preview values for the same fields).
         /// </summary>
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(_CanSetAbSide))]
         public void ToggleAbSide()
         {
             SetAbSide(IsAbSidePreview ? RenameListPrefs.AbSideOriginal : RenameListPrefs.AbSidePreview);
@@ -310,12 +312,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// When Before/After Mode is on and the side becomes After, hydrates metadata for
         /// <see cref="ProjectedColumns"/> before the side sticks (same path as column apply).
         /// Side is remembered while the mode is off so re-enabling restores it.
+        /// Menu radios and Ctrl+[ / Ctrl+] use <see cref="SetAbSideCommand"/>, which is disabled
+        /// while the mode is off; direct calls still update the remembered side.
         /// </para>
         /// </summary>
         /// <param name="side">
         /// <see cref="RenameListPrefs.AbSideOriginal"/> or <see cref="RenameListPrefs.AbSidePreview"/>.
         /// </param>
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(_CanSetAbSide))]
         public void SetAbSide(string side)
         {
             var normalized = RenameListPrefs.NormalizeAbSide(side);
@@ -346,6 +350,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             AbSide = normalized;
+        }
+
+        private bool _CanSetAbSide()
+        {
+            return IsAbModeEnabled;
         }
 
         /// <summary>

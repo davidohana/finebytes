@@ -70,7 +70,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         private StyledTextDisplay _FormatRefreshOutcome()
         {
-            var itemsWithLoadErrors = Entries.Count(entry => entry.HasRowError);
+            var itemsWithLoadErrors = Entries.Count(entry => entry.HasLoadError);
             if (itemsWithLoadErrors == 0)
             {
                 return StyledTextDisplay.Empty;

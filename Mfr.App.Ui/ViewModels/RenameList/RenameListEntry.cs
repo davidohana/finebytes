@@ -51,9 +51,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Returns whether Show Error Details should list issues for this row.
+        /// Returns whether Show Error Details should list load or missing-from-disk issues for this row.
         /// </summary>
-        public bool HasRowError => RenameListFieldCatalog.HasAnyLoadError(EngineItem);
+        public bool HasLoadError => RenameListFieldCatalog.HasAnyLoadError(EngineItem);
 
         /// <summary>
         /// Returns whether the last preview left a preview error on this row (lavender highlight).
@@ -66,13 +66,35 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public bool HasCommitError => EngineItem.CommitError is not null;
 
         /// <summary>
-        /// Returns whether the status column should show the error glyph.
-        /// <para>
-        /// True for commit, preview, or load/missing errors. Priority for tips matches row highlight:
-        /// commit, then preview, then load/missing.
-        /// </para>
+        /// Highest-priority status-column error (commit → preview → load/missing).
         /// </summary>
-        public bool HasStatusError => HasCommitError || HasPreviewError || HasRowError;
+        public RenameListStatusErrorKind HighestStatusError
+        {
+            get
+            {
+                if (HasCommitError)
+                {
+                    return RenameListStatusErrorKind.Commit;
+                }
+
+                if (HasPreviewError)
+                {
+                    return RenameListStatusErrorKind.Preview;
+                }
+
+                if (HasLoadError)
+                {
+                    return RenameListStatusErrorKind.LoadOrMissing;
+                }
+
+                return RenameListStatusErrorKind.None;
+            }
+        }
+
+        /// <summary>
+        /// Returns whether the status column should show the error glyph.
+        /// </summary>
+        public bool HasStatusError => HighestStatusError != RenameListStatusErrorKind.None;
 
         /// <summary>
         /// Returns whether this row path is missing from disk (whole-row gray; not a metadata load error).

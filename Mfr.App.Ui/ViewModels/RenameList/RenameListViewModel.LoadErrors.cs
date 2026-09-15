@@ -41,7 +41,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            return RenameListFieldCatalog.HasAnyLoadError(_selectedEntries[0].EngineItem);
+            return _selectedEntries[0].HasLoadError;
         }
 
         /// <summary>

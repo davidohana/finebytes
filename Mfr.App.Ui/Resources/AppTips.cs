@@ -176,21 +176,20 @@ namespace Mfr.App.Ui.Resources
         public const string LegendRenameError =
             "Last GO failed for this row — right-click Show Rename Error; F5 clears";
 
-        /// <summary>Rename List row-error badge when the highest-priority issue is a load/missing error.</summary>
-        public const string RenameListRowErrorGlyph =
-            "This row has a load error. Right-click and choose Show Error Details.";
+        /// <summary>Rename List status glyph when the highest-priority issue is load/missing.</summary>
+        public const string RenameListLoadErrorGlyph =
+            "This row has a load error or is missing on disk. Right-click and choose Show Error Details.";
 
-        /// <summary>Rename List row-error badge when the highest-priority issue is a preview failure.</summary>
+        /// <summary>Rename List status glyph when the highest-priority issue is a preview failure.</summary>
         public const string RenameListPreviewErrorGlyph =
             "This row has a preview error. Right-click and choose Show Preview Error.";
 
-        /// <summary>Rename List row-error badge when the highest-priority issue is a rename/commit failure.</summary>
+        /// <summary>Rename List status glyph when the highest-priority issue is a rename/commit failure.</summary>
         public const string RenameListCommitErrorGlyph =
             "This row has a rename error. Right-click and choose Show Rename Error.";
 
         /// <summary>Rename List status column header tip.</summary>
-        public const string RenameListRowErrorColumn =
-            "Error column — marks rows with load, preview, or rename errors";
+        public const string RenameListRowErrorColumn = "Error column — marks rows with load, preview, or rename errors";
 
         /// <summary>File List refresh button tip.</summary>
         public const string Refresh = "Refresh (F5)";

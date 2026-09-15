@@ -1251,7 +1251,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
             var entry = Assert.Single(renameListViewModel.Entries);
-            Assert.True(entry.HasRowError);
+            Assert.True(entry.HasLoadError);
             Assert.True(entry.HasStatusError);
 
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
@@ -1294,7 +1294,7 @@ namespace Mfr.Tests.Ui.RenameList
             var grid = view.GetVisualDescendants().OfType<DataGrid>().Single();
             Assert.Equal(2, grid.Columns.Count);
             var entry = Assert.Single(renameListViewModel.Entries);
-            Assert.False(entry.HasRowError);
+            Assert.False(entry.HasLoadError);
             Assert.False(entry.HasStatusError);
 
             var row = Assert.Single(grid.GetVisualDescendants().OfType<DataGridRow>());
