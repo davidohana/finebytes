@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json.Serialization;
+using Mfr.Models.RenameList.Fields.Extended;
 
 namespace Mfr.Filters.Attributes
 {
@@ -43,7 +44,7 @@ namespace Mfr.Filters.Attributes
     /// </summary>
     /// <param name="Options">Per-flag tri-state options.</param>
     [FilterPalette(FilterGroup.Attributes, "Attributes Setter")]
-    public sealed record AttributesSetterFilter(AttributesSetterOptions Options) : BaseFilter
+    public sealed record AttributesSetterFilter(AttributesSetterOptions Options) : BaseFilter, IFixedApplyToFilter
     {
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (all attribute flags unchanged).
@@ -60,6 +61,10 @@ namespace Mfr.Filters.Attributes
 
         /// <inheritdoc />
         public override string Type => "AttributesSetter";
+
+        /// <inheritdoc />
+        public string FixedApplyToLabel =>
+            FixedFilterApplyToLabels.ForExtendedProperty(ExtendedRenameListFields.Key.Attrs);
 
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)

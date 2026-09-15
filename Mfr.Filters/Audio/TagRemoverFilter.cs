@@ -52,7 +52,7 @@ namespace Mfr.Filters.Audio
     /// </remarks>
     /// <param name="Options">Whether to strip all tags, or which block types to remove.</param>
     [FilterPalette(FilterGroup.Audio, "Audio Tag Remover")]
-    public sealed record TagRemoverFilter(TagRemoverOptions Options) : BaseFilter
+    public sealed record TagRemoverFilter(TagRemoverOptions Options) : BaseFilter, IFixedApplyToFilter
     {
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (nuclear strip all embedded tags).
@@ -62,6 +62,9 @@ namespace Mfr.Filters.Audio
 
         /// <inheritdoc />
         public override string Type => "TagRemover";
+
+        /// <inheritdoc />
+        public string FixedApplyToLabel => FixedFilterApplyToLabels.AudioTags;
 
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)

@@ -40,7 +40,7 @@ namespace Mfr.Filters.Misc
     /// </remarks>
     /// <param name="Options">Path mover options.</param>
     [FilterPalette(FilterGroup.Misc, "Path Mover")]
-    public sealed record PathMoverFilter(PathMoverOptions Options) : BaseFilter
+    public sealed record PathMoverFilter(PathMoverOptions Options) : BaseFilter, IFixedApplyToFilter
     {
         private Formatter? _compiledSubFolder;
 
@@ -54,6 +54,9 @@ namespace Mfr.Filters.Misc
         /// Gets the filter type discriminator.
         /// </summary>
         public override string Type => "PathMover";
+
+        /// <inheritdoc />
+        public string FixedApplyToLabel => PathFieldLabels.ParentDirectory;
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when <see cref="PathMoverOptions.RootFolder"/> is empty, whitespace-only, or not an absolute path.</exception>

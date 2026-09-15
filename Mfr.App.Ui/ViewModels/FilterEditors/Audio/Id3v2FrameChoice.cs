@@ -1,4 +1,3 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio

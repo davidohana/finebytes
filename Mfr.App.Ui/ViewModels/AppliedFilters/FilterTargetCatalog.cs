@@ -1,12 +1,6 @@
 using Mfr.Filters;
-using Mfr.Filters.Attributes;
-using Mfr.Filters.Audio;
-using Mfr.Filters.Misc;
 using Mfr.Models.Filters;
-using Mfr.Models.Media;
 using Mfr.Models.Rename;
-using Mfr.Models.RenameList;
-using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
@@ -19,8 +13,6 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
     /// </summary>
     public static class FilterTargetCatalog
     {
-        private const string _audioTagsLabel = "Audio tags";
-
         private static readonly FilterTargetGroupOption _fileNameGroup = new(
             PathFieldLabels.FileName,
             [
@@ -91,8 +83,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// </summary>
         /// <param name="filter">Applied filter instance.</param>
         /// <returns>
-        /// Target plus scope for string-target filters; a fixed-domain label for filters that always
-        /// write one known domain; otherwise empty (e.g. pipeline-state-only filters).
+        /// Target plus scope for string-target filters; <see cref="IFixedApplyToFilter.FixedApplyToLabel"/>
+        /// when implemented; otherwise empty (e.g. pipeline-state-only filters).
         /// </returns>
         public static string GetApplyToLabel(BaseFilter filter)
         {
@@ -114,52 +106,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 };
             }
 
-            return _GetFixedApplyToLabel(filter);
-        }
-
-        /// <summary>
-        /// Label for non-string filters that always mutate a known domain.
-        /// </summary>
-        /// <param name="filter">Fixed-domain filter instance.</param>
-        /// <returns>User-facing Apply-To text, or empty when the filter has no write target.</returns>
-        private static string _GetFixedApplyToLabel(BaseFilter filter)
-        {
-            return filter switch
-            {
-                AttributesSetterFilter => _GetExtendedFieldDisplayName(ExtendedRenameListFields.Key.Attrs),
-                PathMoverFilter => PathFieldLabels.ParentDirectory,
-                DateTimeSetterFilter dateTimeSetter => _GetTimestampFieldLabel(dateTimeSetter.Options.TimestampField),
-                TimeShifterFilter timeShifter => _GetTimestampFieldLabel(timeShifter.Options.TimestampField),
-                AudioTagSetterFilter or TagRemoverFilter => _audioTagsLabel,
-                Id3v2FieldSetterFilter id3v2Setter => Id3v2FrameLabels.For(id3v2Setter.Options.FrameId),
-                _ => string.Empty,
-            };
-        }
-
-        /// <summary>
-        /// Maps a filesystem timestamp field to the Extended Rename List column display name.
-        /// </summary>
-        /// <param name="field">Which timestamp the filter writes.</param>
-        /// <returns>Column-style label such as <c>Last Write Date</c>.</returns>
-        private static string _GetTimestampFieldLabel(TimestampField field)
-        {
-            return field switch
-            {
-                TimestampField.Creation => _GetExtendedFieldDisplayName(ExtendedRenameListFields.Key.CreationDate),
-                TimestampField.LastWrite => _GetExtendedFieldDisplayName(ExtendedRenameListFields.Key.LastWriteDate),
-                TimestampField.LastAccess => _GetExtendedFieldDisplayName(ExtendedRenameListFields.Key.LastAccessDate),
-                _ => _GetExtendedFieldDisplayName(ExtendedRenameListFields.Key.LastWriteDate),
-            };
-        }
-
-        /// <summary>
-        /// Display name for an Extended Rename List column (Attributes, Creation Date, …).
-        /// </summary>
-        /// <param name="propertyKey">Key within <see cref="ExtendedRenameListFields.Group"/>.</param>
-        /// <returns>User-facing column title from <see cref="RenameListFieldCatalog"/>.</returns>
-        private static string _GetExtendedFieldDisplayName(string propertyKey)
-        {
-            return RenameListFieldCatalog.GetField(ExtendedRenameListFields.Group, propertyKey).DisplayName;
+            return filter is IFixedApplyToFilter fixedApplyTo ? fixedApplyTo.FixedApplyToLabel : string.Empty;
         }
 
         /// <summary>

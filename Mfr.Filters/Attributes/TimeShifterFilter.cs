@@ -69,7 +69,7 @@ namespace Mfr.Filters.Attributes
     /// </para>
     /// </remarks>
     [FilterPalette(FilterGroup.Attributes, "Time Shifter")]
-    public sealed record TimeShifterFilter(TimeShifterOptions Options) : BaseFilter
+    public sealed record TimeShifterFilter(TimeShifterOptions Options) : BaseFilter, IFixedApplyToFilter
     {
         /// <summary>
         /// Creates a filter with MFR7 add-to-list defaults (last write time, +1 day).
@@ -81,6 +81,9 @@ namespace Mfr.Filters.Attributes
 
         /// <inheritdoc />
         public override string Type => "TimeShifter";
+
+        /// <inheritdoc />
+        public string FixedApplyToLabel => FixedFilterApplyToLabels.ForTimestampField(Options.TimestampField);
 
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)

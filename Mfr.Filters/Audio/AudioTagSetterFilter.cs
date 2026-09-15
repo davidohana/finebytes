@@ -96,7 +96,7 @@ namespace Mfr.Filters.Audio
     /// </remarks>
     /// <param name="Options">Per-field behaviors and values.</param>
     [FilterPalette(FilterGroup.Audio, "Audio Tag Setter")]
-    public sealed record AudioTagSetterFilter(AudioTagSetterOptions Options) : BaseFilter
+    public sealed record AudioTagSetterFilter(AudioTagSetterOptions Options) : BaseFilter, IFixedApplyToFilter
     {
         /// <summary>
         /// Formatter used when a field is omitted from options: always expands to empty string (field is not applied).
@@ -127,6 +127,9 @@ namespace Mfr.Filters.Audio
 
         /// <inheritdoc />
         public override string Type => "AudioTagSetter";
+
+        /// <inheritdoc />
+        public string FixedApplyToLabel => FixedFilterApplyToLabels.AudioTags;
 
         /// <inheritdoc />
         protected override void _Setup()

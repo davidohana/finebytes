@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.FormatString;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.Filters.Audio
 {
@@ -48,7 +49,7 @@ namespace Mfr.Filters.Audio
     /// </remarks>
     /// <param name="Options">Frame identity, value, and fill-if-empty behavior.</param>
     [FilterPalette(FilterGroup.Audio, "ID3v2 Field Setter")]
-    public sealed record Id3v2FieldSetterFilter(Id3v2FieldSetterOptions Options) : BaseFilter
+    public sealed record Id3v2FieldSetterFilter(Id3v2FieldSetterOptions Options) : BaseFilter, IFixedApplyToFilter
     {
         private Formatter _textFormatter = FormatStringCompiler.EmptyFormatter;
         private string _normalizedFrameId = string.Empty;
@@ -61,6 +62,9 @@ namespace Mfr.Filters.Audio
 
         /// <inheritdoc />
         public override string Type => "Id3v2FieldSetter";
+
+        /// <inheritdoc />
+        public string FixedApplyToLabel => Id3v2FrameLabels.For(Options.FrameId);
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException"><see cref="Id3v2FieldSetterOptions.FrameId"/> is missing or whitespace.</exception>

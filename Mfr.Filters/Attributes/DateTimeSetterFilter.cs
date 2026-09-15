@@ -29,7 +29,7 @@ namespace Mfr.Filters.Attributes
     /// </para>
     /// </remarks>
     [FilterPalette(FilterGroup.Attributes, "Date/Time Setter")]
-    public sealed record DateTimeSetterFilter(DateTimeSetterOptions Options) : BaseFilter
+    public sealed record DateTimeSetterFilter(DateTimeSetterOptions Options) : BaseFilter, IFixedApplyToFilter
     {
         /// <summary>
         /// Creates a filter with defaults (last write; date and time both on, today/now).
@@ -47,6 +47,9 @@ namespace Mfr.Filters.Attributes
 
         /// <inheritdoc />
         public override string Type => "DateTimeSetter";
+
+        /// <inheritdoc />
+        public string FixedApplyToLabel => FixedFilterApplyToLabels.ForTimestampField(Options.TimestampField);
 
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
