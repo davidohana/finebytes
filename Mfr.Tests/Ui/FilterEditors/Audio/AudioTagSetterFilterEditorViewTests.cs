@@ -10,7 +10,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Audio;
 using Mfr.Filters.Audio;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Audio

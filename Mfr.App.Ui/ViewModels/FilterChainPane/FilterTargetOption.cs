@@ -1,6 +1,6 @@
 using Mfr.Models.Filters;
 
-namespace Mfr.App.Ui.ViewModels.FilterChain
+namespace Mfr.App.Ui.ViewModels.FilterChainPane
 {
     /// <summary>
     /// One Apply-To group shown in the first Filter Options combo.

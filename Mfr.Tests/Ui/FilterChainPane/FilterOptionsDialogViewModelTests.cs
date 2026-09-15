@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
@@ -10,7 +10,7 @@ using Mfr.Models.Media;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 
-namespace Mfr.Tests.Ui.FilterChain
+namespace Mfr.Tests.Ui.FilterChainPane
 {
     /// <summary>
     /// Unit tests for <see cref="FilterOptionsDialogViewModel"/> and <see cref="FilterChainViewModel.ApplyFilterOptions"/>.

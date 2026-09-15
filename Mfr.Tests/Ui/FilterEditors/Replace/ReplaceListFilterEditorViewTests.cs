@@ -10,7 +10,7 @@ using Mfr.App.Ui.Views.FilterEditors.Replace;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Filters;
 using Mfr.Filters.Replace;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Replace

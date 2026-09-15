@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.Filters.Formatting;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Formatting

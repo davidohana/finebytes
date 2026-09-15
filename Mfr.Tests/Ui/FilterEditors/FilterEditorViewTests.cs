@@ -8,13 +8,13 @@ using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.Views.Controls;
-using Mfr.App.Ui.Views.FilterChain;
+using Mfr.App.Ui.Views.FilterChainPane;
 using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.App.Ui.Views.FilterEditors.Case;
 using Mfr.App.Ui.Views.FilterEditors.Space;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.Filters.Case;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.FilterEditors
 {
@@ -213,7 +213,7 @@ namespace Mfr.Tests.Ui.FilterEditors
                 saveButton.Command.Execute(null);
 
                 // Silent replace — attached FilterChainView wires ConfirmClearAsync (headless dialog hang).
-                applied.ReplaceFromChain(new FilterChainModel { Steps = [] });
+                applied.ReplaceFromChain(new FilterChain { Steps = [] });
                 applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
                 Assert.Equal(LettersCaseMode.UpperCase, ((LettersCaseFilter)applied.Steps[0].Filter).Options.Mode);
 

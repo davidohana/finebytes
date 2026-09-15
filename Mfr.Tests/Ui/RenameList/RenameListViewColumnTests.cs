@@ -824,7 +824,7 @@ namespace Mfr.Tests.Ui.RenameList
             );
 
             renameListViewModel.Preview(
-                FilterChainModel.CreateAllEnabled([
+                FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
                         new FilePrefixTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
@@ -879,7 +879,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             renameListViewModel.Preview(
-                FilterChainModel.CreateAllEnabled([
+                FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
                         new FilePrefixTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
@@ -935,7 +935,7 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             renameListViewModel.Preview(
-                FilterChainModel.CreateAllEnabled([
+                FilterChain.CreateAllEnabled([
                     new FormatterFilter(
                         Target: new SemanticAudioFieldTarget(SemanticAudioField.Title),
                         Options: new FormatterOptions("x")

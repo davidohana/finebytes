@@ -5,7 +5,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.Filters.Trimming;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.FilterEditors.Trimming
 {

@@ -6,8 +6,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.Resources;
-using Mfr.App.Ui.ViewModels.FilterChain;
-using Mfr.App.Ui.Views.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
+using Mfr.App.Ui.Views.FilterChainPane;
 using Mfr.Filters.Case;
 
 namespace Mfr.Tests.Ui.Presets
@@ -71,7 +71,7 @@ namespace Mfr.Tests.Ui.Presets
                     {
                         Id = Guid.NewGuid(),
                         Name = name,
-                        Chain = new FilterChainModel { Steps = [] },
+                        Chain = new FilterChain { Steps = [] },
                     }
                 );
             }
@@ -137,7 +137,7 @@ namespace Mfr.Tests.Ui.Presets
                     Id = Guid.NewGuid(),
                     Name = "Demo",
                     Description = "demo",
-                    Chain = new FilterChainModel { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
+                    Chain = new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
                 }
             );
             var viewModel = new FilterChainViewModel(presetManager: manager);

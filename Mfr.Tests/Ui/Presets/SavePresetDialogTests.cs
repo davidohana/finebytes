@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.Presets
                 Id = Guid.NewGuid(),
                 Name = "Demo",
                 Description = "notes",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             var viewModel = new SavePresetDialogViewModel(existing, existingPresets: [existing]);
             var dialog = new SavePresetDialog(viewModel);
@@ -63,14 +63,14 @@ namespace Mfr.Tests.Ui.Presets
                 Id = Guid.NewGuid(),
                 Name = "Mine",
                 Description = "mine",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             var other = new FilterPreset
             {
                 Id = Guid.NewGuid(),
                 Name = "Other",
                 Description = "from other",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
                 VisibleColumns =
                 [
                     new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)),

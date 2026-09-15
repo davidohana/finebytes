@@ -6,7 +6,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Space;
 using Mfr.Filters.Space;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.FilterEditors.Space
 {

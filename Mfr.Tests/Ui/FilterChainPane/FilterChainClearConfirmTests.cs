@@ -1,6 +1,6 @@
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 
-namespace Mfr.Tests.Ui.FilterChain
+namespace Mfr.Tests.Ui.FilterChainPane
 {
     /// <summary>
     /// Clear-command confirmation gates for Filter Chain.

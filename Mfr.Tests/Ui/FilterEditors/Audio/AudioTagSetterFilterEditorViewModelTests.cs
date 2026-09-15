@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.Filters.Audio;
 

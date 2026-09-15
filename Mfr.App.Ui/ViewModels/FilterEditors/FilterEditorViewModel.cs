@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Models.Config;
 using Mfr.Models.Rename;

@@ -2,13 +2,13 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Filters.Case;
 using Mfr.Models.RenameList.Fields.Basic;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -312,7 +312,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
 
             // Force a stale identity preview while the Upper filter remains on the stack.
-            renameList.Preview(new FilterChainModel { Steps = [] });
+            renameList.Preview(new FilterChain { Steps = [] });
             Assert.Equal("hello.txt", renameList.Entries[0].FullFileNamePreview);
 
             var originalsRaises = 0;
@@ -342,7 +342,7 @@ namespace Mfr.Tests.Ui.RenameList
             await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
             Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
 
-            main.RenameListViewModel.Preview(new FilterChainModel { Steps = [] });
+            main.RenameListViewModel.Preview(new FilterChain { Steps = [] });
             Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
 
             await main.RenameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
@@ -371,7 +371,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
 
             main.RenameListViewModel.IsAutoPreview = false;
-            main.RenameListViewModel.Preview(new FilterChainModel { Steps = [] });
+            main.RenameListViewModel.Preview(new FilterChain { Steps = [] });
             Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
 
             await main.RenameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
@@ -451,7 +451,7 @@ namespace Mfr.Tests.Ui.RenameList
             var revisionBefore = renameList.FieldDisplayRevision;
 
             renameList.Preview(
-                new FilterChainModel
+                new FilterChain
                 {
                     Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
                 }
@@ -490,7 +490,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameList.Progress.PropertyChanged += OnProgressChanged;
             try
             {
-                var chain = new FilterChainModel
+                var chain = new FilterChain
                 {
                     Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
                 };
@@ -530,7 +530,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameList.Progress.PropertyChanged += OnProgressChanged;
             try
             {
-                var chain = new FilterChainModel
+                var chain = new FilterChain
                 {
                     Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
                 };
@@ -560,7 +560,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
             Assert.True(renameList.IsAutoPreview);
 
-            var chain = new FilterChainModel
+            var chain = new FilterChain
             {
                 Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
             };

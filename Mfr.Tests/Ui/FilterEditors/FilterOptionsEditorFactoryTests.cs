@@ -1,5 +1,5 @@
 using Avalonia.Headless.XUnit;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters;

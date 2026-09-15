@@ -2,9 +2,9 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 
-namespace Mfr.Tests.Ui.FilterChain
+namespace Mfr.Tests.Ui.FilterChainPane
 {
     /// <summary>
     /// Headless tests for Filter Chain remove, clear, and reorder gestures.

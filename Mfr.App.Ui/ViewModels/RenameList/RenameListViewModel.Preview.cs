@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Engine.Commit;
-using FilterChainModel = Mfr.Models.Filters.FilterChain;
+using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -96,7 +96,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <see cref="PreviewAsync"/> from the shell so long runs show cancelable progress.
         /// </para>
         /// </remarks>
-        public void Preview(FilterChainModel chain)
+        public void Preview(FilterChain chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
 
@@ -117,7 +117,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <see langword="true"/> when preview finished; <see langword="false"/> when canceled
         /// (Auto-Preview is then disabled).
         /// </returns>
-        public async Task<bool> PreviewAsync(FilterChainModel chain)
+        public async Task<bool> PreviewAsync(FilterChain chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
 

@@ -6,7 +6,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Replace;
 using Mfr.Filters.Replace;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.FilterEditors.Replace
 {

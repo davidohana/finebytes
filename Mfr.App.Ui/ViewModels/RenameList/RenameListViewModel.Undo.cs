@@ -1,8 +1,8 @@
 using Mfr.Engine.RenameList;
 using Mfr.Engine.RenameLog;
 using Mfr.Models.Config;
+using Mfr.Models.Filters;
 using Mfr.Models.Rename;
-using FilterChainModel = Mfr.Models.Filters.FilterChain;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -78,7 +78,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
                 // Clear filters before replacing Entries so a later Auto-Preview sees an empty chain
                 // (not the pre-undo filters). Undo confirm already warned filters will be cleared.
-                _filterChain?.ReplaceFromChain(new FilterChainModel { Steps = [] });
+                _filterChain?.ReplaceFromChain(new FilterChain { Steps = [] });
                 _ReplaceEntriesFromEngine();
 
                 if (prepareResult is not null)

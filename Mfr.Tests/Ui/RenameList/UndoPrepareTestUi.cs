@@ -1,7 +1,7 @@
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.Filters.Replace;
 using Mfr.Models.Config;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.RenameList
 {

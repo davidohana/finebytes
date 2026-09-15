@@ -10,4 +10,3 @@ global using Mfr.Models.Filters;
 global using Mfr.Models.Media;
 global using Mfr.Models.Rename;
 global using Mfr.Models.RenameList;
-global using FilterChainModel = Mfr.Models.Filters.FilterChain;

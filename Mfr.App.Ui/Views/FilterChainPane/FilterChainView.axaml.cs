@@ -1,9 +1,9 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 
-namespace Mfr.App.Ui.Views.FilterChain
+namespace Mfr.App.Ui.Views.FilterChainPane
 {
     /// <summary>
     /// Filter Chain pane host.

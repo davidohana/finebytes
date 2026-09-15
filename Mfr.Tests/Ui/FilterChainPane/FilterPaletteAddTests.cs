@@ -5,11 +5,11 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views.DragAndDrop;
-using Mfr.App.Ui.Views.FilterChain;
+using Mfr.App.Ui.Views.FilterChainPane;
 using Mfr.App.Ui.Views.FilterPalette;
 using Mfr.Filters;
 
-namespace Mfr.Tests.Ui.FilterChain
+namespace Mfr.Tests.Ui.FilterChainPane
 {
     /// <summary>
     /// Headless tests for adding filters from Available Filters to Filter Chain.
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterChain
         [AvaloniaFact]
         public void Enter_on_available_list_appends_selected_filter()
         {
-            var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
+            var (window, mainViewModel, paletteList, filterChainView) = _ShowFilterPanes();
             var shrinkSpaces = FilterChainTestUi.Entry("ShrinkSpaces");
             _SelectPaletteEntry(paletteList, shrinkSpaces);
 
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Ui.FilterChain
 
             Assert.Single(mainViewModel.FilterChainViewModel.Steps);
             Assert.Equal("Shrink Spaces", mainViewModel.FilterChainViewModel.Steps[0].DisplayName);
-            Assert.Equal(1, appliedView.FindControl<ListBox>("FilterChainList")!.ItemCount);
+            Assert.Equal(1, filterChainView.FindControl<ListBox>("FilterChainList")!.ItemCount);
             Assert.Equal(1, mainViewModel.FilterCount);
 
             window.Close();
@@ -61,11 +61,11 @@ namespace Mfr.Tests.Ui.FilterChain
         [AvaloniaFact]
         public void Filter_chain_add_button_appends_palette_selection()
         {
-            var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
+            var (window, mainViewModel, paletteList, filterChainView) = _ShowFilterPanes();
             var shrinkSpaces = FilterChainTestUi.Entry("ShrinkSpaces");
             _SelectPaletteEntry(paletteList, shrinkSpaces);
 
-            var addButton = appliedView.FindControl<Button>("AddFromPaletteButton");
+            var addButton = filterChainView.FindControl<Button>("AddFromPaletteButton");
             Assert.NotNull(addButton);
             Assert.NotNull(addButton.Command);
             Assert.True(addButton.Command.CanExecute(null));
@@ -84,18 +84,18 @@ namespace Mfr.Tests.Ui.FilterChain
         [AvaloniaFact]
         public void Drop_from_available_inserts_filter_at_drop_index()
         {
-            var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
+            var (window, mainViewModel, paletteList, filterChainView) = _ShowFilterPanes();
             var lettersCase = FilterChainTestUi.Entry("LettersCase");
             _SelectPaletteEntry(paletteList, lettersCase);
 
-            var appliedList = appliedView.FindControl<ListBox>("FilterChainList");
-            Assert.NotNull(appliedList);
+            var filterChainList = filterChainView.FindControl<ListBox>("FilterChainList");
+            Assert.NotNull(filterChainList);
 
             var payload = new FilterPaletteDragPayload([lettersCase.Type]);
             var dataTransfer = payload.CreateTransfer();
 
-            appliedList.RaiseEvent(
-                new DragEventArgs(DragDrop.DropEvent, dataTransfer, appliedList, default, KeyModifiers.None)
+            filterChainList.RaiseEvent(
+                new DragEventArgs(DragDrop.DropEvent, dataTransfer, filterChainList, default, KeyModifiers.None)
             );
             Dispatcher.UIThread.RunJobs();
 
@@ -140,7 +140,7 @@ namespace Mfr.Tests.Ui.FilterChain
             Window Window,
             MainWindowViewModel MainViewModel,
             ListBox PaletteList,
-            FilterChainView AppliedView
+            FilterChainView FilterChainView
         ) _ShowFilterPanes()
         {
             var mainViewModel = new MainWindowViewModel();
@@ -150,7 +150,7 @@ namespace Mfr.Tests.Ui.FilterChain
                 AddSelectedToFilterChainCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
                 RemoveFilterChainStepsCommand = mainViewModel.FilterChainViewModel.RemoveStepsAtIndicesCommand,
             };
-            var appliedView = new FilterChainView
+            var filterChainView = new FilterChainView
             {
                 DataContext = mainViewModel.FilterChainViewModel,
                 AddFromPaletteCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
@@ -159,9 +159,9 @@ namespace Mfr.Tests.Ui.FilterChain
             var grid = new Grid
             {
                 ColumnDefinitions = new ColumnDefinitions("*,*"),
-                Children = { paletteView, appliedView },
+                Children = { paletteView, filterChainView },
             };
-            Grid.SetColumn(appliedView, 1);
+            Grid.SetColumn(filterChainView, 1);
 
             var window = new Window
             {
@@ -175,7 +175,7 @@ namespace Mfr.Tests.Ui.FilterChain
 
             var paletteList = paletteView.FindControl<ListBox>("FilterList");
             Assert.NotNull(paletteList);
-            return (window, mainViewModel, paletteList, appliedView);
+            return (window, mainViewModel, paletteList, filterChainView);
         }
 
         private static void _SelectPaletteEntry(ListBox paletteList, FilterCatalogEntry entry)

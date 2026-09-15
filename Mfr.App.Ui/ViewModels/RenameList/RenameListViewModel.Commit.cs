@@ -1,8 +1,8 @@
 using Avalonia.Media;
 using Mfr.Engine.Commit;
 using Mfr.Models.Config;
+using Mfr.Models.Filters;
 using Mfr.Models.Rename;
-using FilterChainModel = Mfr.Models.Filters.FilterChain;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -23,7 +23,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Does not clear <see cref="LastStatusMessage"/> at start — cancel / decline keep the prior sticky status
         /// until an outcome publishes (or <c>Clear</c> / locate success wipe intentionally).
         /// </remarks>
-        public async Task<bool> GoAsync(FilterChainModel chain)
+        public async Task<bool> GoAsync(FilterChain chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
 

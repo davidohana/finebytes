@@ -3,7 +3,7 @@ using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Ui.MainWindow

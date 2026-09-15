@@ -8,7 +8,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.Tests.Ui.DragAndDrop;
 
-namespace Mfr.Tests.Ui.FilterChain
+namespace Mfr.Tests.Ui.FilterChainPane
 {
     /// <summary>
     /// Headless tests for Filter Chain drag-and-drop reorder.

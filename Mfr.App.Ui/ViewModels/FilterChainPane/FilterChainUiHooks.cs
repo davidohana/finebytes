@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.ViewModels.FilterChain
+namespace Mfr.App.Ui.ViewModels.FilterChainPane
 {
     /// <summary>
     /// Optional UI hooks for Filter Chain (wired by the view; set in tests).

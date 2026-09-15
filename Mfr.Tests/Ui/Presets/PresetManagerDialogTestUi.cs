@@ -4,7 +4,7 @@ using Avalonia.Headless;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.App.Ui.Views.Presets;
 
@@ -35,7 +35,7 @@ namespace Mfr.Tests.Ui.Presets
                         Id = Guid.NewGuid(),
                         Name = name,
                         Description = $"desc-{name}",
-                        Chain = new FilterChainModel { Steps = [] },
+                        Chain = new FilterChain { Steps = [] },
                     }
                 );
             }

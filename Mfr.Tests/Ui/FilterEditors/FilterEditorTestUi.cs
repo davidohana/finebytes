@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.MainWindow;
-using Mfr.App.Ui.Views.FilterChain;
+using Mfr.App.Ui.Views.FilterChainPane;
 using Mfr.App.Ui.Views.FilterEditors;
 
 namespace Mfr.Tests.Ui.FilterEditors
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         ) ShowFilterEditorPanes(bool persistSession = false, FilterDefaultsStore? filterDefaults = null)
         {
             var mainViewModel = new MainWindowViewModel(persistSession: persistSession, filterDefaults: filterDefaults);
-            var appliedView = new FilterChainView
+            var filterChainView = new FilterChainView
             {
                 DataContext = mainViewModel.FilterChainViewModel,
                 AddFromPaletteCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
@@ -43,7 +43,11 @@ namespace Mfr.Tests.Ui.FilterEditors
                 OpenSelectedFilterHelpCommand = mainViewModel.FilterChainViewModel.OpenSelectedFilterHelpCommand,
             };
 
-            var grid = new Grid { RowDefinitions = new RowDefinitions("*,*"), Children = { appliedView, editorView } };
+            var grid = new Grid
+            {
+                RowDefinitions = new RowDefinitions("*,*"),
+                Children = { filterChainView, editorView },
+            };
             Grid.SetRow(editorView, 1);
 
             var window = new Window

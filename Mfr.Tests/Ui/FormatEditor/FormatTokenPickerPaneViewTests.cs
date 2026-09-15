@@ -6,7 +6,7 @@ using Avalonia.VisualTree;
 using AvaloniaEdit;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 using Mfr.Tests.Ui.FilterEditors;
 
 namespace Mfr.Tests.Ui.FormatEditor

@@ -3,11 +3,11 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels.FilterChain;
-using Mfr.App.Ui.Views.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
+using Mfr.App.Ui.Views.FilterChainPane;
 using Mfr.Filters;
 
-namespace Mfr.Tests.Ui.FilterChain
+namespace Mfr.Tests.Ui.FilterChainPane
 {
     /// <summary>
     /// Shared catalog lookup and headless host for Filter Chain tests.

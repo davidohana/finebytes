@@ -5,7 +5,7 @@ using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
 
-namespace Mfr.App.Ui.Views.FilterChain
+namespace Mfr.App.Ui.Views.FilterChainPane
 {
     public partial class FilterChainView
     {

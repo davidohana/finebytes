@@ -6,7 +6,7 @@ using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.App.Ui.Views.FilterPalette;
 using Mfr.Filters;
 
-namespace Mfr.App.Ui.Views.FilterChain
+namespace Mfr.App.Ui.Views.FilterChainPane
 {
     public partial class FilterChainView
     {

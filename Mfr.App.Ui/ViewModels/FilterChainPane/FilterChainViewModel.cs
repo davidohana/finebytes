@@ -11,9 +11,8 @@ using Mfr.Models.Config;
 using Mfr.Models.Filters;
 using Mfr.Models.RenameList;
 using Mfr.Utils;
-using FilterChainModel = Mfr.Models.Filters.FilterChain;
 
-namespace Mfr.App.Ui.ViewModels.FilterChain
+namespace Mfr.App.Ui.ViewModels.FilterChainPane
 {
     /// <summary>
     /// Filter Chain pane: ordered filter stack edited before preview.
@@ -732,12 +731,12 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         }
 
         /// <summary>
-        /// Builds a <see cref="FilterChainModel"/> matching the current stack.
+        /// Builds a <see cref="FilterChain"/> matching the current stack.
         /// </summary>
         /// <returns>Enabled flags and filters in list order.</returns>
-        public FilterChainModel ToChain()
+        public FilterChain ToChain()
         {
-            return new FilterChainModel
+            return new FilterChain
             {
                 Steps =
                 [
@@ -756,7 +755,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         /// </para>
         /// </summary>
         /// <param name="chain">Source chain (always replaces; never merges).</param>
-        public void ReplaceFromChain(FilterChainModel chain)
+        public void ReplaceFromChain(FilterChain chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
 

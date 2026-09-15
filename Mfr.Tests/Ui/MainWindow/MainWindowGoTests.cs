@@ -4,7 +4,7 @@ using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Replace;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.MainWindow
 {
@@ -328,7 +328,7 @@ namespace Mfr.Tests.Ui.MainWindow
             {
                 Id = Guid.NewGuid(),
                 Name = "ShellPreset",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
 
             viewModel.FilterChainViewModel.LoadPreset(preset);
@@ -456,9 +456,9 @@ namespace Mfr.Tests.Ui.MainWindow
             }
         }
 
-        private static FilterChainModel _Chain(params ReplacerFilter[] filters)
+        private static FilterChain _Chain(params ReplacerFilter[] filters)
         {
-            return new FilterChainModel
+            return new FilterChain
             {
                 Steps = [.. filters.Select(filter => new FilterChainStep(Enabled: true, Filter: filter))],
             };

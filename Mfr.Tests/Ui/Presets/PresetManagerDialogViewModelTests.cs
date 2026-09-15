@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.Presets;
 
 namespace Mfr.Tests.Ui.Presets
@@ -152,7 +152,7 @@ namespace Mfr.Tests.Ui.Presets
                         Id = Guid.NewGuid(),
                         Name = name,
                         Description = description,
-                        Chain = new FilterChainModel { Steps = [] },
+                        Chain = new FilterChain { Steps = [] },
                     }
                 );
             }

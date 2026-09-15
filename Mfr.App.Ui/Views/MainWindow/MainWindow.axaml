@@ -10,7 +10,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:filelistviews="using:Mfr.App.Ui.Views.FileList"
   xmlns:filterpaletteviews="using:Mfr.App.Ui.Views.FilterPalette"
-  xmlns:filterchainviews="using:Mfr.App.Ui.Views.FilterChain"
+  xmlns:filterchainviews="using:Mfr.App.Ui.Views.FilterChainPane"
   xmlns:filtereditorsviews="using:Mfr.App.Ui.Views.FilterEditors"
   xmlns:renamelistviews="using:Mfr.App.Ui.Views.RenameList"
   xmlns:input="using:Mfr.App.Ui.Input"

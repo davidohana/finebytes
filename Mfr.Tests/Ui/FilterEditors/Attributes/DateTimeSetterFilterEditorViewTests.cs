@@ -6,7 +6,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
 using Mfr.App.Ui.Views.FilterEditors.Attributes;
 using Mfr.Filters.Attributes;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.FilterEditors.Attributes
 {

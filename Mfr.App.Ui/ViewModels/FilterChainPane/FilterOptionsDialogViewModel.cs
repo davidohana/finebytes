@@ -3,7 +3,7 @@ using Mfr.Filters;
 using Mfr.Models.Filters;
 using Mfr.Models.Tags.Id3v2;
 
-namespace Mfr.App.Ui.ViewModels.FilterChain
+namespace Mfr.App.Ui.ViewModels.FilterChainPane
 {
     /// <summary>
     /// Draft state for the Filter Options dialog (name, Apply-To targets, and apply scope).

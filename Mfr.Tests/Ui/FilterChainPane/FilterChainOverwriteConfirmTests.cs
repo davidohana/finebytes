@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
-using Mfr.App.Ui.Views.FilterChain;
+using Mfr.App.Ui.Views.FilterChainPane;
 
-namespace Mfr.Tests.Ui.FilterChain
+namespace Mfr.Tests.Ui.FilterChainPane
 {
     /// <summary>
     /// Overwrite-preset confirmation gates for Filter Chain save.

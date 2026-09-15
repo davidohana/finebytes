@@ -4,11 +4,11 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.Models.Config;
 
-namespace Mfr.App.Ui.Views.FilterChain
+namespace Mfr.App.Ui.Views.FilterChainPane
 {
     public partial class FilterChainView
     {

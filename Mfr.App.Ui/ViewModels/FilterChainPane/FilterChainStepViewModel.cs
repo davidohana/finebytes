@@ -2,7 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.Filters;
 using Mfr.Models.Filters;
 
-namespace Mfr.App.Ui.ViewModels.FilterChain
+namespace Mfr.App.Ui.ViewModels.FilterChainPane
 {
     /// <summary>
     /// One row in the Filter Chain list.

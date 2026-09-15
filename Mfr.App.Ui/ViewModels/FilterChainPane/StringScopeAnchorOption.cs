@@ -1,6 +1,6 @@
 using Mfr.Models.Filters;
 
-namespace Mfr.App.Ui.ViewModels.FilterChain
+namespace Mfr.App.Ui.ViewModels.FilterChainPane
 {
     /// <summary>
     /// Display entry for a <see cref="StringScopeAnchor"/> combo.

@@ -7,7 +7,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Case;
 using Mfr.Filters.Case;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.FilterEditors.Case
 {

@@ -6,7 +6,7 @@ using Mfr.Models;
 using Mfr.Models.Config;
 using Mfr.Models.Filters;
 
-namespace Mfr.App.Ui.Views.FilterChain
+namespace Mfr.App.Ui.Views.FilterChainPane
 {
     public partial class FilterChainView
     {
@@ -132,7 +132,7 @@ namespace Mfr.App.Ui.Views.FilterChain
         /// Confirms replace when needed, then loads the preset (chain and optional columns).
         /// <para>
         /// Shared by Preset Manager Load and the toolbar ▾ quick-pick. Column apply (when the preset
-        /// includes them) happens inside <see cref="ViewModels.FilterChain.FilterChainViewModel.LoadPreset"/>
+        /// includes them) happens inside <see cref="ViewModels.FilterChainPane.FilterChainViewModel.LoadPreset"/>
         /// through the wired Rename List source. On failure shows an error dialog and returns
         /// <see langword="false"/>.
         /// </para>

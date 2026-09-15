@@ -1,7 +1,7 @@
 using Avalonia.Controls;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 
-namespace Mfr.App.Ui.Views.FilterChain
+namespace Mfr.App.Ui.Views.FilterChainPane
 {
     /// <summary>
     /// Modal dialog for filter-chain name and Apply-To targets.

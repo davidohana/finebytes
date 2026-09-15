@@ -6,7 +6,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.Views.FilterEditors.Misc;
 using Mfr.Filters.Misc;
-using Mfr.Tests.Ui.FilterChain;
+using Mfr.Tests.Ui.FilterChainPane;
 using Mfr.Tests.Ui.RenameList;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 

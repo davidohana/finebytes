@@ -5,9 +5,9 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.MainWindow;
-using Mfr.App.Ui.Views.FilterChain;
+using Mfr.App.Ui.Views.FilterChainPane;
 
-namespace Mfr.Tests.Ui.FilterChain
+namespace Mfr.Tests.Ui.FilterChainPane
 {
     /// <summary>
     /// Headless tests for the Filter Chain list UI.

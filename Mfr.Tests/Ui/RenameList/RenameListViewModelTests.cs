@@ -1,7 +1,7 @@
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.FileList;
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
@@ -417,7 +417,7 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([helloPath, worldPath, otherPath]);
             renameListViewModel.Preview(
-                FilterChainModel.CreateAllEnabled([
+                FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
                         new FilePrefixTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
@@ -744,7 +744,7 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([helloPath]);
             renameListViewModel.Preview(
-                FilterChainModel.CreateAllEnabled([
+                FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
                         new FilePrefixTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
@@ -1593,7 +1593,7 @@ namespace Mfr.Tests.Ui.RenameList
                 BasicRenameListFields.Key.FullPath
             );
             entry.EngineItem.SetOverride(previewPath, "not-a-full-path");
-            renameListViewModel.Preview(FilterChainModel.CreateAllEnabled([]));
+            renameListViewModel.Preview(FilterChain.CreateAllEnabled([]));
 
             Assert.True(entry.HasPreviewError);
             renameListViewModel.SetFocusedFieldKey(previewPath);

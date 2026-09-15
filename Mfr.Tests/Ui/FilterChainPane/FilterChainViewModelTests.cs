@@ -1,11 +1,11 @@
-using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.Basic;
 
-namespace Mfr.Tests.Ui.FilterChain
+namespace Mfr.Tests.Ui.FilterChainPane
 {
     /// <summary>
     /// Tests Filter Chain stack commands and <see cref="FilterChainViewModel.ToChain"/>.
@@ -742,7 +742,7 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "Demo",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(preset);
             var viewModel = new FilterChainViewModel(presetManager: manager);
@@ -769,7 +769,7 @@ namespace Mfr.Tests.Ui.FilterChain
 
             var letters = new LettersCaseFilter();
             var shrink = new ShrinkSpacesFilter();
-            var chain = new FilterChainModel
+            var chain = new FilterChain
             {
                 Steps =
                 [
@@ -802,7 +802,7 @@ namespace Mfr.Tests.Ui.FilterChain
         public void ReplaceFromChain_Uses_Stored_Step_Names()
         {
             var viewModel = new FilterChainViewModel();
-            var chain = new FilterChainModel
+            var chain = new FilterChain
             {
                 Steps =
                 [
@@ -828,7 +828,7 @@ namespace Mfr.Tests.Ui.FilterChain
 
             var count = _CountChainChanged(
                 viewModel,
-                () => viewModel.ReplaceFromChain(new FilterChainModel { Steps = [] })
+                () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] })
             );
 
             Assert.Equal(1, count);
@@ -845,7 +845,7 @@ namespace Mfr.Tests.Ui.FilterChain
             var viewModel = new FilterChainViewModel();
             var count = _CountChainChanged(
                 viewModel,
-                () => viewModel.ReplaceFromChain(new FilterChainModel { Steps = [] })
+                () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] })
             );
             Assert.Equal(0, count);
         }
@@ -861,7 +861,7 @@ namespace Mfr.Tests.Ui.FilterChain
             var oldStep = viewModel.Steps[0];
 
             viewModel.ReplaceFromChain(
-                new FilterChainModel { Steps = [new FilterChainStep(Enabled: true, Filter: new LettersCaseFilter())] }
+                new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: new LettersCaseFilter())] }
             );
 
             var count = _CountChainChanged(viewModel, () => oldStep.Enabled = false);
@@ -907,7 +907,7 @@ namespace Mfr.Tests.Ui.FilterChain
                 Id = existingId,
                 Name = "KeepMe",
                 Description = "old",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
                 VisibleColumns = null,
             };
             manager.Upsert(existing);
@@ -989,7 +989,7 @@ namespace Mfr.Tests.Ui.FilterChain
                 Id = existingId,
                 Name = "ClearCols",
                 Description = "old",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
                 VisibleColumns =
                 [
                     new(
@@ -1024,7 +1024,7 @@ namespace Mfr.Tests.Ui.FilterChain
                 Id = Guid.NewGuid(),
                 Name = "LoadMe",
                 Description = "demo",
-                Chain = new FilterChainModel { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
+                Chain = new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
             };
             manager.Upsert(preset);
             var viewModel = new FilterChainViewModel(presetManager: manager);
@@ -1053,7 +1053,7 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "Multi",
-                Chain = new FilterChainModel
+                Chain = new FilterChain
                 {
                     Steps =
                     [
@@ -1097,7 +1097,7 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "WithCols",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
                 VisibleColumns = columns,
             };
             var viewModel = new FilterChainViewModel();
@@ -1125,7 +1125,7 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "BadCols",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
                 VisibleColumns = columns,
             };
             var viewModel = new FilterChainViewModel();
@@ -1149,7 +1149,7 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "NoCols",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
                 VisibleColumns = null,
             };
             var viewModel = new FilterChainViewModel();
@@ -1177,7 +1177,7 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "ColsNoWire",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
                 VisibleColumns = columns,
             };
             var viewModel = new FilterChainViewModel();
@@ -1220,14 +1220,14 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "Gone",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(preset);
             var other = new FilterPreset
             {
                 Id = Guid.NewGuid(),
                 Name = "Keep",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(other);
             var viewModel = new FilterChainViewModel(presetManager: manager);
@@ -1254,7 +1254,7 @@ namespace Mfr.Tests.Ui.FilterChain
                 Id = id,
                 Name = "Old",
                 Description = "keep",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(preset);
             var viewModel = new FilterChainViewModel(presetManager: manager);
@@ -1283,13 +1283,13 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "Alpha",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             var beta = new FilterPreset
             {
                 Id = Guid.NewGuid(),
                 Name = "Beta",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(alpha);
             manager.Upsert(beta);
@@ -1313,13 +1313,13 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "Keep",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             var gone = new FilterPreset
             {
                 Id = Guid.NewGuid(),
                 Name = "Gone",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(keep);
             manager.Upsert(gone);
@@ -1343,19 +1343,19 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = "Keep",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             var goneA = new FilterPreset
             {
                 Id = Guid.NewGuid(),
                 Name = "GoneA",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             var goneB = new FilterPreset
             {
                 Id = Guid.NewGuid(),
                 Name = "GoneB",
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(keep);
             manager.Upsert(goneA);
@@ -1403,7 +1403,7 @@ namespace Mfr.Tests.Ui.FilterChain
             {
                 Id = Guid.NewGuid(),
                 Name = name,
-                Chain = new FilterChainModel { Steps = [] },
+                Chain = new FilterChain { Steps = [] },
             };
         }
 
