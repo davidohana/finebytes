@@ -53,6 +53,33 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
+        /// Verifies logged Prefix/Extension/directory/Extended names use catalog labels (File Name, not Prefix).
+        /// </summary>
+        [Theory]
+        [InlineData(RenamePropertyNames.Prefix, PathFieldLabels.FileName)]
+        [InlineData(RenamePropertyNames.Extension, PathFieldLabels.FileExtension)]
+        [InlineData(RenamePropertyNames.DirectoryPath, PathFieldLabels.ParentDirectory)]
+        [InlineData(RenamePropertyNames.Attributes, "Attributes")]
+        [InlineData(RenamePropertyNames.CreationTime, "Creation Date")]
+        [InlineData(RenamePropertyNames.LastWriteTime, "Last Write Date")]
+        [InlineData(RenamePropertyNames.LastAccessTime, "Last Access Date")]
+        public void FormatDisplayName_uses_catalog_labels(string property, string expected)
+        {
+            Assert.Equal(expected, RenamePropertyFileMeta.FormatDisplayName(property));
+        }
+
+        /// <summary>
+        /// Verifies unrestorable strip and AudioTag.Block rows keep their stored names.
+        /// </summary>
+        [Theory]
+        [InlineData(RenamePropertyNames.StripAllEmbeddedTagsOnCommit)]
+        [InlineData("AudioTag.Block.Xiph.TITLE")]
+        public void FormatDisplayName_keeps_unmapped_names(string property)
+        {
+            Assert.Equal(property, RenamePropertyFileMeta.FormatDisplayName(property));
+        }
+
+        /// <summary>
         /// Verifies TryApplyOldValue writes path and filesystem scalars onto Preview.
         /// </summary>
         [Fact]

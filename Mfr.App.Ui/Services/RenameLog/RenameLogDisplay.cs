@@ -1,4 +1,5 @@
 using System.Text;
+using Mfr.Models.Rename;
 using RenameLogModel = Mfr.Models.Rename.RenameLog;
 
 namespace Mfr.App.Ui.Services.RenameLog
@@ -137,7 +138,7 @@ namespace Mfr.App.Ui.Services.RenameLog
                 {
                     builder
                         .Append("Changed '")
-                        .Append(change.Property)
+                        .Append(RenamePropertyFileMeta.FormatDisplayName(change.Property))
                         .Append("' from '")
                         .Append(change.OldValue)
                         .Append("' to '")

@@ -647,7 +647,7 @@ namespace Mfr.Tests.Engine
             Assert.False(loaded.IsUndo);
             Assert.Equal(TestPaths.Absolute("new.txt"), Assert.Single(loaded.Entries).DestinationPath);
             Assert.Contains("Operation: GO", RenameLogDisplay.FormatDetails(loaded), StringComparison.Ordinal);
-            Assert.Contains("Changed 'Prefix'", RenameLogDisplay.FormatDetails(loaded));
+            Assert.Contains($"Changed '{PathFieldLabels.FileName}'", RenameLogDisplay.FormatDetails(loaded));
 
             Assert.True(RenameLogStore.TryDeleteFile(writtenPath));
             Assert.False(File.Exists(writtenPath));

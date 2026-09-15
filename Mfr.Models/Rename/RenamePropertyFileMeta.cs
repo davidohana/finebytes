@@ -144,6 +144,26 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Returns the user-facing label for a logged property name.
+        /// </summary>
+        /// <param name="property">Canonical <see cref="RenamePropertyNames"/> value (or other logged name).</param>
+        /// <returns>
+        /// Rename List / Apply-To display name when <paramref name="property"/> maps to a catalog field;
+        /// otherwise the stored property name.
+        /// </returns>
+        public static string FormatDisplayName(string property)
+        {
+            ArgumentNullException.ThrowIfNull(property);
+
+            if (TryMapPreview(property, out var key) && RenameListFieldCatalog.TryGetField(key, out var field))
+            {
+                return field.DisplayName;
+            }
+
+            return property;
+        }
+
+        /// <summary>
         /// Collects distinct preview field keys for mapped properties across <paramref name="changes"/> (first-seen order).
         /// </summary>
         /// <param name="changes">Logged property deltas.</param>

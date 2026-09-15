@@ -195,7 +195,7 @@ namespace Mfr.Tests.Ui.LogDialog
             var viewModel = new RenameLogDialogViewModel(logDir);
 
             Assert.Contains("shown.txt", viewModel.DetailsText);
-            Assert.Contains("Changed 'Prefix'", viewModel.DetailsText);
+            Assert.Contains($"Changed '{PathFieldLabels.FileName}'", viewModel.DetailsText);
         }
 
         private static string _WriteDiskLog(string logDir, string stamp, string destinationPath)
