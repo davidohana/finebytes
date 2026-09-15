@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
-        /// <param name="step">Applied list row.</param>
+        /// <param name="step">Filter Chain step.</param>
         public PathMoverFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {

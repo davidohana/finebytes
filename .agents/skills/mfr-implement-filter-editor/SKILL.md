@@ -1,17 +1,17 @@
 ---
 name: mfr-implement-filter-editor
 description: >-
-  Implements Filter Configuration option editors for applied filters in this repo:
+  Implements Filter Configuration option editors for Filter Chain steps in this repo:
   ViewModel + AXAML under FilterEditors/<FilterGroup>, factory registration, live
   option replace, and VM/headless tests. Use when adding or changing a filter editor,
-  Filter Options body, FilterOptionsEditorFactory, F5 applied-filter editors, or
+  Filter Options body, FilterOptionsEditorFactory, F5 Filter Chain editors, or
   Filter Configuration UI for a filter type — not for creating the filter record itself
   (use mfr-implement-filter).
 ---
 
 # MFR: implement a filter editor
 
-Adds the **Filter Configuration** options body for one applied-filter type (or one intentional shared group). Does **not** create/change `Mfr.Filters` records — use `mfr-implement-filter` for that.
+Adds the **Filter Configuration** options body for one Filter Chain filter type (or one intentional shared group). Does **not** create/change `Mfr.Filters` records — use `mfr-implement-filter` for that.
 
 Grouping rules: see **Grouping** below (mirror `FilterGroup` folders under `FilterEditors/`).
 

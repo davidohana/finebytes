@@ -12,7 +12,7 @@ using Mfr.Models.Tags;
 namespace Mfr.Filters
 {
     /// <summary>
-    /// Infers Rename List columns relevant to an applied filter chain (write targets and format tokens).
+    /// Infers Rename List columns relevant to a Filter Chain (write targets and format tokens).
     /// </summary>
     public static class FilterRelevantRenameListColumns
     {
@@ -21,7 +21,7 @@ namespace Mfr.Filters
         /// <summary>
         /// Collects ordered unique Rename List field keys that the filter chain writes or reads via tokens.
         /// </summary>
-        /// <param name="filters">Applied filter chain in order (disabled steps included).</param>
+        /// <param name="filters">Filter Chain filters in order (disabled steps included).</param>
         /// <returns>
         /// Stable unique keys: chain order, write keys before token keys per filter, Original before Preview.
         /// </returns>

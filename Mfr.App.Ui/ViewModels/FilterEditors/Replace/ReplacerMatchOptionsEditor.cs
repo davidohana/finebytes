@@ -50,7 +50,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         /// <summary>
         /// Copies values from filter options into the editor fields.
         /// </summary>
-        /// <param name="options">Match options from the applied filter.</param>
+        /// <param name="options">Match options from the Filter Chain step.</param>
         public void Load(ReplacerMatchOptions options)
         {
             Mode = options.Mode;

@@ -34,7 +34,7 @@ namespace Mfr.App.Ui.Views.FilterPalette
             AvaloniaProperty.Register<FilterPaletteView, ICommand?>(nameof(RemoveFilterChainStepsCommand));
 
         /// <summary>
-        /// Gets or sets the command that removes applied steps dragged back to Available Filters.
+        /// Gets or sets the command that removes Filter Chain steps dragged back to Available Filters.
         /// </summary>
         public ICommand? RemoveFilterChainStepsCommand
         {

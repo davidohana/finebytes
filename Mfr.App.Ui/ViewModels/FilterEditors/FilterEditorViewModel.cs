@@ -27,7 +27,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         private Func<string, RenameItem?>? _resolveRenameItemByFullPath;
 
         /// <summary>
-        /// Gets whether an Filter Chain row is driving the configuration pane.
+        /// Gets whether a Filter Chain row is driving the configuration pane.
         /// </summary>
         [ObservableProperty]
         private bool _hasSelectedStep;
@@ -88,7 +88,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// <summary>
         /// Updates the pane from the Filter Chain selection (first row when multi-select).
         /// </summary>
-        /// <param name="selectedSteps">Current Applied list selection.</param>
+        /// <param name="selectedSteps">Current Filter Chain selection.</param>
         internal void SyncSelection(IReadOnlyList<FilterChainStepViewModel> selectedSteps)
         {
             ArgumentNullException.ThrowIfNull(selectedSteps);

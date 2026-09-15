@@ -545,7 +545,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void Applied_filters_commands_disabled_when_chain_empty()
+        public void Filter_chain_commands_disabled_when_chain_empty()
         {
             var dialogVm = new RenameListFieldShuttleDialogViewModel(
                 RenameListVisibleColumn.CreateDefaults(),

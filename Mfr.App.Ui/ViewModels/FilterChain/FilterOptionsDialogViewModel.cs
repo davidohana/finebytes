@@ -61,7 +61,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         private decimal _ancestorFolderLevel = 1;
 
         /// <summary>
-        /// Gets or sets the filter instance name shown in the Applied list.
+        /// Gets or sets the filter instance name shown in the Filter Chain.
         /// </summary>
         [ObservableProperty]
         private string _name = string.Empty;

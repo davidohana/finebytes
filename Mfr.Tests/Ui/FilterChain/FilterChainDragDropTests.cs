@@ -46,7 +46,7 @@ namespace Mfr.Tests.Ui.FilterChain
         }
 
         /// <summary>
-        /// Verifies dropping a selected row reorders the Applied list.
+        /// Verifies dropping a selected row reorders the Filter Chain.
         /// </summary>
         [AvaloniaFact]
         public void Drop_reorders_selected_filter()

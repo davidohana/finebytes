@@ -12,7 +12,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
-        /// <param name="step">Applied list row.</param>
+        /// <param name="step">Filter Chain step.</param>
         public Id3v2FieldSetterFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {

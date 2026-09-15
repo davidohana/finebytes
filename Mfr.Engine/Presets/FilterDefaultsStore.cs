@@ -140,7 +140,7 @@ namespace Mfr.Engine.Presets
         /// <summary>
         /// Stores a clone of <paramref name="filter"/> as the add default for its type and writes prefs.
         /// </summary>
-        /// <param name="filter">Current applied filter configuration to remember.</param>
+        /// <param name="filter">Current Filter Chain filter configuration to remember.</param>
         public void SetDefault(BaseFilter filter)
         {
             ArgumentNullException.ThrowIfNull(filter);

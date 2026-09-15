@@ -39,9 +39,9 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         public const int LargeListTextParseOffUiThreshold = 32_000;
 
         /// <summary>
-        /// Initializes an options editor for one applied-filter step.
+        /// Initializes an options editor for one Filter Chain step.
         /// </summary>
-        /// <param name="step">Applied list row being edited.</param>
+        /// <param name="step">Filter Chain step being edited.</param>
         protected FilterOptionsEditorViewModel(FilterChainStepViewModel step)
         {
             ArgumentNullException.ThrowIfNull(step);
@@ -49,7 +49,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         }
 
         /// <summary>
-        /// Gets the applied list row being edited.
+        /// Gets the Filter Chain step being edited.
         /// </summary>
         protected FilterChainStepViewModel Step { get; }
 

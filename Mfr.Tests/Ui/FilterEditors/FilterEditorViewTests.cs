@@ -25,10 +25,10 @@ namespace Mfr.Tests.Ui.FilterEditors
     public sealed class FilterEditorViewTests
     {
         /// <summary>
-        /// Verifies an empty Applied list shows the Filter Configuration empty state.
+        /// Verifies an empty Filter Chain shows the Filter Configuration empty state.
         /// </summary>
         [AvaloniaFact]
-        public void Empty_applied_list_shows_empty_state()
+        public void Empty_filter_chain_shows_empty_state()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
 
@@ -50,10 +50,10 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies selecting an Applied row updates the configuration title.
+        /// Verifies selecting a Filter Chain row updates the configuration title.
         /// </summary>
         [AvaloniaFact]
-        public void Selecting_applied_row_updates_configuration_title()
+        public void Selecting_filter_chain_row_updates_configuration_title()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
             var appliedViewModel = mainViewModel.FilterChainViewModel;
@@ -66,7 +66,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             Assert.Equal("Filter: Letters Case", _TitleText(editorView));
             Assert.False(editorView.FindControl<TextBlock>("EmptySelectionHint")!.IsVisible);
 
-            var list = _AppliedList(window);
+            var list = _FilterChainList(window);
             list.Focus();
             Dispatcher.UIThread.RunJobs();
             FilterChainTestUi.ClickRow(window, list, rowIndex: 0);
@@ -295,7 +295,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             window.Close();
         }
 
-        private static ListBox _AppliedList(Window window)
+        private static ListBox _FilterChainList(Window window)
         {
             var appliedView = window.Content is Grid grid
                 ? grid.Children.OfType<FilterChainView>().FirstOrDefault()
@@ -314,7 +314,7 @@ namespace Mfr.Tests.Ui.FilterEditors
 
         private static TextBlock? _TitleBlock(FilterEditorView editorView)
         {
-            return editorView.FindControl<TextBlock>("AppliedFilterTitle");
+            return editorView.FindControl<TextBlock>("FilterEditorTitle");
         }
 
         private static ContentControl _OptionsEditorSlot(FilterEditorView editorView)

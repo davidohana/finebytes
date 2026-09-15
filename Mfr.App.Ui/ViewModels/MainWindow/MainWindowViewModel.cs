@@ -195,7 +195,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Appends the selected Available Filters row to the Applied list.
+        /// Appends the selected Available Filters row to the Filter Chain.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanAddSelectedFilterFromPalette))]
         public void AddSelectedFilterFromPalette()

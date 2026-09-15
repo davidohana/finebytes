@@ -25,7 +25,7 @@ namespace Mfr.Tests.Ui.FilterChain
         }
 
         /// <summary>
-        /// Shows an Filter Chain view seeded with Shrink Spaces then Letters Case.
+        /// Shows a Filter Chain view seeded with Shrink Spaces then Letters Case.
         /// </summary>
         /// <param name="selectIndex">Optional row to select after seed; otherwise the last added row stays selected.</param>
         /// <returns>Host window, view model, list, and view.</returns>
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Ui.FilterChain
         }
 
         /// <summary>
-        /// Reads the subtitle from an Filter Chain list row.
+        /// Reads the subtitle from a Filter Chain list row.
         /// </summary>
         /// <param name="list">Filter Chain list.</param>
         /// <param name="rowIndex">Zero-based row index.</param>
@@ -98,7 +98,7 @@ namespace Mfr.Tests.Ui.FilterChain
         }
 
         /// <summary>
-        /// Clicks an Filter Chain list row (not the checkbox).
+        /// Clicks a Filter Chain list row (not the checkbox).
         /// </summary>
         /// <param name="window">Host window for pointer routing.</param>
         /// <param name="list">Filter Chain list.</param>

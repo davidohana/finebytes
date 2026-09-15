@@ -6,7 +6,7 @@ namespace Mfr.Models.Filters
     public interface IFixedApplyToFilter
     {
         /// <summary>
-        /// Gets the Apply-To label for the Applied list and Filter Options.
+        /// Gets the Apply-To label for the Filter Chain and Filter Options.
         /// </summary>
         string FixedApplyToLabel { get; }
     }

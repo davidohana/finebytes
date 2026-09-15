@@ -82,7 +82,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public event EventHandler<RenameListFieldShuttleTab>? FieldShuttleRequested;
 
         /// <summary>
-        /// Appends Rename List columns inferred from the entire applied filter chain (missing keys only).
+        /// Appends Rename List columns inferred from the entire Filter Chain (missing keys only).
         /// </summary>
         /// <remarks>
         /// <para>

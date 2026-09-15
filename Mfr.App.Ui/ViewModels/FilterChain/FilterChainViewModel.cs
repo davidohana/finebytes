@@ -390,7 +390,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         }
 
         /// <summary>
-        /// Gets applied filter steps in stack order.
+        /// Gets Filter Chain steps in stack order.
         /// </summary>
         public ObservableCollection<FilterChainStepViewModel> Steps { get; }
 
@@ -566,7 +566,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         }
 
         /// <summary>
-        /// Enables every applied filter step (MFR7 Check All Filters).
+        /// Enables every Filter Chain step (MFR7 Check All Filters).
         /// </summary>
         [RelayCommand(CanExecute = nameof(_HasSteps))]
         public void CheckAllFilters()
@@ -575,7 +575,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         }
 
         /// <summary>
-        /// Disables every applied filter step (MFR7 Uncheck All Filters).
+        /// Disables every Filter Chain step (MFR7 Uncheck All Filters).
         /// </summary>
         [RelayCommand(CanExecute = nameof(_HasSteps))]
         public void UncheckAllFilters()
@@ -915,7 +915,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         }
 
         /// <summary>
-        /// Resolves the catalog row for an applied filter instance.
+        /// Resolves the catalog row for a filter instance.
         /// </summary>
         private static FilterCatalogEntry _CatalogEntryFor(BaseFilter filter)
         {

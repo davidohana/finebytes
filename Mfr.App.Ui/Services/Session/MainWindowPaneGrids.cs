@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.Services.Session
         /// <summary>File List | filters column grid.</summary>
         public required Grid TopPanes { get; init; }
 
-        /// <summary>Available | Applied filters column grid.</summary>
+        /// <summary>Available | Filter Chain column grid.</summary>
         public required Grid FilterLists { get; init; }
 
         /// <summary>Filter lists | Filter Configuration row grid.</summary>

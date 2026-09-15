@@ -173,7 +173,7 @@ namespace Mfr.Tests.Ui.Services.Help
         }
 
         /// <summary>
-        /// Verifies help is disabled with an empty Applied list.
+        /// Verifies help is disabled with an empty Filter Chain.
         /// </summary>
         [Fact]
         public void OpenSelectedFilterHelp_disabled_when_empty()

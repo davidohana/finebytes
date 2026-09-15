@@ -54,7 +54,7 @@ namespace Mfr.Tests.Ui.FilterChain
         }
 
         /// <summary>
-        /// Verifies the main window status bar reflects the applied-filter count.
+        /// Verifies the main window status bar reflects the Filter Chain count.
         /// </summary>
         [AvaloniaFact]
         public void MainWindow_FilterCount_tracks_applied_steps()

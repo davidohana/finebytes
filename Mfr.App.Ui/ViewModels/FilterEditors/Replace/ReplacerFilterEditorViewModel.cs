@@ -12,7 +12,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         /// <summary>
         /// Initializes the editor from the current step filter.
         /// </summary>
-        /// <param name="step">Applied list row.</param>
+        /// <param name="step">Filter Chain step.</param>
         public ReplacerFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {

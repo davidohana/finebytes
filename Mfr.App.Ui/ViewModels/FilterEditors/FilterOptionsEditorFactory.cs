@@ -28,7 +28,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// <summary>
         /// Creates an options editor for <paramref name="step"/>, or <see langword="null"/> when unsupported.
         /// </summary>
-        /// <param name="step">Selected applied-filter row.</param>
+        /// <param name="step">Selected Filter Chain step.</param>
         /// <param name="resolveSampleRenameItems">
         /// Live Rename List items for Visual Trim Helper init/navigation. Ignored by editors that do not use the helper.
         /// </param>

@@ -79,9 +79,9 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         }
 
         /// <summary>
-        /// Gets the Applied-list / Filter Options Apply-To label for <paramref name="filter"/>.
+        /// Gets the Filter Chain / Filter Options Apply-To label for <paramref name="filter"/>.
         /// </summary>
-        /// <param name="filter">Applied filter instance.</param>
+        /// <param name="filter">Filter instance.</param>
         /// <returns>
         /// Target plus scope for string-target filters; <see cref="IFixedApplyToFilter.FixedApplyToLabel"/>
         /// when implemented; otherwise empty (e.g. pipeline-state-only filters).

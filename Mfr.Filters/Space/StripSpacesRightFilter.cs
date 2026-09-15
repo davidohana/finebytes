@@ -5,7 +5,7 @@ namespace Mfr.Filters.Space
     /// </summary>
     /// <remarks>
     /// The space character is <c>U+0020 SPACE</c> by default, but can be changed by
-    /// a preceding <c>SpaceCharacter</c> filter in the applied filters list.
+    /// a preceding <c>SpaceCharacter</c> filter in the Filter Chain.
     /// </remarks>
     /// <param name="Target">The target that this filter applies to.</param>
     /// <param name="ApplyScope">When non-null, restricts this filter to a substring or token of the target; see <see cref="StringApplyScope"/>.</param>

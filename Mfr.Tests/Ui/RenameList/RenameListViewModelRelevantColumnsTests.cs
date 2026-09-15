@@ -21,7 +21,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies both commands are disabled when the applied filter chain is empty.
+        /// Verifies both commands are disabled when the Filter Chain is empty.
         /// </summary>
         [Fact]
         public void RelevantColumns_commands_disabled_when_chain_empty()

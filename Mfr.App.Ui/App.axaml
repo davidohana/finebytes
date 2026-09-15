@@ -113,7 +113,7 @@
     <Style Selector=":is(GridSplitter):pointerover /template/ Rectangle#Hairline">
       <Setter Property="Fill" Value="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
     </Style>
-    <!-- Shared surface chrome (compose with layout classes such as tool-action / applied-filter-toolbar). -->
+    <!-- Shared surface chrome (compose with layout classes such as tool-action / filter-chain-toolbar). -->
     <Style Selector="Button.tool-chrome, ToggleButton.tool-chrome, Button.tool-action, ToggleButton.tool-action">
       <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeBorderBrush}" />

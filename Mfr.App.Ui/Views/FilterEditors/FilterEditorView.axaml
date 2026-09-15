@@ -47,7 +47,7 @@
             IsVisible="{Binding HasSelectedStep}"
             Command="{Binding SaveSelectedAsDefaultCommand, ElementName=FilterEditorRoot}"
           />
-          <TextBlock x:Name="AppliedFilterTitle" Classes="filter-editor-title-bar" Text="{Binding TitleText}" />
+          <TextBlock x:Name="FilterEditorTitle" Classes="filter-editor-title-bar" Text="{Binding TitleText}" />
         </DockPanel>
       </Border>
       <TextBlock

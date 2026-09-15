@@ -22,7 +22,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="sortKeys">Current Auto-Sort keys in priority order.</param>
         /// <param name="initialTab">Tab to show when the dialog opens.</param>
         /// <param name="relevantFieldKeys">
-        /// Snapshot of field keys inferred from the applied filter chain (may be empty).
+        /// Snapshot of field keys inferred from the Filter Chain (may be empty).
         /// </param>
         /// <param name="canUseFilterChain">
         /// When <see langword="true"/>, Add/Set columns from filters are enabled (non-empty chain).
@@ -420,7 +420,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Merges applied-filter-relevant keys into the draft Selected fields list (missing keys only).
+        /// Merges Filter Chain–relevant keys into the draft Selected fields list (missing keys only).
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanUseFilterChain))]
         public void AddColumnsFromFilters()
@@ -701,7 +701,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Builds draft columns for applied-filter keys; originals-only when A/B Mode draft is on.
+        /// Builds draft columns for Filter Chain keys; originals-only when A/B Mode draft is on.
         /// </summary>
         private List<RenameListVisibleColumn> _ColumnsForRelevantKeys(IReadOnlyList<RenameListFieldKey> keys)
         {
