@@ -22,7 +22,7 @@ isProject: false
 
 # Undo as preview session plan
 
-Parent: former [docs/plans/undo.plan.md](docs/plans/undo.plan.md) (P1–P5 shipped, plan file removed). This follow-on **replaces** the locked “Mechanism / Rename List on undo” auto-Commit behavior with prepare + GO (see Decisions below).
+Parent: former `docs/plans/undo.plan.md` (P1–P5 shipped, plan file removed). This follow-on **replaces** the locked “Mechanism / Rename List on undo” auto-Commit behavior with prepare + GO (see Decisions below).
 
 Canonical copy after approval: [docs/plans/undo-preview-session.plan.md](docs/plans/undo-preview-session.plan.md).
 
@@ -45,8 +45,8 @@ Canonical copy after approval: [docs/plans/undo-preview-session.plan.md](docs/pl
 ### Sources
 
 - Help: `undolast.html`, `log.html`; code: `Log.Undo` + `LogForm.UndoLog` → populate RIL then **Apply** immediately
-- finebytes today: [`RenameList.Undo`](Mfr.Engine/RenameList/RenameList.cs) = populate + OldValueApplier + **Commit** (MFR7 parity)
-- Extended columns: MFR7 ReadWrite dates/attrs; finebytes already `supportsPreview: true` but no `WriteTarget`
+- finebytes before this plan: [`RenameList.Undo`](Mfr.Engine/RenameList/RenameList.cs) = populate + OldValueApplier + **Commit** (MFR7 parity); now `PrepareUndo` + user GO
+- Extended columns: MFR7 ReadWrite dates/attrs; finebytes had `supportsPreview: true` without WriteTargets until P1
 
 ### Behavior (legacy)
 
@@ -89,7 +89,7 @@ flowchart TD
 Hook points:
 
 - P1: [`Targets.cs`](Mfr.Models/Filters/Targets.cs), [`FileMetaPreviewExtensions`](Mfr.Models/Rename/FileMetaPreviewExtensions.cs), [`ExtendedRenameListFields`](Mfr.Models/RenameList/Fields/Extended/ExtendedRenameListFields.cs), parse helpers next to [`RenameListFieldDisplay`](Mfr.Models/RenameList/RenameListFieldDisplay.cs); JsonDerivedType + any FilterTargetKey catalog tests; **not** [`FilterTargetCatalog`](Mfr.App.Ui/ViewModels/AppliedFilters/FilterTargetCatalog.cs)
-- Engine: split today’s `Undo` into `PrepareUndo` (stop before Commit); sticky reapply after filters in preview pipeline ([`FilterChain`](Mfr.Models/Filters/FilterChain.cs) / [`RenameList`](Mfr.Engine/RenameList/RenameList.cs) PreviewEnd)
+- Engine: split former auto-Commit `Undo` into `PrepareUndo` (stop before Commit); sticky reapply after filters in preview pipeline ([`FilterChain`](Mfr.Models/Filters/FilterChain.cs) / [`RenameList`](Mfr.Engine/RenameList/RenameList.cs) PreviewEnd)
 - UI: [`RenameListViewModel.Undo.cs`](Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Undo.cs), [`MainWindowViewModel`](Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs) (drop File List refresh on undo prepare), Log dialog still returns `LogToUndo`
 - Columns: replace via existing `SetVisibleColumns` / `ApplyFieldShuttleAsync` on [`RenameListViewModel.Columns.cs`](Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Columns.cs) (status column first + mapped undo field keys)
 - Filters: `ReplaceFromChain([])`
