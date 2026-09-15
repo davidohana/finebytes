@@ -166,7 +166,7 @@ namespace Mfr.Tests.Ui.MainWindow
             var expectedStart = viewModel.FileListViewModel.CurrentPath;
 
             Assert.Equal(
-                $"Last folder unavailable — opened {FileListPath.ToDisplayPath(expectedStart)}.",
+                $"Last folder unavailable ({FileListPath.ToDisplayPath(remembered)}) — opened {FileListPath.ToDisplayPath(expectedStart)}.",
                 viewModel.StatusHint.ToPlainText()
             );
             Assert.Equal(
