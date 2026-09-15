@@ -98,6 +98,9 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Equal(
                 [
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType),
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
                     RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
                 ],
                 visibleKeys
@@ -181,6 +184,9 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Equal(
                 [
                     RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType),
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
                     RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
                 ],
                 visibleKeys

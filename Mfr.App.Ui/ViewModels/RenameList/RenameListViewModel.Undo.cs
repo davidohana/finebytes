@@ -3,8 +3,6 @@ using Mfr.Engine.RenameLog;
 using Mfr.Models.Config;
 using Mfr.Models.Filters;
 using Mfr.Models.Rename;
-using Mfr.Models.RenameList;
-using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -108,29 +106,25 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Replaces visible columns with ItemType plus preview keys for properties changed in the undo log.
+        /// Replaces visible columns with catalog defaults, then appends preview keys for properties changed in the undo log.
         /// </summary>
         /// <param name="log">Prepared undo log (undoable entries only contribute mapped keys).</param>
+        /// <remarks>
+        /// <para>
+        /// Same base as <see cref="ReplaceWithRelevantColumnsAsync"/> (defaults first, then missing relevant keys).
+        /// Preview-side undo columns must not be stripped by Before/After originals-only normalize, so A/B Mode is
+        /// disabled without companion expand before apply.
+        /// </para>
+        /// </remarks>
         private async Task _ReplaceVisibleColumnsForUndoAsync(RenameLog log)
         {
-            var previewKeys = RenamePropertyFileMeta.CollectPreviewKeysFromLog(log);
-            if (previewKeys.Count == 0)
-            {
-                return;
-            }
-
             // Preview-side undo columns must not be stripped by Before/After originals-only normalize.
             // Disable without companion expand — that product path is for Toggle/shuttle cancel; here we replace.
             _DisableAbModeWithoutCompanionExpand();
 
-            var columns = new List<RenameListVisibleColumn>
-            {
-                new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType)),
-            };
-            foreach (var key in previewKeys)
-            {
-                columns.Add(new RenameListVisibleColumn(key));
-            }
+            var columns = RenameListVisibleColumn.CreateDefaults().ToList();
+            var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
+            _AppendMissingRelevantColumns(columns, RenamePropertyFileMeta.CollectPreviewKeysFromLog(log), keyToIsPresent);
 
             await _ApplyVisibleColumnsWithHydrateAsync(columns).ConfigureAwait(true);
         }
