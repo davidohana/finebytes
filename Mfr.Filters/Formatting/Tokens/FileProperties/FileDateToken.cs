@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Globalization;
 using Mfr.Utils;
 
@@ -34,19 +33,12 @@ namespace Mfr.Filters.Formatting.Tokens.FileProperties
 
         /// <inheritdoc />
         /// <exception cref="ArgumentException">Thrown when the fragment after ':' is malformed or <c>date-kind</c> is not recognized.</exception>
-        /// <exception cref="UnreachableException">Thrown when an unexpected enum value appears at runtime (should not happen for parsed options).</exception>
         public Formatter Compile(string tokenArgs)
         {
             var options = _ParseOptions(FormatOptionsParsing.TokenDisplayName(this), tokenArgs);
             return item =>
             {
-                var date = options.TimestampField switch
-                {
-                    TimestampField.Creation => item.Original.CreationTime,
-                    TimestampField.LastWrite => item.Original.LastWriteTime,
-                    TimestampField.LastAccess => item.Original.LastAccessTime,
-                    _ => throw new UnreachableException(),
-                };
+                var date = item.Original.GetTimestamp(options.TimestampField);
                 return date.ToString(options.Format, CultureInfo.InvariantCulture);
             };
         }

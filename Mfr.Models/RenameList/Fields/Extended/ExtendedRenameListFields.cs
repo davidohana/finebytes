@@ -191,7 +191,7 @@ namespace Mfr.Models.RenameList.Fields.Extended
 
         public override string Resolve(FileMeta meta)
         {
-            return RenameListFieldDisplay.FormatAttributes(meta.Attributes);
+            return FileAttributesRahs.Format(meta.Attributes);
         }
     }
 

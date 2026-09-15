@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models.Filters
             var target = new FileTimestampTarget(field);
 
             meta.SetTargetString(target, stamp.ToString("O", CultureInfo.InvariantCulture));
-            Assert.Equal(stamp, _ReadTimestamp(meta, field));
+            Assert.Equal(stamp, meta.GetTimestamp(field));
             Assert.Equal(stamp.ToString("G", CultureInfo.CurrentCulture), meta.GetTargetString(target));
 
             var display = stamp.AddHours(1).ToString("G", CultureInfo.CurrentCulture);
@@ -159,17 +159,6 @@ namespace Mfr.Tests.Models.Filters
                 lastWriteTime: lastWriteTime,
                 lastAccessTime: lastAccessTime
             );
-        }
-
-        private static DateTime _ReadTimestamp(FileMeta meta, TimestampField field)
-        {
-            return field switch
-            {
-                TimestampField.Creation => meta.CreationTime,
-                TimestampField.LastWrite => meta.LastWriteTime,
-                TimestampField.LastAccess => meta.LastAccessTime,
-                _ => throw new ArgumentOutOfRangeException(nameof(field)),
-            };
         }
     }
 }

@@ -59,21 +59,6 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Formats the MFR7 RAHS attribute string for grid display.
-        /// </summary>
-        /// <param name="attributes">Filesystem attributes from scan metadata.</param>
-        /// <returns>Four-character <c>R/A/H/S</c> or dash flags.</returns>
-        internal static string FormatAttributes(FileAttributes attributes)
-        {
-            return string.Concat(
-                _FormatAttributeFlag(attributes, FileAttributes.ReadOnly, 'R'),
-                _FormatAttributeFlag(attributes, FileAttributes.Archive, 'A'),
-                _FormatAttributeFlag(attributes, FileAttributes.Hidden, 'H'),
-                _FormatAttributeFlag(attributes, FileAttributes.System, 'S')
-            );
-        }
-
-        /// <summary>
         /// Formats a positive integer property, or empty when zero.
         /// </summary>
         /// <param name="value">Property value; zero means absent.</param>
@@ -206,11 +191,6 @@ namespace Mfr.Models.RenameList
             var firstSeparator = joined.IndexOf(';');
             var segment = firstSeparator < 0 ? joined : joined[..firstSeparator];
             return segment.Trim();
-        }
-
-        private static char _FormatAttributeFlag(FileAttributes attributes, FileAttributes flag, char letter)
-        {
-            return attributes.HasFlag(flag) ? letter : '-';
         }
     }
 }

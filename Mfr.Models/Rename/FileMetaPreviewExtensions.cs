@@ -1,6 +1,4 @@
-using System.Diagnostics;
 using Mfr.Models.Filters;
-using Mfr.Models.Media;
 using Mfr.Models.RenameList;
 using Mfr.Models.Tags;
 using Mfr.Utils;
@@ -35,9 +33,9 @@ namespace Mfr.Models.Rename
                 FileFullNameTarget => meta.FullFileName,
                 FullPathTarget => meta.FullPath,
                 ParentDirectoryTarget => meta.DirectoryPath,
-                FileAttributesTarget => RenameListFieldDisplay.FormatAttributes(meta.Attributes),
+                FileAttributesTarget => FileAttributesRahs.Format(meta.Attributes),
                 FileTimestampTarget timestampTarget => RenameListFieldDisplay.FormatFileDate(
-                    _GetTimestamp(meta, timestampTarget.Field)
+                    meta.GetTimestamp(timestampTarget.Field)
                 ),
                 AncestorFolderTarget ancestorFolderTarget => meta.GetAncestorFolderSegmentName(
                     ancestorFolderTarget.Level
@@ -85,51 +83,16 @@ namespace Mfr.Models.Rename
                     meta.SetAbsoluteDirectoryPath(value);
                     return;
                 case FileAttributesTarget:
-                    meta.Attributes = RenameListFieldParse.ParseAttributes(value, meta.Attributes);
+                    meta.Attributes = FileAttributesRahs.Parse(value, meta.Attributes);
                     return;
                 case FileTimestampTarget timestampTarget:
-                    _SetTimestamp(meta, timestampTarget.Field, RenameListFieldParse.ParseFileDate(value));
+                    meta.SetTimestamp(timestampTarget.Field, RenameListFieldParse.ParseFileDate(value));
                     return;
                 case AncestorFolderTarget ancestorFolderTarget:
                     meta.ReplaceAncestorFolderSegment(ancestorFolderTarget.Level, value);
                     return;
                 default:
                     throw new NotSupportedException($"Unsupported filter target '{target.GetType().Name}'.");
-            }
-        }
-
-        /// <summary>
-        /// Reads one filesystem timestamp property for <paramref name="field"/>.
-        /// </summary>
-        private static DateTime _GetTimestamp(FileMeta meta, TimestampField field)
-        {
-            return field switch
-            {
-                TimestampField.Creation => meta.CreationTime,
-                TimestampField.LastWrite => meta.LastWriteTime,
-                TimestampField.LastAccess => meta.LastAccessTime,
-                _ => throw new UnreachableException(),
-            };
-        }
-
-        /// <summary>
-        /// Writes one filesystem timestamp property for <paramref name="field"/>.
-        /// </summary>
-        private static void _SetTimestamp(FileMeta meta, TimestampField field, DateTime value)
-        {
-            switch (field)
-            {
-                case TimestampField.Creation:
-                    meta.CreationTime = value;
-                    return;
-                case TimestampField.LastWrite:
-                    meta.LastWriteTime = value;
-                    return;
-                case TimestampField.LastAccess:
-                    meta.LastAccessTime = value;
-                    return;
-                default:
-                    throw new UnreachableException();
             }
         }
 

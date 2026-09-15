@@ -85,8 +85,7 @@ namespace Mfr.Filters.Attributes
         /// <inheritdoc />
         protected internal override void ApplyCore(RenameItem item)
         {
-            TimestampFields.Update(
-                item.Preview,
+            item.Preview.UpdateTimestamp(
                 Options.TimestampField,
                 current => _Shift(current, Options.Amount, Options.Unit)
             );

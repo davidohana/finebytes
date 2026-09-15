@@ -123,11 +123,11 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List field shuttle (toolbar, context menu, main menu).</summary>
         public const string SelectRenameListFields = "Select Rename List columns and Auto-Sort fields";
 
-        /// <summary>Rename List toolbar / field shuttle / main menu: add columns inferred from the applied filter chain.</summary>
+        /// <summary>Rename List Add Filter Fields (toolbar / shuttle / menu).</summary>
         public const string AddFieldsByAppliedFilters =
             "Add Rename List columns for fields used by the applied filters";
 
-        /// <summary>Rename List toolbar / field shuttle / main menu: replace columns with defaults plus chain-relevant fields.</summary>
+        /// <summary>Rename List Replace Filter Fields (toolbar / shuttle / menu).</summary>
         public const string ReplaceFieldsByAppliedFilters =
             "Replace Rename List columns with defaults plus fields used by the applied filters";
 

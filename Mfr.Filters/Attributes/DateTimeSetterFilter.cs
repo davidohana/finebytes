@@ -58,11 +58,7 @@ namespace Mfr.Filters.Attributes
                 return;
             }
 
-            TimestampFields.Update(
-                item.Preview,
-                Options.TimestampField,
-                current => _Apply(current, applyDate, applyTime)
-            );
+            item.Preview.UpdateTimestamp(Options.TimestampField, current => _Apply(current, applyDate, applyTime));
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ using Mfr.Models.RenameList.Fields.Basic;
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Tests Add / Replace Fields by Applied Filters on <see cref="RenameListViewModel"/>.
+    /// Tests Add / Replace Filter Fields on <see cref="RenameListViewModel"/>.
     /// </summary>
     public sealed class RenameListViewModelRelevantColumnsTests : IDisposable
     {

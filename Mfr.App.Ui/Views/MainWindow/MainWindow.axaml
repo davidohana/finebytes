@@ -344,7 +344,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Add Fields by Applied Filters"
+          Header="Add Filter Fields"
           Command="{Binding RenameListViewModel.AddRelevantColumnsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.AddFieldsByAppliedFilters}"
         >
@@ -353,7 +353,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Replace Fields by Applied Filters"
+          Header="Replace Filter Fields"
           Command="{Binding RenameListViewModel.ReplaceWithRelevantColumnsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.ReplaceFieldsByAppliedFilters}"
         >
