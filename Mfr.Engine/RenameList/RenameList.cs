@@ -38,6 +38,18 @@ namespace Mfr.Engine.RenameList
         private readonly Dictionary<string, int> _folderPathToCount = new(PathComparers.Os);
 
         /// <summary>
+        /// When <see langword="true"/>, the next non-dry-run <see cref="Commit"/> captures the rename log as Undo.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Set by <see cref="PrepareUndo"/>; used by the next non-dry-run <see cref="Commit"/> for IsUndo.
+        /// Cleared when no sticky seeds remain after that Commit, or on <see cref="Clear"/> /
+        /// <see cref="RefreshOriginals"/> when the prepare session is abandoned. Dry-run does not clear it.
+        /// </para>
+        /// </remarks>
+        private bool _pendingUndoCommit;
+
+        /// <summary>
         /// Gets the resolved file items in current list order.
         /// </summary>
         public IReadOnlyList<RenameItem> RenameItems => _renameItems;
@@ -247,12 +259,14 @@ namespace Mfr.Engine.RenameList
             var removedCount = _renameItems.Count;
             if (removedCount == 0)
             {
+                _pendingUndoCommit = false;
                 return;
             }
 
             _renameItems.Clear();
             _includedResolvedPaths.Clear();
             _folderPathToCount.Clear();
+            _pendingUndoCommit = false;
             Log.Information("Cleared rename list ({RemovedCount} item(s)).", removedCount);
         }
 
@@ -504,6 +518,7 @@ namespace Mfr.Engine.RenameList
         )
         {
             ClearCommitErrors();
+            _pendingUndoCommit = false;
             if (_renameItems.Count == 0)
             {
                 return;
@@ -512,6 +527,7 @@ namespace Mfr.Engine.RenameList
             foreach (var item in _renameItems)
             {
                 item.ClearAllOverrides();
+                item.ClearStickyUndoChanges();
             }
 
             var tracker = new RenameListProgressTracker(progress, cancellationToken);
@@ -632,7 +648,8 @@ namespace Mfr.Engine.RenameList
         /// <para>
         /// MFR7 <c>PreviewStart</c> (original overrides) runs inside <see cref="FilterChain.ApplyFilters"/>
         /// after <see cref="RenameItem.ClearPreview"/>. MFR7 <c>PreviewEnd</c> (preview overrides) runs here
-        /// after filters succeed.
+        /// after filters succeed; sticky undo OldValues reapply after PreviewEnd so empty-chain re-preview
+        /// keeps the prepared reverse plan.
         /// </para>
         /// </remarks>
         private void _ApplyPreviewFilters(FilterChain chain, RenameListProgressTracker tracker)
@@ -650,13 +667,12 @@ namespace Mfr.Engine.RenameList
                 {
                     chain.ApplyFilters(renameItem);
 
-                    if (renameItem.PreviewError is null)
+                    if (
+                        renameItem.PreviewError is null
+                        && RenameListFieldOverrides.TryApplyToPreview(renameItem, isPreview: true)
+                    )
                     {
-                        RenameListFieldOverrides.TryApplyToPreview(renameItem, isPreview: true);
-                    }
-
-                    if (renameItem.PreviewError is null)
-                    {
+                        _TryApplyStickyUndoSeed(renameItem);
                         renameItem.Status = RenameStatus.PreviewOk;
                     }
                 }
@@ -668,6 +684,21 @@ namespace Mfr.Engine.RenameList
 
                 tracker.OnRowProcessed(renameItem.Original.FullPath);
             }
+        }
+
+        /// <summary>
+        /// Reapplies sticky undo OldValues onto Preview when a prepare seed is present.
+        /// </summary>
+        /// <param name="item">Row that may carry <see cref="RenameItem.StickyUndoChanges"/>.</param>
+        private static void _TryApplyStickyUndoSeed(RenameItem item)
+        {
+            var changes = item.StickyUndoChanges;
+            if (changes is null || changes.Count == 0)
+            {
+                return;
+            }
+
+            RenamePropertyOldValueApplier.Apply(item, changes);
         }
 
         /// <summary>
@@ -704,15 +735,14 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Reverses a captured rename log by rebuilding this list at post-GO paths, applying OldValues to Preview, and committing.
+        /// Rebuilds this list at post-GO paths and applies OldValues to Preview without committing.
         /// </summary>
         /// <param name="log">Rename operation to undo (typically <see cref="RenameLogStore.LastOperation"/>).</param>
-        /// <param name="failFast">If <c>true</c>, stop committing after the first per-item error.</param>
-        /// <param name="cancellationToken">When canceled, stops applying remaining items without throwing.</param>
-        /// <param name="progress">Optional progress sink for the undo commit phase.</param>
+        /// <param name="cancellationToken">When canceled, stops loading remaining sources without throwing.</param>
+        /// <param name="progress">Optional progress sink for the source-load phase.</param>
         /// <returns>
-        /// Commit outcomes from the undo re-commit (also captured as a new last operation when any succeed)
-        /// plus how many undoable rows never loaded from <c>DestinationPath</c>.
+        /// Preview commit plan plus how many undoable rows never loaded from <c>DestinationPath</c>.
+        /// Pass <see cref="RenameListPrepareUndoResult.Plan"/> to <see cref="Commit"/> when the user presses GO.
         /// </returns>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="log"/> is <c>null</c>.</exception>
         /// <remarks>
@@ -721,12 +751,13 @@ namespace Mfr.Engine.RenameList
         /// Rows with errors or only unrestorable changes (e.g. Tag Remover strip) are skipped.
         /// <c>StripAllEmbeddedTagsOnCommit</c> deltas on otherwise undoable rows are ignored when applying OldValues.
         /// Hidden destinations are included so attribute undos can reopen them.
-        /// Missing destination paths are skipped silently and reported via <see cref="RenameListUndoResult.NotLoadedCount"/>.
+        /// Missing destination paths are skipped silently and reported via <see cref="RenameListPrepareUndoResult.NotLoadedCount"/>.
+        /// Sets a one-shot pending flag so the next non-dry-run Commit captures an IsUndo log entry.
+        /// Does not write a rename log or clear <see cref="RenameLogStore.LastOperation"/>.
         /// </para>
         /// </remarks>
-        public RenameListUndoResult Undo(
+        public RenameListPrepareUndoResult PrepareUndo(
             RenameLogModel log,
-            bool failFast = false,
             CancellationToken cancellationToken = default,
             IProgress<RenameListProgress>? progress = null
         )
@@ -736,7 +767,11 @@ namespace Mfr.Engine.RenameList
             var undoableEntries = log.Entries.Where(static entry => entry.IsUndoable).ToList();
             if (undoableEntries.Count == 0)
             {
-                return new RenameListUndoResult(Results: [], NotLoadedCount: 0);
+                return new RenameListPrepareUndoResult(
+                    Plan: CommitPlanner.Build(_renameItems),
+                    PreparedCount: 0,
+                    NotLoadedCount: 0
+                );
             }
 
             // Clear only after we know there is something to reverse — otherwise the current list is wiped for a no-op.
@@ -752,6 +787,7 @@ namespace Mfr.Engine.RenameList
                 includeFolders: true,
                 includeHidden: true,
                 cancellationToken: cancellationToken,
+                progress: progress,
                 metadataRequirement: needsTagLib
                     ? RenameListMetadataRequirement.TagLib
                     : RenameListMetadataRequirement.None
@@ -764,22 +800,27 @@ namespace Mfr.Engine.RenameList
             }
 
             var loadedDestinationKeys = new HashSet<string>(PathComparers.Os);
+            var preparedCount = 0;
             foreach (var item in _renameItems)
             {
-                if (!destinationPathToEntry.TryGetValue(NormalizePathKey(item.Original.FullPath), out var logEntry))
+                var pathKey = NormalizePathKey(item.Original.FullPath);
+                if (!destinationPathToEntry.TryGetValue(pathKey, out var logEntry))
                 {
                     continue;
                 }
 
-                loadedDestinationKeys.Add(NormalizePathKey(item.Original.FullPath));
+                loadedDestinationKeys.Add(pathKey);
 
                 try
                 {
-                    RenamePropertyOldValueApplier.Apply(item, logEntry.Changes);
+                    item.SetStickyUndoChanges(logEntry.Changes);
+                    _TryApplyStickyUndoSeed(item);
                     item.Status = RenameStatus.PreviewOk;
+                    preparedCount++;
                 }
                 catch (Exception ex)
                 {
+                    item.ClearStickyUndoChanges();
                     item.SetPreviewError(message: ex.Message, cause: ex);
                     Log.Warning(
                         ex,
@@ -793,16 +834,13 @@ namespace Mfr.Engine.RenameList
                 !loadedDestinationKeys.Contains(NormalizePathKey(entry.DestinationPath))
             );
 
+            _pendingUndoCommit = preparedCount > 0;
             var plan = _CompletePreviewPlan(new RenameListProgressTracker(progress: null, cancellationToken));
-            var results = Commit(
-                plan,
-                failFast: failFast,
-                dryRun: false,
-                cancellationToken: cancellationToken,
-                progress: progress,
-                isUndo: true
+            return new RenameListPrepareUndoResult(
+                Plan: plan,
+                PreparedCount: preparedCount,
+                NotLoadedCount: notLoadedCount
             );
-            return new RenameListUndoResult(Results: results, NotLoadedCount: notLoadedCount);
         }
 
         /// <summary>
@@ -819,16 +857,17 @@ namespace Mfr.Engine.RenameList
         /// </param>
         /// <param name="cancellationToken">When canceled, stops applying remaining items without throwing.</param>
         /// <param name="progress">Optional progress sink (processed count, total changed rows, last path).</param>
-        /// <param name="isUndo">
-        /// When <see langword="true"/>, the captured rename log is marked as Undo (details pane / undo-of-undo).
-        /// </param>
         /// <returns>Per-item commit outcomes including success, skipped, and errors.</returns>
         /// <remarks>
         /// <para>
         /// After the plan walk, clears preview snapshots and metadata caches on every item.
         /// Manual overrides clear on <see cref="RenameStatus.CommitOk"/> /
         /// <see cref="RenameStatus.CommitError"/> (MFR7 post-apply <c>Reload</c>); they remain on
-        /// preview-error and skipped rows.
+        /// preview-error and skipped rows. Sticky undo seeds clear only on non-dry-run
+        /// <see cref="RenameStatus.CommitOk"/>.
+        /// When <see cref="PrepareUndo"/> set a pending undo flag, the captured rename log is marked IsUndo.
+        /// Dry-run does not consume the flag; it clears when no sticky seeds remain (all CommitOk) or the
+        /// prepare session is abandoned (<see cref="Clear"/> / <see cref="RefreshOriginals"/>).
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="plan"/> is <c>null</c>.</exception>
@@ -838,18 +877,20 @@ namespace Mfr.Engine.RenameList
             bool dryRun = false,
             Func<RenameItem, bool>? confirmBeforeApply = null,
             CancellationToken cancellationToken = default,
-            IProgress<RenameListProgress>? progress = null,
-            bool isUndo = false
+            IProgress<RenameListProgress>? progress = null
         )
         {
             ArgumentNullException.ThrowIfNull(plan);
 
+            var isUndo = !dryRun && _pendingUndoCommit;
+
             Log.Information(
-                "Starting commit for {ItemCount} item(s). FailFast: {FailFast}. DryRun: {DryRun}. ConfirmBeforeApply: {HasConfirmBeforeApply}.",
+                "Starting commit for {ItemCount} item(s). FailFast: {FailFast}. DryRun: {DryRun}. ConfirmBeforeApply: {HasConfirmBeforeApply}. IsUndo: {IsUndo}.",
                 _renameItems.Count,
                 failFast,
                 dryRun,
-                confirmBeforeApply is not null
+                confirmBeforeApply is not null,
+                isUndo
             );
 
             var tracker = new RenameListProgressTracker(progress, cancellationToken);
@@ -879,7 +920,18 @@ namespace Mfr.Engine.RenameList
                     item.ClearAllOverrides();
                 }
 
+                if (!dryRun && item.Status == RenameStatus.CommitOk)
+                {
+                    item.ClearStickyUndoChanges();
+                }
+
                 item.ClearMetadataCaches();
+            }
+
+            if (isUndo)
+            {
+                // Keep pending while any sticky seed remains so a failed/partial GO can retry as IsUndo.
+                _pendingUndoCommit = _renameItems.Any(static item => item.StickyUndoChanges is not null);
             }
 
             var commitOkCount = results.Count(item => item.Status == RenameStatus.CommitOk);

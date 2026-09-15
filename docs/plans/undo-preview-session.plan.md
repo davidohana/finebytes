@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-prepare-undo-engine
     content: "P2: PrepareUndo + sticky OldValue seed + IsUndo pending flag; rewrite engine undo tests"
-    status: pending
+    status: completed
   - id: p3-ui-prepare-session
     content: "P3: Wire Undo Last/Log to prepare; clear filters; status; confirm copy; no File List refresh; update UI tests"
     status: pending
@@ -104,7 +104,7 @@ Hook points:
 - Tests: Models tests for Get/SetTargetString; catalog `SupportsWrite`; optional small override→commit smoke
 - Note: shippable and useful without any undo changes
 
-### P2 — Engine `PrepareUndo` + sticky seed
+### P2 — Engine `PrepareUndo` + sticky seed — done
 
 - Scope / files: [`Mfr.Engine/RenameList/RenameList.cs`](Mfr.Engine/RenameList/RenameList.cs) — replace auto-Commit `Undo` with `PrepareUndo`; [`RenameItem`](Mfr.Models/Rename/RenameItem.cs) sticky OldValue changes + clear on Cancel/RefreshOriginals/Commit success; preview pipeline reapplies seed after PreviewEnd; one-shot `pendingUndoCommit` for next log `IsUndo`
 - Exit criteria: PrepareUndo loads destinations, Preview shows OldValues, no filesystem change, re-preview with empty filters keeps OldValues; strip-only skipped

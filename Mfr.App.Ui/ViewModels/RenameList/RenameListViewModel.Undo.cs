@@ -62,14 +62,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return false;
             }
 
-            RenameListUndoResult? undoResult = null;
+            RenameListPrepareUndoResult? prepareResult = null;
+            IReadOnlyList<RenameResultItem>? results = null;
             var commitCompleted = await _RunProgressAsync(
                     RenameListProgressOperation.Commit,
                     (token, progress) =>
                     {
-                        undoResult = _renameList.Undo(
-                            log,
+                        prepareResult = _renameList.PrepareUndo(log, cancellationToken: token, progress: progress);
+                        results = _renameList.Commit(
+                            prepareResult.Plan,
                             failFast: false,
+                            dryRun: false,
                             cancellationToken: token,
                             progress: progress
                         );
@@ -81,10 +84,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _ClearPreviewCounts();
             _RefreshFieldDisplay();
 
-            var results = undoResult?.Results;
             var undoneCount = results?.Count(item => item.Status == RenameStatus.CommitOk) ?? 0;
             var commitErrorCount = results?.Count(item => item.Status == RenameStatus.CommitError) ?? 0;
-            var notLoadedCount = undoResult?.NotLoadedCount ?? 0;
+            var notLoadedCount = prepareResult?.NotLoadedCount ?? 0;
             LastStatusMessage = _FormatUndoOutcome(
                 undoneCount: undoneCount,
                 errorCount: commitErrorCount,

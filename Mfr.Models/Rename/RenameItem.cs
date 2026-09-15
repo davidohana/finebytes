@@ -58,6 +58,17 @@ namespace Mfr.Models.Rename
         private readonly Dictionary<(string GroupId, string PropertyKey), string> _previewOverrides = [];
 
         /// <summary>
+        /// Gets the sticky undo OldValue deltas reapplied after each preview, when present.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Set by <c>PrepareUndo</c>; cleared via <see cref="ClearStickyUndoChanges"/> on F5
+        /// <c>RefreshOriginals</c>, list Clear (items dropped), or successful Commit.
+        /// </para>
+        /// </remarks>
+        internal IReadOnlyList<RenamePropertyChange>? StickyUndoChanges { get; private set; }
+
+        /// <summary>
         /// Gets the original immutable file snapshot.
         /// </summary>
         public FileMeta Original { get; internal set; } = original;
@@ -313,10 +324,34 @@ namespace Mfr.Models.Rename
         /// <summary>
         /// Clears every manual original and preview field override on this item.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Does not clear the sticky undo OldValue seed — that survives failed commits so GO can retry;
+        /// clear it via <see cref="ClearStickyUndoChanges"/> (RefreshOriginals / CommitOk / list Clear).
+        /// </para>
+        /// </remarks>
         public void ClearAllOverrides()
         {
             _originalOverrides.Clear();
             _previewOverrides.Clear();
+        }
+
+        /// <summary>
+        /// Attaches undoable log changes as a sticky seed for later preview reapply.
+        /// </summary>
+        /// <param name="changes">Property deltas from the rename log (Old → New at GO time).</param>
+        internal void SetStickyUndoChanges(IReadOnlyList<RenamePropertyChange> changes)
+        {
+            ArgumentNullException.ThrowIfNull(changes);
+            StickyUndoChanges = changes;
+        }
+
+        /// <summary>
+        /// Clears the sticky undo OldValue seed without touching manual overrides.
+        /// </summary>
+        internal void ClearStickyUndoChanges()
+        {
+            StickyUndoChanges = null;
         }
 
         /// <summary>
