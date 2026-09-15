@@ -1578,6 +1578,39 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies Manual Override stays available after an invalid override causes a preview error (MFR7 parity).
+        /// </summary>
+        [Fact]
+        public async Task ManualOverrideField_available_on_preview_error_row()
+        {
+            var dir = _CreateSampleFolder();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir);
+            await renameListViewModel.AddPathsAsync([Path.Combine(dir, "alpha.txt")]);
+
+            var entry = Assert.Single(renameListViewModel.Entries);
+            var previewPath = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullPath
+            );
+            entry.EngineItem.SetOverride(previewPath, "not-a-full-path");
+            renameListViewModel.Preview(FilterChain.CreateAllEnabled([]));
+
+            Assert.True(entry.HasPreviewError);
+            renameListViewModel.SetFocusedFieldKey(previewPath);
+            renameListViewModel.SetSelectedEntries([entry]);
+            renameListViewModel.UiHooks = new RenameListUiHooks
+            {
+                PromptAsync = _ => Task.FromResult<string?>(Path.Combine(dir, "fixed.txt")),
+            };
+
+            Assert.True(renameListViewModel.ManualOverrideFieldCommand.CanExecute(null));
+            await renameListViewModel.ManualOverrideFieldAsync();
+
+            Assert.True(entry.IsOverridden(previewPath));
+            Assert.Equal(Path.Combine(dir, "fixed.txt"), entry.GetFieldText(previewPath));
+        }
+
+        /// <summary>
         /// Verifies Cancel Manual Override clears the focused side for the whole selection when any row is overridden.
         /// </summary>
         [Fact]

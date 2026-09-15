@@ -41,8 +41,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Prompts for a value and applies the same manual override to all selected non-error rows.
+        /// Prompts for a value and applies the same manual override to all selected eligible rows.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Skips load-error cells only (MFR7 field-display error). Preview-error rows stay eligible so a
+        /// bad override can be corrected without Cancel + re-enter.
+        /// </para>
+        /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanManualOverrideField))]
         public async Task ManualOverrideFieldAsync()
         {
@@ -212,21 +218,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Rows with a preview error or load-error cell are skipped for Manual Override defaults/apply.
+        /// Load-error cells are skipped for Manual Override defaults/apply (MFR7 field-display error).
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Row preview errors do not block eligibility — MFR7 allows Forced Value on Preview Error rows
+        /// when the focused cell is not a field error.
+        /// </para>
+        /// </remarks>
         private static bool _IsOverrideEligible(RenameListEntry entry, RenameListFieldKey key)
         {
-            if (entry.HasPreviewError)
-            {
-                return false;
-            }
-
-            if (entry.IsLoadError(key))
-            {
-                return false;
-            }
-
-            return true;
+            return !entry.IsLoadError(key);
         }
 
         private void _NotifyManualOverrideCommandsChanged()
