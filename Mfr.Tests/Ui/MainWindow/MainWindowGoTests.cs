@@ -87,8 +87,8 @@ namespace Mfr.Tests.Ui.MainWindow
             FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
+            viewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            viewModel.FilterChainViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
 
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "alpha.txt");
 
@@ -331,12 +331,12 @@ namespace Mfr.Tests.Ui.MainWindow
                 Chain = new FilterChain { Steps = [] },
             };
 
-            viewModel.AppliedFiltersViewModel.LoadPreset(preset);
+            viewModel.FilterChainViewModel.LoadPreset(preset);
 
             Assert.Equal("Loaded preset \"ShellPreset\".", viewModel.StatusHint.ToPlainText());
             Assert.All(viewModel.StatusHint.Runs, run => Assert.Null(run.ForegroundResourceKey));
 
-            viewModel.AppliedFiltersViewModel.SavePreset("ShellPresetSaved", description: null, visibleColumns: null);
+            viewModel.FilterChainViewModel.SavePreset("ShellPresetSaved", description: null, visibleColumns: null);
 
             Assert.Equal("Saved preset \"ShellPresetSaved\".", viewModel.StatusHint.ToPlainText());
             Assert.All(viewModel.StatusHint.Runs, run => Assert.Null(run.ForegroundResourceKey));

@@ -30,7 +30,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Casing_list_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("CasingList"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("CasingList"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -51,7 +51,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (CasingListFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (CasingListFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(["and", "or", "RMX"], filter.Options.Words);
             Assert.False(filter.Options.UppercaseSentenceInitial);
 

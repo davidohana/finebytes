@@ -60,7 +60,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Creates a Name List filter from this column's display lines and adds it to Applied Filters (MFR7 Free Names Edit).
+        /// Creates a Name List filter from this column's display lines and adds it to Filter Chain (MFR7 Free Names Edit).
         /// </summary>
         /// <param name="key">Original or preview field key from the header menu.</param>
         /// <remarks>
@@ -72,7 +72,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </remarks>
         public void EditAsNameList(RenameListFieldKey key)
         {
-            if (IsBusy || _appliedFilters is null)
+            if (IsBusy || _filterChain is null)
             {
                 return;
             }
@@ -85,7 +85,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var lines = _renameList.CollectNameList(key);
             var filter = new NameListFilter(writeTarget, new NameListOptions(Entries: lines));
-            _appliedFilters.AddAndSelect(filter, $"{field.DisplayName} List");
+            _filterChain.AddAndSelect(filter, $"{field.DisplayName} List");
         }
 
         /// <summary>

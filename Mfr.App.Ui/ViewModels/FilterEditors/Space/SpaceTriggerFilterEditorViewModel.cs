@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Space;
 using Mfr.Models.Filters;
 
@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public SpaceTriggerFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public SpaceTriggerFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {
             (CharsPrompt, NeighborCheckLabel, NeighborCheckToolTip) = _ResolveLabels(step.Filter);

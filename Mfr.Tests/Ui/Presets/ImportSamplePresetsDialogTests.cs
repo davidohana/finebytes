@@ -3,7 +3,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.Presets;
@@ -95,7 +95,7 @@ namespace Mfr.Tests.Ui.Presets
         public void Manager_Import_Samples_Button_Invokes_Dialog_Path()
         {
             var invoked = false;
-            var appliedFilters = new AppliedFiltersViewModel();
+            var appliedFilters = new FilterChainViewModel();
             var viewModel = new PresetManagerDialogViewModel(appliedFilters);
             var dialog = new PresetManagerDialog(
                 viewModel,

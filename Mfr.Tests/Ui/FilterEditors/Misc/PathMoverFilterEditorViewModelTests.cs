@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters.Misc;
@@ -16,7 +16,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public void Options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var step = new FilterChainStepViewModel("Path Mover", new PathMoverFilter());
             var editor = new PathMoverFilterEditorViewModel(step);
 
             Assert.Equal(@"C:\", editor.RootFolder);
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public async Task Browse_applies_picked_root_folder()
         {
-            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var step = new FilterChainStepViewModel("Path Mover", new PathMoverFilter());
             var editor = new PathMoverFilterEditorViewModel(step)
             {
                 PickRootFolderAsync = (current, _) =>
@@ -58,7 +58,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public async Task Browse_cancelled_leaves_root_unchanged()
         {
-            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var step = new FilterChainStepViewModel("Path Mover", new PathMoverFilter());
             var editor = new PathMoverFilterEditorViewModel(step)
             {
                 PickRootFolderAsync = (_, _) => Task.FromResult<string?>(null),
@@ -76,7 +76,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public async Task Browse_whitespace_pick_leaves_root_unchanged()
         {
-            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var step = new FilterChainStepViewModel("Path Mover", new PathMoverFilter());
             var editor = new PathMoverFilterEditorViewModel(step)
             {
                 PickRootFolderAsync = (_, _) => Task.FromResult<string?>("   "),
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public async Task Browse_without_picker_leaves_root_unchanged()
         {
-            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var step = new FilterChainStepViewModel("Path Mover", new PathMoverFilter());
             var editor = new PathMoverFilterEditorViewModel(step);
 
             await editor.BrowseRootFolderCommand.ExecuteAsync(null);

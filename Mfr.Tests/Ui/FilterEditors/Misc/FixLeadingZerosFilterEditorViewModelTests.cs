@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.Filters.Misc;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public void Options_update_step_filter()
         {
-            var step = new AppliedFilterStepViewModel("Fix Leading 0's", new FixLeadingZerosFilter());
+            var step = new FilterChainStepViewModel("Fix Leading 0's", new FixLeadingZerosFilter());
             var editor = new FixLeadingZerosFilterEditorViewModel(step);
 
             Assert.Equal(2, editor.Width);
@@ -41,7 +41,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public void Width_and_MaxCount_clamp_to_option_ranges()
         {
-            var step = new AppliedFilterStepViewModel("Fix Leading 0's", new FixLeadingZerosFilter());
+            var step = new FilterChainStepViewModel("Fix Leading 0's", new FixLeadingZerosFilter());
             var editor = new FixLeadingZerosFilterEditorViewModel(step) { Width = 0, MaxCount = -1 };
             var low = ((FixLeadingZerosFilter)step.Filter).Options;
             Assert.Equal(1, low.Width);
@@ -64,7 +64,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 new FilePrefixTarget(),
                 new FixLeadingZerosOptions(Width: 5, RemoveExtraZeros: true, MaxCount: 3, WholeWordOnly: false)
             );
-            var step = new AppliedFilterStepViewModel("Fix Leading 0's", filter);
+            var step = new FilterChainStepViewModel("Fix Leading 0's", filter);
             var editor = new FixLeadingZerosFilterEditorViewModel(step);
 
             Assert.Equal(5, editor.Width);

@@ -1,6 +1,6 @@
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Shell;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Tests.Ui.AppliedFilters;
 
 namespace Mfr.Tests.Ui.Services.Help
@@ -112,7 +112,7 @@ namespace Mfr.Tests.Ui.Services.Help
                 var helpFile = Path.Combine(helpDir, "LettersCase.html");
                 File.WriteAllText(helpFile, "<html></html>");
                 var opener = new RecordingShellOpener();
-                var viewModel = new AppliedFiltersViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
+                var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
                 viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
                 Assert.True(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));
@@ -131,7 +131,7 @@ namespace Mfr.Tests.Ui.Services.Help
         }
 
         /// <summary>
-        /// Verifies help raises <see cref="AppliedFiltersViewModel.FilterHelpMissing"/> when the file is absent.
+        /// Verifies help raises <see cref="FilterChainViewModel.FilterHelpMissing"/> when the file is absent.
         /// </summary>
         [Fact]
         public void OpenSelectedFilterHelp_raises_missing_when_file_absent()
@@ -141,7 +141,7 @@ namespace Mfr.Tests.Ui.Services.Help
             try
             {
                 var opener = new RecordingShellOpener();
-                var viewModel = new AppliedFiltersViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
+                var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
                 viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
                 string? missing = null;
                 viewModel.FilterHelpMissing += (_, fileName) => missing = fileName;
@@ -163,9 +163,7 @@ namespace Mfr.Tests.Ui.Services.Help
         [Fact]
         public void OpenSelectedFilterHelp_disabled_for_multi_select()
         {
-            var viewModel = new AppliedFiltersViewModel(
-                filterHelp: new FilterHelpHost(NullFileShellOpener.Instance, [])
-            );
+            var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(NullFileShellOpener.Instance, []));
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
@@ -180,9 +178,7 @@ namespace Mfr.Tests.Ui.Services.Help
         [Fact]
         public void OpenSelectedFilterHelp_disabled_when_empty()
         {
-            var viewModel = new AppliedFiltersViewModel(
-                filterHelp: new FilterHelpHost(NullFileShellOpener.Instance, [])
-            );
+            var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(NullFileShellOpener.Instance, []));
             Assert.False(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));
         }
     }

@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Trimming;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public ShrinkDuplicateCharactersFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public ShrinkDuplicateCharactersFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {
             _SyncFromFilter();

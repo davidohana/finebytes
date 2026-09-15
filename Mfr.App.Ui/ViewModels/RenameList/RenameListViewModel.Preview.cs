@@ -1,7 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Engine.Commit;
-using Mfr.Models.Filters;
+using FilterChainModel = Mfr.Models.Filters.FilterChain;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -89,14 +89,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Runs the filter chain over every Rename List item and refreshes preview columns.
         /// </summary>
-        /// <param name="chain">Live Applied Filters chain.</param>
+        /// <param name="chain">Live Filter Chain.</param>
         /// <remarks>
         /// <para>
         /// Synchronous path for tests and callers that already own the UI thread. Prefer
         /// <see cref="PreviewAsync"/> from the shell so long runs show cancelable progress.
         /// </para>
         /// </remarks>
-        public void Preview(FilterChain chain)
+        public void Preview(FilterChainModel chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
 
@@ -112,12 +112,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Runs preview on a background thread with delayed cancelable progress (MFR7 PreviewProgressDialog).
         /// </summary>
-        /// <param name="chain">Live Applied Filters chain.</param>
+        /// <param name="chain">Live Filter Chain.</param>
         /// <returns>
         /// <see langword="true"/> when preview finished; <see langword="false"/> when canceled
         /// (Auto-Preview is then disabled).
         /// </returns>
-        public async Task<bool> PreviewAsync(FilterChain chain)
+        public async Task<bool> PreviewAsync(FilterChainModel chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
 

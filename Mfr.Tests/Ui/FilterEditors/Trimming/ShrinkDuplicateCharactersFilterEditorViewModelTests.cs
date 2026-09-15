@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters.Trimming;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void Shrink_duplicate_character_text_updates_step_options()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Shrink Duplicate Characters",
                 new ShrinkDuplicateCharactersFilter()
             );
@@ -37,7 +37,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void Shrink_duplicate_null_character_loads_as_empty_text()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Shrink Duplicate Characters",
                 new ShrinkDuplicateCharactersFilter(
                     new FilePrefixTarget(),

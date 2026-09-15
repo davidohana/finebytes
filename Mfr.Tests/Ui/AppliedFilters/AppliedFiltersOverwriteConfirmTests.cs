@@ -1,7 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
-using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.FilterChain;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
@@ -69,9 +69,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
             owner.Close();
         }
 
-        private static (AppliedFiltersView View, Window Owner) _ShowView()
+        private static (FilterChainView View, Window Owner) _ShowView()
         {
-            var view = new AppliedFiltersView();
+            var view = new FilterChainView();
             var owner = new Window { Content = view };
             owner.Show();
             owner.UpdateLayout();

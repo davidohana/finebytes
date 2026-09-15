@@ -8,7 +8,7 @@ namespace Mfr.App.Ui.Input
     /// Keep <c>docs/keyboard-shortcuts.md</c> in sync with these gestures.
     /// Window-level <see cref="KeyBinding"/>s use the members here, including File List
     /// view types (Ctrl+1 through Ctrl+6). Pane-local keys (Backspace, thumbnail zoom,
-    /// address Enter/Esc, Applied Filters Del/Ctrl+Arrow, Properties Alt+Enter, File List
+    /// address Enter/Esc, Filter Chain Del/Ctrl+Arrow, Properties Alt+Enter, File List
     /// Cut/Copy/Paste, Del / Shift+Del) are handled in the pane views. Toolbar tip text lives in
     /// <see cref="Resources.AppTips"/>.
     /// </para>
@@ -123,13 +123,13 @@ namespace Mfr.App.Ui.Input
         /// <summary>Moves selected Rename List rows down when the grid has focus.</summary>
         public static KeyGesture MoveSelectedDown { get; } = new(Key.Down, KeyModifiers.Control);
 
-        /// <summary>Removes selected Applied Filters when the list has focus.</summary>
+        /// <summary>Removes selected Filter Chain when the list has focus.</summary>
         public static KeyGesture RemoveSelectedFilterDelete { get; } = RemoveSelectedDelete;
 
-        /// <summary>Moves selected Applied Filters up when the list has focus.</summary>
+        /// <summary>Moves selected Filter Chain up when the list has focus.</summary>
         public static KeyGesture MoveFilterUp { get; } = MoveSelectedUp;
 
-        /// <summary>Moves selected Applied Filters down when the list has focus.</summary>
+        /// <summary>Moves selected Filter Chain down when the list has focus.</summary>
         public static KeyGesture MoveFilterDown { get; } = MoveSelectedDown;
     }
 }

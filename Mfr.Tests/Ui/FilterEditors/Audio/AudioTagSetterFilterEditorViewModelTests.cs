@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.Filters.Audio;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Audio_tag_setter_defaults_omit_all_fields()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
             var editor = new AudioTagSetterFilterEditorViewModel(step);
 
             Assert.Equal(AudioTagSetterFieldChoice.All.Count, editor.FieldRows.Count);
@@ -31,7 +31,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Audio_tag_setter_title_mode_and_text_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
             var editor = new AudioTagSetterFilterEditorViewModel(step);
             var title = _Row(editor, AudioTagSetterFieldKind.Title);
 
@@ -58,7 +58,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Audio_tag_setter_typing_checks_omitted_field()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
             var editor = new AudioTagSetterFilterEditorViewModel(step);
             var album = _Row(editor, AudioTagSetterFieldKind.Album);
 
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Audio_tag_setter_track_and_auto_increment_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
             var editor = new AudioTagSetterFilterEditorViewModel(step);
             var track = _Row(editor, AudioTagSetterFieldKind.Track);
 
@@ -106,7 +106,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Audio_tag_setter_syncs_from_existing_options()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Audio Tag Setter",
                 new AudioTagSetterFilter(
                     new AudioTagSetterOptions(
@@ -141,7 +141,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Audio_tag_setter_field_rows_match_catalog()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
             var editor = new AudioTagSetterFilterEditorViewModel(step);
             var catalogKinds = AudioTagSetterFieldChoice.All.Select(c => c.Kind).ToArray();
 
@@ -183,7 +183,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Audio_tag_setter_auto_increment_updates_when_track_omitted()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
             var editor = new AudioTagSetterFilterEditorViewModel(step);
             var track = _Row(editor, AudioTagSetterFieldKind.Track);
 
@@ -201,7 +201,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Audio_tag_setter_genre_text_updates_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Setter", new AudioTagSetterFilter());
             var editor = new AudioTagSetterFilterEditorViewModel(step);
             var genre = _Row(editor, AudioTagSetterFieldKind.Genre);
 

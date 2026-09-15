@@ -21,7 +21,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         public void Attributes_setter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AttributesSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AttributesSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -63,7 +63,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (AttributesSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (AttributesSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(AttributeTriState.Set, filter.Options.ReadOnly);
             Assert.Equal(AttributeTriState.Set, filter.Options.Hidden);
             Assert.Equal(AttributeTriState.Clear, filter.Options.Archive);

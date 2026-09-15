@@ -2,7 +2,7 @@
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor.TokenEditors"
-  xmlns:anchors="using:Mfr.App.Ui.ViewModels.AppliedFilters"
+  xmlns:anchors="using:Mfr.App.Ui.ViewModels.FilterChain"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:fe="using:Mfr.App.Ui.Views.FormatEditor"
   x:Class="Mfr.App.Ui.Views.FormatEditor.TokenEditors.SubstrFormatTokenEditorView"

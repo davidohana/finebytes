@@ -14,9 +14,9 @@ namespace Mfr.Tests.Models
         [Theory]
         [InlineData(ConfirmationKind.GoWithPreviewErrors)]
         [InlineData(ConfirmationKind.UndoRename)]
-        [InlineData(ConfirmationKind.ReplaceAppliedFiltersOnLoad)]
+        [InlineData(ConfirmationKind.ReplaceFilterChainOnLoad)]
         [InlineData(ConfirmationKind.ClearRenameList)]
-        [InlineData(ConfirmationKind.ClearAppliedFilters)]
+        [InlineData(ConfirmationKind.ClearFilterChain)]
         [InlineData(ConfirmationKind.OverwritePreset)]
         [InlineData(ConfirmationKind.DeletePreset)]
         public void ShouldConfirm_true_by_default(ConfirmationKind kind)

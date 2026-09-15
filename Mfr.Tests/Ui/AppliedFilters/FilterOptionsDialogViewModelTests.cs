@@ -1,5 +1,5 @@
 using System.Text.Json;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
@@ -13,7 +13,7 @@ using Mfr.Models.Tags.Id3v1;
 namespace Mfr.Tests.Ui.AppliedFilters
 {
     /// <summary>
-    /// Unit tests for <see cref="FilterOptionsDialogViewModel"/> and <see cref="AppliedFiltersViewModel.ApplyFilterOptions"/>.
+    /// Unit tests for <see cref="FilterOptionsDialogViewModel"/> and <see cref="FilterChainViewModel.ApplyFilterOptions"/>.
     /// </summary>
     public sealed class FilterOptionsDialogViewModelTests
     {
@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Dialog_initializes_apply_to_for_string_filters()
         {
-            var step = new AppliedFilterStepViewModel("Shrink Spaces", new ShrinkSpacesFilter());
+            var step = new FilterChainStepViewModel("Shrink Spaces", new ShrinkSpacesFilter());
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Dialog_hides_editable_apply_to_for_non_string_filters()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Remover", new Filters.Audio.TagRemoverFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Remover", new Filters.Audio.TagRemoverFilter());
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
@@ -56,7 +56,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Dialog_shows_fixed_apply_to_for_attributes_setter()
         {
-            var step = new AppliedFilterStepViewModel("Attributes Setter", new AttributesSetterFilter());
+            var step = new FilterChainStepViewModel("Attributes Setter", new AttributesSetterFilter());
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                     Time: default
                 )
             );
-            var step = new AppliedFilterStepViewModel("Date/Time Setter", filter);
+            var step = new FilterChainStepViewModel("Date/Time Setter", filter);
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Dialog_shows_fixed_apply_to_for_path_mover()
         {
-            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+            var step = new FilterChainStepViewModel("Path Mover", new PathMoverFilter());
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Dialog_shows_fixed_apply_to_for_id3v2_field_setter()
         {
-            var step = new AppliedFilterStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
+            var step = new FilterChainStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
@@ -120,7 +120,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Dialog_hides_apply_to_for_sentence_end_characters()
         {
-            var step = new AppliedFilterStepViewModel("Sentence End Characters", new SentenceEndCharactersFilter());
+            var step = new FilterChainStepViewModel("Sentence End Characters", new SentenceEndCharactersFilter());
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
@@ -130,12 +130,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies accepting Apply-To edits updates the step and <see cref="AppliedFiltersViewModel.ToChain"/>.
+        /// Verifies accepting Apply-To edits updates the step and <see cref="FilterChainViewModel.ToChain"/>.
         /// </summary>
         [Fact]
         public void ApplyFilterOptions_updates_step_target_and_chain_json()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -165,7 +165,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_updates_display_name()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -182,7 +182,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_updates_semantic_audio_target()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -215,7 +215,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_updates_id3v1_target()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -252,7 +252,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_updates_xiph_target()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -285,7 +285,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_updates_id3v2_singleton_target()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -322,7 +322,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_updates_id3v2_multi_instance_target()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -363,7 +363,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_id3v2_singleton_ignores_stale_multi_instance_fields()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
             var id3v2Group = FilterTargetCatalog.Groups.First(group => group.Label == "ID3v2");
@@ -395,7 +395,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_id3v2_txxx_ignores_language()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
             var id3v2Group = FilterTargetCatalog.Groups.First(group => group.Label == "ID3v2");
@@ -431,7 +431,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var filter = new FormatterFilter(new Id3v1FieldTarget(Id3v1Field.Album), new FormatterOptions("x"));
 
-            var step = new AppliedFilterStepViewModel("Formatter", filter);
+            var step = new FilterChainStepViewModel("Formatter", filter);
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
@@ -450,7 +450,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var filter = new FormatterFilter(new XiphFieldTarget("TITLE"), new FormatterOptions("x"));
 
-            var step = new AppliedFilterStepViewModel("Formatter", filter);
+            var step = new FilterChainStepViewModel("Formatter", filter);
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
@@ -467,7 +467,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_updates_substring_apply_scope()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -507,7 +507,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_updates_token_apply_scope()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -539,7 +539,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void CanConfirm_is_false_when_token_separator_empty()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
@@ -569,7 +569,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [InlineData("   ")]
         public void CanConfirm_is_false_when_name_blank(string blankName)
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]) { Name = blankName };
@@ -588,7 +588,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_ancestor_level_1_uses_parent_folder_label()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
@@ -621,7 +621,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyFilterOptions_updates_ancestor_folder_level()
         {
-            var applied = new AppliedFiltersViewModel();
+            var applied = new FilterChainViewModel();
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 

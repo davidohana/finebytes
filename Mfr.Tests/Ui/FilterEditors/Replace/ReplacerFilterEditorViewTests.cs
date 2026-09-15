@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
         public void Replacer_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             Assert.Equal("DSC*.JPG", find.PlaceholderText);
             Assert.Equal("photo.jpg", replacement.Watermark);
 
-            var filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (ReplacerFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal("dog", filter.Options.Find);
             Assert.Equal("cat", filter.Options.Replacement);
             Assert.Equal(ReplacerMode.Wildcard, filter.Options.Match.Mode);
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             regex.IsChecked = true;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
-            filter = (ReplacerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (ReplacerFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(ReplacerMode.Regex, filter.Options.Match.Mode);
             Assert.Equal(@"\((.+)\)", find.PlaceholderText);
             Assert.Equal("$1", replacement.Watermark);

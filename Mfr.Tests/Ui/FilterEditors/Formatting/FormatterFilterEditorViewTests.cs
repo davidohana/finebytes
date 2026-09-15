@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Formatter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -37,7 +37,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (FormatterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (FormatterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal("<file-name>_<counter:initial=1,step=1>", filter.Options.Template);
 
             window.Close();
@@ -50,7 +50,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Formatter_FormatEditor_insert_updates_template()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (FormatterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (FormatterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal("<file-name>", filter.Options.Template);
             Assert.Equal("<file-name>", templateEditor.Text);
 

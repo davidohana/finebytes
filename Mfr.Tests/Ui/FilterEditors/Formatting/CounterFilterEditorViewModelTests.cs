@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         [Fact]
         public void Counter_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Counter", new CounterFilter());
+            var step = new FilterChainStepViewModel("Counter", new CounterFilter());
             var editor = new CounterFilterEditorViewModel(step);
 
             Assert.Equal(1, editor.Start);

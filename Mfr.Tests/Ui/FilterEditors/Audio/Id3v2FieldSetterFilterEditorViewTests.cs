@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Id3v2_field_setter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Id3v2FieldSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Id3v2FieldSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -66,7 +66,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (Id3v2FieldSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (Id3v2FieldSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal("COMM", filter.Options.FrameId);
             Assert.Equal("Hi", filter.Options.Text);
             Assert.True(filter.Options.OnlyIfEmpty);
@@ -77,7 +77,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            filter = (Id3v2FieldSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (Id3v2FieldSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal("TALB", filter.Options.FrameId);
             Assert.Null(filter.Options.Language);
             Assert.Null(filter.Options.Description);

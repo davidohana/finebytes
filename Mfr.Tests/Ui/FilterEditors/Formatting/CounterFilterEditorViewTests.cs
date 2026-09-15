@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Counter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Counter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Counter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -60,7 +60,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (CounterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (CounterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(10, filter.Options.Start);
             Assert.Equal(5, filter.Options.Step);
             Assert.Equal(CounterLeadingZerosMode.Custom, filter.Options.LeadingZerosMode);

@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters;
 using Mfr.Filters.Trimming;
@@ -18,7 +18,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void Trim_helper_selection_updates_count()
         {
-            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(step);
             editor.TrimHelper.SetSampleText("abcdef");
 
@@ -33,7 +33,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void Placeholder_selection_updates_count()
         {
-            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(step);
             Assert.False(editor.TrimHelper.HasSample);
             Assert.Equal(VisualTrimHelperViewModel.PlaceholderText, editor.TrimHelper.DisplayText);
@@ -50,7 +50,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void Spinner_updates_right_edge_highlight()
         {
-            var step = new AppliedFilterStepViewModel("Trim Right", new TrimRightFilter());
+            var step = new FilterChainStepViewModel("Trim Right", new TrimRightFilter());
             var editor = new CountFilterEditorViewModel(step);
             editor.TrimHelper.SetSampleText("abcdef");
             editor.Count = 2;
@@ -74,7 +74,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     extension: "txt"
                 )
             );
-            var step = new AppliedFilterStepViewModel("Extract Left", new ExtractLeftFilter());
+            var step = new FilterChainStepViewModel("Extract Left", new ExtractLeftFilter());
             var editor = new CountFilterEditorViewModel(step, sampleRenameItems: [item]);
 
             Assert.Equal("sample-name", editor.TrimHelper.SampleText);
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void First_sample_drop_syncs_highlight_from_count()
         {
             var filter = new TrimLeftFilter(new FilePrefixTarget(), new CountFilterOptions(Count: 3));
-            var step = new AppliedFilterStepViewModel("Trim Left", filter);
+            var step = new FilterChainStepViewModel("Trim Left", filter);
             var editor = new CountFilterEditorViewModel(step);
             Assert.False(editor.TrimHelper.HasSample);
             // Default count highlight already applies to the placeholder.
@@ -115,7 +115,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                 FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"),
                 FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1),
             };
-            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(step, sampleRenameItems: items);
 
             Assert.Equal("alpha", editor.TrimHelper.SampleText);
@@ -146,7 +146,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                 FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"),
                 FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1),
             };
-            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(
                 step,
                 sampleRenameItems: items,
@@ -168,7 +168,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Refresh_enables_navigation_after_late_list_add()
         {
             var items = new List<RenameItem>();
-            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(step, resolveSampleRenameItems: () => items);
             Assert.False(editor.TrimHelper.HasSample);
             Assert.False(editor.TrimHelper.CanGoNext);
@@ -194,7 +194,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                 FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"),
                 FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1),
             };
-            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(step, resolveSampleRenameItems: () => items);
             editor.TrimHelper.SetSampleText("custom-sample");
 
@@ -225,7 +225,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     extension: "mp3"
                 )
             );
-            var step = new AppliedFilterStepViewModel("Trim Left", new TrimLeftFilter());
+            var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(
                 step,
                 resolveRenameItemByFullPath: path => PathComparers.Os.Equals(path, item.Original.FullPath) ? item : null

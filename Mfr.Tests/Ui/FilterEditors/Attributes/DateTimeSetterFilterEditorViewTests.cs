@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         public void Date_time_setter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("DateTimeSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("DateTimeSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (DateTimeSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(TimestampField.Creation, filter.Options.TimestampField);
             Assert.True(filter.Options.SetDate);
             Assert.Equal(new DateOnly(2020, 12, 25), filter.Options.Date);
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (DateTimeSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(DateOnly.FromDateTime(DateTime.Today), filter.Options.Date);
             Assert.True(filter.Options.SetTime);
 
@@ -80,7 +80,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (DateTimeSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(
                 filter.Options.Time.ToString("HH':'mm':'ss", System.Globalization.CultureInfo.InvariantCulture),
                 timeBox.Text
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (DateTimeSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(
                 filter.Options.Date.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
                 dateBox.Text
@@ -102,7 +102,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (DateTimeSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(
                 filter.Options.Date.ToString("yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture),
                 dateBox.Text
@@ -113,7 +113,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            filter = (DateTimeSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (DateTimeSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(new TimeOnly(18, 14, 0), filter.Options.Time);
             Assert.Equal("18:14:00", timeBox.Text);
 

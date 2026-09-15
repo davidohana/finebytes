@@ -124,12 +124,11 @@ namespace Mfr.App.Ui.Resources
         public const string SelectRenameListFields = "Select Rename List columns and Auto-Sort fields";
 
         /// <summary>Rename List Add columns from filters (toolbar / shuttle / menu).</summary>
-        public const string AddColumnsFromFilters =
-            "Add Rename List columns for fields used by the applied filters";
+        public const string AddColumnsFromFilters = "Add Rename List columns for fields used by the Filter Chain";
 
         /// <summary>Rename List Set columns from filters (toolbar / shuttle / menu).</summary>
         public const string SetColumnsFromFilters =
-            "Set Rename List columns to defaults plus fields used by the applied filters";
+            "Set Rename List columns to defaults plus fields used by the Filter Chain";
 
         /// <summary>Rename List field shuttle: Auto-Sort fields (main menu).</summary>
         public const string EditRenameListSortFields = "Choose Auto-Sort fields and order";
@@ -203,32 +202,32 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Typed-path box tip.</summary>
         public const string AddressEdit = "Enter to go, Esc to cancel";
 
-        /// <summary>Applied Filters add-from-palette shuttle tip.</summary>
-        public const string AddSelectedFilter = "Add selected filter to Applied Filters";
+        /// <summary>Filter Chain add-from-palette shuttle tip.</summary>
+        public const string AddSelectedFilter = "Add selected filter to Filter Chain";
 
-        /// <summary>Applied Filters remove-selected shuttle tip.</summary>
-        public const string RemoveSelectedFilter = "Remove selected filter from Applied Filters (Del)";
+        /// <summary>Filter Chain remove-selected shuttle tip.</summary>
+        public const string RemoveSelectedFilter = "Remove selected filter from Filter Chain (Del)";
 
-        /// <summary>Applied Filters clear-all shuttle tip.</summary>
-        public const string RemoveAllFilters = "Clear Applied Filters";
+        /// <summary>Filter Chain clear-all shuttle tip.</summary>
+        public const string RemoveAllFilters = "Clear Filter Chain";
 
-        /// <summary>Applied Filters move-up shuttle tip.</summary>
-        public const string MoveFilterUp = "Move selected filter up in Applied Filters (Ctrl+Up) — applies sooner";
+        /// <summary>Filter Chain move-up shuttle tip.</summary>
+        public const string MoveFilterUp = "Move selected filter up in Filter Chain (Ctrl+Up) — applies sooner";
 
-        /// <summary>Applied Filters move-down shuttle tip.</summary>
-        public const string MoveFilterDown = "Move selected filter down in Applied Filters (Ctrl+Down) — applies later";
+        /// <summary>Filter Chain move-down shuttle tip.</summary>
+        public const string MoveFilterDown = "Move selected filter down in Filter Chain (Ctrl+Down) — applies later";
 
-        /// <summary>Applied Filters Filter Options shuttle tip.</summary>
+        /// <summary>Filter Chain Filter Options shuttle tip.</summary>
         public const string FilterOptions =
             "Filter Options — name, Apply To target, and where the filter runs (whole / substring / token)";
 
-        /// <summary>Applied Filters / Filters menu: open Preset Manager (MFR7 PresetManager).</summary>
+        /// <summary>Filter Chain / Filters menu: open Preset Manager (MFR7 PresetManager).</summary>
         public const string Presets = "Show Preset Manager window";
 
-        /// <summary>Applied Filters / Filters menu: Save Preset dialog (upsert by name).</summary>
-        public const string SavePreset = "Save applied filters as a preset";
+        /// <summary>Filter Chain / Filters menu: Save Preset dialog (upsert by name).</summary>
+        public const string SavePreset = "Save Filter Chain as a preset";
 
-        /// <summary>Applied Filters toolbar ▾ quick-pick tip.</summary>
+        /// <summary>Filter Chain toolbar ▾ quick-pick tip.</summary>
         public const string PresetsQuickPick = "Load a preset";
 
         /// <summary>Filter Configuration title-bar reset tip (MFR7 Reset settings for this filter).</summary>

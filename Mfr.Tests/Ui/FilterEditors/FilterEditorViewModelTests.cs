@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
@@ -38,7 +38,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void SyncSelection_with_one_step_sets_title()
         {
             var editor = new FilterEditorViewModel();
-            var step = new AppliedFilterStepViewModel("Shrink Spaces", new ShrinkSpacesFilter());
+            var step = new FilterChainStepViewModel("Shrink Spaces", new ShrinkSpacesFilter());
 
             editor.SyncSelection([step]);
 
@@ -53,8 +53,8 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void SyncSelection_with_multi_select_uses_first_row()
         {
             var editor = new FilterEditorViewModel();
-            var first = new AppliedFilterStepViewModel("Shrink Spaces", new ShrinkSpacesFilter());
-            var second = new AppliedFilterStepViewModel("Letters Case", new LettersCaseFilter());
+            var first = new FilterChainStepViewModel("Shrink Spaces", new ShrinkSpacesFilter());
+            var second = new FilterChainStepViewModel("Letters Case", new LettersCaseFilter());
 
             editor.SyncSelection([first, second]);
 
@@ -102,7 +102,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void SyncSelection_copies_format_token_picker_expanded_onto_options_editor()
         {
             var editor = new FilterEditorViewModel { FormatTokenPickerExpanded = false };
-            var step = new AppliedFilterStepViewModel("Formatter", new FormatterFilter());
+            var step = new FilterChainStepViewModel("Formatter", new FormatterFilter());
 
             editor.SyncSelection([step]);
 
@@ -119,7 +119,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             ConfigStoreTestReset.LoadEmpty();
             var editor = new FilterEditorViewModel();
             editor.ApplySession(persistSession: true);
-            var step = new AppliedFilterStepViewModel("Formatter", new FormatterFilter());
+            var step = new FilterChainStepViewModel("Formatter", new FormatterFilter());
             editor.SyncSelection([step]);
 
             editor.OptionsEditor!.FormatTokenPickerExpanded = false;

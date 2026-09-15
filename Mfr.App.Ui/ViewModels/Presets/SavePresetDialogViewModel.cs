@@ -22,7 +22,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// </param>
         /// <param name="prefillFromLastLoaded">
         /// When <see langword="true"/> and <paramref name="lastLoaded"/> is set, Name / description /
-        /// columns start from that preset. Pass <see langword="false"/> when Applied Filters is empty
+        /// columns start from that preset. Pass <see langword="false"/> when Filter Chain is empty
         /// so the Name field starts blank.
         /// </param>
         public SavePresetDialogViewModel(

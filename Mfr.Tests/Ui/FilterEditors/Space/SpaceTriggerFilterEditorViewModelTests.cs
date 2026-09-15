@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.Filters.Space;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         [Fact]
         public void Space_after_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Space After", new SpaceAfterFilter());
+            var step = new FilterChainStepViewModel("Space After", new SpaceAfterFilter());
             var editor = new SpaceTriggerFilterEditorViewModel(step);
 
             Assert.Equal(",;!", editor.Chars);
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         [Fact]
         public void Space_around_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Space Around", new SpaceAroundFilter());
+            var step = new FilterChainStepViewModel("Space Around", new SpaceAroundFilter());
             var editor = new SpaceTriggerFilterEditorViewModel(step);
 
             Assert.Equal("-", editor.Chars);

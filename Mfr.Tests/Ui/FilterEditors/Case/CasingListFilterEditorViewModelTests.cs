@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.Filters.Case;
@@ -21,7 +21,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         [Fact]
         public void Casing_list_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Casing List", new CasingListFilter());
+            var step = new FilterChainStepViewModel("Casing List", new CasingListFilter());
             var editor = new CasingListFilterEditorViewModel(step);
 
             Assert.Equal(string.Empty, editor.WordsText);

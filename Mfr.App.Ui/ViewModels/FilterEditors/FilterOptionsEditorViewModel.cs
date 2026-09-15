@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors
@@ -42,7 +42,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// Initializes an options editor for one applied-filter step.
         /// </summary>
         /// <param name="step">Applied list row being edited.</param>
-        protected FilterOptionsEditorViewModel(AppliedFilterStepViewModel step)
+        protected FilterOptionsEditorViewModel(FilterChainStepViewModel step)
         {
             ArgumentNullException.ThrowIfNull(step);
             Step = step;
@@ -51,7 +51,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// <summary>
         /// Gets the applied list row being edited.
         /// </summary>
-        protected AppliedFilterStepViewModel Step { get; }
+        protected FilterChainStepViewModel Step { get; }
 
         /// <summary>
         /// Gets or sets whether the format-token picker catalog is expanded.

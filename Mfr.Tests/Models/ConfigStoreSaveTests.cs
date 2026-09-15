@@ -99,7 +99,7 @@ namespace Mfr.Tests.Models
                 {
                   "ui": {
                     "presets": {
-                      "confirmReplaceAppliedFiltersOnLoad": "true"
+                      "confirmReplaceFilterChainOnLoad": "true"
                     },
                     "confirmationPrompts": "more",
                     "doubleClickAddsToRenameList": "true",

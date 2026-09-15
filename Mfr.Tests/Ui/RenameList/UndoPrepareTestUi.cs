@@ -37,8 +37,8 @@ namespace Mfr.Tests.Ui.RenameList
             }
 
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(PrefixReplacer("alpha", "renamed"));
+            viewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            viewModel.FilterChainViewModel.Steps[0].SetFilter(PrefixReplacer("alpha", "renamed"));
             ConfigStore.Ui.SuppressedConfirmations =
             [
                 ConfirmationKind.GoWithPreviewErrors,

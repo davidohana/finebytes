@@ -26,7 +26,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Count_filter_numeric_box_updates_chain_options(string filterType)
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry(filterType));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry(filterType));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -40,12 +40,12 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             spinner.Value = 5;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
-            Assert.Equal(5, _CountOf(mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter));
+            Assert.Equal(5, _CountOf(mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter));
 
             spinner.Value = 0;
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
-            Assert.Equal(0, _CountOf(mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter));
+            Assert.Equal(0, _CountOf(mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter));
 
             window.Close();
         }
@@ -57,7 +57,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Visual_trim_helper_selection_updates_trim_left_count()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -79,7 +79,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Equal(4, _CountOf(mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter));
+            Assert.Equal(4, _CountOf(mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter));
             Assert.Equal(0, textBox.SelectionStart);
             Assert.Equal(4, textBox.SelectionEnd);
 
@@ -93,7 +93,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Count_spinner_updates_helper_text_selection()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -131,7 +131,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Visual_trim_helper_exposes_navigation_buttons()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

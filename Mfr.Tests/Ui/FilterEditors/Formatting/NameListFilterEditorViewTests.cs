@@ -30,7 +30,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Name_list_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("NameList"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("NameList"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -57,7 +57,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (NameListFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (NameListFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(["Alpha", "Beta"], filter.Options.Entries);
             Assert.Equal("pre_", filter.Options.Prefix);
             Assert.Equal("_suf", filter.Options.Suffix);
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Large_entries_stay_within_max_height()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("NameList"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("NameList"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -100,7 +100,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Entries_paste_budget_truncates_document()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("NameList"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("NameList"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

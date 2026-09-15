@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var (window, _, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
             var payload = new IndicesDragPayload([0]);
-            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.AppliedFiltersFormat);
+            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.FilterChainFormat);
 
             var firstItem = list.ContainerFromIndex(1) as ListBoxItem;
             Assert.NotNull(firstItem);
@@ -53,7 +53,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
             var payload = new IndicesDragPayload([0]);
-            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.AppliedFiltersFormat);
+            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.FilterChainFormat);
 
             var targetItem = list.ContainerFromIndex(1) as ListBoxItem;
             Assert.NotNull(targetItem);

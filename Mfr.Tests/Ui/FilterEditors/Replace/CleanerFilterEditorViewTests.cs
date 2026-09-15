@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
         public void Cleaner_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Cleaner"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Cleaner"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (CleanerFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (CleanerFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.False(filter.Options.RemoveIllegalChars);
             Assert.Equal("@#", filter.Options.CustomCharsToRemove);
             Assert.Equal("_", filter.Options.Replacement);

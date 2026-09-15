@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.Filters.Audio;
 using Mfr.Models.Tags;
@@ -16,7 +16,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Tag_remover_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Remover", new TagRemoverFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Remover", new TagRemoverFilter());
             var editor = new TagRemoverFilterEditorViewModel(step);
 
             Assert.True(editor.RemoveAll);
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Tag_remover_nuclear_sync_clears_leftover_block_checkboxes()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Audio Tag Remover",
                 new TagRemoverFilter(
                     Options: new TagRemoverOptions(All: true, Blocks: [AudioTagBlockKind.Id3v2, AudioTagBlockKind.Xiph])
@@ -87,7 +87,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Tag_remover_empty_selective_options_sync_as_noop()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Audio Tag Remover",
                 new TagRemoverFilter(Options: new TagRemoverOptions(All: false, Blocks: []))
             );
@@ -104,7 +104,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Tag_remover_block_rows_match_enum_catalog()
         {
-            var step = new AppliedFilterStepViewModel("Audio Tag Remover", new TagRemoverFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Remover", new TagRemoverFilter());
             var editor = new TagRemoverFilterEditorViewModel(step);
 
             Assert.Equal(Enum.GetValues<AudioTagBlockKind>(), editor.BlockRows.Select(row => row.Kind));

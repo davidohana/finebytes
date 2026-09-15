@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.Filters.Space;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         [Fact]
         public void Space_character_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
+            var step = new FilterChainStepViewModel("Space Character", new SpaceCharacterFilter());
             var editor = new SpaceCharacterFilterEditorViewModel(step);
 
             Assert.Equal(SpaceCharacterDefinition.Space, editor.Definition);
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         [Fact]
         public void Space_character_loads_non_default_options()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Space Character",
                 new SpaceCharacterFilter(
                     new FilePrefixTarget(),
@@ -76,7 +76,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         [Fact]
         public void Space_character_other_text_selects_other_definition()
         {
-            var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
+            var step = new FilterChainStepViewModel("Space Character", new SpaceCharacterFilter());
             var editor = new SpaceCharacterFilterEditorViewModel(step) { OtherCharacter = "." };
 
             Assert.Equal(SpaceCharacterDefinition.Other, editor.Definition);
@@ -89,7 +89,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         [Fact]
         public void Space_character_empty_other_persists_undefined_separator()
         {
-            var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
+            var step = new FilterChainStepViewModel("Space Character", new SpaceCharacterFilter());
             var editor = new SpaceCharacterFilterEditorViewModel(step) { Definition = SpaceCharacterDefinition.Other };
             Assert.Equal('\0', ((SpaceCharacterFilter)step.Filter).Options.SpaceCharacter);
 
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         [Fact]
         public void Space_character_other_text_keeps_last_character()
         {
-            var step = new AppliedFilterStepViewModel("Space Character", new SpaceCharacterFilter());
+            var step = new FilterChainStepViewModel("Space Character", new SpaceCharacterFilter());
             var editor = new SpaceCharacterFilterEditorViewModel(step) { OtherCharacter = "-." };
 
             Assert.Equal(".", editor.OtherCharacter);

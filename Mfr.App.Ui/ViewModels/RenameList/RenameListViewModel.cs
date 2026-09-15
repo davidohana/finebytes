@@ -3,8 +3,8 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.Collections;
 using Mfr.App.Ui.Services.Shell;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Models.Config;
 using Mfr.Models.RenameList;
 using EngineRenameList = Mfr.Engine.RenameList.RenameList;
@@ -17,7 +17,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel : ViewModelBase
     {
         private readonly FileListViewModel _fileListViewModel;
-        private readonly AppliedFiltersViewModel? _appliedFilters;
+        private readonly FilterChainViewModel? _filterChain;
         private readonly IFileShellOpener _shellOpener;
         private readonly EngineRenameList _renameList = new();
         private readonly List<RenameListEntry> _selectedEntries = [];
@@ -35,20 +35,20 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="shellOpener">
         /// Opens paths with the OS shell, or <see langword="null"/> to use the OS default.
         /// </param>
-        /// <param name="appliedFilters">
-        /// Applied Filters pane for Edit as Name List; when null, Edit as Name List is a no-op.
+        /// <param name="filterChain">
+        /// Filter Chain pane for Edit as Name List; when null, Edit as Name List is a no-op.
         /// </param>
         public RenameListViewModel(
             FileListViewModel fileListViewModel,
             IFileShellOpener? shellOpener = null,
-            AppliedFiltersViewModel? appliedFilters = null
+            FilterChainViewModel? filterChain = null
         )
         {
             ArgumentNullException.ThrowIfNull(fileListViewModel);
             _fileListViewModel = fileListViewModel;
             _shellOpener = shellOpener ?? FileShellOpener.CreateDefault();
-            _appliedFilters = appliedFilters;
-            appliedFilters?.ChainChanged += (_, _) => _NotifyRelevantColumnsCommandsChanged();
+            _filterChain = filterChain;
+            filterChain?.ChainChanged += (_, _) => _NotifyRelevantColumnsCommandsChanged();
 
             _fileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             _fileListViewModel.Entries.CollectionChanged += _OnFileListEntriesChanged;

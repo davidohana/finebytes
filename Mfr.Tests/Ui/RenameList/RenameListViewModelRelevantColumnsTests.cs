@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
@@ -26,8 +26,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void RelevantColumns_commands_disabled_when_chain_empty()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
 
             Assert.False(renameListViewModel.AddRelevantColumnsCommand.CanExecute(null));
             Assert.False(renameListViewModel.ReplaceWithRelevantColumnsCommand.CanExecute(null));
@@ -39,8 +39,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void RelevantColumns_commands_track_chain_count()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
 
             appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
@@ -59,8 +59,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_merges_missing_keys_at_end()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
             appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
@@ -94,8 +94,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_dedupes_already_visible_keys()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
             appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -127,8 +127,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ReplaceWithRelevantColumns_defaults_then_appends_relevant()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
             appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             renameListViewModel.SetVisibleColumns([
@@ -154,8 +154,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ReplaceWithRelevantColumns_empty_map_applies_defaults_only()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
             appliedFilters.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
 
             renameListViewModel.SetVisibleColumns([
@@ -176,8 +176,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_empty_map_is_noop()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
             appliedFilters.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
 
             var before = renameListViewModel.VisibleColumns.ToList();
@@ -196,8 +196,8 @@ namespace Mfr.Tests.Ui.RenameList
             var path = Path.Combine(dir, "tagged.wav");
             TaggedMinimalWav.WriteTagged(path, title: "RelevantTitle", album: null);
 
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(dir, appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: appliedFilters);
             await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
 
             appliedFilters.AddAndSelect(

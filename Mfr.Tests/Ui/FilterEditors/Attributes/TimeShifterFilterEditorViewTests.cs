@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         public void Time_shifter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TimeShifter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TimeShifter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -45,7 +45,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (TimeShifterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (TimeShifterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(TimestampField.Creation, filter.Options.TimestampField);
             Assert.Equal(-2, filter.Options.Amount);
             Assert.Equal(TimeShiftUnit.Hours, filter.Options.Unit);

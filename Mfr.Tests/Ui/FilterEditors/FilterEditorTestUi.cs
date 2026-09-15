@@ -3,7 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.MainWindow;
-using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.FilterChain;
 using Mfr.App.Ui.Views.FilterEditors;
 
 namespace Mfr.Tests.Ui.FilterEditors
@@ -30,17 +30,17 @@ namespace Mfr.Tests.Ui.FilterEditors
         ) ShowFilterEditorPanes(bool persistSession = false, FilterDefaultsStore? filterDefaults = null)
         {
             var mainViewModel = new MainWindowViewModel(persistSession: persistSession, filterDefaults: filterDefaults);
-            var appliedView = new AppliedFiltersView
+            var appliedView = new FilterChainView
             {
-                DataContext = mainViewModel.AppliedFiltersViewModel,
+                DataContext = mainViewModel.FilterChainViewModel,
                 AddFromPaletteCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
             };
             var editorView = new FilterEditorView
             {
                 DataContext = mainViewModel.FilterEditorViewModel,
-                ResetSelectedToDefaultsCommand = mainViewModel.AppliedFiltersViewModel.ResetSelectedToDefaultsCommand,
-                SaveSelectedAsDefaultCommand = mainViewModel.AppliedFiltersViewModel.SaveSelectedAsDefaultCommand,
-                OpenSelectedFilterHelpCommand = mainViewModel.AppliedFiltersViewModel.OpenSelectedFilterHelpCommand,
+                ResetSelectedToDefaultsCommand = mainViewModel.FilterChainViewModel.ResetSelectedToDefaultsCommand,
+                SaveSelectedAsDefaultCommand = mainViewModel.FilterChainViewModel.SaveSelectedAsDefaultCommand,
+                OpenSelectedFilterHelpCommand = mainViewModel.FilterChainViewModel.OpenSelectedFilterHelpCommand,
             };
 
             var grid = new Grid { RowDefinitions = new RowDefinitions("*,*"), Children = { appliedView, editorView } };

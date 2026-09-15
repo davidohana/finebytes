@@ -5,14 +5,14 @@ using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.MainWindow;
-using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.Views.FilterChain;
 
 namespace Mfr.Tests.Ui.AppliedFilters
 {
     /// <summary>
     /// Headless tests for the Applied Filters list UI.
     /// </summary>
-    public sealed class AppliedFiltersViewTests
+    public sealed class FilterChainViewTests
     {
         /// <summary>
         /// Verifies seeded steps render display name and catalog/Apply-To subtitle in the list.
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies clicking the row checkbox updates the step and <see cref="AppliedFiltersViewModel.ToChain"/>.
+        /// Verifies clicking the row checkbox updates the step and <see cref="FilterChainViewModel.ToChain"/>.
         /// </summary>
         [AvaloniaFact]
         public void Checkbox_click_toggles_enabled_on_step_and_chain()
@@ -65,7 +65,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Width = 480,
                 Height = 320,
                 DataContext = viewModel,
-                Content = new AppliedFiltersView { DataContext = viewModel.AppliedFiltersViewModel },
+                Content = new FilterChainView { DataContext = viewModel.FilterChainViewModel },
             };
 
             window.Show();
@@ -74,12 +74,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal(0, viewModel.FilterCount);
 
-            viewModel.AppliedFiltersViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.FilterChainViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(1, viewModel.FilterCount);
-            Assert.Equal(1, viewModel.AppliedFiltersViewModel.Count);
+            Assert.Equal(1, viewModel.FilterChainViewModel.Count);
 
             window.Close();
         }

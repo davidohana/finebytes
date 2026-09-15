@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Mfr.App.Ui.ViewModels;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.Models;
 using Mfr.Models.Config;
@@ -19,7 +19,7 @@ namespace Mfr.App.Ui.Views.Presets
     /// </summary>
     public partial class PresetManagerDialog : Window
     {
-        private readonly AppliedFiltersViewModel? _appliedFilters;
+        private readonly FilterChainViewModel? _filterChain;
         private readonly Func<Task>? _importSamplesAsync;
         private readonly Func<FilterPreset, Task<bool>>? _tryLoadAsync;
 
@@ -43,7 +43,7 @@ namespace Mfr.App.Ui.Views.Presets
         /// Initializes the dialog with list state and the shared host load path.
         /// </summary>
         /// <param name="viewModel">Ordered preset list and multi-selection.</param>
-        /// <param name="appliedFilters">Pane that mutates presets and the Applied Filters chain.</param>
+        /// <param name="filterChain">Pane that mutates presets and the Filter Chain.</param>
         /// <param name="tryLoadAsync">
         /// Shared load path (confirm → replace → optional columns). Returns <see langword="true"/> on success.
         /// </param>
@@ -52,18 +52,18 @@ namespace Mfr.App.Ui.Views.Presets
         /// </param>
         public PresetManagerDialog(
             PresetManagerDialogViewModel viewModel,
-            AppliedFiltersViewModel appliedFilters,
+            FilterChainViewModel filterChain,
             Func<FilterPreset, Task<bool>> tryLoadAsync,
             Func<Task>? importSamplesAsync = null
         )
             : this()
         {
             ArgumentNullException.ThrowIfNull(viewModel);
-            ArgumentNullException.ThrowIfNull(appliedFilters);
+            ArgumentNullException.ThrowIfNull(filterChain);
             ArgumentNullException.ThrowIfNull(tryLoadAsync);
 
             DataContext = viewModel;
-            _appliedFilters = appliedFilters;
+            _filterChain = filterChain;
             _tryLoadAsync = tryLoadAsync;
             _importSamplesAsync = importSamplesAsync ?? _ShowImportSamplesAsync;
         }
@@ -96,7 +96,7 @@ namespace Mfr.App.Ui.Views.Presets
         /// <returns>A task that completes after the import flow closes.</returns>
         private async Task _ShowImportSamplesAsync()
         {
-            if (_ViewModel is null || _appliedFilters is null)
+            if (_ViewModel is null || _filterChain is null)
             {
                 return;
             }
@@ -110,7 +110,7 @@ namespace Mfr.App.Ui.Views.Presets
 
             try
             {
-                var (AddedCount, SkippedCount) = _appliedFilters.ImportSamplePresets(dialogViewModel.SelectedNames());
+                var (AddedCount, SkippedCount) = _filterChain.ImportSamplePresets(dialogViewModel.SelectedNames());
                 _ViewModel.Refresh();
                 if (SkippedCount == 0)
                 {
@@ -166,7 +166,7 @@ namespace Mfr.App.Ui.Views.Presets
 
         private async void _OnDeleteClick(object? sender, RoutedEventArgs e)
         {
-            if (_ViewModel is not { HasSelection: true } || _appliedFilters is null)
+            if (_ViewModel is not { HasSelection: true } || _filterChain is null)
             {
                 return;
             }
@@ -184,7 +184,7 @@ namespace Mfr.App.Ui.Views.Presets
 
             try
             {
-                _appliedFilters.DeletePresets(names);
+                _filterChain.DeletePresets(names);
                 _ViewModel.Refresh();
             }
             catch (Exception ex)
@@ -216,7 +216,7 @@ namespace Mfr.App.Ui.Views.Presets
 
         private async void _OnRenameClick(object? sender, RoutedEventArgs e)
         {
-            if (_ViewModel is not { HasSingleSelection: true } || _appliedFilters is null)
+            if (_ViewModel is not { HasSingleSelection: true } || _filterChain is null)
             {
                 return;
             }
@@ -236,7 +236,7 @@ namespace Mfr.App.Ui.Views.Presets
 
             try
             {
-                var rename = _appliedFilters.RenamePreset(preset.Name, result);
+                var rename = _filterChain.RenamePreset(preset.Name, result);
                 switch (rename.Status)
                 {
                     case PresetRenameStatus.Unchanged:

@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.Filters.Case;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         [Fact]
         public void Capitalize_after_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Capitalize After", new CapitalizeAfterFilter());
+            var step = new FilterChainStepViewModel("Capitalize After", new CapitalizeAfterFilter());
             var editor = new CharacterListFilterEditorViewModel(step);
 
             Assert.Equal(",!()[]{};-", editor.Chars);
@@ -33,7 +33,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         [Fact]
         public void Sentence_end_characters_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Sentence End Characters", new SentenceEndCharactersFilter());
+            var step = new FilterChainStepViewModel("Sentence End Characters", new SentenceEndCharactersFilter());
             var editor = new CharacterListFilterEditorViewModel(step);
 
             Assert.Equal("-.!", editor.Chars);

@@ -28,7 +28,7 @@ namespace Mfr.App.Ui.Views.FilterEditors
             AvaloniaProperty.Register<FilterEditorView, ICommand?>(nameof(OpenSelectedFilterHelpCommand));
 
         /// <summary>
-        /// Gets or sets the command that restores the selected Applied Filters step to catalog defaults.
+        /// Gets or sets the command that restores the selected Filter Chain step to catalog defaults.
         /// </summary>
         public ICommand? ResetSelectedToDefaultsCommand
         {
@@ -46,7 +46,7 @@ namespace Mfr.App.Ui.Views.FilterEditors
         }
 
         /// <summary>
-        /// Gets or sets the command that opens Help for the selected Applied Filters step.
+        /// Gets or sets the command that opens Help for the selected Filter Chain step.
         /// </summary>
         public ICommand? OpenSelectedFilterHelpCommand
         {

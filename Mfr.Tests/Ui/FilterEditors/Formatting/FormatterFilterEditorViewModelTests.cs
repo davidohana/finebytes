@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         [Fact]
         public void Formatter_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Formatter", new FormatterFilter());
+            var step = new FilterChainStepViewModel("Formatter", new FormatterFilter());
             var editor = new FormatterFilterEditorViewModel(step);
 
             Assert.Equal(string.Empty, editor.Template);

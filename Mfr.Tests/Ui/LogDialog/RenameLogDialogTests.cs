@@ -238,7 +238,7 @@ namespace Mfr.Tests.Ui.LogDialog
 
             Assert.True(File.Exists(destination));
             Assert.False(File.Exists(source));
-            Assert.Empty(viewModel.AppliedFiltersViewModel.Steps);
+            Assert.Empty(viewModel.FilterChainViewModel.Steps);
             Assert.Contains("Prepared undo", viewModel.StatusHint.ToPlainText());
 
             await viewModel.GoCommand.ExecuteAsync(null).ConfigureAwait(true);

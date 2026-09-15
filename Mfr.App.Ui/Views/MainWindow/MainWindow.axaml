@@ -10,7 +10,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:filelistviews="using:Mfr.App.Ui.Views.FileList"
   xmlns:filterpaletteviews="using:Mfr.App.Ui.Views.FilterPalette"
-  xmlns:appliedfiltersviews="using:Mfr.App.Ui.Views.AppliedFilters"
+  xmlns:filterchainviews="using:Mfr.App.Ui.Views.FilterChain"
   xmlns:filtereditorsviews="using:Mfr.App.Ui.Views.FilterEditors"
   xmlns:renamelistviews="using:Mfr.App.Ui.Views.RenameList"
   xmlns:input="using:Mfr.App.Ui.Input"
@@ -462,14 +462,14 @@
         </MenuItem>
         <MenuItem
           Header="Remove Selected Filter"
-          Command="{Binding AppliedFiltersViewModel.RemoveSelectedCommand}"
+          Command="{Binding FilterChainViewModel.RemoveSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.RemoveSelectedFilterDelete}"
         >
           <MenuItem.Icon>
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/RemoveSelected.png" />
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem Header="Remove All Filters" Command="{Binding AppliedFiltersViewModel.ClearCommand}">
+        <MenuItem Header="Remove All Filters" Command="{Binding FilterChainViewModel.ClearCommand}">
           <MenuItem.Icon>
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/Clear.png" />
           </MenuItem.Icon>
@@ -477,7 +477,7 @@
         <Separator />
         <MenuItem
           Header="Move Filter Up"
-          Command="{Binding AppliedFiltersViewModel.MoveSelectedUpCommand}"
+          Command="{Binding FilterChainViewModel.MoveSelectedUpCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveFilterUp}"
         >
           <MenuItem.Icon>
@@ -486,7 +486,7 @@
         </MenuItem>
         <MenuItem
           Header="Move Filter Down"
-          Command="{Binding AppliedFiltersViewModel.MoveSelectedDownCommand}"
+          Command="{Binding FilterChainViewModel.MoveSelectedDownCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveFilterDown}"
         >
           <MenuItem.Icon>
@@ -496,7 +496,7 @@
         <Separator />
         <MenuItem Header="Presets" Click="_OnPresetsMenuClick" ToolTip.Tip="{x:Static resources:AppTips.Presets}">
           <MenuItem.Icon>
-            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/AppliedFilters/Presets.png" />
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/FilterChain/Presets.png" />
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
@@ -505,16 +505,16 @@
           ToolTip.Tip="{x:Static resources:AppTips.SavePreset}"
         >
           <MenuItem.Icon>
-            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/AppliedFilters/SavePreset.png" />
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/FilterChain/SavePreset.png" />
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
           Header="Filter Options"
           Click="_OnFilterOptionsMenuClick"
-          IsEnabled="{Binding AppliedFiltersViewModel.CanShowFilterOptions}"
+          IsEnabled="{Binding FilterChainViewModel.CanShowFilterOptions}"
         >
           <MenuItem.Icon>
-            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/AppliedFilters/FilterOptions.png" />
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/FilterChain/FilterOptions.png" />
           </MenuItem.Icon>
         </MenuItem>
       </MenuItem>
@@ -658,7 +658,7 @@
               Grid.Column="0"
               DataContext="{Binding FilterPaletteViewModel}"
               AddSelectedToAppliedCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AddSelectedFilterFromPaletteCommand}"
-              RemoveAppliedStepsCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel.RemoveStepsAtIndicesCommand}"
+              RemoveFilterChainStepsCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).FilterChainViewModel.RemoveStepsAtIndicesCommand}"
             />
             <controls:PaneSplitter
               x:Name="AvailableAppliedSplitter"
@@ -668,10 +668,10 @@
               HorizontalAlignment="Stretch"
               VerticalAlignment="Stretch"
             />
-            <appliedfiltersviews:AppliedFiltersView
-              x:Name="AppliedFiltersPane"
+            <filterchainviews:FilterChainView
+              x:Name="FilterChainPane"
               Grid.Column="2"
-              DataContext="{Binding AppliedFiltersViewModel}"
+              DataContext="{Binding FilterChainViewModel}"
               AddFromPaletteCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AddSelectedFilterFromPaletteCommand}"
             />
           </Grid>
@@ -686,9 +686,9 @@
           <filtereditorsviews:FilterEditorView
             Grid.Row="2"
             DataContext="{Binding FilterEditorViewModel}"
-            ResetSelectedToDefaultsCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel.ResetSelectedToDefaultsCommand}"
-            SaveSelectedAsDefaultCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel.SaveSelectedAsDefaultCommand}"
-            OpenSelectedFilterHelpCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).AppliedFiltersViewModel.OpenSelectedFilterHelpCommand}"
+            ResetSelectedToDefaultsCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).FilterChainViewModel.ResetSelectedToDefaultsCommand}"
+            SaveSelectedAsDefaultCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).FilterChainViewModel.SaveSelectedAsDefaultCommand}"
+            OpenSelectedFilterHelpCommand="{Binding #MainWindowRoot.((vm:MainWindowViewModel)DataContext).FilterChainViewModel.OpenSelectedFilterHelpCommand}"
           />
         </Grid>
       </Grid>

@@ -68,8 +68,8 @@ namespace Mfr.App.Ui.Views.FilterPalette
         private void _OnListDragOver(object? sender, DragEventArgs e)
         {
             if (
-                RemoveAppliedStepsCommand is null
-                || IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.AppliedFiltersFormat) is null
+                RemoveFilterChainStepsCommand is null
+                || IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.FilterChainFormat) is null
             )
             {
                 e.DragEffects = DragDropEffects.None;
@@ -82,11 +82,10 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _OnListDrop(object? sender, DragEventArgs e)
         {
-            var command = RemoveAppliedStepsCommand;
+            var command = RemoveFilterChainStepsCommand;
             if (
                 command is null
-                || IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.AppliedFiltersFormat)
-                    is not { } payload
+                || IndicesDragPayload.TryRead(e.DataTransfer, IndicesDragPayload.FilterChainFormat) is not { } payload
             )
             {
                 return;

@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Character_list_box_updates_chain_options(string filterType, string defaultChars, string editedChars)
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry(filterType));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry(filterType));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -38,7 +38,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             var actualChars = filter switch
             {
                 CapitalizeAfterFilter capitalizeAfter => capitalizeAfter.Options.CapitalizeAfterChars,

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Space;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Space
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public SpaceCharacterFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public SpaceCharacterFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {
             _SyncFromFilter();

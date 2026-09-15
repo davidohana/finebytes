@@ -135,7 +135,7 @@ namespace Mfr.Tests.Models
         public void Save_and_Load_round_trips_session_and_filter_default_in_one_file()
         {
             using var temp = ConfigStoreTempFile.CreateReady();
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearAppliedFilters];
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearFilterChain];
             ConfigStore.FileList = new FileListPrefs { FileMask = "*.flac" };
             ConfigStore.Save(temp.Path);
 
@@ -159,7 +159,7 @@ namespace Mfr.Tests.Models
             }
 
             ConfigStore.Load(temp.Path);
-            Assert.Equal([ConfirmationKind.ClearAppliedFilters], ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Equal([ConfirmationKind.ClearFilterChain], ConfigStore.Ui.SuppressedConfirmations);
             Assert.Equal("*.flac", ConfigStore.FileList?.FileMask);
             var reloaded = FilterDefaultsStore.FromConfigStore();
             Assert.True(reloaded.TryGetDefault("LettersCase", out var filter));

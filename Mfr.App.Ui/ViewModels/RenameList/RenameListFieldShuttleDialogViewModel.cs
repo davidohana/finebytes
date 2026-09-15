@@ -11,7 +11,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private readonly OrderedDraft<RenameListFieldKey, RenameListVisibleColumn> _columns;
         private readonly OrderedDraft<RenameListFieldKey, RenameListSortKey> _sortKeys;
         private readonly IReadOnlyList<RenameListFieldKey> _relevantFieldKeys;
-        private readonly bool _canUseAppliedFilters;
+        private readonly bool _canUseFilterChain;
         private bool _suppressSelectionSync;
         private bool _isAbModeEnabled;
 
@@ -24,7 +24,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="relevantFieldKeys">
         /// Snapshot of field keys inferred from the applied filter chain (may be empty).
         /// </param>
-        /// <param name="canUseAppliedFilters">
+        /// <param name="canUseFilterChain">
         /// When <see langword="true"/>, Add/Set columns from filters are enabled (non-empty chain).
         /// </param>
         /// <param name="abModeEnabled">
@@ -36,7 +36,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             IReadOnlyList<RenameListSortKey> sortKeys,
             RenameListFieldShuttleTab initialTab = RenameListFieldShuttleTab.Columns,
             IReadOnlyList<RenameListFieldKey>? relevantFieldKeys = null,
-            bool canUseAppliedFilters = false,
+            bool canUseFilterChain = false,
             bool abModeEnabled = false
         )
         {
@@ -47,7 +47,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _columns = new OrderedDraft<RenameListFieldKey, RenameListVisibleColumn>(columns, column => column.Key);
             _sortKeys = new OrderedDraft<RenameListFieldKey, RenameListSortKey>(sortKeys, key => key.FieldKey);
             _relevantFieldKeys = relevantFieldKeys ?? [];
-            _canUseAppliedFilters = canUseAppliedFilters;
+            _canUseFilterChain = canUseFilterChain;
             _isAbModeEnabled = abModeEnabled;
 
             Groups = _BuildGroups();
@@ -422,10 +422,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Merges applied-filter-relevant keys into the draft Selected fields list (missing keys only).
         /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanUseAppliedFilters))]
+        [RelayCommand(CanExecute = nameof(_CanUseFilterChain))]
         public void AddColumnsFromFilters()
         {
-            if (!_canUseAppliedFilters)
+            if (!_canUseFilterChain)
             {
                 return;
             }
@@ -447,10 +447,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Sets the draft Selected fields to catalog defaults, then appends remaining relevant keys.
         /// </summary>
-        [RelayCommand(CanExecute = nameof(_CanUseAppliedFilters))]
+        [RelayCommand(CanExecute = nameof(_CanUseFilterChain))]
         public void SetColumnsFromFilters()
         {
-            if (!_canUseAppliedFilters)
+            if (!_canUseFilterChain)
             {
                 return;
             }
@@ -638,9 +638,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return _sortKeys.HasItems;
         }
 
-        private bool _CanUseAppliedFilters()
+        private bool _CanUseFilterChain()
         {
-            return _canUseAppliedFilters;
+            return _canUseFilterChain;
         }
 
         private void _AddColumns(IEnumerable<RenameListFieldKey> keys)

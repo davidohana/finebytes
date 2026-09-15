@@ -4,8 +4,8 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
@@ -53,7 +53,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         )
         {
             PersistSession = persistSession;
-            AppliedFiltersViewModel = new AppliedFiltersViewModel(
+            FilterChainViewModel = new FilterChainViewModel(
                 filterDefaults ?? FilterDefaultsStore.CreateEmpty(),
                 presetManager ?? PresetManager.CreateEmpty()
             );
@@ -62,8 +62,8 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 initialPath: initialFileListPath,
                 deferInitialListing: persistSession
             );
-            RenameListViewModel = new RenameListViewModel(FileListViewModel, appliedFilters: AppliedFiltersViewModel);
-            AppliedFiltersViewModel.SetRenameListColumnSource(
+            RenameListViewModel = new RenameListViewModel(FileListViewModel, filterChain: FilterChainViewModel);
+            FilterChainViewModel.SetRenameListColumnSource(
                 RenameListViewModel.CaptureVisibleColumnSpecs,
                 RenameListViewModel.ApplyVisibleColumnSpecs
             );
@@ -86,16 +86,16 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             RenameListViewModel.MembershipChanged += _OnPreviewInputsChanged;
             RenameListViewModel.OriginalsRefreshed += _OnPreviewInputsChanged;
             RenameListViewModel.ManualOverridesChanged += _OnPreviewInputsChanged;
-            AppliedFiltersViewModel.PropertyChanged += _OnAppliedFiltersPropertyChanged;
-            AppliedFiltersViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
-            AppliedFiltersViewModel.ChainChanged += _OnPreviewInputsChanged;
+            FilterChainViewModel.PropertyChanged += _OnFilterChainPropertyChanged;
+            FilterChainViewModel.FilterOptionsApplied += _OnFilterOptionsApplied;
+            FilterChainViewModel.ChainChanged += _OnPreviewInputsChanged;
             FileListViewModel.PropertyChanged += _OnFileListPropertyChanged;
             FilterPaletteViewModel.PropertyChanged += _OnFilterPalettePropertyChanged;
             // File List may set LastStatusMessage during construction (e.g. remembered folder fallback)
             // before this handler was wired — seed the bar once.
             _ApplyStatusHintIfPresent(FileListViewModel.LastStatusMessage);
             ItemCount = RenameListViewModel.ItemCount;
-            FilterCount = AppliedFiltersViewModel.Count;
+            FilterCount = FilterChainViewModel.Count;
             ChangeCount = RenameListViewModel.ChangeCount;
             PreviewErrorCount = RenameListViewModel.PreviewErrorCount;
             WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
@@ -122,9 +122,9 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         public FilterPaletteViewModel FilterPaletteViewModel { get; } = new FilterPaletteViewModel();
 
         /// <summary>
-        /// Gets the Applied Filters pane.
+        /// Gets the Filter Chain pane.
         /// </summary>
-        public AppliedFiltersViewModel AppliedFiltersViewModel { get; }
+        public FilterChainViewModel FilterChainViewModel { get; }
 
         /// <summary>
         /// Gets the Filter Configuration pane.
@@ -149,7 +149,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         private int _itemCount;
 
         /// <summary>
-        /// Count of applied filters.
+        /// Count of Filter Chain.
         /// </summary>
         [ObservableProperty]
         private int _filterCount;
@@ -206,7 +206,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 return;
             }
 
-            AppliedFiltersViewModel.AppendCommand.Execute(entry);
+            FilterChainViewModel.AppendCommand.Execute(entry);
         }
 
         /// <summary>
@@ -224,9 +224,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 return;
             }
 
-            var commitStarted = await RenameListViewModel
-                .GoAsync(AppliedFiltersViewModel.ToChain())
-                .ConfigureAwait(true);
+            var commitStarted = await RenameListViewModel.GoAsync(FilterChainViewModel.ToChain()).ConfigureAwait(true);
             if (!commitStarted)
             {
                 return;
@@ -396,21 +394,21 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             }
         }
 
-        private void _OnAppliedFiltersPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void _OnFilterChainPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is nameof(AppliedFiltersViewModel.Count))
+            if (e.PropertyName is nameof(FilterChainViewModel.Count))
             {
-                FilterCount = AppliedFiltersViewModel.Count;
+                FilterCount = FilterChainViewModel.Count;
             }
 
-            if (e.PropertyName is nameof(AppliedFiltersViewModel.SelectedSteps))
+            if (e.PropertyName is nameof(FilterChainViewModel.SelectedSteps))
             {
-                FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
+                FilterEditorViewModel.SyncSelection(FilterChainViewModel.SelectedSteps);
             }
 
-            if (e.PropertyName is nameof(AppliedFiltersViewModel.LastStatusMessage))
+            if (e.PropertyName is nameof(FilterChainViewModel.LastStatusMessage))
             {
-                _ApplyStatusHintIfPresent(AppliedFiltersViewModel.LastStatusMessage);
+                _ApplyStatusHintIfPresent(FilterChainViewModel.LastStatusMessage);
             }
         }
 
@@ -424,7 +422,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
 
         private void _OnFilterOptionsApplied(object? sender, EventArgs e)
         {
-            FilterEditorViewModel.SyncSelection(AppliedFiltersViewModel.SelectedSteps);
+            FilterEditorViewModel.SyncSelection(FilterChainViewModel.SelectedSteps);
         }
 
         /// <summary>
@@ -470,7 +468,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Applies the live Applied Filters chain until the queue is idle or Auto-Preview turns off.
+        /// Applies the live Filter Chain until the queue is idle or Auto-Preview turns off.
         /// </summary>
         private async Task _DrainPreviewAsync()
         {
@@ -490,7 +488,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                     }
 
                     _previewDirty = false;
-                    await RenameListViewModel.PreviewAsync(AppliedFiltersViewModel.ToChain()).ConfigureAwait(true);
+                    await RenameListViewModel.PreviewAsync(FilterChainViewModel.ToChain()).ConfigureAwait(true);
                 }
             }
             finally
@@ -526,7 +524,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// <summary>
         /// Applies a non-empty pane status to the status-bar hint (last write wins).
         /// </summary>
-        /// <param name="message">Status published by Applied Filters or File List.</param>
+        /// <param name="message">Status published by Filter Chain or File List.</param>
         /// <remarks>
         /// Empty is ignored so producers can reset their property without wiping the bar.
         /// Rename List assigns <see cref="StatusHint"/> directly (including Empty) so Clear can wipe.

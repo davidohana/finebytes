@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Audio;
 using Mfr.Models.Tags;
 
@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public TagRemoverFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public TagRemoverFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {
             BlockRows =

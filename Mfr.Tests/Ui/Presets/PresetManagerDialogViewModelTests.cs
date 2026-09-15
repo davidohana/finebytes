@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.Presets;
 
 namespace Mfr.Tests.Ui.Presets
@@ -157,7 +157,7 @@ namespace Mfr.Tests.Ui.Presets
                 );
             }
 
-            return (manager, new PresetManagerDialogViewModel(new AppliedFiltersViewModel(presetManager: manager)));
+            return (manager, new PresetManagerDialogViewModel(new FilterChainViewModel(presetManager: manager)));
         }
     }
 }

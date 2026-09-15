@@ -1,5 +1,5 @@
 using Avalonia.Headless.XUnit;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.Filters;
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             foreach (var entry in FilterCatalog.Entries)
             {
                 var filter = FilterCatalog.CreateDefault(entry);
-                var step = new AppliedFilterStepViewModel(entry.DisplayName, filter);
+                var step = new FilterChainStepViewModel(entry.DisplayName, filter);
                 var editor = FilterOptionsEditorFactory.Create(step);
                 var expectsEditor = !OptionlessTypes.Contains(entry.Type);
 
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             foreach (var entry in FilterCatalog.Entries.Where(e => !OptionlessTypes.Contains(e.Type)))
             {
                 var filter = FilterCatalog.CreateDefault(entry);
-                var step = new AppliedFilterStepViewModel(entry.DisplayName, filter);
+                var step = new FilterChainStepViewModel(entry.DisplayName, filter);
                 var editor = FilterOptionsEditorFactory.Create(step);
                 Assert.NotNull(editor);
 

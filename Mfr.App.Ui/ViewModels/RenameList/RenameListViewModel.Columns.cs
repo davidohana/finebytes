@@ -382,7 +382,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanApplyRelevantColumns()
         {
-            return !IsBusy && _appliedFilters is not null && _appliedFilters.Count > 0;
+            return !IsBusy && _filterChain is not null && _filterChain.Count > 0;
         }
 
         /// <summary>
@@ -401,12 +401,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         internal IReadOnlyList<RenameListFieldKey> CollectRelevantFieldKeys()
         {
-            if (_appliedFilters is null || _appliedFilters.Count == 0)
+            if (_filterChain is null || _filterChain.Count == 0)
             {
                 return [];
             }
 
-            var filters = _appliedFilters.Steps.Select(step => step.Filter);
+            var filters = _filterChain.Steps.Select(step => step.Filter);
             return FilterRelevantRenameListColumns.Collect(filters);
         }
 

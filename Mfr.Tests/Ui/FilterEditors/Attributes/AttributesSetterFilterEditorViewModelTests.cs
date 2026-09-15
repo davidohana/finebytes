@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
 using Mfr.Filters.Attributes;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Attributes_setter_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Attributes Setter", new AttributesSetterFilter());
+            var step = new FilterChainStepViewModel("Attributes Setter", new AttributesSetterFilter());
             var editor = new AttributesSetterFilterEditorViewModel(step);
 
             Assert.Equal(AttributeTriState.Keep, editor.ReadOnly);

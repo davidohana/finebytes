@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_after_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceAfter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceAfter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -41,7 +41,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (SpaceAfterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (SpaceAfterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(".,", filter.Options.AfterChars);
             Assert.False(filter.Options.OnlyWhenNextIsLetterOrDigit);
 
@@ -55,7 +55,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_around_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceAround"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceAround"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -74,7 +74,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (SpaceAroundFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (SpaceAroundFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal("+=", filter.Options.AroundChars);
             Assert.False(filter.Options.OnlyWhenNeighboringAreLettersOrDigits);
 

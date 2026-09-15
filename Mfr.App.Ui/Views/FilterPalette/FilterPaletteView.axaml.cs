@@ -13,13 +13,13 @@ namespace Mfr.App.Ui.Views.FilterPalette
     public partial class FilterPaletteView : UserControl
     {
         /// <summary>
-        /// Applied Filters append command, set by the main window shell.
+        /// Filter Chain append command, set by the main window shell.
         /// </summary>
         public static readonly StyledProperty<ICommand?> AddSelectedToAppliedCommandProperty =
             AvaloniaProperty.Register<FilterPaletteView, ICommand?>(nameof(AddSelectedToAppliedCommand));
 
         /// <summary>
-        /// Gets or sets the command that appends the selected catalog row to Applied Filters.
+        /// Gets or sets the command that appends the selected catalog row to Filter Chain.
         /// </summary>
         public ICommand? AddSelectedToAppliedCommand
         {
@@ -28,20 +28,18 @@ namespace Mfr.App.Ui.Views.FilterPalette
         }
 
         /// <summary>
-        /// Applied Filters remove-by-index command, set by the main window shell.
+        /// Filter Chain remove-by-index command, set by the main window shell.
         /// </summary>
-        public static readonly StyledProperty<ICommand?> RemoveAppliedStepsCommandProperty = AvaloniaProperty.Register<
-            FilterPaletteView,
-            ICommand?
-        >(nameof(RemoveAppliedStepsCommand));
+        public static readonly StyledProperty<ICommand?> RemoveFilterChainStepsCommandProperty =
+            AvaloniaProperty.Register<FilterPaletteView, ICommand?>(nameof(RemoveFilterChainStepsCommand));
 
         /// <summary>
         /// Gets or sets the command that removes applied steps dragged back to Available Filters.
         /// </summary>
-        public ICommand? RemoveAppliedStepsCommand
+        public ICommand? RemoveFilterChainStepsCommand
         {
-            get => GetValue(RemoveAppliedStepsCommandProperty);
-            set => SetValue(RemoveAppliedStepsCommandProperty, value);
+            get => GetValue(RemoveFilterChainStepsCommandProperty);
+            set => SetValue(RemoveFilterChainStepsCommandProperty, value);
         }
 
         /// <summary>

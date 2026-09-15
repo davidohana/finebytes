@@ -551,7 +551,7 @@ namespace Mfr.Tests.Ui.RenameList
                 RenameListVisibleColumn.CreateDefaults(),
                 RenameListSortKey.DefaultKeys,
                 relevantFieldKeys: [],
-                canUseAppliedFilters: false
+                canUseFilterChain: false
             );
 
             Assert.False(dialogVm.AddColumnsFromFiltersCommand.CanExecute(null));
@@ -567,7 +567,7 @@ namespace Mfr.Tests.Ui.RenameList
                 RenameListVisibleColumn.CreateDefaults(),
                 RenameListSortKey.DefaultKeys,
                 relevantFieldKeys: [nameKey, namePreview],
-                canUseAppliedFilters: true
+                canUseFilterChain: true
             );
 
             Assert.True(dialogVm.AddColumnsFromFiltersCommand.CanExecute(null));
@@ -595,7 +595,7 @@ namespace Mfr.Tests.Ui.RenameList
                 onlyName,
                 RenameListSortKey.DefaultKeys,
                 relevantFieldKeys: [titleKey],
-                canUseAppliedFilters: true
+                canUseFilterChain: true
             );
 
             dialogVm.SetColumnsFromFiltersCommand.Execute(null);
@@ -706,7 +706,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ],
                 [],
                 relevantFieldKeys: [nameKey, namePreview],
-                canUseAppliedFilters: true,
+                canUseFilterChain: true,
                 abModeEnabled: true
             );
 
@@ -729,7 +729,7 @@ namespace Mfr.Tests.Ui.RenameList
                 ],
                 [],
                 relevantFieldKeys: [nameKey, namePreview],
-                canUseAppliedFilters: true,
+                canUseFilterChain: true,
                 abModeEnabled: true
             );
 

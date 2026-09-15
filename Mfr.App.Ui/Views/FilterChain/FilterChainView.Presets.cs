@@ -247,7 +247,7 @@ namespace Mfr.App.Ui.Views.FilterChain
                     owner,
                     title: "Replace Filter Chain",
                     message: "Loading this preset will replace the current Filter Chain. Continue?",
-                    kind: ConfirmationKind.ReplaceAppliedFiltersOnLoad
+                    kind: ConfirmationKind.ReplaceFilterChainOnLoad
                 )
                 .ConfigureAwait(true);
         }

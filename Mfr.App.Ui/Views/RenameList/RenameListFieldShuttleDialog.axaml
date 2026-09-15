@@ -355,7 +355,7 @@
                 Margin="0"
                 MinHeight="0"
                 VerticalAlignment="Center"
-                Text="From applied filters:"
+                Text="From Filter Chain:"
               />
               <Button
                 Classes="message-dialog-footer"

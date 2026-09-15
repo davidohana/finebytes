@@ -7,16 +7,16 @@ namespace Mfr.App.Ui.Views.DragAndDrop
     /// </summary>
     /// <param name="SourceIndices">Selected row indices when the drag started.</param>
     /// <remarks>
-    /// Applied Filters and Preset Manager share this shape but use distinct
+    /// Filter Chain and Preset Manager share this shape but use distinct
     /// <see cref="DataFormat{T}"/> values so cross-pane drops do not match.
     /// </remarks>
     internal sealed record IndicesDragPayload(IReadOnlyList<int> SourceIndices)
     {
         /// <summary>
-        /// Avalonia data format for Applied Filters reorder (and Palette remove-drop).
+        /// Avalonia data format for Filter Chain reorder (and Palette remove-drop).
         /// </summary>
-        public static readonly DataFormat<string> AppliedFiltersFormat = JsonDragPayload.CreateFormat(
-            "Mfr.AppliedFilterDragPayload"
+        public static readonly DataFormat<string> FilterChainFormat = JsonDragPayload.CreateFormat(
+            "Mfr.FilterChainDragPayload"
         );
 
         /// <summary>

@@ -4,9 +4,9 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
-using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.Views.Controls;
+using Mfr.App.Ui.Views.FilterChain;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Fixed_apply_to_row_shows_label_and_hides_editable_targets()
         {
-            var step = new AppliedFilterStepViewModel("Attributes Setter", new AttributesSetterFilter());
+            var step = new FilterChainStepViewModel("Attributes Setter", new AttributesSetterFilter());
             var viewModel = new FilterOptionsDialogViewModel(step);
             var dialog = new FilterOptionsDialog(viewModel);
             dialog.Show();
@@ -217,7 +217,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Target_parameter_rows_follow_selected_apply_to()
         {
-            var step = new AppliedFilterStepViewModel("Fix Leading 0's", new ShrinkSpacesFilter());
+            var step = new FilterChainStepViewModel("Fix Leading 0's", new ShrinkSpacesFilter());
             var viewModel = new FilterOptionsDialogViewModel(step);
             var pathGroup = FilterTargetCatalog.Groups.First(group => group.Label == "Path");
             var ancestorOption = pathGroup.Targets.First(option => option.Prototype is AncestorFolderTarget);
@@ -290,7 +290,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Id3v2_multi_instance_fields_load_from_filter()
         {
             var filter = new FormatterFilter(new Id3v2FrameTarget("COMM", "eng", "Primary"), new FormatterOptions("x"));
-            var step = new AppliedFilterStepViewModel("Formatter", filter);
+            var step = new FilterChainStepViewModel("Formatter", filter);
             var viewModel = new FilterOptionsDialogViewModel(step);
             var dialog = new FilterOptionsDialog(viewModel);
             dialog.Show();
@@ -387,7 +387,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
         private static FilterOptionsDialog _Show(FilterApplyScopeMode scopeMode)
         {
-            var step = new AppliedFilterStepViewModel("Fix Leading 0's", new ShrinkSpacesFilter());
+            var step = new FilterChainStepViewModel("Fix Leading 0's", new ShrinkSpacesFilter());
             var viewModel = new FilterOptionsDialogViewModel(step) { ScopeMode = scopeMode };
             var dialog = new FilterOptionsDialog(viewModel);
             dialog.Show();

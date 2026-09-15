@@ -27,7 +27,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Audio_tag_setter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -44,7 +44,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(titleCheck.IsChecked);
-            var filter = (AudioTagSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (AudioTagSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.NotNull(filter.Options.Title);
             Assert.Equal("<file-name>", filter.Options.Title.Text);
             Assert.False(filter.Options.Title.OnlyIfEmpty);
@@ -53,7 +53,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            filter = (AudioTagSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (AudioTagSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.NotNull(filter.Options.Title);
             Assert.True(filter.Options.Title.OnlyIfEmpty);
 
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(trackCheck.IsChecked);
-            filter = (AudioTagSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (AudioTagSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.NotNull(filter.Options.Track);
             Assert.Equal("1", filter.Options.Track.Text);
             Assert.False(filter.Options.TrackAutoIncrement);
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(genreCheck.IsChecked);
-            filter = (AudioTagSetterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (AudioTagSetterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.NotNull(filter.Options.Genre);
             Assert.Equal("Jazz", filter.Options.Genre.Text);
 
@@ -99,7 +99,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Audio_tag_setter_value_fields_align_vertically()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -128,7 +128,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Audio_tag_setter_label_click_toggles_field_checkbox()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

@@ -92,7 +92,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 _viewModel.SortKeys,
                 tab,
                 relevantFieldKeys: _viewModel.CollectRelevantFieldKeysForApply(),
-                canUseAppliedFilters: _viewModel.CanApplyRelevantColumns,
+                canUseFilterChain: _viewModel.CanApplyRelevantColumns,
                 abModeEnabled: _viewModel.IsAbModeEnabled
             );
             var dialog = new RenameListFieldShuttleDialog(dialogVm);
@@ -203,7 +203,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             return await _ConfirmMessageAsync(
                     title: "Undo",
-                    message: "This will prepare a Rename List with this undo session and clear Applied Filters. Press GO to apply it.",
+                    message: "This will prepare a Rename List with this undo session and clear the Filter Chain. Press GO to apply it.",
                     kind: ConfirmationKind.UndoRename
                 )
                 .ConfigureAwait(true);

@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
@@ -8,10 +8,10 @@ using Mfr.Models.RenameList.Fields.Basic;
 namespace Mfr.Tests.Ui.AppliedFilters
 {
     /// <summary>
-    /// Tests Applied Filters stack commands and <see cref="AppliedFiltersViewModel.ToChain"/>.
+    /// Tests Applied Filters stack commands and <see cref="FilterChainViewModel.ToChain"/>.
     /// </summary>
     [Collection(ConfigStoreCollection.Name)]
-    public sealed class AppliedFiltersViewModelTests
+    public sealed class FilterChainViewModelTests
     {
         /// <summary>
         /// Verifies add creates an enabled step with catalog defaults and combined subtitle.
@@ -19,7 +19,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Add_Creates_Enabled_Step_With_Defaults()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             var entry = AppliedFiltersTestUi.Entry("ShrinkSpaces");
 
             viewModel.AddCommand.Execute(entry);
@@ -41,7 +41,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void AddAndSelect_appends_concrete_filter_and_selects()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([viewModel.Steps[0]]);
 
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void AddAndSelect_appends_star_until_display_name_unique()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddAndSelect(
                 new NameListFilter(new FilePrefixTarget(), new NameListOptions(Entries: ["a"])),
                 "Title List"
@@ -88,7 +88,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Add_Duplicate_Types_Get_Numbered_Display_Names()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             var entry = AppliedFiltersTestUi.Entry("LettersCase");
 
             viewModel.AddCommand.Execute(entry);
@@ -104,7 +104,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Add_Inserts_Before_First_Selected_Row()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             var shrinkSpaces = AppliedFiltersTestUi.Entry("ShrinkSpaces");
             var lettersCase = AppliedFiltersTestUi.Entry("LettersCase");
 
@@ -128,7 +128,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void RemoveSelected_Removes_Selection_And_Keeps_Neighbor()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -147,11 +147,11 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public async Task Clear_Removes_All_Steps()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
-            ConfirmationPolicy.Suppress(ConfirmationKind.ClearAppliedFilters);
+            ConfirmationPolicy.Suppress(ConfirmationKind.ClearFilterChain);
             await viewModel.ClearCommand.ExecuteAsync(null);
 
             Assert.Empty(viewModel.Steps);
@@ -160,12 +160,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Check All enables every step and raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// Verifies Check All enables every step and raises <see cref="FilterChainViewModel.ChainChanged"/> once.
         /// </summary>
         [Fact]
         public void CheckAllFilters_Enables_All_With_Single_ChainChanged()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -180,12 +180,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Uncheck All disables every step and raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// Verifies Uncheck All disables every step and raises <see cref="FilterChainViewModel.ChainChanged"/> once.
         /// </summary>
         [Fact]
         public void UncheckAllFilters_Disables_All_With_Single_ChainChanged()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -198,12 +198,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Invert Check flips each enabled flag and raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// Verifies Invert Check flips each enabled flag and raises <see cref="FilterChainViewModel.ChainChanged"/> once.
         /// </summary>
         [Fact]
         public void InvertCheck_Flips_Each_Enabled_With_Single_ChainChanged()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -222,7 +222,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void RemoveAllButSelected_Keeps_Selection()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -239,12 +239,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Remove All But Selected raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// Verifies Remove All But Selected raises <see cref="FilterChainViewModel.ChainChanged"/> once.
         /// </summary>
         [Fact]
         public void RemoveAllButSelected_Raises_ChainChanged_Once()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -264,7 +264,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void RemoveAllButSelected_CanExecute_Requires_Partial_Selection()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             Assert.False(viewModel.RemoveAllButSelectedCommand.CanExecute(null));
 
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
@@ -286,7 +286,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void MoveSelected_Reorders_Steps()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -304,12 +304,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies enabled flags and filters round-trip through <see cref="AppliedFiltersViewModel.ToChain"/>.
+        /// Verifies enabled flags and filters round-trip through <see cref="FilterChainViewModel.ToChain"/>.
         /// </summary>
         [Fact]
         public void ToChain_Matches_Steps()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -332,7 +332,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ApplyToLabel_Shows_Audio_Tags_For_Tag_Remover()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
 
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
 
@@ -348,7 +348,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void SetDisplayName_keeps_catalog_type_in_subtitle()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             var step = viewModel.Steps[0];
 
@@ -366,7 +366,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void CanShowFilterOptions_requires_single_selection()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
@@ -385,7 +385,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void Append_Adds_At_End_Even_With_Selection()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             var shrinkSpaces = AppliedFiltersTestUi.Entry("ShrinkSpaces");
             var lettersCase = AppliedFiltersTestUi.Entry("LettersCase");
 
@@ -403,7 +403,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ResetSelectedToDefaults_restores_options_keeps_name_and_enabled()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             var step = viewModel.Steps[0];
             step.SetDisplayName("My Letters");
@@ -436,7 +436,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ResetSelectedToDefaults_noop_when_already_default()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             var filterBefore = viewModel.Steps[0].Filter;
 
@@ -458,7 +458,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ResetSelectedToDefaults_noop_after_setup_when_already_default()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             var filterBefore = viewModel.Steps[0].Filter;
             filterBefore.Setup();
@@ -481,7 +481,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ResetSelectedToDefaults_disabled_for_multi_select()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
@@ -503,7 +503,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             {
                 ConfigStore.Load(configPath);
                 var store = FilterDefaultsStore.CreateEmpty();
-                var viewModel = new AppliedFiltersViewModel(store);
+                var viewModel = new FilterChainViewModel(store);
                 viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
                 var customized = new LettersCaseFilter(
                     new FileExtensionTarget(),
@@ -554,7 +554,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                     )
                 );
 
-                var viewModel = new AppliedFiltersViewModel(store);
+                var viewModel = new FilterChainViewModel(store);
                 viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
                 Assert.Equal(LettersCaseMode.UpperCase, ((LettersCaseFilter)viewModel.Steps[0].Filter).Options.Mode);
 
@@ -578,7 +578,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void MoveStepsTo_reorders_selected_block()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -601,7 +601,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void InsertFromCatalogAt_inserts_at_index_and_selects_new_steps()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
 
@@ -625,7 +625,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void RemoveStepsAtIndices_removes_rows_and_selects_neighbor()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -639,12 +639,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies inserting several catalog rows raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// Verifies inserting several catalog rows raises <see cref="FilterChainViewModel.ChainChanged"/> once.
         /// </summary>
         [Fact]
         public void InsertFromCatalogAt_raises_chain_changed_once()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             var count = _CountChainChanged(
                 viewModel,
                 () =>
@@ -658,12 +658,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies removing several steps raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// Verifies removing several steps raises <see cref="FilterChainViewModel.ChainChanged"/> once.
         /// </summary>
         [Fact]
         public void RemoveStepsAtIndices_raises_chain_changed_once()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -675,12 +675,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies a drag-reorder raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// Verifies a drag-reorder raises <see cref="FilterChainViewModel.ChainChanged"/> once.
         /// </summary>
         [Fact]
         public void MoveStepsTo_raises_chain_changed_once()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -691,12 +691,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies a neighbor-swap move raises <see cref="AppliedFiltersViewModel.ChainChanged"/> once.
+        /// Verifies a neighbor-swap move raises <see cref="FilterChainViewModel.ChainChanged"/> once.
         /// </summary>
         [Fact]
         public void MoveSelectedUp_raises_chain_changed_once()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
@@ -708,12 +708,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies renaming a step does not raise <see cref="AppliedFiltersViewModel.ChainChanged"/>.
+        /// Verifies renaming a step does not raise <see cref="FilterChainViewModel.ChainChanged"/>.
         /// </summary>
         [Fact]
         public void SetDisplayName_does_not_raise_chain_changed()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
             var count = _CountChainChanged(viewModel, () => viewModel.Steps[0].SetDisplayName("Custom"));
@@ -727,12 +727,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void LastLoaded_Is_Null_Initially()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             Assert.Null(viewModel.LastLoaded);
         }
 
         /// <summary>
-        /// Verifies <see cref="AppliedFiltersViewModel.SetLastLoaded"/> records and clears last-loaded.
+        /// Verifies <see cref="FilterChainViewModel.SetLastLoaded"/> records and clears last-loaded.
         /// </summary>
         [Fact]
         public void SetLastLoaded_Records_And_Clears()
@@ -745,7 +745,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(preset);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
 
             viewModel.SetLastLoaded(preset);
             Assert.Same(preset, viewModel.LastLoaded);
@@ -755,15 +755,15 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies <see cref="AppliedFiltersViewModel.ReplaceFromChain"/> rebuilds steps, copies enabled flags,
+        /// Verifies <see cref="FilterChainViewModel.ReplaceFromChain"/> rebuilds steps, copies enabled flags,
         /// uses catalog display names when step names are omitted, selects the first step, raises
-        /// <see cref="AppliedFiltersViewModel.ChainChanged"/> once, and does not set
-        /// <see cref="AppliedFiltersViewModel.LastLoaded"/> (preset load sets last-loaded after replace).
+        /// <see cref="FilterChainViewModel.ChainChanged"/> once, and does not set
+        /// <see cref="FilterChainViewModel.LastLoaded"/> (preset load sets last-loaded after replace).
         /// </summary>
         [Fact]
         public void ReplaceFromChain_Rebuilds_With_Catalog_Names_And_Single_ChainChanged()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             viewModel.Steps[0].SetDisplayName("Custom Label");
 
@@ -796,12 +796,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
         /// <summary>
         /// Verifies stored <see cref="FilterChainStep.Name"/> values replace catalog labels on load and round-trip
-        /// through <see cref="AppliedFiltersViewModel.ToChain"/>.
+        /// through <see cref="FilterChainViewModel.ToChain"/>.
         /// </summary>
         [Fact]
         public void ReplaceFromChain_Uses_Stored_Step_Names()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             var chain = new FilterChain
             {
                 Steps =
@@ -823,7 +823,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void ReplaceFromChain_Empty_Clears_Stack()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
             var count = _CountChainChanged(viewModel, () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] }));
@@ -834,23 +834,23 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies empty-to-empty replace is a no-op for <see cref="AppliedFiltersViewModel.ChainChanged"/>.
+        /// Verifies empty-to-empty replace is a no-op for <see cref="FilterChainViewModel.ChainChanged"/>.
         /// </summary>
         [Fact]
         public void ReplaceFromChain_Empty_When_Already_Empty_Raises_No_ChainChanged()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             var count = _CountChainChanged(viewModel, () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] }));
             Assert.Equal(0, count);
         }
 
         /// <summary>
-        /// Verifies replaced steps no longer raise <see cref="AppliedFiltersViewModel.ChainChanged"/> after detach.
+        /// Verifies replaced steps no longer raise <see cref="FilterChainViewModel.ChainChanged"/> after detach.
         /// </summary>
         [Fact]
         public void ReplaceFromChain_Detaches_Old_Step_Handlers()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             var oldStep = viewModel.Steps[0];
 
@@ -869,7 +869,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void SavePreset_Creates_Preset_And_Sets_LastLoaded()
         {
             var manager = PresetManager.CreateEmpty();
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
             Assert.Null(viewModel.LastLoaded);
@@ -905,7 +905,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 VisibleColumns = null,
             };
             manager.Upsert(existing);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             var columns = new List<RenameListVisibleColumnSpec>
             {
@@ -935,7 +935,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void SavePreset_Rejects_Blank_Name()
         {
             var manager = PresetManager.CreateEmpty();
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
 
             Assert.Null(viewModel.SavePreset("   ", description: null, visibleColumns: null));
             Assert.Empty(manager.NameToPreset);
@@ -953,7 +953,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var sampleNames = SamplePresetCatalog.Presets.Take(2).Select(preset => preset.Name).ToList();
             var existing = SamplePresetCatalog.Presets[0] with { Id = Guid.NewGuid(), Description = "user-owned" };
             manager.Upsert(existing);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
 
             var (AddedCount, SkippedCount) = viewModel.ImportSamplePresets(sampleNames);
 
@@ -993,7 +993,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 ],
             };
             manager.Upsert(existing);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
 
             var saved = viewModel.SavePreset("ClearCols", "new desc", visibleColumns: null);
@@ -1006,7 +1006,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies <see cref="AppliedFiltersViewModel.LoadPreset"/> replaces the chain and sets last-loaded.
+        /// Verifies <see cref="FilterChainViewModel.LoadPreset"/> replaces the chain and sets last-loaded.
         /// </summary>
         [Fact]
         public void LoadPreset_Replaces_Chain_And_Sets_LastLoaded()
@@ -1021,7 +1021,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Chain = new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
             };
             manager.Upsert(preset);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             Assert.Null(viewModel.LastLoaded);
 
@@ -1056,7 +1056,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                     ],
                 },
             };
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
 
             viewModel.LoadPreset(preset);
 
@@ -1094,7 +1094,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Chain = new FilterChain { Steps = [] },
                 VisibleColumns = columns,
             };
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.SetRenameListColumnSource(capture: () => [], apply: specs => applied = specs);
 
             viewModel.LoadPreset(preset);
@@ -1122,7 +1122,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Chain = new FilterChain { Steps = [] },
                 VisibleColumns = columns,
             };
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.SetRenameListColumnSource(
                 capture: () => [],
                 apply: _ => throw new InvalidOperationException("column apply failed")
@@ -1146,7 +1146,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Chain = new FilterChain { Steps = [] },
                 VisibleColumns = null,
             };
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.SetRenameListColumnSource(capture: () => [], apply: _ => applyCount++);
 
             viewModel.LoadPreset(preset);
@@ -1174,7 +1174,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Chain = new FilterChain { Steps = [] },
                 VisibleColumns = columns,
             };
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
 
             // Pane-only hosts leave the source unset; must not throw.
             viewModel.LoadPreset(preset);
@@ -1188,7 +1188,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [Fact]
         public void CaptureRenameListColumns_Uses_Wired_Source_Or_Empty()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             Assert.Empty(viewModel.CaptureRenameListColumns());
 
             var columns = new List<RenameListVisibleColumnSpec>
@@ -1224,7 +1224,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(other);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
             viewModel.SetLastLoaded(preset);
             Assert.Same(preset, viewModel.LastLoaded);
 
@@ -1251,7 +1251,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 Chain = new FilterChain { Steps = [] },
             };
             manager.Upsert(preset);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
             viewModel.SetLastLoaded(preset);
 
             var result = viewModel.RenamePreset("Old", "New");
@@ -1287,7 +1287,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             };
             manager.Upsert(alpha);
             manager.Upsert(beta);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
 
             Assert.Equal(PresetRenameStatus.BlankName, viewModel.RenamePreset("Alpha", "   ").Status);
             Assert.Equal(PresetRenameStatus.Unchanged, viewModel.RenamePreset("Alpha", "Alpha").Status);
@@ -1317,7 +1317,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             };
             manager.Upsert(keep);
             manager.Upsert(gone);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
             viewModel.SetLastLoaded(keep);
 
             Assert.True(viewModel.DeletePreset("Gone"));
@@ -1354,7 +1354,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             manager.Upsert(keep);
             manager.Upsert(goneA);
             manager.Upsert(goneB);
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
             viewModel.SetLastLoaded(goneA);
 
             Assert.Equal(2, viewModel.DeletePresets(["GoneA", "GoneB", "GoneA", "Missing"]));
@@ -1377,7 +1377,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             manager.Upsert(_NamedPreset("A"));
             manager.Upsert(_NamedPreset("B"));
             manager.Upsert(_NamedPreset("C"));
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
 
             Assert.True(viewModel.TryMovePresetsTowardNeighbor(["A", "B"], offset: 1));
             Assert.Equal(["C", "A", "B"], manager.Presets.Select(preset => preset.Name));
@@ -1402,9 +1402,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Counts <see cref="AppliedFiltersViewModel.ChainChanged"/> raises during <paramref name="action"/>.
+        /// Counts <see cref="FilterChainViewModel.ChainChanged"/> raises during <paramref name="action"/>.
         /// </summary>
-        private static int _CountChainChanged(AppliedFiltersViewModel viewModel, Action action)
+        private static int _CountChainChanged(FilterChainViewModel viewModel, Action action)
         {
             var count = 0;
             void OnChanged(object? sender, EventArgs e)

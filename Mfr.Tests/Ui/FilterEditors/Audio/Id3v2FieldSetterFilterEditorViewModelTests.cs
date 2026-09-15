@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.Filters.Audio;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Id3v2_field_setter_defaults_tit2_empty_text()
         {
-            var step = new AppliedFilterStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
+            var step = new FilterChainStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
             var editor = new Id3v2FieldSetterFilterEditorViewModel(step);
 
             Assert.Equal("TIT2", editor.SelectedFrame.FrameId);
@@ -38,7 +38,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Id3v2_field_setter_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
+            var step = new FilterChainStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
             _ = new Id3v2FieldSetterFilterEditorViewModel(step)
             {
                 SelectedFrame = Id3v2FrameChoice.For("TALB"),
@@ -60,7 +60,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Id3v2_field_setter_comm_identity_fields_update_options()
         {
-            var step = new AppliedFilterStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
+            var step = new FilterChainStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
             var editor = new Id3v2FieldSetterFilterEditorViewModel(step)
             {
                 SelectedFrame = Id3v2FrameChoice.For("COMM"),
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Id3v2_field_setter_leaving_comm_clears_identity()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "ID3v2 Field Setter",
                 new Id3v2FieldSetterFilter(
                     new Id3v2FieldSetterOptions(FrameId: "COMM", Text: "X", Language: "eng", Description: "d")
@@ -118,7 +118,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         [Fact]
         public void Id3v2_field_setter_hydrates_from_existing_options()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "ID3v2 Field Setter",
                 new Id3v2FieldSetterFilter(
                     new Id3v2FieldSetterOptions(FrameId: "txxx", Text: "custom", OnlyIfEmpty: true, Description: "key")

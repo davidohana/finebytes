@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Trim_between_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimBetween"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimBetween"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (TrimBetweenFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (TrimBetweenFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(new Position(13, Side.Left), filter.Options.Start);
             Assert.Equal(new Position(5, Side.Right), filter.Options.End);
 
@@ -63,7 +63,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Visual_trim_helper_selection_updates_trim_between_range()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimBetween"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimBetween"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (TrimBetweenFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (TrimBetweenFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(new Position(2, Side.Left), filter.Options.Start);
             Assert.Equal(new Position(4, Side.Left), filter.Options.End);
             Assert.Equal(1, textBox.SelectionStart);
@@ -108,7 +108,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     extension: "txt"
                 )
             );
-            var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());
+            var step = new FilterChainStepViewModel("Trim Between", new TrimBetweenFilter());
             var editorVm = new TrimBetweenFilterEditorViewModel(step, sampleRenameItems: [item]);
             var editor = new TrimBetweenFilterEditorView { DataContext = editorVm };
             var window = new Window

@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
 using Mfr.Filters.Attributes;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Time_shifter_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Time Shifter", new TimeShifterFilter());
+            var step = new FilterChainStepViewModel("Time Shifter", new TimeShifterFilter());
             var editor = new TimeShifterFilterEditorViewModel(step);
 
             Assert.Equal(TimestampField.LastWrite, editor.SelectedTimestampField.Field);

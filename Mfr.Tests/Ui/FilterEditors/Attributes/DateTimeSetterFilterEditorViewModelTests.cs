@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
 using Mfr.Filters.Attributes;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Date/Time Setter", new DateTimeSetterFilter());
+            var step = new FilterChainStepViewModel("Date/Time Setter", new DateTimeSetterFilter());
             var editor = new DateTimeSetterFilterEditorViewModel(step);
 
             Assert.True(editor.SetDate);
@@ -55,7 +55,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_rejects_illegal_time_and_reverts_text()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Date/Time Setter",
                 new DateTimeSetterFilter(
                     Options: new DateTimeSetterOptions(
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_rejects_illegal_date_and_reverts_text()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Date/Time Setter",
                 new DateTimeSetterFilter(
                     Options: new DateTimeSetterOptions(
@@ -123,7 +123,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_restores_full_date_for_partial_text()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Date/Time Setter",
                 new DateTimeSetterFilter(
                     Options: new DateTimeSetterOptions(
@@ -148,7 +148,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_restores_full_time_for_incomplete_text()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Date/Time Setter",
                 new DateTimeSetterFilter(
                     Options: new DateTimeSetterOptions(
@@ -175,7 +175,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_rejects_illegal_hh_mm_and_reverts_text()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Date/Time Setter",
                 new DateTimeSetterFilter(
                     Options: new DateTimeSetterOptions(
@@ -199,7 +199,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_accepts_hh_mm_and_shows_full_time()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Date/Time Setter",
                 new DateTimeSetterFilter(
                     Options: new DateTimeSetterOptions(
@@ -223,7 +223,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_rejects_far_future_date_and_restores_incomplete_time()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Date/Time Setter",
                 new DateTimeSetterFilter(
                     Options: new DateTimeSetterOptions(
@@ -250,7 +250,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_set_date_ignores_illegal_time_when_time_unchecked()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Date/Time Setter",
                 new DateTimeSetterFilter(
                     Options: new DateTimeSetterOptions(
@@ -282,7 +282,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         [Fact]
         public void Date_time_setter_commit_date_restores_partial_text()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Date/Time Setter",
                 new DateTimeSetterFilter(
                     Options: new DateTimeSetterOptions(

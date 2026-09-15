@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
@@ -37,7 +37,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         /// </param>
         /// <returns>Editor view model, or <see langword="null"/> for optionless / not-yet-implemented types.</returns>
         internal static FilterOptionsEditorViewModel? Create(
-            AppliedFilterStepViewModel step,
+            FilterChainStepViewModel step,
             Func<IReadOnlyList<RenameItem>>? resolveSampleRenameItems = null,
             Func<string, RenameItem?>? resolveRenameItemByFullPath = null
         )

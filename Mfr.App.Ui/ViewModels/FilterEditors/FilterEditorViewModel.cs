@@ -1,6 +1,6 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Models.Config;
 using Mfr.Models.Rename;
@@ -13,27 +13,27 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
     public sealed partial class FilterEditorViewModel : ViewModelBase
     {
         /// <summary>
-        /// Title bar text when no Applied Filters row is selected.
+        /// Title bar text when no Filter Chain row is selected.
         /// </summary>
         public const string EmptyTitleText = "Filter Configuration";
 
         /// <summary>
-        /// Body hint when no Applied Filters row is selected.
+        /// Body hint when no Filter Chain row is selected.
         /// </summary>
-        public const string EmptySelectionHint = "Select a filter in Applied Filters to configure it.";
+        public const string EmptySelectionHint = "Select a filter in Filter Chain to configure it.";
 
         private bool _persistSession;
         private Func<IReadOnlyList<RenameItem>>? _resolveSampleRenameItems;
         private Func<string, RenameItem?>? _resolveRenameItemByFullPath;
 
         /// <summary>
-        /// Gets whether an Applied Filters row is driving the configuration pane.
+        /// Gets whether an Filter Chain row is driving the configuration pane.
         /// </summary>
         [ObservableProperty]
         private bool _hasSelectedStep;
 
         /// <summary>
-        /// Gets the pane title: empty-state label, or <c>Applied Filter: …</c> when a row is selected.
+        /// Gets the pane title: empty-state label, or <c>Filter: …</c> when a row is selected.
         /// </summary>
         [ObservableProperty]
         private string _titleText = EmptyTitleText;
@@ -86,16 +86,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
         }
 
         /// <summary>
-        /// Updates the pane from the Applied Filters selection (first row when multi-select).
+        /// Updates the pane from the Filter Chain selection (first row when multi-select).
         /// </summary>
         /// <param name="selectedSteps">Current Applied list selection.</param>
-        internal void SyncSelection(IReadOnlyList<AppliedFilterStepViewModel> selectedSteps)
+        internal void SyncSelection(IReadOnlyList<FilterChainStepViewModel> selectedSteps)
         {
             ArgumentNullException.ThrowIfNull(selectedSteps);
 
             var step = selectedSteps.Count > 0 ? selectedSteps[0] : null;
             HasSelectedStep = step is not null;
-            TitleText = step is null ? EmptyTitleText : $"Applied Filter: {step.DisplayName}";
+            TitleText = step is null ? EmptyTitleText : $"Filter: {step.DisplayName}";
             OptionsEditor = step is null
                 ? null
                 : FilterOptionsEditorFactory.Create(step, _resolveSampleRenameItems, _resolveRenameItemByFullPath);

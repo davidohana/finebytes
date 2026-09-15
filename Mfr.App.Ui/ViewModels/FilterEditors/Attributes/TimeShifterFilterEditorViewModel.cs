@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Attributes;
 using Mfr.Models.Media;
 
@@ -33,7 +33,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public TimeShifterFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public TimeShifterFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {
             _selectedTimestampField = TimestampFieldChoice.For(TimestampField.LastWrite);

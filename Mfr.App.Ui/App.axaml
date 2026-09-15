@@ -148,7 +148,7 @@
       <Setter Property="Margin" Value="1" />
     </Style>
 
-    <!-- Shared vertical action rail (Rename List, Applied Filters). -->
+    <!-- Shared vertical action rail (Rename List, Filter Chain). -->
     <Style Selector="Border.pane-action-rail">
       <Setter Property="Background" Value="{DynamicResource AppChromeHeaderBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSeparatorBrush}" />

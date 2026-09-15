@@ -32,7 +32,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
         public void Replace_list_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ReplaceList"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ReplaceList"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -78,7 +78,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (ReplaceListFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (ReplaceListFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(2, filter.Options.Entries.Count);
             Assert.Equal("a", filter.Options.Entries[0].Search);
             Assert.Equal("b", filter.Options.Entries[0].Replacement);

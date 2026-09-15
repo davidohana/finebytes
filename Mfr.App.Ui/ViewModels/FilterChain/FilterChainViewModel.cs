@@ -204,7 +204,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         }
 
         /// <summary>
-        /// Gets whether loading a preset should confirm before replacing the current Filter Chain chain.
+        /// Gets whether loading a preset should confirm before replacing the current Filter Chain.
         /// </summary>
         /// <returns>
         /// <see langword="true"/> when <see cref="ConfirmationPolicy"/> requires replace-on-load confirm
@@ -212,7 +212,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         /// </returns>
         public bool NeedsConfirmReplaceOnLoad()
         {
-            return ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ReplaceAppliedFiltersOnLoad) && Steps.Count > 0;
+            return ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ReplaceFilterChainOnLoad) && Steps.Count > 0;
         }
 
         /// <summary>
@@ -400,7 +400,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
         public IReadOnlyList<FilterChainStepViewModel> SelectedSteps => _selectedSteps;
 
         /// <summary>
-        /// Gets the number of applied filters.
+        /// Gets the number of filters in the Filter Chain.
         /// </summary>
         public int Count => Steps.Count;
 
@@ -526,7 +526,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChain
                 return;
             }
 
-            if (ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearAppliedFilters))
+            if (ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearFilterChain))
             {
                 var confirm = UiHooks?.ConfirmClearAsync;
                 if (confirm is null || !await confirm().ConfigureAwait(true))

@@ -15,9 +15,9 @@ namespace Mfr.Models.Config
         GoWithPreviewErrors = 0,
 
         /// <summary>
-        /// Confirm before replacing a non-empty Applied Filters chain on preset load.
+        /// Confirm before replacing a non-empty Filter Chain on preset load.
         /// </summary>
-        ReplaceAppliedFiltersOnLoad = 1,
+        ReplaceFilterChainOnLoad = 1,
 
         /// <summary>
         /// Confirm before clearing a non-empty Rename List.
@@ -25,9 +25,9 @@ namespace Mfr.Models.Config
         ClearRenameList = 2,
 
         /// <summary>
-        /// Confirm before removing all Applied Filters.
+        /// Confirm before clearing the Filter Chain.
         /// </summary>
-        ClearAppliedFilters = 3,
+        ClearFilterChain = 3,
 
         /// <summary>
         /// Confirm before Undo Last / Log-window Undo (prepare preview session; user presses GO to apply).

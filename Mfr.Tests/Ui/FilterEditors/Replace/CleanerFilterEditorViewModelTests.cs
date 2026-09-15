@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.Filters.Replace;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
         [Fact]
         public void Cleaner_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Cleaner", new CleanerFilter());
+            var step = new FilterChainStepViewModel("Cleaner", new CleanerFilter());
             var editor = new CleanerFilterEditorViewModel(step);
 
             Assert.True(editor.RemoveIllegalChars);

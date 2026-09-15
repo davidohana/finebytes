@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         [Fact]
         public void Options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Token Mover", new TokenMoverFilter());
+            var step = new FilterChainStepViewModel("Token Mover", new TokenMoverFilter());
             var editor = new TokenMoverFilterEditorViewModel(step);
 
             Assert.Equal("-", editor.Delimiter);
@@ -38,7 +38,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         [Fact]
         public void Options_clamp_spinner_bounds()
         {
-            var step = new AppliedFilterStepViewModel("Token Mover", new TokenMoverFilter());
+            var step = new FilterChainStepViewModel("Token Mover", new TokenMoverFilter());
             var editor = new TokenMoverFilterEditorViewModel(step) { TokenNumber = 0, MoveBy = -1000 };
 
             var options = ((TokenMoverFilter)step.Filter).Options;
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         [Fact]
         public void Options_null_delimiter_becomes_empty()
         {
-            var step = new AppliedFilterStepViewModel("Token Mover", new TokenMoverFilter());
+            var step = new FilterChainStepViewModel("Token Mover", new TokenMoverFilter());
             _ = new TokenMoverFilterEditorViewModel(step) { Delimiter = null! };
 
             Assert.Equal(string.Empty, ((TokenMoverFilter)step.Filter).Options.Delimiter);

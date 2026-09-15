@@ -154,7 +154,7 @@ namespace Mfr.Tests.Ui.Options
         [AvaloniaFact]
         public void OptionsDialog_ResetConfirmations_clears_draft_only()
         {
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearAppliedFilters];
+            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearFilterChain];
             var dialogVm = new OptionsDialogViewModel();
             var dialog = new OptionsDialog(dialogVm);
             dialog.Show();
@@ -162,7 +162,7 @@ namespace Mfr.Tests.Ui.Options
 
             try
             {
-                Assert.Equal([ConfirmationKind.ClearAppliedFilters], dialogVm.SuppressedConfirmations);
+                Assert.Equal([ConfirmationKind.ClearFilterChain], dialogVm.SuppressedConfirmations);
                 Assert.Equal("1 confirmation is currently suppressed.", dialogVm.SuppressedConfirmationsSummary);
 
                 var summary = dialog.FindControl<TextBlock>("SuppressedConfirmationsSummaryText");
@@ -179,7 +179,7 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Empty(dialogVm.SuppressedConfirmations);
                 Assert.Equal("No confirmations are currently suppressed.", dialogVm.SuppressedConfirmationsSummary);
                 Assert.Equal("No confirmations are currently suppressed.", summary.Text);
-                Assert.Equal([ConfirmationKind.ClearAppliedFilters], ConfigStore.Ui.SuppressedConfirmations);
+                Assert.Equal([ConfirmationKind.ClearFilterChain], ConfigStore.Ui.SuppressedConfirmations);
             }
             finally
             {

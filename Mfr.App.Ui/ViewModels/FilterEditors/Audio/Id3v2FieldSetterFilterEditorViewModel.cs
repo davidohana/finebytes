@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Audio;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public Id3v2FieldSetterFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public Id3v2FieldSetterFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {
             _selectedFrame = Id3v2FrameChoice.Tit2;

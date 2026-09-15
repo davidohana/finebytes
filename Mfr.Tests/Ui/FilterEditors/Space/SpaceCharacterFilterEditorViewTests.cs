@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_character_other_box_accepts_typed_character()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -43,7 +43,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal("-", otherBox.Text);
-            var filter = (SpaceCharacterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (SpaceCharacterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal('-', filter.Options.SpaceCharacter);
 
             window.KeyTextInput(".");
@@ -51,7 +51,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
             Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(".", otherBox.Text);
-            filter = (SpaceCharacterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (SpaceCharacterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal('.', filter.Options.SpaceCharacter);
 
             window.Close();
@@ -64,7 +64,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_character_checkbox_updates_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -78,7 +78,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (SpaceCharacterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (SpaceCharacterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.DoesNotContain("_", filter.Options.Replacements);
 
             window.Close();
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_character_definition_radio_updates_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -103,7 +103,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (SpaceCharacterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (SpaceCharacterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal('_', filter.Options.SpaceCharacter);
             Assert.True(radio.IsChecked);
 

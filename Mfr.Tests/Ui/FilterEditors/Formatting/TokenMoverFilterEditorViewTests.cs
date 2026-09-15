@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Token_mover_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TokenMover"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TokenMover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -45,7 +45,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (TokenMoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (TokenMoverFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(",", filter.Options.Delimiter);
             Assert.Equal(2, filter.Options.TokenNumber);
             Assert.Equal(-1, filter.Options.MoveBy);

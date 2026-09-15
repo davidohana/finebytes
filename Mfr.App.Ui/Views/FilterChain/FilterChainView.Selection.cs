@@ -102,7 +102,7 @@ namespace Mfr.App.Ui.Views.FilterChain
                     owner,
                     title: "Remove All Filters",
                     message: "Clear the Filter Chain?",
-                    kind: ConfirmationKind.ClearAppliedFilters
+                    kind: ConfirmationKind.ClearFilterChain
                 )
                 .ConfigureAwait(true);
         }

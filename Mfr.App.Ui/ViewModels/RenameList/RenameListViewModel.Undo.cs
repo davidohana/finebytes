@@ -1,8 +1,8 @@
 using Mfr.Engine.RenameList;
 using Mfr.Engine.RenameLog;
 using Mfr.Models.Config;
-using Mfr.Models.Filters;
 using Mfr.Models.Rename;
+using FilterChainModel = Mfr.Models.Filters.FilterChain;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -37,7 +37,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         /// <summary>
         /// Confirms (when policy requires), rebuilds the list from <paramref name="log"/> as a preview-only
-        /// undo session, and clears Applied Filters. User presses GO to apply.
+        /// undo session, and clears Filter Chain. User presses GO to apply.
         /// </summary>
         /// <param name="log">Rename operation to reverse (last op or a loaded disk log).</param>
         /// <returns>
@@ -78,7 +78,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
                 // Clear filters before replacing Entries so a later Auto-Preview sees an empty chain
                 // (not the pre-undo filters). Undo confirm already warned filters will be cleared.
-                _appliedFilters?.ReplaceFromChain(new FilterChain { Steps = [] });
+                _filterChain?.ReplaceFromChain(new FilterChainModel { Steps = [] });
                 _ReplaceEntriesFromEngine();
 
                 if (prepareResult is not null)

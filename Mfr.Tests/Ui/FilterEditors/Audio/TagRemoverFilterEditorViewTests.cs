@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Tag_remover_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -51,7 +51,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.False(id3v1.IsChecked);
             Assert.False(id3v2.IsChecked);
 
-            var filter = (TagRemoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (TagRemoverFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.False(filter.Options.All);
             Assert.Empty(filter.Options.Blocks ?? []);
 
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            filter = (TagRemoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (TagRemoverFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.False(filter.Options.All);
             Assert.Equal([AudioTagBlockKind.Id3v1], filter.Options.Blocks);
 
@@ -67,7 +67,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            filter = (TagRemoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            filter = (TagRemoverFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.False(filter.Options.All);
             Assert.Empty(filter.Options.Blocks ?? []);
             Assert.False(removeAll.IsChecked);

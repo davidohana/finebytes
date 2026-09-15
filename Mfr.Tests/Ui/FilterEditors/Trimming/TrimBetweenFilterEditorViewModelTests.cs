@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.Filters.Trimming;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void Trim_between_positions_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());
+            var step = new FilterChainStepViewModel("Trim Between", new TrimBetweenFilter());
             var editor = new TrimBetweenFilterEditorViewModel(step);
 
             Assert.Equal(2, editor.StartValue);
@@ -38,7 +38,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void Trim_helper_selection_updates_left_anchored_range()
         {
-            var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());
+            var step = new FilterChainStepViewModel("Trim Between", new TrimBetweenFilter());
             var editor = new TrimBetweenFilterEditorViewModel(step);
             editor.TrimHelper.SetSampleText("abcdef");
 
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void Placeholder_selection_updates_left_anchored_range()
         {
-            var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());
+            var step = new FilterChainStepViewModel("Trim Between", new TrimBetweenFilter());
             var editor = new TrimBetweenFilterEditorViewModel(step);
             Assert.False(editor.TrimHelper.HasSample);
             Assert.Equal(VisualTrimHelperViewModel.PlaceholderText, editor.TrimHelper.DisplayText);
@@ -77,7 +77,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void Spinner_updates_helper_highlight()
         {
-            var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());
+            var step = new FilterChainStepViewModel("Trim Between", new TrimBetweenFilter());
             var editor = new TrimBetweenFilterEditorViewModel(step);
             editor.TrimHelper.SetSampleText("abcdef");
             // Defaults are already 2–4; change to force highlight sync after sample is set.
@@ -102,7 +102,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     extension: "txt"
                 )
             );
-            var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());
+            var step = new FilterChainStepViewModel("Trim Between", new TrimBetweenFilter());
             var editor = new TrimBetweenFilterEditorViewModel(step, sampleRenameItems: [item]);
 
             Assert.Equal("abcdef", editor.TrimHelper.SampleText);
@@ -116,7 +116,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void First_sample_drop_syncs_highlight_from_options()
         {
-            var step = new AppliedFilterStepViewModel("Trim Between", new TrimBetweenFilter());
+            var step = new FilterChainStepViewModel("Trim Between", new TrimBetweenFilter());
             var editor = new TrimBetweenFilterEditorViewModel(step);
             Assert.False(editor.TrimHelper.HasSample);
             // Default 2–4 highlight already applies to the placeholder.

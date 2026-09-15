@@ -1,6 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.Input;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Models.Filters;
 
 namespace Mfr.App.Ui.ViewModels.Presets
@@ -10,17 +10,17 @@ namespace Mfr.App.Ui.ViewModels.Presets
     /// </summary>
     public sealed partial class PresetManagerDialogViewModel : ViewModelBase
     {
-        private readonly AppliedFiltersViewModel _appliedFilters;
+        private readonly FilterChainViewModel _filterChain;
         private readonly List<FilterPreset> _selectedPresets = [];
 
         /// <summary>
-        /// Initializes the manager list from <paramref name="appliedFilters"/>.
+        /// Initializes the manager list from <paramref name="filterChain"/>.
         /// </summary>
-        /// <param name="appliedFilters">Applied Filters pane that owns the <see cref="Engine.Presets.PresetManager"/>.</param>
-        public PresetManagerDialogViewModel(AppliedFiltersViewModel appliedFilters)
+        /// <param name="filterChain">Filter Chain pane that owns the <see cref="Engine.Presets.PresetManager"/>.</param>
+        public PresetManagerDialogViewModel(FilterChainViewModel filterChain)
         {
-            ArgumentNullException.ThrowIfNull(appliedFilters);
-            _appliedFilters = appliedFilters;
+            ArgumentNullException.ThrowIfNull(filterChain);
+            _filterChain = filterChain;
             Presets = [];
             Refresh();
         }
@@ -90,7 +90,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         /// </param>
         /// <remarks>
         /// When every previously selected name is gone (e.g. after delete), selects the row at the
-        /// prior first-selected index (clamped), matching Applied Filters / Rename List remove.
+        /// prior first-selected index (clamped), matching Filter Chain / Rename List remove.
         /// </remarks>
         public void Refresh(string? preferredName = null)
         {
@@ -149,7 +149,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         {
             ArgumentNullException.ThrowIfNull(sourceIndices);
 
-            if (!_appliedFilters.TryMovePresetsTo(sourceIndices, targetIndex, out var newIndices))
+            if (!_filterChain.TryMovePresetsTo(sourceIndices, targetIndex, out var newIndices))
             {
                 return;
             }
@@ -166,7 +166,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
             }
 
             var names = _selectedPresets.Select(preset => preset.Name).ToList();
-            if (!_appliedFilters.TryMovePresetsTowardNeighbor(names, offset))
+            if (!_filterChain.TryMovePresetsTowardNeighbor(names, offset))
             {
                 return;
             }
@@ -180,7 +180,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
         private void _ReloadPresetsFromManager()
         {
             Presets.Clear();
-            foreach (var preset in _appliedFilters.PresetManager.Presets)
+            foreach (var preset in _filterChain.PresetManager.Presets)
             {
                 Presets.Add(preset);
             }
@@ -223,7 +223,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
             }
 
             var names = _selectedPresets.Select(preset => preset.Name).ToList();
-            return _appliedFilters.PresetManager.CanMoveSelectedTowardNeighbor(names, offset);
+            return _filterChain.PresetManager.CanMoveSelectedTowardNeighbor(names, offset);
         }
 
         private void _NotifySelectionCommandsChanged()

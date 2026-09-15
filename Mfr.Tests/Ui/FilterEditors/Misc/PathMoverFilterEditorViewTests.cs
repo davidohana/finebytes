@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -52,7 +52,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (PathMoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (PathMoverFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(@"E:\Archive", filter.Options.RootFolder);
             Assert.Equal("<now:yyyy>", filter.Options.SubFolder);
 
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 Directory.CreateDirectory(dest);
 
                 var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-                mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
+                mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
@@ -101,7 +101,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
-                var moverFilter = (PathMoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+                var moverFilter = (PathMoverFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
                 Assert.Equal(dest, moverFilter.Options.RootFolder);
                 Assert.Equal(
                     dest,
@@ -134,7 +134,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 File.WriteAllText(filePath, "x");
 
                 var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-                mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
+                mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
@@ -149,7 +149,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
-                var moverFilter = (PathMoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+                var moverFilter = (PathMoverFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
                 Assert.Equal(dir, moverFilter.Options.RootFolder);
 
                 window.Close();
@@ -171,7 +171,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Root_folder_drag_over_rejects_non_file()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -196,7 +196,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             Assert.Equal(DragDropEffects.None, dragOver.DragEffects);
             Assert.Equal(
                 @"C:\",
-                ((PathMoverFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter).Options.RootFolder
+                ((PathMoverFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter).Options.RootFolder
             );
 
             window.Close();

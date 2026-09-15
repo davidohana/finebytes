@@ -1,5 +1,5 @@
 using Avalonia.Headless.XUnit;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
@@ -370,8 +370,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ReplaceWithRelevantColumns_under_ab_mode_stays_originals_only()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
             appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
             renameListViewModel.IsAbModeEnabled = true;
 
@@ -394,8 +394,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_under_ab_mode_adds_original_only_and_skips_preview_companion()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
             appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
@@ -414,8 +414,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_under_ab_mode_is_noop_when_original_already_visible()
         {
-            var appliedFilters = new AppliedFiltersViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(appliedFilters: appliedFilters);
+            var appliedFilters = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
             appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);

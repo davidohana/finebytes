@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Misc;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Misc
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public StripParenthesesFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public StripParenthesesFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {
             _SyncFromFilter();

@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters;
 using Mfr.Filters.Trimming;
 using Mfr.Models.Rename;
@@ -27,7 +27,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Trimming
         /// Live Rename List items for helper init/navigation; preferred over a one-shot snapshot.
         /// </param>
         public CountFilterEditorViewModel(
-            AppliedFilterStepViewModel step,
+            FilterChainStepViewModel step,
             IReadOnlyList<RenameItem>? sampleRenameItems = null,
             Func<string, RenameItem?>? resolveRenameItemByFullPath = null,
             Func<IReadOnlyList<RenameItem>>? resolveSampleRenameItems = null

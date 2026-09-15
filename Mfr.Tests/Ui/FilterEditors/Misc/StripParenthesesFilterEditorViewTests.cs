@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Strip_parentheses_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("StripParentheses"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("StripParentheses"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (StripParenthesesFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (StripParenthesesFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(ParenthesisType.Square, filter.Options.Type);
             Assert.False(filter.Options.RemoveContents);
 

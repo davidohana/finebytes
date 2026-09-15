@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.Filters.Misc;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         [Fact]
         public void Strip_parentheses_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Strip Parentheses", new StripParenthesesFilter());
+            var step = new FilterChainStepViewModel("Strip Parentheses", new StripParenthesesFilter());
             var editor = new StripParenthesesFilterEditorViewModel(step);
 
             Assert.Equal(ParenthesisType.Round, editor.Type);

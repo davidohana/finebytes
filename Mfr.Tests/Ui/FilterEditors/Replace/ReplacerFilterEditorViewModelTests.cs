@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.Filters.Replace;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
         [Fact]
         public void Replacer_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Replacer", new ReplacerFilter());
+            var step = new FilterChainStepViewModel("Replacer", new ReplacerFilter());
             var editor = new ReplacerFilterEditorViewModel(step);
 
             Assert.Equal(string.Empty, editor.Find);

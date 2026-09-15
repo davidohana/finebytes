@@ -7,8 +7,8 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.ViewModels.FilterEditors.Case;
-using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
+using Mfr.App.Ui.Views.FilterChain;
 using Mfr.App.Ui.Views.FilterEditors;
 using Mfr.App.Ui.Views.FilterEditors.Case;
 using Mfr.App.Ui.Views.FilterEditors.Space;
@@ -56,7 +56,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Selecting_applied_row_updates_configuration_title()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            var appliedViewModel = mainViewModel.AppliedFiltersViewModel;
+            var appliedViewModel = mainViewModel.FilterChainViewModel;
             appliedViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             appliedViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             window.UpdateLayout();
@@ -87,7 +87,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Tag_remover_loads_options_editor()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -106,7 +106,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Optionless_filter_has_no_options_editor()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -123,7 +123,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Help_button_present_and_enabled_for_single_selection()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -143,7 +143,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Reset_button_restores_defaults_and_refreshes_editor()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            var applied = mainViewModel.AppliedFiltersViewModel;
+            var applied = mainViewModel.FilterChainViewModel;
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
             var step = applied.Steps[0];
             step.SetDisplayName("Custom Letters");
@@ -193,7 +193,7 @@ namespace Mfr.Tests.Ui.FilterEditors
                 var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(
                     filterDefaults: store
                 );
-                var applied = mainViewModel.AppliedFiltersViewModel;
+                var applied = mainViewModel.FilterChainViewModel;
                 applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
@@ -236,7 +236,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Fieldset_header_does_not_cover_full_top_border()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -261,7 +261,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         public void Filter_editor_field_styles_come_from_app_theme()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(
                 AppliedFiltersTestUi.Entry("ShrinkDuplicateCharacters")
             );
             window.UpdateLayout();
@@ -297,7 +297,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         private static ListBox _AppliedList(Window window)
         {
             var appliedView = window.Content is Grid grid
-                ? grid.Children.OfType<AppliedFiltersView>().FirstOrDefault()
+                ? grid.Children.OfType<FilterChainView>().FirstOrDefault()
                 : null;
             Assert.NotNull(appliedView);
 

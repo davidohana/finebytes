@@ -169,7 +169,7 @@ namespace Mfr.Tests.Ui
             {
                 DataContext = mainViewModel.FilterPaletteViewModel,
                 AddSelectedToAppliedCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
-                RemoveAppliedStepsCommand = mainViewModel.AppliedFiltersViewModel.RemoveStepsAtIndicesCommand,
+                RemoveFilterChainStepsCommand = mainViewModel.FilterChainViewModel.RemoveStepsAtIndicesCommand,
             };
 
             var window = new Window

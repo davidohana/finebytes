@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Replace;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
@@ -13,7 +13,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Replace
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public ReplacerFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public ReplacerFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {
             Match = new ReplacerMatchOptionsEditor(defaultWholeWord: false);

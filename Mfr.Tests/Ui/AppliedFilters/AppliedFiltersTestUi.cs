@@ -3,8 +3,8 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
-using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.Views.FilterChain;
 using Mfr.Filters;
 
 namespace Mfr.Tests.Ui.AppliedFilters
@@ -31,12 +31,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         /// <returns>Host window, view model, list, and view.</returns>
         public static (
             Window Window,
-            AppliedFiltersViewModel ViewModel,
+            FilterChainViewModel ViewModel,
             ListBox List,
-            AppliedFiltersView View
+            FilterChainView View
         ) ShowSeededList(int? selectIndex = null)
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(Entry("LettersCase"));
@@ -45,7 +45,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
                 viewModel.SetSelectedSteps([viewModel.Steps[index]]);
             }
 
-            var view = new AppliedFiltersView { DataContext = viewModel };
+            var view = new FilterChainView { DataContext = viewModel };
             var window = new Window
             {
                 Width = 280,

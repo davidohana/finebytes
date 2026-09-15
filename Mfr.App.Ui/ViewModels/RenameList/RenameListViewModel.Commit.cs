@@ -1,8 +1,8 @@
 using Avalonia.Media;
 using Mfr.Engine.Commit;
 using Mfr.Models.Config;
-using Mfr.Models.Filters;
 using Mfr.Models.Rename;
+using FilterChainModel = Mfr.Models.Filters.FilterChain;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -14,7 +14,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Clears old commit errors, previews the current chain, confirms preview errors, and commits valid rows.
         /// </summary>
-        /// <param name="chain">Live Applied Filters chain to preview immediately before commit.</param>
+        /// <param name="chain">Live Filter Chain to preview immediately before commit.</param>
         /// <returns>
         /// <see langword="true"/> when the commit stage was reached; <see langword="false"/> when GO was refused,
         /// preview was canceled, or the preview-error warning was declined.
@@ -23,7 +23,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Does not clear <see cref="LastStatusMessage"/> at start — cancel / decline keep the prior sticky status
         /// until an outcome publishes (or <c>Clear</c> / locate success wipe intentionally).
         /// </remarks>
-        public async Task<bool> GoAsync(FilterChain chain)
+        public async Task<bool> GoAsync(FilterChainModel chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
 

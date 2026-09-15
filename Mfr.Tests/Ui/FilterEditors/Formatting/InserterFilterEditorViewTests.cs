@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Inserter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Inserter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Inserter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -52,7 +52,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (InserterFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (InserterFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal("_-", filter.Options.Text);
             Assert.Equal(3, filter.Options.Position);
             Assert.Equal(InserterOrigin.End, filter.Options.StartFrom);

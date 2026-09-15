@@ -1,5 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.Filters.Case;
 using Mfr.Models.Filters;
 
@@ -15,7 +15,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         /// Initializes the editor from the current step filter.
         /// </summary>
         /// <param name="step">Applied list row.</param>
-        public CharacterListFilterEditorViewModel(AppliedFilterStepViewModel step)
+        public CharacterListFilterEditorViewModel(FilterChainStepViewModel step)
             : base(step)
         {
             (CharsPrompt, CharsToolTip) = _ResolveLabels(step.Filter);

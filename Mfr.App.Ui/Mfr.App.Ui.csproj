@@ -30,7 +30,7 @@
     <AvaloniaResource Include="Assets\Undo.png" />
     <AvaloniaResource Include="Assets\Log.png" />
     <AvaloniaResource Include="Assets\Options.png" />
-    <AvaloniaResource Include="Assets\AppliedFilters\*.png" />
+    <AvaloniaResource Include="Assets\FilterChain\*.png" />
     <AvaloniaResource Include="Assets\FilterGroups\*.png" />
     <AvaloniaResource Include="Assets\RenameList\*.png" />
   </ItemGroup>

@@ -7,10 +7,10 @@ todos:
     status: completed
   - id: p2
     content: "P2: Wire MainWindow, ConfirmationKind, AppTips, IndicesDragPayload, and other App.Ui call sites"
-    status: pending
+    status: completed
   - id: p3
     content: "P3: Rename tests tree + docs; format/lint; verify build"
-    status: pending
+    status: in_progress
 isProject: false
 ---
 

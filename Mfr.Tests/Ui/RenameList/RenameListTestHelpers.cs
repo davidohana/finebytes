@@ -7,8 +7,8 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.Shell;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
@@ -246,20 +246,20 @@ namespace Mfr.Tests.Ui.RenameList
         /// <param name="shellOpener">
         /// Shell opener for Properties / Show in Explorer, or <see langword="null"/> for the null opener.
         /// </param>
-        /// <param name="appliedFilters">
-        /// Applied Filters for Edit as Name List tests, or <see langword="null"/> when not needed.
+        /// <param name="filterChain">
+        /// Filter Chain for Edit as Name List tests, or <see langword="null"/> when not needed.
         /// </param>
         /// <returns>Rename List view model.</returns>
         public RenameListViewModel CreateRenameListViewModel(
             string? directoryPath = null,
             IFileShellOpener? shellOpener = null,
-            AppliedFiltersViewModel? appliedFilters = null
+            FilterChainViewModel? filterChain = null
         )
         {
             return new RenameListViewModel(
                 CreateFileListViewModel(directoryPath ?? CreateTempDir()),
                 shellOpener ?? NullFileShellOpener.Instance,
-                appliedFilters
+                filterChain
             );
         }
 

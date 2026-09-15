@@ -69,8 +69,8 @@ namespace Mfr.App.Ui.Views.MainWindow
         {
             if (_boundViewModel is not null)
             {
-                _boundViewModel.AppliedFiltersViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
-                _boundViewModel.AppliedFiltersViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
+                _boundViewModel.FilterChainViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
+                _boundViewModel.FilterChainViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
                 _boundViewModel.OptionsRequested -= _OnOptionsRequested;
                 _boundViewModel.LogRequested -= _OnLogRequested;
                 _boundViewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
@@ -83,8 +83,8 @@ namespace Mfr.App.Ui.Views.MainWindow
             }
 
             _boundViewModel = viewModel;
-            viewModel.AppliedFiltersViewModel.FilterDefaultSaved += _OnFilterDefaultSaved;
-            viewModel.AppliedFiltersViewModel.FilterHelpMissing += _OnFilterHelpMissing;
+            viewModel.FilterChainViewModel.FilterDefaultSaved += _OnFilterDefaultSaved;
+            viewModel.FilterChainViewModel.FilterHelpMissing += _OnFilterHelpMissing;
             viewModel.OptionsRequested += _OnOptionsRequested;
             viewModel.LogRequested += _OnLogRequested;
             viewModel.ResetConfigurationRequested += _OnResetConfigurationRequested;
@@ -396,8 +396,8 @@ namespace Mfr.App.Ui.Views.MainWindow
                 return;
             }
 
-            viewModel.AppliedFiltersViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
-            viewModel.AppliedFiltersViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
+            viewModel.FilterChainViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
+            viewModel.FilterChainViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
             viewModel.OptionsRequested -= _OnOptionsRequested;
             viewModel.LogRequested -= _OnLogRequested;
             viewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
@@ -422,17 +422,17 @@ namespace Mfr.App.Ui.Views.MainWindow
 
         private async void _OnFilterOptionsMenuClick(object? sender, RoutedEventArgs e)
         {
-            await AppliedFiltersPane.ShowFilterOptionsAsync();
+            await FilterChainPane.ShowFilterOptionsAsync();
         }
 
         private async void _OnPresetsMenuClick(object? sender, RoutedEventArgs e)
         {
-            await AppliedFiltersPane.ShowPresetManagerAsync();
+            await FilterChainPane.ShowPresetManagerAsync();
         }
 
         private async void _OnSavePresetMenuClick(object? sender, RoutedEventArgs e)
         {
-            await AppliedFiltersPane.ShowSavePresetAsync();
+            await FilterChainPane.ShowSavePresetAsync();
         }
     }
 }

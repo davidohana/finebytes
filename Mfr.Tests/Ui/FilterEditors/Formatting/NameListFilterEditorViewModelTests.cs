@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
@@ -21,7 +21,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         [Fact]
         public void Syncs_existing_entries_prefix_and_suffix()
         {
-            var step = new AppliedFilterStepViewModel(
+            var step = new FilterChainStepViewModel(
                 "Name List",
                 new NameListFilter(
                     Target: new FilePrefixTarget(),
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         [Fact]
         public void Option_edits_update_step_including_trailing_blank()
         {
-            var step = new AppliedFilterStepViewModel("Name List", new NameListFilter());
+            var step = new FilterChainStepViewModel("Name List", new NameListFilter());
             var editor = new NameListFilterEditorViewModel(step)
             {
                 EntriesText = "Alpha\nBeta\n",

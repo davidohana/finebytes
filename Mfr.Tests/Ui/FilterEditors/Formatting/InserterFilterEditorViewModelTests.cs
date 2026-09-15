@@ -1,4 +1,4 @@
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
 
@@ -15,7 +15,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         [Fact]
         public void Inserter_options_update_step_options()
         {
-            var step = new AppliedFilterStepViewModel("Inserter", new InserterFilter());
+            var step = new FilterChainStepViewModel("Inserter", new InserterFilter());
             var editor = new InserterFilterEditorViewModel(step);
 
             Assert.Equal(string.Empty, editor.InsertText);

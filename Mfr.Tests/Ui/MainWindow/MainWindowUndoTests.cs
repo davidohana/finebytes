@@ -46,8 +46,8 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.False(viewModel.UndoLastCommand.CanExecute(null));
 
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
-            viewModel.AppliedFiltersViewModel.Steps[0].SetFilter(UndoPrepareTestUi.PrefixReplacer("alpha", "renamed"));
+            viewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            viewModel.FilterChainViewModel.Steps[0].SetFilter(UndoPrepareTestUi.PrefixReplacer("alpha", "renamed"));
             ConfigStore.Ui.SuppressedConfirmations =
             [
                 ConfirmationKind.GoWithPreviewErrors,
@@ -75,7 +75,7 @@ namespace Mfr.Tests.Ui.MainWindow
             FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             Assert.True(File.Exists(destination));
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "renamed.txt");
-            Assert.Single(viewModel.AppliedFiltersViewModel.Steps);
+            Assert.Single(viewModel.FilterChainViewModel.Steps);
 
             await viewModel.UndoLastCommand.ExecuteAsync(null).ConfigureAwait(true);
 
@@ -83,7 +83,7 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.False(File.Exists(source));
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "renamed.txt");
             Assert.DoesNotContain(viewModel.FileListViewModel.Entries, entry => entry.Name == "alpha.txt");
-            Assert.Empty(viewModel.AppliedFiltersViewModel.Steps);
+            Assert.Empty(viewModel.FilterChainViewModel.Steps);
             Assert.Contains("Prepared undo", viewModel.StatusHint.ToPlainText());
             Assert.Contains("press GO", viewModel.StatusHint.ToPlainText());
             Assert.Equal(RenameListProgressOperation.Add, viewModel.RenameListViewModel.Progress.Operation);
@@ -129,7 +129,7 @@ namespace Mfr.Tests.Ui.MainWindow
 
             Assert.True(File.Exists(destination));
             Assert.False(File.Exists(source));
-            Assert.Empty(viewModel.AppliedFiltersViewModel.Steps);
+            Assert.Empty(viewModel.FilterChainViewModel.Steps);
             Assert.Contains("Prepared undo", viewModel.StatusHint.ToPlainText());
 
             var prepared = Assert.Single(viewModel.RenameListViewModel.Entries);

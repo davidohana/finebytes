@@ -4,8 +4,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.ViewModels.MainWindow;
-using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.DragAndDrop;
+using Mfr.App.Ui.Views.FilterChain;
 using Mfr.App.Ui.Views.FilterPalette;
 using Mfr.Filters;
 
@@ -28,8 +28,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             AppliedFiltersTestUi.PressKeyOnControl(paletteList, Key.Enter);
 
-            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
-            Assert.Equal("Shrink Spaces", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+            Assert.Single(mainViewModel.FilterChainViewModel.Steps);
+            Assert.Equal("Shrink Spaces", mainViewModel.FilterChainViewModel.Steps[0].DisplayName);
             Assert.Equal(1, appliedView.FindControl<ListBox>("AppliedFiltersList")!.ItemCount);
             Assert.Equal(1, mainViewModel.FilterCount);
 
@@ -49,8 +49,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
             paletteList.RaiseEvent(new RoutedEventArgs(InputElement.DoubleTappedEvent));
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
-            Assert.Equal("Letters Case", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+            Assert.Single(mainViewModel.FilterChainViewModel.Steps);
+            Assert.Equal("Letters Case", mainViewModel.FilterChainViewModel.Steps[0].DisplayName);
 
             window.Close();
         }
@@ -72,8 +72,8 @@ namespace Mfr.Tests.Ui.AppliedFilters
             addButton.Command.Execute(null);
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
-            Assert.Equal("Shrink Spaces", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+            Assert.Single(mainViewModel.FilterChainViewModel.Steps);
+            Assert.Equal("Shrink Spaces", mainViewModel.FilterChainViewModel.Steps[0].DisplayName);
 
             window.Close();
         }
@@ -99,11 +99,11 @@ namespace Mfr.Tests.Ui.AppliedFilters
             );
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
-            Assert.Equal("Letters Case", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+            Assert.Single(mainViewModel.FilterChainViewModel.Steps);
+            Assert.Equal("Letters Case", mainViewModel.FilterChainViewModel.Steps[0].DisplayName);
             Assert.Equal(
-                mainViewModel.AppliedFiltersViewModel.Steps[0],
-                mainViewModel.AppliedFiltersViewModel.SelectedSteps[0]
+                mainViewModel.FilterChainViewModel.Steps[0],
+                mainViewModel.FilterChainViewModel.SelectedSteps[0]
             );
             Assert.Equal(1, mainViewModel.FilterCount);
 
@@ -117,20 +117,20 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Drop_from_applied_to_palette_removes_filter()
         {
             var (window, mainViewModel, paletteList, _) = _ShowFilterPanes();
-            mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
-            mainViewModel.AppliedFiltersViewModel.SetSelectedSteps([]);
-            mainViewModel.AppliedFiltersViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            mainViewModel.FilterChainViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            mainViewModel.FilterChainViewModel.SetSelectedSteps([]);
+            mainViewModel.FilterChainViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
 
             var payload = new IndicesDragPayload([0]);
-            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.AppliedFiltersFormat);
+            var dataTransfer = payload.CreateTransfer(IndicesDragPayload.FilterChainFormat);
 
             paletteList.RaiseEvent(
                 new DragEventArgs(DragDrop.DropEvent, dataTransfer, paletteList, default, KeyModifiers.None)
             );
             Dispatcher.UIThread.RunJobs();
 
-            Assert.Single(mainViewModel.AppliedFiltersViewModel.Steps);
-            Assert.Equal("Letters Case", mainViewModel.AppliedFiltersViewModel.Steps[0].DisplayName);
+            Assert.Single(mainViewModel.FilterChainViewModel.Steps);
+            Assert.Equal("Letters Case", mainViewModel.FilterChainViewModel.Steps[0].DisplayName);
             Assert.Equal(1, mainViewModel.FilterCount);
 
             window.Close();
@@ -140,7 +140,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Window Window,
             MainWindowViewModel MainViewModel,
             ListBox PaletteList,
-            AppliedFiltersView AppliedView
+            FilterChainView AppliedView
         ) _ShowFilterPanes()
         {
             var mainViewModel = new MainWindowViewModel();
@@ -148,11 +148,11 @@ namespace Mfr.Tests.Ui.AppliedFilters
             {
                 DataContext = mainViewModel.FilterPaletteViewModel,
                 AddSelectedToAppliedCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
-                RemoveAppliedStepsCommand = mainViewModel.AppliedFiltersViewModel.RemoveStepsAtIndicesCommand,
+                RemoveFilterChainStepsCommand = mainViewModel.FilterChainViewModel.RemoveStepsAtIndicesCommand,
             };
-            var appliedView = new AppliedFiltersView
+            var appliedView = new FilterChainView
             {
-                DataContext = mainViewModel.AppliedFiltersViewModel,
+                DataContext = mainViewModel.FilterChainViewModel,
                 AddFromPaletteCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
             };
 

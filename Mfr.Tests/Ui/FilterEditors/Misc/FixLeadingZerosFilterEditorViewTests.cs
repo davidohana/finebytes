@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Fix_leading_zeros_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("FixLeadingZeros"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("FixLeadingZeros"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var filter = (FixLeadingZerosFilter)mainViewModel.AppliedFiltersViewModel.ToChain().Steps[0].Filter;
+            var filter = (FixLeadingZerosFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(4, filter.Options.Width);
             Assert.Equal(0, filter.Options.MaxCount);
             Assert.True(filter.Options.RemoveExtraZeros);

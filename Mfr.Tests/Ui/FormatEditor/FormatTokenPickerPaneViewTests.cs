@@ -220,7 +220,7 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.False(mainViewModel.FilterEditorViewModel.FormatTokenPickerExpanded);
 
-            mainViewModel.AppliedFiltersViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -246,7 +246,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             ConfigStoreTestReset.LoadEmpty();
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(persistSession: true);
-            var applied = mainViewModel.AppliedFiltersViewModel;
+            var applied = mainViewModel.FilterChainViewModel;
 
             applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
             window.UpdateLayout();

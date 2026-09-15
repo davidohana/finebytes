@@ -6,8 +6,8 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.Resources;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
-using Mfr.App.Ui.Views.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
+using Mfr.App.Ui.Views.FilterChain;
 using Mfr.Filters.Case;
 
 namespace Mfr.Tests.Ui.Presets
@@ -39,7 +39,7 @@ namespace Mfr.Tests.Ui.Presets
         [AvaloniaFact]
         public void QuickPick_Empty_Shows_Disabled_No_Presets()
         {
-            var viewModel = new AppliedFiltersViewModel();
+            var viewModel = new FilterChainViewModel();
             var (window, view) = _Show(viewModel);
             var button = view.FindControl<Button>("PresetsQuickPickButton");
             Assert.NotNull(button);
@@ -76,7 +76,7 @@ namespace Mfr.Tests.Ui.Presets
                 );
             }
 
-            var (window, view) = _Show(new AppliedFiltersViewModel(presetManager: manager));
+            var (window, view) = _Show(new FilterChainViewModel(presetManager: manager));
             var button = view.FindControl<Button>("PresetsQuickPickButton");
             Assert.NotNull(button);
             var flyout = view.PresetsQuickPickFlyout;
@@ -127,7 +127,7 @@ namespace Mfr.Tests.Ui.Presets
             window.Close();
         }
 
-        private static (Window Window, AppliedFiltersViewModel ViewModel, AppliedFiltersView View) _ShowWithPresets()
+        private static (Window Window, FilterChainViewModel ViewModel, FilterChainView View) _ShowWithPresets()
         {
             var manager = PresetManager.CreateEmpty();
             var letters = new LettersCaseFilter();
@@ -140,14 +140,14 @@ namespace Mfr.Tests.Ui.Presets
                     Chain = new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
                 }
             );
-            var viewModel = new AppliedFiltersViewModel(presetManager: manager);
+            var viewModel = new FilterChainViewModel(presetManager: manager);
             var (window, view) = _Show(viewModel);
             return (window, viewModel, view);
         }
 
-        private static (Window Window, AppliedFiltersView View) _Show(AppliedFiltersViewModel viewModel)
+        private static (Window Window, FilterChainView View) _Show(FilterChainViewModel viewModel)
         {
-            var view = new AppliedFiltersView { DataContext = viewModel };
+            var view = new FilterChainView { DataContext = viewModel };
             var window = new Window
             {
                 Width = 420,
