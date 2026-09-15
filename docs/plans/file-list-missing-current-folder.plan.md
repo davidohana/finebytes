@@ -71,5 +71,6 @@ Parent / related: [file-list-cut-copy-paste-delete.plan.md](file-list-cut-copy-p
 
 ## Deferred deeper work (from reviews)
 
-- Share Catalog’s timed `Directory.Exists` with `TryGetFirstExistingAncestor` so Go Up cannot hang on dead UNC.
+- ~~Share Catalog’s timed `Directory.Exists` with `TryGetFirstExistingAncestor`~~ — done (`FileListIo`).
+- ~~Sticky listing error until success~~ — done (clear on success; `ShowListingError` hides while `IsListing`).
 - Optional later: `FileSystemWatcher` / refresh-on-focus (see `docs/debts.md`).

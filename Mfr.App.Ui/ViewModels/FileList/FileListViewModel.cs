@@ -281,6 +281,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(HasListingError))]
+        [NotifyPropertyChangedFor(nameof(ShowListingError))]
         [NotifyPropertyChangedFor(nameof(CanShowLogInExplorer))]
         [NotifyCanExecuteChangedFor(nameof(ShowLogInExplorerCommand))]
         [NotifyCanExecuteChangedFor(nameof(PasteCommand))]
@@ -293,9 +294,19 @@ namespace Mfr.App.Ui.ViewModels.FileList
         public bool HasListingError => !string.IsNullOrEmpty(ListingError);
 
         /// <summary>
+        /// Gets whether the listing-error empty state should show (hidden while a reload is in flight).
+        /// </summary>
+        public bool ShowListingError => HasListingError && !IsListing;
+
+        /// <summary>
         /// Gets whether a folder listing is in progress.
         /// </summary>
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(ShowListingError))]
+        [NotifyPropertyChangedFor(nameof(CanShowLogInExplorer))]
+        [NotifyCanExecuteChangedFor(nameof(PasteCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ShowInExplorerCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ShowLogInExplorerCommand))]
         private bool _isListing;
 
         /// <summary>
@@ -310,7 +321,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// <summary>
         /// Gets whether the listing-error empty state may offer revealing the session log file.
         /// </summary>
-        public bool CanShowLogInExplorer => HasListingError && !string.IsNullOrEmpty(LogSession.LogFilePath);
+        public bool CanShowLogInExplorer => ShowListingError && !string.IsNullOrEmpty(LogSession.LogFilePath);
 
         /// <summary>
         /// Layout used to present <see cref="Entries"/>. Default is Report.
@@ -1199,7 +1210,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         private bool _CanUseCurrentFolderAsDestination()
         {
-            return _IsFilesystemFolderLocation() && !HasListingError;
+            return _IsFilesystemFolderLocation() && !HasListingError && !IsListing;
         }
 
         /// <summary>
@@ -1414,7 +1425,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
             Entries.Clear();
             _listedItems.Clear();
             _thumbnails.ClearCache();
-            ListingError = string.Empty;
+            // Keep ListingError until a successful apply so destination verbs stay disabled mid-refresh.
             return Interlocked.Increment(ref _listingGeneration);
         }
 
@@ -1467,6 +1478,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return;
             }
 
+            ListingError = string.Empty;
             _listedItems.AddRange(result.Items);
             FileListListingSort.Apply(_listedItems, SortMemberPath, IsSortAscending);
             _RebuildVisibleEntries(preserveSelection);

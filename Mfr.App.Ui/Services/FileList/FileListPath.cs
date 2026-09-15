@@ -296,7 +296,7 @@ namespace Mfr.App.Ui.Services.FileList
                     return true;
                 }
 
-                if (Directory.Exists(current))
+                if (FileListIo.DirectoryExists(current))
                 {
                     ancestor = current;
                     return true;

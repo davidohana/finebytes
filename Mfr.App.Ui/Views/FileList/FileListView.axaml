@@ -472,7 +472,7 @@
           HorizontalAlignment="Center"
           VerticalAlignment="Center"
           Spacing="8"
-          IsVisible="{Binding HasListingError}"
+          IsVisible="{Binding ShowListingError}"
         >
           <TextBlock
             x:Name="ListingErrorText"

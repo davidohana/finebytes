@@ -19,14 +19,6 @@ namespace Mfr.App.Ui.Services.FileList
             AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
         };
 
-        // Caps how long a disconnected UNC or mapped drive may block Exists/enumerate.
-        // The OS SMB timeout cannot be cancelled; this bound keeps File List from waiting forever
-        // after async listing already keeps the UI responsive.
-        private static readonly TimeSpan _NetworkProbeTimeout = TimeSpan.FromSeconds(15);
-
-        // First contact with a UNC server (\\ohanas) is often slower than a share Exists check.
-        private static readonly TimeSpan _UncServerProbeTimeout = TimeSpan.FromSeconds(30);
-
         private const int _VolumeListingGroup = 0;
         private const int _KnownPlaceListingGroup = 1;
 
@@ -202,7 +194,7 @@ namespace Mfr.App.Ui.Services.FileList
                 }
 
                 resolved = new DirectoryInfo(expanded).FullName;
-                return _DirectoryExists(resolved);
+                return FileListIo.DirectoryExists(resolved);
             }
             catch (Exception ex)
                 when (ex is ArgumentException or NotSupportedException or IOException or UnauthorizedAccessException)
@@ -333,8 +325,11 @@ namespace Mfr.App.Ui.Services.FileList
         private static List<FileListListedItem> _ListUncShares(string serverRoot)
         {
             if (
-                !_TryRunWithTimeout(() => _TryReadUncShares(serverRoot), _UncServerProbeTimeout, out var sharePaths)
-                || sharePaths is null
+                !FileListIo.TryRunWithTimeout(
+                    () => _TryReadUncShares(serverRoot),
+                    FileListIo.UncServerProbeTimeout,
+                    out var sharePaths
+                ) || sharePaths is null
             )
             {
                 return [];
@@ -372,9 +367,9 @@ namespace Mfr.App.Ui.Services.FileList
         [SupportedOSPlatform("windows")]
         private static bool _UncServerIsReachable(string serverRoot)
         {
-            return _TryRunWithTimeout(
+            return FileListIo.TryRunWithTimeout(
                     () => _TryReadUncShares(serverRoot) is not null,
-                    _UncServerProbeTimeout,
+                    FileListIo.UncServerProbeTimeout,
                     out var reachable
                 ) && reachable;
         }
@@ -442,13 +437,15 @@ namespace Mfr.App.Ui.Services.FileList
             failure = FileListListingFailure.None;
             try
             {
-                if (!_NeedsNetworkTimeout(path))
+                if (!FileListIo.NeedsNetworkTimeout(path))
                 {
                     (folders, files) = _ReadFolderListing(path, maskFilter);
                     return true;
                 }
 
-                var timeout = WindowsWslUnc.IsWslUncPath(path) ? _UncServerProbeTimeout : _NetworkProbeTimeout;
+                var timeout = WindowsWslUnc.IsWslUncPath(path)
+                    ? FileListIo.UncServerProbeTimeout
+                    : FileListIo.NetworkProbeTimeout;
                 var listTask = Task.Run(() => _ReadFolderListing(path, maskFilter));
                 try
                 {
@@ -553,67 +550,6 @@ namespace Mfr.App.Ui.Services.FileList
             }
 
             return !WildcardMask.MatchesAny(fileName, maskFilter.ExcludeMasks);
-        }
-
-        private static bool _DirectoryExists(string path)
-        {
-            if (!_NeedsNetworkTimeout(path))
-            {
-                return Directory.Exists(path);
-            }
-
-            return _TryRunWithTimeout(() => Directory.Exists(path), _NetworkProbeTimeout, out var exists) && exists;
-        }
-
-        private static bool _NeedsNetworkTimeout(string path)
-        {
-            if (FileListPath.IsUncPath(path))
-            {
-                return true;
-            }
-
-            try
-            {
-                var root = Path.GetPathRoot(path);
-                if (string.IsNullOrEmpty(root))
-                {
-                    return false;
-                }
-
-                return new DriveInfo(root).DriveType == DriveType.Network;
-            }
-            catch (Exception ex) when (ex is ArgumentException or IOException or UnauthorizedAccessException)
-            {
-                return false;
-            }
-        }
-
-        private static bool _TryRunWithTimeout<T>(Func<T> action, TimeSpan timeout, out T result)
-        {
-            var task = Task.Run(action);
-            try
-            {
-                if (task.Wait(timeout))
-                {
-                    result = task.Result;
-                    return true;
-                }
-            }
-            catch (AggregateException)
-            {
-                result = default!;
-                return false;
-            }
-
-            // Exists/enumerate cannot be cancelled; observe later faults so they are not unhandled.
-            _ = task.ContinueWith(
-                static completed => completed.Exception,
-                CancellationToken.None,
-                TaskContinuationOptions.OnlyOnFaulted | TaskContinuationOptions.ExecuteSynchronously,
-                TaskScheduler.Default
-            );
-            result = default!;
-            return false;
         }
 
         private static FileListListedItem _CreateListedItem(string path, bool isDirectory, int listingGroup = 0)

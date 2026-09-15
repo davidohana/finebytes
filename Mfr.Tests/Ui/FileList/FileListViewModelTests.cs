@@ -724,6 +724,67 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
+        /// Verifies Paste stays disabled while a NotFound folder is re-listing (sticky error).
+        /// </summary>
+        [Fact]
+        public void Refresh_On_ListingError_Keeps_Paste_Disabled_While_IsListing()
+        {
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var child = Directory.CreateDirectory(Path.Combine(parent, "gone")).FullName;
+            var fileClipboard = new RecordingFileClipboard();
+            fileClipboard.SeedPaste([TestPaths.Absolute("clip.txt")], preferMove: false);
+            var releaseList = new ManualResetEventSlim(false);
+            var listStarted = new ManualResetEventSlim(false);
+            var blockChildList = false;
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                child,
+                NullFileShellOpener.Instance,
+                NullTextClipboard.Instance,
+                NullFileShellOperations.Instance,
+                fileClipboard,
+                ownerHwnd: null,
+                listEntries: (path, mask, excludeEnabled, excludeMasks, pathHistory) =>
+                {
+                    if (blockChildList && PathRelations.IsSamePath(path, child))
+                    {
+                        listStarted.Set();
+                        Assert.True(releaseList.Wait(TimeSpan.FromSeconds(10)));
+                        return FileListCatalogResult.Failed(FileListListingFailure.NotFound);
+                    }
+
+                    return FileListCatalog.List(path, mask, excludeEnabled, excludeMasks, pathHistory);
+                }
+            );
+            _viewModels.Add(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Directory.Delete(child);
+            viewModel.Refresh();
+            FileListListingWait.WaitUntilIdle(viewModel);
+            Assert.True(viewModel.HasListingError);
+            Assert.False(viewModel.PasteCommand.CanExecute(null));
+
+            blockChildList = true;
+            listStarted.Reset();
+            releaseList.Reset();
+            viewModel.Refresh();
+
+            Assert.True(listStarted.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(viewModel.IsListing);
+            Assert.True(viewModel.HasListingError);
+            Assert.False(viewModel.ShowListingError);
+            Assert.False(viewModel.PasteCommand.CanExecute(null));
+
+            releaseList.Set();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.False(viewModel.IsListing);
+            Assert.True(viewModel.ShowListingError);
+            Assert.False(viewModel.PasteCommand.CanExecute(null));
+        }
+
+        /// <summary>
         /// Verifies Go Up skips nested deleted folders and lands on the first existing ancestor.
         /// </summary>
         [Fact]
