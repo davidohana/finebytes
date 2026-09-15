@@ -17,6 +17,62 @@ namespace Mfr.Models.Tags.Id3v2
     public sealed class Id3v2ModeledFrame : IEquatable<Id3v2ModeledFrame?>
     {
         /// <summary>
+        /// Modeled frame id → friendly short name (single source for ids and Apply-To labels).
+        /// </summary>
+        public static IReadOnlyDictionary<string, string> FrameIdToShortName { get; } =
+            new Dictionary<string, string>(StringComparer.Ordinal)
+            {
+                ["TALB"] = "Album",
+                ["TBPM"] = "BPM",
+                ["TCOM"] = "Composer",
+                ["TCON"] = "Genre",
+                ["TCOP"] = "Copyright",
+                ["TDAT"] = "Date",
+                ["TDEN"] = "Encoding Time",
+                ["TDOR"] = "Original Release Time",
+                ["TDRC"] = "Recording Date",
+                ["TDRL"] = "Release Time",
+                ["TDTG"] = "Tagging Time",
+                ["TENC"] = "Encoded By",
+                ["TEXT"] = "Lyricist",
+                ["TFLT"] = "File Type",
+                ["TIPL"] = "Involved People",
+                ["TIT1"] = "Grouping",
+                ["TIT2"] = "Title",
+                ["TIT3"] = "Subtitle",
+                ["TKEY"] = "Initial Key",
+                ["TLAN"] = "Language(s)",
+                ["TLEN"] = "Length",
+                ["TMED"] = "Media Type",
+                ["TMOO"] = "Mood",
+                ["TOAL"] = "Original Album",
+                ["TOFN"] = "Original Filename",
+                ["TOLY"] = "Original Lyricist",
+                ["TOPE"] = "Original Artist",
+                ["TORY"] = "Original Year",
+                ["TOWN"] = "File Owner",
+                ["TPE1"] = "Artist",
+                ["TPE2"] = "Album Artist",
+                ["TPE3"] = "Conductor",
+                ["TPE4"] = "Remixer",
+                ["TPOS"] = "Disc",
+                ["TPUB"] = "Publisher",
+                ["TRCK"] = "Track",
+                ["TRDA"] = "Recording Dates",
+                ["TRSN"] = "Radio Station Name",
+                ["TRSO"] = "Radio Station Owner",
+                ["TSIZ"] = "Size",
+                ["TSOA"] = "Album Sort",
+                ["TSOP"] = "Performer Sort",
+                ["TSSE"] = "Encoder Settings",
+                ["TSST"] = "Set Subtitle",
+                ["TYER"] = "Year",
+                ["COMM"] = "Comment",
+                ["USLT"] = "Lyrics",
+                ["TXXX"] = "Custom",
+            };
+
+        /// <summary>
         /// Frame ids whose identity includes language and/or description (not <see cref="FrameId"/> alone).
         /// </summary>
         public static IReadOnlySet<string> MultiInstanceFrameIds { get; } =
@@ -35,55 +91,16 @@ namespace Mfr.Models.Tags.Id3v2
         /// <summary>
         /// Singleton text frame ids modeled for read, write, and Filter Options Apply-To.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Derived as <see cref="FrameIdToShortName"/> keys minus <see cref="MultiInstanceFrameIds"/>.
+        /// </para>
+        /// </remarks>
         public static IReadOnlySet<string> SingletonFrameIds { get; } =
-            new HashSet<string>(StringComparer.Ordinal)
-            {
-                "TALB",
-                "TBPM",
-                "TCOM",
-                "TCON",
-                "TCOP",
-                "TDAT",
-                "TDEN",
-                "TDOR",
-                "TDRC",
-                "TDRL",
-                "TDTG",
-                "TENC",
-                "TEXT",
-                "TFLT",
-                "TIPL",
-                "TIT1",
-                "TIT2",
-                "TIT3",
-                "TKEY",
-                "TLAN",
-                "TLEN",
-                "TMED",
-                "TMOO",
-                "TOAL",
-                "TOFN",
-                "TOLY",
-                "TOPE",
-                "TORY",
-                "TOWN",
-                "TPE1",
-                "TPE2",
-                "TPE3",
-                "TPE4",
-                "TPOS",
-                "TPUB",
-                "TRCK",
-                "TRDA",
-                "TRSN",
-                "TRSO",
-                "TSIZ",
-                "TSOA",
-                "TSOP",
-                "TSSE",
-                "TSST",
-                "TYER",
-            };
+            new HashSet<string>(
+                FrameIdToShortName.Keys.Where(static id => !MultiInstanceFrameIds.Contains(id)),
+                StringComparer.Ordinal
+            );
 
         /// <summary>
         /// All modeled frame ids (singletons plus multi-instance) in stable Apply-To order.

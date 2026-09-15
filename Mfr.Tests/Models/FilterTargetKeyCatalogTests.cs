@@ -28,6 +28,18 @@ namespace Mfr.Tests.Models
                     .Concat(Id3v2ModeledFrame.MultiInstanceFrameIds.OrderBy(static id => id, StringComparer.Ordinal)),
                 Id3v2ModeledFrame.AllModeledFrameIds
             );
+            Assert.Equal(
+                Id3v2ModeledFrame.AllModeledFrameIds.OrderBy(static id => id, StringComparer.Ordinal),
+                Id3v2ModeledFrame.FrameIdToShortName.Keys.OrderBy(static id => id, StringComparer.Ordinal)
+            );
+            Assert.All(
+                Id3v2ModeledFrame.MultiInstanceFrameIds,
+                static id => Assert.Contains(id, Id3v2ModeledFrame.FrameIdToShortName.Keys)
+            );
+            Assert.All(
+                Id3v2ModeledFrame.FrameIdToShortName,
+                static pair => Assert.False(string.IsNullOrWhiteSpace(pair.Value))
+            );
         }
 
         /// <summary>
