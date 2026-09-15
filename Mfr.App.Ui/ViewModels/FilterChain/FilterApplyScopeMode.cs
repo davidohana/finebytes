@@ -1,4 +1,4 @@
-namespace Mfr.App.Ui.ViewModels.AppliedFilters
+namespace Mfr.App.Ui.ViewModels.FilterChain
 {
     /// <summary>
     /// Apply-scope mode for string-target filters in Filter Options.

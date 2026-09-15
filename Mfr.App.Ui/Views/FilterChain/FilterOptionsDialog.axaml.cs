@@ -1,10 +1,10 @@
 using Avalonia.Controls;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 
-namespace Mfr.App.Ui.Views.AppliedFilters
+namespace Mfr.App.Ui.Views.FilterChain
 {
     /// <summary>
-    /// Modal dialog for applied-filter name and Apply-To targets.
+    /// Modal dialog for filter-chain name and Apply-To targets.
     /// </summary>
     /// <remarks>
     /// Opens height-to-content, then locks height so only width remains resizable. Relocks when

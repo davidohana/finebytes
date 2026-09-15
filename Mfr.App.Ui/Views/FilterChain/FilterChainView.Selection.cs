@@ -4,21 +4,21 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.Models.Config;
 
-namespace Mfr.App.Ui.Views.AppliedFilters
+namespace Mfr.App.Ui.Views.FilterChain
 {
-    public partial class AppliedFiltersView
+    public partial class FilterChainView
     {
         private bool _isSyncingSelection;
-        private AppliedFiltersViewModel? _viewModel;
+        private FilterChainViewModel? _viewModel;
 
         private void _WireSelectionHandlers()
         {
-            AppliedFiltersList.SelectionChanged += (_, _) => _OnListSelectionChanged();
-            AppliedFiltersList.AddHandler(ContextRequestedEvent, _OnListContextRequested, RoutingStrategies.Tunnel);
+            FilterChainList.SelectionChanged += (_, _) => _OnListSelectionChanged();
+            FilterChainList.AddHandler(ContextRequestedEvent, _OnListContextRequested, RoutingStrategies.Tunnel);
             Loaded += (_, _) => _QueueRestoreSelectionFromViewModel();
         }
 
@@ -30,7 +30,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             }
 
             var item = source.FindAncestorOfType<ListBoxItem>() ?? source as ListBoxItem;
-            if (item?.DataContext is not AppliedFilterStepViewModel hit)
+            if (item?.DataContext is not FilterChainStepViewModel hit)
             {
                 return;
             }
@@ -43,7 +43,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         /// (sole selection or part of a multi-selection).
         /// </summary>
         /// <param name="hit">Step under the pointer.</param>
-        private void _SelectStepForContextMenu(AppliedFilterStepViewModel hit)
+        private void _SelectStepForContextMenu(FilterChainStepViewModel hit)
         {
             if (_viewModel is null)
             {
@@ -61,7 +61,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             );
         }
 
-        private void _OnDataContextAttached(AppliedFiltersViewModel viewModel)
+        private void _OnDataContextAttached(FilterChainViewModel viewModel)
         {
             if (ReferenceEquals(_viewModel, viewModel))
             {
@@ -80,12 +80,12 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             _QueueRestoreSelectionFromViewModel();
         }
 
-        private void _WireUiHooks(AppliedFiltersViewModel viewModel)
+        private void _WireUiHooks(FilterChainViewModel viewModel)
         {
-            viewModel.UiHooks = new AppliedFiltersUiHooks { ConfirmClearAsync = _ConfirmClearAsync };
+            viewModel.UiHooks = new FilterChainUiHooks { ConfirmClearAsync = _ConfirmClearAsync };
         }
 
-        private static void _ClearUiHooks(AppliedFiltersViewModel viewModel)
+        private static void _ClearUiHooks(FilterChainViewModel viewModel)
         {
             viewModel.UiHooks = null;
         }
@@ -101,7 +101,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 .ConfirmAsync(
                     owner,
                     title: "Remove All Filters",
-                    message: "Remove all Applied Filters?",
+                    message: "Clear the Filter Chain?",
                     kind: ConfirmationKind.ClearAppliedFilters
                 )
                 .ConfigureAwait(true);
@@ -109,7 +109,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
         private void _OnViewModelPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName is nameof(AppliedFiltersViewModel.SelectedSteps))
+            if (e.PropertyName is nameof(FilterChainViewModel.SelectedSteps))
             {
                 _QueueRestoreSelectionFromViewModel();
             }
@@ -137,7 +137,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return;
             }
 
-            _viewModel.SetSelectedSteps(_ReadSelectedSteps(AppliedFiltersList));
+            _viewModel.SetSelectedSteps(_ReadSelectedSteps(FilterChainList));
         }
 
         private bool _TryKeepMultiSelectionForDrag()
@@ -148,7 +148,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             }
 
             var anchor = _dragSession.HitIndex is int hit && snapshot.Contains(hit) ? hit : snapshot[^1];
-            _RestoreListSelection(AppliedFiltersList, snapshot, anchor);
+            _RestoreListSelection(FilterChainList, snapshot, anchor);
             return true;
         }
 
@@ -165,17 +165,17 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 .OrderBy(index => index)
                 .ToList();
             var anchorIndex = indices.Count > 0 ? indices[0] : -1;
-            _RestoreListSelection(AppliedFiltersList, indices, anchorIndex);
+            _RestoreListSelection(FilterChainList, indices, anchorIndex);
         }
 
-        private static IReadOnlyList<AppliedFilterStepViewModel> _ReadSelectedSteps(ListBox listBox)
+        private static IReadOnlyList<FilterChainStepViewModel> _ReadSelectedSteps(ListBox listBox)
         {
             return
             [
                 .. ListBoxDrag
                     .ReadSelectedIndices(listBox)
                     .Where(index => index < listBox.ItemCount)
-                    .Select(index => (AppliedFilterStepViewModel)listBox.Items[index]!),
+                    .Select(index => (FilterChainStepViewModel)listBox.Items[index]!),
             ];
         }
 

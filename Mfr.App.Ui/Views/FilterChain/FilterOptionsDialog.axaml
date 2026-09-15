@@ -1,11 +1,11 @@
 <Window
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-  xmlns:vm="using:Mfr.App.Ui.ViewModels.AppliedFilters"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterChain"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:converters="using:Mfr.App.Ui.Converters"
   xmlns:avConv="using:Avalonia.Data.Converters"
-  x:Class="Mfr.App.Ui.Views.AppliedFilters.FilterOptionsDialog"
+  x:Class="Mfr.App.Ui.Views.FilterChain.FilterOptionsDialog"
   x:DataType="vm:FilterOptionsDialogViewModel"
   Title="Filter Options"
   Icon="/Assets/mfr.ico"

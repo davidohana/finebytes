@@ -1,20 +1,20 @@
 using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 
-namespace Mfr.App.Ui.Views.AppliedFilters
+namespace Mfr.App.Ui.Views.FilterChain
 {
     /// <summary>
-    /// Applied Filters pane host.
+    /// Filter Chain pane host.
     /// </summary>
-    public partial class AppliedFiltersView : UserControl
+    public partial class FilterChainView : UserControl
     {
         /// <summary>
         /// Append-from-palette command, set by the main window shell.
         /// </summary>
         public static readonly StyledProperty<ICommand?> AddFromPaletteCommandProperty = AvaloniaProperty.Register<
-            AppliedFiltersView,
+            FilterChainView,
             ICommand?
         >(nameof(AddFromPaletteCommand));
 
@@ -28,9 +28,9 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Initializes the Applied Filters pane.
+        /// Initializes the Filter Chain pane.
         /// </summary>
-        public AppliedFiltersView()
+        public FilterChainView()
         {
             InitializeComponent();
             _WireSelectionHandlers();
@@ -40,7 +40,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             _WirePresetHandlers();
             DataContextChanged += (_, _) =>
             {
-                if (DataContext is AppliedFiltersViewModel viewModel)
+                if (DataContext is FilterChainViewModel viewModel)
                 {
                     _OnDataContextAttached(viewModel);
                 }

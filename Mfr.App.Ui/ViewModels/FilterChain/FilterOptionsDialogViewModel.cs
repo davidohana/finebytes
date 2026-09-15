@@ -3,7 +3,7 @@ using Mfr.Filters;
 using Mfr.Models.Filters;
 using Mfr.Models.Tags.Id3v2;
 
-namespace Mfr.App.Ui.ViewModels.AppliedFilters
+namespace Mfr.App.Ui.ViewModels.FilterChain
 {
     /// <summary>
     /// Draft state for the Filter Options dialog (name, Apply-To targets, and apply scope).
@@ -13,10 +13,10 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private bool _isLoadingTarget;
 
         /// <summary>
-        /// Initializes draft fields from the selected applied-filter step.
+        /// Initializes draft fields from the selected filter-chain step.
         /// </summary>
-        /// <param name="step">Applied list row being edited.</param>
-        public FilterOptionsDialogViewModel(AppliedFilterStepViewModel step)
+        /// <param name="step">Filter Chain list row being edited.</param>
+        public FilterOptionsDialogViewModel(FilterChainStepViewModel step)
         {
             ArgumentNullException.ThrowIfNull(step);
 

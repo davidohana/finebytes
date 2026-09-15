@@ -3,19 +3,19 @@
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-  xmlns:vm="using:Mfr.App.Ui.ViewModels.AppliedFilters"
+  xmlns:vm="using:Mfr.App.Ui.ViewModels.FilterChain"
   xmlns:input="using:Mfr.App.Ui.Input"
   xmlns:resources="using:Mfr.App.Ui.Resources"
   mc:Ignorable="d"
   d:DesignWidth="280"
   d:DesignHeight="200"
-  x:Class="Mfr.App.Ui.Views.AppliedFilters.AppliedFiltersView"
-  x:Name="AppliedFiltersRoot"
-  x:DataType="vm:AppliedFiltersViewModel"
+  x:Class="Mfr.App.Ui.Views.FilterChain.FilterChainView"
+  x:Name="FilterChainRoot"
+  x:DataType="vm:FilterChainViewModel"
 >
   <UserControl.Resources>
     <ResourceDictionary>
-      <ContextMenu x:Key="AppliedFiltersContextMenu" x:Shared="False">
+      <ContextMenu x:Key="FilterChainContextMenu" x:Shared="False">
         <MenuItem Header="Check All Filters" Command="{Binding CheckAllFiltersCommand}" />
         <MenuItem Header="Uncheck All Filters" Command="{Binding UncheckAllFiltersCommand}" />
         <MenuItem Header="Invert Check" Command="{Binding InvertCheckCommand}" />
@@ -33,7 +33,7 @@
     </ResourceDictionary>
   </UserControl.Resources>
   <UserControl.Styles>
-    <Style Selector="Button.applied-filter-toolbar">
+    <Style Selector="Button.filter-chain-toolbar">
       <Setter Property="Height" Value="26" />
       <Setter Property="MinHeight" Value="26" />
       <Setter Property="Padding" Value="10,4" />
@@ -41,21 +41,21 @@
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
       <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
     </Style>
-    <Style Selector="Button.applied-filter-toolbar:disabled">
+    <Style Selector="Button.filter-chain-toolbar:disabled">
       <Setter Property="Opacity" Value="0.55" />
     </Style>
     <!-- Flush split after Presets (MFR7 16×24 dropdown abutting the Presets button). -->
-    <Style Selector="Button.applied-filter-toolbar-split">
+    <Style Selector="Button.filter-chain-toolbar-split">
       <Setter Property="Width" Value="16" />
       <Setter Property="MinWidth" Value="16" />
       <Setter Property="MaxWidth" Value="16" />
       <Setter Property="Padding" Value="0" />
       <Setter Property="Margin" Value="-1,0,4,0" />
     </Style>
-    <Style Selector="Button.applied-filter-toolbar-split:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="Button.filter-chain-toolbar-split:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Padding" Value="0" />
     </Style>
-    <Style Selector="ListBox.applied-filters">
+    <Style Selector="ListBox.filter-chain">
       <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />
       <Setter Property="BorderThickness" Value="0" />
       <Setter Property="Padding" Value="0" />
@@ -65,37 +65,37 @@
       <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
       <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
     </Style>
-    <Style Selector="ListBox.applied-filters ListBoxItem">
+    <Style Selector="ListBox.filter-chain ListBoxItem">
       <Setter Property="MinHeight" Value="0" />
       <Setter Property="Padding" Value="4,2" />
       <Setter Property="Margin" Value="0" />
       <Setter Property="CornerRadius" Value="0" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
-    <Style Selector="ListBox.applied-filters ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="ListBox.filter-chain ListBoxItem /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="BorderBrush" Value="Transparent" />
       <Setter Property="BorderThickness" Value="1" />
     </Style>
-    <Style Selector="ListBox.applied-filters ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="ListBox.filter-chain ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
-    <Style Selector="ListBox.applied-filters ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="ListBox.filter-chain ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
-    <Style Selector="ListBox.applied-filters ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Style Selector="ListBox.filter-chain ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
       <Setter Property="Background" Value="{DynamicResource AppChromeSelectionBrush}" />
       <Setter Property="BorderBrush" Value="{DynamicResource AppChromeSelectionBorderBrush}" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
     </Style>
 
-    <Style Selector="TextBlock.applied-filter-subtitle">
+    <Style Selector="TextBlock.filter-chain-subtitle">
       <Setter Property="FontSize" Value="11" />
       <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
       <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
-    <Style Selector="CheckBox.applied-filter-enabled">
+    <Style Selector="CheckBox.filter-chain-enabled">
       <Setter Property="Margin" Value="0,0,6,0" />
       <Setter Property="VerticalAlignment" Value="Center" />
       <Setter Property="MinWidth" Value="0" />
@@ -110,7 +110,7 @@
             x:Name="AddFromPaletteButton"
             Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.AddSelectedFilter}"
-            Command="{Binding AddFromPaletteCommand, ElementName=AppliedFiltersRoot}"
+            Command="{Binding AddFromPaletteCommand, ElementName=FilterChainRoot}"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
           </Button>
@@ -152,7 +152,7 @@
             ToolTip.Tip="{x:Static resources:AppTips.FilterOptions}"
             IsEnabled="{Binding CanShowFilterOptions}"
           >
-            <Image Width="24" Height="24" Stretch="None" Source="/Assets/AppliedFilters/FilterOptions.png" />
+            <Image Width="24" Height="24" Stretch="None" Source="/Assets/FilterChain/FilterOptions.png" />
           </Button>
         </StackPanel>
       </Border>
@@ -160,7 +160,7 @@
         <Button
           Grid.Column="0"
           x:Name="PresetsButton"
-          Classes="tool-chrome applied-filter-toolbar"
+          Classes="tool-chrome filter-chain-toolbar"
           Margin="0"
           ToolTip.Tip="{x:Static resources:AppTips.Presets}"
         >
@@ -170,7 +170,7 @@
               Height="16"
               VerticalAlignment="Center"
               Stretch="None"
-              Source="/Assets/AppliedFilters/Presets.png"
+              Source="/Assets/FilterChain/Presets.png"
             />
             <TextBlock Text="Presets" VerticalAlignment="Center" />
           </StackPanel>
@@ -178,7 +178,7 @@
         <Button
           Grid.Column="1"
           x:Name="PresetsQuickPickButton"
-          Classes="tool-chrome applied-filter-toolbar applied-filter-toolbar-split"
+          Classes="tool-chrome filter-chain-toolbar filter-chain-toolbar-split"
           ToolTip.Tip="{x:Static resources:AppTips.PresetsQuickPick}"
         >
           <Path
@@ -194,7 +194,7 @@
         <Button
           Grid.Column="2"
           x:Name="SavePresetButton"
-          Classes="tool-chrome applied-filter-toolbar"
+          Classes="tool-chrome filter-chain-toolbar"
           ToolTip.Tip="{x:Static resources:AppTips.SavePreset}"
         >
           <StackPanel Orientation="Horizontal" Spacing="6">
@@ -203,7 +203,7 @@
               Height="16"
               VerticalAlignment="Center"
               Stretch="None"
-              Source="/Assets/AppliedFilters/SavePreset.png"
+              Source="/Assets/FilterChain/SavePreset.png"
             />
             <TextBlock Text="Save Preset" VerticalAlignment="Center" />
           </StackPanel>
@@ -212,19 +212,19 @@
       <ListBox
         Grid.Column="1"
         Grid.Row="1"
-        x:Name="AppliedFiltersList"
-        Classes="applied-filters"
+        x:Name="FilterChainList"
+        Classes="filter-chain"
         ItemsSource="{Binding Steps}"
         SelectionMode="Multiple"
-        ContextMenu="{StaticResource AppliedFiltersContextMenu}"
+        ContextMenu="{StaticResource FilterChainContextMenu}"
       >
         <ListBox.ItemTemplate>
-          <DataTemplate x:DataType="vm:AppliedFilterStepViewModel">
+          <DataTemplate x:DataType="vm:FilterChainStepViewModel">
             <Grid ColumnDefinitions="Auto,*">
-              <CheckBox Grid.Column="0" Classes="applied-filter-enabled" IsChecked="{Binding Enabled, Mode=TwoWay}" />
+              <CheckBox Grid.Column="0" Classes="filter-chain-enabled" IsChecked="{Binding Enabled, Mode=TwoWay}" />
               <StackPanel Grid.Column="1" VerticalAlignment="Center">
                 <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
-                <TextBlock Classes="applied-filter-subtitle" Text="{Binding Subtitle}" />
+                <TextBlock Classes="filter-chain-subtitle" Text="{Binding Subtitle}" />
               </StackPanel>
             </Grid>
           </DataTemplate>

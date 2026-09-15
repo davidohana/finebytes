@@ -1,18 +1,18 @@
-namespace Mfr.App.Ui.ViewModels.AppliedFilters
+namespace Mfr.App.Ui.ViewModels.FilterChain
 {
     /// <summary>
-    /// Optional UI hooks for Applied Filters (wired by the view; set in tests).
+    /// Optional UI hooks for Filter Chain (wired by the view; set in tests).
     /// </summary>
     /// <remarks>
     /// <para>
-    /// When <see cref="AppliedFiltersViewModel.UiHooks"/> is null, or <see cref="ConfirmClearAsync"/> is null
+    /// When <see cref="FilterChainViewModel.UiHooks"/> is null, or <see cref="ConfirmClearAsync"/> is null
     /// while confirmation policy requires a Clear confirm, Clear aborts.
     /// </para>
     /// </remarks>
-    public sealed class AppliedFiltersUiHooks
+    public sealed class FilterChainUiHooks
     {
         /// <summary>
-        /// Confirm before removing all Applied Filters when confirmation policy requires it.
+        /// Confirm before clearing the Filter Chain when confirmation policy requires it.
         /// </summary>
         /// <remarks>
         /// <para>

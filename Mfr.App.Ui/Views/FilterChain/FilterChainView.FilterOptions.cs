@@ -1,16 +1,16 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.App.Ui.ViewModels.FilterChain;
 
-namespace Mfr.App.Ui.Views.AppliedFilters
+namespace Mfr.App.Ui.Views.FilterChain
 {
-    public partial class AppliedFiltersView
+    public partial class FilterChainView
     {
         private void _WireFilterOptionsHandlers()
         {
             FilterOptionsButton.Click += _OnFilterOptionsClick;
-            AppliedFiltersList.DoubleTapped += _OnListDoubleTapped;
+            FilterChainList.DoubleTapped += _OnListDoubleTapped;
         }
 
         private async void _OnFilterOptionsClick(object? sender, RoutedEventArgs e)
@@ -24,7 +24,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Opens Filter Options for the single selected applied-filter row.
+        /// Opens Filter Options for the single selected filter-chain row.
         /// </summary>
         /// <returns>A task that completes when the dialog closes.</returns>
         public async Task ShowFilterOptionsAsync()

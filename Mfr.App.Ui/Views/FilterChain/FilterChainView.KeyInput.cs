@@ -5,19 +5,19 @@ using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using Mfr.App.Ui.Input;
 
-namespace Mfr.App.Ui.Views.AppliedFilters
+namespace Mfr.App.Ui.Views.FilterChain
 {
-    public partial class AppliedFiltersView
+    public partial class FilterChainView
     {
         private void _WireKeyHandlers()
         {
-            AppliedFiltersList.AddHandler(KeyDownEvent, _OnListKeyDown, RoutingStrategies.Tunnel);
+            FilterChainList.AddHandler(KeyDownEvent, _OnListKeyDown, RoutingStrategies.Tunnel);
         }
 
         /// <inheritdoc />
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (_TryHandleAppliedFiltersShortcut(e))
+            if (_TryHandleFilterChainShortcut(e))
             {
                 return;
             }
@@ -27,17 +27,17 @@ namespace Mfr.App.Ui.Views.AppliedFilters
 
         private void _OnListKeyDown(object? sender, KeyEventArgs e)
         {
-            _ = _TryHandleAppliedFiltersShortcut(e, fromList: true);
+            _ = _TryHandleFilterChainShortcut(e, fromList: true);
         }
 
-        private bool _TryHandleAppliedFiltersShortcut(KeyEventArgs e, bool fromList = false)
+        private bool _TryHandleFilterChainShortcut(KeyEventArgs e, bool fromList = false)
         {
             if (_viewModel is null || e.Handled)
             {
                 return false;
             }
 
-            var shouldHandle = fromList || _IsAppliedFiltersFocused() || _IsEventFromAppliedList(e);
+            var shouldHandle = fromList || _IsFilterChainFocused() || _IsEventFromFilterChainList(e);
             if (!shouldHandle)
             {
                 return false;
@@ -63,7 +63,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             return false;
         }
 
-        private bool _IsAppliedFiltersFocused()
+        private bool _IsFilterChainFocused()
         {
             var focused = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement();
             if (focused is null)
@@ -71,17 +71,17 @@ namespace Mfr.App.Ui.Views.AppliedFilters
                 return false;
             }
 
-            if (ReferenceEquals(focused, AppliedFiltersList))
+            if (ReferenceEquals(focused, FilterChainList))
             {
                 return true;
             }
 
-            return focused is Visual visual && visual.GetVisualAncestors().Contains(AppliedFiltersList);
+            return focused is Visual visual && visual.GetVisualAncestors().Contains(FilterChainList);
         }
 
-        private bool _IsEventFromAppliedList(KeyEventArgs e)
+        private bool _IsEventFromFilterChainList(KeyEventArgs e)
         {
-            return e.Source is Visual source && source.GetVisualAncestors().Contains(AppliedFiltersList);
+            return e.Source is Visual source && source.GetVisualAncestors().Contains(FilterChainList);
         }
     }
 }

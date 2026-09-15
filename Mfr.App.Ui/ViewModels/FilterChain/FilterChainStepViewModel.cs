@@ -2,19 +2,19 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.Filters;
 using Mfr.Models.Filters;
 
-namespace Mfr.App.Ui.ViewModels.AppliedFilters
+namespace Mfr.App.Ui.ViewModels.FilterChain
 {
     /// <summary>
-    /// One row in the Applied Filters list.
+    /// One row in the Filter Chain list.
     /// </summary>
-    public sealed partial class AppliedFilterStepViewModel : ViewModelBase
+    public sealed partial class FilterChainStepViewModel : ViewModelBase
     {
         /// <summary>
-        /// Initializes a new applied-filter step.
+        /// Initializes a new filter-chain step.
         /// </summary>
         /// <param name="displayName">Unique list label (catalog display name plus duplicate suffix).</param>
         /// <param name="filter">Filter configuration for this step.</param>
-        public AppliedFilterStepViewModel(string displayName, BaseFilter filter)
+        public FilterChainStepViewModel(string displayName, BaseFilter filter)
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(displayName);
             ArgumentNullException.ThrowIfNull(filter);

@@ -6,9 +6,9 @@ using Mfr.Models;
 using Mfr.Models.Config;
 using Mfr.Models.Filters;
 
-namespace Mfr.App.Ui.Views.AppliedFilters
+namespace Mfr.App.Ui.Views.FilterChain
 {
-    public partial class AppliedFiltersView
+    public partial class FilterChainView
     {
         /// <summary>
         /// Gets the ▾ quick-pick flyout (tests).
@@ -132,7 +132,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         /// Confirms replace when needed, then loads the preset (chain and optional columns).
         /// <para>
         /// Shared by Preset Manager Load and the toolbar ▾ quick-pick. Column apply (when the preset
-        /// includes them) happens inside <see cref="ViewModels.AppliedFilters.AppliedFiltersViewModel.LoadPreset"/>
+        /// includes them) happens inside <see cref="ViewModels.FilterChain.FilterChainViewModel.LoadPreset"/>
         /// through the wired Rename List source. On failure shows an error dialog and returns
         /// <see langword="false"/>.
         /// </para>
@@ -224,7 +224,7 @@ namespace Mfr.App.Ui.Views.AppliedFilters
         }
 
         /// <summary>
-        /// Confirms replacing a non-empty Applied Filters chain when the confirmation policy requires it.
+        /// Confirms replacing a non-empty Filter Chain when the confirmation policy requires it.
         /// </summary>
         /// <param name="owner">Owner window for the confirm dialog.</param>
         /// <returns>
@@ -245,8 +245,8 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             return await SuppressibleConfirm
                 .ConfirmAsync(
                     owner,
-                    title: "Replace Applied Filters",
-                    message: "Loading this preset will replace the current Applied Filters list. Continue?",
+                    title: "Replace Filter Chain",
+                    message: "Loading this preset will replace the current Filter Chain. Continue?",
                     kind: ConfirmationKind.ReplaceAppliedFiltersOnLoad
                 )
                 .ConfigureAwait(true);

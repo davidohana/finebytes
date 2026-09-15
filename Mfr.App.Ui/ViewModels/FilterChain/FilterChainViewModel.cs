@@ -11,17 +11,18 @@ using Mfr.Models.Config;
 using Mfr.Models.Filters;
 using Mfr.Models.RenameList;
 using Mfr.Utils;
+using FilterChainModel = Mfr.Models.Filters.FilterChain;
 
-namespace Mfr.App.Ui.ViewModels.AppliedFilters
+namespace Mfr.App.Ui.ViewModels.FilterChain
 {
     /// <summary>
-    /// Applied Filters pane: ordered filter stack edited before preview.
+    /// Filter Chain pane: ordered filter stack edited before preview.
     /// </summary>
-    public sealed partial class AppliedFiltersViewModel : ViewModelBase
+    public sealed partial class FilterChainViewModel : ViewModelBase
     {
         private readonly FilterDefaultsStore _filterDefaults;
         private readonly FilterHelpHost _filterHelp;
-        private readonly List<AppliedFilterStepViewModel> _selectedSteps = [];
+        private readonly List<FilterChainStepViewModel> _selectedSteps = [];
         private Func<IReadOnlyList<RenameListVisibleColumnSpec>>? _captureRenameListColumns;
         private Action<IReadOnlyList<RenameListVisibleColumnSpec>>? _applyRenameListColumns;
         private int _chainChangedBatchDepth;
@@ -30,10 +31,10 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Optional UI hooks for confirm dialogs; when null, gated confirms abort.
         /// </summary>
-        public AppliedFiltersUiHooks? UiHooks { get; set; }
+        public FilterChainUiHooks? UiHooks { get; set; }
 
         /// <summary>
-        /// Initializes an empty applied-filter list.
+        /// Initializes an empty filter-chain list.
         /// </summary>
         /// <param name="filterDefaults">
         /// Per-type add defaults store. When null, uses an empty store that does not read AppData
@@ -46,7 +47,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <param name="filterHelp">
         /// Opens per-filter Help HTML. When null, uses a host with default app <c>help/</c> roots.
         /// </param>
-        public AppliedFiltersViewModel(
+        public FilterChainViewModel(
             FilterDefaultsStore? filterDefaults = null,
             PresetManager? presetManager = null,
             FilterHelpHost? filterHelp = null
@@ -70,7 +71,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         public FilterPreset? LastLoaded { get; private set; }
 
         /// <summary>
-        /// Gets the most recent high-signal Applied Filters status-bar message (preset load/save).
+        /// Gets the most recent high-signal Filter Chain status-bar message (preset load/save).
         /// </summary>
         [ObservableProperty]
         private StyledTextDisplay _lastStatusMessage = StyledTextDisplay.Empty;
@@ -203,7 +204,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Gets whether loading a preset should confirm before replacing the current Applied Filters chain.
+        /// Gets whether loading a preset should confirm before replacing the current Filter Chain chain.
         /// </summary>
         /// <returns>
         /// <see langword="true"/> when <see cref="ConfirmationPolicy"/> requires replace-on-load confirm
@@ -215,7 +216,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Replaces the Applied Filters stack from <paramref name="preset"/> and records it as last-loaded.
+        /// Replaces the Filter Chain stack from <paramref name="preset"/> and records it as last-loaded.
         /// <para>
         /// When <see cref="FilterPreset.VisibleColumns"/> is present and a Rename List column source is
         /// wired, applies those columns. Caller owns confirm-replace / corrupt-open UI. Empty chains are
@@ -391,12 +392,12 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// <summary>
         /// Gets applied filter steps in stack order.
         /// </summary>
-        public ObservableCollection<AppliedFilterStepViewModel> Steps { get; }
+        public ObservableCollection<FilterChainStepViewModel> Steps { get; }
 
         /// <summary>
         /// Gets the current multi-selection.
         /// </summary>
-        public IReadOnlyList<AppliedFilterStepViewModel> SelectedSteps => _selectedSteps;
+        public IReadOnlyList<FilterChainStepViewModel> SelectedSteps => _selectedSteps;
 
         /// <summary>
         /// Gets the number of applied filters.
@@ -429,7 +430,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Replaces the current multi-selection.
         /// </summary>
         /// <param name="steps">Selected steps in list order.</param>
-        public void SetSelectedSteps(IReadOnlyList<AppliedFilterStepViewModel> steps)
+        public void SetSelectedSteps(IReadOnlyList<FilterChainStepViewModel> steps)
         {
             ArgumentNullException.ThrowIfNull(steps);
 
@@ -494,7 +495,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             var displayName = _AppendStarsUntilDisplayNameUnique(trimmedName);
-            var step = new AppliedFilterStepViewModel(displayName, filter);
+            var step = new FilterChainStepViewModel(displayName, filter);
             _WithSingleChainChanged(() => Steps.Add(step));
             SetSelectedSteps([step]);
         }
@@ -583,7 +584,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Toggles <see cref="AppliedFilterStepViewModel.Enabled"/> on every step (MFR7 Invert Check).
+        /// Toggles <see cref="FilterChainStepViewModel.Enabled"/> on every step (MFR7 Invert Check).
         /// </summary>
         [RelayCommand(CanExecute = nameof(_HasSteps))]
         public void InvertCheck()
@@ -660,8 +661,8 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// Restores the sole selected step to catalog defaults without removing it from the list.
         /// <para>
         /// Replaces the filter via <see cref="FilterCatalog.CreateDefault"/> (options, Apply To, and
-        /// scope). Keeps <see cref="AppliedFilterStepViewModel.DisplayName"/> and
-        /// <see cref="AppliedFilterStepViewModel.Enabled"/>. Requires exactly one selected step (same as
+        /// scope). Keeps <see cref="FilterChainStepViewModel.DisplayName"/> and
+        /// <see cref="FilterChainStepViewModel.Enabled"/>. Requires exactly one selected step (same as
         /// Filter Options / the Filter Configuration pane).
         /// </para>
         /// </summary>
@@ -731,12 +732,12 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Builds a <see cref="FilterChain"/> matching the current stack.
+        /// Builds a <see cref="FilterChainModel"/> matching the current stack.
         /// </summary>
         /// <returns>Enabled flags and filters in list order.</returns>
-        public FilterChain ToChain()
+        public FilterChainModel ToChain()
         {
-            return new FilterChain
+            return new FilterChainModel
             {
                 Steps =
                 [
@@ -746,7 +747,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Replaces the Applied Filters stack from a preset or session chain.
+        /// Replaces the Filter Chain stack from a preset or session chain.
         /// <para>
         /// Clears existing steps, rebuilds from <paramref name="chain"/>, restores each step’s
         /// <see cref="FilterChainStep.Name"/> when set (otherwise synthesizes a catalog display name),
@@ -755,7 +756,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// </para>
         /// </summary>
         /// <param name="chain">Source chain (always replaces; never merges).</param>
-        public void ReplaceFromChain(FilterChain chain)
+        public void ReplaceFromChain(FilterChainModel chain)
         {
             ArgumentNullException.ThrowIfNull(chain);
 
@@ -772,7 +773,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
                 {
                     var entry = _CatalogEntryFor(chainStep.Filter);
                     var displayName = _ResolveDisplayName(chainStep.Name, entry);
-                    var step = new AppliedFilterStepViewModel(displayName, chainStep.Filter)
+                    var step = new FilterChainStepViewModel(displayName, chainStep.Filter)
                     {
                         Enabled = chainStep.Enabled,
                     };
@@ -811,14 +812,14 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         {
             if (e.Action == NotifyCollectionChangedAction.Add && e.NewItems is not null)
             {
-                foreach (AppliedFilterStepViewModel step in e.NewItems)
+                foreach (FilterChainStepViewModel step in e.NewItems)
                 {
                     step.PropertyChanged += _OnStepPropertyChanged;
                 }
             }
             else if (e.Action == NotifyCollectionChangedAction.Remove && e.OldItems is not null)
             {
-                foreach (AppliedFilterStepViewModel step in e.OldItems)
+                foreach (FilterChainStepViewModel step in e.OldItems)
                 {
                     step.PropertyChanged -= _OnStepPropertyChanged;
                 }
@@ -835,11 +836,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
 
         private void _OnStepPropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (
-                e.PropertyName
-                is nameof(AppliedFilterStepViewModel.Enabled)
-                    or nameof(AppliedFilterStepViewModel.Filter)
-            )
+            if (e.PropertyName is nameof(FilterChainStepViewModel.Enabled) or nameof(FilterChainStepViewModel.Filter))
             {
                 _RaiseChainChanged();
             }
@@ -896,7 +893,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             }
 
             insertIndex = Math.Clamp(insertIndex, 0, Steps.Count);
-            var inserted = new List<AppliedFilterStepViewModel>();
+            var inserted = new List<FilterChainStepViewModel>();
             _WithSingleChainChanged(() =>
             {
                 for (var offset = 0; offset < entries.Count; offset++)
@@ -910,11 +907,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             SetSelectedSteps(inserted);
         }
 
-        private AppliedFilterStepViewModel _CreateStep(FilterCatalogEntry entry)
+        private FilterChainStepViewModel _CreateStep(FilterCatalogEntry entry)
         {
             var filter = _ResolveAddDefault(entry);
             var displayName = _GenerateCatalogDisplayName(entry);
-            return new AppliedFilterStepViewModel(displayName, filter);
+            return new FilterChainStepViewModel(displayName, filter);
         }
 
         /// <summary>
@@ -1018,7 +1015,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             SetSelectedSteps([.. Steps.Where(selected.Contains)]);
         }
 
-        private int _FindFirstSelectedIndex(IReadOnlyCollection<AppliedFilterStepViewModel> selected)
+        private int _FindFirstSelectedIndex(IReadOnlyCollection<FilterChainStepViewModel> selected)
         {
             for (var index = 0; index < Steps.Count; index++)
             {
@@ -1031,7 +1028,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             return -1;
         }
 
-        private IReadOnlyList<AppliedFilterStepViewModel> _SelectStepsAfterRemove(int anchorIndex)
+        private IReadOnlyList<FilterChainStepViewModel> _SelectStepsAfterRemove(int anchorIndex)
         {
             if (Steps.Count == 0 || anchorIndex < 0)
             {
@@ -1063,7 +1060,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         }
 
         /// <summary>
-        /// Sets <see cref="AppliedFilterStepViewModel.Enabled"/> on every step with one <see cref="ChainChanged"/>.
+        /// Sets <see cref="FilterChainStepViewModel.Enabled"/> on every step with one <see cref="ChainChanged"/>.
         /// </summary>
         /// <param name="enabled">Value written to each step.</param>
         private void _SetAllEnabled(bool enabled)

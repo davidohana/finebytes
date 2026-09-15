@@ -6,23 +6,23 @@ using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.App.Ui.Views.FilterPalette;
 using Mfr.Filters;
 
-namespace Mfr.App.Ui.Views.AppliedFilters
+namespace Mfr.App.Ui.Views.FilterChain
 {
-    public partial class AppliedFiltersView
+    public partial class FilterChainView
     {
         private readonly ListBoxDragSession _dragSession = new();
         private readonly ListBoxDropMark _dropMark = new();
 
         private void _WireDragDropHandlers()
         {
-            DragDrop.SetAllowDrop(AppliedFiltersList, true);
-            AppliedFiltersList.AddHandler(PointerPressedEvent, _OnListPointerPressed, RoutingStrategies.Tunnel);
-            AppliedFiltersList.AddHandler(PointerMovedEvent, _OnListPointerMoved, RoutingStrategies.Tunnel);
-            AppliedFiltersList.AddHandler(PointerReleasedEvent, _OnListPointerReleased, RoutingStrategies.Tunnel);
-            AppliedFiltersList.AddHandler(PointerCaptureLostEvent, _OnListPointerCaptureLost, RoutingStrategies.Tunnel);
-            AppliedFiltersList.AddHandler(DragDrop.DragOverEvent, _OnListDragOver);
-            AppliedFiltersList.AddHandler(DragDrop.DragLeaveEvent, _OnListDragLeave);
-            AppliedFiltersList.AddHandler(DragDrop.DropEvent, _OnListDrop);
+            DragDrop.SetAllowDrop(FilterChainList, true);
+            FilterChainList.AddHandler(PointerPressedEvent, _OnListPointerPressed, RoutingStrategies.Tunnel);
+            FilterChainList.AddHandler(PointerMovedEvent, _OnListPointerMoved, RoutingStrategies.Tunnel);
+            FilterChainList.AddHandler(PointerReleasedEvent, _OnListPointerReleased, RoutingStrategies.Tunnel);
+            FilterChainList.AddHandler(PointerCaptureLostEvent, _OnListPointerCaptureLost, RoutingStrategies.Tunnel);
+            FilterChainList.AddHandler(DragDrop.DragOverEvent, _OnListDragOver);
+            FilterChainList.AddHandler(DragDrop.DragLeaveEvent, _OnListDragLeave);
+            FilterChainList.AddHandler(DragDrop.DropEvent, _OnListDrop);
         }
 
         private void _OnListPointerPressed(object? sender, PointerPressedEventArgs e)
@@ -45,13 +45,13 @@ namespace Mfr.App.Ui.Views.AppliedFilters
             }
 
             await _dragSession
-                .TryBeginDragAsync(AppliedFiltersList, e, _BuildAppliedFilterDrag, _dropMark.Clear)
+                .TryBeginDragAsync(FilterChainList, e, _BuildFilterChainDrag, _dropMark.Clear)
                 .ConfigureAwait(true);
         }
 
-        private ListBoxDragStart? _BuildAppliedFilterDrag()
+        private ListBoxDragStart? _BuildFilterChainDrag()
         {
-            var indices = ListBoxDrag.ReadSelectedIndices(AppliedFiltersList);
+            var indices = ListBoxDrag.ReadSelectedIndices(FilterChainList);
             if (indices.Count == 0)
             {
                 return null;
