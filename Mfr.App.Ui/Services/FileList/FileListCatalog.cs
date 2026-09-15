@@ -115,13 +115,20 @@ namespace Mfr.App.Ui.Services.FileList
         /// Resolves a start folder for the File List: the given path, else the user profile, else cwd.
         /// </summary>
         /// <param name="initialPath">Directory to open, or <see langword="null"/> for the user profile.</param>
+        /// <param name="usedFallback">
+        /// <see langword="true"/> when <paramref name="initialPath"/> was non-empty but unusable,
+        /// so the returned path is a fallback (profile or cwd).
+        /// </param>
         /// <returns>A resolvable filesystem path.</returns>
-        public static string ResolveStartPath(string? initialPath)
+        public static string ResolveStartPath(string? initialPath, out bool usedFallback)
         {
+            usedFallback = false;
             if (TryResolvePath(initialPath, out var resolved) && !FileListPath.IsComputerPath(resolved))
             {
                 return resolved;
             }
+
+            usedFallback = !string.IsNullOrEmpty(initialPath);
 
             var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             if (TryResolvePath(profile, out resolved) && !FileListPath.IsComputerPath(resolved))

@@ -197,7 +197,12 @@ namespace Mfr.App.Ui.ViewModels.FileList
             MaskSuggestions = [.. _DefaultMasks];
             PathHistory = [];
             BreadcrumbSegments = [];
-            _Navigate(FileListCatalog.ResolveStartPath(initialPath));
+            var startPath = FileListCatalog.ResolveStartPath(initialPath, out var usedFallback);
+            _Navigate(startPath);
+            if (usedFallback)
+            {
+                LastStatusMessage = StatusBarText.Neutral($"Opened {FileListPath.ToDisplayPath(startPath)}.");
+            }
         }
 
         /// <summary>
@@ -1316,10 +1321,17 @@ namespace Mfr.App.Ui.ViewModels.FileList
             DeletePermanentCommand.NotifyCanExecuteChanged();
         }
 
+        /// <summary>
+        /// Navigates when <paramref name="path"/> resolves; otherwise leaves the current folder and sets an error status.
+        /// </summary>
+        /// <param name="path">Typed or programmatic location to open.</param>
         private void _Navigate(string? path)
         {
             if (!FileListCatalog.TryResolvePath(path, out var resolved))
             {
+                LastStatusMessage = StatusBarText.Error(
+                    FileListCatalog.FormatListingError(FileListListingFailure.NotFound)
+                );
                 return;
             }
 

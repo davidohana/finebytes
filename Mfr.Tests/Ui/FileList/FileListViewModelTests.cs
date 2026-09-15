@@ -515,7 +515,7 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
-        /// Verifies an invalid committed path leaves the current folder unchanged.
+        /// Verifies an invalid committed path leaves the current folder unchanged and sets an error status.
         /// </summary>
         [Fact]
         public void CommitPath_Ignores_Missing_Directory()
@@ -528,6 +528,73 @@ namespace Mfr.Tests.Ui.FileList
             viewModel.CommitPath();
 
             Assert.Equal(current, viewModel.CurrentPath);
+            Assert.Equal(
+                FileListCatalog.FormatListingError(FileListListingFailure.NotFound),
+                viewModel.LastStatusMessage.ToPlainText()
+            );
+            Assert.Equal(
+                StatusBarText.ErrorForegroundResourceKey,
+                viewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
+        }
+
+        /// <summary>
+        /// Verifies a deleted remembered start folder falls back and sets a neutral status naming the fallback folder.
+        /// </summary>
+        [Fact]
+        public void Constructor_Missing_Remembered_Directory_Sets_Fallback_Status()
+        {
+            var remembered = Path.Combine(_tempDirectoryFixture.CreateTempDir(), "remembered-gone");
+            Directory.CreateDirectory(remembered);
+            Directory.Delete(remembered);
+
+            var expectedStart = FileListCatalog.ResolveStartPath(remembered, out var usedFallback);
+            Assert.True(usedFallback);
+
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                remembered,
+                NullFileShellOpener.Instance,
+                NullTextClipboard.Instance,
+                NullFileShellOperations.Instance,
+                new NullFileClipboard()
+            );
+            _viewModels.Add(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.Equal(expectedStart, viewModel.CurrentPath);
+            Assert.Equal(
+                $"Opened {FileListPath.ToDisplayPath(expectedStart)}.",
+                viewModel.LastStatusMessage.ToPlainText()
+            );
+            Assert.All(viewModel.LastStatusMessage.Runs, run => Assert.Null(run.ForegroundResourceKey));
+        }
+
+        /// <summary>
+        /// Verifies <see cref="FileListCatalog.ResolveStartPath"/> does not signal fallback for a usable folder.
+        /// </summary>
+        [Fact]
+        public void ResolveStartPath_Valid_Initial_Does_Not_Signal_Fallback()
+        {
+            var dir = _CreateTree();
+
+            var resolved = FileListCatalog.ResolveStartPath(dir, out var usedFallback);
+
+            Assert.False(usedFallback);
+            Assert.Equal(new DirectoryInfo(dir).FullName, resolved);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="FileListCatalog.ResolveStartPath"/> does not signal fallback when no path was remembered.
+        /// </summary>
+        [Fact]
+        public void ResolveStartPath_Null_Initial_Does_Not_Signal_Fallback()
+        {
+            var resolved = FileListCatalog.ResolveStartPath(null, out var usedFallback);
+
+            Assert.False(usedFallback);
+            Assert.False(string.IsNullOrEmpty(resolved));
+            Assert.True(Directory.Exists(resolved));
         }
 
         /// <summary>
