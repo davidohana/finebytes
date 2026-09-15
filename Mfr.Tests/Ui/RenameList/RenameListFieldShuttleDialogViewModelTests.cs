@@ -667,17 +667,15 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void AbMode_off_keeps_originals_and_allows_preview_subtab()
+        public void AbMode_off_inserts_preview_companions_and_allows_preview_subtab()
         {
+            var fullName = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var fullNamePreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
             var dialogVm = new RenameListFieldShuttleDialogViewModel(
-                [
-                    new RenameListVisibleColumn(
-                        RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
-                    ),
-                    new RenameListVisibleColumn(
-                        RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)
-                    ),
-                ],
+                [new RenameListVisibleColumn(fullName), new RenameListVisibleColumn(fullNamePreview)],
                 []
             )
             {
@@ -689,8 +687,7 @@ namespace Mfr.Tests.Ui.RenameList
             dialogVm.IsAbModeEnabled = false;
 
             Assert.False(dialogVm.IsAbModeEnabled);
-            Assert.Single(dialogVm.ResultColumns);
-            Assert.False(dialogVm.ResultColumns[0].Key.IsPreview);
+            Assert.Equal([fullName, fullNamePreview], dialogVm.ResultColumns.Select(column => column.Key));
             dialogVm.IsPreviewColumnsTab = true;
             Assert.True(dialogVm.IsPreviewColumnsTab);
             Assert.True(dialogVm.AddAllPreviewFieldsCommand.CanExecute(null));

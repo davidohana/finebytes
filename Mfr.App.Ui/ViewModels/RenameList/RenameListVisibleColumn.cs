@@ -73,6 +73,48 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Inserts a preview companion immediately after each original that supports preview and does not
+        /// already have that preview key in the list (catalog default width).
+        /// </summary>
+        /// <param name="columns">Columns in left-to-right order (typically originals-only after A/B Mode).</param>
+        /// <returns>
+        /// Same order with missing preview companions inserted after their originals; idempotent when
+        /// companions are already present.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="columns"/> is null.</exception>
+        public static IReadOnlyList<RenameListVisibleColumn> WithPreviewCompanions(
+            IReadOnlyList<RenameListVisibleColumn> columns
+        )
+        {
+            ArgumentNullException.ThrowIfNull(columns);
+
+            var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
+            var expanded = new List<RenameListVisibleColumn>(capacity: columns.Count * 2);
+            foreach (var column in columns)
+            {
+                expanded.Add(column);
+                if (column.Key.IsPreview)
+                {
+                    continue;
+                }
+
+                if (!RenameListFieldCatalog.TryGetField(column.Key, out var field) || !field.SupportsPreview)
+                {
+                    continue;
+                }
+
+                if (!keyToIsPresent.Add(field.PreviewKey))
+                {
+                    continue;
+                }
+
+                expanded.Add(new RenameListVisibleColumn(field.PreviewKey));
+            }
+
+            return expanded;
+        }
+
+        /// <summary>
         /// Maps each key to its original form and drops later duplicates, preserving first-seen order.
         /// </summary>
         /// <param name="keys">Keys in left-to-right order (may include preview keys).</param>

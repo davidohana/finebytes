@@ -60,7 +60,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets or sets the draft A/B Mode flag. Committed with columns/sort on OK; discarded on Cancel.
         /// <para>
         /// When turned on, the selected list is normalized to originals-only, the Preview Fields subtab is
-        /// hidden, and preview keys cannot be added until the draft is turned off.
+        /// hidden, and preview keys cannot be added until the draft is turned off. When turned off, a
+        /// preview companion is inserted after each original that supports preview.
         /// </para>
         /// </summary>
         public bool IsAbModeEnabled
@@ -79,6 +80,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 {
                     IsPreviewColumnsTab = false;
                     _NormalizeSelectedColumnsToOriginals();
+                }
+                else
+                {
+                    _ExpandSelectedColumnsWithPreviewCompanions();
                 }
 
                 AddSelectedPreviewFieldCommand.NotifyCanExecuteChanged();
@@ -668,6 +673,22 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             _columns.Clear();
             _ = _columns.TryInsertMany(0, normalized);
+            _RefreshLists();
+        }
+
+        /// <summary>
+        /// Inserts preview companions after each original when the A/B Mode draft is turned off.
+        /// </summary>
+        private void _ExpandSelectedColumnsWithPreviewCompanions()
+        {
+            var expanded = RenameListVisibleColumn.WithPreviewCompanions(_columns.Items);
+            if (expanded.SequenceEqual(_columns.Items))
+            {
+                return;
+            }
+
+            _columns.Clear();
+            _ = _columns.TryInsertMany(0, expanded);
             _RefreshLists();
         }
 

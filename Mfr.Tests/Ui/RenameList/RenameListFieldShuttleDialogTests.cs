@@ -335,8 +335,10 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.False(dialogVm.IsAbModeEnabled);
             Assert.True(previewSubtab.IsEffectivelyVisible);
             Assert.False(abModeOriginalLabel.IsVisible);
-            Assert.Single(dialogVm.ResultColumns);
+            Assert.Equal(2, dialogVm.ResultColumns.Count);
             Assert.False(dialogVm.ResultColumns[0].Key.IsPreview);
+            Assert.True(dialogVm.ResultColumns[1].Key.IsPreview);
+            Assert.Equal(BasicRenameListFields.Key.FullName, dialogVm.ResultColumns[1].Key.PropertyKey);
 
             dialog.Close();
         }

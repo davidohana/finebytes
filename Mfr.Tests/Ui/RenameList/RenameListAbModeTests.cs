@@ -21,6 +21,55 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void WithPreviewCompanions_inserts_after_each_original_idempotently()
+        {
+            var itemType = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType);
+            var fullName = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var fullNamePreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+            var name = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+
+            var expanded = RenameListVisibleColumn.WithPreviewCompanions([
+                new RenameListVisibleColumn(itemType, Width: 80),
+                new RenameListVisibleColumn(fullName, Width: 200),
+                new RenameListVisibleColumn(name, Width: 120),
+            ]);
+
+            Assert.Equal(
+                [
+                    new RenameListVisibleColumn(itemType, Width: 80),
+                    new RenameListVisibleColumn(fullName, Width: 200),
+                    new RenameListVisibleColumn(fullNamePreview),
+                    new RenameListVisibleColumn(name, Width: 120),
+                    new RenameListVisibleColumn(namePreview),
+                ],
+                expanded
+            );
+            Assert.Equal(expanded, RenameListVisibleColumn.WithPreviewCompanions(expanded));
+        }
+
+        [Fact]
+        public void WithPreviewCompanions_skips_when_preview_already_present()
+        {
+            var fullName = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            var fullNamePreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.FullName
+            );
+
+            var columns = new[]
+            {
+                new RenameListVisibleColumn(fullName, Width: 200),
+                new RenameListVisibleColumn(fullNamePreview, Width: 180),
+            };
+
+            Assert.Equal(columns, RenameListVisibleColumn.WithPreviewCompanions(columns));
+        }
+
+        [Fact]
         public void NormalizeToOriginals_preview_only_becomes_originals()
         {
             var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -232,7 +281,10 @@ namespace Mfr.Tests.Ui.RenameList
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FullName
             );
-            var folderPreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            var folderPreview = RenameListFieldKey.Preview(
+                BasicRenameListField.Group,
+                BasicRenameListFields.Key.Folder
+            );
             renameListViewModel.SetVisibleColumns([
                 new RenameListVisibleColumn(folderKey, Width: 100),
                 new RenameListVisibleColumn(fullNameKey, Width: 200),
@@ -395,6 +447,41 @@ namespace Mfr.Tests.Ui.RenameList
 
             renameListViewModel.ToggleAbMode();
             Assert.False(renameListViewModel.IsAbModeEnabled);
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                    fullNamePreview,
+                ],
+                renameListViewModel.VisibleColumns.Select(column => column.Key)
+            );
+        }
+
+        [Fact]
+        public void Disabling_ab_mode_inserts_preview_companions_after_originals()
+        {
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            var itemType = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.ItemType);
+            var folder = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            var fullName = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(itemType),
+                new RenameListVisibleColumn(folder),
+                new RenameListVisibleColumn(fullName),
+            ]);
+            renameListViewModel.IsAbModeEnabled = true;
+
+            renameListViewModel.IsAbModeEnabled = false;
+
+            Assert.Equal(
+                [
+                    itemType,
+                    folder,
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Folder),
+                    fullName,
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName),
+                ],
+                renameListViewModel.VisibleColumns.Select(column => column.Key)
+            );
         }
 
         [AvaloniaFact]

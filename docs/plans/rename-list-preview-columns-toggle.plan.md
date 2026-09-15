@@ -51,7 +51,7 @@ On the **Columns** tab of [RenameListFieldShuttleDialog](../../Mfr.App.Ui/Views/
 
 Enabling A/B does **not** invent fields and does **not** drop field identity: Title (Preview) becomes Title (original). Preview *columns* leave the stored layout (they come back as derived companions on the toolbar Preview side). No confirm in v1 (KISS; hint text is enough).
 
-**When turning A/B off in the shuttle:** Preview Fields subtab returns; selected list stays as the current originals; user may add preview keys again as today.
+**When turning A/B off in the shuttle:** Preview Fields subtab returns; selected list expands so each original that supports preview gets a preview companion inserted immediately after it; user may further edit preview keys as today.
 
 `abModeEnabled` is committed with the rest of the shuttle on **OK** (same as column order). Cancel discards a mid-dialog toggle. Also persist so the next shuttle open and the toolbar side control reflect session state after OK / session restore.
 
@@ -117,7 +117,7 @@ Existing model (14d) already has **two slots per `(group, property)`** on each i
 
 - **A/B Mode chrome:** checkbox in field shuttle Columns tab; applied on OK with columns.
 - **When A/B on:** selected list **normalized** to originals-only (preview→matching original + dedupe); preview keys **cannot be selected**; Preview Fields subtab **hidden**.
-- **When A/B off:** shuttle and grid behave as today (mixed original/preview columns allowed).
+- **When A/B off:** shuttle and grid behave as today (mixed original/preview columns allowed). Turning A/B off inserts a preview companion immediately after each original that supports preview (catalog default width; skip if that preview key is already in the list).
 - **Side control:** toolbar (+ menu) Original|Preview, enabled only when `abModeEnabled`; Preview side **derives** companions, does not persist them.
 - **No restore stash** of old preview column entries when enabling A/B (normalize keeps field identity as originals; derived previews are projection-only).
 - **Normalize (not hard-delete, not invent):** preview→original + first-seen dedupe; width prefers existing original, else preview’s width, else catalog default. Preview-only layouts become originals-only without refusing A/B or injecting an unrelated fallback field.

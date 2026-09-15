@@ -255,6 +255,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <para>
         /// Enabling normalizes persisted columns to originals-only. When the remembered side is After,
         /// hydrates metadata for the After projection before the grid sticks (same path as side flip).
+        /// Disabling inserts a preview companion after each original that supports preview.
         /// </para>
         /// </summary>
         [RelayCommand]
@@ -263,6 +264,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             if (IsAbModeEnabled)
             {
                 IsAbModeEnabled = false;
+                if (IsBusy)
+                {
+                    return;
+                }
+
+                var requirement = _CombinedMetadataRequirement(_visibleColumns, _sortKeys);
+                if (!_NeedsHydrate(requirement))
+                {
+                    return;
+                }
+
+                _ = _HydrateForColumnsAndSortAsync(_visibleColumns, _sortKeys);
                 return;
             }
 
@@ -273,8 +286,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var projected = _DeriveAfterSideColumns(_visibleColumns);
-            var requirement = _CombinedMetadataRequirement(projected, _sortKeys);
-            if (!_NeedsHydrate(requirement))
+            var requirementOn = _CombinedMetadataRequirement(projected, _sortKeys);
+            if (!_NeedsHydrate(requirementOn))
             {
                 return;
             }
@@ -525,6 +538,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 _NormalizeVisibleColumnsForAbMode();
             }
+            else
+            {
+                _ExpandVisibleColumnsWithPreviewCompanions();
+            }
 
             OnPropertyChanged(nameof(ProjectedColumns));
         }
@@ -553,6 +570,21 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             _visibleColumns = [.. normalized];
+            OnPropertyChanged(nameof(VisibleColumns));
+        }
+
+        /// <summary>
+        /// Inserts preview companions after each original when A/B Mode turns off.
+        /// </summary>
+        private void _ExpandVisibleColumnsWithPreviewCompanions()
+        {
+            var expanded = RenameListVisibleColumn.WithPreviewCompanions(_visibleColumns);
+            if (expanded.SequenceEqual(_visibleColumns))
+            {
+                return;
+            }
+
+            _visibleColumns = [.. expanded];
             OnPropertyChanged(nameof(VisibleColumns));
         }
 

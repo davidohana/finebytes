@@ -29,6 +29,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             // Normalize before hydrate so cancel leaves AbMode and columns untouched.
+            // Preview companions on A/B-off are added by the shuttle draft / OnIsAbModeEnabledChanged.
             var columnsToApply = abModeEnabled ? RenameListVisibleColumn.NormalizeToOriginals(columns) : columns;
             if (
                 abModeEnabled == IsAbModeEnabled
@@ -46,7 +47,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             // Commit without flashing the pre-draft layout when enabling A/B:
             // - On: apply draft columns first (AbMode still off → no normalize), then set AbMode.
-            // - Off: clear AbMode first so SetVisibleColumns can keep preview keys.
+            // - Off: clear AbMode first (expands current originals with preview companions) so
+            //   SetVisibleColumns can keep preview keys from the draft.
             if (abModeEnabled)
             {
                 if (!columnsToApply.SequenceEqual(_visibleColumns))
