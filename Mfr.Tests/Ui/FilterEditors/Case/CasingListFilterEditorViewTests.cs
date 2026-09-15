@@ -9,7 +9,7 @@ using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Case;
 using Mfr.Filters;
 using Mfr.Filters.Case;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Case
 {
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Casing_list_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("CasingList"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("CasingList"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

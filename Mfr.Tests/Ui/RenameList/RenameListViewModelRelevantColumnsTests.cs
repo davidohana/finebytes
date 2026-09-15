@@ -26,8 +26,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void RelevantColumns_commands_disabled_when_chain_empty()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
 
             Assert.False(renameListViewModel.AddRelevantColumnsCommand.CanExecute(null));
             Assert.False(renameListViewModel.ReplaceWithRelevantColumnsCommand.CanExecute(null));
@@ -39,15 +39,15 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void RelevantColumns_commands_track_chain_count()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
 
-            appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             Assert.True(renameListViewModel.AddRelevantColumnsCommand.CanExecute(null));
             Assert.True(renameListViewModel.ReplaceWithRelevantColumnsCommand.CanExecute(null));
 
-            appliedFilters.RemoveSelectedCommand.Execute(null);
+            filterChain.RemoveSelectedCommand.Execute(null);
 
             Assert.False(renameListViewModel.AddRelevantColumnsCommand.CanExecute(null));
             Assert.False(renameListViewModel.ReplaceWithRelevantColumnsCommand.CanExecute(null));
@@ -59,9 +59,9 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_merges_missing_keys_at_end()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
-            appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
             renameListViewModel.SetVisibleColumns([
@@ -94,9 +94,9 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_dedupes_already_visible_keys()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
-            appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -127,9 +127,9 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ReplaceWithRelevantColumns_defaults_then_appends_relevant()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
-            appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             renameListViewModel.SetVisibleColumns([
                 new RenameListVisibleColumn(
@@ -154,9 +154,9 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ReplaceWithRelevantColumns_empty_map_applies_defaults_only()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
-            appliedFilters.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
 
             renameListViewModel.SetVisibleColumns([
                 new RenameListVisibleColumn(
@@ -176,9 +176,9 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_empty_map_is_noop()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
-            appliedFilters.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
 
             var before = renameListViewModel.VisibleColumns.ToList();
             await renameListViewModel.AddRelevantColumnsCommand.ExecuteAsync(null);
@@ -196,11 +196,11 @@ namespace Mfr.Tests.Ui.RenameList
             var path = Path.Combine(dir, "tagged.wav");
             TaggedMinimalWav.WriteTagged(path, title: "RelevantTitle", album: null);
 
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: appliedFilters);
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: filterChain);
             await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
 
-            appliedFilters.AddAndSelect(
+            filterChain.AddAndSelect(
                 new FormatterFilter(new FilePrefixTarget(), new FormatterOptions("<audio-title>")),
                 "Formatter"
             );

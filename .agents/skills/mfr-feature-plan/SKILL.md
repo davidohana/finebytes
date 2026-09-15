@@ -4,7 +4,7 @@ description: >-
   Writes a phased finebytes/MFR feature plan under docs/plans/: explore stubs,
   MFR7 once via mfr7-reference, lock blocking decisions, split phases. Use when
   the user says plan in details, handover a plan, or designs a new Rename List /
-  Applied Filters / FormatEditor / presets / export feature before coding — not
+  Filter Chain / FormatEditor / presets / export feature before coding — not
   for implementing phases (use mfr-plan-phase) or a single filter/editor
   (use mfr-implement-filter / mfr-implement-filter-editor).
 ---

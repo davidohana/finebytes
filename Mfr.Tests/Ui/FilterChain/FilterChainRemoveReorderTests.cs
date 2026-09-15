@@ -2,23 +2,33 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
+using Mfr.App.Ui.ViewModels.FilterChain;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
-    /// Headless tests for Applied Filters remove, clear, and reorder gestures.
+    /// Headless tests for Filter Chain remove, clear, and reorder gestures.
     /// </summary>
-    public sealed class AppliedFiltersRemoveReorderTests
+    [Collection(ConfigStoreCollection.Name)]
+    public sealed class FilterChainRemoveReorderTests
     {
+        /// <summary>
+        /// Initializes a fresh empty config so clear confirmation is isolated.
+        /// </summary>
+        public FilterChainRemoveReorderTests()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+        }
+
         /// <summary>
         /// Verifies the remove shuttle button deletes the selected step.
         /// </summary>
         [AvaloniaFact]
         public void Remove_button_removes_selected_filter()
         {
-            var (window, viewModel, list, view) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
+            var (window, viewModel, list, view) = FilterChainTestUi.ShowSeededList(selectIndex: 0);
 
-            var removeButton = view.FindControl<Button>("RemoveFromAppliedButton");
+            var removeButton = view.FindControl<Button>("RemoveFromFilterChainButton");
             Assert.NotNull(removeButton);
             Assert.NotNull(removeButton.Command);
             Assert.True(removeButton.Command.CanExecute(null));
@@ -34,16 +44,17 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Delete on the Applied list removes the selection.
+        /// Verifies Delete on the Filter Chain list removes the selection.
         /// </summary>
         [AvaloniaFact]
-        public void Delete_on_applied_list_removes_selected_filter()
+        public void Delete_on_filter_chain_list_removes_selected_filter()
         {
-            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
+            var (window, viewModel, list, _) = FilterChainTestUi.ShowSeededList(selectIndex: 0);
 
             list.Focus();
             Dispatcher.UIThread.RunJobs();
-            AppliedFiltersTestUi.PressKeyOnControl(list, Key.Delete);
+            FilterChainTestUi.PressKeyOnControl(list, Key.Delete);
+            Dispatcher.UIThread.RunJobs();
 
             Assert.Single(viewModel.Steps);
             Assert.Equal("Letters Case", viewModel.Steps[0].DisplayName);
@@ -52,16 +63,17 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies Ctrl+Up on the Applied list moves the selection up.
+        /// Verifies Ctrl+Up on the Filter Chain list moves the selection up.
         /// </summary>
         [AvaloniaFact]
-        public void Ctrl_up_on_applied_list_moves_selected_filter()
+        public void Ctrl_up_on_filter_chain_list_moves_selected_filter()
         {
-            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 1);
+            var (window, viewModel, list, _) = FilterChainTestUi.ShowSeededList(selectIndex: 1);
 
             list.Focus();
             Dispatcher.UIThread.RunJobs();
-            AppliedFiltersTestUi.PressKeyOnControl(list, Key.Up, KeyModifiers.Control);
+            FilterChainTestUi.PressKeyOnControl(list, Key.Up, KeyModifiers.Control);
+            Dispatcher.UIThread.RunJobs();
 
             Assert.Equal(["Letters Case", "Shrink Spaces"], viewModel.Steps.Select(step => step.DisplayName));
             Assert.Equal(viewModel.Steps[0], viewModel.SelectedSteps[0]);
@@ -75,9 +87,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Move_down_button_reorders_selected_filter()
         {
-            var (window, viewModel, _, view) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
+            var (window, viewModel, _, view) = FilterChainTestUi.ShowSeededList(selectIndex: 0);
 
-            var moveDownButton = view.FindControl<Button>("MoveAppliedDownButton");
+            var moveDownButton = view.FindControl<Button>("MoveFilterChainDownButton");
             Assert.NotNull(moveDownButton);
             Assert.NotNull(moveDownButton.Command);
             Assert.True(moveDownButton.Command.CanExecute(null));
@@ -94,15 +106,17 @@ namespace Mfr.Tests.Ui.AppliedFilters
         /// Verifies the clear shuttle button removes every step.
         /// </summary>
         [AvaloniaFact]
-        public void Clear_button_removes_all_filters()
+        public async Task Clear_button_removes_all_filters()
         {
-            var (window, viewModel, list, view) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
+            var (window, viewModel, list, view) = FilterChainTestUi.ShowSeededList(selectIndex: 0);
+            // Accept via hook (not Suppress): ConfigStore suppressions race with parallel suites.
+            viewModel.UiHooks = new FilterChainUiHooks { ConfirmClearAsync = () => Task.FromResult(true) };
 
-            var clearButton = view.FindControl<Button>("ClearAppliedButton");
+            var clearButton = view.FindControl<Button>("ClearFilterChainButton");
             Assert.NotNull(clearButton);
-            Assert.NotNull(clearButton.Command);
-            Assert.True(clearButton.Command.CanExecute(null));
-            clearButton.Command.Execute(null);
+            Assert.NotNull(viewModel.ClearCommand);
+            Assert.True(viewModel.ClearCommand.CanExecute(null));
+            await viewModel.ClearCommand.ExecuteAsync(null);
             Dispatcher.UIThread.RunJobs();
 
             Assert.Empty(viewModel.Steps);

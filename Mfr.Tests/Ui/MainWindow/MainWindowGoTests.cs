@@ -4,7 +4,7 @@ using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Replace;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.MainWindow
 {
@@ -87,7 +87,7 @@ namespace Mfr.Tests.Ui.MainWindow
             FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
             viewModel.RenameListViewModel.DisableAutoPreview();
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            viewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Replacer"));
             viewModel.FilterChainViewModel.Steps[0].SetFilter(_PrefixReplacer("alpha", "renamed"));
 
             Assert.Contains(viewModel.FileListViewModel.Entries, entry => entry.Name == "alpha.txt");
@@ -318,17 +318,17 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies Applied Filters preset load/save status is sticky on the main-window hint.
+        /// Verifies Filter Chain preset load/save status is sticky on the main-window hint.
         /// </summary>
         [AvaloniaFact]
-        public void AppliedFilters_preset_status_updates_main_window_hint()
+        public void FilterChain_preset_status_updates_main_window_hint()
         {
             var viewModel = new MainWindowViewModel();
             var preset = new FilterPreset
             {
                 Id = Guid.NewGuid(),
                 Name = "ShellPreset",
-                Chain = new FilterChain { Steps = [] },
+                Chain = new FilterChainModel { Steps = [] },
             };
 
             viewModel.FilterChainViewModel.LoadPreset(preset);
@@ -456,9 +456,9 @@ namespace Mfr.Tests.Ui.MainWindow
             }
         }
 
-        private static FilterChain _Chain(params ReplacerFilter[] filters)
+        private static FilterChainModel _Chain(params ReplacerFilter[] filters)
         {
-            return new FilterChain
+            return new FilterChainModel
             {
                 Steps = [.. filters.Select(filter => new FilterChainStep(Enabled: true, Filter: filter))],
             };

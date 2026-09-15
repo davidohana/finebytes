@@ -3,7 +3,7 @@ using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 using Mfr.Tests.Ui.RenameList;
 
 namespace Mfr.Tests.Ui.MainWindow
@@ -46,7 +46,7 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.False(viewModel.UndoLastCommand.CanExecute(null));
 
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            viewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Replacer"));
             viewModel.FilterChainViewModel.Steps[0].SetFilter(UndoPrepareTestUi.PrefixReplacer("alpha", "renamed"));
             ConfigStore.Ui.SuppressedConfirmations =
             [

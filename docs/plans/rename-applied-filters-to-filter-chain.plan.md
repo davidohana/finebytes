@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: p3
     content: "P3: Rename tests tree + docs; format/lint; verify build"
-    status: in_progress
+    status: completed
 isProject: false
 ---
 
@@ -26,15 +26,15 @@ isProject: false
 
 ## Naming map
 
-| From | To |
-| ---- | -- |
-| folders / namespaces `AppliedFilters` | `FilterChain` |
+| From                                             | To                                         |
+| ------------------------------------------------ | ------------------------------------------ |
+| folders / namespaces `AppliedFilters`            | `FilterChain`                              |
 | `AppliedFiltersViewModel` / `AppliedFiltersView` | `FilterChainViewModel` / `FilterChainView` |
-| `AppliedFilterStepViewModel` | `FilterChainStepViewModel` |
-| `AppliedFiltersUiHooks` | `FilterChainUiHooks` |
-| `Assets/AppliedFilters` | `Assets/FilterChain` |
-| styles `applied-filters` / `applied-filter-*` | `filter-chain` / `filter-chain-*` |
-| control `AppliedFiltersList` | `FilterChainList` |
+| `AppliedFilterStepViewModel`                     | `FilterChainStepViewModel`                 |
+| `AppliedFiltersUiHooks`                          | `FilterChainUiHooks`                       |
+| `Assets/AppliedFilters`                          | `Assets/FilterChain`                       |
+| styles `applied-filters` / `applied-filter-*`    | `filter-chain` / `filter-chain-*`          |
+| control `AppliedFiltersList`                     | `FilterChainList`                          |
 
 Inside namespace `FilterChain`, qualify the model as `Mfr.Models.Filters.FilterChain` or use a type alias when the namespace shadows the type name.
 

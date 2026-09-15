@@ -6,7 +6,7 @@ using Avalonia.VisualTree;
 using AvaloniaEdit;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 using Mfr.Tests.Ui.FilterEditors;
 
 namespace Mfr.Tests.Ui.FormatEditor
@@ -220,7 +220,7 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.False(mainViewModel.FilterEditorViewModel.FormatTokenPickerExpanded);
 
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Formatter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -248,7 +248,7 @@ namespace Mfr.Tests.Ui.FormatEditor
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes(persistSession: true);
             var applied = mainViewModel.FilterChainViewModel;
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("Formatter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -261,7 +261,7 @@ namespace Mfr.Tests.Ui.FormatEditor
 
             Assert.False(ConfigStore.FilterEditor!.FormatTokenPickerExpanded);
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Inserter"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("Inserter"));
             applied.SetSelectedSteps([applied.Steps[^1]]);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

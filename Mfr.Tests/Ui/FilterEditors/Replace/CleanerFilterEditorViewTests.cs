@@ -6,7 +6,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Replace;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Replace;
 using Mfr.Filters.Replace;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Replace
 {
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
         public void Cleaner_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Cleaner"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Cleaner"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

@@ -34,7 +34,7 @@ namespace Mfr.Tests.Ui.Presets
                 Id = Guid.NewGuid(),
                 Name = "Rock",
                 Description = "Loud",
-                Chain = new FilterChain { Steps = [] },
+                Chain = new FilterChainModel { Steps = [] },
                 VisibleColumns =
                 [
                     new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)),
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Ui.Presets
             {
                 Id = Guid.NewGuid(),
                 Name = "Plain",
-                Chain = new FilterChain { Steps = [] },
+                Chain = new FilterChainModel { Steps = [] },
             };
 
             var viewModel = new SavePresetDialogViewModel(lastLoaded);
@@ -90,7 +90,7 @@ namespace Mfr.Tests.Ui.Presets
         }
 
         /// <summary>
-        /// Verifies clearing Applied Filters leaves the Name blank even when last-loaded remains.
+        /// Verifies clearing Filter Chain leaves the Name blank even when last-loaded remains.
         /// </summary>
         [Fact]
         public void Empty_Chain_Skips_Prefill_From_LastLoaded()
@@ -100,7 +100,7 @@ namespace Mfr.Tests.Ui.Presets
                 Id = Guid.NewGuid(),
                 Name = "Rock",
                 Description = "Loud",
-                Chain = new FilterChain { Steps = [] },
+                Chain = new FilterChainModel { Steps = [] },
             };
 
             var viewModel = new SavePresetDialogViewModel(
@@ -127,19 +127,19 @@ namespace Mfr.Tests.Ui.Presets
                 {
                     Id = Guid.NewGuid(),
                     Name = "beta",
-                    Chain = new FilterChain { Steps = [] },
+                    Chain = new FilterChainModel { Steps = [] },
                 },
                 new FilterPreset
                 {
                     Id = Guid.NewGuid(),
                     Name = "Alpha",
-                    Chain = new FilterChain { Steps = [] },
+                    Chain = new FilterChainModel { Steps = [] },
                 },
                 new FilterPreset
                 {
                     Id = Guid.NewGuid(),
                     Name = "alpha2",
-                    Chain = new FilterChain { Steps = [] },
+                    Chain = new FilterChainModel { Steps = [] },
                 },
             };
 
@@ -159,7 +159,7 @@ namespace Mfr.Tests.Ui.Presets
                 Id = Guid.NewGuid(),
                 Name = "Other",
                 Description = "from other",
-                Chain = new FilterChain { Steps = [] },
+                Chain = new FilterChainModel { Steps = [] },
                 VisibleColumns =
                 [
                     new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)),
@@ -170,7 +170,7 @@ namespace Mfr.Tests.Ui.Presets
                 Id = Guid.NewGuid(),
                 Name = "Mine",
                 Description = "mine",
-                Chain = new FilterChain { Steps = [] },
+                Chain = new FilterChainModel { Steps = [] },
             };
 
             var viewModel = new SavePresetDialogViewModel(lastLoaded, existingPresets: [lastLoaded, other]);
@@ -196,7 +196,7 @@ namespace Mfr.Tests.Ui.Presets
                 Id = Guid.NewGuid(),
                 Name = "Other",
                 Description = "from other",
-                Chain = new FilterChain { Steps = [] },
+                Chain = new FilterChainModel { Steps = [] },
                 VisibleColumns =
                 [
                     new(RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)),
@@ -207,7 +207,7 @@ namespace Mfr.Tests.Ui.Presets
                 Id = Guid.NewGuid(),
                 Name = "Mine",
                 Description = "mine",
-                Chain = new FilterChain { Steps = [] },
+                Chain = new FilterChainModel { Steps = [] },
             };
 
             var viewModel = new SavePresetDialogViewModel(lastLoaded, existingPresets: [lastLoaded, other])

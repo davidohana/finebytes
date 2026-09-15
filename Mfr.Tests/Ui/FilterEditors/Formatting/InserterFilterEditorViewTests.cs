@@ -7,7 +7,7 @@ using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Formatting
@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Inserter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Inserter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Inserter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

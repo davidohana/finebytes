@@ -5,7 +5,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.Filters.Trimming;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Trimming
 {
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
             mainViewModel.FilterChainViewModel.AppendCommand.Execute(
-                AppliedFiltersTestUi.Entry("ShrinkDuplicateCharacters")
+                FilterChainTestUi.Entry("ShrinkDuplicateCharacters")
             );
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

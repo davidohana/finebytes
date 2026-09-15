@@ -6,7 +6,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.Views.FilterEditors.Space;
 using Mfr.Filters.Space;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Space
 {
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_character_other_box_accepts_typed_character()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("SpaceCharacter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -64,7 +64,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_character_checkbox_updates_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("SpaceCharacter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_character_definition_radio_updates_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("SpaceCharacter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

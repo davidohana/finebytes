@@ -123,7 +123,7 @@ namespace Mfr.Tests.Ui.RenameList
         private static void _PreviewAudioTitle(RenameListViewModel renameListViewModel)
         {
             renameListViewModel.Preview(
-                new FilterChain
+                new FilterChainModel
                 {
                     Steps =
                     [

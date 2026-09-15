@@ -6,7 +6,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Misc;
 using Mfr.Filters.Misc;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Misc
 {
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Fix_leading_zeros_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("FixLeadingZeros"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("FixLeadingZeros"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

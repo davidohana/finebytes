@@ -9,10 +9,10 @@ using Mfr.App.Ui.Views.FilterChain;
 using Mfr.App.Ui.Views.FilterPalette;
 using Mfr.Filters;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
-    /// Headless tests for adding filters from Available to Applied.
+    /// Headless tests for adding filters from Available Filters to Filter Chain.
     /// </summary>
     public sealed class FilterPaletteAddTests
     {
@@ -23,14 +23,14 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Enter_on_available_list_appends_selected_filter()
         {
             var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
-            var shrinkSpaces = AppliedFiltersTestUi.Entry("ShrinkSpaces");
+            var shrinkSpaces = FilterChainTestUi.Entry("ShrinkSpaces");
             _SelectPaletteEntry(paletteList, shrinkSpaces);
 
-            AppliedFiltersTestUi.PressKeyOnControl(paletteList, Key.Enter);
+            FilterChainTestUi.PressKeyOnControl(paletteList, Key.Enter);
 
             Assert.Single(mainViewModel.FilterChainViewModel.Steps);
             Assert.Equal("Shrink Spaces", mainViewModel.FilterChainViewModel.Steps[0].DisplayName);
-            Assert.Equal(1, appliedView.FindControl<ListBox>("AppliedFiltersList")!.ItemCount);
+            Assert.Equal(1, appliedView.FindControl<ListBox>("FilterChainList")!.ItemCount);
             Assert.Equal(1, mainViewModel.FilterCount);
 
             window.Close();
@@ -43,7 +43,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Double_click_on_available_list_appends_selected_filter()
         {
             var (window, mainViewModel, paletteList, _) = _ShowFilterPanes();
-            var lettersCase = AppliedFiltersTestUi.Entry("LettersCase");
+            var lettersCase = FilterChainTestUi.Entry("LettersCase");
             _SelectPaletteEntry(paletteList, lettersCase);
 
             paletteList.RaiseEvent(new RoutedEventArgs(InputElement.DoubleTappedEvent));
@@ -56,13 +56,13 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies the Applied Filters add button appends the palette selection.
+        /// Verifies the Filter Chain add button appends the palette selection.
         /// </summary>
         [AvaloniaFact]
-        public void Applied_add_button_appends_palette_selection()
+        public void Filter_chain_add_button_appends_palette_selection()
         {
             var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
-            var shrinkSpaces = AppliedFiltersTestUi.Entry("ShrinkSpaces");
+            var shrinkSpaces = FilterChainTestUi.Entry("ShrinkSpaces");
             _SelectPaletteEntry(paletteList, shrinkSpaces);
 
             var addButton = appliedView.FindControl<Button>("AddFromPaletteButton");
@@ -85,10 +85,10 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Drop_from_available_inserts_filter_at_drop_index()
         {
             var (window, mainViewModel, paletteList, appliedView) = _ShowFilterPanes();
-            var lettersCase = AppliedFiltersTestUi.Entry("LettersCase");
+            var lettersCase = FilterChainTestUi.Entry("LettersCase");
             _SelectPaletteEntry(paletteList, lettersCase);
 
-            var appliedList = appliedView.FindControl<ListBox>("AppliedFiltersList");
+            var appliedList = appliedView.FindControl<ListBox>("FilterChainList");
             Assert.NotNull(appliedList);
 
             var payload = new FilterPaletteDragPayload([lettersCase.Type]);
@@ -117,9 +117,9 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void Drop_from_applied_to_palette_removes_filter()
         {
             var (window, mainViewModel, paletteList, _) = _ShowFilterPanes();
-            mainViewModel.FilterChainViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            mainViewModel.FilterChainViewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             mainViewModel.FilterChainViewModel.SetSelectedSteps([]);
-            mainViewModel.FilterChainViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            mainViewModel.FilterChainViewModel.AddCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
 
             var payload = new IndicesDragPayload([0]);
             var dataTransfer = payload.CreateTransfer(IndicesDragPayload.FilterChainFormat);
@@ -147,7 +147,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var paletteView = new FilterPaletteView
             {
                 DataContext = mainViewModel.FilterPaletteViewModel,
-                AddSelectedToAppliedCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
+                AddSelectedToFilterChainCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
                 RemoveFilterChainStepsCommand = mainViewModel.FilterChainViewModel.RemoveStepsAtIndicesCommand,
             };
             var appliedView = new FilterChainView

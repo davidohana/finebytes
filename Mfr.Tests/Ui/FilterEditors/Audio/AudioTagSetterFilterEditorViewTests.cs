@@ -10,7 +10,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Audio;
 using Mfr.Filters.Audio;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Audio
@@ -27,7 +27,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Audio_tag_setter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("AudioTagSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -99,7 +99,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Audio_tag_setter_value_fields_align_vertically()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("AudioTagSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -128,7 +128,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Audio_tag_setter_label_click_toggles_field_checkbox()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("AudioTagSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("AudioTagSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

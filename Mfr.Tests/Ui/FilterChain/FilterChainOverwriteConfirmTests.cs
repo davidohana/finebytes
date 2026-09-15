@@ -3,15 +3,15 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Mfr.App.Ui.Views.FilterChain;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
-    /// Overwrite-preset confirmation gates for Applied Filters save.
+    /// Overwrite-preset confirmation gates for Filter Chain save.
     /// </summary>
     [Collection(ConfigStoreCollection.Name)]
-    public sealed class AppliedFiltersOverwriteConfirmTests
+    public sealed class FilterChainOverwriteConfirmTests
     {
-        public AppliedFiltersOverwriteConfirmTests()
+        public FilterChainOverwriteConfirmTests()
         {
             ConfigStoreTestReset.LoadEmpty();
         }

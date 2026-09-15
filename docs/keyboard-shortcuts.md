@@ -18,7 +18,7 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 | Refresh focused pane | F5              |
 | Go to address bar    | Ctrl+L or Alt+D |
 
-Undo last (Ctrl+Z) prepares an undo session from the last GO when a rename log exists: it replaces the Rename List with reverse OldValues, clears Applied Filters, and leaves disk unchanged until you press GO. Rename Log (Ctrl+Shift+L) opens the dialog (disk history + last operation); Undo there uses the same prepare path. Options (Ctrl+,) is live. GO previews the current list, warns before ignoring preview errors, applies valid renames, and clears manual field overrides on rows that were applied or hit a commit error (preview-error and skipped rows keep theirs).
+Undo last (Ctrl+Z) prepares an undo session from the last GO when a rename log exists: it replaces the Rename List with reverse OldValues, clears Filter Chain, and leaves disk unchanged until you press GO. Rename Log (Ctrl+Shift+L) opens the dialog (disk history + last operation); Undo there uses the same prepare path. Options (Ctrl+,) is live. GO previews the current list, warns before ignoring preview errors, applies valid renames, and clears manual field overrides on rows that were applied or hit a commit error (preview-error and skipped rows keep theirs).
 
 Ctrl+L is the address bar (Explorer / Chrome). Rename Log is Ctrl+Shift+L so the two do not clash. Alt+F4 is shown on **MFR → Exit** and is handled by the window manager on Windows, not as an extra app binding.
 
@@ -85,15 +85,15 @@ Click the **Select Fields** toolbar button on the Rename List, or choose **Selec
 
 **Add columns from filters** / **Set columns from filters** (Rename List toolbar after **Select Fields**, Rename List menu, or **Add** / **Set** on the field shuttle Columns tab) infer columns from the full applied filter chain (write targets and format tokens). In the shuttle they update the draft Selected fields until you press OK. Toolbar and menu apply immediately to the live column layout. There is no dedicated keyboard shortcut in v1.
 
-### Applied Filters
+### Filter Chain
 
-| Action             | Shortcut | Where it works               |
-| ------------------ | -------- | ---------------------------- |
-| Remove selected    | Del      | Applied Filters list focused |
-| Move selected up   | Ctrl+↑   | Applied Filters list focused |
-| Move selected down | Ctrl+↓   | Applied Filters list focused |
+| Action             | Shortcut | Where it works            |
+| ------------------ | -------- | ------------------------- |
+| Remove selected    | Del      | Filter Chain list focused |
+| Move selected up   | Ctrl+↑   | Filter Chain list focused |
+| Move selected down | Ctrl+↓   | Filter Chain list focused |
 
-**Filters → Add Selected Filter** appends the selected Available Filters row (same as Enter on the palette or the Applied Filters add shuttle). **Remove Selected Filter**, **Remove All Filters**, and **Move Filter Up/Down** are on the **Filters** menu and the Applied Filters shuttle column.
+**Filters → Add Selected Filter** appends the selected Available Filters row (same as Enter on the palette or the Filter Chain add shuttle). **Remove Selected Filter**, **Remove All Filters**, and **Move Filter Up/Down** are on the **Filters** menu and the Filter Chain shuttle column.
 
 ### Field shuttle (Select Fields dialog)
 

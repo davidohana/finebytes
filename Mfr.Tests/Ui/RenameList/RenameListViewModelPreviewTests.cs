@@ -8,7 +8,7 @@ using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Filters.Case;
 using Mfr.Models.RenameList.Fields.Basic;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("hello.txt", renameList.Entries[0].FullFileNamePreview);
             Assert.Equal(0, renameList.ChangeCount);
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
 
             Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
@@ -60,7 +60,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
 
@@ -82,7 +82,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
@@ -109,7 +109,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
 
             ConfirmationPolicy.Suppress(ConfirmationKind.ClearFilterChain);
@@ -138,9 +138,9 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[1].SetFilter(_LettersCase(LettersCaseMode.LowerCase));
             Assert.Equal("hello.txt", renameList.Entries[0].FullFileNamePreview);
 
@@ -160,7 +160,7 @@ namespace Mfr.Tests.Ui.RenameList
             File.WriteAllText(path, "x");
 
             var (renameList, applied) = _CreateWiredPanes(dir);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
 
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
@@ -183,7 +183,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([upperPath, lowerPath]).ConfigureAwait(true);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             Assert.Equal(1, renameList.ChangeCount);
 
@@ -207,7 +207,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             Assert.Equal(1, renameList.ChangeCount);
 
@@ -233,7 +233,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([firstPath, secondPath]).ConfigureAwait(true);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             Assert.Equal("AAA.txt", renameList.Entries[0].FullFileNamePreview);
             Assert.Equal("BBB.txt", renameList.Entries[1].FullFileNamePreview);
@@ -260,7 +260,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
 
@@ -284,7 +284,7 @@ namespace Mfr.Tests.Ui.RenameList
             File.WriteAllText(path, "x");
 
             var main = new MainWindowViewModel(dir);
-            main.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             main.FilterChainViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
 
@@ -307,12 +307,12 @@ namespace Mfr.Tests.Ui.RenameList
 
             var (renameList, applied) = _CreateWiredPanes(dir);
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             applied.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             Assert.Equal("HELLO.txt", renameList.Entries[0].FullFileNamePreview);
 
             // Force a stale identity preview while the Upper filter remains on the stack.
-            renameList.Preview(new FilterChain { Steps = [] });
+            renameList.Preview(new FilterChainModel { Steps = [] });
             Assert.Equal("hello.txt", renameList.Entries[0].FullFileNamePreview);
 
             var originalsRaises = 0;
@@ -337,12 +337,12 @@ namespace Mfr.Tests.Ui.RenameList
             var main = new MainWindowViewModel(dir);
             await main.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
             await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
-            main.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             main.FilterChainViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
             Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
 
-            main.RenameListViewModel.Preview(new FilterChain { Steps = [] });
+            main.RenameListViewModel.Preview(new FilterChainModel { Steps = [] });
             Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
 
             await main.RenameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
@@ -365,13 +365,13 @@ namespace Mfr.Tests.Ui.RenameList
             var main = new MainWindowViewModel(dir);
             await main.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
             await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
-            main.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             main.FilterChainViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
             Assert.Equal("HELLO.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
 
             main.RenameListViewModel.IsAutoPreview = false;
-            main.RenameListViewModel.Preview(new FilterChain { Steps = [] });
+            main.RenameListViewModel.Preview(new FilterChainModel { Steps = [] });
             Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
 
             await main.RenameListViewModel.RefreshCommand.ExecuteAsync(null).ConfigureAwait(true);
@@ -396,7 +396,7 @@ namespace Mfr.Tests.Ui.RenameList
             await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
 
             main.RenameListViewModel.IsAutoPreview = false;
-            main.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             main.FilterChainViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
 
@@ -419,7 +419,7 @@ namespace Mfr.Tests.Ui.RenameList
             await main.WaitForPendingPreviewAsync().ConfigureAwait(true);
 
             main.RenameListViewModel.IsAutoPreview = false;
-            main.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            main.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             main.FilterChainViewModel.Steps[0].SetFilter(_LettersCase(LettersCaseMode.UpperCase));
             Assert.Equal("hello.txt", main.RenameListViewModel.Entries[0].FullFileNamePreview);
 
@@ -451,7 +451,7 @@ namespace Mfr.Tests.Ui.RenameList
             var revisionBefore = renameList.FieldDisplayRevision;
 
             renameList.Preview(
-                new FilterChain
+                new FilterChainModel
                 {
                     Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
                 }
@@ -490,7 +490,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameList.Progress.PropertyChanged += OnProgressChanged;
             try
             {
-                var chain = new FilterChain
+                var chain = new FilterChainModel
                 {
                     Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
                 };
@@ -530,7 +530,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameList.Progress.PropertyChanged += OnProgressChanged;
             try
             {
-                var chain = new FilterChain
+                var chain = new FilterChainModel
                 {
                     Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
                 };
@@ -560,7 +560,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameList.AddPathsAsync([path]).ConfigureAwait(true);
             Assert.True(renameList.IsAutoPreview);
 
-            var chain = new FilterChain
+            var chain = new FilterChainModel
             {
                 Steps = [new FilterChainStep(Enabled: true, _LettersCase(LettersCaseMode.UpperCase))],
             };

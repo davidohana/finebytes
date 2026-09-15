@@ -5,7 +5,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Formatting
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Formatter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Formatter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -50,7 +50,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Formatter_FormatEditor_insert_updates_template()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Formatter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Formatter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

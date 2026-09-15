@@ -7,12 +7,12 @@ using Mfr.App.Ui.ViewModels.FilterChain;
 using Mfr.App.Ui.Views.FilterChain;
 using Mfr.Filters;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
-    /// Shared catalog lookup and headless host for Applied Filters tests.
+    /// Shared catalog lookup and headless host for Filter Chain tests.
     /// </summary>
-    internal static class AppliedFiltersTestUi
+    internal static class FilterChainTestUi
     {
         /// <summary>
         /// Looks up a catalog row by <see cref="FilterCatalogEntry.Type"/>.
@@ -25,7 +25,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Shows an Applied Filters view seeded with Shrink Spaces then Letters Case.
+        /// Shows an Filter Chain view seeded with Shrink Spaces then Letters Case.
         /// </summary>
         /// <param name="selectIndex">Optional row to select after seed; otherwise the last added row stays selected.</param>
         /// <returns>Host window, view model, list, and view.</returns>
@@ -56,15 +56,15 @@ namespace Mfr.Tests.Ui.AppliedFilters
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
-            var list = view.FindControl<ListBox>("AppliedFiltersList");
+            var list = view.FindControl<ListBox>("FilterChainList");
             Assert.NotNull(list);
             return (window, viewModel, list, view);
         }
 
         /// <summary>
-        /// Reads the subtitle from an Applied Filters list row.
+        /// Reads the subtitle from an Filter Chain list row.
         /// </summary>
-        /// <param name="list">Applied Filters list.</param>
+        /// <param name="list">Filter Chain list.</param>
         /// <param name="rowIndex">Zero-based row index.</param>
         /// <returns>Subtitle text.</returns>
         public static string RowSubtitle(ListBox list, int rowIndex)
@@ -98,10 +98,10 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Clicks an Applied Filters list row (not the checkbox).
+        /// Clicks an Filter Chain list row (not the checkbox).
         /// </summary>
         /// <param name="window">Host window for pointer routing.</param>
-        /// <param name="list">Applied Filters list.</param>
+        /// <param name="list">Filter Chain list.</param>
         /// <param name="rowIndex">Zero-based row index.</param>
         public static void ClickRow(Window window, ListBox list, int rowIndex)
         {

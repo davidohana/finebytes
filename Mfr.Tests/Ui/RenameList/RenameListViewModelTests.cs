@@ -417,7 +417,7 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([helloPath, worldPath, otherPath]);
             renameListViewModel.Preview(
-                FilterChain.CreateAllEnabled([
+                FilterChainModel.CreateAllEnabled([
                     new LettersCaseFilter(
                         new FilePrefixTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
@@ -449,15 +449,15 @@ namespace Mfr.Tests.Ui.RenameList
             await File.WriteAllTextAsync(alphaPath, "x");
             await File.WriteAllTextAsync(betaPath, "x");
 
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: appliedFilters);
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: filterChain);
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.EditAsNameList(nameKey);
 
-            var step = Assert.Single(appliedFilters.Steps);
-            Assert.Equal([step], appliedFilters.SelectedSteps);
+            var step = Assert.Single(filterChain.Steps);
+            Assert.Equal([step], filterChain.SelectedSteps);
             Assert.Equal("File Name List", step.DisplayName);
             var filter = Assert.IsType<NameListFilter>(step.Filter);
             Assert.IsType<FilePrefixTarget>(filter.Target);
@@ -474,14 +474,14 @@ namespace Mfr.Tests.Ui.RenameList
             var path = Path.Combine(dir, "track.mp3");
             await File.WriteAllTextAsync(path, "x");
 
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: appliedFilters);
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: filterChain);
             await renameListViewModel.AddPathsAsync([path]);
 
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
             renameListViewModel.EditAsNameList(titleKey);
 
-            var step = Assert.Single(appliedFilters.Steps);
+            var step = Assert.Single(filterChain.Steps);
             Assert.Equal("Title List", step.DisplayName);
             var filter = Assert.IsType<NameListFilter>(step.Filter);
             var target = Assert.IsType<SemanticAudioFieldTarget>(filter.Target);
@@ -499,8 +499,8 @@ namespace Mfr.Tests.Ui.RenameList
             var path = Path.Combine(dir, "row.txt");
             await File.WriteAllTextAsync(path, "x");
 
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: appliedFilters);
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: filterChain);
             await renameListViewModel.AddPathsAsync([path]);
 
             var lengthKey = RenameListFieldKey.Original(
@@ -509,7 +509,7 @@ namespace Mfr.Tests.Ui.RenameList
             );
             renameListViewModel.EditAsNameList(lengthKey);
 
-            Assert.Empty(appliedFilters.Steps);
+            Assert.Empty(filterChain.Steps);
         }
 
         /// <summary>
@@ -522,16 +522,16 @@ namespace Mfr.Tests.Ui.RenameList
             var path = Path.Combine(dir, "row.txt");
             await File.WriteAllTextAsync(path, "x");
 
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: appliedFilters);
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(dir, filterChain: filterChain);
             await renameListViewModel.AddPathsAsync([path]);
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.EditAsNameList(nameKey);
             renameListViewModel.EditAsNameList(nameKey);
 
-            Assert.Equal(["File Name List", "File Name List*"], appliedFilters.Steps.Select(step => step.DisplayName));
-            Assert.Equal(appliedFilters.Steps[1], Assert.Single(appliedFilters.SelectedSteps));
+            Assert.Equal(["File Name List", "File Name List*"], filterChain.Steps.Select(step => step.DisplayName));
+            Assert.Equal(filterChain.Steps[1], Assert.Single(filterChain.SelectedSteps));
         }
 
         /// <summary>
@@ -744,7 +744,7 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = _context.CreateRenameListViewModel(dir);
             await renameListViewModel.AddPathsAsync([helloPath]);
             renameListViewModel.Preview(
-                FilterChain.CreateAllEnabled([
+                FilterChainModel.CreateAllEnabled([
                     new LettersCaseFilter(
                         new FilePrefixTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
@@ -1593,7 +1593,7 @@ namespace Mfr.Tests.Ui.RenameList
                 BasicRenameListFields.Key.FullPath
             );
             entry.EngineItem.SetOverride(previewPath, "not-a-full-path");
-            renameListViewModel.Preview(FilterChain.CreateAllEnabled([]));
+            renameListViewModel.Preview(FilterChainModel.CreateAllEnabled([]));
 
             Assert.True(entry.HasPreviewError);
             renameListViewModel.SetFocusedFieldKey(previewPath);

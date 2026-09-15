@@ -35,14 +35,14 @@ namespace Mfr.Tests.Ui.Presets
                         Id = Guid.NewGuid(),
                         Name = name,
                         Description = $"desc-{name}",
-                        Chain = new FilterChain { Steps = [] },
+                        Chain = new FilterChainModel { Steps = [] },
                     }
                 );
             }
 
-            var appliedFilters = new FilterChainViewModel(presetManager: manager);
-            var viewModel = new PresetManagerDialogViewModel(appliedFilters);
-            var dialog = new PresetManagerDialog(viewModel, appliedFilters, tryLoadAsync: _ => Task.FromResult(false));
+            var filterChain = new FilterChainViewModel(presetManager: manager);
+            var viewModel = new PresetManagerDialogViewModel(filterChain);
+            var dialog = new PresetManagerDialog(viewModel, filterChain, tryLoadAsync: _ => Task.FromResult(false));
             dialog.Show();
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

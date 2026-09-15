@@ -10,7 +10,7 @@ namespace Mfr.Models.Filters
     /// <param name="Enabled">Whether this step participates when applying the chain.</param>
     /// <param name="Filter">The filter configuration for this step.</param>
     /// <param name="Name">
-    /// Optional Applied Filters list label. When null or blank on load, the UI synthesizes a catalog
+    /// Optional Filter Chain list label. When null or blank on load, the UI synthesizes a catalog
     /// display name (with <c>(2)</c>, <c>(3)</c>, … for duplicate types).
     /// </param>
     public sealed record FilterChainStep(

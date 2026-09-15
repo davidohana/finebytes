@@ -15,16 +15,16 @@ namespace Mfr.App.Ui.Views.FilterPalette
         /// <summary>
         /// Filter Chain append command, set by the main window shell.
         /// </summary>
-        public static readonly StyledProperty<ICommand?> AddSelectedToAppliedCommandProperty =
-            AvaloniaProperty.Register<FilterPaletteView, ICommand?>(nameof(AddSelectedToAppliedCommand));
+        public static readonly StyledProperty<ICommand?> AddSelectedToFilterChainCommandProperty =
+            AvaloniaProperty.Register<FilterPaletteView, ICommand?>(nameof(AddSelectedToFilterChainCommand));
 
         /// <summary>
         /// Gets or sets the command that appends the selected catalog row to Filter Chain.
         /// </summary>
-        public ICommand? AddSelectedToAppliedCommand
+        public ICommand? AddSelectedToFilterChainCommand
         {
-            get => GetValue(AddSelectedToAppliedCommandProperty);
-            set => SetValue(AddSelectedToAppliedCommandProperty, value);
+            get => GetValue(AddSelectedToFilterChainCommandProperty);
+            set => SetValue(AddSelectedToFilterChainCommandProperty, value);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _OnSearchKeyDown(object? sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && _TryAddSelectedToApplied())
+            if (e.Key == Key.Enter && _TryAddSelectedToFilterChain())
             {
                 e.Handled = true;
                 return;
@@ -67,7 +67,7 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _OnFilterListKeyDown(object? sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter && _TryAddSelectedToApplied())
+            if (e.Key == Key.Enter && _TryAddSelectedToFilterChain())
             {
                 e.Handled = true;
                 return;
@@ -104,15 +104,15 @@ namespace Mfr.App.Ui.Views.FilterPalette
 
         private void _OnFilterListDoubleTapped(object? sender, RoutedEventArgs e)
         {
-            if (_TryAddSelectedToApplied())
+            if (_TryAddSelectedToFilterChain())
             {
                 e.Handled = true;
             }
         }
 
-        private bool _TryAddSelectedToApplied()
+        private bool _TryAddSelectedToFilterChain()
         {
-            var command = AddSelectedToAppliedCommand;
+            var command = AddSelectedToFilterChainCommand;
             if (command is null || !command.CanExecute(null))
             {
                 return false;

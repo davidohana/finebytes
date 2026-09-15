@@ -95,11 +95,11 @@ namespace Mfr.Tests.Ui.Presets
         public void Manager_Import_Samples_Button_Invokes_Dialog_Path()
         {
             var invoked = false;
-            var appliedFilters = new FilterChainViewModel();
-            var viewModel = new PresetManagerDialogViewModel(appliedFilters);
+            var filterChain = new FilterChainViewModel();
+            var viewModel = new PresetManagerDialogViewModel(filterChain);
             var dialog = new PresetManagerDialog(
                 viewModel,
-                appliedFilters,
+                filterChain,
                 tryLoadAsync: _ => Task.FromResult(false),
                 importSamplesAsync: () =>
                 {

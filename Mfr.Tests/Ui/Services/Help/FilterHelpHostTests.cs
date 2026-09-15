@@ -1,7 +1,7 @@
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FilterChain;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.Services.Help
 {
@@ -95,9 +95,9 @@ namespace Mfr.Tests.Ui.Services.Help
     }
 
     /// <summary>
-    /// Applied Filters help command enablement and open wiring.
+    /// Filter Chain help command enablement and open wiring.
     /// </summary>
-    public sealed class AppliedFiltersFilterHelpTests
+    public sealed class FilterChainFilterHelpTests
     {
         /// <summary>
         /// Verifies help is enabled for a single mapped selection and opens the file.
@@ -113,7 +113,7 @@ namespace Mfr.Tests.Ui.Services.Help
                 File.WriteAllText(helpFile, "<html></html>");
                 var opener = new RecordingShellOpener();
                 var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
-                viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+                viewModel.AddCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
 
                 Assert.True(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));
                 string? missing = null;
@@ -142,7 +142,7 @@ namespace Mfr.Tests.Ui.Services.Help
             {
                 var opener = new RecordingShellOpener();
                 var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
-                viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("SpaceCharacter"));
+                viewModel.AddCommand.Execute(FilterChainTestUi.Entry("SpaceCharacter"));
                 string? missing = null;
                 viewModel.FilterHelpMissing += (_, fileName) => missing = fileName;
 
@@ -164,9 +164,9 @@ namespace Mfr.Tests.Ui.Services.Help
         public void OpenSelectedFilterHelp_disabled_for_multi_select()
         {
             var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(NullFileShellOpener.Instance, []));
-            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            viewModel.AddCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([viewModel.Steps[0], viewModel.Steps[1]]);
 
             Assert.False(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));

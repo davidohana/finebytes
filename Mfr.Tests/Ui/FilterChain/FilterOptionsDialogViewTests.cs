@@ -12,7 +12,7 @@ using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
 using Mfr.Tests.Ui.Controls;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
     /// Headless layout tests for the Filter Options dialog.

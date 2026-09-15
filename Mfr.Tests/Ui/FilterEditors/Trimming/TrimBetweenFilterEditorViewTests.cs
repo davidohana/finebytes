@@ -7,7 +7,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.Filters.Trimming;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Trimming
 {
@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Trim_between_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimBetween"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("TrimBetween"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -63,7 +63,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Visual_trim_helper_selection_updates_trim_between_range()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimBetween"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("TrimBetween"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

@@ -6,7 +6,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Space;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Space;
 using Mfr.Filters.Space;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Space
 {
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_after_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceAfter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("SpaceAfter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -55,7 +55,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
         public void Space_around_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("SpaceAround"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("SpaceAround"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

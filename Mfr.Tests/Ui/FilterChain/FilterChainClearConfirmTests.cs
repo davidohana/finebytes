@@ -1,14 +1,14 @@
 using Mfr.App.Ui.ViewModels.FilterChain;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
-    /// Clear-command confirmation gates for Applied Filters.
+    /// Clear-command confirmation gates for Filter Chain.
     /// </summary>
     [Collection(ConfigStoreCollection.Name)]
-    public sealed class AppliedFiltersClearConfirmTests
+    public sealed class FilterChainClearConfirmTests
     {
-        public AppliedFiltersClearConfirmTests()
+        public FilterChainClearConfirmTests()
         {
             ConfigStoreTestReset.LoadEmpty();
         }
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var viewModel = new FilterChainViewModel();
             Assert.False(viewModel.NeedsConfirmReplaceOnLoad());
 
-            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             Assert.True(viewModel.NeedsConfirmReplaceOnLoad());
 
             ConfirmationPolicy.Suppress(ConfirmationKind.ReplaceFilterChainOnLoad);
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public async Task Clear_confirm_accept_clears_stack()
         {
             var viewModel = new FilterChainViewModel();
-            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             var asked = 0;
             viewModel.UiHooks = new FilterChainUiHooks
             {
@@ -54,13 +54,13 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies decline leaves the Applied Filters stack unchanged.
+        /// Verifies decline leaves the Filter Chain stack unchanged.
         /// </summary>
         [Fact]
         public async Task Clear_confirm_decline_keeps_stack()
         {
             var viewModel = new FilterChainViewModel();
-            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             viewModel.UiHooks = new FilterChainUiHooks { ConfirmClearAsync = () => Task.FromResult(false) };
 
             await viewModel.ClearCommand.ExecuteAsync(null);
@@ -76,7 +76,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             ConfirmationPolicy.Suppress(ConfirmationKind.ClearFilterChain);
             var viewModel = new FilterChainViewModel();
-            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             var asked = 0;
             viewModel.UiHooks = new FilterChainUiHooks
             {
@@ -100,7 +100,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public async Task Clear_null_hook_aborts()
         {
             var viewModel = new FilterChainViewModel();
-            viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             await viewModel.ClearCommand.ExecuteAsync(null);
 

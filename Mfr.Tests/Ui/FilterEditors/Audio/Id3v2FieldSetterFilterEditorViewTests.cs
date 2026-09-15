@@ -7,7 +7,7 @@ using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Audio;
 using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Audio
@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Id3v2_field_setter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Id3v2FieldSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Id3v2FieldSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

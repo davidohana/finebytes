@@ -1,7 +1,7 @@
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.Filters.Replace;
 using Mfr.Models.Config;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -37,7 +37,7 @@ namespace Mfr.Tests.Ui.RenameList
             }
 
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
-            viewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("Replacer"));
+            viewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Replacer"));
             viewModel.FilterChainViewModel.Steps[0].SetFilter(PrefixReplacer("alpha", "renamed"));
             ConfigStore.Ui.SuppressedConfirmations =
             [

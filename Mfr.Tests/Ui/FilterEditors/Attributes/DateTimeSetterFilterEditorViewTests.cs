@@ -6,7 +6,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Attributes;
 using Mfr.App.Ui.Views.FilterEditors.Attributes;
 using Mfr.Filters.Attributes;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Attributes
 {
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Attributes
         public void Date_time_setter_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("DateTimeSetter"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("DateTimeSetter"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

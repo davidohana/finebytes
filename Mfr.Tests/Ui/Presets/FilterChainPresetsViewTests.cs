@@ -13,9 +13,9 @@ using Mfr.Filters.Case;
 namespace Mfr.Tests.Ui.Presets
 {
     /// <summary>
-    /// Headless tests for Applied Filters preset toolbar (▾ quick-pick + tips).
+    /// Headless tests for Filter Chain preset toolbar (▾ quick-pick + tips).
     /// </summary>
-    public sealed class AppliedFiltersPresetsViewTests
+    public sealed class FilterChainPresetsViewTests
     {
         /// <summary>
         /// Verifies Presets / ▾ / Save toolbar tips bind to <see cref="AppTips"/>.
@@ -71,7 +71,7 @@ namespace Mfr.Tests.Ui.Presets
                     {
                         Id = Guid.NewGuid(),
                         Name = name,
-                        Chain = new FilterChain { Steps = [] },
+                        Chain = new FilterChainModel { Steps = [] },
                     }
                 );
             }
@@ -137,7 +137,7 @@ namespace Mfr.Tests.Ui.Presets
                     Id = Guid.NewGuid(),
                     Name = "Demo",
                     Description = "demo",
-                    Chain = new FilterChain { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
+                    Chain = new FilterChainModel { Steps = [new FilterChainStep(Enabled: true, Filter: letters)] },
                 }
             );
             var viewModel = new FilterChainViewModel(presetManager: manager);

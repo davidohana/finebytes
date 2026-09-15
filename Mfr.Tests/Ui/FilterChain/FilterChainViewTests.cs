@@ -7,10 +7,10 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views.FilterChain;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
-    /// Headless tests for the Applied Filters list UI.
+    /// Headless tests for the Filter Chain list UI.
     /// </summary>
     public sealed class FilterChainViewTests
     {
@@ -20,13 +20,13 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Seeded_steps_render_in_list()
         {
-            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList();
+            var (window, viewModel, list, _) = FilterChainTestUi.ShowSeededList();
 
             Assert.Equal(2, list.ItemCount);
             Assert.Equal("Shrink Spaces", _RowDisplayName(list, 0));
-            Assert.Equal("Shrink Spaces · File Name", AppliedFiltersTestUi.RowSubtitle(list, 0));
+            Assert.Equal("Shrink Spaces · File Name", FilterChainTestUi.RowSubtitle(list, 0));
             Assert.Equal("Letters Case", _RowDisplayName(list, 1));
-            Assert.Equal("Letters Case · File Name", AppliedFiltersTestUi.RowSubtitle(list, 1));
+            Assert.Equal("Letters Case · File Name", FilterChainTestUi.RowSubtitle(list, 1));
             Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
             Assert.Single(list.Selection.SelectedIndexes);
 
@@ -39,7 +39,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Checkbox_click_toggles_enabled_on_step_and_chain()
         {
-            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList();
+            var (window, viewModel, list, _) = FilterChainTestUi.ShowSeededList();
             var step = viewModel.Steps[0];
             Assert.True(step.Enabled);
             Assert.True(viewModel.ToChain().Steps[0].Enabled);
@@ -74,7 +74,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
 
             Assert.Equal(0, viewModel.FilterCount);
 
-            viewModel.FilterChainViewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            viewModel.FilterChainViewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -85,12 +85,12 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies the Applied Filters list exposes the context menu with expected headers.
+        /// Verifies the Filter Chain list exposes the context menu with expected headers.
         /// </summary>
         [AvaloniaFact]
         public void List_Has_ContextMenu_With_Expected_Items()
         {
-            var (window, _, list, _) = AppliedFiltersTestUi.ShowSeededList();
+            var (window, _, list, _) = FilterChainTestUi.ShowSeededList();
 
             Assert.NotNull(list.ContextMenu);
             var headers = list.ContextMenu.Items.OfType<MenuItem>().Select(item => item.Header?.ToString()).ToList();
@@ -116,7 +116,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void ContextRequest_On_Unselected_Row_Selects_That_Row()
         {
-            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 1);
+            var (window, viewModel, list, _) = FilterChainTestUi.ShowSeededList(selectIndex: 1);
             Assert.Equal(viewModel.Steps[1], viewModel.SelectedSteps[0]);
 
             var row = list.ContainerFromIndex(0) as ListBoxItem;
@@ -136,7 +136,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void ContextRequest_On_Selected_Row_Keeps_MultiSelection()
         {
-            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
+            var (window, viewModel, list, _) = FilterChainTestUi.ShowSeededList(selectIndex: 0);
             viewModel.SetSelectedSteps([viewModel.Steps[0], viewModel.Steps[1]]);
             Dispatcher.UIThread.RunJobs();
             Assert.Equal([0, 1], list.Selection.SelectedIndexes.OrderBy(i => i).ToList());

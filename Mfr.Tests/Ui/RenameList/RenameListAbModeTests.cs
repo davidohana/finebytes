@@ -370,9 +370,9 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task ReplaceWithRelevantColumns_under_ab_mode_stays_originals_only()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
-            appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
             renameListViewModel.IsAbModeEnabled = true;
 
             await renameListViewModel.ReplaceWithRelevantColumnsCommand.ExecuteAsync(null);
@@ -394,9 +394,9 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_under_ab_mode_adds_original_only_and_skips_preview_companion()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
-            appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
             renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(folderKey, Width: 180)]);
@@ -414,9 +414,9 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public async Task AddRelevantColumns_under_ab_mode_is_noop_when_original_already_visible()
         {
-            var appliedFilters = new FilterChainViewModel();
-            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: appliedFilters);
-            appliedFilters.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
             var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(nameOriginal, Width: 120)]);

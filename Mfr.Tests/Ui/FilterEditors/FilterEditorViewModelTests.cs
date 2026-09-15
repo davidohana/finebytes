@@ -32,7 +32,7 @@ namespace Mfr.Tests.Ui.FilterEditors
         }
 
         /// <summary>
-        /// Verifies the first selected step sets the Applied Filter title.
+        /// Verifies the first selected step sets the Filter title.
         /// </summary>
         [Fact]
         public void SyncSelection_with_one_step_sets_title()
@@ -43,7 +43,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             editor.SyncSelection([step]);
 
             Assert.True(editor.HasSelectedStep);
-            Assert.Equal("Applied Filter: Shrink Spaces", editor.TitleText);
+            Assert.Equal("Filter: Shrink Spaces", editor.TitleText);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Ui.FilterEditors
             editor.SyncSelection([first, second]);
 
             Assert.True(editor.HasSelectedStep);
-            Assert.Equal("Applied Filter: Shrink Spaces", editor.TitleText);
+            Assert.Equal("Filter: Shrink Spaces", editor.TitleText);
         }
 
         /// <summary>

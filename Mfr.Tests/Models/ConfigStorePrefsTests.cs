@@ -152,7 +152,7 @@ namespace Mfr.Tests.Models
                     .EnumerateArray()
                     .Select(e => e.GetString()!)
                     .ToArray();
-                Assert.Equal(["clearAppliedFilters"], suppressed);
+                Assert.Equal(["clearFilterChain"], suppressed);
                 Assert.Equal("*.flac", doc.RootElement.GetProperty("fileList").GetProperty("fileMask").GetString());
                 Assert.True(doc.RootElement.GetProperty("filterDefaults").TryGetProperty("LettersCase", out _));
                 Assert.False(doc.RootElement.GetProperty("filterDefaults").TryGetProperty("defaults", out _));

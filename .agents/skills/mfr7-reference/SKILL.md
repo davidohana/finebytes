@@ -177,7 +177,7 @@ Get-ChildItem "D:\Devl\mfr7\Core\MfrFilters\FormattingParams" -Recurse -Filter "
 
 Documented in `Mfr.App.Ui/README.md` and `Help/ui.html`, `Help/parts.html`, `Help/overview.html`:
 
-- Splitter shell: File List (left), Rename List, Available Filters, Applied Filters, preview areas.
+- Splitter shell: File List (left), Rename List, Available Filters, Filter Chain, preview areas.
 - File List types: Large Icons, Small Icons, Report, List, Tiles, Thumbnails.
 - Key panes: `fileexp.html`, `renamelist.html`, `availfilterlist.html`, `appliedfilterlist.html`, `filteropts.html`, `presetmanager.html`.
 

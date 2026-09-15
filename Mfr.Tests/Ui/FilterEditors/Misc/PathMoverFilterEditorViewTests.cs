@@ -6,7 +6,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.FilterEditors.Misc;
 using Mfr.App.Ui.Views.FilterEditors.Misc;
 using Mfr.Filters.Misc;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 using Mfr.Tests.Ui.RenameList;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("PathMover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -73,7 +73,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 Directory.CreateDirectory(dest);
 
                 var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-                mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
+                mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("PathMover"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
@@ -134,7 +134,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
                 File.WriteAllText(filePath, "x");
 
                 var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-                mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
+                mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("PathMover"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 
@@ -171,7 +171,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Root_folder_drag_over_rejects_non_file()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("PathMover"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("PathMover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

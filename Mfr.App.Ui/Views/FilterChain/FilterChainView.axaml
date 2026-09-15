@@ -115,7 +115,7 @@
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddSelected.png" />
           </Button>
           <Button
-            x:Name="RemoveFromAppliedButton"
+            x:Name="RemoveFromFilterChainButton"
             Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.RemoveSelectedFilter}"
             Command="{Binding RemoveSelectedCommand}"
@@ -123,7 +123,7 @@
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/RemoveSelected.png" />
           </Button>
           <Button
-            x:Name="ClearAppliedButton"
+            x:Name="ClearFilterChainButton"
             Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.RemoveAllFilters}"
             Command="{Binding ClearCommand}"
@@ -131,7 +131,7 @@
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Clear.png" />
           </Button>
           <Button
-            x:Name="MoveAppliedUpButton"
+            x:Name="MoveFilterChainUpButton"
             Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.MoveFilterUp}"
             Command="{Binding MoveSelectedUpCommand}"
@@ -139,7 +139,7 @@
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveUp.png" />
           </Button>
           <Button
-            x:Name="MoveAppliedDownButton"
+            x:Name="MoveFilterChainDownButton"
             Classes="tool-action"
             ToolTip.Tip="{x:Static resources:AppTips.MoveFilterDown}"
             Command="{Binding MoveSelectedDownCommand}"

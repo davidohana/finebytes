@@ -168,7 +168,7 @@ namespace Mfr.Tests.Ui
             var paletteView = new FilterPaletteView
             {
                 DataContext = mainViewModel.FilterPaletteViewModel,
-                AddSelectedToAppliedCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
+                AddSelectedToFilterChainCommand = mainViewModel.AddSelectedFilterFromPaletteCommand,
                 RemoveFilterChainStepsCommand = mainViewModel.FilterChainViewModel.RemoveStepsAtIndicesCommand,
             };
 

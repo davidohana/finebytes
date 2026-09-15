@@ -7,7 +7,7 @@ using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Audio;
 using Mfr.Filters.Audio;
 using Mfr.Models.Tags;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Audio
 {
@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         public void Tag_remover_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("TagRemover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

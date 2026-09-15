@@ -6,7 +6,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Formatting;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Formatting;
 using Mfr.Filters.Formatting;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Formatting
 {
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
         public void Token_mover_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TokenMover"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("TokenMover"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

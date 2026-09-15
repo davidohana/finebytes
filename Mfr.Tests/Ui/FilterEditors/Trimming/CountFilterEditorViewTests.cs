@@ -6,7 +6,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.Filters;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Trimming
 {
@@ -26,7 +26,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Count_filter_numeric_box_updates_chain_options(string filterType)
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry(filterType));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry(filterType));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -57,7 +57,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Visual_trim_helper_selection_updates_trim_left_count()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("TrimLeft"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -93,7 +93,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Count_spinner_updates_helper_text_selection()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("TrimLeft"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -131,7 +131,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         public void Visual_trim_helper_exposes_navigation_buttons()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("TrimLeft"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("TrimLeft"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

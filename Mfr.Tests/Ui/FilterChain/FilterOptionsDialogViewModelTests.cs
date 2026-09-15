@@ -10,7 +10,7 @@ using Mfr.Models.Media;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
     /// Unit tests for <see cref="FilterOptionsDialogViewModel"/> and <see cref="FilterChainViewModel.ApplyFilterOptions"/>.
@@ -137,7 +137,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
             {
@@ -167,7 +167,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]) { Name = "Cleaner" };
 
@@ -184,7 +184,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
 
@@ -217,7 +217,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
 
@@ -254,7 +254,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
 
@@ -287,7 +287,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
 
@@ -324,7 +324,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
 
@@ -364,7 +364,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void ApplyFilterOptions_id3v2_singleton_ignores_stale_multi_instance_fields()
         {
             var applied = new FilterChainViewModel();
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
             var id3v2Group = FilterTargetCatalog.Groups.First(group => group.Label == "ID3v2");
             var commentOption = id3v2Group.Targets.First(option =>
@@ -396,7 +396,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void ApplyFilterOptions_id3v2_txxx_ignores_language()
         {
             var applied = new FilterChainViewModel();
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
             var id3v2Group = FilterTargetCatalog.Groups.First(group => group.Label == "ID3v2");
             var commentOption = id3v2Group.Targets.First(option =>
@@ -469,7 +469,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
             {
@@ -509,7 +509,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
             {
@@ -540,7 +540,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void CanConfirm_is_false_when_token_separator_empty()
         {
             var applied = new FilterChainViewModel();
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0])
             {
@@ -570,7 +570,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         public void CanConfirm_is_false_when_name_blank(string blankName)
         {
             var applied = new FilterChainViewModel();
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]) { Name = blankName };
 
@@ -590,7 +590,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
 
@@ -623,7 +623,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         {
             var applied = new FilterChainViewModel();
 
-            applied.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ShrinkSpaces"));
+            applied.AppendCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
             var dialog = new FilterOptionsDialogViewModel(applied.Steps[0]);
 

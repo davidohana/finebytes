@@ -14,7 +14,7 @@ namespace Mfr.Tests.Ui.FilterEditors
     internal static class FilterEditorTestUi
     {
         /// <summary>
-        /// Shows Applied Filters above Filter Configuration for headless editor tests.
+        /// Shows Filter Chain above Filter Configuration for headless editor tests.
         /// </summary>
         /// <param name="persistSession">
         /// When <see langword="true"/>, restore Filter Configuration chrome from <see cref="ConfigStore"/>.

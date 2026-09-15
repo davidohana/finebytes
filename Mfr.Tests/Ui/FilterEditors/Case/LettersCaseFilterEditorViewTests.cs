@@ -7,7 +7,7 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Case;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.App.Ui.Views.FilterEditors.Case;
 using Mfr.Filters.Case;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 
 namespace Mfr.Tests.Ui.FilterEditors.Case
 {
@@ -23,7 +23,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Letters_case_mode_radio_updates_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -51,7 +51,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Letters_case_skip_words_box_updates_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -77,7 +77,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Letters_case_mode_hides_irrelevant_option_groups()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -124,7 +124,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
         public void Letters_case_weird_settings_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
@@ -173,7 +173,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
                 var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
                 await mainViewModel.RenameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
 
-                mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("LettersCase"));
+                mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
                 window.UpdateLayout();
                 Dispatcher.UIThread.RunJobs();
 

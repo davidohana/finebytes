@@ -3,7 +3,7 @@ using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 using Mfr.Models.Tags.Id3v2;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
     /// Unit tests for <see cref="FilterTargetCatalog"/> lookup and Apply-To labels.

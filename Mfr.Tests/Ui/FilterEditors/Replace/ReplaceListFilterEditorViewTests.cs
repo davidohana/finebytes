@@ -10,7 +10,7 @@ using Mfr.App.Ui.Views.FilterEditors.Replace;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.Filters;
 using Mfr.Filters.Replace;
-using Mfr.Tests.Ui.AppliedFilters;
+using Mfr.Tests.Ui.FilterChain;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.FilterEditors.Replace
@@ -32,7 +32,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
         public void Replace_list_controls_update_chain_options()
         {
             var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
-            mainViewModel.FilterChainViewModel.AppendCommand.Execute(AppliedFiltersTestUi.Entry("ReplaceList"));
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("ReplaceList"));
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

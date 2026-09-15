@@ -152,7 +152,7 @@ namespace Mfr.Tests.Ui.Presets
                         Id = Guid.NewGuid(),
                         Name = name,
                         Description = description,
-                        Chain = new FilterChain { Steps = [] },
+                        Chain = new FilterChainModel { Steps = [] },
                     }
                 );
             }

@@ -8,12 +8,12 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.Views.DragAndDrop;
 using Mfr.Tests.Ui.DragAndDrop;
 
-namespace Mfr.Tests.Ui.AppliedFilters
+namespace Mfr.Tests.Ui.FilterChain
 {
     /// <summary>
-    /// Headless tests for Applied Filters drag-and-drop reorder.
+    /// Headless tests for Filter Chain drag-and-drop reorder.
     /// </summary>
-    public sealed class AppliedFiltersDragDropTests
+    public sealed class FilterChainDragDropTests
     {
         /// <summary>
         /// Verifies drag-over shows the salmon insert line on the list adorner.
@@ -21,7 +21,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void DragOver_marks_insert_row()
         {
-            var (window, _, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
+            var (window, _, list, _) = FilterChainTestUi.ShowSeededList(selectIndex: 0);
             var payload = new IndicesDragPayload([0]);
             var dataTransfer = payload.CreateTransfer(IndicesDragPayload.FilterChainFormat);
 
@@ -51,7 +51,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Drop_reorders_selected_filter()
         {
-            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
+            var (window, viewModel, list, _) = FilterChainTestUi.ShowSeededList(selectIndex: 0);
             var payload = new IndicesDragPayload([0]);
             var dataTransfer = payload.CreateTransfer(IndicesDragPayload.FilterChainFormat);
 
@@ -76,7 +76,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
         [AvaloniaFact]
         public void Release_without_drag_collapses_multi_selection()
         {
-            var (window, viewModel, list, _) = AppliedFiltersTestUi.ShowSeededList(selectIndex: 0);
+            var (window, viewModel, list, _) = FilterChainTestUi.ShowSeededList(selectIndex: 0);
             viewModel.SetSelectedSteps([viewModel.Steps[0], viewModel.Steps[1]]);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();

@@ -100,7 +100,7 @@ Add a `switch` arm in `FilterOptionsEditorFactory.Create`. Until registered, sel
 For **each** filter type wired in the pass:
 
 1. **VM** (`Ui/FilterEditors/<Group>/…ViewModelTests`): construct step + editor; assert defaults; mutate properties; assert `step.Filter` options
-1. **Headless** (`…ViewTests`, `[AvaloniaFact]`): `FilterEditorTestUi.ShowFilterEditorPanes()`; append via `AppliedFiltersTestUi.Entry("Type")`; find named controls; set values; assert `ToChain().Steps[0].Filter` options
+1. **Headless** (`…ViewTests`, `[AvaloniaFact]`): `FilterEditorTestUi.ShowFilterEditorPanes()`; append via `FilterChainTestUi.Entry("Type")`; find named controls; set values; assert `ToChain().Steps[0].Filter` options
 
 Follow `mfr-ui-headless-tests` for gesture/control rules. Put per-editor facts in that editor’s suite — do not add them to the root host mega-suites.
 
