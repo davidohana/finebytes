@@ -344,18 +344,18 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Add Filter Fields"
+          Header="Add columns from filters"
           Command="{Binding RenameListViewModel.AddRelevantColumnsCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.AddFieldsByAppliedFilters}"
+          ToolTip.Tip="{x:Static resources:AppTips.AddColumnsFromFilters}"
         >
           <MenuItem.Icon>
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/AddFieldsByFilters.png" />
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Replace Filter Fields"
+          Header="Set columns from filters"
           Command="{Binding RenameListViewModel.ReplaceWithRelevantColumnsCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.ReplaceFieldsByAppliedFilters}"
+          ToolTip.Tip="{x:Static resources:AppTips.SetColumnsFromFilters}"
         >
           <MenuItem.Icon>
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/ReplaceFieldsByFilters.png" />

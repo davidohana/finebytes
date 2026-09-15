@@ -554,12 +554,12 @@ namespace Mfr.Tests.Ui.RenameList
                 canUseAppliedFilters: false
             );
 
-            Assert.False(dialogVm.AddFieldsByAppliedFiltersCommand.CanExecute(null));
-            Assert.False(dialogVm.ReplaceFieldsByAppliedFiltersCommand.CanExecute(null));
+            Assert.False(dialogVm.AddColumnsFromFiltersCommand.CanExecute(null));
+            Assert.False(dialogVm.SetColumnsFromFiltersCommand.CanExecute(null));
         }
 
         [Fact]
-        public void AddFieldsByAppliedFilters_merges_missing_keys_into_draft()
+        public void AddColumnsFromFilters_merges_missing_keys_into_draft()
         {
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -570,8 +570,8 @@ namespace Mfr.Tests.Ui.RenameList
                 canUseAppliedFilters: true
             );
 
-            Assert.True(dialogVm.AddFieldsByAppliedFiltersCommand.CanExecute(null));
-            dialogVm.AddFieldsByAppliedFiltersCommand.Execute(null);
+            Assert.True(dialogVm.AddColumnsFromFiltersCommand.CanExecute(null));
+            dialogVm.AddColumnsFromFiltersCommand.Execute(null);
 
             Assert.Contains(dialogVm.ResultColumns, column => column.Key == nameKey);
             Assert.Contains(dialogVm.ResultColumns, column => column.Key == namePreview);
@@ -579,7 +579,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void ReplaceFieldsByAppliedFilters_defaults_then_appends_relevant()
+        public void SetColumnsFromFilters_defaults_then_appends_relevant()
         {
             var titleKey = RenameListFieldKey.Original(
                 AudioTagRenameListFields.Group,
@@ -598,7 +598,7 @@ namespace Mfr.Tests.Ui.RenameList
                 canUseAppliedFilters: true
             );
 
-            dialogVm.ReplaceFieldsByAppliedFiltersCommand.Execute(null);
+            dialogVm.SetColumnsFromFiltersCommand.Execute(null);
 
             var expected = RenameListVisibleColumn.CreateDefaults().Select(column => column.Key).Append(titleKey);
             Assert.Equal(expected, dialogVm.ResultColumns.Select(column => column.Key));
@@ -694,7 +694,7 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
-        public void AbMode_AddFieldsByAppliedFilters_normalizes_preview_keys()
+        public void AbMode_AddColumnsFromFilters_normalizes_preview_keys()
         {
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -710,14 +710,14 @@ namespace Mfr.Tests.Ui.RenameList
                 abModeEnabled: true
             );
 
-            dialogVm.AddFieldsByAppliedFiltersCommand.Execute(null);
+            dialogVm.AddColumnsFromFiltersCommand.Execute(null);
 
             Assert.Contains(dialogVm.ResultColumns, column => column.Key == nameKey);
             Assert.DoesNotContain(dialogVm.ResultColumns, column => column.Key.IsPreview);
         }
 
         [Fact]
-        public void AbMode_ReplaceFieldsByAppliedFilters_normalizes_defaults_preview()
+        public void AbMode_SetColumnsFromFilters_normalizes_defaults_preview()
         {
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -733,7 +733,7 @@ namespace Mfr.Tests.Ui.RenameList
                 abModeEnabled: true
             );
 
-            dialogVm.ReplaceFieldsByAppliedFiltersCommand.Execute(null);
+            dialogVm.SetColumnsFromFiltersCommand.Execute(null);
 
             Assert.Contains(dialogVm.ResultColumns, column => column.Key == nameKey);
             Assert.DoesNotContain(dialogVm.ResultColumns, column => column.Key.IsPreview);

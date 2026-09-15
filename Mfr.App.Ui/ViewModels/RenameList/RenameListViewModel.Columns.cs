@@ -386,7 +386,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Gets whether Add/Replace by applied filters can run (non-empty applied chain, not busy).
+        /// Gets whether Add/Set columns from filters can run (non-empty applied chain, not busy).
         /// </summary>
         internal bool CanApplyRelevantColumns => _CanApplyRelevantColumns();
 

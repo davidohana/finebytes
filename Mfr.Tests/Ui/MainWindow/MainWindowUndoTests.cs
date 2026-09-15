@@ -163,7 +163,7 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies prepare under Before/After Mode keeps A/B on and stores originals-only (like Replace filter fields).
+        /// Verifies prepare under Before/After Mode keeps A/B on and stores originals-only (like Set columns from filters).
         /// </summary>
         [AvaloniaFact]
         public async Task UndoLast_with_ab_mode_keeps_ab_and_stores_originals_only()

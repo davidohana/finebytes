@@ -25,7 +25,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Snapshot of field keys inferred from the applied filter chain (may be empty).
         /// </param>
         /// <param name="canUseAppliedFilters">
-        /// When <see langword="true"/>, Add/Replace by applied filters are enabled (non-empty chain).
+        /// When <see langword="true"/>, Add/Set columns from filters are enabled (non-empty chain).
         /// </param>
         /// <param name="abModeEnabled">
         /// Initial A/B Mode draft (session value). When <see langword="true"/>, columns are normalized to
@@ -423,7 +423,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Merges applied-filter-relevant keys into the draft Selected fields list (missing keys only).
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanUseAppliedFilters))]
-        public void AddFieldsByAppliedFilters()
+        public void AddColumnsFromFilters()
         {
             if (!_canUseAppliedFilters)
             {
@@ -445,10 +445,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Replaces the draft Selected fields with catalog defaults, then appends remaining relevant keys.
+        /// Sets the draft Selected fields to catalog defaults, then appends remaining relevant keys.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_CanUseAppliedFilters))]
-        public void ReplaceFieldsByAppliedFilters()
+        public void SetColumnsFromFilters()
         {
             if (!_canUseAppliedFilters)
             {

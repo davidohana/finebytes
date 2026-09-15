@@ -361,17 +361,17 @@
                 Classes="message-dialog-footer"
                 MinWidth="72"
                 Content="Add"
-                ToolTip.Tip="{x:Static resources:AppTips.AddFieldsByAppliedFilters}"
+                ToolTip.Tip="{x:Static resources:AppTips.AddColumnsFromFilters}"
                 ToolTip.ShowOnDisabled="True"
-                Command="{Binding AddFieldsByAppliedFiltersCommand}"
+                Command="{Binding AddColumnsFromFiltersCommand}"
               />
               <Button
                 Classes="message-dialog-footer"
                 MinWidth="72"
-                Content="Replace"
-                ToolTip.Tip="{x:Static resources:AppTips.ReplaceFieldsByAppliedFilters}"
+                Content="Set"
+                ToolTip.Tip="{x:Static resources:AppTips.SetColumnsFromFilters}"
                 ToolTip.ShowOnDisabled="True"
-                Command="{Binding ReplaceFieldsByAppliedFiltersCommand}"
+                Command="{Binding SetColumnsFromFiltersCommand}"
               />
             </StackPanel>
           </Grid>

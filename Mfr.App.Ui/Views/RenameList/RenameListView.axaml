@@ -389,7 +389,7 @@
           <Button
             Classes="tool-action"
             Command="{Binding AddRelevantColumnsCommand}"
-            ToolTip.Tip="{x:Static resources:AppTips.AddFieldsByAppliedFilters}"
+            ToolTip.Tip="{x:Static resources:AppTips.AddColumnsFromFilters}"
             ToolTip.ShowOnDisabled="True"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddFieldsByFilters.png" />
@@ -397,7 +397,7 @@
           <Button
             Classes="tool-action"
             Command="{Binding ReplaceWithRelevantColumnsCommand}"
-            ToolTip.Tip="{x:Static resources:AppTips.ReplaceFieldsByAppliedFilters}"
+            ToolTip.Tip="{x:Static resources:AppTips.SetColumnsFromFilters}"
             ToolTip.ShowOnDisabled="True"
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/ReplaceFieldsByFilters.png" />
