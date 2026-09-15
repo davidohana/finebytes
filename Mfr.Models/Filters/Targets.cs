@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
+using Mfr.Models.Media;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 
 namespace Mfr.Models.Filters
 {
     /// <summary>
-    /// Represents a polymorphic filter target (file-name slices, paths, ancestor segments, audio overlay fields); JSON uses property <c>targetType</c> as the discriminator.
+    /// Represents a polymorphic filter target (file-name slices, paths, ancestor segments, audio overlay fields,
+    /// filesystem attributes/timestamps); JSON uses property <c>targetType</c> as the discriminator.
     /// </summary>
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "targetType")]
     [JsonDerivedType(typeof(FilePrefixTarget), "FilePrefix")]
@@ -14,6 +16,8 @@ namespace Mfr.Models.Filters
     [JsonDerivedType(typeof(AncestorFolderTarget), "AncestorFolder")]
     [JsonDerivedType(typeof(FullPathTarget), "FullPath")]
     [JsonDerivedType(typeof(ParentDirectoryTarget), "ParentDirectory")]
+    [JsonDerivedType(typeof(FileAttributesTarget), "FileAttributes")]
+    [JsonDerivedType(typeof(FileTimestampTarget), "FileTimestamp")]
     [JsonDerivedType(typeof(SemanticAudioFieldTarget), "SemanticAudioField")]
     [JsonDerivedType(typeof(Id3v1FieldTarget), "Id3v1Field")]
     [JsonDerivedType(typeof(Id3v2FrameTarget), "Id3v2Frame")]
@@ -66,6 +70,29 @@ namespace Mfr.Models.Filters
     /// Writes assign the containing-folder path only; the preview prefix and extension stay unchanged.
     /// </remarks>
     public sealed record ParentDirectoryTarget : FilterTarget;
+
+    /// <summary>
+    /// Targets the MFR7 RAHS filesystem attributes on preview metadata (<see cref="Rename.FileMeta.Attributes"/>).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Used by Rename List Manual Override / Edit as Name List — not Filter Options Apply-To.
+    /// Reads format as <c>R/A/H/S</c> dashes; writes accept that display form or <see cref="FileAttributes"/> enum names.
+    /// </para>
+    /// </remarks>
+    public sealed record FileAttributesTarget : FilterTarget;
+
+    /// <summary>
+    /// Targets one filesystem timestamp on preview metadata (creation, last write, or last access).
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Used by Rename List Manual Override / Edit as Name List — not Filter Options Apply-To.
+    /// Reads use culture general date/time; writes also accept round-trip <c>O</c> strings from rename logs.
+    /// </para>
+    /// </remarks>
+    /// <param name="Field">Which filesystem timestamp is addressed.</param>
+    public sealed record FileTimestampTarget(TimestampField Field) : FilterTarget;
 
     /// <summary>
     /// Targets one cross-format field on the semantic projection of <see cref="Rename.FileMeta.AudioTagOverlay"/>; string filters read/write text or decimal-digit numeric strings.

@@ -1,5 +1,4 @@
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.Models.Rename;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Models.Filters;
 

@@ -347,12 +347,20 @@
           Header="Add Fields by Applied Filters"
           Command="{Binding RenameListViewModel.AddRelevantColumnsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.AddFieldsByAppliedFilters}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/AddFieldsByFilters.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Replace Fields by Applied Filters"
           Command="{Binding RenameListViewModel.ReplaceWithRelevantColumnsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.ReplaceFieldsByAppliedFilters}"
-        />
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/ReplaceFieldsByFilters.png" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
           Header="Select Sort Fields..."
           Command="{Binding RenameListViewModel.OpenEditSortFieldsCommand}"
@@ -543,11 +551,7 @@
         </Style>
       </Border.Styles>
       <StackPanel Orientation="Horizontal" Spacing="4">
-        <Button
-          Classes="tool-action"
-          Command="{Binding GoCommand}"
-          ToolTip.Tip="{x:Static resources:AppTips.Go}"
-        >
+        <Button Classes="tool-action" Command="{Binding GoCommand}" ToolTip.Tip="{x:Static resources:AppTips.Go}">
           <Image Width="20" Height="20" Stretch="Uniform" Source="/Assets/Go.png" />
         </Button>
         <Button

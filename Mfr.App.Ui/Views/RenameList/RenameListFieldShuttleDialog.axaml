@@ -178,12 +178,7 @@
               />
             </Grid>
             <Grid Grid.Row="1" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="22,*" RowSpacing="4">
-              <TextBlock
-                Grid.Row="0"
-                Grid.Column="0"
-                Classes="field-shuttle-label"
-                Text="Groups:"
-              />
+              <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-shuttle-label" Text="Groups:" />
               <!-- Before/After on: plain label (no lone radio). Off: Original|Preview subtabs. -->
               <TextBlock
                 x:Name="OriginalFieldsAbModeLabel"
@@ -215,12 +210,7 @@
                   IsChecked="{Binding IsPreviewColumnsTab}"
                 />
               </StackPanel>
-              <TextBlock
-                Grid.Row="0"
-                Grid.Column="3"
-                Classes="field-shuttle-label"
-                Text="Selected fields:"
-              />
+              <TextBlock Grid.Row="0" Grid.Column="3" Classes="field-shuttle-label" Text="Selected fields:" />
               <ListBox
                 x:Name="ColumnGroupsList"
                 Grid.Row="1"

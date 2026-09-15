@@ -626,14 +626,49 @@ namespace Mfr.Tests.Models
             Assert.Null(field.WriteTarget);
         }
 
-        [Fact]
-        public void Extended_fields_are_not_writable_even_with_preview()
+        [Theory]
+        [InlineData(ExtendedRenameListFields.Key.Attrs, typeof(FileAttributesTarget))]
+        [InlineData(ExtendedRenameListFields.Key.CreationDate, typeof(FileTimestampTarget))]
+        [InlineData(ExtendedRenameListFields.Key.LastWriteDate, typeof(FileTimestampTarget))]
+        [InlineData(ExtendedRenameListFields.Key.LastAccessDate, typeof(FileTimestampTarget))]
+        public void Extended_writable_fields_map_to_filter_targets(string propertyKey, Type expectedTargetType)
         {
-            foreach (var field in RenameListFieldCatalog.GetFieldsForGroup(ExtendedRenameListFields.Group))
-            {
-                Assert.False(field.SupportsWrite, field.PropertyKey);
-                Assert.Null(field.WriteTarget);
-            }
+            var field = RenameListFieldCatalog.GetField(ExtendedRenameListFields.Group, propertyKey);
+
+            Assert.True(field.SupportsWrite);
+            Assert.IsType(expectedTargetType, field.WriteTarget);
+        }
+
+        [Theory]
+        [InlineData(ExtendedRenameListFields.Key.Size)]
+        [InlineData(ExtendedRenameListFields.Key.FileCount)]
+        public void Extended_non_writable_fields_omit_write_target(string propertyKey)
+        {
+            var field = RenameListFieldCatalog.GetField(ExtendedRenameListFields.Group, propertyKey);
+
+            Assert.False(field.SupportsWrite);
+            Assert.Null(field.WriteTarget);
+        }
+
+        [Fact]
+        public void Extended_timestamp_write_targets_match_property()
+        {
+            var creation = RenameListFieldCatalog.GetField(
+                ExtendedRenameListFields.Group,
+                ExtendedRenameListFields.Key.CreationDate
+            );
+            var lastWrite = RenameListFieldCatalog.GetField(
+                ExtendedRenameListFields.Group,
+                ExtendedRenameListFields.Key.LastWriteDate
+            );
+            var lastAccess = RenameListFieldCatalog.GetField(
+                ExtendedRenameListFields.Group,
+                ExtendedRenameListFields.Key.LastAccessDate
+            );
+
+            Assert.Equal(TimestampField.Creation, Assert.IsType<FileTimestampTarget>(creation.WriteTarget).Field);
+            Assert.Equal(TimestampField.LastWrite, Assert.IsType<FileTimestampTarget>(lastWrite.WriteTarget).Field);
+            Assert.Equal(TimestampField.LastAccess, Assert.IsType<FileTimestampTarget>(lastAccess.WriteTarget).Field);
         }
 
         [Fact]

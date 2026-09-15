@@ -1,3 +1,5 @@
+using Mfr.Models.Filters;
+using Mfr.Models.Media;
 using Mfr.Models.Rename;
 
 namespace Mfr.Models.RenameList.Fields.Extended
@@ -64,11 +66,15 @@ namespace Mfr.Models.RenameList.Fields.Extended
     /// <param name="supportsPreview">
     /// When <see langword="true"/>, a preview column variant may be added (MFR7 <c>ReadWrite</c> dates/attrs).
     /// </param>
+    /// <param name="writeTarget">
+    /// Filter target for Manual Override / Edit as Name List, or <see langword="null"/> when not writable.
+    /// </param>
     internal abstract class ExtendedRenameListField(
         string propertyKey,
         string displayName,
         int? defaultWidth = null,
-        bool supportsPreview = false
+        bool supportsPreview = false,
+        FilterTarget? writeTarget = null
     )
         : RenameListField(
             ExtendedRenameListFields.Group,
@@ -77,7 +83,8 @@ namespace Mfr.Models.RenameList.Fields.Extended
             displayName,
             defaultWidth,
             isSortable: true,
-            supportsPreview
+            supportsPreview,
+            writeTarget: writeTarget
         );
 
     internal sealed class ExtendedCreationDateField()
@@ -85,7 +92,8 @@ namespace Mfr.Models.RenameList.Fields.Extended
             ExtendedRenameListFields.Key.CreationDate,
             "Creation Date",
             defaultWidth: 110,
-            supportsPreview: true
+            supportsPreview: true,
+            writeTarget: new FileTimestampTarget(TimestampField.Creation)
         )
     {
         /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.CreationDate"/>.</summary>
@@ -108,7 +116,8 @@ namespace Mfr.Models.RenameList.Fields.Extended
             ExtendedRenameListFields.Key.LastWriteDate,
             "Last Write Date",
             defaultWidth: 110,
-            supportsPreview: true
+            supportsPreview: true,
+            writeTarget: new FileTimestampTarget(TimestampField.LastWrite)
         )
     {
         /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.LastWriteDate"/>.</summary>
@@ -131,7 +140,8 @@ namespace Mfr.Models.RenameList.Fields.Extended
             ExtendedRenameListFields.Key.LastAccessDate,
             "Last Access Date",
             defaultWidth: 110,
-            supportsPreview: true
+            supportsPreview: true,
+            writeTarget: new FileTimestampTarget(TimestampField.LastAccess)
         )
     {
         /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.LastAccessDate"/>.</summary>
@@ -172,7 +182,8 @@ namespace Mfr.Models.RenameList.Fields.Extended
             ExtendedRenameListFields.Key.Attrs,
             "Attributes",
             defaultWidth: 65,
-            supportsPreview: true
+            supportsPreview: true,
+            writeTarget: new FileAttributesTarget()
         )
     {
         /// <summary>Forwards to <see cref="ExtendedRenameListFields.Key.Attrs"/>.</summary>

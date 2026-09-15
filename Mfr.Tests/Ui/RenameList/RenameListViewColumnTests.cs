@@ -9,7 +9,6 @@ using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
-using Mfr.Models.Rename;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.Tags;

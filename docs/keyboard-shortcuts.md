@@ -69,8 +69,8 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 | Refresh                 | F5           | Rename List grid focused  |
 | Move selected up        | Ctrl+↑       | Rename List grid focused  |
 | Move selected down      | Ctrl+↓       | Rename List grid focused  |
-| Toggle Before           | Ctrl+[       | Main window               |
-| Toggle After            | Ctrl+]       | Main window               |
+| Toggle Before           | Ctrl+\[      | Main window               |
+| Toggle After            | Ctrl+\]      | Main window               |
 | First item              | Home         | Rename List grid focused  |
 | Last item               | End          | Rename List grid focused  |
 | Add/toggle sort level   | Shift+click  | Rename List column header |
@@ -81,7 +81,7 @@ Shift+click a column header to append a sort key, toggle its direction, or remov
 
 Click the **Select Fields** toolbar button on the Rename List, or choose **Select Fields...** from the **Rename List** menu, the grid right-click menu, or a column-header right-click menu, to open the field shuttle (visible columns and Auto-Sort tabs). **Select Sort Fields...** on the **Rename List** menu opens the same dialog on the Sort tab. Right-click a column header and choose **Hide Field** to hide that column (persisted layout keys only — After-side preview headers map to the same stored field). **Export Rename List (csv)...** on the **Rename List** menu (or **Export → Export Visible Columns (csv)** on a column header) writes a CSV of the on-screen columns (preview values while the After side is showing).
 
-**Before/After Mode** is available on the field shuttle Columns tab and the **Rename List** menu. When on, the stored layout is originals-only; use the Rename List toolbar **Before/After** toggle (◀ / ▶), matching **Rename List** menu radios (**Toggle Before** / **Toggle After**, icons ◀ / ▶), or **Ctrl+[** / **Ctrl+]** to flip between original and preview values for the same fields. The side control is hidden when Before/After Mode is off. There is no dedicated shortcut for enabling Before/After Mode itself.
+**Before/After Mode** is available on the field shuttle Columns tab and the **Rename List** menu. When on, the stored layout is originals-only; use the Rename List toolbar **Before/After** toggle (◀ / ▶), matching **Rename List** menu radios (**Toggle Before** / **Toggle After**, icons ◀ / ▶), or **Ctrl+\[** / **Ctrl+\]** to flip between original and preview values for the same fields. The side control is hidden when Before/After Mode is off. There is no dedicated shortcut for enabling Before/After Mode itself.
 
 **Add Fields by Applied Filters** / **Replace Fields by Applied Filters** (Rename List menu, or **Add** / **Replace** on the field shuttle Columns tab) infer columns from the full applied filter chain (write targets and format tokens). In the shuttle they update the draft Selected fields until you press OK. There is no dedicated keyboard shortcut in v1.
 

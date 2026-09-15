@@ -212,6 +212,26 @@ namespace Mfr.Tests.Ui.AppliedFilters
             Assert.Null(title.Tip);
         }
 
+        /// <summary>
+        /// Verifies Extended Attrs/date WriteTargets stay out of Filter Options Apply-To.
+        /// </summary>
+        [Fact]
+        public void Resolve_falls_back_for_extended_write_targets()
+        {
+            Assert.IsType<FilePrefixTarget>(FilterTargetCatalog.Resolve(new FileAttributesTarget()).Option.Prototype);
+            Assert.IsType<FilePrefixTarget>(
+                FilterTargetCatalog.Resolve(new FileTimestampTarget(TimestampField.Creation)).Option.Prototype
+            );
+
+            foreach (var group in FilterTargetCatalog.Groups)
+            {
+                Assert.DoesNotContain(
+                    group.Targets,
+                    option => option.Prototype is FileAttributesTarget or FileTimestampTarget
+                );
+            }
+        }
+
         private sealed record UnknownFilterTarget : FilterTarget;
     }
 }
