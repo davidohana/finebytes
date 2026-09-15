@@ -93,6 +93,16 @@
       Gesture="{x:Static input:AppShortcuts.ClearRenameList}"
       Command="{Binding RenameListViewModel.ClearCommand}"
     />
+    <KeyBinding
+      Gesture="{x:Static input:AppShortcuts.ToggleBefore}"
+      Command="{Binding RenameListViewModel.SetAbSideCommand}"
+      CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSideOriginal}"
+    />
+    <KeyBinding
+      Gesture="{x:Static input:AppShortcuts.ToggleAfter}"
+      Command="{Binding RenameListViewModel.SetAbSideCommand}"
+      CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSidePreview}"
+    />
   </Window.KeyBindings>
 
   <DockPanel>
@@ -388,25 +398,53 @@
           ToggleType="CheckBox"
           IsChecked="{Binding RenameListViewModel.IsAbModeEnabled, Mode=OneWay}"
           ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterMode}"
-        />
+        >
+          <MenuItem.Icon>
+            <StackPanel Orientation="Horizontal" Spacing="1" HorizontalAlignment="Center">
+              <TextBlock Text="◀" FontSize="12" VerticalAlignment="Center" />
+              <TextBlock Text="▶" FontSize="12" VerticalAlignment="Center" />
+            </StackPanel>
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
-          Header="_Before"
+          Header="Toggle _Before"
           Command="{Binding RenameListViewModel.SetAbSideCommand}"
           CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSideOriginal}"
           ToggleType="Radio"
           IsChecked="{Binding RenameListViewModel.IsAbSideOriginal, Mode=OneWay}"
           IsVisible="{Binding RenameListViewModel.IsAbModeEnabled}"
-          ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterSide}"
-        />
+          InputGesture="{x:Static input:AppShortcuts.ToggleBefore}"
+          ToolTip.Tip="{x:Static resources:AppTips.ToggleBefore}"
+        >
+          <MenuItem.Icon>
+            <TextBlock Text="◀" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </MenuItem.Icon>
+        </MenuItem>
         <MenuItem
-          Header="_After"
+          Header="Toggle _After"
           Command="{Binding RenameListViewModel.SetAbSideCommand}"
           CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSidePreview}"
           ToggleType="Radio"
           IsChecked="{Binding RenameListViewModel.IsAbSidePreview, Mode=OneWay}"
           IsVisible="{Binding RenameListViewModel.IsAbModeEnabled}"
-          ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterSide}"
-        />
+          InputGesture="{x:Static input:AppShortcuts.ToggleAfter}"
+          ToolTip.Tip="{x:Static resources:AppTips.ToggleAfter}"
+        >
+          <MenuItem.Icon>
+            <TextBlock Text="▶" FontSize="12" HorizontalAlignment="Center" VerticalAlignment="Center" />
+          </MenuItem.Icon>
+        </MenuItem>
+        <MenuItem
+          Header="Color _Legend"
+          Command="{Binding RenameListViewModel.ToggleLegendCommand}"
+          ToggleType="CheckBox"
+          IsChecked="{Binding RenameListViewModel.IsLegendVisible, Mode=OneWay}"
+          ToolTip.Tip="{x:Static resources:AppTips.ColorLegend}"
+        >
+          <MenuItem.Icon>
+            <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/Legend.png" />
+          </MenuItem.Icon>
+        </MenuItem>
       </MenuItem>
       <MenuItem Header="F_ilters">
         <MenuItem Header="Add Selected Filter" Command="{Binding AddSelectedFilterFromPaletteCommand}">

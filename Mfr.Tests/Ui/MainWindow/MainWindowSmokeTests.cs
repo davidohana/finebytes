@@ -79,6 +79,8 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Contains(AppShortcuts.RemoveSelected, gestures);
             Assert.Contains(AppShortcuts.RemoveAllButSelected, gestures);
             Assert.Contains(AppShortcuts.ClearRenameList, gestures);
+            Assert.Contains(AppShortcuts.ToggleBefore, gestures);
+            Assert.Contains(AppShortcuts.ToggleAfter, gestures);
             Assert.DoesNotContain(AppShortcuts.RemoveSelectedDelete, gestures);
             Assert.DoesNotContain(AppShortcuts.LocateInFileList, gestures);
             Assert.DoesNotContain(AppShortcuts.ShowProperties, gestures);
@@ -202,8 +204,9 @@ namespace Mfr.Tests.Ui.MainWindow
                     "Auto-Sort",
                     "Auto-Preview",
                     "Before/After Mode",
-                    "_Before",
-                    "_After",
+                    "Toggle _Before",
+                    "Toggle _After",
+                    "Color _Legend",
                 ],
                 headers
             );
@@ -222,10 +225,10 @@ namespace Mfr.Tests.Ui.MainWindow
             var renameListMenu = _RenameListMenu(window);
             var beforeItem = renameListMenu
                 .Items.OfType<MenuItem>()
-                .Single(item => item.Header?.ToString() == "_Before");
+                .Single(item => item.Header?.ToString() == "Toggle _Before");
             var afterItem = renameListMenu
                 .Items.OfType<MenuItem>()
-                .Single(item => item.Header?.ToString() == "_After");
+                .Single(item => item.Header?.ToString() == "Toggle _After");
 
             Assert.False(viewModel.RenameListViewModel.IsAbModeEnabled);
             Assert.False(beforeItem.IsVisible);

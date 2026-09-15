@@ -39,6 +39,8 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(4, renameListViewModel.VisibleColumns.Count);
             Assert.Equal(5, grid.Columns.Count);
+            var statusColumn = Assert.Single(grid.Columns, RenameListGridColumns.IsRowStatusColumn);
+            Assert.Equal("!", statusColumn.Header);
 
             window.Close();
         }

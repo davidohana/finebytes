@@ -87,6 +87,12 @@ namespace Mfr.App.Ui.Input
         /// <summary>Clears the Rename List.</summary>
         public static KeyGesture ClearRenameList { get; } = new(Key.C, KeyModifiers.Control | KeyModifiers.Shift);
 
+        /// <summary>Shows original (Before) values while Before/After Mode is on.</summary>
+        public static KeyGesture ToggleBefore { get; } = new(Key.OemOpenBrackets, KeyModifiers.Control);
+
+        /// <summary>Shows preview (After) values while Before/After Mode is on.</summary>
+        public static KeyGesture ToggleAfter { get; } = new(Key.OemCloseBrackets, KeyModifiers.Control);
+
         /// <summary>Removes the Rename List selection when the grid has focus.</summary>
         public static KeyGesture RemoveSelectedDelete { get; } = new(Key.Delete);
 

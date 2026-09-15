@@ -141,9 +141,15 @@ namespace Mfr.App.Ui.Resources
         public const string BeforeAfterMode =
             "Use a Before/After toggle for original vs preview values instead of side-by-side columns";
 
-        /// <summary>Rename List Before/After side tip (toolbar toggle and menu radios).</summary>
+        /// <summary>Rename List Before/After side tip (toolbar toggle).</summary>
         public const string BeforeAfterSide =
-            "Show original (Before) or preview (After) values for the same fields";
+            "Show original (Before) or preview (After) values for the same fields (Ctrl+[ / Ctrl+])";
+
+        /// <summary>Rename List menu: switch Before/After Mode to original values.</summary>
+        public const string ToggleBefore = "Toggle Before — show original values (Ctrl+[)";
+
+        /// <summary>Rename List menu: switch Before/After Mode to preview values.</summary>
+        public const string ToggleAfter = "Toggle After — show preview values (Ctrl+])";
 
         /// <summary>Rename List color legend toolbar tip (MFR7 btnLegendEnabled).</summary>
         public const string ColorLegend = "Show or hide the Rename List color legend";
@@ -173,6 +179,10 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Rename List row-error badge in the status column.</summary>
         public const string RenameListRowErrorGlyph =
             "This row has an error. Right-click and choose Show Error Details.";
+
+        /// <summary>Rename List status column header tip.</summary>
+        public const string RenameListRowErrorColumn =
+            "Error column — rows with field load errors show a red mark";
 
         /// <summary>File List refresh button tip.</summary>
         public const string Refresh = "Refresh (F5)";

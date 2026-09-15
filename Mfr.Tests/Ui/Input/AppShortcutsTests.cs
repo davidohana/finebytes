@@ -51,6 +51,8 @@ namespace Mfr.Tests.Ui.Input
                 new KeyGesture(Key.C, KeyModifiers.Control | KeyModifiers.Shift),
                 AppShortcuts.ClearRenameList
             );
+            Assert.Equal(new KeyGesture(Key.OemOpenBrackets, KeyModifiers.Control), AppShortcuts.ToggleBefore);
+            Assert.Equal(new KeyGesture(Key.OemCloseBrackets, KeyModifiers.Control), AppShortcuts.ToggleAfter);
             Assert.Equal(new KeyGesture(Key.Delete), AppShortcuts.RemoveSelectedDelete);
             Assert.Equal(new KeyGesture(Key.F4), AppShortcuts.LocateInFileList);
             Assert.Equal(new KeyGesture(Key.Enter, KeyModifiers.Alt), AppShortcuts.ShowProperties);

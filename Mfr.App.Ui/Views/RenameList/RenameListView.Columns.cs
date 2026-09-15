@@ -5,6 +5,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Mfr.App.Ui.Resources;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.Controls;
 using Mfr.Models.RenameList;
@@ -100,13 +101,29 @@ namespace Mfr.App.Ui.Views.RenameList
                 Width = new DataGridLength(width, DataGridLengthUnitType.Pixel),
                 MinWidth = width,
                 MaxWidth = width,
-                Header = string.Empty,
+                Header = "!",
+                HeaderTemplate = new FuncDataTemplate<object>((_, _) => _CreateRowStatusHeader()),
                 CellTemplate = new FuncDataTemplate<RenameListEntry>(
                     (_, _) => RenameListRowErrorGlyph.Create(listViewModel)
                 ),
             };
             RenameListGridColumns.MarkAsRowStatusColumn(column);
             return column;
+        }
+
+        /// <summary>
+        /// Builds the centered "!" status-column header with its tooltip.
+        /// </summary>
+        private static Control _CreateRowStatusHeader()
+        {
+            var header = new TextBlock
+            {
+                Text = "!",
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            ToolTip.SetTip(header, RichToolTip.Wrap(AppTips.RenameListRowErrorColumn));
+            return header;
         }
 
         private void _EnsureRowStatusColumnFirst()
