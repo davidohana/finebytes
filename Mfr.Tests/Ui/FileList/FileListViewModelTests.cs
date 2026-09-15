@@ -625,6 +625,38 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
+        /// Verifies Paste and empty-selection Show-in-Explorer disable while the folder is missing.
+        /// </summary>
+        [Fact]
+        public void ListingError_Disables_Paste_And_ShowInExplorer_Until_NavigateAway()
+        {
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var child = Directory.CreateDirectory(Path.Combine(parent, "gone")).FullName;
+            var fileClipboard = new RecordingFileClipboard();
+            fileClipboard.SeedPaste([TestPaths.Absolute("clip.txt")], preferMove: false);
+            var viewModel = _CreateViewModel(child, fileClipboard: fileClipboard);
+
+            Assert.True(viewModel.PasteCommand.CanExecute(null));
+            Assert.True(viewModel.ShowInExplorerCommand.CanExecute(null));
+
+            Directory.Delete(child);
+            viewModel.Refresh();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.True(viewModel.HasListingError);
+            Assert.Contains("could not be found", viewModel.ListingError, StringComparison.OrdinalIgnoreCase);
+            Assert.False(viewModel.PasteCommand.CanExecute(null));
+            Assert.False(viewModel.ShowInExplorerCommand.CanExecute(null));
+
+            viewModel.NavigateTo(parent);
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.False(viewModel.HasListingError);
+            Assert.True(viewModel.PasteCommand.CanExecute(null));
+            Assert.True(viewModel.ShowInExplorerCommand.CanExecute(null));
+        }
+
+        /// <summary>
         /// Verifies the File List starts in Report view.
         /// </summary>
         [Fact]

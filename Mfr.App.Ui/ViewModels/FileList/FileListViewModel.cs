@@ -278,6 +278,8 @@ namespace Mfr.App.Ui.ViewModels.FileList
         [NotifyPropertyChangedFor(nameof(HasListingError))]
         [NotifyPropertyChangedFor(nameof(CanShowLogInExplorer))]
         [NotifyCanExecuteChangedFor(nameof(ShowLogInExplorerCommand))]
+        [NotifyCanExecuteChangedFor(nameof(PasteCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ShowInExplorerCommand))]
         private string _listingError = string.Empty;
 
         /// <summary>
@@ -645,7 +647,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return;
             }
 
-            if (!FileListPath.IsFilesystemFolderPath(CurrentPath))
+            if (!_CanUseCurrentFolderAsDestination())
             {
                 return;
             }
@@ -1156,7 +1158,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
                 return true;
             }
 
-            return FileListPath.IsFilesystemFolderPath(CurrentPath);
+            return _CanUseCurrentFolderAsDestination();
         }
 
         private bool _CanShowProperties()
@@ -1177,7 +1179,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         /// </summary>
         private bool _CanPaste()
         {
-            return _IsFilesystemFolderLocation() && _fileClipboard.HasPasteableFiles;
+            return _CanUseCurrentFolderAsDestination() && _fileClipboard.HasPasteableFiles;
         }
 
         /// <summary>
@@ -1186,6 +1188,14 @@ namespace Mfr.App.Ui.ViewModels.FileList
         private bool _IsFilesystemFolderLocation()
         {
             return FileListPath.IsFilesystemFolderPath(CurrentPath);
+        }
+
+        /// <summary>
+        /// Whether <see cref="CurrentPath"/> can receive paste / open-folder when listing succeeded.
+        /// </summary>
+        private bool _CanUseCurrentFolderAsDestination()
+        {
+            return _IsFilesystemFolderLocation() && !HasListingError;
         }
 
         /// <summary>
