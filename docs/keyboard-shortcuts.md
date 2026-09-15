@@ -83,7 +83,7 @@ Click the **Select Fields** toolbar button on the Rename List, or choose **Selec
 
 **Before/After Mode** is available on the field shuttle Columns tab and the **Rename List** menu. When on, the stored layout is originals-only; use the Rename List toolbar **Before/After** toggle (◀ / ▶), matching **Rename List** menu radios (**Toggle Before** / **Toggle After**, icons ◀ / ▶), or **Ctrl+\[** / **Ctrl+\]** to flip between original and preview values for the same fields. The side control is hidden when Before/After Mode is off. There is no dedicated shortcut for enabling Before/After Mode itself.
 
-**Add Fields by Applied Filters** / **Replace Fields by Applied Filters** (Rename List menu, or **Add** / **Replace** on the field shuttle Columns tab) infer columns from the full applied filter chain (write targets and format tokens). In the shuttle they update the draft Selected fields until you press OK. There is no dedicated keyboard shortcut in v1.
+**Add Fields by Applied Filters** / **Replace Fields by Applied Filters** (Rename List toolbar after **Select Fields**, Rename List menu, or **Add** / **Replace** on the field shuttle Columns tab) infer columns from the full applied filter chain (write targets and format tokens). In the shuttle they update the draft Selected fields until you press OK. Toolbar and menu apply immediately to the live column layout. There is no dedicated keyboard shortcut in v1.
 
 ### Applied Filters
 

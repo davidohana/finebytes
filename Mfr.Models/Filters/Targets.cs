@@ -89,6 +89,7 @@ namespace Mfr.Models.Filters
     /// <para>
     /// Used by Rename List Manual Override / Edit as Name List — not Filter Options Apply-To.
     /// Reads use culture general date/time; writes also accept round-trip <c>O</c> strings from rename logs.
+    /// Blank and dates outside <see cref="FileTimestampDateLimits"/> are PreviewErrors.
     /// </para>
     /// </remarks>
     /// <param name="Field">Which filesystem timestamp is addressed.</param>

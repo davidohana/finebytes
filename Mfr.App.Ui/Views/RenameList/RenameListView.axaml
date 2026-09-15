@@ -386,6 +386,22 @@
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/SelectFields.png" />
           </Button>
+          <Button
+            Classes="tool-action"
+            Command="{Binding AddRelevantColumnsCommand}"
+            ToolTip.Tip="{x:Static resources:AppTips.AddFieldsByAppliedFilters}"
+            ToolTip.ShowOnDisabled="True"
+          >
+            <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/AddFieldsByFilters.png" />
+          </Button>
+          <Button
+            Classes="tool-action"
+            Command="{Binding ReplaceWithRelevantColumnsCommand}"
+            ToolTip.Tip="{x:Static resources:AppTips.ReplaceFieldsByAppliedFilters}"
+            ToolTip.ShowOnDisabled="True"
+          >
+            <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/ReplaceFieldsByFilters.png" />
+          </Button>
           <ToggleButton
             Classes="tool-action"
             IsChecked="{Binding IsAutoSort, Mode=OneWay}"

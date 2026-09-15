@@ -1,7 +1,7 @@
-namespace Mfr.Filters.Attributes
+namespace Mfr.Models.Media
 {
     /// <summary>
-    /// Allowed calendar-date range for filesystem timestamp setters.
+    /// Allowed calendar-date range for filesystem timestamps (filters and Rename List WriteTargets).
     /// </summary>
     /// <remarks>
     /// <para>
@@ -18,7 +18,7 @@ namespace Mfr.Filters.Attributes
         public static readonly DateOnly Min = new(1601, 1, 1);
 
         /// <summary>
-        /// Latest calendar date accepted by Date/Time Setter (inclusive product ceiling).
+        /// Latest calendar date accepted for filesystem timestamp writes (inclusive product ceiling).
         /// </summary>
         public static readonly DateOnly Max = new(2100, 12, 31);
 

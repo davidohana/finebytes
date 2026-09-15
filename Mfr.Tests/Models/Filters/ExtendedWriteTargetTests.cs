@@ -79,29 +79,43 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
-        /// Verifies blank timestamp clears to default and Get returns empty.
+        /// Verifies blank and out-of-range timestamps throw for Manual Override PreviewError.
         /// </summary>
-        [Fact]
-        public void Timestamp_set_blank_clears_to_default()
-        {
-            var meta = _CreateMeta(creationTime: DateTime.Now);
-            var target = new FileTimestampTarget(TimestampField.Creation);
-
-            meta.SetTargetString(target, "   ");
-            Assert.Equal(default, meta.CreationTime);
-            Assert.Equal(string.Empty, meta.GetTargetString(target));
-        }
-
-        /// <summary>
-        /// Verifies invalid timestamp strings throw for Manual Override PreviewError.
-        /// </summary>
-        [Fact]
-        public void Timestamp_set_rejects_invalid_value()
+        [Theory]
+        [InlineData("   ")]
+        [InlineData("not-a-date")]
+        [InlineData("1500-01-01")]
+        [InlineData("3026-01-01")]
+        public void Timestamp_set_rejects_blank_invalid_and_out_of_range(string value)
         {
             var meta = _CreateMeta();
             Assert.Throws<ArgumentException>(() =>
-                meta.SetTargetString(new FileTimestampTarget(TimestampField.LastWrite), "not-a-date")
+                meta.SetTargetString(new FileTimestampTarget(TimestampField.LastWrite), value)
             );
+        }
+
+        /// <summary>
+        /// Verifies a preview-side Creation Date override survives re-preview via WriteTarget.
+        /// </summary>
+        [Fact]
+        public void Preview_override_creation_date_survives_repreview()
+        {
+            var stamp = new DateTime(2024, 6, 15, 14, 30, 45, DateTimeKind.Unspecified);
+            var meta = _CreateMeta(creationTime: stamp.AddDays(-1));
+            var item = new RenameItem(meta);
+            var previewCreation = RenameListFieldKey.Preview(
+                ExtendedRenameListFields.Group,
+                ExtendedRenameListFields.Key.CreationDate
+            );
+            var overrideText = stamp.ToString("G", CultureInfo.CurrentCulture);
+
+            item.SetOverride(previewCreation, overrideText);
+            Assert.True(RenameListFieldOverrides.TryApplyToPreview(item, isPreview: true));
+            Assert.Equal(overrideText, RenameListFieldCatalog.Resolve(item, previewCreation));
+
+            item.Preview.CreationTime = stamp.AddYears(1);
+            Assert.True(RenameListFieldOverrides.TryApplyToPreview(item, isPreview: true));
+            Assert.Equal(overrideText, RenameListFieldCatalog.Resolve(item, previewCreation));
         }
 
         /// <summary>

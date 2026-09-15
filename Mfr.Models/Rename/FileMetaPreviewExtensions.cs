@@ -36,7 +36,9 @@ namespace Mfr.Models.Rename
                 FullPathTarget => meta.FullPath,
                 ParentDirectoryTarget => meta.DirectoryPath,
                 FileAttributesTarget => RenameListFieldDisplay.FormatAttributes(meta.Attributes),
-                FileTimestampTarget timestampTarget => _GetTimestampString(meta, timestampTarget.Field),
+                FileTimestampTarget timestampTarget => RenameListFieldDisplay.FormatFileDate(
+                    _GetTimestamp(meta, timestampTarget.Field)
+                ),
                 AncestorFolderTarget ancestorFolderTarget => meta.GetAncestorFolderSegmentName(
                     ancestorFolderTarget.Level
                 ),
@@ -96,11 +98,9 @@ namespace Mfr.Models.Rename
             }
         }
 
-        private static string _GetTimestampString(FileMeta meta, TimestampField field)
-        {
-            return RenameListFieldDisplay.FormatFileDate(_GetTimestamp(meta, field));
-        }
-
+        /// <summary>
+        /// Reads one filesystem timestamp property for <paramref name="field"/>.
+        /// </summary>
         private static DateTime _GetTimestamp(FileMeta meta, TimestampField field)
         {
             return field switch
@@ -112,6 +112,9 @@ namespace Mfr.Models.Rename
             };
         }
 
+        /// <summary>
+        /// Writes one filesystem timestamp property for <paramref name="field"/>.
+        /// </summary>
         private static void _SetTimestamp(FileMeta meta, TimestampField field, DateTime value)
         {
             switch (field)
