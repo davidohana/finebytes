@@ -16,13 +16,13 @@ todos:
     status: completed
   - id: p5-docs
     content: "P5: Amend undo.plan.md + keyboard-shortcuts for prepare+GO"
-    status: pending
+    status: completed
 isProject: false
 ---
 
 # Undo as preview session plan
 
-Parent: [docs/plans/undo.plan.md](docs/plans/undo.plan.md) (P1–P5 complete). This follow-on **replaces** the locked “Mechanism / Rename List on undo” auto-Commit behavior.
+Parent: former [docs/plans/undo.plan.md](docs/plans/undo.plan.md) (P1–P5 shipped, plan file removed). This follow-on **replaces** the locked “Mechanism / Rename List on undo” auto-Commit behavior with prepare + GO (see Decisions below).
 
 Canonical copy after approval: [docs/plans/undo-preview-session.plan.md](docs/plans/undo-preview-session.plan.md).
 
@@ -122,7 +122,7 @@ Hook points:
 - Exit criteria: undoing name/dir/attr/date/tag ops **replaces** column set with those preview columns; path/Extended overrides show as ForceValue and survive re-preview
 - Tests: column replace unit/VM tests; override mirror smoke
 
-### P5 — Docs
+### P5 — Docs — done
 
-- Scope: amend [undo.plan.md](docs/plans/undo.plan.md) Decisions (mechanism + Rename List on undo); [keyboard-shortcuts.md](docs/keyboard-shortcuts.md) Undo Last wording; brief note in debts if needed
+- Scope: [keyboard-shortcuts.md](../keyboard-shortcuts.md) Undo Last wording (prepare + GO); parent `undo.plan.md` already removed after ship — Decisions in this plan are the mechanism of record (no debts note needed)
 - Exit criteria: docs describe prepare + GO, not auto-undo commit

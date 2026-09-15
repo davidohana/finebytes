@@ -18,7 +18,7 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 | Refresh focused pane | F5              |
 | Go to address bar    | Ctrl+L or Alt+D |
 
-Undo last (Ctrl+Z) reverses the last GO when a rename log exists; Rename Log (Ctrl+Shift+L) opens the dialog (disk history + last operation). Options (Ctrl+,) is live. GO previews the current list, warns before ignoring preview errors, applies valid renames, and clears manual field overrides on rows that were applied or hit a commit error (preview-error and skipped rows keep theirs).
+Undo last (Ctrl+Z) prepares an undo session from the last GO when a rename log exists: it replaces the Rename List with reverse OldValues, clears Applied Filters, and leaves disk unchanged until you press GO. Rename Log (Ctrl+Shift+L) opens the dialog (disk history + last operation); Undo there uses the same prepare path. Options (Ctrl+,) is live. GO previews the current list, warns before ignoring preview errors, applies valid renames, and clears manual field overrides on rows that were applied or hit a commit error (preview-error and skipped rows keep theirs).
 
 Ctrl+L is the address bar (Explorer / Chrome). Rename Log is Ctrl+Shift+L so the two do not clash. Alt+F4 is shown on **MFR → Exit** and is handled by the window manager on Windows, not as an extra app binding.
 
