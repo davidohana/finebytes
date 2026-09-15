@@ -7,6 +7,7 @@ using Avalonia.VisualTree;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
 using Mfr.App.Ui.Views.AppliedFilters;
 using Mfr.App.Ui.Views.Controls;
+using Mfr.Filters.Attributes;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
 using Mfr.Tests.Ui.Controls;
@@ -52,12 +53,48 @@ namespace Mfr.Tests.Ui.AppliedFilters
             {
                 var rows = dialog.GetVisualDescendants().OfType<FilterEditorLabeledRow>().ToList();
                 var nameRow = rows.Single(row => row.Label == "Name:");
-                var applyToRow = rows.Single(row => row.Label == "Apply To:");
+                var applyToRow = rows.Single(row => row.Label == "Apply To:" && row.IsVisible);
                 var nameLabel = _LabelText(nameRow);
                 var applyToLabel = _LabelText(applyToRow);
 
                 Assert.True(nameLabel.Bounds.Width > 1 && applyToLabel.Bounds.Width > 1);
                 Assert.Equal(applyToLabel.Bounds.Width, nameLabel.Bounds.Width, precision: 0);
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        /// <summary>
+        /// Verifies fixed-domain filters show a read-only Apply To value and hide the editable target editors.
+        /// </summary>
+        [AvaloniaFact]
+        public void Fixed_apply_to_row_shows_label_and_hides_editable_targets()
+        {
+            var step = new AppliedFilterStepViewModel("Attributes Setter", new AttributesSetterFilter());
+            var viewModel = new FilterOptionsDialogViewModel(step);
+            var dialog = new FilterOptionsDialog(viewModel);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                Assert.Equal("Attributes", viewModel.FixedApplyToLabel);
+                Assert.False(viewModel.HasApplyTo);
+
+                var fixedLabel = dialog
+                    .GetVisualDescendants()
+                    .OfType<TextBlock>()
+                    .Single(block => block.Text == "Attributes" && block.IsEffectivelyVisible);
+                Assert.True(fixedLabel.IsEffectivelyVisible);
+
+                var editablePanel = dialog.FindControl<StackPanel>("EditableApplyToPanel");
+                Assert.NotNull(editablePanel);
+                Assert.False(editablePanel.IsVisible);
             }
             finally
             {

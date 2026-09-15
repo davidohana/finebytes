@@ -327,19 +327,19 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies non-string filters have no Apply-To label; subtitle is catalog name only.
+        /// Verifies Tag Remover shows a fixed Apply-To label for audio tags.
         /// </summary>
         [Fact]
-        public void ApplyToLabel_Is_Empty_For_Non_String_Filters()
+        public void ApplyToLabel_Shows_Audio_Tags_For_Tag_Remover()
         {
             var viewModel = new AppliedFiltersViewModel();
 
             viewModel.AddCommand.Execute(AppliedFiltersTestUi.Entry("TagRemover"));
 
             var step = viewModel.Steps[0];
-            Assert.Equal(string.Empty, step.ApplyToLabel);
+            Assert.Equal("Audio tags", step.ApplyToLabel);
             Assert.Equal("Audio Tag Remover", step.CatalogDisplayName);
-            Assert.Equal("Audio Tag Remover", step.Subtitle);
+            Assert.Equal("Audio Tag Remover · Audio tags", step.Subtitle);
         }
 
         /// <summary>

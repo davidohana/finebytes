@@ -1,8 +1,12 @@
 using System.Text.Json;
 using Mfr.App.Ui.ViewModels.AppliedFilters;
+using Mfr.Filters.Attributes;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
+using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
+using Mfr.Models.Media;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 
@@ -31,18 +35,83 @@ namespace Mfr.Tests.Ui.AppliedFilters
         }
 
         /// <summary>
-        /// Verifies non-string filters hide Apply-To in the dialog draft.
+        /// Verifies fixed-domain filters hide editable Apply-To but expose a read-only label.
         /// </summary>
         [Fact]
-        public void Dialog_hides_apply_to_for_non_string_filters()
+        public void Dialog_hides_editable_apply_to_for_non_string_filters()
         {
             var step = new AppliedFilterStepViewModel("Audio Tag Remover", new Filters.Audio.TagRemoverFilter());
 
             var dialog = new FilterOptionsDialogViewModel(step);
 
             Assert.False(dialog.HasApplyTo);
-
             Assert.Null(dialog.SelectedTargetOption);
+            Assert.Equal("Audio tags", dialog.FixedApplyToLabel);
+            Assert.Equal("Audio tags", step.ApplyToLabel);
+        }
+
+        /// <summary>
+        /// Verifies Attributes Setter shows a fixed Apply-To label for filesystem attributes.
+        /// </summary>
+        [Fact]
+        public void Dialog_shows_fixed_apply_to_for_attributes_setter()
+        {
+            var step = new AppliedFilterStepViewModel("Attributes Setter", new AttributesSetterFilter());
+
+            var dialog = new FilterOptionsDialogViewModel(step);
+
+            Assert.False(dialog.HasApplyTo);
+            Assert.Equal("Attributes", dialog.FixedApplyToLabel);
+            Assert.Equal("Attributes", step.ApplyToLabel);
+            Assert.Equal("Attributes Setter · Attributes", step.Subtitle);
+        }
+
+        /// <summary>
+        /// Verifies Date/Time Setter fixed Apply-To reflects the configured timestamp field.
+        /// </summary>
+        [Fact]
+        public void Dialog_shows_fixed_apply_to_for_date_time_setter_timestamp()
+        {
+            var filter = new DateTimeSetterFilter(
+                new DateTimeSetterOptions(
+                    TimestampField: TimestampField.Creation,
+                    SetDate: true,
+                    Date: new DateOnly(2024, 1, 1),
+                    SetTime: false,
+                    Time: default
+                )
+            );
+            var step = new AppliedFilterStepViewModel("Date/Time Setter", filter);
+
+            var dialog = new FilterOptionsDialogViewModel(step);
+
+            Assert.Equal("Creation Date", dialog.FixedApplyToLabel);
+        }
+
+        /// <summary>
+        /// Verifies Path Mover shows Parent Directory as its fixed Apply-To.
+        /// </summary>
+        [Fact]
+        public void Dialog_shows_fixed_apply_to_for_path_mover()
+        {
+            var step = new AppliedFilterStepViewModel("Path Mover", new PathMoverFilter());
+
+            var dialog = new FilterOptionsDialogViewModel(step);
+
+            Assert.Equal("Parent Directory", dialog.FixedApplyToLabel);
+        }
+
+        /// <summary>
+        /// Verifies ID3v2 Field Setter fixed Apply-To uses the friendly frame label.
+        /// </summary>
+        [Fact]
+        public void Dialog_shows_fixed_apply_to_for_id3v2_field_setter()
+        {
+            var step = new AppliedFilterStepViewModel("ID3v2 Field Setter", new Id3v2FieldSetterFilter());
+
+            var dialog = new FilterOptionsDialogViewModel(step);
+
+            Assert.Equal("TIT2 (Title)", dialog.FixedApplyToLabel);
         }
 
         /// <summary>
@@ -56,6 +125,7 @@ namespace Mfr.Tests.Ui.AppliedFilters
             var dialog = new FilterOptionsDialogViewModel(step);
 
             Assert.False(dialog.HasApplyTo);
+            Assert.Empty(dialog.FixedApplyToLabel);
             Assert.Empty(step.ApplyToLabel);
         }
 

@@ -26,6 +26,10 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             {
                 _LoadFromStringFilter(stringFilter);
             }
+            else
+            {
+                FixedApplyToLabel = FilterTargetCatalog.GetApplyToLabel(step.Filter);
+            }
         }
 
         /// <summary>
@@ -67,6 +71,12 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         /// </summary>
         [ObservableProperty]
         private bool _hasApplyTo;
+
+        /// <summary>
+        /// Gets the read-only Apply-To text for fixed-domain filters; empty when none.
+        /// </summary>
+        [ObservableProperty]
+        private string _fixedApplyToLabel = string.Empty;
 
         /// <summary>
         /// Gets or sets the selected Apply-To group.

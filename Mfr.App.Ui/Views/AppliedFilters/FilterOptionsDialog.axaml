@@ -4,6 +4,7 @@
   xmlns:vm="using:Mfr.App.Ui.ViewModels.AppliedFilters"
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   xmlns:converters="using:Mfr.App.Ui.Converters"
+  xmlns:avConv="using:Avalonia.Data.Converters"
   x:Class="Mfr.App.Ui.Views.AppliedFilters.FilterOptionsDialog"
   x:DataType="vm:FilterOptionsDialogViewModel"
   Title="Filter Options"
@@ -92,7 +93,15 @@
           <TextBox x:Name="NameBox" Classes="filter-options-field" MaxLength="100" Text="{Binding Name}" />
         </controls:FilterEditorLabeledRow>
 
-        <StackPanel Spacing="8" IsVisible="{Binding HasApplyTo}">
+        <controls:FilterEditorLabeledRow
+          Label="Apply To:"
+          IsVisible="{Binding FixedApplyToLabel, Converter={x:Static avConv:StringConverters.IsNotNullOrEmpty}}"
+          ToolTip.Tip="This filter always applies to a fixed domain (not selectable)."
+        >
+          <TextBlock Classes="filter-options-suffix" Margin="0" Text="{Binding FixedApplyToLabel}" />
+        </controls:FilterEditorLabeledRow>
+
+        <StackPanel x:Name="EditableApplyToPanel" Spacing="8" IsVisible="{Binding HasApplyTo}">
           <controls:FilterEditorLabeledRow
             Label="Apply To:"
             ToolTip.Tip="Which part of the path or metadata this filter transforms (name, extension, folder, tags, …)."

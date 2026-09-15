@@ -44,7 +44,7 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
         private string _catalogDisplayName = string.Empty;
 
         /// <summary>
-        /// Gets the Apply-To label for string-target filters; otherwise empty.
+        /// Gets the Apply-To label for string-target and fixed-domain filters; otherwise empty.
         /// </summary>
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(Subtitle))]
