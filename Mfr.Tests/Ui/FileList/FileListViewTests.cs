@@ -1278,6 +1278,47 @@ namespace Mfr.Tests.Ui.FileList
             window.Close();
         }
 
+        /// <summary>
+        /// Verifies the listing-error overlay offers Go Up and computer/root recovery buttons.
+        /// </summary>
+        [AvaloniaFact]
+        public void ListingError_Overlay_Shows_GoUp_And_Root_Buttons()
+        {
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var child = Directory.CreateDirectory(Path.Combine(parent, "gone")).FullName;
+            var viewModel = new FileListViewModel(NullSystemIconProvider.Instance, child, NullFileShellOpener.Instance);
+            _Track(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Directory.Delete(child);
+            viewModel.Refresh();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            var view = new FileListView { DataContext = viewModel };
+            var window = new Window
+            {
+                Width = 400,
+                Height = 300,
+                Content = view,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var goUp = view.FindControl<Button>("ListingErrorGoUpButton");
+            var root = view.FindControl<Button>("ListingErrorRootButton");
+            Assert.NotNull(goUp);
+            Assert.NotNull(root);
+            Assert.True(viewModel.CanGoUp);
+            Assert.True(goUp.IsEffectivelyVisible);
+            Assert.True(goUp.IsEnabled);
+            Assert.True(root.IsEffectivelyVisible);
+            Assert.Equal("Go Up", goUp.Content?.ToString());
+            Assert.Equal(viewModel.RootTargetPath, root.Content?.ToString());
+
+            window.Close();
+        }
+
         private FileListViewModel _CreateThumbnailsViewModel(int folderCount)
         {
             var dir = _tempDirectoryFixture.CreateTempDir();

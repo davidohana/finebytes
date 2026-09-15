@@ -482,6 +482,20 @@
             Foreground="{DynamicResource AppChromeForegroundBrush}"
             Opacity="0.85"
           />
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+            <Button
+              x:Name="ListingErrorGoUpButton"
+              Content="Go Up"
+              IsVisible="{Binding CanGoUp}"
+              Command="{Binding GoUpCommand}"
+            />
+            <Button
+              x:Name="ListingErrorRootButton"
+              Content="{Binding RootTargetPath}"
+              Command="{Binding NavigateToCommand}"
+              CommandParameter="{Binding RootTargetPath}"
+            />
+          </StackPanel>
           <Button
             x:Name="ShowLogInExplorerButton"
             Content="Show log in Explorer"

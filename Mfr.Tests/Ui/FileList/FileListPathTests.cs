@@ -1,4 +1,5 @@
 using Mfr.App.Ui.Services.FileList;
+using Mfr.Utils;
 
 namespace Mfr.Tests.Ui.FileList
 {
@@ -265,6 +266,48 @@ namespace Mfr.Tests.Ui.FileList
             }
 
             Assert.True(FileListPath.IsFilesystemFolderPath(@"C:\Music"));
+        }
+
+        /// <summary>
+        /// Verifies ancestor climb skips missing parents and stops at an existing folder.
+        /// </summary>
+        [Fact]
+        public void TryGetFirstExistingAncestor_Skips_Missing_Parents()
+        {
+            var keep = Path.GetFullPath(Path.Combine(Path.GetTempPath(), "mfr-path-" + Guid.NewGuid().ToString("N")));
+            Directory.CreateDirectory(keep);
+            try
+            {
+                var mid = Directory.CreateDirectory(Path.Combine(keep, "mid")).FullName;
+                var leaf = Directory.CreateDirectory(Path.Combine(mid, "leaf")).FullName;
+                Directory.Delete(mid, recursive: true);
+
+                Assert.True(FileListPath.TryGetFirstExistingAncestor(leaf, out var ancestor));
+                Assert.True(PathRelations.IsSamePath(keep, ancestor));
+            }
+            finally
+            {
+                if (Directory.Exists(keep))
+                {
+                    Directory.Delete(keep, recursive: true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verifies This PC has no ancestor and Network climbs to This PC on Windows.
+        /// </summary>
+        [Fact]
+        public void TryGetFirstExistingAncestor_Sentinels()
+        {
+            Assert.False(FileListPath.TryGetFirstExistingAncestor(FileListPath.ComputerPath, out _));
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            Assert.True(FileListPath.TryGetFirstExistingAncestor(FileListPath.NetworkPath, out var ancestor));
+            Assert.Equal(FileListPath.ComputerPath, ancestor);
         }
 
         /// <summary>

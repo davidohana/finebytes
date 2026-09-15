@@ -483,18 +483,17 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
-        /// Opens the current folder's parent, Network at a UNC share root, or This PC at a volume root.
+        /// Opens the first existing parent, Network, or This PC (skipping deleted intermediate folders).
         /// </summary>
         [RelayCommand(CanExecute = nameof(CanGoUp))]
         public void GoUp()
         {
-            var parent = FileListPath.GetParentPath(CurrentPath);
-            if (parent is null)
+            if (!FileListPath.TryGetFirstExistingAncestor(CurrentPath, out var ancestor))
             {
                 return;
             }
 
-            _Navigate(parent);
+            _Navigate(ancestor);
         }
 
         /// <summary>

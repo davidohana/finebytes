@@ -230,7 +230,10 @@ namespace Mfr.App.Ui.Services.FileList
         }
 
         /// <summary>
-        /// Parent folder, Network, or This PC for File List Go Up.
+        /// Immediate parent folder, Network, or This PC.
+        /// <para>
+        /// <see cref="TryGetFirstExistingAncestor"/> walks this for Go Up when intermediate folders are missing.
+        /// </para>
         /// </summary>
         /// <param name="path">Current File List path or sentinel.</param>
         /// <returns>Parent path, or <see langword="null"/> at This PC / Unix root.</returns>
@@ -268,6 +271,41 @@ namespace Mfr.App.Ui.Services.FileList
             }
 
             return parent;
+        }
+
+        /// <summary>
+        /// Walks parents until an existing folder or a Computer/Network sentinel.
+        /// <para>
+        /// Used by Go Up so one click skips nested deleted folders and lands on a listable location.
+        /// </para>
+        /// </summary>
+        /// <param name="path">Current File List path or sentinel.</param>
+        /// <param name="ancestor">First existing ancestor, or This PC / Network when reached.</param>
+        /// <returns>
+        /// <see langword="true"/> when a parent exists; <see langword="false"/> at This PC / Unix root.
+        /// </returns>
+        public static bool TryGetFirstExistingAncestor(string path, [NotNullWhen(true)] out string? ancestor)
+        {
+            ancestor = null;
+            var current = GetParentPath(path);
+            while (current is not null)
+            {
+                if (IsComputerPath(current) || IsNetworkPath(current))
+                {
+                    ancestor = current;
+                    return true;
+                }
+
+                if (Directory.Exists(current))
+                {
+                    ancestor = current;
+                    return true;
+                }
+
+                current = GetParentPath(current);
+            }
+
+            return false;
         }
 
         /// <summary>

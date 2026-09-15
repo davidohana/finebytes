@@ -657,6 +657,133 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
+        /// Verifies Go Up skips nested deleted folders and lands on the first existing ancestor.
+        /// </summary>
+        [Fact]
+        public void GoUp_From_Nested_Deleted_Folders_Lands_On_First_Existing_Ancestor()
+        {
+            var keep = _tempDirectoryFixture.CreateTempDir();
+            var mid = Directory.CreateDirectory(Path.Combine(keep, "mid")).FullName;
+            var leaf = Directory.CreateDirectory(Path.Combine(mid, "leaf")).FullName;
+            var viewModel = _CreateViewModel(leaf);
+
+            Directory.Delete(mid, recursive: true);
+            viewModel.Refresh();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.True(viewModel.HasListingError);
+            Assert.True(viewModel.CanGoUp);
+            Assert.True(viewModel.GoUpCommand.CanExecute(null));
+
+            viewModel.GoUp();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.True(PathRelations.IsSamePath(keep, viewModel.CurrentPath));
+            Assert.False(viewModel.HasListingError);
+        }
+
+        /// <summary>
+        /// Verifies Go Up recovers from access-denied listing errors when a parent exists.
+        /// </summary>
+        [Fact]
+        public void GoUp_From_AccessDenied_ListingError_Navigates_To_Parent()
+        {
+            if (!OperatingSystem.IsWindows())
+            {
+                return;
+            }
+
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var deniedFolder = Directory.CreateDirectory(Path.Combine(parent, "Denied")).FullName;
+            _DenyDirectoryTraverse(deniedFolder);
+
+            try
+            {
+                var viewModel = _CreateViewModel(parent);
+                viewModel.NavigateTo(deniedFolder);
+                FileListListingWait.WaitUntilIdle(viewModel);
+
+                Assert.True(viewModel.HasListingError);
+                Assert.Contains("Access denied", viewModel.ListingError, StringComparison.Ordinal);
+
+                viewModel.GoUp();
+                FileListListingWait.WaitUntilIdle(viewModel);
+
+                Assert.True(PathRelations.IsSamePath(parent, viewModel.CurrentPath));
+                Assert.False(viewModel.HasListingError);
+            }
+            finally
+            {
+                _AllowDirectoryTraverse(deniedFolder);
+            }
+        }
+
+        /// <summary>
+        /// Verifies Go Up recovers from Unavailable listing errors when a parent exists.
+        /// </summary>
+        [Fact]
+        public void GoUp_From_Unavailable_ListingError_Navigates_To_Parent()
+        {
+            var keep = _tempDirectoryFixture.CreateTempDir();
+            var leaf = Directory.CreateDirectory(Path.Combine(keep, "leaf")).FullName;
+            var viewModel = new FileListViewModel(
+                NullSystemIconProvider.Instance,
+                leaf,
+                NullFileShellOpener.Instance,
+                NullTextClipboard.Instance,
+                NullFileShellOperations.Instance,
+                new NullFileClipboard(),
+                ownerHwnd: null,
+                listEntries: (path, mask, excludeEnabled, excludeMasks, pathHistory) =>
+                {
+                    if (PathRelations.IsSamePath(path, leaf))
+                    {
+                        return FileListCatalogResult.Failed(FileListListingFailure.Unavailable);
+                    }
+
+                    return FileListCatalog.List(path, mask, excludeEnabled, excludeMasks, pathHistory);
+                }
+            );
+            _viewModels.Add(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.True(viewModel.HasListingError);
+            Assert.Contains("Could not read", viewModel.ListingError, StringComparison.Ordinal);
+
+            viewModel.GoUp();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.True(PathRelations.IsSamePath(keep, viewModel.CurrentPath));
+            Assert.False(viewModel.HasListingError);
+        }
+
+        /// <summary>
+        /// Verifies navigating to the computer/filesystem root clears a NotFound listing error.
+        /// </summary>
+        [Fact]
+        public void NavigateTo_Root_Clears_NotFound_ListingError()
+        {
+            var parent = _tempDirectoryFixture.CreateTempDir();
+            var child = Directory.CreateDirectory(Path.Combine(parent, "gone")).FullName;
+            var viewModel = _CreateViewModel(child);
+
+            Directory.Delete(child);
+            viewModel.Refresh();
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.True(viewModel.HasListingError);
+
+            viewModel.NavigateTo(viewModel.RootTargetPath);
+            FileListListingWait.WaitUntilIdle(viewModel);
+
+            Assert.Equal(
+                OperatingSystem.IsWindows() ? FileListViewModel.ComputerPath : FileListViewModel.UnixRootPath,
+                viewModel.CurrentPath
+            );
+            Assert.False(viewModel.HasListingError);
+        }
+
+        /// <summary>
         /// Verifies the File List starts in Report view.
         /// </summary>
         [Fact]
