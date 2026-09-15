@@ -206,79 +206,11 @@ namespace Mfr.App.Ui.ViewModels.AppliedFilters
             return
             [
                 .. XiphKnownKeys.All.Select(key => new FilterTargetOption(
-                    _GetXiphKeyLabel(key),
+                    XiphKeyLabels.For(key),
                     new XiphFieldTarget(key),
-                    _GetXiphKeyTip(key)
+                    XiphKeyLabels.Tip(key)
                 )),
             ];
-        }
-
-        /// <summary>
-        /// Friendly Apply-To label for a Xiph key: catalog IDs follow
-        /// <see cref="SemanticAudioFieldLabels"/>; overlapping common keys reuse that map; Xiph-only
-        /// aliases keep distinct wording (e.g. Track Number vs Track).
-        /// </summary>
-        private static string _GetXiphKeyLabel(string key)
-        {
-            var catalogRow = AudioCatalogFieldMaps.All.FirstOrDefault(row =>
-                string.Equals(row.XiphKey, key, StringComparison.OrdinalIgnoreCase)
-            );
-            if (catalogRow is not null)
-            {
-                return SemanticAudioFieldLabels.For(catalogRow.Field);
-            }
-
-            return key.ToUpperInvariant() switch
-            {
-                "TITLE" => SemanticAudioFieldLabels.For(SemanticAudioField.Title),
-                "ALBUM" => SemanticAudioFieldLabels.For(SemanticAudioField.Album),
-                "ARTIST" => SemanticAudioFieldLabels.For(SemanticAudioField.Performers),
-                "ALBUMARTIST" => SemanticAudioFieldLabels.For(SemanticAudioField.AlbumArtists),
-                "COMPOSER" => SemanticAudioFieldLabels.For(SemanticAudioField.Composers),
-                "GENRE" => SemanticAudioFieldLabels.For(SemanticAudioField.Genre),
-                "DESCRIPTION" => "Description",
-                "COMMENT" => SemanticAudioFieldLabels.For(SemanticAudioField.Comment),
-                "LYRICS" => SemanticAudioFieldLabels.For(SemanticAudioField.Lyrics),
-                "UNSYNCEDLYRICS" => "Unsynced Lyrics",
-                "COPYRIGHT" => SemanticAudioFieldLabels.For(SemanticAudioField.Copyright),
-                "GROUPING" => SemanticAudioFieldLabels.For(SemanticAudioField.Grouping),
-                "CONTENTGROUP" => "Content Group",
-                "DATE" => "Date",
-                "YEAR" => SemanticAudioFieldLabels.For(SemanticAudioField.Year),
-                "TRACKNUMBER" => "Track Number",
-                "TRACKTOTAL" => "Track Total",
-                "TOTALTRACKS" => "Total Tracks",
-                "DISCNUMBER" => "Disc Number",
-                "DISCTOTAL" => "Disc Total",
-                "TOTALDISCS" => "Total Discs",
-                "BPM" => SemanticAudioFieldLabels.For(SemanticAudioField.BeatsPerMinute),
-                "TEMPO" => "Tempo",
-                "CONDUCTOR" => SemanticAudioFieldLabels.For(SemanticAudioField.Conductor),
-                _ => key,
-            };
-        }
-
-        /// <summary>
-        /// Optional Apply-To tip for a Xiph key when the common key matches a clarifying semantic tip.
-        /// </summary>
-        /// <remarks>
-        /// <para>
-        /// Most catalog-ID keys stay quiet — their labels are already specific. Abbreviation
-        /// keys (ASIN, BPM) and role / multi-value common keys get tips.
-        /// </para>
-        /// </remarks>
-        private static string? _GetXiphKeyTip(string key)
-        {
-            return key.ToUpperInvariant() switch
-            {
-                "ARTIST" => SemanticAudioFieldTips.Artist,
-                "ALBUMARTIST" => SemanticAudioFieldTips.AlbumArtist,
-                "COMPOSER" => SemanticAudioFieldTips.Composer,
-                "GENRE" => SemanticAudioFieldTips.Genre,
-                "ASIN" => SemanticAudioFieldTips.Asin,
-                "BPM" => SemanticAudioFieldTips.Bpm,
-                _ => null,
-            };
         }
     }
 }

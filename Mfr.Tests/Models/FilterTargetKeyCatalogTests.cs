@@ -43,7 +43,7 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies known Xiph keys used by Metadata and Filter Options stay unique and non-empty.
+        /// Verifies known Xiph keys used by Metadata and Filter Options stay unique and labeled.
         /// </summary>
         [Fact]
         public void Xiph_known_keys_are_unique_uppercase()
@@ -51,6 +51,13 @@ namespace Mfr.Tests.Models
             Assert.NotEmpty(XiphKnownKeys.All);
             Assert.Equal(XiphKnownKeys.All.Count, XiphKnownKeys.All.Distinct(StringComparer.Ordinal).Count());
             Assert.All(XiphKnownKeys.All, key => Assert.Equal(key.ToUpperInvariant(), key));
+            Assert.All(
+                XiphKnownKeys.All,
+                static key => Assert.False(string.IsNullOrWhiteSpace(XiphKeyLabels.For(key)))
+            );
+            Assert.Equal("Track Number", XiphKeyLabels.For(XiphKnownKeys.TrackNumber));
+            Assert.Equal(SemanticAudioFieldTips.Artist, XiphKeyLabels.Tip(XiphKnownKeys.Artist));
+            Assert.Null(XiphKeyLabels.Tip(XiphKnownKeys.Title));
         }
 
         /// <summary>

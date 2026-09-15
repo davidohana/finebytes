@@ -126,30 +126,34 @@ namespace Mfr.Models.Tags
         private static XiphTagData? _MergeXiph(XiphTagData existing, SemanticAudioTag common)
         {
             var map = _ToMutableMultimap(existing.Fields);
-            _SetMapScalar(map, "TITLE", common.Title);
-            _SetMapScalar(map, "ALBUM", common.Album);
-            _SetMapList(map, "ARTIST", common.Performers);
-            _SetMapList(map, "ALBUMARTIST", common.AlbumArtists);
-            _SetMapList(map, "COMPOSER", common.Composers);
-            _SetMapScalar(map, "GENRE", common.Genre);
-            _SetMapScalar(map, "DESCRIPTION", common.Comment);
-            map.Remove("COMMENT");
-            _SetMapScalar(map, "LYRICS", common.Lyrics);
-            map.Remove("UNSYNCEDLYRICS");
-            _SetMapScalar(map, "COPYRIGHT", common.Copyright);
-            _SetMapScalar(map, "GROUPING", common.Grouping);
-            map.Remove("CONTENTGROUP");
-            _SetMapScalar(map, "DATE", common.Year?.ToString(CultureInfo.InvariantCulture));
-            map.Remove("YEAR");
-            _SetMapScalar(map, "TRACKNUMBER", common.Track?.ToString(CultureInfo.InvariantCulture));
-            _SetMapScalar(map, "TRACKTOTAL", common.TrackCount?.ToString(CultureInfo.InvariantCulture));
-            map.Remove("TOTALTRACKS");
-            _SetMapScalar(map, "DISCNUMBER", common.Disc?.ToString(CultureInfo.InvariantCulture));
-            _SetMapScalar(map, "DISCTOTAL", common.DiscCount?.ToString(CultureInfo.InvariantCulture));
-            map.Remove("TOTALDISCS");
-            _SetMapScalar(map, "BPM", common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture));
-            map.Remove("TEMPO");
-            _SetMapScalar(map, "CONDUCTOR", common.Conductor);
+            _SetMapScalar(map, XiphKnownKeys.Title, common.Title);
+            _SetMapScalar(map, XiphKnownKeys.Album, common.Album);
+            _SetMapList(map, XiphKnownKeys.Artist, common.Performers);
+            _SetMapList(map, XiphKnownKeys.AlbumArtist, common.AlbumArtists);
+            _SetMapList(map, XiphKnownKeys.Composer, common.Composers);
+            _SetMapScalar(map, XiphKnownKeys.Genre, common.Genre);
+            _SetMapScalar(map, XiphKnownKeys.Description, common.Comment);
+            map.Remove(XiphKnownKeys.Comment);
+            _SetMapScalar(map, XiphKnownKeys.Lyrics, common.Lyrics);
+            map.Remove(XiphKnownKeys.UnsyncedLyrics);
+            _SetMapScalar(map, XiphKnownKeys.Copyright, common.Copyright);
+            _SetMapScalar(map, XiphKnownKeys.Grouping, common.Grouping);
+            map.Remove(XiphKnownKeys.ContentGroup);
+            _SetMapScalar(map, XiphKnownKeys.Date, common.Year?.ToString(CultureInfo.InvariantCulture));
+            map.Remove(XiphKnownKeys.Year);
+            _SetMapScalar(map, XiphKnownKeys.TrackNumber, common.Track?.ToString(CultureInfo.InvariantCulture));
+            _SetMapScalar(map, XiphKnownKeys.TrackTotal, common.TrackCount?.ToString(CultureInfo.InvariantCulture));
+            map.Remove(XiphKnownKeys.TotalTracks);
+            _SetMapScalar(map, XiphKnownKeys.DiscNumber, common.Disc?.ToString(CultureInfo.InvariantCulture));
+            _SetMapScalar(map, XiphKnownKeys.DiscTotal, common.DiscCount?.ToString(CultureInfo.InvariantCulture));
+            map.Remove(XiphKnownKeys.TotalDiscs);
+            _SetMapScalar(
+                map,
+                XiphKnownKeys.BeatsPerMinute,
+                common.BeatsPerMinute?.ToString(CultureInfo.InvariantCulture)
+            );
+            map.Remove(XiphKnownKeys.Tempo);
+            _SetMapScalar(map, XiphKnownKeys.Conductor, common.Conductor);
             _MergeCatalogMap(map, common, static row => row.XiphKey);
 
             var rows = _SortedRows(map);
