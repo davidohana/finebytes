@@ -1408,6 +1408,40 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies a File Name write with Windows-illegal characters surfaces PreviewError instead of PreviewOk.
+        /// </summary>
+        public void Preview_IllegalFileNameChars_HasPreviewError()
+        {
+            var path = TestHelpers.CreateFile(_tempRoot, "track.txt");
+            var renameList = new RenameList();
+            renameList.AddSources([path]);
+            var item = Assert.Single(renameList.RenameItems);
+
+            var preset = new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = "illegal-file-name",
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled([
+                    new FormatterFilter(
+                        Target: new FileNameTarget(),
+                        Options: new FormatterOptions("0:00:44")
+                    ),
+                ]),
+            };
+            _ = _SetupPreview(renameList, preset);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.NotNull(item.PreviewError);
+            Assert.Contains(
+                "invalid characters for Windows file names",
+                item.PreviewError.Message,
+                StringComparison.Ordinal
+            );
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies formatter audio tokens on a folder row surfaces preview failure instead of silently empty overlays.
         /// </summary>
         public void Preview_AudioFormatter_OnDirectory_HasPreviewError()

@@ -38,9 +38,6 @@ namespace Mfr.App.Ui.Services.Session
 
             s_attached.Add(window, string.Empty);
 
-            // Plan: do not persist maximized dialog state; keep modals normal-sized.
-            window.CanMaximize = false;
-
             if (_RememberWindowState())
             {
                 _TryRestore(window, id, mode);
@@ -57,15 +54,27 @@ namespace Mfr.App.Ui.Services.Session
                 return;
             }
 
+            _TryApplyNormalGeometry(window, saved, mode);
+            if (saved.Maximized)
+            {
+                window.WindowState = WindowState.Maximized;
+            }
+        }
+
+        /// <summary>
+        /// Applies saved normal size/position when valid; returns whether geometry was applied.
+        /// </summary>
+        private static bool _TryApplyNormalGeometry(Window window, WindowGeometryPrefs saved, DialogGeometryMode mode)
+        {
             var restoreHeight = mode == DialogGeometryMode.SizeAndPosition;
             if (!WindowGeometryChecks.IsPositiveFinite(saved.Width))
             {
-                return;
+                return false;
             }
 
             if (restoreHeight && !WindowGeometryChecks.IsPositiveFinite(saved.Height))
             {
-                return;
+                return false;
             }
 
             // Width-only restore ignores saved height; use the dialog's current height for the on-screen check.
@@ -74,13 +83,13 @@ namespace Mfr.App.Ui.Services.Session
                 : (WindowGeometryChecks.IsPositiveFinite(window.Height) ? window.Height : 1);
             if (!WindowGeometryChecks.IsOnScreen(window, saved.X, saved.Y, saved.Width, heightForBounds))
             {
-                return;
+                return false;
             }
 
             // Drop maximized-frame leftovers (e.g. x/y = -8) that still pass the screen-bounds check.
             if (!WindowGeometryChecks.IsPositionInWorkingArea(window, saved.X, saved.Y))
             {
-                return;
+                return false;
             }
 
             window.WindowStartupLocation = WindowStartupLocation.Manual;
@@ -91,12 +100,17 @@ namespace Mfr.App.Ui.Services.Session
             }
 
             window.Position = new PixelPoint(saved.X, saved.Y);
+            return true;
         }
 
         /// <summary>
-        /// Writes current size and position into root <see cref="ConfigStore.Dialogs"/> when remember is on.
+        /// Writes current size, position, and maximized flag into root <see cref="ConfigStore.Dialogs"/>
+        /// when remember is on.
         /// <para>Always stores height; <see cref="DialogGeometryMode.WidthAndPosition"/> restore ignores it.</para>
-        /// <para>Skips capture while maximized/fullscreen so Windows chrome insets are not persisted.</para>
+        /// <para>
+        /// When maximized, keeps prior normal restore bounds and only sets <see cref="WindowGeometryPrefs.Maximized"/>;
+        /// Windows maximized-frame coords are not written.
+        /// </para>
         /// </summary>
         private static void _Capture(Window window, string id)
         {
@@ -105,8 +119,22 @@ namespace Mfr.App.Ui.Services.Session
                 return;
             }
 
-            if (window.WindowState != WindowState.Normal)
+            var isMaximized = window.WindowState == WindowState.Maximized;
+            if (window.WindowState is not (WindowState.Normal or WindowState.Maximized))
             {
+                return;
+            }
+
+            var dialogs = ConfigStore.EnsureDialogs();
+            if (!dialogs.TryGetValue(id, out var entry))
+            {
+                entry = new WindowGeometryPrefs();
+                dialogs[id] = entry;
+            }
+
+            if (isMaximized)
+            {
+                entry.Maximized = true;
                 return;
             }
 
@@ -127,17 +155,11 @@ namespace Mfr.App.Ui.Services.Session
                 return;
             }
 
-            var dialogs = ConfigStore.EnsureDialogs();
-            if (!dialogs.TryGetValue(id, out var entry))
-            {
-                entry = new WindowGeometryPrefs();
-                dialogs[id] = entry;
-            }
-
             entry.X = x;
             entry.Y = y;
             entry.Width = width;
             entry.Height = height;
+            entry.Maximized = false;
         }
 
         private static WindowGeometryPrefs? _TryGetSaved(string id)

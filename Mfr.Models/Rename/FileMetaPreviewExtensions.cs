@@ -53,7 +53,7 @@ namespace Mfr.Models.Rename
         /// <exception cref="ArgumentOutOfRangeException">Thrown when an ancestor-folder level argument is invalid; see <see cref="DirectoryPathAncestor"/>.</exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="value"/> cannot be assigned for the addressed target (ancestor-folder constraints,
-        /// invalid paths, attributes, or timestamps).
+        /// invalid file-name or path characters, attributes, or timestamps).
         /// </exception>
         /// <exception cref="InvalidOperationException">Thrown when an ancestor-folder segment cannot be resolved; see <see cref="DirectoryPathAncestor"/>.</exception>
         /// <exception cref="NotSupportedException">Thrown when no handler exists for <paramref name="target"/>.</exception>
@@ -68,9 +68,11 @@ namespace Mfr.Models.Rename
             switch (target)
             {
                 case FileNameTarget:
+                    _RequireValidFileNameSegment(value, nameof(value));
                     meta.FileName = value;
                     return;
                 case FileExtensionTarget:
+                    _RequireValidFileNameSegment(value, nameof(value));
                     meta.Extension = value;
                     return;
                 case FileFullNameTarget:
@@ -99,6 +101,7 @@ namespace Mfr.Models.Rename
         private static void _SetFullFileNameFromValue(FileMeta meta, string fullValue)
         {
             var fullName = Path.GetFileName(fullValue);
+            _RequireValidFileNameSegment(fullName, nameof(fullValue));
             meta.Extension = FileMeta.ExtensionWithoutDot(fullName);
             meta.FileName = Path.GetFileNameWithoutExtension(fullName);
         }
@@ -121,7 +124,8 @@ namespace Mfr.Models.Rename
         /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">
         /// Thrown when <paramref name="value"/> is whitespace-only, not fully qualified, missing a directory,
-        /// missing a file name, invalid for use as a path, or resolves to directory name <c>null</c>.
+        /// missing a file name, invalid for use as a path, has an illegal file-name leaf, or resolves to directory name
+        /// <c>null</c>.
         /// </exception>
         internal static void SetFromAbsoluteFullPath(this FileMeta meta, string value)
         {
@@ -148,6 +152,8 @@ namespace Mfr.Models.Rename
             {
                 throw new ArgumentException("Full path must include a file name.", nameof(value));
             }
+
+            _RequireValidFileNameSegment(fileName, nameof(value));
 
             var directory = Path.GetDirectoryName(trimmed);
             if (string.IsNullOrEmpty(directory))
@@ -209,6 +215,17 @@ namespace Mfr.Models.Rename
                 level: level,
                 newSegmentName: newSegmentName
             );
+        }
+
+        private static void _RequireValidFileNameSegment(string value, string paramName)
+        {
+            if (WindowsFileNameChars.ContainsInvalid(value))
+            {
+                throw new ArgumentException(
+                    $"'{value}' contains invalid characters for Windows file names.",
+                    paramName
+                );
+            }
         }
 
         private static bool _ContainsInvalidPathChar(string path)

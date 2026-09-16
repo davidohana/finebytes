@@ -60,6 +60,7 @@ namespace Mfr.Tests.Models
                     Y = 80,
                     Width = 820,
                     Height = 560,
+                    Maximized = true,
                 },
             };
             ConfigStore.FileList = new FileListPrefs
@@ -110,6 +111,7 @@ namespace Mfr.Tests.Models
             Assert.Equal(80, dialog.Y);
             Assert.Equal(820, dialog.Width);
             Assert.Equal(560, dialog.Height);
+            Assert.True(dialog.Maximized);
             Assert.NotNull(ConfigStore.FileList);
             Assert.Equal(Path.Combine(Path.GetTempPath(), "music"), ConfigStore.FileList.LastOpenedDirectory);
             Assert.Equal("*.mp3", ConfigStore.FileList.FileMask);

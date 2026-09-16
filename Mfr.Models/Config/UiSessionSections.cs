@@ -22,19 +22,19 @@ namespace Mfr.Models.Config
     public sealed class WindowGeometryPrefs
     {
         /// <summary>
-        /// Left edge in screen pixels.
+        /// Left edge in screen pixels (restore bounds when <see cref="Maximized"/>).
         /// </summary>
         [JsonPropertyName("x")]
         public int X { get; set; }
 
         /// <summary>
-        /// Top edge in screen pixels.
+        /// Top edge in screen pixels (restore bounds when <see cref="Maximized"/>).
         /// </summary>
         [JsonPropertyName("y")]
         public int Y { get; set; }
 
         /// <summary>
-        /// Width in device-independent pixels.
+        /// Width in device-independent pixels (restore bounds when <see cref="Maximized"/>).
         /// </summary>
         [JsonPropertyName("width")]
         public double Width { get; set; }
@@ -43,10 +43,19 @@ namespace Mfr.Models.Config
         /// Height in device-independent pixels.
         /// <para>
         /// Horizontal-resize dialogs may persist a height for completeness but restore ignores it.
+        /// Used as restore bounds when <see cref="Maximized"/>.
         /// </para>
         /// </summary>
         [JsonPropertyName("height")]
         public double Height { get; set; }
+
+        /// <summary>
+        /// When true, the dialog opens maximized; <see cref="X"/>/<see cref="Y"/>/<see cref="Width"/>/<see cref="Height"/>
+        /// remain the normal restore bounds.
+        /// <para>Missing on soft-load defaults to false.</para>
+        /// </summary>
+        [JsonPropertyName("maximized")]
+        public bool Maximized { get; set; }
     }
 
     /// <summary>

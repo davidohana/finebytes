@@ -7,7 +7,7 @@
 - **Coords:** Absolute screen pixels for `x`/`y` (same as main window), not owner-relative.
 - **Flush:** Update in-memory `ConfigStore` on dialog **close**; disk flush stays with existing `ConfigStore.TrySave` paths (app close / Options OK). No per-dialog disk write.
 - **Horizontal-only / content-height dialogs:** For `ModalDialogHorizontalResize` windows and `SizeToContent=Height` modals (`renameListRowError`), restore **width + position** only; keep height content-driven. Capture still stores height for a complete prefs entry; restore ignores it.
-- **Maximize:** Do not persist dialog `WindowState`; modals stay normal.
+- **Maximize:** Persist `dialogs.<id>.maximized` (bool). Size/position remain normal restore bounds; do not write Windows maximized-frame coords.
 
 ## MFR7 reference brief
 
@@ -29,8 +29,8 @@ Root `dialogs` holds modal geometries; `options.rememberWindowState` gates main-
   "splitters": { … }
 },
 "dialogs": {
-  "fieldShuttle": { "x": 100, "y": 80, "width": 820, "height": 560 },
-  "renameLog": { "x": …, "y": …, "width": …, "height": … }
+  "fieldShuttle": { "x": 100, "y": 80, "width": 820, "height": 560, "maximized": false },
+  "renameLog": { "x": …, "y": …, "width": …, "height": …, "maximized": true }
 }
 ```
 
@@ -59,7 +59,6 @@ Root `dialogs` holds modal geometries; `options.rememberWindowState` gates main-
 - Non-resizable dialogs
 - Owner-relative positioning
 - Separate Options toggle for dialogs
-- Persisting maximized dialog state
 - Migrating any legacy shapes (none exist)
 
 ## Phases

@@ -80,6 +80,75 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
+        /// Verifies a name-illegal leaf is rejected even when the path-char check would pass.
+        /// </summary>
+        [Fact]
+        public void SetFromAbsoluteFullPath_rejects_windows_illegal_file_name_leaf()
+        {
+            var meta = new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: TestPaths.Absolute("album"),
+                fileName: "track",
+                extension: "mp3"
+            );
+
+            // '*' is illegal in file names but not in Windows path-char validation.
+            var bad = TestPaths.Absolute("album", "bad*name.txt");
+            var ex = Assert.Throws<ArgumentException>(() => meta.SetFromAbsoluteFullPath(bad));
+            Assert.Contains("invalid characters for Windows file names", ex.Message);
+        }
+
+        /// <summary>
+        /// Verifies File Name / Extension / Full File Name writes reject Windows-illegal characters.
+        /// </summary>
+        [Theory]
+        [InlineData(typeof(FileNameTarget), "0:00:44")]
+        [InlineData(typeof(FileNameTarget), "bad*name")]
+        [InlineData(typeof(FileExtensionTarget), "mp3:x")]
+        [InlineData(typeof(FileFullNameTarget), "0:00:44.mp3")]
+        [InlineData(typeof(FileFullNameTarget), "song?.mp3")]
+        public void SetTargetString_rejects_windows_illegal_file_name_chars(Type targetType, string value)
+        {
+            var meta = new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: TestPaths.Absolute("album"),
+                fileName: "track",
+                extension: "mp3"
+            );
+            var target = (FilterTarget)Activator.CreateInstance(targetType)!;
+
+            var ex = Assert.Throws<ArgumentException>(() => meta.SetTargetString(target, value));
+            Assert.Contains("invalid characters for Windows file names", ex.Message);
+        }
+
+        /// <summary>
+        /// Verifies legal File Name / Extension / Full File Name writes still assign.
+        /// </summary>
+        [Fact]
+        public void SetTargetString_accepts_legal_file_name_segments()
+        {
+            var meta = new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: TestPaths.Absolute("album"),
+                fileName: "track",
+                extension: "mp3"
+            );
+
+            meta.SetTargetString(new FileNameTarget(), "0-00-44");
+            Assert.Equal("0-00-44", meta.FileName);
+
+            meta.SetTargetString(new FileExtensionTarget(), "flac");
+            Assert.Equal("flac", meta.Extension);
+
+            meta.SetTargetString(new FileFullNameTarget(), "song.wav");
+            Assert.Equal("song", meta.FileName);
+            Assert.Equal("wav", meta.Extension);
+        }
+
+        /// <summary>
         /// Verifies relative paths are rejected.
         /// </summary>
         [Fact]

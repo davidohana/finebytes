@@ -44,15 +44,44 @@ namespace Mfr.Tests.Ui.Services.Session
             var window = _CreateDialog(width: 500, height: 400);
             DialogSession.Attach(window, DialogIds.FieldShuttle);
 
-            Assert.False(window.CanMaximize);
             Assert.Equal(WindowStartupLocation.Manual, window.WindowStartupLocation);
             Assert.Equal(820, window.Width);
             Assert.Equal(560, window.Height);
             Assert.Equal(new PixelPoint(40, 60), window.Position);
+            Assert.Equal(WindowState.Normal, window.WindowState);
         }
 
         /// <summary>
-        /// Verifies maximized-frame leftovers (negative top) are not restored.
+        /// Verifies Attach restores restore-bounds then maximizes when maximized is set.
+        /// </summary>
+        [AvaloniaFact]
+        public void Attach_Maximized_AppliesRestoreBoundsThenMaximizes()
+        {
+            ConfigStore.Options.RememberWindowState = true;
+            ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+            {
+                [DialogIds.RenameLog] = new WindowGeometryPrefs
+                {
+                    X = 40,
+                    Y = 60,
+                    Width = 820,
+                    Height = 560,
+                    Maximized = true,
+                },
+            };
+
+            var window = _CreateDialog(width: 500, height: 400);
+            DialogSession.Attach(window, DialogIds.RenameLog);
+
+            Assert.Equal(WindowStartupLocation.Manual, window.WindowStartupLocation);
+            Assert.Equal(820, window.Width);
+            Assert.Equal(560, window.Height);
+            Assert.Equal(new PixelPoint(40, 60), window.Position);
+            Assert.Equal(WindowState.Maximized, window.WindowState);
+        }
+
+        /// <summary>
+        /// Verifies maximized-frame leftovers (negative top) without maximized flag are not restored.
         /// </summary>
         [AvaloniaFact]
         public void Attach_MaximizedFrameCoords_DoesNotRestore()
@@ -75,13 +104,14 @@ namespace Mfr.Tests.Ui.Services.Session
             Assert.Equal(WindowStartupLocation.CenterOwner, window.WindowStartupLocation);
             Assert.Equal(500, window.Width);
             Assert.Equal(400, window.Height);
+            Assert.Equal(WindowState.Normal, window.WindowState);
         }
 
         /// <summary>
-        /// Verifies Closing does not overwrite saved geometry while the dialog is maximized.
+        /// Verifies Closing while maximized keeps prior restore bounds and sets maximized.
         /// </summary>
         [AvaloniaFact]
-        public void Closing_Maximized_DoesNotCapture()
+        public void Closing_Maximized_KeepsRestoreBoundsAndSetsFlag()
         {
             ConfigStore.Options.RememberWindowState = true;
             ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
@@ -110,6 +140,7 @@ namespace Mfr.Tests.Ui.Services.Session
             Assert.Equal(60, saved.Y);
             Assert.Equal(820, saved.Width);
             Assert.Equal(560, saved.Height);
+            Assert.True(saved.Maximized);
         }
 
         /// <summary>
@@ -212,6 +243,7 @@ namespace Mfr.Tests.Ui.Services.Session
             Assert.Equal(44, saved.Y);
             Assert.Equal(700, saved.Width);
             Assert.Equal(450, saved.Height);
+            Assert.False(saved.Maximized);
         }
 
         /// <summary>
