@@ -17,7 +17,40 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Saved main-window size, position, state, and pane splitter ratios.
+    /// Saved window size and screen position (main window or a modal dialog).
+    /// </summary>
+    public sealed class WindowGeometryPrefs
+    {
+        /// <summary>
+        /// Left edge in screen pixels.
+        /// </summary>
+        [JsonPropertyName("x")]
+        public int X { get; set; }
+
+        /// <summary>
+        /// Top edge in screen pixels.
+        /// </summary>
+        [JsonPropertyName("y")]
+        public int Y { get; set; }
+
+        /// <summary>
+        /// Width in device-independent pixels.
+        /// </summary>
+        [JsonPropertyName("width")]
+        public double Width { get; set; }
+
+        /// <summary>
+        /// Height in device-independent pixels.
+        /// <para>
+        /// Horizontal-resize dialogs may persist a height for completeness but restore ignores it.
+        /// </para>
+        /// </summary>
+        [JsonPropertyName("height")]
+        public double Height { get; set; }
+    }
+
+    /// <summary>
+    /// Saved main-window size, position, state, pane splitter ratios, and dialog geometries.
     /// </summary>
     public sealed class MainWindowPrefs
     {
@@ -61,7 +94,14 @@ namespace Mfr.Models.Config
         public MainWindowSplitters? Splitters { get; set; }
 
         /// <summary>
-        /// When true, restore and save main-window size, position, maximized state, and pane splitters across launches.
+        /// Last size/position per resizable modal dialog id, when remembered.
+        /// </summary>
+        [JsonPropertyName("dialogs")]
+        public Dictionary<string, WindowGeometryPrefs>? Dialogs { get; set; }
+
+        /// <summary>
+        /// When true, restore and save main-window size, position, maximized state, pane splitters,
+        /// and resizable dialog geometries across launches.
         /// </summary>
         [JsonPropertyName("rememberWindowState")]
         public bool RememberWindowState { get; set; } = true;

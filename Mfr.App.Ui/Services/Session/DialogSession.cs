@@ -1,0 +1,162 @@
+using System.Runtime.CompilerServices;
+using Avalonia;
+using Avalonia.Controls;
+using Mfr.Models.Config;
+
+namespace Mfr.App.Ui.Services.Session
+{
+    /// <summary>
+    /// Applies and captures resizable-modal geometry under <see cref="MainWindowPrefs.Dialogs"/>.
+    /// </summary>
+    internal static class DialogSession
+    {
+        private static readonly ConditionalWeakTable<Window, object> s_attached = [];
+
+        /// <summary>
+        /// Restores saved geometry when remember is on, and captures on close into <see cref="ConfigStore"/>.
+        /// <para>
+        /// Disk flush stays with existing <see cref="ConfigStore.TrySave"/> paths (app close / Options OK).
+        /// Invalid or missing entries leave the dialog's XAML <c>CenterOwner</c> defaults.
+        /// </para>
+        /// </summary>
+        /// <param name="window">Modal dialog to configure.</param>
+        /// <param name="id">Stable key under <see cref="MainWindowPrefs.Dialogs"/>.</param>
+        /// <param name="mode">Which size fields to restore (height is ignored for width-only dialogs).</param>
+        public static void Attach(
+            Window window,
+            string id,
+            DialogGeometryMode mode = DialogGeometryMode.SizeAndPosition
+        )
+        {
+            ArgumentNullException.ThrowIfNull(window);
+            ArgumentException.ThrowIfNullOrWhiteSpace(id);
+
+            if (s_attached.TryGetValue(window, out _))
+            {
+                return;
+            }
+
+            s_attached.Add(window, string.Empty);
+
+            if (_RememberWindowState())
+            {
+                _TryRestore(window, id, mode);
+            }
+
+            window.Closing += (_, _) => _Capture(window, id);
+        }
+
+        private static void _TryRestore(Window window, string id, DialogGeometryMode mode)
+        {
+            var saved = _TryGetSaved(id);
+            if (saved is null)
+            {
+                return;
+            }
+
+            var restoreHeight = mode == DialogGeometryMode.SizeAndPosition;
+            if (!_IsPositiveFinite(saved.Width))
+            {
+                return;
+            }
+
+            if (restoreHeight && !_IsPositiveFinite(saved.Height))
+            {
+                return;
+            }
+
+            // Width-only restore ignores saved height; use the dialog's current height for the on-screen check.
+            var heightForBounds = restoreHeight ? saved.Height : (_IsPositiveFinite(window.Height) ? window.Height : 1);
+            if (!_IsOnScreen(window, saved.X, saved.Y, saved.Width, heightForBounds))
+            {
+                return;
+            }
+
+            window.WindowStartupLocation = WindowStartupLocation.Manual;
+            window.Width = saved.Width;
+            if (restoreHeight)
+            {
+                window.Height = saved.Height;
+            }
+
+            window.Position = new PixelPoint(saved.X, saved.Y);
+        }
+
+        /// <summary>
+        /// Writes current size and position into <see cref="MainWindowPrefs.Dialogs"/> when remember is on.
+        /// <para>Always stores height; <see cref="DialogGeometryMode.WidthAndPosition"/> restore ignores it.</para>
+        /// </summary>
+        private static void _Capture(Window window, string id)
+        {
+            if (!_RememberWindowState())
+            {
+                return;
+            }
+
+            var width = window.Width;
+            var height = window.Height;
+            if (!_IsValidSize(width, height))
+            {
+                return;
+            }
+
+            var x = window.Position.X;
+            var y = window.Position.Y;
+            if (!_IsOnScreen(window, x, y, width, height))
+            {
+                return;
+            }
+
+            var mainWindow = ConfigStore.EnsureMainWindow();
+            var dialogs = mainWindow.Dialogs ??= new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal);
+            if (!dialogs.TryGetValue(id, out var entry))
+            {
+                entry = new WindowGeometryPrefs();
+                dialogs[id] = entry;
+            }
+
+            entry.X = x;
+            entry.Y = y;
+            entry.Width = width;
+            entry.Height = height;
+        }
+
+        private static WindowGeometryPrefs? _TryGetSaved(string id)
+        {
+            var dialogs = ConfigStore.MainWindow?.Dialogs;
+            if (dialogs is null)
+            {
+                return null;
+            }
+
+            return dialogs.TryGetValue(id, out var saved) ? saved : null;
+        }
+
+        private static bool _RememberWindowState()
+        {
+            return ConfigStore.MainWindow?.RememberWindowState ?? true;
+        }
+
+        private static bool _IsValidSize(double width, double height)
+        {
+            return _IsPositiveFinite(width) && _IsPositiveFinite(height);
+        }
+
+        private static bool _IsPositiveFinite(double value)
+        {
+            return !double.IsNaN(value) && !double.IsInfinity(value) && value > 0;
+        }
+
+        private static bool _IsOnScreen(Window window, int x, int y, double width, double height)
+        {
+            var screens = window.Screens;
+            if (screens is null || screens.ScreenCount == 0)
+            {
+                return true;
+            }
+
+            var bounds = new PixelRect(x, y, (int)Math.Ceiling(width), (int)Math.Ceiling(height));
+            return screens.ScreenFromBounds(bounds) is not null;
+        }
+    }
+}

@@ -134,5 +134,59 @@ namespace Mfr.Tests.Ui.Services.Session
                 ConfigStoreTestReset.LoadEmpty();
             }
         }
+
+        /// <summary>
+        /// Verifies close-save keeps dialog geometries when rewriting main-window capture.
+        /// </summary>
+        [AvaloniaFact]
+        public void SaveOnClose_Preserves_DialogGeometries()
+        {
+            var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-session-dialogs-" + Guid.NewGuid() + ".json");
+            File.WriteAllText(configPath, "{}");
+            try
+            {
+                ConfigStore.Load(configPath);
+                ConfigStore.MainWindow = new MainWindowPrefs
+                {
+                    RememberWindowState = true,
+                    Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+                    {
+                        ["renameLog"] = new WindowGeometryPrefs
+                        {
+                            X = 11,
+                            Y = 22,
+                            Width = 700,
+                            Height = 500,
+                        },
+                    },
+                };
+
+                var window = new AppMainWindow
+                {
+                    DataContext = new MainWindowViewModel(persistSession: false),
+                    Width = 1100,
+                    Height = 720,
+                };
+                window.Show();
+                window.UpdateLayout();
+
+                UiSessionPersistence.SaveOnClose(window, window.GetPaneGrids(), fileList: null);
+
+                var saved = Assert.Contains("renameLog", ConfigStore.MainWindow!.Dialogs!);
+                Assert.Equal(11, saved.X);
+                Assert.Equal(22, saved.Y);
+                Assert.Equal(700, saved.Width);
+                Assert.Equal(500, saved.Height);
+            }
+            finally
+            {
+                if (File.Exists(configPath))
+                {
+                    File.Delete(configPath);
+                }
+
+                ConfigStoreTestReset.LoadEmpty();
+            }
+        }
     }
 }

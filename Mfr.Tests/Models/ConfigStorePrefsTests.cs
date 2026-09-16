@@ -50,6 +50,16 @@ namespace Mfr.Tests.Models
                     FilterLists = 0.55,
                     TopPanes = 0.65,
                 },
+                Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+                {
+                    ["fieldShuttle"] = new WindowGeometryPrefs
+                    {
+                        X = 100,
+                        Y = 80,
+                        Width = 820,
+                        Height = 560,
+                    },
+                },
             };
             ConfigStore.FileList = new FileListPrefs
             {
@@ -92,6 +102,12 @@ namespace Mfr.Tests.Models
             Assert.Equal(0.45, ConfigStore.MainWindow.Splitters.AvailableApplied);
             Assert.Equal(0.55, ConfigStore.MainWindow.Splitters.FilterLists);
             Assert.Equal(0.65, ConfigStore.MainWindow.Splitters.TopPanes);
+            Assert.NotNull(ConfigStore.MainWindow.Dialogs);
+            Assert.True(ConfigStore.MainWindow.Dialogs.TryGetValue("fieldShuttle", out var dialog));
+            Assert.Equal(100, dialog.X);
+            Assert.Equal(80, dialog.Y);
+            Assert.Equal(820, dialog.Width);
+            Assert.Equal(560, dialog.Height);
             Assert.NotNull(ConfigStore.FileList);
             Assert.Equal(Path.Combine(Path.GetTempPath(), "music"), ConfigStore.FileList.LastOpenedDirectory);
             Assert.Equal("*.mp3", ConfigStore.FileList.FileMask);

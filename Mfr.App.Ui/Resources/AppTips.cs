@@ -25,8 +25,7 @@ namespace Mfr.App.Ui.Resources
             "Prepare an undo session from this log — replaces the Rename List, clears Filter Chain; press GO to apply";
 
         /// <summary>Rename Log dialog: Erase the selected log.</summary>
-        public const string RenameLogErase =
-            "Erase this log from history (deletes the on-disk file when present)";
+        public const string RenameLogErase = "Erase this log from history (deletes the on-disk file when present)";
 
         /// <summary>Toolbar tip for Options.</summary>
         public const string ShowOptions = "Options (Ctrl+,)";
@@ -35,9 +34,9 @@ namespace Mfr.App.Ui.Resources
         public const string OptionsRememberLastFolder =
             "Save the File List folder when closing and restore it next launch";
 
-        /// <summary>Options: remember main-window layout across launches.</summary>
+        /// <summary>Options: remember main-window and dialog layout across launches.</summary>
         public const string OptionsRememberWindowState =
-            "Restore main window size, position, and splitters next launch";
+            "Restore main window and dialog size/position (and splitters) next launch";
 
         /// <summary>Options: Confirmations section — how suppressions work.</summary>
         public const string OptionsConfirmations =

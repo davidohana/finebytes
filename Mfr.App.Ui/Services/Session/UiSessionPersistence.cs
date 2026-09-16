@@ -66,9 +66,12 @@ namespace Mfr.App.Ui.Services.Session
 
                 if (rememberWindow)
                 {
+                    // WindowSession.Capture rebuilds MainWindow; keep dialog geometries written by DialogSession.
+                    var existingDialogs = ConfigStore.MainWindow?.Dialogs;
                     var captured = WindowSession.Capture(window);
                     captured.RememberWindowState = rememberWindow;
                     captured.Splitters = SplitterSession.Capture(panes);
+                    captured.Dialogs = existingDialogs;
                     ConfigStore.MainWindow = captured;
                 }
 
