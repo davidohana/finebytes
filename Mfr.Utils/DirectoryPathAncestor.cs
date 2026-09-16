@@ -16,10 +16,12 @@ namespace Mfr.Utils
         /// <summary>
         /// Returns one folder-name segment counted from the item’s containing directory upward.
         /// </summary>
+        /// <remarks>
         /// <para>
         /// Level <c>1</c> names the leaf folder (<paramref name="containingDirectoryPath"/>),
         /// <c>2</c> names its parent, and so on.
         /// </para>
+        /// </remarks>
         /// <param name="containingDirectoryPath">Absolute directory that holds the rename item.</param>
         /// <param name="level">Positive ancestor distance (<c>1</c>-based).</param>
         /// <returns>The folder segment name.</returns>

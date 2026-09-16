@@ -9,7 +9,7 @@ namespace Mfr.Models.Tags.Id3v2
         /// Returns <c>FRAMEID (Short name)</c> for a modeled frame, or the trimmed uppercase id when unknown.
         /// </summary>
         /// <param name="frameId">Four-character frame id (any casing).</param>
-        /// <returns>Friendly label for pickers and Applied-list subtitles.</returns>
+        /// <returns>Friendly label for pickers and Filter Chain step subtitles.</returns>
         public static string For(string frameId)
         {
             if (string.IsNullOrWhiteSpace(frameId))

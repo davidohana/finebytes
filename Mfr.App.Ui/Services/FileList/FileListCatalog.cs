@@ -531,10 +531,12 @@ namespace Mfr.App.Ui.Services.FileList
         /// <summary>
         /// Throws when <paramref name="path"/> cannot be listed (e.g. access denied).
         /// </summary>
+        /// <remarks>
         /// <para>
         /// Uses <see cref="EnumerationOptions.IgnoreInaccessible"/> = false so denial on the directory itself
         /// surfaces as an exception instead of an empty listing.
         /// </para>
+        /// </remarks>
         private static void _EnsureDirectoryReadable(string path)
         {
             var probeOptions = new EnumerationOptions

@@ -1423,10 +1423,7 @@ namespace Mfr.Tests.Engine
                 Name = "illegal-file-name",
                 Description = null,
                 Chain = FilterChain.CreateAllEnabled([
-                    new FormatterFilter(
-                        Target: new FileNameTarget(),
-                        Options: new FormatterOptions("0:00:44")
-                    ),
+                    new FormatterFilter(Target: new FileNameTarget(), Options: new FormatterOptions("0:00:44")),
                 ]),
             };
             _ = _SetupPreview(renameList, preset);
@@ -1434,10 +1431,7 @@ namespace Mfr.Tests.Engine
             Assert.Equal("0:00:44", item.Preview.FileName);
             Assert.Equal("0:00:44.txt", item.Preview.FullFileName);
             Assert.Equal(RenameStatus.PreviewError, item.Status);
-            Assert.Equal(
-                "Target name '0:00:44.txt' contains illegal characters: ':'.",
-                item.PreviewError!.Message
-            );
+            Assert.Equal("Target name '0:00:44.txt' contains illegal characters: ':'.", item.PreviewError!.Message);
         }
 
         [Fact]

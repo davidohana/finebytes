@@ -69,14 +69,8 @@ namespace Mfr.Models.Tags.Xiph
             }
 
             var normalized = key.Trim().ToUpperInvariant();
-            var catalogRow = AudioCatalogFieldMaps.All.FirstOrDefault(row =>
-                string.Equals(row.XiphKey, normalized, StringComparison.OrdinalIgnoreCase)
-            );
-            if (catalogRow is not null)
-            {
-                return SemanticAudioFieldLabels.For(catalogRow.Field);
-            }
 
+            // Common keys hit O(1) maps first; MusicBrainz/ASIN catalog rows are a small linear fallback.
             if (s_KeyToSemanticField.TryGetValue(normalized, out var field))
             {
                 return SemanticAudioFieldLabels.For(field);
@@ -85,6 +79,14 @@ namespace Mfr.Models.Tags.Xiph
             if (s_DistinctLabels.TryGetValue(normalized, out var label))
             {
                 return label;
+            }
+
+            var catalogRow = AudioCatalogFieldMaps.All.FirstOrDefault(row =>
+                string.Equals(row.XiphKey, normalized, StringComparison.OrdinalIgnoreCase)
+            );
+            if (catalogRow is not null)
+            {
+                return SemanticAudioFieldLabels.For(catalogRow.Field);
             }
 
             return key;

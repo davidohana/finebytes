@@ -23,6 +23,7 @@ namespace Mfr.Utils
         /// <returns><see langword="true"/> when any Windows-illegal character is present.</returns>
         public static bool ContainsInvalid(string value)
         {
+            ArgumentNullException.ThrowIfNull(value);
             return value.AsSpan().IndexOfAny(s_invalidName) >= 0;
         }
 
@@ -33,6 +34,8 @@ namespace Mfr.Utils
         /// <returns>Illegal characters found; empty when none.</returns>
         public static IReadOnlyList<char> FindInvalid(string value)
         {
+            ArgumentNullException.ThrowIfNull(value);
+
             List<char>? found = null;
             HashSet<char>? seen = null;
             foreach (var c in value)
@@ -62,6 +65,8 @@ namespace Mfr.Utils
         /// <returns>Display text such as <c>':'</c> or <c>':' '*'</c>; empty when <paramref name="invalidChars"/> is empty.</returns>
         public static string FormatInvalidForMessage(IReadOnlyList<char> invalidChars)
         {
+            ArgumentNullException.ThrowIfNull(invalidChars);
+
             if (invalidChars.Count == 0)
             {
                 return string.Empty;
@@ -77,6 +82,7 @@ namespace Mfr.Utils
         /// <returns><see langword="true"/> when any Windows-illegal path character is present.</returns>
         public static bool ContainsInvalidPath(string path)
         {
+            ArgumentNullException.ThrowIfNull(path);
             return path.AsSpan().IndexOfAny(s_invalidPath) >= 0;
         }
 
@@ -86,6 +92,8 @@ namespace Mfr.Utils
         /// <param name="chars">Set to populate.</param>
         public static void AddInvalidTo(ISet<char> chars)
         {
+            ArgumentNullException.ThrowIfNull(chars);
+
             foreach (var c in s_invalidName)
             {
                 chars.Add(c);

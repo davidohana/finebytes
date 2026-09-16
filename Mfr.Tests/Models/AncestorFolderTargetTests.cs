@@ -73,7 +73,7 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies invalid ancestor level errors surface through applied filters unchanged.
+        /// Verifies invalid ancestor level errors surface through the filter chain unchanged.
         /// </summary>
         [Fact]
         public void Replacer_Invalid_level_throws_same_as_DirectoryPathAncestor()

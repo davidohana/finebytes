@@ -18,10 +18,7 @@ namespace Mfr.Tests.Engine
             Assert.Equal(RenameStatus.PreviewError, item.Status);
             Assert.Equal("0:00:44", item.Preview.FileName);
             Assert.Equal("0:00:44.txt", item.Preview.FullFileName);
-            Assert.Equal(
-                "Target name '0:00:44.txt' contains illegal characters: ':'.",
-                item.PreviewError!.Message
-            );
+            Assert.Equal("Target name '0:00:44.txt' contains illegal characters: ':'.", item.PreviewError!.Message);
         }
 
         /// <summary>
@@ -34,10 +31,7 @@ namespace Mfr.Tests.Engine
 
             PreviewIllegalFileNameDetector.MarkIllegalNames([item]);
 
-            Assert.Equal(
-                "Target name 'a*:b.txt' contains illegal characters: '*' ':'.",
-                item.PreviewError!.Message
-            );
+            Assert.Equal("Target name 'a*:b.txt' contains illegal characters: '*' ':'.", item.PreviewError!.Message);
         }
 
         /// <summary>

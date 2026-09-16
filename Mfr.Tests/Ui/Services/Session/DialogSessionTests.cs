@@ -81,6 +81,27 @@ namespace Mfr.Tests.Ui.Services.Session
         }
 
         /// <summary>
+        /// Verifies maximize-only prefs (no restore size) leave the dialog at XAML defaults.
+        /// </summary>
+        [AvaloniaFact]
+        public void Attach_MaximizedWithoutRestoreSize_LeavesDefaults()
+        {
+            ConfigStore.Options.RememberWindowState = true;
+            ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+            {
+                [DialogIds.RenameLog] = new WindowGeometryPrefs { Maximized = true },
+            };
+
+            var window = _CreateDialog(width: 500, height: 400);
+            DialogSession.Attach(window, DialogIds.RenameLog);
+
+            Assert.Equal(WindowStartupLocation.CenterOwner, window.WindowStartupLocation);
+            Assert.Equal(500, window.Width);
+            Assert.Equal(400, window.Height);
+            Assert.Equal(WindowState.Normal, window.WindowState);
+        }
+
+        /// <summary>
         /// Verifies maximized-frame leftovers (negative top) without maximized flag are not restored.
         /// </summary>
         [AvaloniaFact]
@@ -141,6 +162,24 @@ namespace Mfr.Tests.Ui.Services.Session
             Assert.Equal(820, saved.Width);
             Assert.Equal(560, saved.Height);
             Assert.True(saved.Maximized);
+        }
+
+        /// <summary>
+        /// Verifies Closing while maximized without prior restore bounds does not persist maximized alone.
+        /// </summary>
+        [AvaloniaFact]
+        public void Closing_MaximizedWithoutPriorBounds_DoesNotPersistMaximizedOnly()
+        {
+            ConfigStore.Options.RememberWindowState = true;
+
+            var window = _CreateDialog(width: 700, height: 450);
+            DialogSession.Attach(window, DialogIds.SavePreset);
+            window.Show();
+            window.UpdateLayout();
+            window.WindowState = WindowState.Maximized;
+            window.Close();
+
+            Assert.False(ConfigStore.Dialogs!.ContainsKey(DialogIds.SavePreset));
         }
 
         /// <summary>

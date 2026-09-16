@@ -60,5 +60,18 @@ namespace Mfr.Tests.Utils
             Assert.Equal("U+0000", WindowsFileNameChars.FormatInvalidForMessage(['\0']));
             Assert.Equal(string.Empty, WindowsFileNameChars.FormatInvalidForMessage([]));
         }
+
+        /// <summary>
+        /// Verifies null inputs are rejected.
+        /// </summary>
+        [Fact]
+        public void Public_apis_reject_null()
+        {
+            Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.ContainsInvalid(null!));
+            Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.ContainsInvalidPath(null!));
+            Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.FindInvalid(null!));
+            Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.FormatInvalidForMessage(null!));
+            Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.AddInvalidTo(null!));
+        }
     }
 }

@@ -54,7 +54,12 @@ namespace Mfr.App.Ui.Services.Session
                 return;
             }
 
-            _TryApplyNormalGeometry(window, saved, mode);
+            // Maximize only after restore bounds apply — maximize-only entries (zero size) leave XAML defaults.
+            if (!_TryApplyNormalGeometry(window, saved, mode))
+            {
+                return;
+            }
+
             if (saved.Maximized)
             {
                 window.WindowState = WindowState.Maximized;
@@ -109,7 +114,7 @@ namespace Mfr.App.Ui.Services.Session
         /// <para>Always stores height; <see cref="DialogGeometryMode.WidthAndPosition"/> restore ignores it.</para>
         /// <para>
         /// When maximized, keeps prior normal restore bounds and only sets <see cref="WindowGeometryPrefs.Maximized"/>;
-        /// Windows maximized-frame coords are not written.
+        /// Windows maximized-frame coords are not written. Maximize without prior valid size is not persisted.
         /// </para>
         /// </summary>
         private static void _Capture(Window window, string id)
@@ -126,14 +131,16 @@ namespace Mfr.App.Ui.Services.Session
             }
 
             var dialogs = ConfigStore.EnsureDialogs();
-            if (!dialogs.TryGetValue(id, out var entry))
-            {
-                entry = new WindowGeometryPrefs();
-                dialogs[id] = entry;
-            }
+            dialogs.TryGetValue(id, out var entry);
 
             if (isMaximized)
             {
+                // Need prior normal bounds; otherwise a later restore would maximize with no size/position.
+                if (entry is null || !WindowGeometryChecks.IsValidSize(entry.Width, entry.Height))
+                {
+                    return;
+                }
+
                 entry.Maximized = true;
                 return;
             }
@@ -155,6 +162,8 @@ namespace Mfr.App.Ui.Services.Session
                 return;
             }
 
+            entry ??= new WindowGeometryPrefs();
+            dialogs[id] = entry;
             entry.X = x;
             entry.Y = y;
             entry.Width = width;
