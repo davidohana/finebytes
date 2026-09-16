@@ -55,6 +55,12 @@ namespace Mfr.Models.Config
         /// <para>Persisted as <c>options.addFolderContents</c> (JSON string <c>true</c>/<c>false</c>).</para>
         /// </summary>
         public bool AddFolderContents = true;
+
+        /// <summary>
+        /// When true, store Rename List column pixel widths and reuse them when a column is shown again.
+        /// <para>Persisted as <c>options.rememberColumnWidths</c> (JSON string <c>true</c>/<c>false</c>). Default on.</para>
+        /// </summary>
+        public bool RememberColumnWidths = true;
     }
 
     /// <summary>

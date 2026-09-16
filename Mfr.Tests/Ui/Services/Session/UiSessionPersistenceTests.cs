@@ -1,6 +1,7 @@
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.MainWindow;
+using Mfr.Models.RenameList.Fields.Basic;
 using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
 
 namespace Mfr.Tests.Ui.Services.Session
@@ -75,12 +76,20 @@ namespace Mfr.Tests.Ui.Services.Session
                 ConfigStore.Load(configPath);
                 ConfigStore.Options.AddMode = RenameListAddMode.Folders;
                 ConfigStore.Options.AddFolderContents = false;
+                ConfigStore.Options.RememberColumnWidths = true;
                 ConfigStore.RenameList = new RenameListPrefs
                 {
                     UseFixedWidthFont = true,
                     PreviewEnabled = true,
                     AbModeEnabled = false,
                     AbSide = RenameListPrefs.AbSideOriginal,
+                    ColumnWidths =
+                    [
+                        new RenameListVisibleColumnSpec(
+                            RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                            Width: 111
+                        ),
+                    ],
                 };
                 ConfigStore.Options.RememberWindowState = false;
 
@@ -93,6 +102,7 @@ namespace Mfr.Tests.Ui.Services.Session
                 window.Show();
                 window.UpdateLayout();
 
+                var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
                 var capture = new RenameListPrefs
                 {
                     UseFixedWidthFont = false,
@@ -100,18 +110,23 @@ namespace Mfr.Tests.Ui.Services.Session
                     AbModeEnabled = true,
                     AbSide = RenameListPrefs.AbSidePreview,
                     SortFields = [],
+                    ColumnWidths = [new RenameListVisibleColumnSpec(nameKey, Width: 222)],
                 };
 
                 UiSessionPersistence.SaveOnClose(window, window.GetPaneGrids(), fileList: null, renameList: capture);
 
                 Assert.Equal(RenameListAddMode.Folders, ConfigStore.Options.AddMode);
                 Assert.False(ConfigStore.Options.AddFolderContents);
+                Assert.True(ConfigStore.Options.RememberColumnWidths);
                 Assert.False(ConfigStore.RenameList?.UseFixedWidthFont);
                 Assert.False(ConfigStore.RenameList?.PreviewEnabled);
                 Assert.True(ConfigStore.RenameList?.AbModeEnabled);
                 Assert.Equal(RenameListPrefs.AbSidePreview, ConfigStore.RenameList?.AbSide);
                 Assert.NotNull(ConfigStore.RenameList?.SortFields);
                 Assert.Empty(ConfigStore.RenameList.SortFields);
+                Assert.NotNull(ConfigStore.RenameList?.ColumnWidths);
+                Assert.Equal(nameKey, ConfigStore.RenameList.ColumnWidths[0].Key);
+                Assert.Equal(222, ConfigStore.RenameList.ColumnWidths[0].Width);
             }
             finally
             {

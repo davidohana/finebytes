@@ -72,6 +72,50 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Fills <see cref="UseCatalogDefaultWidth"/> entries from a remembered-width map.
+        /// </summary>
+        /// <param name="columns">Columns in left-to-right order.</param>
+        /// <param name="keyToWidth">Remembered absolute pixel widths by field key.</param>
+        /// <returns>
+        /// Same keys and order; remembered width when the column still uses the catalog default and the key
+        /// is present in <paramref name="keyToWidth"/>; otherwise the width already on that column.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="columns"/> or <paramref name="keyToWidth"/> is null.
+        /// </exception>
+        public static IReadOnlyList<RenameListVisibleColumn> WithRememberedWidths(
+            IReadOnlyList<RenameListVisibleColumn> columns,
+            IReadOnlyDictionary<RenameListFieldKey, int> keyToWidth
+        )
+        {
+            ArgumentNullException.ThrowIfNull(columns);
+            ArgumentNullException.ThrowIfNull(keyToWidth);
+
+            if (keyToWidth.Count == 0)
+            {
+                return columns;
+            }
+
+            var applied = new List<RenameListVisibleColumn>(capacity: columns.Count);
+            foreach (var column in columns)
+            {
+                if (
+                    column.Width == UseCatalogDefaultWidth
+                    && keyToWidth.TryGetValue(column.Key, out var width)
+                    && width > 0
+                )
+                {
+                    applied.Add(column with { Width = width });
+                    continue;
+                }
+
+                applied.Add(column);
+            }
+
+            return applied;
+        }
+
+        /// <summary>
         /// Maps a mixed original/preview column list to originals-only for A/B Mode.
         /// </summary>
         /// <param name="columns">Columns in left-to-right order (may include preview keys).</param>

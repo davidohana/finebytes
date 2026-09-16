@@ -128,6 +128,7 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains(AppTips.OptionsRememberWindowState, checkTips);
                 Assert.Contains("dialog", AppTips.OptionsRememberWindowState, StringComparison.OrdinalIgnoreCase);
                 Assert.Contains(AppTips.OptionsAddFolderContents, checkTips);
+                Assert.Contains(AppTips.OptionsRememberColumnWidths, checkTips);
 
                 var radioTips = dialog
                     .GetVisualDescendants()

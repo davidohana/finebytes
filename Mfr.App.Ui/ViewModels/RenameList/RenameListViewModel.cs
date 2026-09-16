@@ -80,6 +80,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var section = renameList ?? new RenameListPrefs();
             IsAbModeEnabled = section.AbModeEnabled;
             AbSide = RenameListPrefs.NormalizeAbSide(section.AbSide);
+            _ApplyRememberedColumnWidthSpecs(section.ColumnWidths);
             ApplySession(renameList?.SortFields);
             ApplyVisibleColumnSpecs(renameList?.VisibleColumns);
             UseFixedWidthFont = section.UseFixedWidthFont;
@@ -97,6 +98,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 SortFields = [.. CaptureSortFields()],
                 VisibleColumns = [.. CaptureVisibleColumnSpecs()],
+                ColumnWidths = _CaptureRememberedColumnWidthSpecs(),
                 UseFixedWidthFont = UseFixedWidthFont,
                 PreviewEnabled = IsAutoPreview,
                 AbModeEnabled = IsAbModeEnabled,

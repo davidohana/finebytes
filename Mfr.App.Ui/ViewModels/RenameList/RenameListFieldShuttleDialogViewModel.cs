@@ -11,6 +11,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private readonly OrderedDraft<RenameListFieldKey, RenameListVisibleColumn> _columns;
         private readonly OrderedDraft<RenameListFieldKey, RenameListSortKey> _sortKeys;
         private readonly IReadOnlyList<RenameListFieldKey> _relevantFieldKeys;
+        private readonly IReadOnlyDictionary<RenameListFieldKey, int> _rememberedColumnWidths;
         private readonly bool _canUseFilterChain;
         private bool _suppressSelectionSync;
         private bool _isAbModeEnabled;
@@ -31,13 +32,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Initial A/B Mode draft (session value). When <see langword="true"/>, columns are normalized to
         /// originals-only and the Preview Fields subtab stays hidden until the draft is turned off.
         /// </param>
+        /// <param name="rememberedColumnWidths">
+        /// Absolute widths to apply to new catalog-default columns when Options remembering is on.
+        /// </param>
         public RenameListFieldShuttleDialogViewModel(
             IReadOnlyList<RenameListVisibleColumn> visibleColumns,
             IReadOnlyList<RenameListSortKey> sortKeys,
             RenameListFieldShuttleTab initialTab = RenameListFieldShuttleTab.Columns,
             IReadOnlyList<RenameListFieldKey>? relevantFieldKeys = null,
             bool canUseFilterChain = false,
-            bool abModeEnabled = false
+            bool abModeEnabled = false,
+            IReadOnlyDictionary<RenameListFieldKey, int>? rememberedColumnWidths = null
         )
         {
             ArgumentNullException.ThrowIfNull(visibleColumns);
@@ -47,6 +52,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _columns = new OrderedDraft<RenameListFieldKey, RenameListVisibleColumn>(columns, column => column.Key);
             _sortKeys = new OrderedDraft<RenameListFieldKey, RenameListSortKey>(sortKeys, key => key.FieldKey);
             _relevantFieldKeys = relevantFieldKeys ?? [];
+            _rememberedColumnWidths = rememberedColumnWidths ?? new Dictionary<RenameListFieldKey, int>();
             _canUseFilterChain = canUseFilterChain;
             _isAbModeEnabled = abModeEnabled;
 
@@ -479,6 +485,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             columns = [.. RenameListVisibleColumn.WithPreservedWidths(columns, previousColumns)];
+            columns = [.. _ApplyRememberedWidths(columns)];
 
             _columns.Clear();
             if (_columns.TryInsertMany(0, columns) == 0)
@@ -654,7 +661,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private void _AddColumns(IEnumerable<RenameListFieldKey> keys)
         {
             var insertIndex = _columns.GetInsertIndexBelow();
-            var items = _KeysAllowedInSelectedColumns(keys).Select(key => new RenameListVisibleColumn(key)).ToList();
+            var draftColumns = _KeysAllowedInSelectedColumns(keys)
+                .Select(key => new RenameListVisibleColumn(key))
+                .ToList();
+            var items = _ApplyRememberedWidths(draftColumns).ToList();
             if (items.Count == 0)
             {
                 return;
@@ -689,7 +699,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         private void _ExpandSelectedColumnsWithPreviewCompanions()
         {
-            var expanded = RenameListVisibleColumn.WithPreviewCompanions(_columns.Items);
+            var expanded = _ApplyRememberedWidths(RenameListVisibleColumn.WithPreviewCompanions(_columns.Items));
             if (expanded.SequenceEqual(_columns.Items))
             {
                 return;
@@ -714,7 +724,23 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private List<RenameListVisibleColumn> _ColumnsForRelevantKeys(IReadOnlyList<RenameListFieldKey> keys)
         {
             var keysToAdd = IsAbModeEnabled ? RenameListVisibleColumn.ToOriginalKeysFirstSeen(keys) : keys;
-            return [.. keysToAdd.Select(key => new RenameListVisibleColumn(key))];
+            var draftColumns = keysToAdd.Select(key => new RenameListVisibleColumn(key)).ToList();
+            return [.. _ApplyRememberedWidths(draftColumns)];
+        }
+
+        /// <summary>
+        /// Fills catalog-default columns from the remembered-width snapshot passed into the shuttle.
+        /// </summary>
+        private IReadOnlyList<RenameListVisibleColumn> _ApplyRememberedWidths(
+            IReadOnlyList<RenameListVisibleColumn> columns
+        )
+        {
+            if (_rememberedColumnWidths.Count == 0)
+            {
+                return columns;
+            }
+
+            return RenameListVisibleColumn.WithRememberedWidths(columns, _rememberedColumnWidths);
         }
 
         private void _AddSortKeys(IEnumerable<RenameListFieldKey> fieldKeys)

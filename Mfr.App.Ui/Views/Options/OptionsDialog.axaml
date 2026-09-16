@@ -112,6 +112,13 @@
               ToolTip.Tip="{x:Static resources:AppTips.OptionsAddFolderContents}"
             />
           </controls:FilterEditorLabeledRow>
+          <controls:FilterEditorLabeledRow Label="">
+            <controls:CompactCheckBox
+              IsChecked="{Binding RememberColumnWidths}"
+              Content="Remember column widths"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberColumnWidths}"
+            />
+          </controls:FilterEditorLabeledRow>
         </StackPanel>
       </controls:FieldsetGroup>
 

@@ -2,6 +2,8 @@ using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
+using Mfr.Models.Config;
+using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 
@@ -10,6 +12,7 @@ namespace Mfr.Tests.Ui.RenameList
     /// <summary>
     /// Tests Add / Set columns from filters on <see cref="RenameListViewModel"/>.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class RenameListViewModelRelevantColumnsTests : IDisposable
     {
         private readonly RenameListUiTestContext _context = new();
@@ -18,6 +21,7 @@ namespace Mfr.Tests.Ui.RenameList
         public void Dispose()
         {
             _context.Dispose();
+            ConfigStoreTestReset.LoadEmpty();
         }
 
         /// <summary>
@@ -219,6 +223,84 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Contains(renameListViewModel.VisibleColumns, column => column.Key == titleKey);
             Assert.Equal("RelevantTitle", entry.GetFieldText(titleKey));
             Assert.True(entry.EngineItem.TagLibLoadAttempted);
+        }
+
+        /// <summary>
+        /// Verifies resize remembers width when the option is on, and Add reuses it after hide.
+        /// </summary>
+        [Fact]
+        public async Task Remembered_widths_update_on_resize_and_reuse_on_add()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.Options.RememberColumnWidths = true;
+
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            renameListViewModel.SetVisibleColumns([
+                new RenameListVisibleColumn(nameOriginal, Width: 90),
+                new RenameListVisibleColumn(folderKey),
+            ]);
+
+            renameListViewModel.UpdateVisibleColumnWidth(nameOriginal, 140);
+            Assert.Equal(140, renameListViewModel.RememberedColumnWidths[nameOriginal]);
+
+            renameListViewModel.HideColumn(nameOriginal);
+            Assert.DoesNotContain(renameListViewModel.VisibleColumns, column => column.Key == nameOriginal);
+
+            await renameListViewModel.AddRelevantColumnsCommand.ExecuteAsync(null);
+
+            Assert.Equal(
+                140,
+                Assert.Single(renameListViewModel.VisibleColumns, column => column.Key == nameOriginal).Width
+            );
+        }
+
+        /// <summary>
+        /// Verifies resize does not update the remembered map when the option is off.
+        /// </summary>
+        [Fact]
+        public void Remembered_widths_skip_update_when_option_off()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.Options.RememberColumnWidths = false;
+
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.ApplySessionSection(
+                new RenameListPrefs
+                {
+                    VisibleColumns = [new RenameListVisibleColumnSpec(nameOriginal, Width: 90)],
+                    ColumnWidths = [new RenameListVisibleColumnSpec(nameOriginal, Width: 200)],
+                }
+            );
+
+            renameListViewModel.UpdateVisibleColumnWidth(nameOriginal, 140);
+
+            Assert.Equal(200, renameListViewModel.RememberedColumnWidths[nameOriginal]);
+            Assert.Equal(140, renameListViewModel.VisibleColumns[0].Width);
+        }
+
+        /// <summary>
+        /// Verifies CaptureSession includes remembered widths and seeds from visible absolute widths.
+        /// </summary>
+        [Fact]
+        public void CaptureSession_includes_remembered_column_widths()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.Options.RememberColumnWidths = true;
+
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(nameOriginal, Width: 155)]);
+
+            var captured = renameListViewModel.CaptureSession();
+
+            Assert.NotNull(captured.ColumnWidths);
+            Assert.Contains(captured.ColumnWidths, spec => spec.Key == nameOriginal && spec.Width == 155);
         }
     }
 }

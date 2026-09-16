@@ -613,6 +613,28 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void AddColumnsFromFilters_applies_remembered_widths()
+        {
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                RenameListVisibleColumn.CreateDefaults(),
+                RenameListSortKey.DefaultKeys,
+                relevantFieldKeys: [nameKey, namePreview],
+                canUseFilterChain: true,
+                rememberedColumnWidths: new Dictionary<RenameListFieldKey, int> { [nameKey] = 133 }
+            );
+
+            dialogVm.AddColumnsFromFiltersCommand.Execute(null);
+
+            Assert.Equal(133, Assert.Single(dialogVm.ResultColumns, column => column.Key == nameKey).Width);
+            Assert.Equal(
+                RenameListVisibleColumn.UseCatalogDefaultWidth,
+                Assert.Single(dialogVm.ResultColumns, column => column.Key == namePreview).Width
+            );
+        }
+
+        [Fact]
         public void AbMode_check_normalizes_preview_only_selection_to_originals()
         {
             var fullNamePreview = RenameListFieldKey.Preview(

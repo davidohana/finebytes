@@ -31,6 +31,10 @@ namespace Mfr.Tests.Models
             );
             Assert.Equal("files", doc.RootElement.GetProperty("options").GetProperty("addMode").GetString());
             Assert.Equal("true", doc.RootElement.GetProperty("options").GetProperty("addFolderContents").GetString());
+            Assert.Equal(
+                "true",
+                doc.RootElement.GetProperty("options").GetProperty("rememberColumnWidths").GetString()
+            );
             Assert.Equal("10", doc.RootElement.GetProperty("renameLog").GetProperty("limit").GetString());
             Assert.False(doc.RootElement.GetProperty("options").TryGetProperty("confirmationPrompts", out _));
             Assert.False(doc.RootElement.GetProperty("options").TryGetProperty("presets", out _));

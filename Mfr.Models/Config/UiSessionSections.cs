@@ -164,6 +164,13 @@ namespace Mfr.Models.Config
         public List<RenameListVisibleColumnSpec>? VisibleColumns { get; set; }
 
         /// <summary>
+        /// Last absolute pixel widths per field key (for Options <c>rememberColumnWidths</c>).
+        /// <para>Null or empty means no remembered widths. Only positive widths are stored.</para>
+        /// </summary>
+        [JsonPropertyName("columnWidths")]
+        public List<RenameListVisibleColumnSpec>? ColumnWidths { get; set; }
+
+        /// <summary>
         /// When true, the Rename List grid uses a fixed-width font instead of the proportional File List font.
         /// </summary>
         [JsonPropertyName("useFixedWidthFont")]

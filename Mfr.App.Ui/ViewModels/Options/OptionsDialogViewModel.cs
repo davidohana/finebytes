@@ -38,6 +38,7 @@ namespace Mfr.App.Ui.ViewModels.Options
             DoubleClickAddsToRenameList = options.DoubleClickAddsToRenameList;
             AddMode = options.AddMode;
             AddFolderContents = options.AddFolderContents;
+            RememberColumnWidths = options.RememberColumnWidths;
             _LoadRenameLogRetention(ConfigStore.RenameLog.Limit);
         }
 
@@ -101,6 +102,12 @@ namespace Mfr.App.Ui.ViewModels.Options
         private bool _addFolderContents;
 
         /// <summary>
+        /// When <see langword="true"/>, reuse last resized Rename List column widths when a column returns.
+        /// </summary>
+        [ObservableProperty]
+        private bool _rememberColumnWidths;
+
+        /// <summary>
         /// Draft rename-log retention mode (maps to <c>renameLog.limit</c>).
         /// </summary>
         [ObservableProperty]
@@ -141,6 +148,7 @@ namespace Mfr.App.Ui.ViewModels.Options
             options.SuppressedConfirmations = [.. SuppressedConfirmations];
             options.AddMode = AddMode;
             options.AddFolderContents = AddFolderContents;
+            options.RememberColumnWidths = RememberColumnWidths;
             ConfigStore.RenameLog.Limit = _LimitFromDraft();
         }
 

@@ -12,6 +12,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed partial class RenameListViewModel
     {
         private List<RenameListVisibleColumn> _visibleColumns = [.. RenameListVisibleColumn.CreateDefaults()];
+        private readonly Dictionary<RenameListFieldKey, int> _rememberedColumnWidths = [];
 
         /// <summary>
         /// When true, <see cref="VisibleColumns"/> stay originals-only and <see cref="ProjectedColumns"/>
@@ -107,7 +108,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            await _ApplyVisibleColumnsWithHydrateAsync(_NormalizeColumnsIfAbMode(merged)).ConfigureAwait(true);
+            await _ApplyVisibleColumnsWithHydrateAsync(
+                    _ApplyRememberedWidthsIfEnabled(_NormalizeColumnsIfAbMode(merged))
+                )
+                .ConfigureAwait(true);
         }
 
         /// <summary>
@@ -409,7 +413,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Appends catalog-default-width columns for keys not already in <paramref name="keyToIsPresent"/>.
+        /// Appends columns for keys not already in <paramref name="keyToIsPresent"/> (catalog default width).
         /// </summary>
         /// <returns><see langword="true"/> when at least one column was appended.</returns>
         private static bool _AppendMissingRelevantColumns(
@@ -434,7 +438,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Builds catalog defaults, appends missing relevant keys, A/B-normalizes, and keeps existing widths.
+        /// Builds catalog defaults, appends missing relevant keys, A/B-normalizes, and keeps widths.
         /// </summary>
         private List<RenameListVisibleColumn> _BuildDefaultsThenRelevantColumns(
             IReadOnlyList<RenameListFieldKey> relevantKeys
@@ -444,7 +448,87 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
             _AppendMissingRelevantColumns(columns, relevantKeys, keyToIsPresent);
             var normalized = _NormalizeColumnsIfAbMode(columns);
-            return [.. RenameListVisibleColumn.WithPreservedWidths(normalized, _visibleColumns)];
+            var preserved = RenameListVisibleColumn.WithPreservedWidths(normalized, _visibleColumns);
+            return [.. _ApplyRememberedWidthsIfEnabled(preserved)];
+        }
+
+        /// <summary>
+        /// Gets a snapshot of remembered absolute widths for shuttle / helpers.
+        /// </summary>
+        internal IReadOnlyDictionary<RenameListFieldKey, int> RememberedColumnWidths => _rememberedColumnWidths;
+
+        /// <summary>
+        /// Applies remembered widths to catalog-default columns when Options remembering is on.
+        /// </summary>
+        private IReadOnlyList<RenameListVisibleColumn> _ApplyRememberedWidthsIfEnabled(
+            IReadOnlyList<RenameListVisibleColumn> columns
+        )
+        {
+            if (!ConfigStore.Options.RememberColumnWidths || _rememberedColumnWidths.Count == 0)
+            {
+                return columns;
+            }
+
+            return RenameListVisibleColumn.WithRememberedWidths(columns, _rememberedColumnWidths);
+        }
+
+        /// <summary>
+        /// Loads remembered widths from session specs (unknown keys and non-positive widths skipped).
+        /// </summary>
+        private void _ApplyRememberedColumnWidthSpecs(IReadOnlyList<RenameListVisibleColumnSpec>? specs)
+        {
+            _rememberedColumnWidths.Clear();
+            if (specs is null)
+            {
+                return;
+            }
+
+            foreach (var spec in specs)
+            {
+                if (spec.Width is not > 0 || !RenameListFieldCatalog.TryGetField(spec.Key, out _))
+                {
+                    continue;
+                }
+
+                _rememberedColumnWidths[spec.Key] = spec.Width.Value;
+            }
+        }
+
+        /// <summary>
+        /// Captures remembered widths for session save; seeds from visible absolute widths when remembering.
+        /// </summary>
+        private List<RenameListVisibleColumnSpec> _CaptureRememberedColumnWidthSpecs()
+        {
+            if (ConfigStore.Options.RememberColumnWidths)
+            {
+                foreach (var column in _visibleColumns)
+                {
+                    if (column.Width > 0)
+                    {
+                        _rememberedColumnWidths[column.Key] = column.Width;
+                    }
+                }
+            }
+
+            return
+            [
+                .. _rememberedColumnWidths
+                    .Where(pair => pair.Value > 0)
+                    .Select(pair => new RenameListVisibleColumnSpec(pair.Key, pair.Value)),
+            ];
+        }
+
+        /// <summary>
+        /// Upserts a remembered width when Options remembering is on.
+        /// </summary>
+        private void _RememberColumnWidthIfEnabled(RenameListFieldKey key, int width)
+        {
+            if (!ConfigStore.Options.RememberColumnWidths || width <= 0)
+            {
+                return;
+            }
+
+            _rememberedColumnWidths[key] = width;
         }
 
         /// <summary>
@@ -457,7 +541,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             if (columns is null)
             {
-                _visibleColumns = [.. _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())];
+                _visibleColumns =
+                [
+                    .. _ApplyRememberedWidthsIfEnabled(
+                        _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())
+                    ),
+                ];
                 _NotifyVisibleAndProjectedColumnsChanged();
                 return;
             }
@@ -476,7 +565,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             if (validColumns.Count == 0)
             {
-                _visibleColumns = [.. _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())];
+                _visibleColumns =
+                [
+                    .. _ApplyRememberedWidthsIfEnabled(
+                        _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())
+                    ),
+                ];
                 _NotifyVisibleAndProjectedColumnsChanged();
                 return;
             }
@@ -551,6 +645,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var updated = _visibleColumns.ToList();
             updated[index] = column with { Width = width };
             _visibleColumns = updated;
+            _RememberColumnWidthIfEnabled(storedKey, width);
         }
 
         /// <summary>
@@ -636,6 +731,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private void _ExpandVisibleColumnsWithPreviewCompanions()
         {
             var expanded = RenameListVisibleColumn.WithPreviewCompanions(_visibleColumns);
+            expanded = _ApplyRememberedWidthsIfEnabled(expanded);
             if (expanded.SequenceEqual(_visibleColumns))
             {
                 return;

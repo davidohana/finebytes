@@ -87,6 +87,36 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
+        public void Column_widths_round_trip_via_config_store_session()
+        {
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var remembered = new List<RenameListVisibleColumnSpec> { new(nameKey, Width: 175) };
+
+            var path = Path.Combine(Path.GetTempPath(), "mfr-session-col-widths-" + Guid.NewGuid() + ".json");
+            try
+            {
+                ConfigStoreTestReset.LoadEmpty();
+                ConfigStore.RenameList = new RenameListPrefs { ColumnWidths = remembered };
+                ConfigStore.Save(path);
+
+                ConfigStore.Load(path);
+                Assert.NotNull(ConfigStore.RenameList?.ColumnWidths);
+                Assert.Single(ConfigStore.RenameList.ColumnWidths);
+                Assert.Equal(nameKey, ConfigStore.RenameList.ColumnWidths[0].Key);
+                Assert.Equal(175, ConfigStore.RenameList.ColumnWidths[0].Width);
+            }
+            finally
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                ConfigStoreTestReset.LoadEmpty();
+            }
+        }
+
+        [Fact]
         public void Ab_mode_prefs_round_trip_defaults_and_values()
         {
             var path = Path.Combine(Path.GetTempPath(), "mfr-session-ab-" + Guid.NewGuid() + ".json");

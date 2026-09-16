@@ -93,7 +93,10 @@ namespace Mfr.App.Ui.Views.RenameList
                 tab,
                 relevantFieldKeys: _viewModel.CollectRelevantFieldKeysForApply(),
                 canUseFilterChain: _viewModel.CanApplyRelevantColumns,
-                abModeEnabled: _viewModel.IsAbModeEnabled
+                abModeEnabled: _viewModel.IsAbModeEnabled,
+                rememberedColumnWidths: ConfigStore.Options.RememberColumnWidths
+                    ? _viewModel.RememberedColumnWidths
+                    : null
             );
             var dialog = new RenameListFieldShuttleDialog(dialogVm);
             _fieldShuttleDialog = dialog;

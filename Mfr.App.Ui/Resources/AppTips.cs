@@ -68,6 +68,10 @@ namespace Mfr.App.Ui.Resources
         public const string OptionsAddFolderContents =
             "When adding a folder, also include matching items from its subfolders recursively";
 
+        /// <summary>Options: remember Rename List column widths across hide/re-add and launches.</summary>
+        public const string OptionsRememberColumnWidths =
+            "Reuse the last resized width when a Rename List column is shown again";
+
         /// <summary>Options: rename-log retention — Disabled.</summary>
         public const string OptionsRenameLogDisabled =
             "Do not save rename logs to disk; Undo Last still works for the in-memory last operation";
