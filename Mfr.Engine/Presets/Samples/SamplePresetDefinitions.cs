@@ -292,13 +292,13 @@ namespace Mfr.Engine.Presets.Samples
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000015",
                 name: "Image: PIC Date Taken Make Model",
-                description: "Rename JPEG images as PIC_date taken_two random lowercase letters_make_model.\nRandom letters reduce name collisions when date/make/model match.",
+                description: "Rename JPEG images as PIC_date taken_[counter]_make_model.\nPer-folder counter in brackets reduces name collisions when date/make/model match.",
                 chain: _Chain(
                     _On(
                         new FormatterFilter(
                             FilePrefix,
                             new FormatterOptions(
-                                "PIC_<exif-date:yyyy-MM-dd HH-mm-ss>_<random-char:a,z><random-char:a,z>_<exif-make>_<exif-model>"
+                                "PIC_<exif-date:yyyy-MM-dd_HH-mm-ss>_[<counter:initial=1,step=1,padding=auto,length=2,resetScope=perFolder>]_<exif-make>_<exif-model>"
                             )
                         )
                     )

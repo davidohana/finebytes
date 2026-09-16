@@ -201,7 +201,7 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies the PIC Date Taken Make Model sample uses date, collision letters, and camera tags.
+        /// Verifies the PIC Date Taken Make Model sample uses a per-folder counter, date, and camera tags.
         /// </summary>
         [Fact]
         public void PIC_Date_Taken_Make_Model_has_locked_formatter()
@@ -210,7 +210,7 @@ namespace Mfr.Tests.Engine
             Assert.True(step.Enabled);
             var formatter = Assert.IsType<FormatterFilter>(step.Filter);
             Assert.Equal(
-                "PIC_<exif-date:yyyy-MM-dd HH-mm-ss>_<random-char:a,z><random-char:a,z>_<exif-make>_<exif-model>",
+                "PIC_<exif-date:yyyy-MM-dd_HH-mm-ss>_[<counter:initial=1,step=1,padding=auto,length=2,resetScope=perFolder>]_<exif-make>_<exif-model>",
                 formatter.Options.Template
             );
             formatter.Setup();

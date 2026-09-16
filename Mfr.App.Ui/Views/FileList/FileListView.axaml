@@ -225,10 +225,19 @@
         <Button
           Grid.Column="2"
           Classes="tool-action"
-          Content="-"
           ToolTip.Tip="Edit masks that hide matching file names from the File List"
           Click="_OnExcludeMasksClick"
-        />
+        >
+          <Viewbox Width="14" Height="14">
+            <Path
+              Width="16"
+              Height="16"
+              Stretch="Uniform"
+              Fill="{DynamicResource AppChromeForegroundBrush}"
+              Data="{StaticResource ExcludeMasksGeometry}"
+            />
+          </Viewbox>
+        </Button>
       </Grid>
 
       <Panel>
