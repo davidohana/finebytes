@@ -117,6 +117,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <para>
         /// When the chain maps to nothing, applies defaults only. Hydrates metadata like field-shuttle apply.
         /// While A/B Mode is on, normalizes to originals-only at this call site (defaults include a preview key).
+        /// Widths for keys that were already visible are preserved.
         /// </para>
         /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanApplyRelevantColumns))]
@@ -128,11 +129,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             var relevantKeys = CollectRelevantFieldKeysForApply();
-            var columns = RenameListVisibleColumn.CreateDefaults().ToList();
-            var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
-            _AppendMissingRelevantColumns(columns, relevantKeys, keyToIsPresent);
-
-            await _ApplyVisibleColumnsWithHydrateAsync(_NormalizeColumnsIfAbMode(columns)).ConfigureAwait(true);
+            await _ApplyVisibleColumnsWithHydrateAsync(_BuildDefaultsThenRelevantColumns(relevantKeys))
+                .ConfigureAwait(true);
         }
 
         /// <summary>
@@ -433,6 +431,20 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return addedAny;
+        }
+
+        /// <summary>
+        /// Builds catalog defaults, appends missing relevant keys, A/B-normalizes, and keeps existing widths.
+        /// </summary>
+        private List<RenameListVisibleColumn> _BuildDefaultsThenRelevantColumns(
+            IReadOnlyList<RenameListFieldKey> relevantKeys
+        )
+        {
+            var columns = RenameListVisibleColumn.CreateDefaults().ToList();
+            var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
+            _AppendMissingRelevantColumns(columns, relevantKeys, keyToIsPresent);
+            var normalized = _NormalizeColumnsIfAbMode(columns);
+            return [.. RenameListVisibleColumn.WithPreservedWidths(normalized, _visibleColumns)];
         }
 
         /// <summary>

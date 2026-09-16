@@ -447,6 +447,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <summary>
         /// Sets the draft Selected fields to catalog defaults, then appends remaining relevant keys.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Widths for keys that were already in the draft Selected list are preserved.
+        /// </para>
+        /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanUseFilterChain))]
         public void SetColumnsFromFilters()
         {
@@ -455,6 +460,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
+            var previousColumns = _columns.Items.ToList();
             var columns = RenameListVisibleColumn.CreateDefaults().ToList();
             var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
             foreach (var key in _relevantFieldKeys)
@@ -471,6 +477,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 columns = [.. RenameListVisibleColumn.NormalizeToOriginals(columns)];
             }
+
+            columns = [.. RenameListVisibleColumn.WithPreservedWidths(columns, previousColumns)];
 
             _columns.Clear();
             if (_columns.TryInsertMany(0, columns) == 0)

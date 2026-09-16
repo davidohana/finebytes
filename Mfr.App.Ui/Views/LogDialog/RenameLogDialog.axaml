@@ -2,6 +2,7 @@
   xmlns="https://github.com/avaloniaui"
   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
   xmlns:converters="using:Avalonia.Data.Converters"
+  xmlns:resources="using:Mfr.App.Ui.Resources"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.LogDialog"
   x:Class="Mfr.App.Ui.Views.LogDialog.RenameLogDialog"
   x:DataType="vm:RenameLogDialogViewModel"
@@ -123,13 +124,15 @@
           <Button
             x:Name="UndoButton"
             Classes="message-dialog-footer rename-log-action"
-            Content="Undo"
+            Content="Prepare Undo"
+            ToolTip.Tip="{x:Static resources:AppTips.RenameLogPrepareUndo}"
             Command="{Binding UndoCommand}"
           />
           <Button
             x:Name="EraseButton"
             Classes="message-dialog-footer rename-log-action"
             Content="Erase"
+            ToolTip.Tip="{x:Static resources:AppTips.RenameLogErase}"
             Command="{Binding EraseCommand}"
           />
         </StackPanel>

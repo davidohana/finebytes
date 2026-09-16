@@ -20,6 +20,14 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Toolbar tip for the Rename Log window.</summary>
         public const string ShowLog = "Rename Log (Ctrl+Shift+L)";
 
+        /// <summary>Rename Log dialog: Prepare Undo for the selected log.</summary>
+        public const string RenameLogPrepareUndo =
+            "Prepare an undo session from this log — replaces the Rename List, clears Filter Chain; press GO to apply";
+
+        /// <summary>Rename Log dialog: Erase the selected log.</summary>
+        public const string RenameLogErase =
+            "Erase this log from history (deletes the on-disk file when present)";
+
         /// <summary>Toolbar tip for Options.</summary>
         public const string ShowOptions = "Options (Ctrl+,)";
 

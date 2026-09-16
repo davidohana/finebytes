@@ -140,6 +140,35 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void WithPreservedWidths_keeps_matching_keys_and_leaves_new_keys()
+        {
+            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var titleKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
+
+            var preserved = RenameListVisibleColumn.WithPreservedWidths(
+                [
+                    new RenameListVisibleColumn(folderKey),
+                    new RenameListVisibleColumn(nameKey),
+                    new RenameListVisibleColumn(titleKey),
+                ],
+                [
+                    new RenameListVisibleColumn(folderKey, Width: 180),
+                    new RenameListVisibleColumn(nameKey, Width: 90),
+                ]
+            );
+
+            Assert.Equal(
+                [
+                    new RenameListVisibleColumn(folderKey, Width: 180),
+                    new RenameListVisibleColumn(nameKey, Width: 90),
+                    new RenameListVisibleColumn(titleKey),
+                ],
+                preserved
+            );
+        }
+
+        [Fact]
         public void AsOriginal_returns_self_for_original_and_maps_preview()
         {
             var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);

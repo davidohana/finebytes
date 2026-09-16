@@ -585,10 +585,13 @@ namespace Mfr.Tests.Ui.RenameList
                 AudioTagRenameListFields.Group,
                 AudioTagRenameListFields.Key.Title
             );
+            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
             var onlyName = new[]
             {
+                new RenameListVisibleColumn(folderKey, Width: 160),
                 new RenameListVisibleColumn(
-                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name)
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                    Width: 110
                 ),
             };
             var dialogVm = new RenameListFieldShuttleDialogViewModel(
@@ -600,8 +603,13 @@ namespace Mfr.Tests.Ui.RenameList
 
             dialogVm.SetColumnsFromFiltersCommand.Execute(null);
 
-            var expected = RenameListVisibleColumn.CreateDefaults().Select(column => column.Key).Append(titleKey);
-            Assert.Equal(expected, dialogVm.ResultColumns.Select(column => column.Key));
+            var expectedKeys = RenameListVisibleColumn.CreateDefaults().Select(column => column.Key).Append(titleKey);
+            Assert.Equal(expectedKeys, dialogVm.ResultColumns.Select(column => column.Key));
+            Assert.Equal(160, Assert.Single(dialogVm.ResultColumns, column => column.Key == folderKey).Width);
+            Assert.Equal(
+                RenameListVisibleColumn.UseCatalogDefaultWidth,
+                Assert.Single(dialogVm.ResultColumns, column => column.Key == titleKey).Width
+            );
         }
 
         [Fact]

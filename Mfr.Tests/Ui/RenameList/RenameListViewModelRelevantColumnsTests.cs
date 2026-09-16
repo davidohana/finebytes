@@ -122,7 +122,8 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies Replace resets to catalog defaults then appends remaining relevant keys.
+        /// Verifies Replace resets to catalog defaults then appends remaining relevant keys,
+        /// preserving widths for keys that were already visible.
         /// </summary>
         [Fact]
         public async Task ReplaceWithRelevantColumns_defaults_then_appends_relevant()
@@ -131,19 +132,23 @@ namespace Mfr.Tests.Ui.RenameList
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
             filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
 
+            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.SetVisibleColumns([
-                new RenameListVisibleColumn(
-                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
-                    Width: 90
-                ),
+                new RenameListVisibleColumn(folderKey, Width: 180),
+                new RenameListVisibleColumn(nameOriginal, Width: 90),
             ]);
 
             await renameListViewModel.ReplaceWithRelevantColumnsCommand.ExecuteAsync(null);
 
-            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
-            var expected = RenameListVisibleColumn.CreateDefaults().ToList();
-            expected.Add(new RenameListVisibleColumn(nameOriginal));
+            var expected = RenameListVisibleColumn
+                .WithPreservedWidths(
+                    RenameListVisibleColumn.CreateDefaults(),
+                    [new RenameListVisibleColumn(folderKey, Width: 180)]
+                )
+                .ToList();
+            expected.Add(new RenameListVisibleColumn(nameOriginal, Width: 90));
             expected.Add(new RenameListVisibleColumn(namePreview));
             Assert.Equal(expected, renameListViewModel.VisibleColumns);
         }

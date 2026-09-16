@@ -26,6 +26,52 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Copies widths from <paramref name="previous"/> onto matching keys in <paramref name="columns"/>.
+        /// </summary>
+        /// <param name="columns">New columns in left-to-right order.</param>
+        /// <param name="previous">Prior columns whose widths should be kept when the key still exists.</param>
+        /// <returns>
+        /// Same keys and order as <paramref name="columns"/>; width from <paramref name="previous"/> when the key
+        /// was present, otherwise the width already on that column.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="columns"/> or <paramref name="previous"/> is null.
+        /// </exception>
+        public static IReadOnlyList<RenameListVisibleColumn> WithPreservedWidths(
+            IReadOnlyList<RenameListVisibleColumn> columns,
+            IReadOnlyList<RenameListVisibleColumn> previous
+        )
+        {
+            ArgumentNullException.ThrowIfNull(columns);
+            ArgumentNullException.ThrowIfNull(previous);
+
+            if (previous.Count == 0)
+            {
+                return columns;
+            }
+
+            var keyToWidth = new Dictionary<RenameListFieldKey, int>(capacity: previous.Count);
+            foreach (var column in previous)
+            {
+                keyToWidth[column.Key] = column.Width;
+            }
+
+            var preserved = new List<RenameListVisibleColumn>(capacity: columns.Count);
+            foreach (var column in columns)
+            {
+                if (keyToWidth.TryGetValue(column.Key, out var width))
+                {
+                    preserved.Add(column with { Width = width });
+                    continue;
+                }
+
+                preserved.Add(column);
+            }
+
+            return preserved;
+        }
+
+        /// <summary>
         /// Maps a mixed original/preview column list to originals-only for A/B Mode.
         /// </summary>
         /// <param name="columns">Columns in left-to-right order (may include preview keys).</param>

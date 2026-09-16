@@ -113,6 +113,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <para>
         /// Same path as <see cref="ReplaceWithRelevantColumnsAsync"/>: defaults first, then missing relevant keys,
         /// originals-only normalize while Before/After Mode is on (A/B stays enabled; Preview side shows companions).
+        /// Widths for keys that were already visible are preserved.
         /// </para>
         /// </remarks>
         private async Task _ReplaceVisibleColumnsForUndoAsync(RenameLog log)
@@ -123,11 +124,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 undoKeys = RenameListVisibleColumn.ToOriginalKeysFirstSeen(undoKeys);
             }
 
-            var columns = RenameListVisibleColumn.CreateDefaults().ToList();
-            var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
-            _AppendMissingRelevantColumns(columns, undoKeys, keyToIsPresent);
-
-            await _ApplyVisibleColumnsWithHydrateAsync(_NormalizeColumnsIfAbMode(columns)).ConfigureAwait(true);
+            await _ApplyVisibleColumnsWithHydrateAsync(_BuildDefaultsThenRelevantColumns(undoKeys))
+                .ConfigureAwait(true);
         }
 
         private async Task<bool> _ConfirmUndoRenameAsync()
