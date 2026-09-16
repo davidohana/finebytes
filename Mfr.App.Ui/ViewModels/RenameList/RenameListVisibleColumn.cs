@@ -75,23 +75,22 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Fills <see cref="UseCatalogDefaultWidth"/> entries from a remembered-width map.
         /// </summary>
         /// <param name="columns">Columns in left-to-right order.</param>
-        /// <param name="keyToWidth">Remembered absolute pixel widths by field key.</param>
+        /// <param name="keyToWidth">
+        /// Remembered absolute pixel widths by field key, or <see langword="null"/> / empty to leave widths unchanged.
+        /// </param>
         /// <returns>
         /// Same keys and order; remembered width when the column still uses the catalog default and the key
         /// is present in <paramref name="keyToWidth"/>; otherwise the width already on that column.
         /// </returns>
-        /// <exception cref="ArgumentNullException">
-        /// <paramref name="columns"/> or <paramref name="keyToWidth"/> is null.
-        /// </exception>
+        /// <exception cref="ArgumentNullException"><paramref name="columns"/> is null.</exception>
         public static IReadOnlyList<RenameListVisibleColumn> WithRememberedWidths(
             IReadOnlyList<RenameListVisibleColumn> columns,
-            IReadOnlyDictionary<RenameListFieldKey, int> keyToWidth
+            IReadOnlyDictionary<RenameListFieldKey, int>? keyToWidth
         )
         {
             ArgumentNullException.ThrowIfNull(columns);
-            ArgumentNullException.ThrowIfNull(keyToWidth);
 
-            if (keyToWidth.Count == 0)
+            if (keyToWidth is null || keyToWidth.Count == 0)
             {
                 return columns;
             }
@@ -113,6 +112,66 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return applied;
+        }
+
+        /// <summary>
+        /// Preserves widths from <paramref name="previous"/>, then fills remaining catalog defaults from remembered widths.
+        /// </summary>
+        /// <param name="columns">New columns in left-to-right order.</param>
+        /// <param name="previous">Prior columns whose widths should be kept when the key still exists.</param>
+        /// <param name="rememberedWidths">
+        /// Absolute widths for catalog-default keys, or <see langword="null"/> / empty to skip remember fill.
+        /// </param>
+        /// <returns>Preserved then remember-filled columns (same keys/order as <paramref name="columns"/>).</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="columns"/> or <paramref name="previous"/> is null.
+        /// </exception>
+        public static IReadOnlyList<RenameListVisibleColumn> WithPreservedThenRememberedWidths(
+            IReadOnlyList<RenameListVisibleColumn> columns,
+            IReadOnlyList<RenameListVisibleColumn> previous,
+            IReadOnlyDictionary<RenameListFieldKey, int>? rememberedWidths
+        )
+        {
+            return WithRememberedWidths(WithPreservedWidths(columns, previous), rememberedWidths);
+        }
+
+        /// <summary>
+        /// Builds the Set-from-filters column list: catalog defaults, append relevant keys, optional A/B
+        /// normalize, preserve prior widths, then fill catalog defaults from remembered widths.
+        /// </summary>
+        /// <param name="relevantKeys">Filter-chain field keys to append when missing from defaults.</param>
+        /// <param name="previous">Prior visible/draft columns for session width preserve.</param>
+        /// <param name="rememberedWidths">
+        /// Absolute widths for catalog-default keys, or <see langword="null"/> / empty to skip remember fill.
+        /// </param>
+        /// <param name="originalsOnly">When <see langword="true"/>, normalize to originals-only (A/B Mode).</param>
+        /// <returns>Set-from-filters columns in left-to-right order.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="relevantKeys"/> or <paramref name="previous"/> is null.
+        /// </exception>
+        public static IReadOnlyList<RenameListVisibleColumn> BuildSetFromFiltersColumns(
+            IReadOnlyList<RenameListFieldKey> relevantKeys,
+            IReadOnlyList<RenameListVisibleColumn> previous,
+            IReadOnlyDictionary<RenameListFieldKey, int>? rememberedWidths,
+            bool originalsOnly
+        )
+        {
+            ArgumentNullException.ThrowIfNull(relevantKeys);
+
+            var columns = CreateDefaults().ToList();
+            var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
+            foreach (var key in relevantKeys)
+            {
+                if (!keyToIsPresent.Add(key))
+                {
+                    continue;
+                }
+
+                columns.Add(new RenameListVisibleColumn(key));
+            }
+
+            IReadOnlyList<RenameListVisibleColumn> normalized = originalsOnly ? NormalizeToOriginals(columns) : columns;
+            return WithPreservedThenRememberedWidths(normalized, previous, rememberedWidths);
         }
 
         /// <summary>

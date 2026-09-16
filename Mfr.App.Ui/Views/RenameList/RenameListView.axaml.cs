@@ -94,9 +94,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 relevantFieldKeys: _viewModel.CollectRelevantFieldKeysForApply(),
                 canUseFilterChain: _viewModel.CanApplyRelevantColumns,
                 abModeEnabled: _viewModel.IsAbModeEnabled,
-                rememberedColumnWidths: ConfigStore.Options.RememberColumnWidths
-                    ? _viewModel.RememberedColumnWidths
-                    : null
+                rememberedColumnWidths: _viewModel.CaptureRememberedColumnWidthsSnapshot()
             );
             var dialog = new RenameListFieldShuttleDialog(dialogVm);
             _fieldShuttleDialog = dialog;

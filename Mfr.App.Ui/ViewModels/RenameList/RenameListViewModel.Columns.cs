@@ -445,18 +445,51 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             IReadOnlyList<RenameListFieldKey> relevantKeys
         )
         {
-            var columns = RenameListVisibleColumn.CreateDefaults().ToList();
-            var keyToIsPresent = columns.Select(column => column.Key).ToHashSet();
-            _AppendMissingRelevantColumns(columns, relevantKeys, keyToIsPresent);
-            var normalized = _NormalizeColumnsIfAbMode(columns);
-            var preserved = RenameListVisibleColumn.WithPreservedWidths(normalized, _visibleColumns);
-            return [.. _ApplyRememberedWidthsIfEnabled(preserved)];
+            return
+            [
+                .. RenameListVisibleColumn.BuildSetFromFiltersColumns(
+                    relevantKeys,
+                    _visibleColumns,
+                    _ActiveRememberedWidths(),
+                    originalsOnly: IsAbModeEnabled
+                ),
+            ];
         }
 
         /// <summary>
-        /// Gets the live remembered absolute widths (session capture and field-shuttle input).
+        /// Gets the live remembered absolute widths (tests and session capture).
         /// </summary>
         internal IReadOnlyDictionary<RenameListFieldKey, int> RememberedColumnWidths => _rememberedColumnWidths;
+
+        /// <summary>
+        /// Snapshot of remembered widths for the field shuttle when Options remembering is on; otherwise null.
+        /// </summary>
+        /// <returns>
+        /// A copy of the map when remembering is enabled and non-empty; otherwise <see langword="null"/>.
+        /// </returns>
+        internal IReadOnlyDictionary<RenameListFieldKey, int>? CaptureRememberedColumnWidthsSnapshot()
+        {
+            var active = _ActiveRememberedWidths();
+            if (active is null)
+            {
+                return null;
+            }
+
+            return new Dictionary<RenameListFieldKey, int>(active);
+        }
+
+        /// <summary>
+        /// Remembered map when Options remembering is on and the map is non-empty; otherwise null.
+        /// </summary>
+        private Dictionary<RenameListFieldKey, int>? _ActiveRememberedWidths()
+        {
+            if (!ConfigStore.Options.RememberColumnWidths || _rememberedColumnWidths.Count == 0)
+            {
+                return null;
+            }
+
+            return _rememberedColumnWidths;
+        }
 
         /// <summary>
         /// Applies remembered widths to catalog-default columns when Options remembering is on.
@@ -465,12 +498,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             IReadOnlyList<RenameListVisibleColumn> columns
         )
         {
-            if (!ConfigStore.Options.RememberColumnWidths || _rememberedColumnWidths.Count == 0)
-            {
-                return columns;
-            }
-
-            return RenameListVisibleColumn.WithRememberedWidths(columns, _rememberedColumnWidths);
+            return RenameListVisibleColumn.WithRememberedWidths(columns, _ActiveRememberedWidths());
         }
 
         /// <summary>

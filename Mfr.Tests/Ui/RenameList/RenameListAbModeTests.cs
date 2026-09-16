@@ -2,6 +2,7 @@ using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Space;
+using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 
@@ -194,6 +195,42 @@ namespace Mfr.Tests.Ui.RenameList
                 ],
                 applied
             );
+        }
+
+        [Fact]
+        public void WithRememberedWidths_null_or_empty_map_is_noop()
+        {
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var columns = new[] { new RenameListVisibleColumn(nameKey) };
+
+            Assert.Same(columns, RenameListVisibleColumn.WithRememberedWidths(columns, null));
+            Assert.Same(
+                columns,
+                RenameListVisibleColumn.WithRememberedWidths(columns, new Dictionary<RenameListFieldKey, int>())
+            );
+        }
+
+        [Fact]
+        public void BuildSetFromFiltersColumns_preserves_then_remembers()
+        {
+            var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
+
+            var built = RenameListVisibleColumn.BuildSetFromFiltersColumns(
+                relevantKeys: [nameKey, titleKey],
+                previous:
+                [
+                    new RenameListVisibleColumn(folderKey, Width: 160),
+                    new RenameListVisibleColumn(nameKey, Width: 90),
+                ],
+                rememberedWidths: new Dictionary<RenameListFieldKey, int> { [titleKey] = 133 },
+                originalsOnly: false
+            );
+
+            Assert.Equal(160, Assert.Single(built, column => column.Key == folderKey).Width);
+            Assert.Equal(90, Assert.Single(built, column => column.Key == nameKey).Width);
+            Assert.Equal(133, Assert.Single(built, column => column.Key == titleKey).Width);
         }
 
         [Fact]
