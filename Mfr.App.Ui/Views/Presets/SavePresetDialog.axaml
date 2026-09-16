@@ -6,7 +6,7 @@
   x:Class="Mfr.App.Ui.Views.Presets.SavePresetDialog"
   x:DataType="vm:SavePresetDialogViewModel"
   Title="Save preset"
-  Icon="/Assets/mfr.ico"
+  Icon="/Assets/FilterChain/SavePreset.png"
   Width="420"
   Height="260"
   MinWidth="360"

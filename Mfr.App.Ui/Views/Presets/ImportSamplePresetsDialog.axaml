@@ -6,7 +6,7 @@
   x:Class="Mfr.App.Ui.Views.Presets.ImportSamplePresetsDialog"
   x:DataType="vm:ImportSamplePresetsDialogViewModel"
   Title="Import sample presets"
-  Icon="/Assets/mfr.ico"
+  Icon="/Assets/FilterChain/Presets.png"
   Width="720"
   Height="560"
   MinWidth="620"

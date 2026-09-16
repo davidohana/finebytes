@@ -6,7 +6,7 @@
   x:Class="Mfr.App.Ui.Views.Presets.PresetManagerDialog"
   x:DataType="vm:PresetManagerDialogViewModel"
   Title="Presets"
-  Icon="/Assets/mfr.ico"
+  Icon="/Assets/FilterChain/Presets.png"
   Width="640"
   Height="420"
   MinWidth="560"

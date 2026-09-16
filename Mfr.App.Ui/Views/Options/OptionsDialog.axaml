@@ -9,7 +9,7 @@
   x:Class="Mfr.App.Ui.Views.Options.OptionsDialog"
   x:DataType="vm:OptionsDialogViewModel"
   Title="Options"
-  Icon="/Assets/mfr.ico"
+  Icon="/Assets/Options.png"
   Width="480"
   MinWidth="420"
   SizeToContent="Height"

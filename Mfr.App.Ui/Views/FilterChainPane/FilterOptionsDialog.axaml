@@ -8,7 +8,7 @@
   x:Class="Mfr.App.Ui.Views.FilterChainPane.FilterOptionsDialog"
   x:DataType="vm:FilterOptionsDialogViewModel"
   Title="Filter options"
-  Icon="/Assets/mfr.ico"
+  Icon="/Assets/FilterChain/FilterOptions.png"
   Width="540"
   MinWidth="460"
   SizeToContent="Height"

@@ -14,7 +14,7 @@
   x:Class="Mfr.App.Ui.Views.RenameList.RenameListFieldShuttleDialog"
   x:DataType="vm:RenameListFieldShuttleDialogViewModel"
   Title="Rename List fields"
-  Icon="/Assets/mfr.ico"
+  Icon="/Assets/RenameList/SelectFields.png"
   Width="720"
   Height="490"
   MinWidth="640"
