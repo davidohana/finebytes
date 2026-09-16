@@ -38,9 +38,9 @@ namespace Mfr.Tests.Models.Filters
         /// Verifies StringTarget write maps to Original + Preview Name columns.
         /// </summary>
         [Fact]
-        public void Collect_StringTarget_FilePrefix_AddsNameOriginalAndPreview()
+        public void Collect_StringTarget_FileName_AddsNameOriginalAndPreview()
         {
-            var keys = FilterRelevantRenameListColumns.Collect([new RemoveSpacesFilter(new FilePrefixTarget())]);
+            var keys = FilterRelevantRenameListColumns.Collect([new RemoveSpacesFilter(new FileNameTarget())]);
 
             Assert.Equal(
                 [
@@ -80,7 +80,7 @@ namespace Mfr.Tests.Models.Filters
         public void Collect_Formatter_WriteThenTokens_OrdersKeys()
         {
             var filter = new FormatterFilter(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new FormatterOptions("<audio-title> - <file-extension>")
             );
 
@@ -106,7 +106,7 @@ namespace Mfr.Tests.Models.Filters
         public void Collect_Formatter_CounterOmitted_NestedSubstrSourceMapped()
         {
             var filter = new FormatterFilter(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new FormatterOptions("<counter>_<substr:start=1,end=3,source=<full-name>>")
             );
 
@@ -130,7 +130,7 @@ namespace Mfr.Tests.Models.Filters
         public void Collect_Formatter_FileDateToken_MapsExtendedDateColumn()
         {
             var filter = new FormatterFilter(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new FormatterOptions("<file-date:yyyy-MM-dd,creation>")
             );
 
@@ -291,7 +291,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Collect_ChainOrder_DedupesAcrossFilters()
         {
-            var first = new RemoveSpacesFilter(new FilePrefixTarget());
+            var first = new RemoveSpacesFilter(new FileNameTarget());
             var second = new FormatterFilter(new FileExtensionTarget(), new FormatterOptions("<file-name>"));
 
             var keys = FilterRelevantRenameListColumns.Collect([first, second]);
@@ -313,7 +313,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Collect_Formatter_FileOrFolderToken_OriginalOnly()
         {
-            var filter = new FormatterFilter(new FilePrefixTarget(), new FormatterOptions("<file-or-folder>"));
+            var filter = new FormatterFilter(new FileNameTarget(), new FormatterOptions("<file-or-folder>"));
 
             var keys = FilterRelevantRenameListColumns.Collect([filter]);
 
@@ -346,7 +346,7 @@ namespace Mfr.Tests.Models.Filters
             string expectedPropertyKey
         )
         {
-            var filter = new FormatterFilter(new FilePrefixTarget(), new FormatterOptions(template));
+            var filter = new FormatterFilter(new FileNameTarget(), new FormatterOptions(template));
 
             var keys = FilterRelevantRenameListColumns.Collect([filter]);
             var expectedTokenKey = RenameListFieldKey.Original(expectedGroupId, expectedPropertyKey);

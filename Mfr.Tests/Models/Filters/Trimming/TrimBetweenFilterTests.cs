@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
     /// </summary>
     public class TrimBetweenFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies the MFR7 help example:
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
             var options = new TrimBetweenFilterOptions(new Position(13, Side.Left), new Position(5, Side.Right));
             var f = new TrimBetweenFilter(_target, options);
 
-            Assert.Equal("Portishead - Box", FilterTestHelpers.ApplyToPrefix(f, "Portishead - Glory Box"));
+            Assert.Equal("Portishead - Box", FilterTestHelpers.ApplyToFileName(f, "Portishead - Glory Box"));
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
             // Remove from 2 to 4 (incl): "abcd" -> "a"
             var options = new TrimBetweenFilterOptions(new Position(2, Side.Left), new Position(4, Side.Left));
             var f = new TrimBetweenFilter(_target, options);
-            Assert.Equal("a", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
+            Assert.Equal("a", FilterTestHelpers.ApplyToFileName(f, "abcd"));
         }
 
         [Fact]
@@ -41,7 +41,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
             // Remove 'b', 'c', 'd' -> "a"
             var options = new TrimBetweenFilterOptions(new Position(3, Side.Right), new Position(1, Side.Right));
             var f = new TrimBetweenFilter(_target, options);
-            Assert.Equal("a", FilterTestHelpers.ApplyToPrefix(f, "abcd"));
+            Assert.Equal("a", FilterTestHelpers.ApplyToFileName(f, "abcd"));
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         {
             var options = new TrimBetweenFilterOptions(new Position(1, Side.Left), new Position(1, Side.Right));
             var f = new TrimBetweenFilter(_target, options);
-            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "anything"));
+            Assert.Equal("", FilterTestHelpers.ApplyToFileName(f, "anything"));
         }
 
         [Fact]
@@ -58,7 +58,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
             // Start at 4, End at 2 -> should be same as 2 to 4
             var options = new TrimBetweenFilterOptions(new Position(4, Side.Left), new Position(2, Side.Left));
             var f = new TrimBetweenFilter(_target, options);
-            Assert.Equal("ae", FilterTestHelpers.ApplyToPrefix(f, "abcde"));
+            Assert.Equal("ae", FilterTestHelpers.ApplyToFileName(f, "abcde"));
         }
 
         [Fact]
@@ -69,7 +69,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new Position(100, Side.Left) // Clamps to length-1
             );
             var f = new TrimBetweenFilter(_target, options);
-            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "abc"));
+            Assert.Equal("", FilterTestHelpers.ApplyToFileName(f, "abc"));
         }
 
         [Fact]
@@ -77,7 +77,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         {
             var options = new TrimBetweenFilterOptions(new Position(1, Side.Left), new Position(1, Side.Right));
             var f = new TrimBetweenFilter(_target, options);
-            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, ""));
+            Assert.Equal("", FilterTestHelpers.ApplyToFileName(f, ""));
         }
 
         [Fact]
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         {
             var options = new TrimBetweenFilterOptions(new Position(2, Side.Left), new Position(2, Side.Left));
             var f = new TrimBetweenFilter(_target, options);
-            Assert.Equal("ac", FilterTestHelpers.ApplyToPrefix(f, "abc"));
+            Assert.Equal("ac", FilterTestHelpers.ApplyToFileName(f, "abc"));
         }
     }
 }

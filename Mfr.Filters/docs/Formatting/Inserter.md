@@ -53,7 +53,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "Inserter",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "text": "_-",

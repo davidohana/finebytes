@@ -15,7 +15,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         private static RenameItem _CreateAudioItem(
             int renameListIndex = 0,
             Action<FileMeta>? configureOriginal = null,
-            string prefix = "song",
+            string fileName = "song",
             string extension = "mp3"
         )
         {
@@ -23,7 +23,7 @@ namespace Mfr.Tests.Models.Filters.Audio
                 renameListIndex,
                 inFolderIndex: 0,
                 directoryPath: @"C:\Music\Album",
-                prefix: prefix,
+                fileName: fileName,
                 extension: extension,
                 attributes: FileAttributes.Normal,
                 creationTime: s_Baseline,
@@ -194,7 +194,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Title_TemplateSpan_CompilesFileNameToken()
         {
-            var item = _CreateAudioItem(prefix: "TrackNine");
+            var item = _CreateAudioItem(fileName: "TrackNine");
             var filter = new AudioTagSetterFilter(
                 new AudioTagSetterOptions(Title: new AudioTagStringFieldOptions(Text: "<file-name>"))
             );
@@ -263,7 +263,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Track_TemplateSpan_CompilesFileNameToken()
         {
-            var item = _CreateAudioItem(prefix: "42");
+            var item = _CreateAudioItem(fileName: "42");
             var filter = new AudioTagSetterFilter(
                 new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "<file-name>"))
             );
@@ -280,7 +280,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Track_TemplateSpan_AutoIncrement_AddsRenameListIndex()
         {
-            var item = _CreateAudioItem(renameListIndex: 3, prefix: "10");
+            var item = _CreateAudioItem(renameListIndex: 3, fileName: "10");
             var filter = new AudioTagSetterFilter(
                 new AudioTagSetterOptions(
                     Track: new AudioTagStringFieldOptions(Text: "<file-name>"),
@@ -300,7 +300,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Track_TemplateSpan_NonNumeric_ThrowsFormatException()
         {
-            var item = _CreateAudioItem(prefix: "Noise");
+            var item = _CreateAudioItem(fileName: "Noise");
             var filter = new AudioTagSetterFilter(
                 new AudioTagSetterOptions(Track: new AudioTagStringFieldOptions(Text: "<file-name>"))
             );
@@ -616,7 +616,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Year_TemplateSpan_CompilesFileNameToken()
         {
-            var item = _CreateAudioItem(prefix: "1999");
+            var item = _CreateAudioItem(fileName: "1999");
             var filter = new AudioTagSetterFilter(
                 new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "<file-name>"))
             );
@@ -633,7 +633,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Year_TemplateSpan_NonNumeric_ThrowsFormatException()
         {
-            var item = _CreateAudioItem(prefix: "Noise");
+            var item = _CreateAudioItem(fileName: "Noise");
             var filter = new AudioTagSetterFilter(
                 new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "<file-name>"))
             );
@@ -649,7 +649,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Year_TemplateSpan_Above9999_ThrowsFormatException()
         {
-            var item = _CreateAudioItem(prefix: "12000");
+            var item = _CreateAudioItem(fileName: "12000");
             var filter = new AudioTagSetterFilter(
                 new AudioTagSetterOptions(Year: new AudioTagStringFieldOptions(Text: "<file-name>"))
             );
@@ -771,7 +771,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             Assert.True(typed.Options.TrackAutoIncrement);
             typed.Setup();
 
-            var item = _CreateAudioItem(renameListIndex: 2, prefix: "P");
+            var item = _CreateAudioItem(renameListIndex: 2, fileName: "P");
             typed.Apply(item);
             var semantic = item.Preview.AudioTagOverlay.Semantic();
             Assert.Equal("P", semantic.Title);

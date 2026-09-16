@@ -10,7 +10,7 @@ namespace Mfr.Models.Filters
     /// filesystem attributes/timestamps); JSON uses property <c>targetType</c> as the discriminator.
     /// </summary>
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "targetType")]
-    [JsonDerivedType(typeof(FilePrefixTarget), "FilePrefix")]
+    [JsonDerivedType(typeof(FileNameTarget), "FileName")]
     [JsonDerivedType(typeof(FileExtensionTarget), "FileExtension")]
     [JsonDerivedType(typeof(FileFullNameTarget), "FileFullName")]
     [JsonDerivedType(typeof(AncestorFolderTarget), "AncestorFolder")]
@@ -30,9 +30,9 @@ namespace Mfr.Models.Filters
     public interface IAudioOverlayFilterTarget;
 
     /// <summary>
-    /// Targets the file name without extension (<c>prefix</c> segment).
+    /// Targets the file name without extension (file-name segment).
     /// </summary>
-    public sealed record FilePrefixTarget : FilterTarget;
+    public sealed record FileNameTarget : FilterTarget;
 
     /// <summary>
     /// Targets the file extension without the leading dot.
@@ -67,7 +67,7 @@ namespace Mfr.Models.Filters
     /// Targets the preview containing-directory absolute path (<c>DirectoryPath</c> on preview metadata).
     /// </summary>
     /// <remarks>
-    /// Writes assign the containing-folder path only; the preview prefix and extension stay unchanged.
+    /// Writes assign the containing-folder path only; the preview file name and extension stay unchanged.
     /// </remarks>
     public sealed record ParentDirectoryTarget : FilterTarget;
 

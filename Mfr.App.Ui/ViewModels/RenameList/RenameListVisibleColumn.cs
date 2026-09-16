@@ -170,7 +170,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 columns.Add(new RenameListVisibleColumn(key));
             }
 
-            IReadOnlyList<RenameListVisibleColumn> normalized = originalsOnly ? NormalizeToOriginals(columns) : columns;
+            var normalized = originalsOnly ? NormalizeToOriginals(columns) : columns;
             return WithPreservedThenRememberedWidths(normalized, previous, rememberedWidths);
         }
 

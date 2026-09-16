@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Misc
     /// </summary>
     public class StripParenthesesFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies each bracket type removes matched pairs and contents.
@@ -20,7 +20,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_RemoveContents_RemovesMatchedRegion(ParenthesisType type, string input, string expected)
         {
             var f = new StripParenthesesFilter(_target, new StripParenthesesOptions(Type: type, RemoveContents: true));
-            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToFileName(f, input));
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: false)
             );
-            Assert.Equal("arem", FilterTestHelpers.ApplyToPrefix(f, "a(rem)"));
+            Assert.Equal("arem", FilterTestHelpers.ApplyToFileName(f, "a(rem)"));
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
             );
-            Assert.Equal("ae", FilterTestHelpers.ApplyToPrefix(f, "a(b(c)d)e"));
+            Assert.Equal("ae", FilterTestHelpers.ApplyToFileName(f, "a(b(c)d)e"));
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: false)
             );
-            Assert.Equal("abcde", FilterTestHelpers.ApplyToPrefix(f, "a(b(c)d)e"));
+            Assert.Equal("abcde", FilterTestHelpers.ApplyToFileName(f, "a(b(c)d)e"));
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
             );
-            Assert.Equal("ace", FilterTestHelpers.ApplyToPrefix(f, "a(b)c(d)e"));
+            Assert.Equal("ace", FilterTestHelpers.ApplyToFileName(f, "a(b)c(d)e"));
         }
 
         /// <summary>
@@ -85,10 +85,10 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
             );
-            Assert.Equal("a(b", FilterTestHelpers.ApplyToPrefix(f, "a(b"));
-            Assert.Equal("a)b", FilterTestHelpers.ApplyToPrefix(f, "a)b"));
-            Assert.Equal("a(bd", FilterTestHelpers.ApplyToPrefix(f, "a(b(c)d"));
-            Assert.Equal("ac)", FilterTestHelpers.ApplyToPrefix(f, "a(b)c)"));
+            Assert.Equal("a(b", FilterTestHelpers.ApplyToFileName(f, "a(b"));
+            Assert.Equal("a)b", FilterTestHelpers.ApplyToFileName(f, "a)b"));
+            Assert.Equal("a(bd", FilterTestHelpers.ApplyToFileName(f, "a(b(c)d"));
+            Assert.Equal("ac)", FilterTestHelpers.ApplyToFileName(f, "a(b)c)"));
         }
 
         /// <summary>
@@ -101,8 +101,8 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: false)
             );
-            Assert.Equal("a(bcd", FilterTestHelpers.ApplyToPrefix(f, "a(b(c)d"));
-            Assert.Equal("abc)", FilterTestHelpers.ApplyToPrefix(f, "a(b)c)"));
+            Assert.Equal("a(bcd", FilterTestHelpers.ApplyToFileName(f, "a(b(c)d"));
+            Assert.Equal("abc)", FilterTestHelpers.ApplyToFileName(f, "a(b)c)"));
         }
     }
 }

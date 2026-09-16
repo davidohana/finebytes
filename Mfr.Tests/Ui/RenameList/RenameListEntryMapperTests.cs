@@ -14,7 +14,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var directory = TestPaths.Absolute("Photos", "2024");
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "vacation007",
+                fileName: "vacation007",
                 extension: "jpg",
                 directory: directory
             );
@@ -33,8 +33,8 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void ToEntry_preview_field_follows_preview_snapshot()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: "txt");
-            item.Preview.Prefix = "after";
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "before", extension: "txt");
+            item.Preview.FileName = "after";
 
             var entry = RenameListEntry.ToEntry(item);
 
@@ -54,7 +54,7 @@ namespace Mfr.Tests.Ui.RenameList
         [Fact]
         public void HighestStatusError_prefers_commit_then_preview_then_load()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "row", extension: "txt");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "row", extension: "txt");
             var entry = RenameListEntry.ToEntry(item);
 
             Assert.Equal(RenameListStatusErrorKind.None, entry.HighestStatusError);

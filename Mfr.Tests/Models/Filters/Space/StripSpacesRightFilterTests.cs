@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public class StripSpacesRightFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies default trimming (space character) from the right.
@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_RemovesTrailingSpaces()
         {
             var f = new StripSpacesRightFilter(_target);
-            Assert.Equal("New_York__", FilterTestHelpers.ApplyToPrefix(f, "New_York__   "));
+            Assert.Equal("New_York__", FilterTestHelpers.ApplyToFileName(f, "New_York__   "));
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Mfr.Tests.Models.Filters.Space
 
             var trimFilter = new StripSpacesRightFilter(_target);
 
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "__New_York__");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "__New_York__");
 
             // In a real scenario, filters are applied in sequence.
             spaceFilter.Setup();
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Space
             spaceFilter.Apply(item);
             trimFilter.Apply(item);
 
-            Assert.Equal("__New_York", item.Preview.Prefix);
+            Assert.Equal("__New_York", item.Preview.FileName);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_OnlyRemovesTrailingCharacters()
         {
             var f = new StripSpacesRightFilter(_target);
-            Assert.Equal("  a b", FilterTestHelpers.ApplyToPrefix(f, "  a b "));
+            Assert.Equal("  a b", FilterTestHelpers.ApplyToFileName(f, "  a b "));
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_AllSpaces_ReturnsEmpty()
         {
             var f = new StripSpacesRightFilter(_target);
-            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(f, "    "));
+            Assert.Equal("", FilterTestHelpers.ApplyToFileName(f, "    "));
         }
     }
 }

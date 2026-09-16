@@ -182,7 +182,7 @@ namespace Mfr.Tests.Models
         {
             var directory = TestPaths.Absolute("Photos", "2024");
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "vacation007",
+                fileName: "vacation007",
                 extension: "jpg",
                 directory: directory
             );
@@ -204,7 +204,7 @@ namespace Mfr.Tests.Models
         {
             var directory = TestPaths.Absolute("Music");
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "Album",
+                fileName: "Album",
                 extension: "",
                 directory: directory,
                 attributes: FileAttributes.Directory
@@ -225,8 +225,8 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Resolve_preview_field_uses_preview_snapshot()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: "txt");
-            item.Preview.Prefix = "after";
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "before", extension: "txt");
+            item.Preview.FileName = "after";
 
             var originalKey = RenameListFieldKey.Original(
                 BasicRenameListField.Group,
@@ -245,7 +245,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void IsPreviewChanged_true_only_for_changed_preview_keys()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "before", extension: "txt");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "before", extension: "txt");
             var originalKey = RenameListFieldKey.Original(
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FullName
@@ -255,7 +255,7 @@ namespace Mfr.Tests.Models
             Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, originalKey));
             Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, previewKey));
 
-            item.Preview.Prefix = "after";
+            item.Preview.FileName = "after";
 
             Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, originalKey));
             Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, previewKey));
@@ -308,7 +308,7 @@ namespace Mfr.Tests.Models
             string expected
         )
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: prefix, extension: extension);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: prefix, extension: extension);
             var key = RenameListFieldKey.Original(
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FileNameNumeric
@@ -600,7 +600,7 @@ namespace Mfr.Tests.Models
         }
 
         [Theory]
-        [InlineData(BasicRenameListFields.Key.Name, typeof(FilePrefixTarget))]
+        [InlineData(BasicRenameListFields.Key.Name, typeof(FileNameTarget))]
         [InlineData(BasicRenameListFields.Key.Extension, typeof(FileExtensionTarget))]
         [InlineData(BasicRenameListFields.Key.FullName, typeof(FileFullNameTarget))]
         [InlineData(BasicRenameListFields.Key.Folder, typeof(ParentDirectoryTarget))]
@@ -850,7 +850,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void CompareForSort_orders_field_load_errors_after_non_error_values()
         {
-            var errored = FilterTestHelpers.CreateRenameItem(prefix: "bad", extension: "mp3");
+            var errored = FilterTestHelpers.CreateRenameItem(fileName: "bad", extension: "mp3");
             errored.SetTagLibMetadataLoadError(new IOException("missing file"));
             var alphaTitle = _ItemWithSemantic(SemanticAudioField.Title, "Alpha");
             var zebraTitle = _ItemWithSemantic(SemanticAudioField.Title, "Zebra");
@@ -862,7 +862,7 @@ namespace Mfr.Tests.Models
             Assert.True(RenameListFieldCatalog.CompareForSort(errored, titleKey, zebraTitle) > 0);
             Assert.True(RenameListFieldCatalog.CompareForSort(zebraTitle, titleKey, errored) < 0);
 
-            var otherErrored = FilterTestHelpers.CreateRenameItem(prefix: "also-bad", extension: "mp3");
+            var otherErrored = FilterTestHelpers.CreateRenameItem(fileName: "also-bad", extension: "mp3");
             otherErrored.SetTagLibMetadataLoadError(new IOException("also missing"));
             Assert.Equal(0, RenameListFieldCatalog.CompareForSort(errored, titleKey, otherErrored));
         }
@@ -898,12 +898,12 @@ namespace Mfr.Tests.Models
             Assert.True(RenameListFieldCatalog.CompareForSort(trackTwo, trackKey, trackTen) < 0);
 
             var widthTen = FilterTestHelpers.CreateRenameItem(
-                prefix: "wide",
+                fileName: "wide",
                 extension: "jpg",
                 configureOriginal: meta => meta.Image = new ImageProperties { Width = 10 }
             );
             var widthTwo = FilterTestHelpers.CreateRenameItem(
-                prefix: "narrow",
+                fileName: "narrow",
                 extension: "jpg",
                 configureOriginal: meta => meta.Image = new ImageProperties { Width = 2 }
             );
@@ -915,20 +915,20 @@ namespace Mfr.Tests.Models
         public void CompareForSort_orders_media_duration_and_file_name_numeric()
         {
             var tenHours = FilterTestHelpers.CreateRenameItem(
-                prefix: "long",
+                fileName: "long",
                 extension: "mp3",
                 configureOriginal: meta => meta.Media = new MediaProperties { Duration = TimeSpan.FromHours(10) }
             );
             var oneHour = FilterTestHelpers.CreateRenameItem(
-                prefix: "short",
+                fileName: "short",
                 extension: "mp3",
                 configureOriginal: meta => meta.Media = new MediaProperties { Duration = TimeSpan.FromHours(1) }
             );
             var durationKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "Duration");
             Assert.True(RenameListFieldCatalog.CompareForSort(oneHour, durationKey, tenHours) < 0);
 
-            var fileTen = FilterTestHelpers.CreateRenameItem(prefix: "file10", extension: "txt");
-            var fileTwo = FilterTestHelpers.CreateRenameItem(prefix: "file2", extension: "txt");
+            var fileTen = FilterTestHelpers.CreateRenameItem(fileName: "file10", extension: "txt");
+            var fileTwo = FilterTestHelpers.CreateRenameItem(fileName: "file2", extension: "txt");
             var numericKey = RenameListFieldKey.Original(
                 BasicRenameListField.Group,
                 BasicRenameListFields.Key.FileNameNumeric
@@ -940,7 +940,7 @@ namespace Mfr.Tests.Models
         public void CompareForSort_orders_jpeg_image_number_numeric()
         {
             var lowImageItem = FilterTestHelpers.CreateRenameItem(
-                prefix: "low",
+                fileName: "low",
                 extension: "jpg",
                 configureOriginal: meta =>
                 {
@@ -954,7 +954,7 @@ namespace Mfr.Tests.Models
                 }
             );
             var highImageItem = FilterTestHelpers.CreateRenameItem(
-                prefix: "high",
+                fileName: "high",
                 extension: "jpg",
                 configureOriginal: meta =>
                 {
@@ -975,8 +975,8 @@ namespace Mfr.Tests.Models
         [Fact]
         public void CompareForSort_throws_for_preview_key()
         {
-            var left = FilterTestHelpers.CreateRenameItem(prefix: "alpha");
-            var right = FilterTestHelpers.CreateRenameItem(prefix: "beta");
+            var left = FilterTestHelpers.CreateRenameItem(fileName: "alpha");
+            var right = FilterTestHelpers.CreateRenameItem(fileName: "beta");
             var previewKey = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
 
             Assert.Throws<ArgumentException>(() => RenameListFieldCatalog.CompareForSort(left, previewKey, right));
@@ -999,7 +999,7 @@ namespace Mfr.Tests.Models
                 _AssertField(fileItem, ExtendedRenameListFields.Group, "FileCount", "2");
 
                 var folderItem = FilterTestHelpers.CreateRenameItem(
-                    prefix: "Album",
+                    fileName: "Album",
                     extension: "",
                     directory: tempDir,
                     attributes: FileAttributes.Directory
@@ -1029,7 +1029,7 @@ namespace Mfr.Tests.Models
         private static RenameItem _ItemWithSemantic(SemanticAudioField field, string value)
         {
             return FilterTestHelpers.CreateRenameItem(
-                prefix: "track",
+                fileName: "track",
                 extension: "mp3",
                 configureOriginal: meta =>
                 {

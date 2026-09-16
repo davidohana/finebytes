@@ -118,13 +118,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m => m.Exif = _SampleExif());
 
             var filter = new FormatterFilter(
-                Target: new FilePrefixTarget(),
+                Target: new FileNameTarget(),
                 Options: new FormatterOptions("<exif-make>_<exif-date:yyyy>")
             );
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("Canon_2020", item.Preview.Prefix);
+            Assert.Equal("Canon_2020", item.Preview.FileName);
         }
 
         [Fact]
@@ -210,7 +210,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directory,
-                prefix: prefix,
+                fileName: prefix,
                 extension: extension,
                 fileSize: new FileInfo(fullPath).Length
             );

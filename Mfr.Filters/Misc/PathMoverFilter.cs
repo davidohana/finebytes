@@ -31,7 +31,7 @@ namespace Mfr.Filters.Misc
     /// </para>
     /// <para>
     /// Applies to filesystem directory rows in the rename list as well as files (directories use an empty extension
-    /// and keep the folder name in <see cref="FileMeta.Prefix"/>).
+    /// and keep the folder name in <see cref="FileMeta.FileName"/>).
     /// </para>
     /// <para>
     /// This filter updates only the preview parent-directory path; actual filesystem creation and

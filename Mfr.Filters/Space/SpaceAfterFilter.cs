@@ -31,10 +31,10 @@ namespace Mfr.Filters.Space
         private HashSet<char>? _triggerChars;
 
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, comma/semicolon/exclamation triggers).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, comma/semicolon/exclamation triggers).
         /// </summary>
         public SpaceAfterFilter()
-            : this(new FilePrefixTarget(), new SpaceAfterOptions(AfterChars: ",;!", OnlyWhenNextIsLetterOrDigit: true))
+            : this(new FileNameTarget(), new SpaceAfterOptions(AfterChars: ",;!", OnlyWhenNextIsLetterOrDigit: true))
         { }
 
         /// <summary>

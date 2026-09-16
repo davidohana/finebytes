@@ -150,9 +150,7 @@ namespace Mfr.Tests.Cli
         /// </summary>
         public void ParseArgs_Accepts_ContinueOnRenameError_Long_Option()
         {
-            var options = CliArgParser.ParseArgs(
-                ["C:\\Music\\*.mp3", "-p", "clean", "--continue-on-rename-error"]
-            )!;
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean", "--continue-on-rename-error"])!;
             Assert.True(options.ContinueOnRenameError);
         }
 

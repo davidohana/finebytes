@@ -61,7 +61,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Misc
         public void Syncs_from_existing_filter_options()
         {
             var filter = new FixLeadingZerosFilter(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new FixLeadingZerosOptions(Width: 5, RemoveExtraZeros: true, MaxCount: 3, WholeWordOnly: false)
             );
             var step = new FilterChainStepViewModel("Fix Leading 0's", filter);

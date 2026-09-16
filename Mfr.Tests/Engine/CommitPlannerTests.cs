@@ -67,7 +67,7 @@ namespace Mfr.Tests.Engine
             var fileItem = _CreateFileItem(oldFolder, "track.mp3");
             // The descendant's preview is already rebased onto the renamed folder.
             fileItem.Preview.DirectoryPath = newFolder;
-            fileItem.Preview.Prefix = "track-renamed";
+            fileItem.Preview.FileName = "track-renamed";
 
             var plan = CommitPlanner.Build([fileItem, folderItem]);
 
@@ -151,7 +151,7 @@ namespace Mfr.Tests.Engine
 
             var innerItem = _CreateDirectoryItem(oldOuter, "Inner");
             innerItem.Preview.DirectoryPath = newOuter;
-            innerItem.Preview.Prefix = "InnerRenamed";
+            innerItem.Preview.FileName = "InnerRenamed";
 
             var fileItem = _CreateFileItem(oldInner, "track.txt");
             fileItem.Preview.DirectoryPath = newInner;
@@ -203,7 +203,7 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
-                prefix: Path.GetFileNameWithoutExtension(fileName),
+                fileName: Path.GetFileNameWithoutExtension(fileName),
                 extension: FileMeta.ExtensionWithoutDot(fileName),
                 attributes: FileAttributes.Normal
             );
@@ -216,7 +216,7 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
-                prefix: folderName,
+                fileName: folderName,
                 extension: string.Empty,
                 attributes: FileAttributes.Directory
             );
@@ -226,7 +226,7 @@ namespace Mfr.Tests.Engine
         private static void _RetargetPreview(RenameItem item, string directoryPath, string fileName)
         {
             item.Preview.DirectoryPath = directoryPath;
-            item.Preview.Prefix = Path.GetFileNameWithoutExtension(fileName);
+            item.Preview.FileName = Path.GetFileNameWithoutExtension(fileName);
             item.Preview.Extension = FileMeta.ExtensionWithoutDot(fileName);
         }
     }

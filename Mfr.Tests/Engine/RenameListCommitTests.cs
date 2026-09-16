@@ -723,7 +723,7 @@ namespace Mfr.Tests.Engine
             var preset = _CreatePresetAllEnabled(
                 "prefix-strip",
                 new ReplacerFilter(
-                    Target: new FilePrefixTarget(),
+                    Target: new FileNameTarget(),
                     Options: new ReplacerOptions(
                         Find: "track",
                         Replacement: "song",
@@ -741,7 +741,7 @@ namespace Mfr.Tests.Engine
             var item = Assert.Single(renameList.RenameItems);
 
             Assert.Equal(RenameStatus.PreviewOk, item.Status);
-            Assert.Equal("song", item.Preview.Prefix);
+            Assert.Equal("song", item.Preview.FileName);
             Assert.True(item.StripAllEmbeddedTagsOnCommit);
             Assert.Null(item.Preview.AudioTagOverlay.Semantic().Title);
 
@@ -1684,7 +1684,7 @@ namespace Mfr.Tests.Engine
         {
             return _CreatePresetAllEnabled(
                 name,
-                new CounterFilter(Target: new FilePrefixTarget(), Options: _CounterReplacePrefixOptions)
+                new CounterFilter(Target: new FileNameTarget(), Options: _CounterReplacePrefixOptions)
             );
         }
 
@@ -1738,7 +1738,7 @@ namespace Mfr.Tests.Engine
             return _CreatePresetAllEnabled(
                 name,
                 new ReplacerFilter(
-                    Target: new FilePrefixTarget(),
+                    Target: new FileNameTarget(),
                     Options: new ReplacerOptions(
                         "b",
                         "c",
@@ -1751,7 +1751,7 @@ namespace Mfr.Tests.Engine
                     )
                 ),
                 new ReplacerFilter(
-                    Target: new FilePrefixTarget(),
+                    Target: new FileNameTarget(),
                     Options: new ReplacerOptions(
                         "a",
                         "b",

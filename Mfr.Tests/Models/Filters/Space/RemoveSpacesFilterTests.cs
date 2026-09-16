@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public class RemoveSpacesFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies all occurrences of the default word separator (U+0020 SPACE) are removed.
@@ -16,8 +16,8 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_StripsSeparatorChar()
         {
             var f = new RemoveSpacesFilter(_target);
-            Assert.Equal("ab", FilterTestHelpers.ApplyToPrefix(f, "a b"));
-            Assert.Equal("a\t\r\nb", FilterTestHelpers.ApplyToPrefix(f, "a \t\r\nb"));
+            Assert.Equal("ab", FilterTestHelpers.ApplyToFileName(f, "a b"));
+            Assert.Equal("a\t\r\nb", FilterTestHelpers.ApplyToFileName(f, "a \t\r\nb"));
         }
     }
 }

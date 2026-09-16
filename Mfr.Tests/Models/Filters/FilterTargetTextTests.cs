@@ -15,11 +15,11 @@ namespace Mfr.Tests.Models.Filters
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: TestPaths.Absolute("album"),
-                prefix: "track",
+                fileName: "track",
                 extension: "mp3"
             );
 
-            Assert.True(FilterTargetText.TryGet(meta, new FilePrefixTarget(), out var prefix));
+            Assert.True(FilterTargetText.TryGet(meta, new FileNameTarget(), out var prefix));
             Assert.Equal("track", prefix);
             Assert.True(FilterTargetText.TryGet(meta, new FileExtensionTarget(), out var extension));
             Assert.Equal("mp3", extension);
@@ -38,13 +38,13 @@ namespace Mfr.Tests.Models.Filters
                     renameListIndex: 0,
                     inFolderIndex: 0,
                     directoryPath: TestPaths.Absolute("album"),
-                    prefix: "original",
+                    fileName: "original",
                     extension: "txt"
                 )
             );
-            item.Preview.Prefix = "previewed";
+            item.Preview.FileName = "previewed";
 
-            Assert.True(FilterTargetText.TryGet(item, new FilePrefixTarget(), out var text));
+            Assert.True(FilterTargetText.TryGet(item, new FileNameTarget(), out var text));
             Assert.Equal("original", text);
         }
 
@@ -58,7 +58,7 @@ namespace Mfr.Tests.Models.Filters
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: TestPaths.Absolute("album"),
-                prefix: "track",
+                fileName: "track",
                 extension: ""
             );
 

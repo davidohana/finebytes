@@ -538,10 +538,10 @@ namespace Mfr.Tests.Ui.RenameList
             );
             var key = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.FullName);
             var shortEntry = RenameListEntry.ToEntry(
-                FilterTestHelpers.CreateRenameItem(prefix: "short", directory: @"C:\folder")
+                FilterTestHelpers.CreateRenameItem(fileName: "short", directory: @"C:\folder")
             );
             var longEntry = RenameListEntry.ToEntry(
-                FilterTestHelpers.CreateRenameItem(prefix: new string('x', 500), directory: @"C:\folder")
+                FilterTestHelpers.CreateRenameItem(fileName: new string('x', 500), directory: @"C:\folder")
             );
 
             var shortFit = RenameListGridColumnWidths.GetAutoFitWidth([shortEntry], key, minHeaderWidth);
@@ -632,10 +632,16 @@ namespace Mfr.Tests.Ui.RenameList
                 BasicRenameListFields.Key.FullPath
             );
             var parentEntry = RenameListEntry.ToEntry(
-                FilterTestHelpers.CreateRenameItem(prefix: "01 - Tales of Endurance (Part 1)", directory: parentFolder)
+                FilterTestHelpers.CreateRenameItem(
+                    fileName: "01 - Tales of Endurance (Part 1)",
+                    directory: parentFolder
+                )
             );
             var fullPathEntry = RenameListEntry.ToEntry(
-                FilterTestHelpers.CreateRenameItem(prefix: "01 - Tales of Endurance (Part 1)", directory: parentFolder)
+                FilterTestHelpers.CreateRenameItem(
+                    fileName: "01 - Tales of Endurance (Part 1)",
+                    directory: parentFolder
+                )
             );
 
             var parentMin = RenameListGridColumnWidths.GetMinimumHeaderWidth(
@@ -826,7 +832,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])
@@ -881,7 +887,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])

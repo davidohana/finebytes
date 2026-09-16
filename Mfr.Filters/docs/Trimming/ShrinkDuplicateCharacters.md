@@ -25,7 +25,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "ShrinkDuplicateCharacters",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "character": "-"

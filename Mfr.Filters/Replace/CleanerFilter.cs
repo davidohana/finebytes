@@ -24,11 +24,11 @@ namespace Mfr.Filters.Replace
         private HashSet<char>? _charsToClean;
 
         /// <summary>
-        /// Creates a filter with add-to-list defaults (file prefix, illegal chars on, MFR7 custom cleanup list).
+        /// Creates a filter with add-to-list defaults (file name, illegal chars on, MFR7 custom cleanup list).
         /// </summary>
         public CleanerFilter()
             : this(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new CleanerOptions(
                     RemoveIllegalChars: true,
                     CustomCharsToRemove: @"!""#$%&'()*+,/:;<=>?@[]\^`{}|~",

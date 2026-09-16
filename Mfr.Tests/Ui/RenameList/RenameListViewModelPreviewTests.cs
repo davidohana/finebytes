@@ -624,7 +624,7 @@ namespace Mfr.Tests.Ui.RenameList
 
         private static LettersCaseFilter _LettersCase(LettersCaseMode mode)
         {
-            return new LettersCaseFilter(new FilePrefixTarget(), new LettersCaseOptions(mode, CapitalizeSkipWords: []));
+            return new LettersCaseFilter(new FileNameTarget(), new LettersCaseOptions(mode, CapitalizeSkipWords: []));
         }
     }
 }

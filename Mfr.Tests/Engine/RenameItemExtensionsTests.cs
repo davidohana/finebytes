@@ -17,10 +17,10 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void ApplyFilters_AllFiltersDisabled_LeavesPreviewAtOriginal()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: "mp3");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "track", extension: "mp3");
             var firstChain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
-                    Target: new FilePrefixTarget(),
+                    Target: new FileNameTarget(),
                     Options: new ReplacerOptions(
                         "track",
                         "stale",
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Engine
                     new FilterChainStep(
                         Enabled: false,
                         Filter: new ReplacerFilter(
-                            Target: new FilePrefixTarget(),
+                            Target: new FileNameTarget(),
                             Options: new ReplacerOptions(
                                 "track",
                                 "song",
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Engine
             chain.ApplyFilters(item);
 
             Assert.Equal(item.Original.FullPath, item.Preview.FullPath);
-            Assert.Equal(item.Original.Prefix, item.Preview.Prefix);
+            Assert.Equal(item.Original.FileName, item.Preview.FileName);
             Assert.Equal(item.Original.Extension, item.Preview.Extension);
         }
 
@@ -72,10 +72,10 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void ApplyFilters_PrefixFilters_ApplyInOrder()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track old", extension: "mp3");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "track old", extension: "mp3");
             var chain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
-                    Target: new FilePrefixTarget(),
+                    Target: new FileNameTarget(),
                     Options: new ReplacerOptions(
                         "track",
                         "song",
@@ -88,7 +88,7 @@ namespace Mfr.Tests.Engine
                     )
                 ),
                 new ReplacerFilter(
-                    Target: new FilePrefixTarget(),
+                    Target: new FileNameTarget(),
                     Options: new ReplacerOptions(
                         "old",
                         "new",
@@ -105,7 +105,7 @@ namespace Mfr.Tests.Engine
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("song new", item.Preview.Prefix);
+            Assert.Equal("song new", item.Preview.FileName);
             Assert.Equal("mp3", item.Preview.Extension);
             Assert.Equal(Path.Combine(item.Original.DirectoryPath, "song new.mp3"), item.Preview.FullPath);
         }
@@ -116,7 +116,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void ApplyFilters_ExtensionAndFullModes_UpdatePreview()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: "mp3");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "track", extension: "mp3");
             var chain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: new FileExtensionTarget(),
@@ -140,7 +140,7 @@ namespace Mfr.Tests.Engine
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("renamed.final", item.Preview.Prefix);
+            Assert.Equal("renamed.final", item.Preview.FileName);
             Assert.Equal("wav", item.Preview.Extension);
             Assert.Equal(Path.Combine(item.Original.DirectoryPath, "renamed.final.wav"), item.Preview.FullPath);
         }
@@ -151,7 +151,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void ApplyFilters_ExtensionTarget_DoesNotIncludeLeadingDot()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: "mp3");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "track", extension: "mp3");
             var chain = FilterChain.CreateAllEnabled([
                 new LettersCaseFilter(new FileExtensionTarget(), new LettersCaseOptions(LettersCaseMode.UpperCase, [])),
             ]);
@@ -159,7 +159,7 @@ namespace Mfr.Tests.Engine
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("track", item.Preview.Prefix);
+            Assert.Equal("track", item.Preview.FileName);
             Assert.Equal("MP3", item.Preview.Extension);
             Assert.Equal("track.MP3", item.Preview.FullFileName);
         }

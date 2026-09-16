@@ -77,7 +77,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         }
 
         /// <summary>
-        /// Verifies the file prefix is unchanged after applying the filter.
+        /// Verifies the file name is unchanged after applying the filter.
         /// </summary>
         [Fact]
         public void Apply_DoesNotChangePrefix()
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Models.Filters.Misc
             var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: "Sub"));
             var item = FilterTestHelpers.ApplyReturnItem(filter, "my-track", directory: Source);
 
-            Assert.Equal("my-track", item.Preview.Prefix);
+            Assert.Equal("my-track", item.Preview.FileName);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: @"D:\OtherRoot"));
             filter.Setup();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", directory: Source);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "track", directory: Source);
 
             Assert.Throws<ArgumentException>(() => filter.Apply(item));
         }
@@ -165,7 +165,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: @"\\server\share"));
             filter.Setup();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", directory: Source);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "track", directory: Source);
 
             Assert.Throws<ArgumentException>(() => filter.Apply(item));
         }
@@ -178,7 +178,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var filter = new PathMoverFilter(new PathMoverOptions(Dest, SubFolder: "C:foo"));
             filter.Setup();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", directory: Source);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "track", directory: Source);
 
             Assert.Throws<ArgumentException>(() => filter.Apply(item));
         }
@@ -230,7 +230,7 @@ namespace Mfr.Tests.Models.Filters.Misc
 
         /// <summary>
         /// Verifies folder list entries (<see cref="FileAttributes.Directory"/>, empty extension) get a preview
-        /// parent path under root + sub-folder and keep the folder name as <see cref="FileMeta.Prefix"/>
+        /// parent path under root + sub-folder and keep the folder name as <see cref="FileMeta.FileName"/>
         /// (same layout as filesystem directories resolved into the rename list).
         /// </summary>
         [Fact]
@@ -238,7 +238,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var filter = new PathMoverFilter(new PathMoverOptions(Archive, SubFolder: "Sorted"));
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "Photos",
+                fileName: "Photos",
                 extension: string.Empty,
                 directory: TestPaths.Absolute("Inbox"),
                 attributes: FileAttributes.Directory
@@ -261,7 +261,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var filter = new PathMoverFilter(new PathMoverOptions(Music, SubFolder: "<parent-folder>"));
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "TheTrinitySession",
+                fileName: "TheTrinitySession",
                 extension: string.Empty,
                 directory: TestPaths.Absolute("Downloads", "CowboyJunkies"),
                 attributes: FileAttributes.Directory

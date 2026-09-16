@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         {
             var token = new FullPathLengthToken();
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "song",
+                fileName: "song",
                 extension: "mp3",
                 directory: @"D:\Music\Album"
             );
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         {
             var token = new FullPathLengthToken();
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "song",
+                fileName: "song",
                 extension: "mp3",
                 directory: @"D:\Music\Album"
             );

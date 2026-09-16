@@ -1,6 +1,5 @@
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.Filters.Replace;
-using Mfr.Models.Config;
 using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.RenameList
@@ -58,7 +57,7 @@ namespace Mfr.Tests.Ui.RenameList
         public static ReplacerFilter PrefixReplacer(string find, string replacement)
         {
             return new ReplacerFilter(
-                Target: new FilePrefixTarget(),
+                Target: new FileNameTarget(),
                 Options: new ReplacerOptions(
                     Find: find,
                     Replacement: replacement,

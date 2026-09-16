@@ -206,12 +206,12 @@ namespace Mfr.Engine.Commit
 
             if (item.Original.Attributes.HasFlag(FileAttributes.Directory))
             {
-                rebasedOriginal.Prefix = Path.GetFileName(trimmedPath);
+                rebasedOriginal.FileName = Path.GetFileName(trimmedPath);
                 rebasedOriginal.Extension = string.Empty;
             }
             else
             {
-                rebasedOriginal.Prefix = Path.GetFileNameWithoutExtension(trimmedPath);
+                rebasedOriginal.FileName = Path.GetFileNameWithoutExtension(trimmedPath);
                 rebasedOriginal.Extension = FileMeta.ExtensionWithoutDot(trimmedPath);
             }
 

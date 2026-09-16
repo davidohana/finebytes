@@ -9,7 +9,7 @@ namespace Mfr.Tests.Models
     /// </summary>
     public sealed class FilterChainTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies <see cref="FilterChain.CreateAllEnabled"/> with no filters yields an empty step list.
@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models
         [Fact]
         public void CreateAllEnabled_AppliesFiltersInOrder()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "ab");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "ab");
             var chain = FilterChain.CreateAllEnabled([
                 new ReplacerFilter(
                     Target: _target,
@@ -63,7 +63,7 @@ namespace Mfr.Tests.Models
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("xy", item.Preview.Prefix);
+            Assert.Equal("xy", item.Preview.FileName);
         }
 
         /// <summary>
@@ -72,14 +72,14 @@ namespace Mfr.Tests.Models
         [Fact]
         public void ApplyFilters_EmptyChain_LeavesPreviewMatchingOriginal()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "only");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "only");
             var chain = new FilterChain { Steps = [] };
 
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
             Assert.Equal(item.Original.FullPath, item.Preview.FullPath);
-            Assert.Equal(item.Original.Prefix, item.Preview.Prefix);
+            Assert.Equal(item.Original.FileName, item.Preview.FileName);
         }
 
         /// <summary>

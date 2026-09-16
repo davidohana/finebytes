@@ -152,7 +152,7 @@ namespace Mfr.Tests.Models.Filters
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: TestPaths.Absolute("album"),
-                prefix: "track",
+                fileName: "track",
                 extension: "mp3",
                 attributes: attributes,
                 creationTime: creationTime,

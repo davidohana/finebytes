@@ -467,7 +467,7 @@ namespace Mfr.Tests.Ui.MainWindow
         private static ReplacerFilter _PrefixReplacer(string find, string replacement)
         {
             return new ReplacerFilter(
-                Target: new FilePrefixTarget(),
+                Target: new FileNameTarget(),
                 Options: new ReplacerOptions(
                     Find: find,
                     Replacement: replacement,

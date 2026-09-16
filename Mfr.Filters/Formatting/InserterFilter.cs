@@ -48,11 +48,11 @@ namespace Mfr.Filters.Formatting
         private Formatter _compiledText = FormatStringCompiler.EmptyFormatter;
 
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, position 1 from start).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, position 1 from start).
         /// </summary>
         public InserterFilter()
             : this(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new InserterOptions(Text: "", Position: 1, StartFrom: InserterOrigin.Beginning, Overwrite: false)
             ) { }
 

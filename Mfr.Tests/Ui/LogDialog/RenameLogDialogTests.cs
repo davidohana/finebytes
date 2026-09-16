@@ -47,7 +47,7 @@ namespace Mfr.Tests.Ui.LogDialog
                         OriginalPath: TestPaths.Absolute("a.txt"),
                         Status: RenameStatus.CommitOk,
                         Error: null,
-                        Changes: [new RenamePropertyChange("Prefix", "a", "b")],
+                        Changes: [new RenamePropertyChange("FileName", "a", "b")],
                         DestinationPath: TestPaths.Absolute("b.txt"),
                         IsFolder: false
                     ),
@@ -120,7 +120,7 @@ namespace Mfr.Tests.Ui.LogDialog
                         OriginalPath: TestPaths.Absolute("a.txt"),
                         Status: RenameStatus.CommitOk,
                         Error: null,
-                        Changes: [new RenamePropertyChange("Prefix", "a", "b")],
+                        Changes: [new RenamePropertyChange("FileName", "a", "b")],
                         DestinationPath: TestPaths.Absolute("b.txt"),
                         IsFolder: false
                     ),
@@ -220,7 +220,7 @@ namespace Mfr.Tests.Ui.LogDialog
                         OriginalPath: source,
                         Status: RenameStatus.CommitOk,
                         Error: null,
-                        Changes: [new RenamePropertyChange("Prefix", "alpha", "renamed")],
+                        Changes: [new RenamePropertyChange("FileName", "alpha", "renamed")],
                         DestinationPath: destination,
                         IsFolder: false
                     ),
@@ -245,7 +245,7 @@ namespace Mfr.Tests.Ui.LogDialog
 
             Assert.True(File.Exists(source));
             Assert.False(File.Exists(destination));
-            Assert.True(RenameLogStore.LastOperation!.IsUndo);
+            Assert.True(RenameLogStore.LastOperation.IsUndo);
         }
 
         /// <summary>

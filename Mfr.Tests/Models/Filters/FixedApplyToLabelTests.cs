@@ -3,8 +3,6 @@ using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
-using Mfr.Models.Media;
-using Mfr.Models.Rename;
 using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.Tests.Models.Filters

@@ -70,7 +70,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     renameListIndex: 0,
                     inFolderIndex: 0,
                     directoryPath: TestPaths.Absolute("album"),
-                    prefix: "sample-name",
+                    fileName: "sample-name",
                     extension: "txt"
                 )
             );
@@ -90,7 +90,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         [Fact]
         public void First_sample_drop_syncs_highlight_from_count()
         {
-            var filter = new TrimLeftFilter(new FilePrefixTarget(), new CountFilterOptions(Count: 3));
+            var filter = new TrimLeftFilter(new FileNameTarget(), new CountFilterOptions(Count: 3));
             var step = new FilterChainStepViewModel("Trim Left", filter);
             var editor = new CountFilterEditorViewModel(step);
             Assert.False(editor.TrimHelper.HasSample);
@@ -112,8 +112,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         {
             var items = new[]
             {
-                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"),
-                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1),
+                FilterTestHelpers.CreateRenameItem(fileName: "alpha", extension: "txt"),
+                FilterTestHelpers.CreateRenameItem(fileName: "beta", extension: "txt", renameListIndex: 1),
             };
             var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(step, sampleRenameItems: items);
@@ -143,8 +143,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         {
             var items = new[]
             {
-                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"),
-                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1),
+                FilterTestHelpers.CreateRenameItem(fileName: "alpha", extension: "txt"),
+                FilterTestHelpers.CreateRenameItem(fileName: "beta", extension: "txt", renameListIndex: 1),
             };
             var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(
@@ -174,8 +174,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             Assert.False(editor.TrimHelper.CanGoNext);
             Assert.Equal(string.Empty, editor.TrimHelper.ItemIndexLabel);
 
-            items.Add(FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"));
-            items.Add(FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1));
+            items.Add(FilterTestHelpers.CreateRenameItem(fileName: "alpha", extension: "txt"));
+            items.Add(FilterTestHelpers.CreateRenameItem(fileName: "beta", extension: "txt", renameListIndex: 1));
             editor.TrimHelper.RefreshRenameItems();
 
             Assert.Equal("alpha", editor.TrimHelper.SampleText);
@@ -191,8 +191,8 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
         {
             var items = new List<RenameItem>
             {
-                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "txt"),
-                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "txt", renameListIndex: 1),
+                FilterTestHelpers.CreateRenameItem(fileName: "alpha", extension: "txt"),
+                FilterTestHelpers.CreateRenameItem(fileName: "beta", extension: "txt", renameListIndex: 1),
             };
             var step = new FilterChainStepViewModel("Trim Left", new TrimLeftFilter());
             var editor = new CountFilterEditorViewModel(step, resolveSampleRenameItems: () => items);
@@ -221,7 +221,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     renameListIndex: 0,
                     inFolderIndex: 0,
                     directoryPath: TestPaths.Absolute("album"),
-                    prefix: "track",
+                    fileName: "track",
                     extension: "mp3"
                 )
             );

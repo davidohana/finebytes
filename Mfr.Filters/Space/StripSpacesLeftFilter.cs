@@ -14,10 +14,10 @@ namespace Mfr.Filters.Space
         : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix target).
+        /// Creates a filter with MFR7 add-to-list defaults (file name target).
         /// </summary>
         public StripSpacesLeftFilter()
-            : this(new FilePrefixTarget()) { }
+            : this(new FileNameTarget()) { }
 
         /// <summary>
         /// Gets the filter type discriminator.

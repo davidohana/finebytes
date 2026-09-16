@@ -25,25 +25,25 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Prefix deltas use ordinal comparison and raw string values (not JSON).
+        /// File name deltas use ordinal comparison and raw string values (not JSON).
         /// </summary>
         [Fact]
-        public void BuildChangeRows_PrefixChange_ReturnsSingleOrdinalRow()
+        public void BuildChangeRows_FileNameChange_ReturnsSingleOrdinalRow()
         {
             var original = _CloneBaseline();
             var item = new RenameItem(original);
-            item.Preview.Prefix = "Song";
+            item.Preview.FileName = "Song";
 
             var rows = RenamePropertyChangeBuilder.BuildChangeRows(item);
 
             var row = Assert.Single(rows);
-            Assert.Equal("Prefix", row.Property);
+            Assert.Equal("FileName", row.Property);
             Assert.Equal("song", row.OldValue);
             Assert.Equal("Song", row.NewValue);
         }
 
         /// <summary>
-        /// Extension changes are surfaced independently from prefix.
+        /// Extension changes are surfaced independently from file name.
         /// </summary>
         [Fact]
         public void BuildChangeRows_ExtensionChange_ReturnsExtensionRow()
@@ -292,7 +292,7 @@ namespace Mfr.Tests.Engine
         )
         {
             var testItem = FilterTestHelpers.CreateRenameItem(
-                prefix: "song",
+                fileName: "song",
                 extension: "mp3",
                 directory: directoryPath ?? @"D:\In",
                 attributes: FileAttributes.Normal,

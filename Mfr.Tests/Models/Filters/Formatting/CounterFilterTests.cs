@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
     /// </summary>
     public class CounterFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies replace mode outputs padded counter only.
@@ -27,7 +27,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     ResetPerFolder: false
                 )
             );
-            Assert.Equal("005", FilterTestHelpers.ApplyToPrefix(f, "old", renameListIndex: 4));
+            Assert.Equal("005", FilterTestHelpers.ApplyToFileName(f, "old", renameListIndex: 4));
         }
 
         /// <summary>
@@ -48,7 +48,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     ResetPerFolder: false
                 )
             );
-            Assert.Equal("2_name", FilterTestHelpers.ApplyToPrefix(f, "name", renameListIndex: 2));
+            Assert.Equal("2_name", FilterTestHelpers.ApplyToFileName(f, "name", renameListIndex: 2));
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     ResetPerFolder: false
                 )
             );
-            Assert.Equal("name-1", FilterTestHelpers.ApplyToPrefix(f, "name", renameListIndex: 1));
+            Assert.Equal("name-1", FilterTestHelpers.ApplyToFileName(f, "name", renameListIndex: 1));
         }
 
         /// <summary>
@@ -90,7 +90,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     ResetPerFolder: true
                 )
             );
-            Assert.Equal("20", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 99, inFolderIndex: 2));
+            Assert.Equal("20", FilterTestHelpers.ApplyToFileName(f, "x", renameListIndex: 99, inFolderIndex: 2));
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     ResetPerFolder: false
                 )
             );
-            Assert.Equal("-005", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
+            Assert.Equal("-005", FilterTestHelpers.ApplyToFileName(f, "x", renameListIndex: 0));
         }
 
         /// <summary>
@@ -134,15 +134,23 @@ namespace Mfr.Tests.Models.Filters.Formatting
             );
 
             // List of 100 → indices 0..99 → values 1..100 → width 3
-            var first = FilterTestHelpers.CreateRenameItem(prefix: "x", renameListIndex: 0, renameListTotalCount: 100);
+            var first = FilterTestHelpers.CreateRenameItem(
+                fileName: "x",
+                renameListIndex: 0,
+                renameListTotalCount: 100
+            );
             f.Setup();
             f.Apply(first);
-            Assert.Equal("001", first.Preview.Prefix);
+            Assert.Equal("001", first.Preview.FileName);
 
-            var last = FilterTestHelpers.CreateRenameItem(prefix: "x", renameListIndex: 99, renameListTotalCount: 100);
+            var last = FilterTestHelpers.CreateRenameItem(
+                fileName: "x",
+                renameListIndex: 99,
+                renameListTotalCount: 100
+            );
             f.Setup();
             f.Apply(last);
-            Assert.Equal("100", last.Preview.Prefix);
+            Assert.Equal("100", last.Preview.FileName);
         }
 
         /// <summary>
@@ -166,7 +174,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
 
             // Global list 1000 would need width 4; folder of 10 → values 1..10 → width 2
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "x",
+                fileName: "x",
                 renameListIndex: 50,
                 inFolderIndex: 0,
                 renameListTotalCount: 1000,
@@ -174,7 +182,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             );
             f.Setup();
             f.Apply(item);
-            Assert.Equal("01", item.Preview.Prefix);
+            Assert.Equal("01", item.Preview.FileName);
         }
 
         /// <summary>
@@ -197,10 +205,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
             );
 
             // Indices 0..9 → values -9..0 → digit width 1; index 0 → "-9"
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "x", renameListIndex: 0, renameListTotalCount: 10);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "x", renameListIndex: 0, renameListTotalCount: 10);
             f.Setup();
             f.Apply(item);
-            Assert.Equal("-9", item.Preview.Prefix);
+            Assert.Equal("-9", item.Preview.FileName);
         }
 
         /// <summary>
@@ -222,7 +230,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 )
             );
 
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "x", renameListIndex: 0, renameListTotalCount: 0);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "x", renameListIndex: 0, renameListTotalCount: 0);
             f.Setup();
             var ex = Assert.Throws<InvalidOperationException>(() => f.Apply(item));
             Assert.Contains("automatic padding", ex.Message, StringComparison.OrdinalIgnoreCase);
@@ -247,7 +255,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 )
             );
 
-            Assert.Equal("7", FilterTestHelpers.ApplyToPrefix(f, "x", renameListIndex: 0));
+            Assert.Equal("7", FilterTestHelpers.ApplyToFileName(f, "x", renameListIndex: 0));
         }
 
         /// <summary>
@@ -269,7 +277,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 )
             );
 
-            Assert.Equal("1name", FilterTestHelpers.ApplyToPrefix(f, "name", renameListIndex: 0));
+            Assert.Equal("1name", FilterTestHelpers.ApplyToFileName(f, "name", renameListIndex: 0));
         }
     }
 }

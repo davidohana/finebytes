@@ -30,7 +30,7 @@ namespace Mfr.Models.Rename
                 return false;
             }
 
-            if (property == RenamePropertyNames.Prefix)
+            if (property == RenamePropertyNames.FileName)
             {
                 key = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
                 return true;
@@ -98,9 +98,9 @@ namespace Mfr.Models.Rename
             ArgumentNullException.ThrowIfNull(property);
             ArgumentNullException.ThrowIfNull(oldValue);
 
-            if (property == RenamePropertyNames.Prefix)
+            if (property == RenamePropertyNames.FileName)
             {
-                preview.Prefix = oldValue;
+                preview.FileName = oldValue;
                 return true;
             }
 

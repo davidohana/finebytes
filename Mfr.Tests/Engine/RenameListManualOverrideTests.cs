@@ -56,7 +56,7 @@ namespace Mfr.Tests.Engine
 
             renameList.Preview(_UppercasePrefixChain());
 
-            Assert.Equal("SEED", item.Preview.Prefix);
+            Assert.Equal("SEED", item.Preview.FileName);
             Assert.Equal("SEED", RenameListFieldCatalog.Resolve(item, previewName));
             Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, previewName));
             Assert.True(item.IsOverridden(originalName));
@@ -78,7 +78,7 @@ namespace Mfr.Tests.Engine
 
             renameList.Preview(_UppercasePrefixChain());
 
-            Assert.Equal("forced", item.Preview.Prefix);
+            Assert.Equal("forced", item.Preview.FileName);
             Assert.Equal("forced", RenameListFieldCatalog.Resolve(item, previewName));
             Assert.True(item.IsOverridden(previewName));
             Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, previewName));
@@ -101,10 +101,10 @@ namespace Mfr.Tests.Engine
             }
 
             renameList.Preview(_UppercasePrefixChain());
-            Assert.All(renameList.RenameItems, item => Assert.Equal("same", item.Preview.Prefix));
+            Assert.All(renameList.RenameItems, item => Assert.Equal("same", item.Preview.FileName));
 
             renameList.Preview(_UppercasePrefixChain());
-            Assert.All(renameList.RenameItems, item => Assert.Equal("same", item.Preview.Prefix));
+            Assert.All(renameList.RenameItems, item => Assert.Equal("same", item.Preview.FileName));
             Assert.All(renameList.RenameItems, item => Assert.True(item.IsOverridden(previewName)));
         }
 
@@ -253,7 +253,7 @@ namespace Mfr.Tests.Engine
         {
             return FilterChain.CreateAllEnabled([
                 new LettersCaseFilter(
-                    new FilePrefixTarget(),
+                    new FileNameTarget(),
                     new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                 ),
             ]);

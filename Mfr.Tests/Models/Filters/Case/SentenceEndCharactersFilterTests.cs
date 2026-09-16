@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Case
     /// </summary>
     public sealed class SentenceEndCharactersFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies the segment text is unchanged while sentence-end chars are updated.
@@ -20,7 +20,7 @@ namespace Mfr.Tests.Models.Filters.Case
 
             var item = FilterTestHelpers.ApplyReturnItem(filter, "hello: world");
 
-            Assert.Equal("hello: world", item.Preview.Prefix);
+            Assert.Equal("hello: world", item.Preview.FileName);
             Assert.Equal(":;", item.SentenceEndChars);
         }
 
@@ -37,13 +37,13 @@ namespace Mfr.Tests.Models.Filters.Case
                 Target: _target,
                 Options: new LettersCaseOptions(LettersCaseMode.SentenceCase, CapitalizeSkipWords: [])
             );
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a - b. c");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "a - b. c");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersCaseFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
             Assert.Equal("-.!", item.SentenceEndChars);
-            Assert.Equal("A - B. C", item.Preview.Prefix);
+            Assert.Equal("A - B. C", item.Preview.FileName);
         }
 
         /// <summary>

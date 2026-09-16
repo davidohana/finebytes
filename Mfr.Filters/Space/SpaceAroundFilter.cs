@@ -34,11 +34,11 @@ namespace Mfr.Filters.Space
         private HashSet<char>? _triggerChars;
 
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, hyphen triggers).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, hyphen triggers).
         /// </summary>
         public SpaceAroundFilter()
             : this(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new SpaceAroundOptions(AroundChars: "-", OnlyWhenNeighboringAreLettersOrDigits: true)
             ) { }
 

@@ -35,10 +35,10 @@ namespace Mfr.Filters.Case
         private Dictionary<string, string>? _lowerWordToCasing;
 
         /// <summary>
-        /// Creates a filter with add-to-list defaults (file prefix, empty word list, sentence-initial uppercasing).
+        /// Creates a filter with add-to-list defaults (file name, empty word list, sentence-initial uppercasing).
         /// </summary>
         public CasingListFilter()
-            : this(new FilePrefixTarget(), new CasingListOptions(Words: [], UppercaseSentenceInitial: true)) { }
+            : this(new FileNameTarget(), new CasingListOptions(Words: [], UppercaseSentenceInitial: true)) { }
 
         /// <summary>
         /// Gets the filter type discriminator.

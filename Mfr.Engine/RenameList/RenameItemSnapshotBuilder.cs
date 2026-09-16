@@ -27,7 +27,7 @@ namespace Mfr.Engine.RenameList
         public static FileMeta CreateOriginalSnapshot(string fullPath, FileAttributes attrs)
         {
             var isDirectory = attrs.IsDirectory();
-            var (directoryPath, prefix, extension) = isDirectory
+            var (directoryPath, fileName, extension) = isDirectory
                 ? _SplitRenamePathForDirectory(fullPath)
                 : _SplitRenamePathForFile(fullPath);
 
@@ -35,7 +35,7 @@ namespace Mfr.Engine.RenameList
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
-                prefix: prefix,
+                fileName: fileName,
                 extension: extension,
                 attributes: attrs,
                 creationTime: File.GetCreationTime(fullPath),
@@ -45,22 +45,24 @@ namespace Mfr.Engine.RenameList
             );
         }
 
-        private static (string DirectoryPath, string Prefix, string Extension) _SplitRenamePathForFile(string fullPath)
+        private static (string DirectoryPath, string FileName, string Extension) _SplitRenamePathForFile(
+            string fullPath
+        )
         {
             var directoryPath = Path.GetDirectoryName(fullPath) ?? "";
-            var prefix = Path.GetFileNameWithoutExtension(fullPath);
+            var fileName = Path.GetFileNameWithoutExtension(fullPath);
             var extension = FileMeta.ExtensionWithoutDot(fullPath);
-            return (directoryPath, prefix, extension);
+            return (directoryPath, fileName, extension);
         }
 
-        private static (string DirectoryPath, string Prefix, string Extension) _SplitRenamePathForDirectory(
+        private static (string DirectoryPath, string FileName, string Extension) _SplitRenamePathForDirectory(
             string fullPath
         )
         {
             var trimmed = fullPath.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
             var directoryPath = Path.GetDirectoryName(trimmed) ?? "";
-            var prefix = Path.GetFileName(trimmed);
-            return (directoryPath, prefix, string.Empty);
+            var fileName = Path.GetFileName(trimmed);
+            return (directoryPath, fileName, string.Empty);
         }
     }
 }

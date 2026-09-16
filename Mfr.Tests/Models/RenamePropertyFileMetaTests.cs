@@ -1,4 +1,3 @@
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
 
@@ -13,7 +12,7 @@ namespace Mfr.Tests.Models
         /// Verifies path and Extended properties map to preview catalog keys.
         /// </summary>
         [Theory]
-        [InlineData(RenamePropertyNames.Prefix, BasicRenameListField.Group, BasicRenameListFields.Key.Name)]
+        [InlineData(RenamePropertyNames.FileName, BasicRenameListField.Group, BasicRenameListFields.Key.Name)]
         [InlineData(RenamePropertyNames.Extension, BasicRenameListField.Group, BasicRenameListFields.Key.Extension)]
         [InlineData(RenamePropertyNames.DirectoryPath, BasicRenameListField.Group, BasicRenameListFields.Key.Folder)]
         [InlineData(RenamePropertyNames.Attributes, ExtendedRenameListFields.Group, ExtendedRenameListFields.Key.Attrs)]
@@ -53,10 +52,10 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies logged Prefix/Extension/directory/Extended names use catalog labels (File Name, not Prefix).
+        /// Verifies logged FileName/Extension/directory/Extended names use catalog labels (File Name, not the stored id).
         /// </summary>
         [Theory]
-        [InlineData(RenamePropertyNames.Prefix, PathFieldLabels.FileName)]
+        [InlineData(RenamePropertyNames.FileName, PathFieldLabels.FileName)]
         [InlineData(RenamePropertyNames.Extension, PathFieldLabels.FileExtension)]
         [InlineData(RenamePropertyNames.DirectoryPath, PathFieldLabels.ParentDirectory)]
         [InlineData(RenamePropertyNames.Attributes, "Attributes")]
@@ -66,6 +65,19 @@ namespace Mfr.Tests.Models
         public void FormatDisplayName_uses_catalog_labels(string property, string expected)
         {
             Assert.Equal(expected, RenamePropertyFileMeta.FormatDisplayName(property));
+        }
+
+        /// <summary>
+        /// Preview/debug change blocks use display labels, not stored property ids.
+        /// </summary>
+        [Fact]
+        public void FormatPreviewChangeBlock_uses_display_name_heading()
+        {
+            var change = new RenamePropertyChange(RenamePropertyNames.FileName, "old", "new");
+            var block = change.FormatPreviewChangeBlock();
+
+            Assert.StartsWith($"  {PathFieldLabels.FileName}:", block, StringComparison.Ordinal);
+            Assert.DoesNotContain("FileName:", block, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -89,7 +101,7 @@ namespace Mfr.Tests.Models
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: @"C:\old",
-                prefix: "a",
+                fileName: "a",
                 extension: "txt",
                 attributes: FileAttributes.Normal,
                 creationTime: new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Local),
@@ -97,7 +109,7 @@ namespace Mfr.Tests.Models
                 lastAccessTime: new DateTime(2020, 1, 3, 0, 0, 0, DateTimeKind.Local)
             );
 
-            Assert.True(RenamePropertyFileMeta.TryApplyOldValue(preview, RenamePropertyNames.Prefix, "b"));
+            Assert.True(RenamePropertyFileMeta.TryApplyOldValue(preview, RenamePropertyNames.FileName, "b"));
             Assert.True(RenamePropertyFileMeta.TryApplyOldValue(preview, RenamePropertyNames.Extension, "bak"));
             Assert.True(RenamePropertyFileMeta.TryApplyOldValue(preview, RenamePropertyNames.DirectoryPath, @"C:\new"));
             Assert.True(RenamePropertyFileMeta.TryApplyOldValue(preview, RenamePropertyNames.Attributes, "Hidden"));
@@ -109,7 +121,7 @@ namespace Mfr.Tests.Models
                 )
             );
 
-            Assert.Equal("b", preview.Prefix);
+            Assert.Equal("b", preview.FileName);
             Assert.Equal("bak", preview.Extension);
             Assert.Equal(@"C:\new", preview.DirectoryPath);
             Assert.Equal(FileAttributes.Hidden, preview.Attributes);
@@ -124,9 +136,9 @@ namespace Mfr.Tests.Models
         public void CollectPreviewKeys_dedupes_and_skips_unmapped()
         {
             var keys = RenamePropertyFileMeta.CollectPreviewKeys([
-                new RenamePropertyChange(RenamePropertyNames.Prefix, "a", "b"),
+                new RenamePropertyChange(RenamePropertyNames.FileName, "a", "b"),
                 new RenamePropertyChange(RenamePropertyNames.StripAllEmbeddedTagsOnCommit, "false", "true"),
-                new RenamePropertyChange(RenamePropertyNames.Prefix, "a", "c"),
+                new RenamePropertyChange(RenamePropertyNames.FileName, "a", "c"),
                 new RenamePropertyChange(RenamePropertyNames.Attributes, "Normal", "Hidden"),
             ]);
 
@@ -155,7 +167,7 @@ namespace Mfr.Tests.Models
                         IsFolder: false,
                         Changes:
                         [
-                            new RenamePropertyChange(RenamePropertyNames.Prefix, "a", "b"),
+                            new RenamePropertyChange(RenamePropertyNames.FileName, "a", "b"),
                             new RenamePropertyChange(RenamePropertyNames.Attributes, "Normal", "Hidden"),
                         ]
                     ),
@@ -170,7 +182,7 @@ namespace Mfr.Tests.Models
                         DestinationPath: @"C:\f.txt",
                         OriginalPath: @"C:\e.txt",
                         IsFolder: false,
-                        Changes: [new RenamePropertyChange(RenamePropertyNames.Prefix, "e", "f")]
+                        Changes: [new RenamePropertyChange(RenamePropertyNames.FileName, "e", "f")]
                     ),
                 ]
             );

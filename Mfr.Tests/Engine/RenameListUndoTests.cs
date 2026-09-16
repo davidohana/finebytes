@@ -3,7 +3,6 @@ using Mfr.Filters.Attributes;
 using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
 using Mfr.Metadata;
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Utils;
@@ -318,7 +317,7 @@ namespace Mfr.Tests.Engine
                             DestinationPath: keepPath,
                             OriginalPath: keepPath,
                             IsFolder: false,
-                            Changes: [new RenamePropertyChange("Prefix", "a", "b")],
+                            Changes: [new RenamePropertyChange("FileName", "a", "b")],
                             Error: "prior commit failed"
                         ),
                     ]
@@ -415,7 +414,7 @@ namespace Mfr.Tests.Engine
                             DestinationPath: missingPath,
                             OriginalPath: dir.CombinePath("old.txt"),
                             IsFolder: false,
-                            Changes: [new RenamePropertyChange("Prefix", "old", "gone")]
+                            Changes: [new RenamePropertyChange("FileName", "old", "gone")]
                         ),
                     ]
                 )
@@ -463,7 +462,7 @@ namespace Mfr.Tests.Engine
                         DestinationPath: missingPath,
                         OriginalPath: dir.CombinePath("was.txt"),
                         IsFolder: false,
-                        Changes: [new RenamePropertyChange("Prefix", "was", "missing")]
+                        Changes: [new RenamePropertyChange("FileName", "was", "missing")]
                     ),
                 ],
             };
@@ -589,7 +588,7 @@ namespace Mfr.Tests.Engine
                 Name = name,
                 Description = null,
                 Chain = FilterChain.CreateAllEnabled([
-                    new FormatterFilter(Target: new FilePrefixTarget(), Options: new FormatterOptions(prefix)),
+                    new FormatterFilter(Target: new FileNameTarget(), Options: new FormatterOptions(prefix)),
                 ]),
             };
         }

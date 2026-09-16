@@ -104,7 +104,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
                     renameListIndex: 0,
                     inFolderIndex: 0,
                     directoryPath: TestPaths.Absolute("album"),
-                    prefix: "abcdef",
+                    fileName: "abcdef",
                     extension: "txt"
                 )
             );

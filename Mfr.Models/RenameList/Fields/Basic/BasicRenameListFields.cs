@@ -145,19 +145,19 @@ namespace Mfr.Models.RenameList.Fields.Basic
             propertyKey: BasicRenameListFields.Key.Name,
             displayName: PathFieldLabels.FileName,
             defaultWidth: 220,
-            writeTarget: new FilePrefixTarget(),
+            writeTarget: new FileNameTarget(),
             tip: PathFieldTips.FileName
         )
     {
         public override string Resolve(FileMeta meta)
         {
-            return meta.Prefix;
+            return meta.FileName;
         }
 
         /// <inheritdoc />
         public override int CompareForSort(FileMeta left, FileMeta right)
         {
-            return RenameListFieldSortCompare.Path(left.Prefix, right.Prefix);
+            return RenameListFieldSortCompare.Path(left.FileName, right.FileName);
         }
     }
 

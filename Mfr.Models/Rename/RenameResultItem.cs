@@ -13,14 +13,17 @@ namespace Mfr.Models.Rename
         /// <summary>
         /// Formats this change using the same layout as console preview output.
         /// </summary>
-        /// <returns>Multi-line text block for the change.</returns>
+        /// <returns>
+        /// Multi-line text block for the change. The heading uses
+        /// <see cref="RenamePropertyFileMeta.FormatDisplayName"/> (e.g. File Name), not the stored property id.
+        /// </returns>
         public string FormatPreviewChangeBlock()
         {
             const int valueLineIndentWidth = 10;
             var valueLinePadding = new string(' ', valueLineIndentWidth);
             var builder = new StringBuilder()
                 .Append("  ")
-                .Append(Property)
+                .Append(RenamePropertyFileMeta.FormatDisplayName(Property))
                 .Append(':')
                 .AppendLine()
                 .Append(valueLinePadding)

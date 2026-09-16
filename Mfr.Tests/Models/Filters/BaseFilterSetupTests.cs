@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters
     /// </summary>
     public sealed class BaseFilterSetupTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies setup is invoked once per filter instance lifetime.
@@ -19,14 +19,14 @@ namespace Mfr.Tests.Models.Filters
             var filter = new SetupCountingFilter(Target: _target);
             filter.Setup();
 
-            var firstItem = FilterTestHelpers.CreateRenameItem(prefix: "first");
+            var firstItem = FilterTestHelpers.CreateRenameItem(fileName: "first");
             filter.Apply(firstItem);
-            var secondItem = FilterTestHelpers.CreateRenameItem(prefix: "second");
+            var secondItem = FilterTestHelpers.CreateRenameItem(fileName: "second");
             filter.Apply(secondItem);
 
             Assert.Equal(1, filter.SetupCount);
-            Assert.Equal("first-1", firstItem.Preview.Prefix);
-            Assert.Equal("second-1", secondItem.Preview.Prefix);
+            Assert.Equal("first-1", firstItem.Preview.FileName);
+            Assert.Equal("second-1", secondItem.Preview.FileName);
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models.Filters
         public void TransformValue_SetupNotRun_ThrowsInvalidOperationException()
         {
             var filter = new SetupCountingFilter(Target: _target);
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "first");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "first");
 
             var ex = Assert.Throws<InvalidOperationException>(() => filter.TransformValue(value: "value", item: item));
             Assert.Contains("setup must complete before transform", ex.Message, StringComparison.OrdinalIgnoreCase);
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Models.Filters
         public void Setup_WhenSetupThrows_PropagatesAndApplyStillFails()
         {
             var filter = new ThrowingSetupFilter(Target: _target);
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "first");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "first");
 
             var setupEx = Assert.Throws<InvalidOperationException>(filter.Setup);
             Assert.Equal("Setup failed.", setupEx.Message);
@@ -78,9 +78,9 @@ namespace Mfr.Tests.Models.Filters
             Assert.Equal(1, filter.SetupCount);
             Assert.Equal(2, clone.SetupCount);
 
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "name");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "name");
             clone.Apply(item);
-            Assert.Equal("name-2", item.Preview.Prefix);
+            Assert.Equal("name-2", item.Preview.FileName);
         }
 
         /// <summary>
@@ -128,11 +128,11 @@ namespace Mfr.Tests.Models.Filters
             filter.Setup();
 
             var cleared = filter with { Template = "" };
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "name");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "name");
             cleared.Setup();
             cleared.Apply(item);
 
-            Assert.Equal("none", item.Preview.Prefix);
+            Assert.Equal("none", item.Preview.FileName);
         }
 
         private sealed record SetupCountingFilter(FilterTarget Target, StringApplyScope? ApplyScope = null)
@@ -186,7 +186,7 @@ namespace Mfr.Tests.Models.Filters
             protected internal override void ApplyCore(RenameItem item)
             {
                 VerifySetupComplete();
-                item.Preview.Prefix = _compiled ?? "none";
+                item.Preview.FileName = _compiled ?? "none";
             }
         }
     }

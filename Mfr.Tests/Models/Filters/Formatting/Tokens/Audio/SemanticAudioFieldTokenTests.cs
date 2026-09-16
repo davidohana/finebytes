@@ -192,10 +192,10 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         [Fact]
         public void Apply_FormatterCombinesYearAndTitle()
         {
-            var target = new FilePrefixTarget();
+            var target = new FileNameTarget();
             var filter = new FormatterFilter(target, new FormatterOptions("<audio-year>-<audio-title>"));
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "song",
+                fileName: "song",
                 configureOriginal: m =>
                 {
                     m.AudioTagOverlay = AudioTagOverlayTestBuilder.Id3Overlay(title: "Blue", year: 1999);
@@ -205,7 +205,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("1999-Blue", item.Preview.Prefix);
+            Assert.Equal("1999-Blue", item.Preview.FileName);
         }
     }
 }

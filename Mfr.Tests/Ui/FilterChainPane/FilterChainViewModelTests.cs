@@ -45,7 +45,7 @@ namespace Mfr.Tests.Ui.FilterChainPane
             viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
             viewModel.SetSelectedSteps([viewModel.Steps[0]]);
 
-            var nameList = new NameListFilter(new FilePrefixTarget(), new NameListOptions(Entries: ["alpha", "beta"]));
+            var nameList = new NameListFilter(new FileNameTarget(), new NameListOptions(Entries: ["alpha", "beta"]));
             var chainChanged = _CountChainChanged(viewModel, () => viewModel.AddAndSelect(nameList, "File Name List"));
 
             Assert.Equal(2, viewModel.Count);
@@ -64,15 +64,15 @@ namespace Mfr.Tests.Ui.FilterChainPane
         {
             var viewModel = new FilterChainViewModel();
             viewModel.AddAndSelect(
-                new NameListFilter(new FilePrefixTarget(), new NameListOptions(Entries: ["a"])),
+                new NameListFilter(new FileNameTarget(), new NameListOptions(Entries: ["a"])),
                 "Title List"
             );
             viewModel.AddAndSelect(
-                new NameListFilter(new FilePrefixTarget(), new NameListOptions(Entries: ["b"])),
+                new NameListFilter(new FileNameTarget(), new NameListOptions(Entries: ["b"])),
                 "Title List"
             );
             viewModel.AddAndSelect(
-                new NameListFilter(new FilePrefixTarget(), new NameListOptions(Entries: ["c"])),
+                new NameListFilter(new FileNameTarget(), new NameListOptions(Entries: ["c"])),
                 "Title List"
             );
 

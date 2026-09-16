@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Replace
     /// </summary>
     public class CleanerFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies add-to-list defaults match MFR7 custom chars plus illegal-char cleanup on.
@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Replace
         public void Ctor_Defaults_EnableIllegalCleanupAndMfr7CustomList()
         {
             var f = new CleanerFilter();
-            Assert.IsType<FilePrefixTarget>(f.Target);
+            Assert.IsType<FileNameTarget>(f.Target);
             Assert.True(f.Options.RemoveIllegalChars);
             Assert.Equal(@"!""#$%&'()*+,/:;<=>?@[]\^`{}|~", f.Options.CustomCharsToRemove);
             Assert.Equal(string.Empty, f.Options.Replacement);
@@ -32,7 +32,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 _target,
                 new CleanerOptions(RemoveIllegalChars: true, CustomCharsToRemove: "", Replacement: "_")
             );
-            Assert.Equal("a_b", FilterTestHelpers.ApplyToPrefix(f, "a/b"));
+            Assert.Equal("a_b", FilterTestHelpers.ApplyToFileName(f, "a/b"));
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 _target,
                 new CleanerOptions(RemoveIllegalChars: true, CustomCharsToRemove: "", Replacement: "_")
             );
-            Assert.Equal("a_b", FilterTestHelpers.ApplyToPrefix(f, "a\u0001b"));
+            Assert.Equal("a_b", FilterTestHelpers.ApplyToFileName(f, "a\u0001b"));
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 _target,
                 new CleanerOptions(RemoveIllegalChars: false, CustomCharsToRemove: "@#", Replacement: "-")
             );
-            Assert.Equal("a-b-c", FilterTestHelpers.ApplyToPrefix(f, "a@b#c"));
+            Assert.Equal("a-b-c", FilterTestHelpers.ApplyToFileName(f, "a@b#c"));
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 _target,
                 new CleanerOptions(RemoveIllegalChars: true, CustomCharsToRemove: "@#", Replacement: "X")
             );
-            Assert.Equal("aXbXcXdXe", FilterTestHelpers.ApplyToPrefix(f, "a/b@c#d|e"));
+            Assert.Equal("aXbXcXdXe", FilterTestHelpers.ApplyToFileName(f, "a/b@c#d|e"));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 _target,
                 new CleanerOptions(RemoveIllegalChars: false, CustomCharsToRemove: "@", Replacement: "xx")
             );
-            Assert.Equal("axxbxxc", FilterTestHelpers.ApplyToPrefix(f, "a@b@c"));
+            Assert.Equal("axxbxxc", FilterTestHelpers.ApplyToFileName(f, "a@b@c"));
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 _target,
                 new CleanerOptions(RemoveIllegalChars: false, CustomCharsToRemove: "@#", Replacement: "")
             );
-            Assert.Equal("abc", FilterTestHelpers.ApplyToPrefix(f, "a@b#c"));
+            Assert.Equal("abc", FilterTestHelpers.ApplyToFileName(f, "a@b#c"));
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 _target,
                 new CleanerOptions(RemoveIllegalChars: false, CustomCharsToRemove: "", Replacement: "_")
             );
-            Assert.Equal("a/b@c", FilterTestHelpers.ApplyToPrefix(f, "a/b@c"));
+            Assert.Equal("a/b@c", FilterTestHelpers.ApplyToFileName(f, "a/b@c"));
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 _target,
                 new CleanerOptions(RemoveIllegalChars: false, CustomCharsToRemove: "ab", Replacement: "ba")
             );
-            Assert.Equal("ba", FilterTestHelpers.ApplyToPrefix(f, "a"));
+            Assert.Equal("ba", FilterTestHelpers.ApplyToFileName(f, "a"));
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Mfr.Tests.Models.Filters.Replace
             filter.Setup();
 
             var cleared = filter with { Options = filter.Options with { CustomCharsToRemove = "" } };
-            Assert.Equal("a@b", FilterTestHelpers.ApplyToPrefix(cleared, "a@b"));
+            Assert.Equal("a@b", FilterTestHelpers.ApplyToFileName(cleared, "a@b"));
         }
     }
 }

@@ -50,7 +50,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "NameList",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "entries": ["Alpha", "Beta", "Gamma"],

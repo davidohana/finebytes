@@ -4,7 +4,7 @@ namespace Mfr.Tests.Models.Filters.Case
 {
     public sealed class CapitalizeAfterFilterTests
     {
-        private readonly FilterTarget _target = new FilePrefixTarget();
+        private readonly FilterTarget _target = new FileNameTarget();
 
         [Fact]
         public void Apply_Default_CapitalizesAfterDefaultChars()
@@ -13,7 +13,7 @@ namespace Mfr.Tests.Models.Filters.Case
 
             Assert.Equal(
                 "hello,World!(Again)[Is]It-Fine?",
-                FilterTestHelpers.ApplyToPrefix(filter, "hello,world!(again)[is]it-fine?")
+                FilterTestHelpers.ApplyToFileName(filter, "hello,world!(again)[is]it-fine?")
             );
         }
 
@@ -22,8 +22,8 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = new CapitalizeAfterFilter(_target, new CapitalizeAfterOptions("._"));
 
-            Assert.Equal("hello.World_Again", FilterTestHelpers.ApplyToPrefix(filter, "hello.world_again"));
-            Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(filter, "a,b")); // , is not in custom set
+            Assert.Equal("hello.World_Again", FilterTestHelpers.ApplyToFileName(filter, "hello.world_again"));
+            Assert.Equal("a,b", FilterTestHelpers.ApplyToFileName(filter, "a,b")); // , is not in custom set
         }
 
         [Fact]
@@ -31,28 +31,28 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = new CapitalizeAfterFilter(_target, new CapitalizeAfterOptions(CapitalizeAfterChars: ""));
 
-            Assert.Equal("hello,world", FilterTestHelpers.ApplyToPrefix(filter, "hello,world"));
+            Assert.Equal("hello,world", FilterTestHelpers.ApplyToFileName(filter, "hello,world"));
         }
 
         [Fact]
         public void Apply_EmptyInput_ReturnsEmpty()
         {
             var filter = new CapitalizeAfterFilter(_target, new CapitalizeAfterOptions());
-            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(filter, ""));
+            Assert.Equal("", FilterTestHelpers.ApplyToFileName(filter, ""));
         }
 
         [Fact]
         public void Apply_NoMatches_LeavesUnchanged()
         {
             var filter = new CapitalizeAfterFilter(_target, new CapitalizeAfterOptions());
-            Assert.Equal("hello world", FilterTestHelpers.ApplyToPrefix(filter, "hello world"));
+            Assert.Equal("hello world", FilterTestHelpers.ApplyToFileName(filter, "hello world"));
         }
 
         [Fact]
         public void Apply_MatchAtEnd_DoesNotThrow()
         {
             var filter = new CapitalizeAfterFilter(_target, new CapitalizeAfterOptions());
-            Assert.Equal("hello!", FilterTestHelpers.ApplyToPrefix(filter, "hello!"));
+            Assert.Equal("hello!", FilterTestHelpers.ApplyToFileName(filter, "hello!"));
         }
     }
 }

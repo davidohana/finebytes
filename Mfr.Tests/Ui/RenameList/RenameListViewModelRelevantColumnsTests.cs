@@ -2,8 +2,6 @@ using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
-using Mfr.Models.Config;
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 
@@ -46,7 +44,7 @@ namespace Mfr.Tests.Ui.RenameList
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
 
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FileNameTarget()), "Remove Spaces");
 
             Assert.True(renameListViewModel.AddRelevantColumnsCommand.CanExecute(null));
             Assert.True(renameListViewModel.ReplaceWithRelevantColumnsCommand.CanExecute(null));
@@ -65,7 +63,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FileNameTarget()), "Remove Spaces");
 
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
             renameListViewModel.SetVisibleColumns([
@@ -100,7 +98,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FileNameTarget()), "Remove Spaces");
 
             var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -134,7 +132,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FileNameTarget()), "Remove Spaces");
 
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
             var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -210,7 +208,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]).ConfigureAwait(true);
 
             filterChain.AddAndSelect(
-                new FormatterFilter(new FilePrefixTarget(), new FormatterOptions("<audio-title>")),
+                new FormatterFilter(new FileNameTarget(), new FormatterOptions("<audio-title>")),
                 "Formatter"
             );
 
@@ -236,7 +234,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FileNameTarget()), "Remove Spaces");
 
             var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);

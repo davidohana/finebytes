@@ -58,11 +58,11 @@ namespace Mfr.Filters.Formatting
         : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, counter prepend with name suffix).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, counter prepend with name suffix).
         /// </summary>
         public CounterFilter()
             : this(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new CounterOptions(
                     Start: 1,
                     Step: 1,

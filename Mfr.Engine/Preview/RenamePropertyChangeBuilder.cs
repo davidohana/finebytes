@@ -52,9 +52,9 @@ namespace Mfr.Engine.Preview
         {
             _AddRenamePropertyChangeIfStringDiffers(
                 changes,
-                propertyName: RenamePropertyNames.Prefix,
-                oldValue: original.Prefix,
-                newValue: preview.Prefix,
+                propertyName: RenamePropertyNames.FileName,
+                oldValue: original.FileName,
+                newValue: preview.FileName,
                 comparison: StringComparison.Ordinal
             );
             _AddRenamePropertyChangeIfStringDiffers(

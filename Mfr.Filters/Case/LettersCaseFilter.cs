@@ -192,11 +192,11 @@ namespace Mfr.Filters.Case
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with add-to-list defaults (file prefix, capitalize, common skip words).
+        /// Creates a filter with add-to-list defaults (file name, capitalize, common skip words).
         /// </summary>
         public LettersCaseFilter()
             : this(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new LettersCaseOptions(LettersCaseMode.Capitalize, LettersCaseOptions.DefaultCapitalizeSkipWords)
             ) { }
 

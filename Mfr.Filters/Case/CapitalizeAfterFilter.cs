@@ -27,10 +27,10 @@ namespace Mfr.Filters.Case
         private HashSet<char>? _capitalizeAfterChars;
 
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, default trigger characters).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, default trigger characters).
         /// </summary>
         public CapitalizeAfterFilter()
-            : this(new FilePrefixTarget(), new CapitalizeAfterOptions()) { }
+            : this(new FileNameTarget(), new CapitalizeAfterOptions()) { }
 
         /// <summary>
         /// Gets the filter type discriminator.

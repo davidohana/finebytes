@@ -22,7 +22,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "ShrinkSpaces",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   }
 }
 ```

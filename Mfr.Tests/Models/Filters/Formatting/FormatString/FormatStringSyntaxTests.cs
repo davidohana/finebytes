@@ -267,7 +267,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         public void TryEvaluate_FileNameToken_ReturnsPreviewPrefix()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "Sound Effects - Bats In The Belfry",
+                fileName: "Sound Effects - Bats In The Belfry",
                 extension: "mp3"
             );
 
@@ -285,7 +285,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         public void TryEvaluate_SubstrOfFileName_ReturnsExpandedText()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "Sound Effects - Bats In The Belfry",
+                fileName: "Sound Effects - Bats In The Belfry",
                 extension: "mp3"
             );
             var template = "<substr:start=1,end=-1,source=<file-name>>";

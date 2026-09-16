@@ -40,7 +40,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "SpaceCharacter",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "spaceCharacter": "_",

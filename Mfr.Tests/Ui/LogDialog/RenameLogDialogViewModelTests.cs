@@ -50,7 +50,7 @@ namespace Mfr.Tests.Ui.LogDialog
                         OriginalPath: TestPaths.Absolute("mem-old.txt"),
                         Status: RenameStatus.CommitOk,
                         Error: null,
-                        Changes: [new RenamePropertyChange("Prefix", "mem-old", "mem-new")],
+                        Changes: [new RenamePropertyChange("FileName", "mem-old", "mem-new")],
                         DestinationPath: TestPaths.Absolute("mem-new.txt"),
                         IsFolder: false
                     ),
@@ -92,7 +92,7 @@ namespace Mfr.Tests.Ui.LogDialog
                         OriginalPath: TestPaths.Absolute("a.txt"),
                         Status: RenameStatus.CommitOk,
                         Error: null,
-                        Changes: [new RenamePropertyChange("Prefix", "a", "b")],
+                        Changes: [new RenamePropertyChange("FileName", "a", "b")],
                         DestinationPath: TestPaths.Absolute("b.txt"),
                         IsFolder: false
                     ),
@@ -128,7 +128,7 @@ namespace Mfr.Tests.Ui.LogDialog
                         OriginalPath: TestPaths.Absolute("a.txt"),
                         Status: RenameStatus.CommitOk,
                         Error: null,
-                        Changes: [new RenamePropertyChange("Prefix", "a", "b")],
+                        Changes: [new RenamePropertyChange("FileName", "a", "b")],
                         DestinationPath: TestPaths.Absolute("b.txt"),
                         IsFolder: false
                     ),
@@ -206,7 +206,7 @@ namespace Mfr.Tests.Ui.LogDialog
                         OriginalPath: TestPaths.Absolute("orig.txt"),
                         Status: RenameStatus.CommitOk,
                         Error: null,
-                        Changes: [new RenamePropertyChange("Prefix", "orig", "shown")],
+                        Changes: [new RenamePropertyChange("FileName", "orig", "shown")],
                         DestinationPath: destinationPath,
                         IsFolder: false
                     ),

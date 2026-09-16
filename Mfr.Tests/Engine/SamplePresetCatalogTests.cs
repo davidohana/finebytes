@@ -74,7 +74,8 @@ namespace Mfr.Tests.Engine
             );
             Assert.Contains(
                 _Preset("Image: PIC Date Taken Make Model").VisibleColumns!,
-                column => column.Key == RenameListFieldKey.Original(JpegRenameListFields.Group, JpegRenameListFields.Key.Make)
+                column =>
+                    column.Key == RenameListFieldKey.Original(JpegRenameListFields.Group, JpegRenameListFields.Key.Make)
             );
             Assert.Contains(
                 _Preset("Image: Name from Image").VisibleColumns!,

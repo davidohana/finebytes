@@ -48,7 +48,7 @@ namespace Mfr.Tests.Engine
         {
             var store = FilterDefaultsStore.CreateEmpty();
             store.SetDefault(
-                new LettersCaseFilter(new FilePrefixTarget(), new LettersCaseOptions(LettersCaseMode.LowerCase, []))
+                new LettersCaseFilter(new FileNameTarget(), new LettersCaseOptions(LettersCaseMode.LowerCase, []))
             );
             var second = new LettersCaseFilter(
                 new FileExtensionTarget(),

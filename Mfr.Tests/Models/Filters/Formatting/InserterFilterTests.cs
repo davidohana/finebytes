@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
     /// </summary>
     public class InserterFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies the documented example: insert before the third character without shifting past overwrite.
@@ -19,7 +19,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 _target,
                 new InserterOptions(Text: "_-", Position: 3, StartFrom: InserterOrigin.Beginning, Overwrite: false)
             );
-            Assert.Equal("01_-_Mercury_Rave_-_Holes", FilterTestHelpers.ApplyToPrefix(f, "01_Mercury_Rave_-_Holes"));
+            Assert.Equal("01_-_Mercury_Rave_-_Holes", FilterTestHelpers.ApplyToFileName(f, "01_Mercury_Rave_-_Holes"));
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Overwrite: false
                 )
             );
-            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToFileName(f, input));
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 _target,
                 new InserterOptions(Text: text, Position: position, StartFrom: InserterOrigin.End, Overwrite: false)
             );
-            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToFileName(f, input));
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 _target,
                 new InserterOptions(Text: text, Position: position, StartFrom: startFrom, Overwrite: true)
             );
-            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToFileName(f, input));
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 _target,
                 new InserterOptions(Text: "a < b", Position: 1, StartFrom: InserterOrigin.Beginning, Overwrite: false)
             );
-            Assert.Equal("a < bhello", FilterTestHelpers.ApplyToPrefix(f, "hello"));
+            Assert.Equal("a < bhello", FilterTestHelpers.ApplyToFileName(f, "hello"));
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                     Overwrite: false
                 )
             );
-            Assert.Equal("_new_new", FilterTestHelpers.ApplyToPrefix(f, "new", renameListIndex: 0));
+            Assert.Equal("_new_new", FilterTestHelpers.ApplyToFileName(f, "new", renameListIndex: 0));
         }
     }
 }

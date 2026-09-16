@@ -42,7 +42,7 @@ namespace Mfr.Tests.Engine
             renameList.AddSources([sourcePath]);
             var preset = _CreatePreset(
                 "commit-captures",
-                new FormatterFilter(Target: new FilePrefixTarget(), Options: new FormatterOptions("new-name"))
+                new FormatterFilter(Target: new FileNameTarget(), Options: new FormatterOptions("new-name"))
             );
             var plan = renameList.Preview(preset.Chain);
             var results = renameList.Commit(plan, failFast: false, dryRun: false);
@@ -51,7 +51,7 @@ namespace Mfr.Tests.Engine
             Assert.Equal(dir.CombinePath("new-name.txt"), results[0].DestinationPath);
             Assert.Contains(
                 results[0].Changes,
-                c => c.Property == "Prefix" && c.OldValue == "old-name" && c.NewValue == "new-name"
+                c => c.Property == "FileName" && c.OldValue == "old-name" && c.NewValue == "new-name"
             );
 
             Assert.NotNull(RenameLogStore.LastOperation);
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Engine
             Assert.False(entry.IsFolder);
             Assert.Contains(
                 entry.Changes,
-                c => c.Property == "Prefix" && c.OldValue == "old-name" && c.NewValue == "new-name"
+                c => c.Property == "FileName" && c.OldValue == "old-name" && c.NewValue == "new-name"
             );
         }
 
@@ -78,8 +78,8 @@ namespace Mfr.Tests.Engine
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("old.txt"),
                     destinationPath: TestPaths.Absolute("new.txt"),
-                    oldPrefix: "old",
-                    newPrefix: "new"
+                    oldFileName: "old",
+                    newFileName: "new"
                 ),
             };
 
@@ -112,8 +112,8 @@ namespace Mfr.Tests.Engine
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("new.txt"),
                     destinationPath: TestPaths.Absolute("old.txt"),
-                    oldPrefix: "new",
-                    newPrefix: "old"
+                    oldFileName: "new",
+                    newFileName: "old"
                 ),
             };
 
@@ -159,7 +159,7 @@ namespace Mfr.Tests.Engine
                       "destinationPath": {{destinationJson}},
                       "originalPath": {{originalJson}},
                       "isFolder": false,
-                      "changes": [ { "property": "Prefix", "oldValue": "b", "newValue": "a" } ]
+                      "changes": [ { "property": "FileName", "oldValue": "b", "newValue": "a" } ]
                     }
                   ]
                 }
@@ -185,8 +185,8 @@ namespace Mfr.Tests.Engine
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("old.txt"),
                     destinationPath: TestPaths.Absolute("new.txt"),
-                    oldPrefix: "old",
-                    newPrefix: "new"
+                    oldFileName: "old",
+                    newFileName: "new"
                 ),
             };
 
@@ -209,8 +209,8 @@ namespace Mfr.Tests.Engine
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("old.txt"),
                     destinationPath: TestPaths.Absolute("new.txt"),
-                    oldPrefix: "old",
-                    newPrefix: "new"
+                    oldFileName: "old",
+                    newFileName: "new"
                 ),
             };
 
@@ -232,8 +232,8 @@ namespace Mfr.Tests.Engine
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("prior-old.txt"),
                     destinationPath: TestPaths.Absolute("prior-new.txt"),
-                    oldPrefix: "prior-old",
-                    newPrefix: "prior-new"
+                    oldFileName: "prior-old",
+                    newFileName: "prior-new"
                 ),
             };
             Assert.Null(RenameLogStore.CaptureFromCommit(prior, limit: 0));
@@ -279,14 +279,14 @@ namespace Mfr.Tests.Engine
                 _CommitErrorResult(
                     originalPath: TestPaths.Absolute("err.txt"),
                     error: "boom",
-                    changes: [new RenamePropertyChange("Prefix", "a", "b")],
+                    changes: [new RenamePropertyChange("FileName", "a", "b")],
                     destinationPath: TestPaths.Absolute("err-dest.txt")
                 ),
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("ok-old.txt"),
                     destinationPath: TestPaths.Absolute("ok-new.txt"),
-                    oldPrefix: "ok-old",
-                    newPrefix: "ok-new",
+                    oldFileName: "ok-old",
+                    newFileName: "ok-new",
                     isFolder: true
                 ),
             };
@@ -319,8 +319,8 @@ namespace Mfr.Tests.Engine
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("ok-old.txt"),
                     destinationPath: TestPaths.Absolute("ok-new.txt"),
-                    oldPrefix: "ok-old",
-                    newPrefix: "ok-new"
+                    oldFileName: "ok-old",
+                    newFileName: "ok-new"
                 ),
                 _CommitErrorResult(originalPath: TestPaths.Absolute("err.txt"), error: "disk full"),
             };
@@ -347,8 +347,8 @@ namespace Mfr.Tests.Engine
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("prior-old.txt"),
                     destinationPath: TestPaths.Absolute("prior-new.txt"),
-                    oldPrefix: "prior-old",
-                    newPrefix: "prior-new"
+                    oldFileName: "prior-old",
+                    newFileName: "prior-new"
                 ),
             };
             Assert.Null(RenameLogStore.CaptureFromCommit(prior, limit: 0));
@@ -388,7 +388,7 @@ namespace Mfr.Tests.Engine
                         DestinationPath: TestPaths.Absolute("ok-new.txt"),
                         OriginalPath: TestPaths.Absolute("ok-old.txt"),
                         IsFolder: false,
-                        Changes: [new RenamePropertyChange("Prefix", "old", "new")]
+                        Changes: [new RenamePropertyChange("FileName", "old", "new")]
                     ),
                     new RenameLogEntry(
                         DestinationPath: TestPaths.Absolute("err-dest.txt"),
@@ -422,7 +422,7 @@ namespace Mfr.Tests.Engine
                     DestinationPath: TestPaths.Absolute($"new-{i}.txt"),
                     OriginalPath: TestPaths.Absolute($"old-{i}.txt"),
                     IsFolder: false,
-                    Changes: [new RenamePropertyChange("Prefix", $"old-{i}", $"new-{i}")]
+                    Changes: [new RenamePropertyChange("FileName", $"old-{i}", $"new-{i}")]
                 ))
                 .ToList();
             var log = new RenameLog(CommittedAt: DateTimeOffset.Parse("2026-01-15T12:00:00Z"), Entries: entries);
@@ -458,7 +458,7 @@ namespace Mfr.Tests.Engine
                         DestinationPath: TestPaths.Absolute("a.txt"),
                         OriginalPath: TestPaths.Absolute("b.txt"),
                         IsFolder: false,
-                        Changes: [new RenamePropertyChange("Prefix", "b", "a")]
+                        Changes: [new RenamePropertyChange("FileName", "b", "a")]
                     ),
                 ]
             );
@@ -470,13 +470,13 @@ namespace Mfr.Tests.Engine
                         DestinationPath: TestPaths.Absolute("1.txt"),
                         OriginalPath: TestPaths.Absolute("1a.txt"),
                         IsFolder: false,
-                        Changes: [new RenamePropertyChange("Prefix", "1a", "1")]
+                        Changes: [new RenamePropertyChange("FileName", "1a", "1")]
                     ),
                     new RenameLogEntry(
                         DestinationPath: TestPaths.Absolute("2.txt"),
                         OriginalPath: TestPaths.Absolute("2a.txt"),
                         IsFolder: false,
-                        Changes: [new RenamePropertyChange("Prefix", "2a", "2")]
+                        Changes: [new RenamePropertyChange("FileName", "2a", "2")]
                     ),
                 ],
                 IsUndo: true
@@ -569,8 +569,8 @@ namespace Mfr.Tests.Engine
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("a.txt"),
                     destinationPath: TestPaths.Absolute("b.txt"),
-                    oldPrefix: "a",
-                    newPrefix: "b"
+                    oldFileName: "a",
+                    newFileName: "b"
                 ),
             };
 
@@ -633,8 +633,8 @@ namespace Mfr.Tests.Engine
                 _CommitOkResult(
                     originalPath: TestPaths.Absolute("old.txt"),
                     destinationPath: TestPaths.Absolute("new.txt"),
-                    oldPrefix: "old",
-                    newPrefix: "new"
+                    oldFileName: "old",
+                    newFileName: "new"
                 ),
             };
 
@@ -657,8 +657,8 @@ namespace Mfr.Tests.Engine
         private static RenameResultItem _CommitOkResult(
             string originalPath,
             string destinationPath,
-            string oldPrefix,
-            string newPrefix,
+            string oldFileName,
+            string newFileName,
             bool isFolder = false
         )
         {
@@ -666,7 +666,7 @@ namespace Mfr.Tests.Engine
                 OriginalPath: originalPath,
                 Status: RenameStatus.CommitOk,
                 Error: null,
-                Changes: [new RenamePropertyChange("Prefix", oldPrefix, newPrefix)],
+                Changes: [new RenamePropertyChange("FileName", oldFileName, newFileName)],
                 DestinationPath: destinationPath,
                 IsFolder: isFolder
             );

@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Formatting
             var step = new FilterChainStepViewModel(
                 "Name List",
                 new NameListFilter(
-                    Target: new FilePrefixTarget(),
+                    Target: new FileNameTarget(),
                     Options: new NameListOptions(Entries: ["Alpha", "", "Beta"], Prefix: "pre_", Suffix: "_suf")
                 )
             );

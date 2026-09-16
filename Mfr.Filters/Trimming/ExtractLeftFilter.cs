@@ -14,10 +14,10 @@ namespace Mfr.Filters.Trimming
     ) : StringTargetFilter(Target, ApplyScope), ICountOptionsFilter
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, extract one character).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, extract one character).
         /// </summary>
         public ExtractLeftFilter()
-            : this(new FilePrefixTarget(), new CountFilterOptions(Count: 1)) { }
+            : this(new FileNameTarget(), new CountFilterOptions(Count: 1)) { }
 
         /// <summary>
         /// Gets the filter type discriminator.

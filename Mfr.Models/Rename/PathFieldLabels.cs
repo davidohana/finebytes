@@ -11,7 +11,7 @@ namespace Mfr.Models.Rename
     /// </remarks>
     public static class PathFieldLabels
     {
-        /// <summary>File name without extension (Apply-To File Prefix target).</summary>
+        /// <summary>File name without extension.</summary>
         public const string FileName = "File Name";
 
         /// <summary>File extension without a leading dot.</summary>

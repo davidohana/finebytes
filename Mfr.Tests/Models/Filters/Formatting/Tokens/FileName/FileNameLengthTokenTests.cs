@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_ReturnsPreviewFullNameLength(string prefix, string extension, string expected)
         {
             var token = new FileNameLengthToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: prefix, extension: extension);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: prefix, extension: extension);
 
             Assert.Equal(expected, token.Compile(tokenArgs: "")(item));
             Assert.Contains("file-name-length", token.Names);
@@ -31,8 +31,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_UsesPreviewNotOriginal()
         {
             var token = new FileNameLengthToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "short", extension: "mp3");
-            item.Preview.Prefix = "much-longer-name";
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "short", extension: "mp3");
+            item.Preview.FileName = "much-longer-name";
 
             Assert.Equal("20", token.Compile(tokenArgs: "")(item));
             Assert.Equal(9, item.Original.FullFileName.Length);

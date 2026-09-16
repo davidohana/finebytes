@@ -16,7 +16,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChainPane
         private static readonly FilterTargetGroupOption _fileNameGroup = new(
             PathFieldLabels.FileName,
             [
-                new FilterTargetOption(PathFieldLabels.FileName, new FilePrefixTarget(), PathFieldTips.FileName),
+                new FilterTargetOption(PathFieldLabels.FileName, new FileNameTarget(), PathFieldTips.FileName),
                 new FilterTargetOption(PathFieldLabels.FileExtension, new FileExtensionTarget()),
                 new FilterTargetOption(
                     PathFieldLabels.FullFileName,

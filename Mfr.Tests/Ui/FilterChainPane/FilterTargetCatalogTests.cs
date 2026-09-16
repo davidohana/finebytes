@@ -19,7 +19,7 @@ namespace Mfr.Tests.Ui.FilterChainPane
             var (group, option, ancestorFolderLevel) = FilterTargetCatalog.Resolve(new UnknownFilterTarget());
 
             Assert.Equal("File Name", group.Label);
-            Assert.IsType<FilePrefixTarget>(option.Prototype);
+            Assert.IsType<FileNameTarget>(option.Prototype);
             Assert.Equal(1, ancestorFolderLevel);
         }
 
@@ -218,8 +218,8 @@ namespace Mfr.Tests.Ui.FilterChainPane
         [Fact]
         public void Resolve_falls_back_for_extended_write_targets()
         {
-            Assert.IsType<FilePrefixTarget>(FilterTargetCatalog.Resolve(new FileAttributesTarget()).Option.Prototype);
-            Assert.IsType<FilePrefixTarget>(
+            Assert.IsType<FileNameTarget>(FilterTargetCatalog.Resolve(new FileAttributesTarget()).Option.Prototype);
+            Assert.IsType<FileNameTarget>(
                 FilterTargetCatalog.Resolve(new FileTimestampTarget(TimestampField.Creation)).Option.Prototype
             );
 

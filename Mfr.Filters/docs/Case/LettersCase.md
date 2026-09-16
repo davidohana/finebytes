@@ -90,7 +90,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "LettersCase",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "mode": "Capitalize",

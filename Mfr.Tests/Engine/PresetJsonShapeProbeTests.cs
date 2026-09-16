@@ -30,7 +30,7 @@ namespace Mfr.Tests.Engine
                             "filter": {
                               "type": "SeparateCapitalizedText",
                               "target": {
-                                "targetType": "FilePrefix"
+                                "targetType": "FileName"
                               }
                             }
                           }
@@ -345,7 +345,7 @@ namespace Mfr.Tests.Engine
         public void LettersCase_JSON_round_trips_apply_scope_token()
         {
             var expected = new LettersCaseFilter(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new LettersCaseOptions(LettersCaseMode.UpperCase, []),
                 new TokenApplyScope(Separator: "-", TokenNumber: 2)
             );
@@ -360,7 +360,7 @@ namespace Mfr.Tests.Engine
                 {
                   "type": "LettersCase",
                   "target": {
-                    "targetType": "FilePrefix"
+                    "targetType": "FileName"
                   },
                   "options": {
                     "mode": "UpperCase",

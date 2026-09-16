@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Misc
     /// </summary>
     public class FixLeadingZerosFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies non-positive width leaves segment unchanged.
@@ -16,7 +16,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void Apply_NonPositiveWidth_ReturnsOriginal()
         {
             var f = new FixLeadingZerosFilter(_target, new FixLeadingZerosOptions(Width: 0, RemoveExtraZeros: true));
-            Assert.Equal("track12", FilterTestHelpers.ApplyToPrefix(f, "track12"));
+            Assert.Equal("track12", FilterTestHelpers.ApplyToFileName(f, "track12"));
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new FixLeadingZerosOptions(Width: 4, RemoveExtraZeros: false, WholeWordOnly: false)
             );
-            Assert.Equal("track0009", FilterTestHelpers.ApplyToPrefix(f, "track9"));
+            Assert.Equal("track0009", FilterTestHelpers.ApplyToFileName(f, "track9"));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true, WholeWordOnly: false)
             );
-            Assert.Equal("x007", FilterTestHelpers.ApplyToPrefix(f, "x0007"));
+            Assert.Equal("x007", FilterTestHelpers.ApplyToFileName(f, "x0007"));
         }
 
         /// <summary>
@@ -53,8 +53,8 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var options = new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, WholeWordOnly: true);
             var f = new FixLeadingZerosFilter(_target, options);
-            Assert.Equal("doc1_012", FilterTestHelpers.ApplyToPrefix(f, "doc1_12"));
-            Assert.Equal("12x", FilterTestHelpers.ApplyToPrefix(f, "12x"));
+            Assert.Equal("doc1_012", FilterTestHelpers.ApplyToFileName(f, "doc1_12"));
+            Assert.Equal("12x", FilterTestHelpers.ApplyToFileName(f, "12x"));
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, MaxCount: 1, WholeWordOnly: true)
             );
-            Assert.Equal("doc1_002", FilterTestHelpers.ApplyToPrefix(f, "doc1_2"));
+            Assert.Equal("doc1_002", FilterTestHelpers.ApplyToFileName(f, "doc1_2"));
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Mfr.Tests.Models.Filters.Misc
         public void DefaultConstructor_UsesMfr7AddDefaults()
         {
             var f = new FixLeadingZerosFilter();
-            Assert.IsType<FilePrefixTarget>(f.Target);
+            Assert.IsType<FileNameTarget>(f.Target);
             Assert.Equal(2, f.Options.Width);
             Assert.False(f.Options.RemoveExtraZeros);
             Assert.Equal(1, f.Options.MaxCount);
@@ -92,11 +92,11 @@ namespace Mfr.Tests.Models.Filters.Misc
         {
             var options = new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, MaxCount: 1);
             var f = new FixLeadingZerosFilter(_target, options);
-            Assert.Equal("005-Opus 40", FilterTestHelpers.ApplyToPrefix(f, "05-Opus 40"));
+            Assert.Equal("005-Opus 40", FilterTestHelpers.ApplyToFileName(f, "05-Opus 40"));
 
             options = new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, MaxCount: 2);
             f = new FixLeadingZerosFilter(_target, options);
-            Assert.Equal("005-Opus 040 (1)", FilterTestHelpers.ApplyToPrefix(f, "05-Opus 40 (1)"));
+            Assert.Equal("005-Opus 040 (1)", FilterTestHelpers.ApplyToFileName(f, "05-Opus 40 (1)"));
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: false, MaxCount: 1, WholeWordOnly: false)
             );
-            Assert.Equal("123-045", FilterTestHelpers.ApplyToPrefix(f, "123-45"));
+            Assert.Equal("123-045", FilterTestHelpers.ApplyToFileName(f, "123-45"));
         }
 
         /// <summary>
@@ -122,7 +122,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true, MaxCount: 1, WholeWordOnly: false)
             );
-            Assert.Equal("123-007-5", FilterTestHelpers.ApplyToPrefix(f, "123-0007-5"));
+            Assert.Equal("123-007-5", FilterTestHelpers.ApplyToFileName(f, "123-0007-5"));
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace Mfr.Tests.Models.Filters.Misc
                 _target,
                 new FixLeadingZerosOptions(Width: 3, RemoveExtraZeros: true, WholeWordOnly: false)
             );
-            Assert.Equal("x000", FilterTestHelpers.ApplyToPrefix(f, "x000"));
+            Assert.Equal("x000", FilterTestHelpers.ApplyToFileName(f, "x000"));
         }
     }
 }

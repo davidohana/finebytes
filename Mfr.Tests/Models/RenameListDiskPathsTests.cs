@@ -83,7 +83,7 @@ namespace Mfr.Tests.Models
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: @"D:\tmp",
-                prefix: Path.GetFileNameWithoutExtension(fileName),
+                fileName: Path.GetFileNameWithoutExtension(fileName),
                 extension: FileMeta.ExtensionWithoutDot(fileName)
             );
         }

@@ -28,7 +28,7 @@ With **`onlyWhenNeighboringAreLettersOrDigits`** **true**, a separator is added 
 {
   "type": "SpaceAround",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "aroundChars": "-",

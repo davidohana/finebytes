@@ -252,13 +252,13 @@ For sequential numbering without a full template, see [Counter](Counter.md).
 
 ## Sample preset (JSON)
 
-The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). When targeting **Prefix**, `<file-name>` is the **preview** file prefix (same as original until an earlier filter mutates it).
+The `filter` object inside a chain step ([preset shape](../README.md#preset-shape)). When targeting **File Name**, `<file-name>` is the **preview** file name (same as original until an earlier filter mutates it).
 
 ```json
 {
   "type": "Formatter",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "template": "<parent-folder> - <file-name>"

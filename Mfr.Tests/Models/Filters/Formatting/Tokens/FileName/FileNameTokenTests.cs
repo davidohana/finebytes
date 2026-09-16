@@ -8,13 +8,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
     public sealed class FileNameTokenTests
     {
         /// <summary>
-        /// Verifies the token returns the preview prefix and exposes its canonical name.
+        /// Verifies the token returns the preview file name and exposes its canonical name.
         /// </summary>
         [Fact]
         public void Resolve_ReturnsPreviewPrefix()
         {
             var token = new FileNameToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "song", extension: "mp3");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "song", extension: "mp3");
 
             Assert.Equal("song", token.Compile(tokenArgs: "")(item));
             Assert.Contains("file-name", token.Names);
@@ -27,11 +27,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_UsesPreviewNotOriginal()
         {
             var token = new FileNameToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "song", extension: "mp3");
-            item.Preview.Prefix = "renamed";
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "song", extension: "mp3");
+            item.Preview.FileName = "renamed";
 
             Assert.Equal("renamed", token.Compile(tokenArgs: "")(item));
-            Assert.Equal("song", item.Original.Prefix);
+            Assert.Equal("song", item.Original.FileName);
         }
 
         /// <summary>

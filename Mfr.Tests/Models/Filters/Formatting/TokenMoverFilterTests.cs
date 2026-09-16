@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
     /// </summary>
     public class TokenMoverFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies moving the second token three places right (documented milk example).
@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: 3));
             var input = "milk,sugar,bread,potatoes,honey,salt,water";
-            Assert.Equal("milk,bread,potatoes,honey,sugar,salt,water", FilterTestHelpers.ApplyToPrefix(f, input));
+            Assert.Equal("milk,bread,potatoes,honey,sugar,salt,water", FilterTestHelpers.ApplyToFileName(f, input));
         }
 
         /// <summary>
@@ -27,7 +27,10 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_MoveSecondTokenThreeRight_ShortName_ClampsToEnd()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: 3));
-            Assert.Equal("milk,bread,potatoes,sugar", FilterTestHelpers.ApplyToPrefix(f, "milk,sugar,bread,potatoes"));
+            Assert.Equal(
+                "milk,bread,potatoes,sugar",
+                FilterTestHelpers.ApplyToFileName(f, "milk,sugar,bread,potatoes")
+            );
         }
 
         /// <summary>
@@ -37,7 +40,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_MoveLeftPastStart_ClampsToFirst()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: -99));
-            Assert.Equal("b,a,c", FilterTestHelpers.ApplyToPrefix(f, "a,b,c"));
+            Assert.Equal("b,a,c", FilterTestHelpers.ApplyToFileName(f, "a,b,c"));
         }
 
         /// <summary>
@@ -47,7 +50,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_MoveOneLeft_SwapsWithPredecessor()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: "-", TokenNumber: 2, MoveBy: -1));
-            Assert.Equal("b-a-c", FilterTestHelpers.ApplyToPrefix(f, "a-b-c"));
+            Assert.Equal("b-a-c", FilterTestHelpers.ApplyToFileName(f, "a-b-c"));
         }
 
         /// <summary>
@@ -57,7 +60,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_MoveOneRight_SwapsWithSuccessor()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: "-", TokenNumber: 1, MoveBy: 1));
-            Assert.Equal("b-a-c", FilterTestHelpers.ApplyToPrefix(f, "a-b-c"));
+            Assert.Equal("b-a-c", FilterTestHelpers.ApplyToFileName(f, "a-b-c"));
         }
 
         /// <summary>
@@ -67,7 +70,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_MultiCharDelimiter_MovesToken()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: " - ", TokenNumber: 1, MoveBy: 1));
-            Assert.Equal("Album - Artist - Title", FilterTestHelpers.ApplyToPrefix(f, "Artist - Album - Title"));
+            Assert.Equal("Album - Artist - Title", FilterTestHelpers.ApplyToFileName(f, "Artist - Album - Title"));
         }
 
         /// <summary>
@@ -77,7 +80,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_MoveByZero_ReturnsOriginal()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 2, MoveBy: 0));
-            Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(f, "a,b"));
+            Assert.Equal("a,b", FilterTestHelpers.ApplyToFileName(f, "a,b"));
         }
 
         /// <summary>
@@ -87,7 +90,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_MoveClampsToSameIndex_ReturnsOriginal()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 3, MoveBy: 5));
-            Assert.Equal("a,b,c", FilterTestHelpers.ApplyToPrefix(f, "a,b,c"));
+            Assert.Equal("a,b,c", FilterTestHelpers.ApplyToFileName(f, "a,b,c"));
         }
 
         /// <summary>
@@ -97,7 +100,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_SingleToken_ReturnsOriginal()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 1, MoveBy: 2));
-            Assert.Equal("only", FilterTestHelpers.ApplyToPrefix(f, "only"));
+            Assert.Equal("only", FilterTestHelpers.ApplyToFileName(f, "only"));
         }
 
         /// <summary>
@@ -107,7 +110,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_EmptyDelimiter_DoesNotChange()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: "", TokenNumber: 1, MoveBy: 1));
-            Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(f, "a,b"));
+            Assert.Equal("a,b", FilterTestHelpers.ApplyToFileName(f, "a,b"));
         }
 
         /// <summary>
@@ -117,7 +120,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_TokenNumberLessThanOne_DoesNotChange()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 0, MoveBy: 1));
-            Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(f, "a,b"));
+            Assert.Equal("a,b", FilterTestHelpers.ApplyToFileName(f, "a,b"));
         }
 
         /// <summary>
@@ -127,7 +130,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_TokenNumberTooLarge_DoesNotChange()
         {
             var f = new TokenMoverFilter(_target, new TokenMoverOptions(Delimiter: ",", TokenNumber: 3, MoveBy: 1));
-            Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(f, "a,b"));
+            Assert.Equal("a,b", FilterTestHelpers.ApplyToFileName(f, "a,b"));
         }
     }
 }

@@ -50,14 +50,14 @@ namespace Mfr.Tests.Engine
 
             var chain = FilterChain.CreateAllEnabled([
                 new LettersCaseFilter(
-                    new FilePrefixTarget(),
+                    new FileNameTarget(),
                     new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                 ),
             ]);
 
             var plan = renameList.Preview(chain);
 
-            Assert.Equal("HELLO", renameList.RenameItems[0].Preview.Prefix);
+            Assert.Equal("HELLO", renameList.RenameItems[0].Preview.FileName);
             Assert.Equal(RenameStatus.PreviewOk, renameList.RenameItems[0].Status);
             Assert.Equal(1, plan.ChangedCount);
             Assert.Equal(0, plan.UnchangedCount);
@@ -79,17 +79,17 @@ namespace Mfr.Tests.Engine
             _ = renameList.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])
             );
-            Assert.Equal("HELLO", renameList.RenameItems[0].Preview.Prefix);
+            Assert.Equal("HELLO", renameList.RenameItems[0].Preview.FileName);
 
             var identityPlan = renameList.Preview(new FilterChain { Steps = [] });
 
-            Assert.Equal(renameList.RenameItems[0].Original.Prefix, renameList.RenameItems[0].Preview.Prefix);
-            Assert.Equal("hello", renameList.RenameItems[0].Preview.Prefix);
+            Assert.Equal(renameList.RenameItems[0].Original.FileName, renameList.RenameItems[0].Preview.FileName);
+            Assert.Equal("hello", renameList.RenameItems[0].Preview.FileName);
             Assert.Equal(0, identityPlan.ChangedCount);
             Assert.Equal(1, identityPlan.UnchangedCount);
             Assert.Equal(0, identityPlan.ErrorCount);
@@ -115,7 +115,7 @@ namespace Mfr.Tests.Engine
 
             var chain = FilterChain.CreateAllEnabled([
                 new LettersCaseFilter(
-                    new FilePrefixTarget(),
+                    new FileNameTarget(),
                     new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                 ),
             ]);
@@ -123,7 +123,7 @@ namespace Mfr.Tests.Engine
             var plan = renameList.Preview(chain, cts.Token);
 
             Assert.Equal(0, plan.ChangedCount);
-            Assert.All(renameList.RenameItems, item => Assert.Equal(item.Original.Prefix, item.Preview.Prefix));
+            Assert.All(renameList.RenameItems, item => Assert.Equal(item.Original.FileName, item.Preview.FileName));
         }
 
         /// <summary>
@@ -140,7 +140,7 @@ namespace Mfr.Tests.Engine
 
             var chain = FilterChain.CreateAllEnabled([
                 new InserterFilter(
-                    new FilePrefixTarget(),
+                    new FileNameTarget(),
                     new InserterOptions(
                         Text: "ddAA <fsssss> AA111",
                         Position: 1,
@@ -160,7 +160,7 @@ namespace Mfr.Tests.Engine
             Assert.Contains("fsssss", item.PreviewError.Message, StringComparison.Ordinal);
             Assert.Contains("Inserter", item.PreviewError.Message, StringComparison.Ordinal);
             // Setup failed: preview stays at identity (no stale insert from a prior pass).
-            Assert.Equal(item.Original.Prefix, item.Preview.Prefix);
+            Assert.Equal(item.Original.FileName, item.Preview.FileName);
         }
     }
 }

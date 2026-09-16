@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters
     /// </summary>
     public sealed class StringApplyScopeTransformTests
     {
-        private static readonly FilePrefixTarget s_target = new();
+        private static readonly FileNameTarget s_target = new();
 
         /// <summary>
         /// Verifies 1-based inclusive left-anchored substring is uppercased only inside the range.
@@ -22,7 +22,7 @@ namespace Mfr.Tests.Models.Filters
                 EndAnchor: StringScopeAnchor.Left
             );
             var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
-            Assert.Equal("ABCdef", FilterTestHelpers.ApplyToPrefix(f, "abcdef"));
+            Assert.Equal("ABCdef", FilterTestHelpers.ApplyToFileName(f, "abcdef"));
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace Mfr.Tests.Models.Filters
                 EndAnchor: StringScopeAnchor.Left
             );
             var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
-            Assert.Equal("aBCDef", FilterTestHelpers.ApplyToPrefix(f, "abcdef"));
+            Assert.Equal("aBCDef", FilterTestHelpers.ApplyToFileName(f, "abcdef"));
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace Mfr.Tests.Models.Filters
                 EndAnchor: StringScopeAnchor.Right
             );
             var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
-            Assert.Equal("abcdeF", FilterTestHelpers.ApplyToPrefix(f, "abcdef"));
+            Assert.Equal("abcdeF", FilterTestHelpers.ApplyToFileName(f, "abcdef"));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models.Filters
                 EndAnchor: StringScopeAnchor.Left
             );
             var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
-            Assert.Equal("AB", FilterTestHelpers.ApplyToPrefix(f, "ab"));
+            Assert.Equal("AB", FilterTestHelpers.ApplyToFileName(f, "ab"));
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Mfr.Tests.Models.Filters
                     EndAnchor: StringScopeAnchor.Left
                 )
             );
-            Assert.Equal("Ab", FilterTestHelpers.ApplyToPrefix(belowOne, "ab"));
+            Assert.Equal("Ab", FilterTestHelpers.ApplyToFileName(belowOne, "ab"));
 
             var rightPast = new LettersCaseFilter(
                 s_target,
@@ -101,7 +101,7 @@ namespace Mfr.Tests.Models.Filters
                     EndAnchor: StringScopeAnchor.Right
                 )
             );
-            Assert.Equal("AB", FilterTestHelpers.ApplyToPrefix(rightPast, "ab"));
+            Assert.Equal("AB", FilterTestHelpers.ApplyToFileName(rightPast, "ab"));
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Mfr.Tests.Models.Filters
         {
             var scope = new TokenApplyScope(Separator: "-", TokenNumber: 2);
             var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
-            Assert.Equal("aa-BB-cc", FilterTestHelpers.ApplyToPrefix(f, "aa-bb-cc"));
+            Assert.Equal("aa-BB-cc", FilterTestHelpers.ApplyToFileName(f, "aa-bb-cc"));
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace Mfr.Tests.Models.Filters
         {
             var scope = new TokenApplyScope(Separator: "--", TokenNumber: 2);
             var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
-            Assert.Equal("x--YY--z", FilterTestHelpers.ApplyToPrefix(f, "x--yy--z"));
+            Assert.Equal("x--YY--z", FilterTestHelpers.ApplyToFileName(f, "x--yy--z"));
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Mfr.Tests.Models.Filters
         {
             var scope = new TokenApplyScope(Separator: "-", TokenNumber: 5);
             var f = new LettersCaseFilter(s_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []), scope);
-            Assert.Equal("a-b", FilterTestHelpers.ApplyToPrefix(f, "a-b"));
+            Assert.Equal("a-b", FilterTestHelpers.ApplyToFileName(f, "a-b"));
         }
     }
 }

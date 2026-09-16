@@ -120,13 +120,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
             );
 
             var filter = new FormatterFilter(
-                Target: new FilePrefixTarget(),
+                Target: new FileNameTarget(),
                 Options: new FormatterOptions("<media-audio-bitrate>_<media-duration>")
             );
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("320_0:01:01", item.Preview.Prefix);
+            Assert.Equal("320_0:01:01", item.Preview.FileName);
         }
 
         [Fact]
@@ -144,7 +144,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directory,
-                prefix: prefix,
+                fileName: prefix,
                 extension: extension,
                 fileSize: new FileInfo(fullPath).Length
             );

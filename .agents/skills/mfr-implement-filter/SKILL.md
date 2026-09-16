@@ -16,7 +16,7 @@ For Filter Configuration **option editors** (VM / AXAML / factory / tests), use 
 
 1. **Shape.**
 
-   - **String-target filters (prefix/extension/full today):** `public sealed record YourFilter(...) : StringTargetFilter(Target)` in **`Mfr.Filters`** (same as most built-ins; `StringTargetFilter` is in the **`Mfr.Filters`** namespace).
+   - **String-target filters (file name/extension/full today):** `public sealed record YourFilter(...) : StringTargetFilter(Target)` in **`Mfr.Filters`** (same as most built-ins; `StringTargetFilter` is in the **`Mfr.Filters`** namespace).
    - **Other targets** (attributes, future ID3, etc.): `public sealed record YourFilter(...) : BaseFilter(Target)` and `protected internal override void ApplyCore(RenameItem item)`.
 
 1. **`Type`.** `public override string Type => "YourFilterType";` — string must match the JSON `type` discriminator **exactly**. Preset polymorphism registers that string from `FilterCatalog` (no separate `PresetJsonOptions` edit).
@@ -29,7 +29,7 @@ For Filter Configuration **option editors** (VM / AXAML / factory / tests), use 
 
    | `targetType` value | Fields                                         | Addresses                                                                            |
    | ------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------ |
-   | `FilePrefix`       | (none)                                         | Prefix (name without extension)                                                      |
+   | `FileName`         | (none)                                         | File name without extension (`FileMeta.FileName`)                                    |
    | `FileExtension`    | (none)                                         | Extension without leading dot                                                        |
    | `FileFullName`     | (none)                                         | Full file name (`FileMeta.FullFileName`); writes parse via `Path.GetFileName` rules  |
    | `AncestorFolder`   | `level`: positive integer                      | Single ancestor segment name vs preview directory                                    |
@@ -44,7 +44,7 @@ For Filter Configuration **option editors** (VM / AXAML / factory / tests), use 
 
 ## Tests
 
-Add `Mfr.Tests/Models/Filters/<Group>/YourFilterTests.cs`. Use `FilterTestHelpers.ApplyToPrefix`, `ApplyReturnItem`, and/or `CreateRenameItem` + `filter.Setup()` + `filter.Apply(item)`. Mirror edge cases and cross-filter ordering when relevant.
+Add `Mfr.Tests/Models/Filters/<Group>/YourFilterTests.cs`. Use `FilterTestHelpers.ApplyToFileName`, `ApplyReturnItem`, and/or `CreateRenameItem` + `filter.Setup()` + `filter.Apply(item)`. Mirror edge cases and cross-filter ordering when relevant.
 
 ## Docs
 

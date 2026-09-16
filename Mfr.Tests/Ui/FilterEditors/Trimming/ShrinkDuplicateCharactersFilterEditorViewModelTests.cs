@@ -40,7 +40,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Trimming
             var step = new FilterChainStepViewModel(
                 "Shrink Duplicate Characters",
                 new ShrinkDuplicateCharactersFilter(
-                    new FilePrefixTarget(),
+                    new FileNameTarget(),
                     new ShrinkDuplicateCharactersOptions(Character: '\0')
                 )
             );

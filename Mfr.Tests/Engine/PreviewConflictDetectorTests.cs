@@ -167,7 +167,7 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
-                prefix: prefix,
+                fileName: prefix,
                 extension: extension,
                 attributes: FileAttributes.Normal
             );
@@ -181,7 +181,7 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
-                prefix: folderName,
+                fileName: folderName,
                 extension: string.Empty,
                 attributes: FileAttributes.Directory
             );
@@ -199,7 +199,7 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
-                prefix: prefix,
+                fileName: prefix,
                 extension: extension,
                 attributes: attributes
             );
@@ -210,7 +210,7 @@ namespace Mfr.Tests.Engine
         private static void _RetargetPreview(RenameItem item, string directoryPath, string fileName)
         {
             item.Preview.DirectoryPath = directoryPath;
-            item.Preview.Prefix = Path.GetFileNameWithoutExtension(fileName);
+            item.Preview.FileName = Path.GetFileNameWithoutExtension(fileName);
             item.Preview.Extension = FileMeta.ExtensionWithoutDot(fileName);
         }
     }

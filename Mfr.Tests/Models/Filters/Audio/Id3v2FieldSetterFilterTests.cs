@@ -123,7 +123,7 @@ namespace Mfr.Tests.Models.Filters.Audio
         [Fact]
         public void Apply_TextWithFormatToken_Expands()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "MySong");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "MySong");
             var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(FrameId: "TIT2", Text: "<file-name>"));
 
             filter.Setup();
@@ -208,7 +208,7 @@ namespace Mfr.Tests.Models.Filters.Audio
             typed.Setup();
 
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "P",
+                fileName: "P",
                 configureOriginal: m =>
                 {
                     m.AudioTagOverlay = new AudioTagOverlay

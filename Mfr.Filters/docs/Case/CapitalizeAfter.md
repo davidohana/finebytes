@@ -24,7 +24,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "CapitalizeAfter",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "capitalizeAfterChars": ",!()[]{};-"

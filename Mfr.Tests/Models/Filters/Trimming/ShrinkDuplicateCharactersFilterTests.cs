@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
     /// </summary>
     public class ShrinkDuplicateCharactersFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies adjacent duplicate occurrences of the configured character collapse to one.
@@ -21,8 +21,8 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new ShrinkDuplicateCharactersOptions(Character: '-')
             );
 
-            Assert.Equal("I am Kloot - To You", FilterTestHelpers.ApplyToPrefix(filter, "I am Kloot --- To You"));
-            Assert.Equal("a-b-c", FilterTestHelpers.ApplyToPrefix(filter, "a--b---c"));
+            Assert.Equal("I am Kloot - To You", FilterTestHelpers.ApplyToFileName(filter, "I am Kloot --- To You"));
+            Assert.Equal("a-b-c", FilterTestHelpers.ApplyToFileName(filter, "a--b---c"));
         }
 
         /// <summary>
@@ -36,8 +36,8 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new ShrinkDuplicateCharactersOptions(Character: '>')
             );
 
-            Assert.Equal("a>b>c", FilterTestHelpers.ApplyToPrefix(filter, "a>>b>>>c"));
-            Assert.Equal(">a>b>", FilterTestHelpers.ApplyToPrefix(filter, ">>>a>>>b>>>"));
+            Assert.Equal("a>b>c", FilterTestHelpers.ApplyToFileName(filter, "a>>b>>>c"));
+            Assert.Equal(">a>b>", FilterTestHelpers.ApplyToFileName(filter, ">>>a>>>b>>>"));
         }
 
         /// <summary>
@@ -50,13 +50,13 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 _target,
                 new ShrinkDuplicateCharactersOptions(Character: '.')
             );
-            Assert.Equal("a.b.c", FilterTestHelpers.ApplyToPrefix(dot, "a...b..c"));
+            Assert.Equal("a.b.c", FilterTestHelpers.ApplyToFileName(dot, "a...b..c"));
 
             var star = new ShrinkDuplicateCharactersFilter(
                 _target,
                 new ShrinkDuplicateCharactersOptions(Character: '*')
             );
-            Assert.Equal("a*b*", FilterTestHelpers.ApplyToPrefix(star, "a***b**"));
+            Assert.Equal("a*b*", FilterTestHelpers.ApplyToFileName(star, "a***b**"));
         }
 
         /// <summary>
@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new ShrinkDuplicateCharactersOptions(Character: '-')
             );
 
-            Assert.Equal("", FilterTestHelpers.ApplyToPrefix(filter, ""));
+            Assert.Equal("", FilterTestHelpers.ApplyToFileName(filter, ""));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new ShrinkDuplicateCharactersOptions(Character: '-')
             );
 
-            Assert.Equal("abc def", FilterTestHelpers.ApplyToPrefix(filter, "abc def"));
+            Assert.Equal("abc def", FilterTestHelpers.ApplyToFileName(filter, "abc def"));
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 new ShrinkDuplicateCharactersOptions(Character: '\0')
             );
 
-            Assert.Equal("a---b", FilterTestHelpers.ApplyToPrefix(filter, "a---b"));
+            Assert.Equal("a---b", FilterTestHelpers.ApplyToFileName(filter, "a---b"));
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
             var typed = Assert.IsType<ShrinkDuplicateCharactersFilter>(filter);
 
             Assert.Equal('.', typed.Options.Character);
-            Assert.Equal("a.b", FilterTestHelpers.ApplyToPrefix(typed, "a...b"));
+            Assert.Equal("a.b", FilterTestHelpers.ApplyToFileName(typed, "a...b"));
         }
 
         /// <summary>
@@ -133,7 +133,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
                 {
                   "type": "ShrinkDuplicateCharacters",
                   "target": {
-                    "targetType": "FilePrefix"
+                    "targetType": "FileName"
                   },
                   "options": {
                     "character": {{characterJson}}

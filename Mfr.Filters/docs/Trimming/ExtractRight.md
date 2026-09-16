@@ -26,7 +26,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "ExtractRight",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "count": 3

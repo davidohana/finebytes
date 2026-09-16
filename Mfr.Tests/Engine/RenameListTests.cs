@@ -82,7 +82,7 @@ namespace Mfr.Tests.Engine
                 entries.Skip(1).Select(e => e.Original.FullPath).OrderBy(path => path, StringComparer.Ordinal).ToArray()
             );
             Assert.Equal([0, 1, 2], entries.Select(e => e.Original.RenameListIndex));
-            Assert.Equal("beta", entries[0].Original.Prefix);
+            Assert.Equal("beta", entries[0].Original.FileName);
             Assert.Equal("log", entries[0].Original.Extension);
             Assert.All(entries, e => Assert.Equal(_tempRoot, e.Original.DirectoryPath));
         }
@@ -581,7 +581,7 @@ namespace Mfr.Tests.Engine
             renameList.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])
@@ -610,7 +610,7 @@ namespace Mfr.Tests.Engine
             renameList.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])
@@ -637,7 +637,7 @@ namespace Mfr.Tests.Engine
             renameList.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])
@@ -667,7 +667,7 @@ namespace Mfr.Tests.Engine
             renameList.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])
@@ -706,7 +706,7 @@ namespace Mfr.Tests.Engine
             renameList.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])
@@ -990,7 +990,7 @@ namespace Mfr.Tests.Engine
 
             var entry = Assert.Single(renameList.RenameItems);
             Assert.Equal(folderPath, entry.Original.FullPath);
-            Assert.Equal("release.v2", entry.Original.Prefix);
+            Assert.Equal("release.v2", entry.Original.FileName);
             Assert.Empty(entry.Original.Extension);
             Assert.Equal(_tempRoot, entry.Original.DirectoryPath);
         }
@@ -1630,7 +1630,7 @@ namespace Mfr.Tests.Engine
             renameList.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ]),

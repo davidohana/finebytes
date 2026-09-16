@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.RenameList
                         renameListIndex: 0,
                         inFolderIndex: 0,
                         directoryPath: dir,
-                        prefix: "PLAYLIST",
+                        fileName: "PLAYLIST",
                         extension: "M3U",
                         fileSize: new FileInfo(path).Length
                     )

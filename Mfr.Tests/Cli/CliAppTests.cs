@@ -66,7 +66,7 @@ namespace Mfr.Tests.Cli
                     Description = null,
                     Chain = FilterChain.CreateAllEnabled([
                         new CounterFilter(
-                            Target: new FilePrefixTarget(),
+                            Target: new FileNameTarget(),
                             Options: new CounterOptions(
                                 Start: 1,
                                 Step: 1,

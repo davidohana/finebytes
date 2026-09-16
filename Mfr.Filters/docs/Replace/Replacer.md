@@ -68,7 +68,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "Replacer",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "find": "a",

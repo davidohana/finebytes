@@ -31,7 +31,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "TrimBetween",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "start": { "value": 13, "anchor": "Left" },

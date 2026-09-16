@@ -28,7 +28,7 @@ With **`onlyWhenNextIsLetterOrDigit`** **true**, insertion happens only when the
 {
   "type": "SpaceAfter",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "afterChars": ",;!",

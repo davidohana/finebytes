@@ -28,7 +28,7 @@ namespace Mfr.Models.Rename
 
             return target switch
             {
-                FilePrefixTarget => meta.Prefix,
+                FileNameTarget => meta.FileName,
                 FileExtensionTarget => meta.Extension,
                 FileFullNameTarget => meta.FullFileName,
                 FullPathTarget => meta.FullPath,
@@ -67,8 +67,8 @@ namespace Mfr.Models.Rename
 
             switch (target)
             {
-                case FilePrefixTarget:
-                    meta.Prefix = value;
+                case FileNameTarget:
+                    meta.FileName = value;
                     return;
                 case FileExtensionTarget:
                     meta.Extension = value;
@@ -100,7 +100,7 @@ namespace Mfr.Models.Rename
         {
             var fullName = Path.GetFileName(fullValue);
             meta.Extension = FileMeta.ExtensionWithoutDot(fullName);
-            meta.Prefix = Path.GetFileNameWithoutExtension(fullName);
+            meta.FileName = Path.GetFileNameWithoutExtension(fullName);
         }
 
         /// <summary>
@@ -114,7 +114,7 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
-        /// Replaces directory path, prefix, and extension from a fully qualified file path string.
+        /// Replaces directory path, file name, and extension from a fully qualified file path string.
         /// </summary>
         /// <param name="meta">Metadata snapshot to mutate.</param>
         /// <param name="value">New absolute path including file name.</param>
@@ -157,7 +157,7 @@ namespace Mfr.Models.Rename
 
             meta.DirectoryPath = directory;
             meta.Extension = FileMeta.ExtensionWithoutDot(fileName);
-            meta.Prefix = Path.GetFileNameWithoutExtension(fileName);
+            meta.FileName = Path.GetFileNameWithoutExtension(fileName);
         }
 
         /// <summary>

@@ -34,8 +34,8 @@ namespace Mfr.Tests.Ui.FormatEditor
         {
             var items = new[]
             {
-                FilterTestHelpers.CreateRenameItem(prefix: "alpha", extension: "mp3"),
-                FilterTestHelpers.CreateRenameItem(prefix: "beta", extension: "wav", renameListIndex: 1),
+                FilterTestHelpers.CreateRenameItem(fileName: "alpha", extension: "mp3"),
+                FilterTestHelpers.CreateRenameItem(fileName: "beta", extension: "wav", renameListIndex: 1),
             };
             var preview = new FormatTokenPreviewViewModel(items);
             preview.Refresh("<file-name>");
@@ -64,7 +64,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         [Fact]
         public void Refresh_ReevaluatesResult()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track", extension: "mp3");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "track", extension: "mp3");
             var preview = new FormatTokenPreviewViewModel([item]);
             preview.Refresh("<file-name>");
             Assert.Equal("track", preview.PreviewResult);

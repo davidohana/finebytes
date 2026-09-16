@@ -32,11 +32,11 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: dir,
-                prefix: "a",
+                fileName: "a",
                 extension: "txt"
             );
             var item = new RenameItem(meta) { Status = RenameStatus.PreviewOk };
-            item.Preview.Prefix = "b";
+            item.Preview.FileName = "b";
 
             var tempPath = RenameItemMover.AllocateTempPath(item.Original.FullPath);
             var plan = new CommitPlan(
@@ -84,20 +84,20 @@ namespace Mfr.Tests.Engine
             File.WriteAllText(pathB, "b");
 
             var itemA = new RenameItem(
-                new FileMeta(renameListIndex: 0, inFolderIndex: 0, directoryPath: dir, prefix: "a", extension: "txt")
+                new FileMeta(renameListIndex: 0, inFolderIndex: 0, directoryPath: dir, fileName: "a", extension: "txt")
             )
             {
                 Status = RenameStatus.PreviewOk,
             };
-            itemA.Preview.Prefix = "b";
+            itemA.Preview.FileName = "b";
 
             var itemB = new RenameItem(
-                new FileMeta(renameListIndex: 1, inFolderIndex: 1, directoryPath: dir, prefix: "b", extension: "txt")
+                new FileMeta(renameListIndex: 1, inFolderIndex: 1, directoryPath: dir, fileName: "b", extension: "txt")
             )
             {
                 Status = RenameStatus.PreviewOk,
             };
-            itemB.Preview.Prefix = "a";
+            itemB.Preview.FileName = "a";
 
             var tempPath = RenameItemMover.AllocateTempPath(itemA.Original.FullPath);
             var plan = new CommitPlan(
@@ -150,11 +150,11 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: dir,
-                prefix: "a",
+                fileName: "a",
                 extension: "txt"
             );
             var item = new RenameItem(meta) { Status = RenameStatus.PreviewOk };
-            item.Preview.Prefix = "b";
+            item.Preview.FileName = "b";
 
             var tempPath = RenameItemMover.AllocateTempPath(item.Original.FullPath);
             var plan = new CommitPlan(

@@ -9,7 +9,7 @@ namespace Mfr.Models.Rename
     /// <param name="renameListIndex">Zero-based index across all scanned files.</param>
     /// <param name="inFolderIndex">Zero-based index within the parent folder.</param>
     /// <param name="directoryPath">Absolute path to the parent directory.</param>
-    /// <param name="prefix">File name without extension.</param>
+    /// <param name="fileName">File name without extension.</param>
     /// <param name="extension">File extension without the leading dot.</param>
     /// <param name="attributes">Filesystem attributes for this entry.</param>
     /// <param name="creationTime">File creation time (local), from scan or synthetic tests.</param>
@@ -22,7 +22,7 @@ namespace Mfr.Models.Rename
         int renameListIndex,
         int inFolderIndex,
         string directoryPath,
-        string prefix,
+        string fileName,
         string extension,
         FileAttributes attributes = FileAttributes.Normal,
         DateTime creationTime = default,
@@ -49,9 +49,9 @@ namespace Mfr.Models.Rename
         public string FullPath => Path.Combine(DirectoryPath, FullFileName);
 
         /// <summary>
-        /// Gets the file name including extension (<see cref="Prefix"/>, a separator dot when needed, and <see cref="Extension"/>).
+        /// Gets the file name including extension (<see cref="FileName"/>, a separator dot when needed, and <see cref="Extension"/>).
         /// </summary>
-        public string FullFileName => Extension.Length == 0 ? Prefix : Prefix + "." + Extension;
+        public string FullFileName => Extension.Length == 0 ? FileName : FileName + "." + Extension;
 
         /// <summary>
         /// Gets or sets the absolute parent directory path.
@@ -61,7 +61,7 @@ namespace Mfr.Models.Rename
         /// <summary>
         /// Gets or sets the file name without extension.
         /// </summary>
-        public string Prefix { get; set; } = prefix;
+        public string FileName { get; set; } = fileName;
 
         /// <summary>
         /// Gets or sets the file extension without the leading dot.
@@ -180,7 +180,7 @@ namespace Mfr.Models.Rename
                 renameListIndex: RenameListIndex,
                 inFolderIndex: InFolderIndex,
                 directoryPath: DirectoryPath,
-                prefix: Prefix,
+                fileName: FileName,
                 extension: Extension,
                 attributes: Attributes,
                 creationTime: CreationTime,

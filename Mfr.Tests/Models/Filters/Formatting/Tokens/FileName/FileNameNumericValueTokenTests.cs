@@ -20,7 +20,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_FullNameWithDigits_ReturnsFirstNumber(string prefix, string expected)
         {
             var token = new FileNameNumericValueToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: prefix);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: prefix);
 
             Assert.Equal(expected, token.Compile(tokenArgs: "")(item));
             Assert.Contains("file-name-numeric-value", token.Names);
@@ -39,7 +39,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         )
         {
             var token = new FileNameNumericValueToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: prefix, extension: extension);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: prefix, extension: extension);
 
             Assert.Equal(expected, token.Compile(tokenArgs: "")(item));
         }
@@ -55,7 +55,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_FullNameWithoutDigits_ReturnsZero(string prefix, string extension)
         {
             var token = new FileNameNumericValueToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: prefix, extension: extension);
+            var item = FilterTestHelpers.CreateRenameItem(fileName: prefix, extension: extension);
 
             Assert.Equal("0", token.Compile(tokenArgs: "")(item));
         }
@@ -67,11 +67,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_UsesPreviewNotOriginal()
         {
             var token = new FileNameNumericValueToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "track01");
-            item.Preview.Prefix = "chapter07";
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "track01");
+            item.Preview.FileName = "chapter07";
 
             Assert.Equal("7", token.Compile(tokenArgs: "")(item));
-            Assert.Equal("track01", item.Original.Prefix);
+            Assert.Equal("track01", item.Original.FileName);
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         public void Resolve_ElevenDigitRun_UsesFirstTenDigits()
         {
             var token = new FileNameNumericValueToken();
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "12345678901");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "12345678901");
 
             Assert.Equal("1234567890", token.Compile(tokenArgs: "")(item));
         }

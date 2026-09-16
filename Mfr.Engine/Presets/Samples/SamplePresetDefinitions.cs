@@ -18,7 +18,7 @@ namespace Mfr.Engine.Presets.Samples
     /// </summary>
     internal static class SamplePresetDefinitions
     {
-        private static readonly FilePrefixTarget FilePrefix = new();
+        private static readonly FileNameTarget FileName = new();
 
         /// <summary>
         /// Builds the locked 15-sample catalog (unsorted).
@@ -55,7 +55,7 @@ namespace Mfr.Engine.Presets.Samples
                 chain: _Chain(
                     _On(
                         new SpaceCharacterFilter(
-                            FilePrefix,
+                            FileName,
                             new SpaceCharacterOptions(
                                 ' ',
                                 [
@@ -67,22 +67,22 @@ namespace Mfr.Engine.Presets.Samples
                     ),
                     _On(
                         new SpaceAroundFilter(
-                            FilePrefix,
+                            FileName,
                             new SpaceAroundOptions(AroundChars: "-", OnlyWhenNeighboringAreLettersOrDigits: true)
                         )
                     ),
                     _On(
                         new SpaceAfterFilter(
-                            FilePrefix,
+                            FileName,
                             new SpaceAfterOptions(AfterChars: ",;!", OnlyWhenNextIsLetterOrDigit: true)
                         )
                     ),
-                    _On(new ShrinkSpacesFilter(FilePrefix)),
-                    _On(new StripSpacesRightFilter(FilePrefix)),
-                    _On(new StripSpacesLeftFilter(FilePrefix)),
+                    _On(new ShrinkSpacesFilter(FileName)),
+                    _On(new StripSpacesRightFilter(FileName)),
+                    _On(new StripSpacesLeftFilter(FileName)),
                     _On(
                         new LettersCaseFilter(
-                            FilePrefix,
+                            FileName,
                             new LettersCaseOptions(
                                 LettersCaseMode.Capitalize,
                                 LettersCaseOptions.DefaultCapitalizeSkipWords
@@ -91,14 +91,14 @@ namespace Mfr.Engine.Presets.Samples
                     ),
                     _On(
                         new CapitalizeAfterFilter(
-                            FilePrefix,
+                            FileName,
                             new CapitalizeAfterOptions(CapitalizeAfterChars: ",!()[]{};-")
                         )
                     ),
-                    _On(new UppercaseInitialsFilter(FilePrefix)),
+                    _On(new UppercaseInitialsFilter(FileName)),
                     _On(
                         new CasingListFilter(
-                            FilePrefix,
+                            FileName,
                             new CasingListOptions(
                                 Words: LettersCaseOptions.DefaultCapitalizeSkipWords,
                                 UppercaseSentenceInitial: true
@@ -125,7 +125,7 @@ namespace Mfr.Engine.Presets.Samples
                 chain: _Chain(
                     _On(
                         new CounterFilter(
-                            FilePrefix,
+                            FileName,
                             new CounterOptions(
                                 Start: 1,
                                 Step: 1,
@@ -211,10 +211,10 @@ namespace Mfr.Engine.Presets.Samples
                 name: "Audio: Artist - Track - Title",
                 description: "Set track titles for MP3 files from ID3 tag.\nFormat: Artist - Track Number - Track Title.mp3",
                 chain: _Chain(
-                    _On(new FormatterFilter(FilePrefix, new FormatterOptions("<audio-track>")), "Track Number"),
+                    _On(new FormatterFilter(FileName, new FormatterOptions("<audio-track>")), "Track Number"),
                     _On(
                         new FixLeadingZerosFilter(
-                            FilePrefix,
+                            FileName,
                             new FixLeadingZerosOptions(
                                 Width: 2,
                                 RemoveExtraZeros: true,
@@ -226,7 +226,7 @@ namespace Mfr.Engine.Presets.Samples
                     ),
                     _On(
                         new InserterFilter(
-                            FilePrefix,
+                            FileName,
                             new InserterOptions(
                                 Text: " - <audio-title>",
                                 Position: 1,
@@ -238,7 +238,7 @@ namespace Mfr.Engine.Presets.Samples
                     ),
                     _On(
                         new InserterFilter(
-                            FilePrefix,
+                            FileName,
                             new InserterOptions(
                                 Text: "<audio-artist> - ",
                                 Position: 1,
@@ -271,7 +271,7 @@ namespace Mfr.Engine.Presets.Samples
                 chain: _Chain(
                     _On(
                         new FormatterFilter(
-                            FilePrefix,
+                            FileName,
                             new FormatterOptions("<exif-date:yyyy-MM-dd HH-mm-ss> - <file-name>")
                         )
                     )
@@ -296,7 +296,7 @@ namespace Mfr.Engine.Presets.Samples
                 chain: _Chain(
                     _On(
                         new FormatterFilter(
-                            FilePrefix,
+                            FileName,
                             new FormatterOptions(
                                 "PIC_<exif-date:yyyy-MM-dd_HH-mm-ss>_[<counter:initial=1,step=1,padding=auto,length=2,resetScope=perFolder>]_<exif-make>_<exif-model>"
                             )
@@ -325,7 +325,7 @@ namespace Mfr.Engine.Presets.Samples
                 chain: _Chain(
                     _On(
                         new FormatterFilter(
-                            FilePrefix,
+                            FileName,
                             new FormatterOptions(
                                 "<counter:initial=1,step=1,padding=fixed,length=2,resetScope=global>.<image-width>x<image-height>.<image-format>.<image-bit-depth>bpp.<image-horz-res>dpi"
                             )
@@ -356,7 +356,7 @@ namespace Mfr.Engine.Presets.Samples
                 chain: _Chain(
                     _On(
                         new FormatterFilter(
-                            FilePrefix,
+                            FileName,
                             new FormatterOptions("<parent-folder:3>.<parent-folder:2>.<parent-folder:1>.<file-name>")
                         )
                     ),
@@ -464,7 +464,7 @@ namespace Mfr.Engine.Presets.Samples
                 chain: _Chain(
                     _On(
                         new TokenMoverFilter(
-                            FilePrefix,
+                            FileName,
                             new TokenMoverOptions(Delimiter: " - ", TokenNumber: 2, MoveBy: -1)
                         )
                     )
@@ -488,7 +488,7 @@ namespace Mfr.Engine.Presets.Samples
                 chain: _Chain(
                     _On(
                         new ReplacerFilter(
-                            FilePrefix,
+                            FileName,
                             new ReplacerOptions(
                                 Find: @"[\\/:*?""<>|]",
                                 Replacement: "-",
@@ -521,21 +521,21 @@ namespace Mfr.Engine.Presets.Samples
                 chain: _Chain(
                     _On(
                         new StripParenthesesFilter(
-                            FilePrefix,
+                            FileName,
                             new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
                         ),
                         "Strip Round Parentheses"
                     ),
                     _On(
                         new StripParenthesesFilter(
-                            FilePrefix,
+                            FileName,
                             new StripParenthesesOptions(Type: ParenthesisType.Square, RemoveContents: true)
                         ),
                         "Strip Square Brackets"
                     ),
-                    _On(new ShrinkSpacesFilter(FilePrefix)),
-                    _On(new StripSpacesRightFilter(FilePrefix)),
-                    _On(new StripSpacesLeftFilter(FilePrefix))
+                    _On(new ShrinkSpacesFilter(FileName)),
+                    _On(new StripSpacesRightFilter(FileName)),
+                    _On(new StripSpacesLeftFilter(FileName))
                 ),
                 columns:
                 [
@@ -553,9 +553,7 @@ namespace Mfr.Engine.Presets.Samples
                 id: "10000000-0000-4000-8000-000000000013",
                 name: "Audio: Year - Title from Tags",
                 description: "Set the name from audio tags as Year - Title.",
-                chain: _Chain(
-                    _On(new FormatterFilter(FilePrefix, new FormatterOptions("<audio-year> - <audio-title>")))
-                ),
+                chain: _Chain(_On(new FormatterFilter(FileName, new FormatterOptions("<audio-year> - <audio-title>")))),
                 columns:
                 [
                     _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),

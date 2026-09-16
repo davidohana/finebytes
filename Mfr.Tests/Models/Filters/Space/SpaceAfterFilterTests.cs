@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public sealed class SpaceAfterFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         private static SpaceAfterFilter _CreateFilter(string afterChars, bool onlyWhenNextIsLetterOrDigit = false)
         {
@@ -24,9 +24,9 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_OnlyWhenNextIsLetterOrDigit_MatchesSpecExamples()
         {
             var f = _CreateFilter(",;!", onlyWhenNextIsLetterOrDigit: true);
-            Assert.Equal("one, two, three", FilterTestHelpers.ApplyToPrefix(f, "one,two,three"));
-            Assert.Equal("one, two, three", FilterTestHelpers.ApplyToPrefix(f, "one, two,three"));
-            Assert.Equal("Blaaa! blaaa!!", FilterTestHelpers.ApplyToPrefix(f, "Blaaa!blaaa!!"));
+            Assert.Equal("one, two, three", FilterTestHelpers.ApplyToFileName(f, "one,two,three"));
+            Assert.Equal("one, two, three", FilterTestHelpers.ApplyToFileName(f, "one, two,three"));
+            Assert.Equal("Blaaa! blaaa!!", FilterTestHelpers.ApplyToFileName(f, "Blaaa!blaaa!!"));
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_SkipsWhenSeparatorAlreadyPresent()
         {
             var f = _CreateFilter(",", onlyWhenNextIsLetterOrDigit: true);
-            Assert.Equal("one, two", FilterTestHelpers.ApplyToPrefix(f, "one, two"));
+            Assert.Equal("one, two", FilterTestHelpers.ApplyToFileName(f, "one, two"));
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_EmptyAfterChars_IsNoOp()
         {
             var f = _CreateFilter("");
-            Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(f, "a,b"));
+            Assert.Equal("a,b", FilterTestHelpers.ApplyToFileName(f, "a,b"));
         }
 
         /// <summary>
@@ -56,8 +56,8 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_WhenNotConditional_InsertsBeforeAnyFollowingCharacter()
         {
             var f = _CreateFilter("!", onlyWhenNextIsLetterOrDigit: false);
-            Assert.Equal("hi! there", FilterTestHelpers.ApplyToPrefix(f, "hi!there"));
-            Assert.Equal("x! y", FilterTestHelpers.ApplyToPrefix(f, "x!y"));
+            Assert.Equal("hi! there", FilterTestHelpers.ApplyToFileName(f, "hi!there"));
+            Assert.Equal("x! y", FilterTestHelpers.ApplyToFileName(f, "x!y"));
         }
 
         /// <summary>
@@ -71,12 +71,12 @@ namespace Mfr.Tests.Models.Filters.Space
                 new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
             var afterFilter = _CreateFilter(",", onlyWhenNextIsLetterOrDigit: true);
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "x,y");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "x,y");
             spaceFilter.Setup();
             afterFilter.Setup();
             spaceFilter.Apply(item);
             afterFilter.Apply(item);
-            Assert.Equal("x,_y", item.Preview.Prefix);
+            Assert.Equal("x,_y", item.Preview.FileName);
         }
 
         /// <summary>
@@ -89,7 +89,7 @@ namespace Mfr.Tests.Models.Filters.Space
             filter.Setup();
 
             var cleared = filter with { Options = filter.Options with { AfterChars = "" } };
-            Assert.Equal("a,b", FilterTestHelpers.ApplyToPrefix(cleared, "a,b"));
+            Assert.Equal("a,b", FilterTestHelpers.ApplyToFileName(cleared, "a,b"));
         }
     }
 }

@@ -30,11 +30,11 @@ namespace Mfr.Filters.Misc
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, width 2, first number only, whole-word).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, width 2, first number only, whole-word).
         /// </summary>
         public FixLeadingZerosFilter()
             : this(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new FixLeadingZerosOptions(Width: 2, RemoveExtraZeros: false, MaxCount: 1, WholeWordOnly: true)
             ) { }
 

@@ -5,7 +5,7 @@ namespace Mfr.Filters
     /// <summary>
     /// Filter that transforms one string-valued preview field identified by <see cref="FilterTarget"/>.
     /// </summary>
-    /// <param name="Target">Polymorphic target (for example <see cref="FilePrefixTarget"/>).</param>
+    /// <param name="Target">Polymorphic target (for example <see cref="FileNameTarget"/>).</param>
     /// <param name="ApplyScope">When non-null, only that substring or token is transformed; result is spliced back into the full target.</param>
     public abstract record StringTargetFilter(
         FilterTarget Target,

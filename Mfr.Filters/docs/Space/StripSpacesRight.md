@@ -19,7 +19,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "StripSpacesRight",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   }
 }
 ```

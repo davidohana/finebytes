@@ -49,7 +49,7 @@ namespace Mfr.Tests.Engine
             var fileItem = renameList.RenameItems.Single(item => item.Original.FullPath == oldFilePath);
 
             // Two literal replacers in a single chain: rename folder (prefix "Album" -> "AlbumRenamed")
-            // and rename file (prefix "track" -> "song"). Both target FilePrefixTarget so each item's
+            // and rename file (prefix "track" -> "song"). Both target FileNameTarget so each item's
             // matching prefix is independently rewritten without affecting the other.
             var preset = _CreatePresetAllEnabled(
                 "folder-and-child",
@@ -209,7 +209,7 @@ namespace Mfr.Tests.Engine
             var result = renameList.Commit(plan, failFast: false);
             Assert.Single(result);
             Assert.Equal(RenameStatus.CommitOk, result[0].Status);
-            Assert.Contains(result[0].Changes, c => c.Property == "Prefix");
+            Assert.Contains(result[0].Changes, c => c.Property == "FileName");
 
             var enumeratedNames = Directory.EnumerateFiles(dir).Select(Path.GetFileName).ToList();
             Assert.Contains("TRACK.mp3", enumeratedNames);
@@ -316,7 +316,7 @@ namespace Mfr.Tests.Engine
         private static ReplacerFilter _LiteralPrefixReplacer(string find, string replacement)
         {
             return new ReplacerFilter(
-                Target: new FilePrefixTarget(),
+                Target: new FileNameTarget(),
                 Options: new ReplacerOptions(
                     Find: find,
                     Replacement: replacement,

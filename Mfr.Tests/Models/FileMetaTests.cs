@@ -13,13 +13,13 @@ namespace Mfr.Tests.Models
         [InlineData("track", "", "track")]
         [InlineData("", "txt", ".txt")]
         [InlineData("", "", "")]
-        public void FullFileName_composes_prefix_and_extension(string prefix, string extension, string expected)
+        public void FullFileName_composes_file_name_and_extension(string fileName, string extension, string expected)
         {
             var meta = new FileMeta(
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: TestPaths.Absolute("album"),
-                prefix: prefix,
+                fileName: fileName,
                 extension: extension
             );
 
@@ -48,7 +48,7 @@ namespace Mfr.Tests.Models
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: TestPaths.Absolute("old"),
-                prefix: "old",
+                fileName: "old",
                 extension: "bak"
             );
 
@@ -56,7 +56,7 @@ namespace Mfr.Tests.Models
             meta.SetFromAbsoluteFullPath(next);
 
             Assert.Equal(TestPaths.Absolute("album"), meta.DirectoryPath);
-            Assert.Equal("track", meta.Prefix);
+            Assert.Equal("track", meta.FileName);
             Assert.Equal("mp3", meta.Extension);
         }
 
@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: TestPaths.Absolute("album"),
-                prefix: "track",
+                fileName: "track",
                 extension: "mp3"
             );
 
@@ -89,7 +89,7 @@ namespace Mfr.Tests.Models
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: TestPaths.Absolute("album"),
-                prefix: "track",
+                fileName: "track",
                 extension: "mp3"
             );
 
@@ -107,7 +107,7 @@ namespace Mfr.Tests.Models
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: TestPaths.Absolute("old"),
-                prefix: "track",
+                fileName: "track",
                 extension: "mp3"
             );
 
@@ -115,7 +115,7 @@ namespace Mfr.Tests.Models
             meta.SetAbsoluteDirectoryPath(next);
 
             Assert.Equal(next, meta.DirectoryPath);
-            Assert.Equal("track", meta.Prefix);
+            Assert.Equal("track", meta.FileName);
         }
     }
 }

@@ -39,11 +39,11 @@ namespace Mfr.Filters.Replace
         private List<(Regex? Search, Formatter CompiledReplacement)> _compiledEntries = [];
 
         /// <summary>
-        /// Creates a filter with add-to-list defaults (file prefix, empty list, replace all, whole word).
+        /// Creates a filter with add-to-list defaults (file name, empty list, replace all, whole word).
         /// </summary>
         public ReplaceListFilter()
             : this(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new ReplaceListOptions(Entries: [], Match: ReplacerMatchOptions.ForReplaceList)
             ) { }
 

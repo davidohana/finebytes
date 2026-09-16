@@ -27,10 +27,10 @@ namespace Mfr.Filters.Case
 #pragma warning restore SYSLIB1045
 
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix target).
+        /// Creates a filter with MFR7 add-to-list defaults (file name target).
         /// </summary>
         public UppercaseInitialsFilter()
-            : this(new FilePrefixTarget()) { }
+            : this(new FileNameTarget()) { }
 
         /// <summary>
         /// Gets the filter type discriminator.

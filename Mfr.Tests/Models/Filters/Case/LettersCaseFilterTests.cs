@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Case
     /// </summary>
     public class LettersCaseFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies add-to-list defaults use capitalize mode and common skip words.
@@ -19,7 +19,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var f = new LettersCaseFilter();
             Assert.Equal(LettersCaseMode.Capitalize, f.Options.Mode);
             Assert.Equal(LettersCaseOptions.DefaultCapitalizeSkipWords, f.Options.CapitalizeSkipWords);
-            Assert.Equal("a Song for the World", FilterTestHelpers.ApplyToPrefix(f, "a song for the world"));
+            Assert.Equal("a Song for the World", FilterTestHelpers.ApplyToFileName(f, "a song for the world"));
         }
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_UpperCase_ConvertsToUpperInvariant()
         {
             var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.UpperCase, []));
-            Assert.Equal("HELLO", FilterTestHelpers.ApplyToPrefix(f, "hello"));
+            Assert.Equal("HELLO", FilterTestHelpers.ApplyToFileName(f, "hello"));
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_LowerCase_ConvertsToLowerInvariant()
         {
             var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.LowerCase, []));
-            Assert.Equal("hello", FilterTestHelpers.ApplyToPrefix(f, "HELLO"));
+            Assert.Equal("hello", FilterTestHelpers.ApplyToFileName(f, "HELLO"));
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_FirstLetterUp_UppercasesFirstLetterOnly()
         {
             var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.FirstLetterUp, []));
-            Assert.Equal("Hello world", FilterTestHelpers.ApplyToPrefix(f, "hELLO world"));
+            Assert.Equal("Hello world", FilterTestHelpers.ApplyToFileName(f, "hELLO world"));
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_FirstLetterUp_UsesIndexZero()
         {
             var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.FirstLetterUp, []));
-            Assert.Equal(" 123_abc", FilterTestHelpers.ApplyToPrefix(f, " 123_aBC"));
+            Assert.Equal(" 123_abc", FilterTestHelpers.ApplyToFileName(f, " 123_aBC"));
         }
 
         /// <summary>
@@ -77,7 +77,7 @@ namespace Mfr.Tests.Models.Filters.Case
                     WeirdFixedPlaces: false
                 )
             );
-            Assert.Equal("abc xyz", FilterTestHelpers.ApplyToPrefix(f, "AbC XyZ"));
+            Assert.Equal("abc xyz", FilterTestHelpers.ApplyToFileName(f, "AbC XyZ"));
         }
 
         /// <summary>
@@ -95,7 +95,7 @@ namespace Mfr.Tests.Models.Filters.Case
                     WeirdFixedPlaces: false
                 )
             );
-            Assert.Equal("ABC XYZ", FilterTestHelpers.ApplyToPrefix(f, "AbC XyZ"));
+            Assert.Equal("ABC XYZ", FilterTestHelpers.ApplyToFileName(f, "AbC XyZ"));
         }
 
         /// <summary>
@@ -113,8 +113,8 @@ namespace Mfr.Tests.Models.Filters.Case
                     WeirdFixedPlaces: true
                 )
             );
-            var a = FilterTestHelpers.ApplyToPrefix(f, "abcdefgh", renameListIndex: 0);
-            var b = FilterTestHelpers.ApplyToPrefix(f, "qrstuvwx", renameListIndex: 999);
+            var a = FilterTestHelpers.ApplyToFileName(f, "abcdefgh", renameListIndex: 0);
+            var b = FilterTestHelpers.ApplyToFileName(f, "qrstuvwx", renameListIndex: 999);
 
             Assert.Equal(_BuildUpperMask(a), _BuildUpperMask(b));
         }
@@ -134,8 +134,8 @@ namespace Mfr.Tests.Models.Filters.Case
                     WeirdFixedPlaces: false
                 )
             );
-            var a = FilterTestHelpers.ApplyToPrefix(f, "abcdefgh", renameListIndex: 0);
-            var b = FilterTestHelpers.ApplyToPrefix(f, "abcdefgh", renameListIndex: 999);
+            var a = FilterTestHelpers.ApplyToFileName(f, "abcdefgh", renameListIndex: 0);
+            var b = FilterTestHelpers.ApplyToFileName(f, "abcdefgh", renameListIndex: 999);
 
             Assert.NotEqual(_BuildUpperMask(a), _BuildUpperMask(b));
         }
@@ -157,7 +157,7 @@ namespace Mfr.Tests.Models.Filters.Case
                     WeirdFixedPlaces: false
                 )
             );
-            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "AbC XyZ"));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToFileName(f, "AbC XyZ"));
         }
 
         /// <summary>
@@ -170,7 +170,7 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(LettersCaseMode.Capitalize, ["a", "the", "for"])
             );
-            Assert.Equal("a Song for the World", FilterTestHelpers.ApplyToPrefix(f, "a song for the world"));
+            Assert.Equal("a Song for the World", FilterTestHelpers.ApplyToFileName(f, "a song for the world"));
         }
 
         /// <summary>
@@ -180,7 +180,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SentenceCase_CapitalizesAfterPunctuation()
         {
             var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
-            Assert.Equal("Hello world. Next line.", FilterTestHelpers.ApplyToPrefix(f, "hello world. next line."));
+            Assert.Equal("Hello world. Next line.", FilterTestHelpers.ApplyToFileName(f, "hello world. next line."));
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SentenceCase_CapitalizesNonAsciiLetters()
         {
             var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
-            Assert.Equal("École. Über next.", FilterTestHelpers.ApplyToPrefix(f, "école. über next."));
+            Assert.Equal("École. Über next.", FilterTestHelpers.ApplyToFileName(f, "école. über next."));
         }
 
         /// <summary>
@@ -204,12 +204,12 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, [])
             );
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello: next; again. no");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "hello: next; again. no");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("Hello: Next; Again. no", item.Preview.Prefix);
+            Assert.Equal("Hello: Next; Again. no", item.Preview.FileName);
         }
 
         /// <summary>
@@ -223,12 +223,12 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, [])
             );
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello. next line");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "hello. next line");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("Hello. next line", item.Preview.Prefix);
+            Assert.Equal("Hello. next line", item.Preview.FileName);
         }
 
         /// <summary>
@@ -242,12 +242,12 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, [])
             );
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello world. next line");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "hello world. next line");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, lettersFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("Hello world. Next line", item.Preview.Prefix);
+            Assert.Equal("Hello world. Next line", item.Preview.FileName);
         }
 
         /// <summary>
@@ -264,11 +264,11 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, [])
             );
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello._world._again");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "hello._world._again");
             var chain = FilterChain.CreateAllEnabled([spaceCharFilter, sentenceFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
-            Assert.Equal("Hello._World._Again", item.Preview.Prefix);
+            Assert.Equal("Hello._World._Again", item.Preview.FileName);
         }
 
         /// <summary>
@@ -285,13 +285,13 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(LettersCaseMode.Capitalize, ["the"])
             );
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "__gone__with__the__wind__");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "__gone__with__the__wind__");
 
             var chain = FilterChain.CreateAllEnabled([spaceCharFilter, capitalizeFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("__Gone__With__the__Wind__", item.Preview.Prefix);
+            Assert.Equal("__Gone__With__the__Wind__", item.Preview.FileName);
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_SentenceCase_SkipsLeadingNonLetters()
         {
             var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.SentenceCase, []));
-            Assert.Equal("03 - Hello. Next", FilterTestHelpers.ApplyToPrefix(f, "03 - hello. next"));
+            Assert.Equal("03 - Hello. Next", FilterTestHelpers.ApplyToFileName(f, "03 - hello. next"));
         }
 
         /// <summary>
@@ -318,13 +318,13 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, [])
             );
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello.__world!___again?__done");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "hello.__world!___again?__done");
 
             var chain = FilterChain.CreateAllEnabled([spaceCharFilter, sentenceFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("Hello.__World!___Again?__Done", item.Preview.Prefix);
+            Assert.Equal("Hello.__World!___Again?__Done", item.Preview.FileName);
         }
 
         /// <summary>
@@ -341,13 +341,13 @@ namespace Mfr.Tests.Models.Filters.Case
                 _target,
                 new LettersCaseOptions(LettersCaseMode.SentenceCase, [])
             );
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "hello.world");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "hello.world");
 
             var chain = FilterChain.CreateAllEnabled([spaceCharFilter, sentenceFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("Hello.world", item.Preview.Prefix);
+            Assert.Equal("Hello.world", item.Preview.FileName);
         }
 
         /// <summary>
@@ -357,7 +357,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_InvertCase_SwapsCasing()
         {
             var f = new LettersCaseFilter(_target, new LettersCaseOptions(LettersCaseMode.InvertCase, []));
-            Assert.Equal("hELLO", FilterTestHelpers.ApplyToPrefix(f, "Hello"));
+            Assert.Equal("hELLO", FilterTestHelpers.ApplyToFileName(f, "Hello"));
         }
 
         private static string _BuildUpperMask(string value)

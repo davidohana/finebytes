@@ -64,7 +64,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Replace
         public void Replace_list_flag_edits_preserve_entries_with_separator_in_search()
         {
             var filter = new ReplaceListFilter(
-                Target: new FilePrefixTarget(),
+                Target: new FileNameTarget(),
                 Options: new ReplaceListOptions(
                     Entries: [new ReplaceListEntry("a=>b", "x")],
                     Match: new ReplacerMatchOptions(

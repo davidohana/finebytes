@@ -1,7 +1,6 @@
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Ui.FilterChainPane;
 using Mfr.Tests.Ui.RenameList;
@@ -286,7 +285,7 @@ namespace Mfr.Tests.Ui.MainWindow
                         DestinationPath: missing,
                         OriginalPath: Path.Combine(dir, "old.txt"),
                         IsFolder: false,
-                        Changes: [new RenamePropertyChange("Prefix", "old", "gone")]
+                        Changes: [new RenamePropertyChange("FileName", "old", "gone")]
                     ),
                 ]
             );

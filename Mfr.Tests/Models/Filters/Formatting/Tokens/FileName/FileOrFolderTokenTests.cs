@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         {
             var token = new FileOrFolderToken();
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "Album",
+                fileName: "Album",
                 extension: "",
                 attributes: FileAttributes.Directory
             );

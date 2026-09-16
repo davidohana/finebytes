@@ -87,13 +87,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
             );
 
             var filter = new FormatterFilter(
-                Target: new FilePrefixTarget(),
+                Target: new FileNameTarget(),
                 Options: new FormatterOptions("<image-width>x<image-height>.<image-format>")
             );
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("2048x1536.JPEG", item.Preview.Prefix);
+            Assert.Equal("2048x1536.JPEG", item.Preview.FileName);
         }
 
         [Fact]
@@ -111,7 +111,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directory,
-                prefix: prefix,
+                fileName: prefix,
                 extension: extension,
                 fileSize: new FileInfo(fullPath).Length
             );

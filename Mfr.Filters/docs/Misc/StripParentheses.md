@@ -32,7 +32,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "StripParentheses",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "type": "Round",

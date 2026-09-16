@@ -96,7 +96,7 @@ namespace Mfr.Tests.Engine
             var claimer = _CreateItemFromExistingFile(outsidePath);
             // Claim a path that currently exists under the folder being renamed away.
             claimer.Preview.DirectoryPath = oldFolder;
-            claimer.Preview.Prefix = "nested";
+            claimer.Preview.FileName = "nested";
             claimer.Preview.Extension = "txt";
 
             // Claimer first so order is forced by the vacate edge, not encounter order.
@@ -127,7 +127,7 @@ namespace Mfr.Tests.Engine
 
             var nestedItem = _CreateItemFromExistingFile(nestedFilePath);
             nestedItem.Preview.DirectoryPath = newFolder;
-            nestedItem.Preview.Prefix = "track-renamed";
+            nestedItem.Preview.FileName = "track-renamed";
 
             var items = new List<RenameItem> { nestedItem, folderItem };
             PreviewConflictDetector.MarkConflicts(items);
@@ -151,7 +151,7 @@ namespace Mfr.Tests.Engine
 
             var folderItem = _CreateDirectoryItem(root, "Album");
             folderItem.Preview.DirectoryPath = root;
-            folderItem.Preview.Prefix = "AlbumRenamed";
+            folderItem.Preview.FileName = "AlbumRenamed";
 
             var movingSources = new HashSet<string>(PathComparers.Os) { sibling };
             var folderRenames = new List<RenameItem> { folderItem };
@@ -184,7 +184,7 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
-                prefix: folderName,
+                fileName: folderName,
                 extension: string.Empty,
                 attributes: FileAttributes.Directory
             );
@@ -201,7 +201,7 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directoryPath,
-                prefix: prefix,
+                fileName: prefix,
                 extension: extension,
                 attributes: attributes
             );
@@ -211,7 +211,7 @@ namespace Mfr.Tests.Engine
         private static void _RetargetPreview(RenameItem item, string directoryPath, string fileName)
         {
             item.Preview.DirectoryPath = directoryPath;
-            item.Preview.Prefix = Path.GetFileNameWithoutExtension(fileName);
+            item.Preview.FileName = Path.GetFileNameWithoutExtension(fileName);
             item.Preview.Extension = FileMeta.ExtensionWithoutDot(fileName);
         }
     }

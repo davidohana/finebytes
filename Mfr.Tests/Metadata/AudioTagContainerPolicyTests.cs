@@ -239,7 +239,7 @@ namespace Mfr.Tests.Metadata
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: Path.GetDirectoryName(absolutePath)!,
-                prefix: Path.GetFileNameWithoutExtension(absolutePath),
+                fileName: Path.GetFileNameWithoutExtension(absolutePath),
                 extension: FileMeta.ExtensionWithoutDot(absolutePath)
             );
 

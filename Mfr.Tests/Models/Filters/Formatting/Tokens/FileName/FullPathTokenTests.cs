@@ -15,7 +15,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         {
             var token = new FullPathToken();
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "song",
+                fileName: "song",
                 extension: "mp3",
                 directory: @"D:\Music\Album"
             );
@@ -31,12 +31,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileName
         {
             var token = new FullPathToken();
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "song",
+                fileName: "song",
                 extension: "mp3",
                 directory: @"D:\Music\Album"
             );
             item.Preview.DirectoryPath = @"D:\Staging";
-            item.Preview.Prefix = "renamed";
+            item.Preview.FileName = "renamed";
 
             Assert.Equal(item.Preview.FullPath, token.Compile(tokenArgs: "")(item));
             Assert.NotEqual(item.Original.FullPath, item.Preview.FullPath);

@@ -419,7 +419,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])
@@ -460,7 +460,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal([step], filterChain.SelectedSteps);
             Assert.Equal("File Name List", step.DisplayName);
             var filter = Assert.IsType<NameListFilter>(step.Filter);
-            Assert.IsType<FilePrefixTarget>(filter.Target);
+            Assert.IsType<FileNameTarget>(filter.Target);
             Assert.Equal(["alpha", "beta"], filter.Options.Entries);
         }
 
@@ -746,7 +746,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.Preview(
                 FilterChain.CreateAllEnabled([
                     new LettersCaseFilter(
-                        new FilePrefixTarget(),
+                        new FileNameTarget(),
                         new LettersCaseOptions(LettersCaseMode.UpperCase, CapitalizeSkipWords: [])
                     ),
                 ])

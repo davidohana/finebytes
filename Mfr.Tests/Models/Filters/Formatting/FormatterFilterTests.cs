@@ -17,7 +17,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
         public void Apply_FileNameToken_UsesPrefix()
         {
             var f = new FormatterFilter(_target, new FormatterOptions("<file-name>"));
-            Assert.Equal("song", FilterTestHelpers.ApplyToPrefix(f, "song"));
+            Assert.Equal("song", FilterTestHelpers.ApplyToFileName(f, "song"));
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
                 _target,
                 new FormatterOptions("<counter:initial=10,step=2,padding=fixed,length=4,resetScope=global>")
             );
-            Assert.Equal("0016", FilterTestHelpers.ApplyToPrefix(f, "ignored", renameListIndex: 3));
+            Assert.Equal("0016", FilterTestHelpers.ApplyToFileName(f, "ignored", renameListIndex: 3));
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var f = new FormatterFilter(_target, new FormatterOptions("<parent-folder>"));
             Assert.Equal(
                 "My Album",
-                FilterTestHelpers.ApplyToPrefix(f, "ignored", directory: "Music".CombinePath("My Album"))
+                FilterTestHelpers.ApplyToFileName(f, "ignored", directory: "Music".CombinePath("My Album"))
             );
         }
 
@@ -57,12 +57,12 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var f = new FormatterFilter(new FullPathTarget(), new FormatterOptions(template));
             var item = FilterTestHelpers.ApplyReturnItem(
                 f,
-                inputPrefix: "song",
+                inputFileName: "song",
                 directory: TestPaths.Absolute("Music", "Album")
             );
             Assert.Equal(Path.Combine(staging, "song.mp3"), item.Preview.FullPath);
             Assert.Equal(staging, item.Preview.DirectoryPath);
-            Assert.Equal("song", item.Preview.Prefix);
+            Assert.Equal("song", item.Preview.FileName);
             Assert.Equal("mp3", item.Preview.Extension);
         }
 
@@ -76,11 +76,11 @@ namespace Mfr.Tests.Models.Filters.Formatting
             var f = new FormatterFilter(new ParentDirectoryTarget(), new FormatterOptions(archived));
             var item = FilterTestHelpers.ApplyReturnItem(
                 f,
-                inputPrefix: "song",
+                inputFileName: "song",
                 directory: TestPaths.Absolute("Music", "Album")
             );
             Assert.Equal(archived, item.Preview.DirectoryPath);
-            Assert.Equal("song", item.Preview.Prefix);
+            Assert.Equal("song", item.Preview.FileName);
             Assert.Equal("mp3", item.Preview.Extension);
             Assert.Equal(Path.Combine(archived, "song.mp3"), item.Preview.FullPath);
         }
@@ -98,7 +98,7 @@ namespace Mfr.Tests.Models.Filters.Formatting
             );
             var item = FilterTestHelpers.ApplyReturnItem(
                 f,
-                inputPrefix: "track",
+                inputFileName: "track",
                 directory: TestPaths.Absolute("Music", "Album")
             );
             Assert.Equal(Path.Combine(libs, "Album"), item.Preview.DirectoryPath);

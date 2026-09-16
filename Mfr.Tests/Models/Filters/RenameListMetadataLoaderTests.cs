@@ -208,7 +208,7 @@ namespace Mfr.Tests.Models.Filters
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directory,
-                prefix: Path.GetFileNameWithoutExtension(fullPath),
+                fileName: Path.GetFileNameWithoutExtension(fullPath),
                 extension: FileMeta.ExtensionWithoutDot(fullPath),
                 fileSize: File.Exists(fullPath) ? new FileInfo(fullPath).Length : 0
             );

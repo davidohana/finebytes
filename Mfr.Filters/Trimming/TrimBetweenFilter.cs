@@ -43,11 +43,11 @@ namespace Mfr.Filters.Trimming
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, positions 2–4 from left).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, positions 2–4 from left).
         /// </summary>
         public TrimBetweenFilter()
             : this(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new TrimBetweenFilterOptions(Start: new Position(2, Side.Left), End: new Position(4, Side.Left))
             ) { }
 

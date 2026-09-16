@@ -78,7 +78,7 @@ Each filter in a preset has:
 
 - `type` — discriminator string (same name as the filter, e.g. `LettersCase`).
 - `enabled` — if `false`, the filter is skipped.
-- `target` — for **string** filters acting on renamed metadata (most built-ins): a polymorphic object with discriminator **`targetType`** (values such as **`FilePrefix`**, **`FileExtension`**, **`FileFullName`**, **`AncestorFolder`**, **`FullPath`**, **`ParentDirectory`**, **`AudioField`**, **`Id3v1Field`**, **`Id3v2Frame`**, **`XiphField`**). **`FileExtension`** is the extension **without** the leading dot. **`AncestorFolder`** adds **`level`**: positive integer counting up from the immediate parent folder. **`AudioField`** adds **`field`**: camelCase name of the embedded audio overlay property (`title`, `album`, `year`, …); see [Formatter](Formatting/Formatter.md) **Target**. Format-specific targets address one tag block only (**`Id3v1Field.field`**, **`Id3v2Frame.frameId`** plus optional **`language`** / **`description`**, **`XiphField.key`**) and fail preview when the container cannot hold that block.
+- `target` — for **string** filters acting on renamed metadata (most built-ins): a polymorphic object with discriminator **`targetType`** (values such as **`FileName`**, **`FileExtension`**, **`FileFullName`**, **`AncestorFolder`**, **`FullPath`**, **`ParentDirectory`**, **`AudioField`**, **`Id3v1Field`**, **`Id3v2Frame`**, **`XiphField`**). **`FileExtension`** is the extension **without** the leading dot. **`AncestorFolder`** adds **`level`**: positive integer counting up from the immediate parent folder. **`AudioField`** adds **`field`**: camelCase name of the embedded audio overlay property (`title`, `album`, `year`, …); see [Formatter](Formatting/Formatter.md) **Target**. Format-specific targets address one tag block only (**`Id3v1Field.field`**, **`Id3v2Frame.frameId`** plus optional **`language`** / **`description`**, **`XiphField.key`**) and fail preview when the container cannot hold that block.
 - **`applyScope`** (optional; string-target filters only) — limits the filter to a **substring** or **token** of the resolved target string, then splices the result back (discriminator **`scopeType`**: **`Substring`** or **`Token`**). Omit for default “whole field” behavior. See [docs/magic-file-renamer-design.md](../../docs/magic-file-renamer-design.md) §6 (filter system).
 - For [DateTimeSetter](Attributes/DateTimeSetter.md) and [TimeShifter](Attributes/TimeShifter.md), `options` includes **`timestampField`**: which **filesystem timestamp field** to edit (not a clock value) — `"creation"`, `"lastWrite"`, or `"lastAccess"` (camelCase strings), together with the other filter-specific options.
 - **AttributesSetter** has no `target`; it always updates filesystem attributes ([AttributesSetter](Attributes/AttributesSetter.md)).
@@ -121,7 +121,7 @@ Each `chain.steps[]` entry has `enabled` and `filter` (the same JSON shape as on
             "filter": {
               "type": "SpaceCharacter",
               "target": {
-                "targetType": "FilePrefix"
+                "targetType": "FileName"
               },
               "options": {
                 "spaceCharacter": "_",
@@ -134,7 +134,7 @@ Each `chain.steps[]` entry has `enabled` and `filter` (the same JSON shape as on
             "filter": {
               "type": "LettersCase",
               "target": {
-                "targetType": "FilePrefix"
+                "targetType": "FileName"
               },
               "options": {
                 "mode": "Capitalize",

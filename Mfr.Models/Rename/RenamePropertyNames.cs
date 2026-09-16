@@ -6,7 +6,7 @@ namespace Mfr.Models.Rename
     public static class RenamePropertyNames
     {
         /// <summary>File name without extension.</summary>
-        public const string Prefix = "Prefix";
+        public const string FileName = "FileName";
 
         /// <summary>Extension without leading dot.</summary>
         public const string Extension = "Extension";

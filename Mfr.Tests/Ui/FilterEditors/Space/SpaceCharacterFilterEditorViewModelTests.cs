@@ -52,7 +52,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Space
             var step = new FilterChainStepViewModel(
                 "Space Character",
                 new SpaceCharacterFilter(
-                    new FilePrefixTarget(),
+                    new FileNameTarget(),
                     new SpaceCharacterOptions(
                         SpaceCharacter: '-',
                         Replacements: [SpaceCharacterOptions.Percent20Replacement, "++"]

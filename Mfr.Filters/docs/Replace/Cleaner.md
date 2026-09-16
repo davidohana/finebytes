@@ -31,7 +31,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "Cleaner",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "removeIllegalChars": true,

@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public sealed class SpaceAroundFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         private static SpaceAroundFilter _CreateFilter(
             string aroundChars,
@@ -32,19 +32,19 @@ namespace Mfr.Tests.Models.Filters.Space
             var f = _CreateFilter("-", onlyWhenNeighboringAreLettersOrDigits: true);
             Assert.Equal(
                 "Aimee Mann - Stupid Thing.mp3",
-                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann-Stupid Thing.mp3")
+                FilterTestHelpers.ApplyToFileName(f, "Aimee Mann-Stupid Thing.mp3")
             );
             Assert.Equal(
                 "Aimee Mann - Stupid Thing.mp3",
-                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann- Stupid Thing.mp3")
+                FilterTestHelpers.ApplyToFileName(f, "Aimee Mann- Stupid Thing.mp3")
             );
             Assert.Equal(
                 "Aimee Mann - Stupid Thing.mp3",
-                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann - Stupid Thing.mp3")
+                FilterTestHelpers.ApplyToFileName(f, "Aimee Mann - Stupid Thing.mp3")
             );
             Assert.Equal(
                 "Aimee Mann -- Stupid Thing.mp3",
-                FilterTestHelpers.ApplyToPrefix(f, "Aimee Mann--Stupid Thing.mp3")
+                FilterTestHelpers.ApplyToFileName(f, "Aimee Mann--Stupid Thing.mp3")
             );
         }
 
@@ -55,7 +55,7 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_EmptyAroundChars_IsNoOp()
         {
             var f = _CreateFilter("");
-            Assert.Equal("a-b", FilterTestHelpers.ApplyToPrefix(f, "a-b"));
+            Assert.Equal("a-b", FilterTestHelpers.ApplyToFileName(f, "a-b"));
         }
 
         /// <summary>
@@ -65,8 +65,8 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_WhenNotConditional_InsertsBesideAnyNeighbor()
         {
             var f = _CreateFilter("-", onlyWhenNeighboringAreLettersOrDigits: false);
-            Assert.Equal("a - b", FilterTestHelpers.ApplyToPrefix(f, "a-b"));
-            Assert.Equal("( - )", FilterTestHelpers.ApplyToPrefix(f, "(-)"));
+            Assert.Equal("a - b", FilterTestHelpers.ApplyToFileName(f, "a-b"));
+            Assert.Equal("( - )", FilterTestHelpers.ApplyToFileName(f, "(-)"));
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_WhenNotConditional_ConsecutiveTriggers_SingleSeparatorBetween()
         {
             var f = _CreateFilter("-", onlyWhenNeighboringAreLettersOrDigits: false);
-            Assert.Equal("a - - b", FilterTestHelpers.ApplyToPrefix(f, "a--b"));
+            Assert.Equal("a - - b", FilterTestHelpers.ApplyToFileName(f, "a--b"));
         }
 
         /// <summary>
@@ -90,12 +90,12 @@ namespace Mfr.Tests.Models.Filters.Space
                 new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
             var aroundFilter = _CreateFilter("-", onlyWhenNeighboringAreLettersOrDigits: true);
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "a-b");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "a-b");
             spaceFilter.Setup();
             aroundFilter.Setup();
             spaceFilter.Apply(item);
             aroundFilter.Apply(item);
-            Assert.Equal("a_-_b", item.Preview.Prefix);
+            Assert.Equal("a_-_b", item.Preview.FileName);
         }
     }
 }

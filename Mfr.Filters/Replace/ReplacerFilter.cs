@@ -58,11 +58,11 @@ namespace Mfr.Filters.Replace
         private Regex? _compiledSearch;
 
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty find/replace, replace all).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, empty find/replace, replace all).
         /// </summary>
         public ReplacerFilter()
             : this(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new ReplacerOptions(Find: "", Replacement: "", Match: ReplacerMatchOptions.ForReplacer)
             ) { }
 

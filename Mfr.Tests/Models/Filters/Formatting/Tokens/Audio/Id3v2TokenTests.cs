@@ -249,11 +249,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
         public void Apply_FormatterUsesId3v2Token()
         {
             var filter = new FormatterFilter(
-                new FilePrefixTarget(),
+                new FileNameTarget(),
                 new FormatterOptions("<id3v2:TXXX:catalog>-<id3v2:TIT2>")
             );
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "song",
+                fileName: "song",
                 configureOriginal: m =>
                     m.AudioTagOverlay = _OverlayWithFrames(
                         new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Title"] },
@@ -269,7 +269,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Audio
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("C1-Title", item.Preview.Prefix);
+            Assert.Equal("C1-Title", item.Preview.FileName);
         }
 
         private static AudioTagOverlay _OverlayWithFrames(params Id3v2ModeledFrame[] frames)

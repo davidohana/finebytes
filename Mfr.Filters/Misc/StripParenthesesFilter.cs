@@ -32,13 +32,11 @@ namespace Mfr.Filters.Misc
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, round parentheses, remove contents).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, round parentheses, remove contents).
         /// </summary>
         public StripParenthesesFilter()
-            : this(
-                new FilePrefixTarget(),
-                new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true)
-            ) { }
+            : this(new FileNameTarget(), new StripParenthesesOptions(Type: ParenthesisType.Round, RemoveContents: true))
+        { }
 
         /// <summary>
         /// Gets the filter type discriminator.

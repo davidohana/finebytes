@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public class SpaceCharacterFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies %20 is replaced with the defined underscore separator (MFR7-style example).
@@ -20,7 +20,7 @@ namespace Mfr.Tests.Models.Filters.Space
                 _target,
                 new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: ["%20"])
             );
-            Assert.Equal("Gone_With_The_Wind", FilterTestHelpers.ApplyToPrefix(f, "Gone%20With%20The%20Wind"));
+            Assert.Equal("Gone_With_The_Wind", FilterTestHelpers.ApplyToFileName(f, "Gone%20With%20The%20Wind"));
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Mfr.Tests.Models.Filters.Space
                 _target,
                 new SpaceCharacterOptions(' ', SpaceCharacterOptions.DefaultReplacements)
             );
-            Assert.Equal("a b c d", FilterTestHelpers.ApplyToPrefix(f, "a_b c%20d"));
+            Assert.Equal("a b c d", FilterTestHelpers.ApplyToFileName(f, "a_b c%20d"));
         }
 
         /// <summary>
@@ -46,7 +46,7 @@ namespace Mfr.Tests.Models.Filters.Space
                 _target,
                 new SpaceCharacterOptions(SpaceCharacter: '-', Replacements: ["++"])
             );
-            Assert.Equal("a-b", FilterTestHelpers.ApplyToPrefix(f, "a++b"));
+            Assert.Equal("a-b", FilterTestHelpers.ApplyToFileName(f, "a++b"));
         }
 
         /// <summary>
@@ -64,12 +64,12 @@ namespace Mfr.Tests.Models.Filters.Space
                 new LettersCaseOptions(LettersCaseMode.Capitalize, ["the"])
             );
 
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "gone%20with%20the%20wind");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "gone%20with%20the%20wind");
             var chain = FilterChain.CreateAllEnabled([spaceFilter, capitalizeFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("Gone_With_the_Wind", item.Preview.Prefix);
+            Assert.Equal("Gone_With_the_Wind", item.Preview.FileName);
         }
 
         /// <summary>
@@ -86,7 +86,7 @@ namespace Mfr.Tests.Models.Filters.Space
                 "my song"
             );
 
-            Assert.Equal("my song", item.Preview.Prefix);
+            Assert.Equal("my song", item.Preview.FileName);
             Assert.Equal('_', item.WordSeparator);
         }
 
@@ -100,7 +100,7 @@ namespace Mfr.Tests.Models.Filters.Space
                 _target,
                 new SpaceCharacterOptions(SpaceCharacter: '-', Replacements: ["", "++"])
             );
-            Assert.Equal("a-b", FilterTestHelpers.ApplyToPrefix(f, "a++b"));
+            Assert.Equal("a-b", FilterTestHelpers.ApplyToFileName(f, "a++b"));
         }
 
         /// <summary>

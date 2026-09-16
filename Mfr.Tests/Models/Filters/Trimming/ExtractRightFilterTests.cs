@@ -8,14 +8,14 @@ namespace Mfr.Tests.Models.Filters.Trimming
     /// </summary>
     public class ExtractRightFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies right extract clamps count to <c>[0, length]</c> then keeps that many characters.
         /// </summary>
         /// <param name="count">Requested keep length (may be negative or past the segment).</param>
-        /// <param name="input">Prefix under test.</param>
-        /// <param name="expected">Prefix after extract.</param>
+        /// <param name="input">File name under test.</param>
+        /// <param name="expected">File name after extract.</param>
         [Theory]
         [InlineData(3, "abcdef", "def")]
         [InlineData(0, "abc", "")]
@@ -24,7 +24,7 @@ namespace Mfr.Tests.Models.Filters.Trimming
         public void Apply_TakesRightSubstring_ClampingCount(int count, string input, string expected)
         {
             var f = new ExtractRightFilter(_target, new CountFilterOptions(count));
-            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, input));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToFileName(f, input));
         }
     }
 }

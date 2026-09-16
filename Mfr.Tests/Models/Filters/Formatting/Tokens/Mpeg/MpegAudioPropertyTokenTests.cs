@@ -132,13 +132,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
             );
 
             var filter = new FormatterFilter(
-                Target: new FilePrefixTarget(),
+                Target: new FileNameTarget(),
                 Options: new FormatterOptions("<mpeg-bitrate>_<mpeg-layer>_<mpeg-duration>")
             );
             filter.Setup();
             filter.Apply(item);
 
-            Assert.Equal("VBR320_III_0:01:01", item.Preview.Prefix);
+            Assert.Equal("VBR320_III_0:01:01", item.Preview.FileName);
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: directory,
-                prefix: prefix,
+                fileName: prefix,
                 extension: extension,
                 fileSize: new FileInfo(fullPath).Length
             );

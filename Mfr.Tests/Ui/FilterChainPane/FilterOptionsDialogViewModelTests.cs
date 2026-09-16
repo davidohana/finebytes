@@ -6,7 +6,6 @@ using Mfr.Filters.Case;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
-using Mfr.Models.Media;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 
@@ -31,7 +30,7 @@ namespace Mfr.Tests.Ui.FilterChainPane
 
             Assert.True(dialog.HasApplyTo);
 
-            Assert.IsType<FilePrefixTarget>(dialog.SelectedTargetOption?.Prototype);
+            Assert.IsType<FileNameTarget>(dialog.SelectedTargetOption?.Prototype);
         }
 
         /// <summary>
@@ -40,7 +39,7 @@ namespace Mfr.Tests.Ui.FilterChainPane
         [Fact]
         public void Dialog_hides_editable_apply_to_for_non_string_filters()
         {
-            var step = new FilterChainStepViewModel("Audio Tag Remover", new Filters.Audio.TagRemoverFilter());
+            var step = new FilterChainStepViewModel("Audio Tag Remover", new TagRemoverFilter());
 
             var dialog = new FilterOptionsDialogViewModel(step);
 

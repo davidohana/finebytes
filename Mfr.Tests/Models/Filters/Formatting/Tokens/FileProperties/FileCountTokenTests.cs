@@ -50,7 +50,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.FileProperties
 
                 var token = new FileCountToken();
                 var item = FilterTestHelpers.CreateRenameItem(
-                    prefix: "Album",
+                    fileName: "Album",
                     extension: "",
                     directory: parentDir,
                     attributes: FileAttributes.Directory

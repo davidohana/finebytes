@@ -41,7 +41,7 @@ The `filter` object inside a chain step ([preset shape](../README.md#preset-shap
 {
   "type": "CasingList",
   "target": {
-    "targetType": "FilePrefix"
+    "targetType": "FileName"
   },
   "options": {
     "words": ["and", "or", "with", "RMX"],

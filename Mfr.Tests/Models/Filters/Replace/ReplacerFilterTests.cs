@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Replace
     /// </summary>
     public class ReplacerFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies literal replacement for replace-all and replace-once modes.
@@ -30,7 +30,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "aba"));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToFileName(f, "aba"));
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "foo"));
+            Assert.Equal("X", FilterTestHelpers.ApplyToFileName(f, "foo"));
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.Equal(expected, FilterTestHelpers.ApplyToPrefix(f, "a12bc34"));
+            Assert.Equal(expected, FilterTestHelpers.ApplyToFileName(f, "a12bc34"));
         }
 
         /// <summary>
@@ -98,7 +98,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.Equal("XbX", FilterTestHelpers.ApplyToPrefix(f, "AbA"));
+            Assert.Equal("XbX", FilterTestHelpers.ApplyToFileName(f, "AbA"));
         }
 
         /// <summary>
@@ -120,9 +120,9 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.Equal("dog", FilterTestHelpers.ApplyToPrefix(f, "cat"));
-            Assert.Equal("category", FilterTestHelpers.ApplyToPrefix(f, "category"));
-            Assert.Equal("a dog b", FilterTestHelpers.ApplyToPrefix(f, "a cat b"));
+            Assert.Equal("dog", FilterTestHelpers.ApplyToFileName(f, "cat"));
+            Assert.Equal("category", FilterTestHelpers.ApplyToFileName(f, "category"));
+            Assert.Equal("a dog b", FilterTestHelpers.ApplyToFileName(f, "a cat b"));
         }
 
         /// <summary>
@@ -144,8 +144,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "foo"));
-            Assert.Equal("X", FilterTestHelpers.ApplyToPrefix(f, "fao"));
+            Assert.Equal("X", FilterTestHelpers.ApplyToFileName(f, "foo"));
+            Assert.Equal("X", FilterTestHelpers.ApplyToFileName(f, "fao"));
         }
 
         /// <summary>
@@ -167,8 +167,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.Equal("dog", FilterTestHelpers.ApplyToPrefix(f, "cat"));
-            Assert.Equal("Category", FilterTestHelpers.ApplyToPrefix(f, "Category"));
+            Assert.Equal("dog", FilterTestHelpers.ApplyToFileName(f, "cat"));
+            Assert.Equal("Category", FilterTestHelpers.ApplyToFileName(f, "Category"));
         }
 
         /// <summary>
@@ -188,7 +188,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     new ReplacerMatchOptions(Mode: mode, CaseSensitive: true, ReplaceAll: true, WholeWord: false)
                 )
             );
-            Assert.Equal("aba", FilterTestHelpers.ApplyToPrefix(f, "aba"));
+            Assert.Equal("aba", FilterTestHelpers.ApplyToFileName(f, "aba"));
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     new ReplacerMatchOptions(Mode: mode, CaseSensitive: true, ReplaceAll: true, WholeWord: false)
                 )
             );
-            Assert.Equal("$1", FilterTestHelpers.ApplyToPrefix(f, "a"));
+            Assert.Equal("$1", FilterTestHelpers.ApplyToFileName(f, "a"));
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.Equal("ba", FilterTestHelpers.ApplyToPrefix(f, "ab"));
+            Assert.Equal("ba", FilterTestHelpers.ApplyToFileName(f, "ab"));
         }
 
         /// <summary>
@@ -252,8 +252,8 @@ namespace Mfr.Tests.Models.Filters.Replace
                     )
                 )
             );
-            Assert.Equal("a1b1", FilterTestHelpers.ApplyToPrefix(f, "axbx", renameListIndex: 0));
-            Assert.Equal("c2d2", FilterTestHelpers.ApplyToPrefix(f, "cxdx", renameListIndex: 1));
+            Assert.Equal("a1b1", FilterTestHelpers.ApplyToFileName(f, "axbx", renameListIndex: 0));
+            Assert.Equal("c2d2", FilterTestHelpers.ApplyToFileName(f, "cxdx", renameListIndex: 1));
         }
 
         /// <summary>

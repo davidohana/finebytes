@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters
         /// <summary>
         /// Builds a <see cref="RenameItem"/> for filter tests with predictable paths and indices.
         /// </summary>
-        /// <param name="prefix">File name without extension.</param>
+        /// <param name="fileName">File name without extension.</param>
         /// <param name="extension">Extension without the leading dot.</param>
         /// <param name="renameListIndex">Zero-based index across all files.</param>
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
@@ -33,7 +33,7 @@ namespace Mfr.Tests.Models.Filters
         /// </param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
-            string prefix = "track",
+            string fileName = "track",
             string extension = "mp3",
             int renameListIndex = 0,
             int inFolderIndex = 0,
@@ -56,7 +56,7 @@ namespace Mfr.Tests.Models.Filters
                 renameListIndex,
                 inFolderIndex,
                 directory,
-                prefix,
+                fileName,
                 extension,
                 attributes,
                 creationTime: creationTime ?? baseline,
@@ -127,35 +127,35 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
-        /// Applies a filter to a prefix-targeted rename item and returns the resulting preview prefix.
+        /// Applies a filter to a file-name-targeted rename item and returns the resulting preview file name.
         /// </summary>
         /// <param name="filter">Filter to apply.</param>
-        /// <param name="inputPrefix">Input prefix used for the test item.</param>
+        /// <param name="inputFileName">Input file name (without extension) used for the test item.</param>
         /// <param name="extension">Input extension used for the test item.</param>
         /// <param name="renameListIndex">Zero-based index across all files.</param>
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
         /// <param name="directory">Parent directory path, or a default when null.</param>
-        /// <returns>The resulting preview prefix after applying the filter.</returns>
-        public static string ApplyToPrefix(
+        /// <returns>The resulting preview file name after applying the filter.</returns>
+        public static string ApplyToFileName(
             BaseFilter filter,
-            string inputPrefix,
+            string inputFileName,
             string extension = "mp3",
             int renameListIndex = 0,
             int inFolderIndex = 0,
             string? directory = null
         )
         {
-            var item = CreateRenameItem(inputPrefix, extension, renameListIndex, inFolderIndex, directory);
+            var item = CreateRenameItem(inputFileName, extension, renameListIndex, inFolderIndex, directory);
             filter.Setup();
             filter.Apply(item);
-            return item.Preview.Prefix;
+            return item.Preview.FileName;
         }
 
         /// <summary>
         /// Applies a filter and returns the item so callers can inspect any preview fields.
         /// </summary>
         /// <param name="filter">Filter to apply.</param>
-        /// <param name="inputPrefix">Input prefix used for the test item.</param>
+        /// <param name="inputFileName">Input file name (without extension) used for the test item.</param>
         /// <param name="extension">Input extension used for the test item.</param>
         /// <param name="renameListIndex">Zero-based index across all files.</param>
         /// <param name="inFolderIndex">Zero-based index within the folder.</param>
@@ -163,14 +163,14 @@ namespace Mfr.Tests.Models.Filters
         /// <returns>The rename item after <see cref="BaseFilter.Setup"/> + <see cref="BaseFilter.Apply"/>.</returns>
         public static RenameItem ApplyReturnItem(
             BaseFilter filter,
-            string inputPrefix,
+            string inputFileName,
             string extension = "mp3",
             int renameListIndex = 0,
             int inFolderIndex = 0,
             string? directory = null
         )
         {
-            var item = CreateRenameItem(inputPrefix, extension, renameListIndex, inFolderIndex, directory);
+            var item = CreateRenameItem(inputFileName, extension, renameListIndex, inFolderIndex, directory);
             filter.Setup();
             filter.Apply(item);
             return item;

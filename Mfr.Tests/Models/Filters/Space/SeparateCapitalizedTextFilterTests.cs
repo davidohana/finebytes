@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public class SeparateCapitalizedTextFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies camel-case, letter–digit, and digit–letter boundaries insert the default separator.
@@ -16,8 +16,8 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_InsertsDefaultSpaceAtBoundaries()
         {
             var f = new SeparateCapitalizedTextFilter(_target);
-            Assert.Equal("Dandy Worhols 01 Godless", FilterTestHelpers.ApplyToPrefix(f, "DandyWorhols01Godless"));
-            Assert.Equal("song 2 remix", FilterTestHelpers.ApplyToPrefix(f, "song2remix"));
+            Assert.Equal("Dandy Worhols 01 Godless", FilterTestHelpers.ApplyToFileName(f, "DandyWorhols01Godless"));
+            Assert.Equal("song 2 remix", FilterTestHelpers.ApplyToFileName(f, "song2remix"));
         }
 
         /// <summary>
@@ -31,12 +31,12 @@ namespace Mfr.Tests.Models.Filters.Space
                 new SpaceCharacterOptions(SpaceCharacter: '_', Replacements: [])
             );
             var separateFilter = new SeparateCapitalizedTextFilter(_target);
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "aBc12x");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "aBc12x");
             spaceFilter.Setup();
             separateFilter.Setup();
             spaceFilter.Apply(item);
             separateFilter.Apply(item);
-            Assert.Equal("a_Bc_12_x", item.Preview.Prefix);
+            Assert.Equal("a_Bc_12_x", item.Preview.FileName);
         }
     }
 }

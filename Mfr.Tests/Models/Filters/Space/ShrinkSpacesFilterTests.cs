@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Space
     /// </summary>
     public class ShrinkSpacesFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies runs of the default word separator (U+0020 SPACE) collapse to a single space.
@@ -16,8 +16,8 @@ namespace Mfr.Tests.Models.Filters.Space
         public void Apply_CollapsesSeparatorRuns()
         {
             var f = new ShrinkSpacesFilter(_target);
-            Assert.Equal("a b c", FilterTestHelpers.ApplyToPrefix(f, "a   b  c"));
-            Assert.Equal("a \t b", FilterTestHelpers.ApplyToPrefix(f, "a  \t b"));
+            Assert.Equal("a b c", FilterTestHelpers.ApplyToFileName(f, "a   b  c"));
+            Assert.Equal("a \t b", FilterTestHelpers.ApplyToFileName(f, "a  \t b"));
         }
     }
 }

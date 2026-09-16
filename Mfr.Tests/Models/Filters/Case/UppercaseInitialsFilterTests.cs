@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Case
     /// </summary>
     public class UppercaseInitialsFilterTests
     {
-        private static readonly FilterTarget _target = new FilePrefixTarget();
+        private static readonly FilterTarget _target = new FileNameTarget();
 
         /// <summary>
         /// Verifies lowercase initials patterns are uppercased.
@@ -18,7 +18,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var filter = new UppercaseInitialsFilter(_target);
             var input = "bruce springsteen - born in the u.s.a";
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, input);
+            var result = FilterTestHelpers.ApplyToFileName(filter, input);
 
             Assert.Equal("bruce springsteen - born in the U.S.A", result);
         }
@@ -32,7 +32,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var filter = new UppercaseInitialsFilter(_target);
             var input = "live in the u.k and the u.s.a and e.u";
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, input);
+            var result = FilterTestHelpers.ApplyToFileName(filter, input);
 
             Assert.Equal("live in the U.K and the U.S.A and E.U", result);
         }
@@ -46,7 +46,7 @@ namespace Mfr.Tests.Models.Filters.Case
             var filter = new UppercaseInitialsFilter(_target);
             var input = "alpha beta c and ab.cd stay as-is";
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, input);
+            var result = FilterTestHelpers.ApplyToFileName(filter, input);
 
             Assert.Equal("alpha beta c and ab.cd stay as-is", result);
         }
@@ -69,7 +69,7 @@ namespace Mfr.Tests.Models.Filters.Case
         public void Apply_VariousPatterns(string input, string expected)
         {
             var filter = new UppercaseInitialsFilter(_target);
-            var result = FilterTestHelpers.ApplyToPrefix(filter, input);
+            var result = FilterTestHelpers.ApplyToFileName(filter, input);
             Assert.Equal(expected, result);
         }
     }

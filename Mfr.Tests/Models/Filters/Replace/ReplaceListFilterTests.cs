@@ -7,7 +7,7 @@ namespace Mfr.Tests.Models.Filters.Replace
     /// </summary>
     public sealed class ReplaceListFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         /// <summary>
         /// Verifies that replacements from the embedded list are applied in order.
@@ -23,7 +23,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 wholeWord: false
             );
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "a.a");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "a.a");
 
             Assert.Equal("b_b", result);
         }
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 wholeWord: false
             );
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "Blue Train Live");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "Blue Train Live");
 
             Assert.Equal("Blue_Train Live", result);
         }
@@ -61,7 +61,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 wholeWord: false
             );
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "xa=>by");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "xa=>by");
 
             Assert.Equal("xxy", result);
         }
@@ -80,7 +80,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 wholeWord: false
             );
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "abxcx");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "abxcx");
 
             Assert.Equal("abc", result);
         }
@@ -99,7 +99,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 wholeWord: false
             );
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "unchanged");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "unchanged");
 
             Assert.Equal("unchanged", result);
         }
@@ -126,14 +126,14 @@ namespace Mfr.Tests.Models.Filters.Replace
                 wholeWord: false
             );
 
-            var first = FilterTestHelpers.ApplyToPrefix(
+            var first = FilterTestHelpers.ApplyToFileName(
                 filter: filter,
-                inputPrefix: "01.-.Blue.Train",
+                inputFileName: "01.-.Blue.Train",
                 renameListIndex: 0
             );
-            var second = FilterTestHelpers.ApplyToPrefix(
+            var second = FilterTestHelpers.ApplyToFileName(
                 filter: filter,
-                inputPrefix: "02.-.A.Moment's.Notice",
+                inputFileName: "02.-.A.Moment's.Notice",
                 renameListIndex: 1
             );
 
@@ -155,7 +155,7 @@ namespace Mfr.Tests.Models.Filters.Replace
                 wholeWord: false
             );
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "foo");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "foo");
 
             Assert.Equal("X", result);
         }
@@ -174,13 +174,13 @@ namespace Mfr.Tests.Models.Filters.Replace
                 wholeWord: false
             );
             filter.Setup();
-            var firstItem = FilterTestHelpers.CreateRenameItem(prefix: "a");
+            var firstItem = FilterTestHelpers.CreateRenameItem(fileName: "a");
             filter.Apply(firstItem);
-            Assert.Equal("x", firstItem.Preview.Prefix);
+            Assert.Equal("x", firstItem.Preview.FileName);
 
-            var secondItem = FilterTestHelpers.CreateRenameItem(prefix: "a");
+            var secondItem = FilterTestHelpers.CreateRenameItem(fileName: "a");
             filter.Apply(secondItem);
-            Assert.Equal("x", secondItem.Preview.Prefix);
+            Assert.Equal("x", secondItem.Preview.FileName);
         }
 
         /// <summary>

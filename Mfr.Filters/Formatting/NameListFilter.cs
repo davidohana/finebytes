@@ -47,10 +47,10 @@ namespace Mfr.Filters.Formatting
         private Formatter _compiledSuffix = FormatStringCompiler.EmptyFormatter;
 
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, empty list).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, empty list).
         /// </summary>
         public NameListFilter()
-            : this(new FilePrefixTarget(), new NameListOptions()) { }
+            : this(new FileNameTarget(), new NameListOptions()) { }
 
         /// <summary>
         /// Gets the filter type discriminator.

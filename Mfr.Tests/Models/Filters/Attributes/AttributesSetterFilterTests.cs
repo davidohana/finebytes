@@ -70,7 +70,7 @@ namespace Mfr.Tests.Models.Filters.Attributes
         public void Apply_preserves_directory_bit()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "folder",
+                fileName: "folder",
                 extension: "",
                 attributes: FileAttributes.Directory
             );

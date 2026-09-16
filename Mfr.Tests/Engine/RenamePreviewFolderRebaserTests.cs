@@ -154,7 +154,7 @@ namespace Mfr.Tests.Engine
         {
             var item = _CreateItem(fullPath: fullPath, attributes: FileAttributes.Normal);
             item.Preview.DirectoryPath = previewDirectoryPath;
-            item.Preview.Prefix = Path.GetFileNameWithoutExtension(previewFileName);
+            item.Preview.FileName = Path.GetFileNameWithoutExtension(previewFileName);
             item.Preview.Extension = FileMeta.ExtensionWithoutDot(previewFileName);
             item.Status = RenameStatus.PreviewOk;
             return item;
@@ -166,7 +166,7 @@ namespace Mfr.Tests.Engine
                 renameListIndex: 0,
                 inFolderIndex: 0,
                 directoryPath: Path.GetDirectoryName(fullPath)!,
-                prefix: Path.GetFileNameWithoutExtension(fullPath),
+                fileName: Path.GetFileNameWithoutExtension(fullPath),
                 extension: FileMeta.ExtensionWithoutDot(fullPath),
                 attributes: attributes
             );
@@ -176,7 +176,7 @@ namespace Mfr.Tests.Engine
         private static void _SetPreviewPath(RenameItem item, string previewFullPath)
         {
             item.Preview.DirectoryPath = Path.GetDirectoryName(previewFullPath)!;
-            item.Preview.Prefix = Path.GetFileNameWithoutExtension(previewFullPath);
+            item.Preview.FileName = Path.GetFileNameWithoutExtension(previewFullPath);
             item.Preview.Extension = FileMeta.ExtensionWithoutDot(previewFullPath);
         }
 

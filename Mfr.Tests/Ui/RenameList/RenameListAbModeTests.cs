@@ -2,7 +2,6 @@ using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Space;
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 
@@ -466,7 +465,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FileNameTarget()), "Remove Spaces");
             renameListViewModel.IsAbModeEnabled = true;
 
             await renameListViewModel.ReplaceWithRelevantColumnsCommand.ExecuteAsync(null);
@@ -490,7 +489,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FileNameTarget()), "Remove Spaces");
 
             var folderKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Folder);
             renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(folderKey, Width: 180)]);
@@ -510,7 +509,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new FilePrefixTarget()), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new FileNameTarget()), "Remove Spaces");
 
             var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
             renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(nameOriginal, Width: 120)]);

@@ -8,7 +8,7 @@ namespace Mfr.Tests.Models.Filters.Case
     /// </summary>
     public sealed class CasingListFilterTests
     {
-        private static readonly FilePrefixTarget _target = new();
+        private static readonly FileNameTarget _target = new();
 
         private static readonly string[] _sampleWords = ["and", "or", "with", "RMX"];
 
@@ -20,7 +20,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = _CreateFilter(words: _sampleWords, uppercaseSentenceInitial: false);
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "03 - WiTH Or Without You Rmx");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "03 - WiTH Or Without You Rmx");
 
             Assert.Equal("03 - with or Without You RMX", result);
         }
@@ -35,12 +35,12 @@ namespace Mfr.Tests.Models.Filters.Case
                 Options: new SentenceEndCharactersOptions(Characters: "-.!")
             );
             var casingFilter = _CreateFilter(words: _sampleWords, uppercaseSentenceInitial: true);
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "03 - WiTH Or Without You Rmx");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "03 - WiTH Or Without You Rmx");
             var chain = FilterChain.CreateAllEnabled([sentenceEndFilter, casingFilter]);
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("03 - With or Without You RMX", item.Preview.Prefix);
+            Assert.Equal("03 - With or Without You RMX", item.Preview.FileName);
         }
 
         /// <summary>
@@ -56,11 +56,11 @@ namespace Mfr.Tests.Models.Filters.Case
             var casingFilter = _CreateFilter(words: ["and", "us", "them"], uppercaseSentenceInitial: true);
             var chain = FilterChain.CreateAllEnabled([spaceCharacterFilter, casingFilter]);
 
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "US_AND_THEM");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "US_AND_THEM");
             chain.SetupFilters();
             chain.ApplyFilters(item);
 
-            Assert.Equal("Us_and_them", item.Preview.Prefix);
+            Assert.Equal("Us_and_them", item.Preview.FileName);
         }
 
         /// <summary>
@@ -71,7 +71,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = _CreateFilter(words: [], uppercaseSentenceInitial: false);
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "WiTH Or Without");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "WiTH Or Without");
 
             Assert.Equal("WiTH Or Without", result);
         }
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = _CreateFilter(words: [], uppercaseSentenceInitial: true);
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "hello world");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "hello world");
 
             Assert.Equal("Hello world", result);
         }
@@ -97,7 +97,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = _CreateFilter(words: [], uppercaseSentenceInitial: true);
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "hello.world");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "hello.world");
 
             Assert.Equal("Hello.world", result);
         }
@@ -110,7 +110,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = _CreateFilter(words: [], uppercaseSentenceInitial: true);
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "école. über next");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "école. über next");
 
             Assert.Equal("École. Über next", result);
         }
@@ -135,7 +135,7 @@ namespace Mfr.Tests.Models.Filters.Case
         {
             var filter = _CreateFilter(words: ["foo", "FOO"], uppercaseSentenceInitial: false);
 
-            var result = FilterTestHelpers.ApplyToPrefix(filter, "Foo");
+            var result = FilterTestHelpers.ApplyToFileName(filter, "Foo");
 
             Assert.Equal("FOO", result);
         }

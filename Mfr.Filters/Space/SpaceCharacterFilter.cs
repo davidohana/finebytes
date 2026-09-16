@@ -38,11 +38,10 @@ namespace Mfr.Filters.Space
     ) : StringTargetFilter(Target, ApplyScope)
     {
         /// <summary>
-        /// Creates a filter with MFR7 add-to-list defaults (file prefix, space separator, common replacements).
+        /// Creates a filter with MFR7 add-to-list defaults (file name, space separator, common replacements).
         /// </summary>
         public SpaceCharacterFilter()
-            : this(new FilePrefixTarget(), new SpaceCharacterOptions(' ', SpaceCharacterOptions.DefaultReplacements))
-        { }
+            : this(new FileNameTarget(), new SpaceCharacterOptions(' ', SpaceCharacterOptions.DefaultReplacements)) { }
 
         /// <summary>
         /// Gets the filter type discriminator.

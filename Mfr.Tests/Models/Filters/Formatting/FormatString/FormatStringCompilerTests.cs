@@ -22,7 +22,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         public void ResolveTemplate_MultipleTokens_ReplacesAll()
         {
             var item = FilterTestHelpers.CreateRenameItem(
-                prefix: "song",
+                fileName: "song",
                 extension: "mp3",
                 directory: TestPaths.Absolute("Music", "My Album")
             );
@@ -39,7 +39,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         [Fact]
         public void ResolveTemplate_TokensMixedWithLiterals_PreservesLiterals()
         {
-            var item = FilterTestHelpers.CreateRenameItem(prefix: "song", extension: "mp3");
+            var item = FilterTestHelpers.CreateRenameItem(fileName: "song", extension: "mp3");
 
             var compiled = FormatStringCompiler.Compile(template: "Track: <file-name> [<ext>]");
             var result = compiled(item);
