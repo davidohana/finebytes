@@ -34,7 +34,7 @@ namespace Mfr.App.Ui.ViewModels.Presets
     }
 
     /// <summary>
-    /// Result of <see cref="FilterChain.FilterChainViewModel.RenamePreset"/>.
+    /// Result of <see cref="FilterChainPane.FilterChainViewModel.RenamePreset"/>.
     /// </summary>
     /// <param name="Status">Rename outcome.</param>
     /// <param name="Preset">
