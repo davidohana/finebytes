@@ -28,7 +28,7 @@ namespace Mfr.Tests.Ui.Presets
             dialog.ConfirmDeleteAsync = (title, message) =>
             {
                 asked++;
-                Assert.Equal("Delete Preset", title);
+                Assert.Equal("Delete preset", title);
                 Assert.Contains("'A'", message, StringComparison.Ordinal);
                 return Task.FromResult(true);
             };

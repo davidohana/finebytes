@@ -44,7 +44,7 @@ namespace Mfr.Tests.Ui.FileList
         [AvaloniaFact]
         public void DoubleTap_When_Flag_Off_Opens_Selected_File()
         {
-            ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = false };
+            ConfigStore.Options.DoubleClickAddsToRenameList = false;
             var shell = new RecordingFileShellOpener();
             var addCommand = new CountingCommand();
             var (window, list, file) = _ShowListWithSelectedFile(shell, addCommand);
@@ -64,7 +64,7 @@ namespace Mfr.Tests.Ui.FileList
         [AvaloniaFact]
         public void DoubleTap_When_Flag_On_Runs_AddSelected()
         {
-            ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
+            ConfigStore.Options.DoubleClickAddsToRenameList = true;
             var shell = new RecordingFileShellOpener();
             var addCommand = new CountingCommand();
             var (window, list, _) = _ShowListWithSelectedFile(shell, addCommand);

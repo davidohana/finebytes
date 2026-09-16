@@ -1297,7 +1297,6 @@ namespace Mfr.Tests.Ui.RenameList
 
         /// <summary>
         /// Verifies font/preview prefs restore from a session section and round-trip through capture.
-        /// <para>Add policy is Options-owned on ConfigStore — capture omits it (defaults on the object).</para>
         /// </summary>
         [Fact]
         public void ApplySessionSection_Restores_Font_And_Preview()
@@ -1309,8 +1308,6 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.ApplySessionSection(
                 new RenameListPrefs
                 {
-                    AddMode = RenameListAddMode.Folders,
-                    AddFolderContents = false,
                     UseFixedWidthFont = true,
                     PreviewEnabled = false,
                     SortFields = [],
@@ -1322,8 +1319,6 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.False(renameListViewModel.IsAutoSort);
 
             var captured = renameListViewModel.CaptureSession();
-            Assert.Equal(RenameListAddMode.Files, captured.AddMode);
-            Assert.True(captured.AddFolderContents);
             Assert.True(captured.UseFixedWidthFont);
             Assert.False(captured.PreviewEnabled);
             Assert.NotNull(captured.SortFields);
@@ -1754,13 +1749,12 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Sets Options-owned Rename List add policy on <see cref="ConfigStore"/>.
+        /// Sets Options-owned Rename List add policy on <see cref="ConfigStore.Options"/>.
         /// </summary>
         private static void _SetAddPolicy(RenameListAddMode addMode, bool addFolderContents = true)
         {
-            var renameList = ConfigStore.EnsureRenameList();
-            renameList.AddMode = addMode;
-            renameList.AddFolderContents = addFolderContents;
+            ConfigStore.Options.AddMode = addMode;
+            ConfigStore.Options.AddFolderContents = addFolderContents;
         }
 
         private string _CreateSampleFolder()

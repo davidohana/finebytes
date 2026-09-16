@@ -11,7 +11,7 @@ namespace Mfr.App.Ui.Views.FileList
         /// Runs Add Selected when <paramref name="addsToRenameList"/> is true and that command can execute;
         /// otherwise Open Selected.
         /// </summary>
-        /// <param name="addsToRenameList">Config flag <c>ui.doubleClickAddsToRenameList</c>.</param>
+        /// <param name="addsToRenameList">Config flag <c>options.doubleClickAddsToRenameList</c>.</param>
         /// <param name="addSelectedCommand">Rename List Add Selected (toolbar) command.</param>
         /// <param name="openSelectedCommand">File List Open Selected command.</param>
         public static void Execute(bool addsToRenameList, ICommand? addSelectedCommand, ICommand? openSelectedCommand)

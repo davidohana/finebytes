@@ -321,19 +321,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Options-owned add mode from <see cref="ConfigStore"/> (defaults when the section is unset).
+        /// Options-owned add mode from <see cref="ConfigStore.Options"/>.
         /// </summary>
         private static RenameListAddMode _AddMode()
         {
-            return ConfigStore.RenameList?.AddMode ?? RenameListAddMode.Files;
+            return ConfigStore.Options.AddMode;
         }
 
         /// <summary>
-        /// Options-owned folder-contents flag from <see cref="ConfigStore"/> (default on when unset).
+        /// Options-owned folder-contents flag from <see cref="ConfigStore.Options"/>.
         /// </summary>
         private static bool _AddFolderContents()
         {
-            return ConfigStore.RenameList?.AddFolderContents ?? true;
+            return ConfigStore.Options.AddFolderContents;
         }
 
         private static IReadOnlyList<FileListSourceItem> _ToSourceItems(IEnumerable<FileListEntry> entries)

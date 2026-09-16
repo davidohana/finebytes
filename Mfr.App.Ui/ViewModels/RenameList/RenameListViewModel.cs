@@ -66,11 +66,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Restores sort, columns, and display prefs from a session section.
+        /// Restores sort, columns, and display prefs from a UI session section.
         /// <para>
-        /// Add policy (<see cref="RenameListPrefs.AddMode"/> / <see cref="RenameListPrefs.AddFolderContents"/>)
-        /// is Options-owned on <see cref="ConfigStore"/> — not applied here. A/B Mode is applied before
-        /// columns so leftover preview keys normalize to originals when mode is on.
+        /// A/B Mode is applied before columns so leftover preview keys normalize to originals when mode is on.
+        /// Add policy lives on <see cref="ConfigStore.Options"/> and is not applied here.
         /// </para>
         /// </summary>
         /// <param name="renameList">
@@ -88,13 +87,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Captures sort, columns, and display prefs for session save.
-        /// <para>
-        /// Omits Options-owned add policy; close-save merges those from <see cref="ConfigStore.RenameList"/>.
-        /// When A/B Mode is on, <see cref="RenameListPrefs.VisibleColumns"/> are originals-only.
-        /// </para>
+        /// Captures sort, columns, and display prefs for UI session save.
+        /// <para>When A/B Mode is on, <see cref="RenameListPrefs.VisibleColumns"/> are originals-only.</para>
         /// </summary>
-        /// <returns>Rename List session section matching the current view model.</returns>
+        /// <returns>Rename List UI session section matching the current view model.</returns>
         internal RenameListPrefs CaptureSession()
         {
             return new RenameListPrefs

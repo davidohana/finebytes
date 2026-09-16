@@ -27,8 +27,9 @@ namespace Mfr.App.Ui
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                var fileList = ConfigStore.FileList;
-                var initialFolder = fileList is { RememberLastFolder: true } ? fileList.LastOpenedDirectory : null;
+                var initialFolder = ConfigStore.Options.RememberLastFolder
+                    ? ConfigStore.FileList?.LastOpenedDirectory
+                    : null;
 
                 var mainWindow = new MainWindow
                 {

@@ -3,10 +3,12 @@ using Mfr.Utils.Config;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Options-dialog prefs from the <c>options</c> section of the config file.
+    /// Options-dialog prefs from the <c>options</c> section of the config file (app config leaf section).
     /// <para>
-    /// <see cref="SuppressedConfirmations"/> gates optional confirms via <see cref="ConfirmationPolicy"/>.
-    /// Obsolete <c>options.confirmationPrompts</c> / <c>ui</c> section names are ignored on soft-load (no migration).
+    /// Bound via <see cref="ConfigJsonApplier"/> string leaves. <see cref="SuppressedConfirmations"/> gates
+    /// optional confirms via <see cref="ConfirmationPolicy"/>. Obsolete <c>options.confirmationPrompts</c> /
+    /// root <c>ui</c> / Options fields formerly under <c>fileList</c> / <c>renameList</c> are ignored on soft-load
+    /// (no migration).
     /// </para>
     /// </summary>
     public sealed class OptionsConfig
@@ -25,10 +27,38 @@ namespace Mfr.Models.Config
         /// <para>Persisted as <c>options.rememberWindowState</c> (JSON string <c>true</c>/<c>false</c>).</para>
         /// </summary>
         public bool RememberWindowState = true;
+
+        /// <summary>
+        /// When true, restore and save the last File List folder across launches.
+        /// <para>Persisted as <c>options.rememberLastFolder</c> (JSON string <c>true</c>/<c>false</c>).</para>
+        /// </summary>
+        public bool RememberLastFolder = true;
+
+        /// <summary>
+        /// When <see langword="true"/>, double-click in the File List adds the selection to the Rename List.
+        /// <para>
+        /// Default <see langword="false"/> (open / navigate instead). Persisted as
+        /// <c>options.doubleClickAddsToRenameList</c> (JSON string <c>true</c>/<c>false</c>).
+        /// </para>
+        /// </summary>
+        public bool DoubleClickAddsToRenameList;
+
+        /// <summary>
+        /// Which path kinds become Rename List rows when adding from the File List.
+        /// <para>Persisted as <c>options.addMode</c> (JSON string camelCase enum name).</para>
+        /// </summary>
+        public RenameListAddMode AddMode = RenameListAddMode.Files;
+
+        /// <summary>
+        /// When true, folder sources recurse: matching files in subfolders, and descendant folder rows when
+        /// <see cref="AddMode"/> includes folders.
+        /// <para>Persisted as <c>options.addFolderContents</c> (JSON string <c>true</c>/<c>false</c>).</para>
+        /// </summary>
+        public bool AddFolderContents = true;
     }
 
     /// <summary>
-    /// Diagnostic session-log config loaded from the <c>log</c> section of the config file.
+    /// Diagnostic session-log config from the <c>log</c> section of the config file (app config leaf section).
     /// <para>Used by both the CLI and the UI. The console template applies to CLI console output only.</para>
     /// </summary>
     public sealed class LogConfig
@@ -75,7 +105,7 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Rename-commit undo log retention from the <c>renameLog</c> section of the config file.
+    /// Rename-commit undo log retention from the <c>renameLog</c> section of the config file (app config leaf section).
     /// <para>
     /// Separate from diagnostic Serilog <c>log</c> / <c>logs/</c>. Disk files live under
     /// <see cref="AppDataPaths.LocalRoot"/> + <c>rename-logs</c> as JSON <c>.mfrlog</c>.

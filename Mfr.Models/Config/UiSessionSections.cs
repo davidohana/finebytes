@@ -4,7 +4,7 @@ using Mfr.Models.RenameList;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Saved Filter Configuration chrome shared across filter option editors.
+    /// UI session: Filter Configuration chrome shared across filter option editors.
     /// </summary>
     public sealed class FilterEditorPrefs
     {
@@ -17,7 +17,7 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Saved window size and screen position (main window or a modal dialog).
+    /// UI session: saved window size and screen position (main window or a modal dialog).
     /// </summary>
     public sealed class WindowGeometryPrefs
     {
@@ -50,7 +50,7 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Saved main-window size, position, state, and pane splitter ratios.
+    /// UI session: saved main-window size, position, state, and pane splitter ratios.
     /// </summary>
     public sealed class MainWindowPrefs
     {
@@ -95,7 +95,7 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Saved File List folder, masks, view, and double-click behavior.
+    /// UI session: saved File List folder, masks, and view chrome (not Options-dialog policy).
     /// </summary>
     public sealed class FileListPrefs
     {
@@ -104,12 +104,6 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("lastOpenedDirectory")]
         public string? LastOpenedDirectory { get; set; }
-
-        /// <summary>
-        /// When true, restore and save the last File List folder across launches.
-        /// </summary>
-        [JsonPropertyName("rememberLastFolder")]
-        public bool RememberLastFolder { get; set; } = true;
 
         /// <summary>
         /// Last include mask applied to file names.
@@ -148,17 +142,10 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("thumbnailSize")]
         public int? ThumbnailSize { get; set; }
-
-        /// <summary>
-        /// When <see langword="true"/>, double-click in the File List adds the selection to the Rename List.
-        /// <para>Default <see langword="false"/> (open / navigate instead). Options dialog + <c>fileList.doubleClickAddsToRenameList</c>.</para>
-        /// </summary>
-        [JsonPropertyName("doubleClickAddsToRenameList")]
-        public bool DoubleClickAddsToRenameList { get; set; }
     }
 
     /// <summary>
-    /// Saved Rename List session fields.
+    /// UI session: saved Rename List chrome (sort, columns, preview, A/B — not Options add policy).
     /// </summary>
     public sealed class RenameListPrefs
     {
@@ -175,19 +162,6 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("visibleColumns")]
         public List<RenameListVisibleColumnSpec>? VisibleColumns { get; set; }
-
-        /// <summary>
-        /// Which path kinds become Rename List rows when adding from the File List.
-        /// </summary>
-        [JsonPropertyName("addMode")]
-        public RenameListAddMode AddMode { get; set; } = RenameListAddMode.Files;
-
-        /// <summary>
-        /// When true, folder sources recurse: matching files in subfolders, and descendant folder rows when
-        /// <see cref="AddMode"/> includes folders.
-        /// </summary>
-        [JsonPropertyName("addFolderContents")]
-        public bool AddFolderContents { get; set; } = true;
 
         /// <summary>
         /// When true, the Rename List grid uses a fixed-width font instead of the proportional File List font.
@@ -241,7 +215,7 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Saved main-window pane splitter positions as star ratios of the first pane in each pair.
+    /// UI session: saved main-window pane splitter positions as star ratios of the first pane in each pair.
     /// <para>
     /// Each ratio is firstPane / (firstPane + secondPane) in the range (0, 1). Null means leave XAML defaults.
     /// </para>

@@ -6,7 +6,7 @@ using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
 namespace Mfr.Tests.Ui.Services.Session
 {
     /// <summary>
-    /// Headless tests for close-save merge into <see cref="ConfigStore"/> sections.
+    /// Headless tests for close-save of UI session sections into <see cref="ConfigStore"/>.
     /// </summary>
     [Collection(ConfigStoreCollection.Name)]
     public sealed class UiSessionPersistenceTests
@@ -17,22 +17,19 @@ namespace Mfr.Tests.Ui.Services.Session
         }
 
         /// <summary>
-        /// Verifies close-save keeps Options-owned File List prefs when merging a pane capture.
+        /// Verifies close-save writes File List chrome without touching Options-owned prefs.
         /// </summary>
         [AvaloniaFact]
-        public void SaveOnClose_Preserves_DoubleClick_And_Remember_Flags()
+        public void SaveOnClose_Writes_FileList_Chrome_Leaves_Options()
         {
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-session-close-" + Guid.NewGuid() + ".json");
             File.WriteAllText(configPath, "{}");
             try
             {
                 ConfigStore.Load(configPath);
-                ConfigStore.FileList = new FileListPrefs
-                {
-                    RememberLastFolder = false,
-                    DoubleClickAddsToRenameList = true,
-                    FileMask = "*.old",
-                };
+                ConfigStore.Options.RememberLastFolder = false;
+                ConfigStore.Options.DoubleClickAddsToRenameList = true;
+                ConfigStore.FileList = new FileListPrefs { FileMask = "*.old" };
                 ConfigStore.MainWindow = null;
                 ConfigStore.Options.RememberWindowState = false;
 
@@ -45,18 +42,12 @@ namespace Mfr.Tests.Ui.Services.Session
                 window.Show();
                 window.UpdateLayout();
 
-                var capture = new FileListPrefs
-                {
-                    LastOpenedDirectory = Path.GetTempPath(),
-                    FileMask = "*.wav",
-                    DoubleClickAddsToRenameList = false,
-                    RememberLastFolder = true,
-                };
+                var capture = new FileListPrefs { LastOpenedDirectory = Path.GetTempPath(), FileMask = "*.wav" };
 
                 UiSessionPersistence.SaveOnClose(window, window.GetPaneGrids(), capture);
 
-                Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
-                Assert.False(ConfigStore.FileList?.RememberLastFolder);
+                Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
+                Assert.False(ConfigStore.Options.RememberLastFolder);
                 Assert.Equal("*.wav", ConfigStore.FileList?.FileMask);
                 Assert.False(ConfigStore.Options.RememberWindowState);
             }
@@ -72,21 +63,20 @@ namespace Mfr.Tests.Ui.Services.Session
         }
 
         /// <summary>
-        /// Verifies close-save keeps Options-owned Rename List add policy when merging a pane capture,
-        /// and writes pane-owned Before/After Mode fields from the capture.
+        /// Verifies close-save replaces Rename List UI session fields and leaves Options add policy alone.
         /// </summary>
         [AvaloniaFact]
-        public void SaveOnClose_Preserves_RenameList_Add_Policy()
+        public void SaveOnClose_Writes_RenameList_Chrome_Leaves_Options_Add_Policy()
         {
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-session-rl-close-" + Guid.NewGuid() + ".json");
             File.WriteAllText(configPath, "{}");
             try
             {
                 ConfigStore.Load(configPath);
+                ConfigStore.Options.AddMode = RenameListAddMode.Folders;
+                ConfigStore.Options.AddFolderContents = false;
                 ConfigStore.RenameList = new RenameListPrefs
                 {
-                    AddMode = RenameListAddMode.Folders,
-                    AddFolderContents = false,
                     UseFixedWidthFont = true,
                     PreviewEnabled = true,
                     AbModeEnabled = false,
@@ -105,8 +95,6 @@ namespace Mfr.Tests.Ui.Services.Session
 
                 var capture = new RenameListPrefs
                 {
-                    AddMode = RenameListAddMode.Files,
-                    AddFolderContents = true,
                     UseFixedWidthFont = false,
                     PreviewEnabled = false,
                     AbModeEnabled = true,
@@ -116,8 +104,8 @@ namespace Mfr.Tests.Ui.Services.Session
 
                 UiSessionPersistence.SaveOnClose(window, window.GetPaneGrids(), fileList: null, renameList: capture);
 
-                Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList?.AddMode);
-                Assert.False(ConfigStore.RenameList?.AddFolderContents);
+                Assert.Equal(RenameListAddMode.Folders, ConfigStore.Options.AddMode);
+                Assert.False(ConfigStore.Options.AddFolderContents);
                 Assert.False(ConfigStore.RenameList?.UseFixedWidthFont);
                 Assert.False(ConfigStore.RenameList?.PreviewEnabled);
                 Assert.True(ConfigStore.RenameList?.AbModeEnabled);

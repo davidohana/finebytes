@@ -33,13 +33,11 @@ namespace Mfr.Tests.Ui.Options
         public void Constructor_loads_prefs_drafts()
         {
             ConfigStore.Options.RememberWindowState = false;
-            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = false, DoubleClickAddsToRenameList = true };
+            ConfigStore.Options.RememberLastFolder = false;
+            ConfigStore.Options.DoubleClickAddsToRenameList = true;
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearRenameList];
-            ConfigStore.RenameList = new RenameListPrefs
-            {
-                AddMode = RenameListAddMode.Folders,
-                AddFolderContents = false,
-            };
+            ConfigStore.Options.AddMode = RenameListAddMode.Folders;
+            ConfigStore.Options.AddFolderContents = false;
             ConfigStore.RenameLog.Limit = 25;
 
             var vm = new OptionsDialogViewModel();
@@ -73,13 +71,11 @@ namespace Mfr.Tests.Ui.Options
         public void Commit_writes_prefs_memory()
         {
             ConfigStore.Options.RememberWindowState = true;
-            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
+            ConfigStore.Options.RememberLastFolder = true;
+            ConfigStore.Options.DoubleClickAddsToRenameList = false;
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
-            ConfigStore.RenameList = new RenameListPrefs
-            {
-                AddMode = RenameListAddMode.Files,
-                AddFolderContents = true,
-            };
+            ConfigStore.Options.AddMode = RenameListAddMode.Files;
+            ConfigStore.Options.AddFolderContents = true;
             ConfigStore.RenameLog.Limit = RenameLogConfig.DefaultLimit;
 
             var vm = new OptionsDialogViewModel()
@@ -96,19 +92,21 @@ namespace Mfr.Tests.Ui.Options
 
             vm.Commit();
 
-            Assert.False(ConfigStore.FileList.RememberLastFolder);
+            Assert.False(ConfigStore.Options.RememberLastFolder);
             Assert.False(ConfigStore.Options.RememberWindowState);
             Assert.Equal([ConfirmationKind.DeletePreset], ConfigStore.Options.SuppressedConfirmations);
-            Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
-            Assert.Equal(RenameListAddMode.FilesAndFolders, ConfigStore.RenameList.AddMode);
-            Assert.False(ConfigStore.RenameList.AddFolderContents);
+            Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
+            Assert.Equal(RenameListAddMode.FilesAndFolders, ConfigStore.Options.AddMode);
+            Assert.False(ConfigStore.Options.AddFolderContents);
             Assert.Equal(3, ConfigStore.RenameLog.Limit);
         }
 
         [Fact]
-        public void Commit_creates_missing_prefs_sections()
+        public void Commit_writes_options_without_creating_session_sections()
         {
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.UndoRename];
+            Assert.Null(ConfigStore.FileList);
+            Assert.Null(ConfigStore.RenameList);
 
             var vm = new OptionsDialogViewModel()
             {
@@ -123,14 +121,14 @@ namespace Mfr.Tests.Ui.Options
 
             vm.Commit();
 
-            Assert.NotNull(ConfigStore.FileList);
-            Assert.NotNull(ConfigStore.RenameList);
-            Assert.False(ConfigStore.FileList.RememberLastFolder);
+            Assert.Null(ConfigStore.FileList);
+            Assert.Null(ConfigStore.RenameList);
+            Assert.False(ConfigStore.Options.RememberLastFolder);
             Assert.False(ConfigStore.Options.RememberWindowState);
             Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
-            Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
-            Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
-            Assert.False(ConfigStore.RenameList.AddFolderContents);
+            Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
+            Assert.Equal(RenameListAddMode.Folders, ConfigStore.Options.AddMode);
+            Assert.False(ConfigStore.Options.AddFolderContents);
             Assert.Equal(int.MaxValue, ConfigStore.RenameLog.Limit);
         }
 
@@ -168,7 +166,11 @@ namespace Mfr.Tests.Ui.Options
         [Fact]
         public void ResetConfirmations_clears_draft_only()
         {
-            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset];
+            ConfigStore.Options.SuppressedConfirmations =
+            [
+                ConfirmationKind.ClearRenameList,
+                ConfirmationKind.DeletePreset,
+            ];
 
             var vm = new OptionsDialogViewModel();
             Assert.Equal([ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset], vm.SuppressedConfirmations);

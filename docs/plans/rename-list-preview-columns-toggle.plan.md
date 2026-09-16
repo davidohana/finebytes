@@ -194,7 +194,7 @@ flowchart TB
 - [`RenameListFieldShuttleDialog.axaml`](../../Mfr.App.Ui/Views/RenameList/RenameListFieldShuttleDialog.axaml) + [`RenameListFieldShuttleDialogViewModel.cs`](../../Mfr.App.Ui/ViewModels/RenameList/RenameListFieldShuttleDialogViewModel.cs)
 - [`RenameListViewModel.Columns.cs`](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Columns.cs) — apply shuttle flag, `ProjectedColumns`, normalize, derive
 - [`RenameListViewModel.Metadata.cs`](../../Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Metadata.cs) — `ApplyFieldShuttleAsync` + hydrate on side flip
-- [`SessionPrefs.cs`](../../Mfr.Models/Config/SessionPrefs.cs) / session apply-capture wiring
+- [`UiSessionSections.cs`](../../Mfr.Models/Config/UiSessionSections.cs) / session apply-capture wiring
 - [`RenameListView.axaml`](../../Mfr.App.Ui/Views/RenameList/RenameListView.axaml) / [`MainWindow.axaml`](../../Mfr.App.Ui/Views/MainWindow/MainWindow.axaml) — side control only
 - [`RenameListView.Columns.cs`](../../Mfr.App.Ui/Views/RenameList/RenameListView.Columns.cs) — rebuild from projection; reorder map; width no-op
 - RL call sites for relevant columns (not `FilterRelevantRenameListColumns` itself)

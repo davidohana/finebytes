@@ -466,7 +466,7 @@ namespace Mfr.App.Ui.Views.FileList
             }
 
             FileListDoubleClickAction.Execute(
-                addsToRenameList: ConfigStore.FileList?.DoubleClickAddsToRenameList ?? false,
+                addsToRenameList: ConfigStore.Options.DoubleClickAddsToRenameList,
                 addSelectedCommand: AddSelectedCommand,
                 openSelectedCommand: viewModel.OpenSelectedCommand
             );

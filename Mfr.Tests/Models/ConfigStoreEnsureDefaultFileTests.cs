@@ -24,9 +24,15 @@ namespace Mfr.Tests.Models
                 doc.RootElement.GetProperty("options").GetProperty("suppressedConfirmations").EnumerateArray().ToArray()
             );
             Assert.Equal("true", doc.RootElement.GetProperty("options").GetProperty("rememberWindowState").GetString());
+            Assert.Equal("true", doc.RootElement.GetProperty("options").GetProperty("rememberLastFolder").GetString());
+            Assert.Equal(
+                "false",
+                doc.RootElement.GetProperty("options").GetProperty("doubleClickAddsToRenameList").GetString()
+            );
+            Assert.Equal("files", doc.RootElement.GetProperty("options").GetProperty("addMode").GetString());
+            Assert.Equal("true", doc.RootElement.GetProperty("options").GetProperty("addFolderContents").GetString());
             Assert.Equal("10", doc.RootElement.GetProperty("renameLog").GetProperty("limit").GetString());
             Assert.False(doc.RootElement.GetProperty("options").TryGetProperty("confirmationPrompts", out _));
-            Assert.False(doc.RootElement.GetProperty("options").TryGetProperty("doubleClickAddsToRenameList", out _));
             Assert.False(doc.RootElement.GetProperty("options").TryGetProperty("presets", out _));
             Assert.False(doc.RootElement.TryGetProperty("session", out _));
             Assert.False(doc.RootElement.TryGetProperty("mainWindow", out _));

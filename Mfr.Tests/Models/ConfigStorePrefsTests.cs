@@ -71,8 +71,8 @@ namespace Mfr.Tests.Models
                 MaskSuggestions = ["*.mp3", "*.flac"],
                 ViewMode = FileListViewMode.List,
                 ThumbnailSize = 128,
-                DoubleClickAddsToRenameList = true,
             };
+            ConfigStore.Options.DoubleClickAddsToRenameList = true;
             ConfigStore.RenameList = new RenameListPrefs
             {
                 SortFields = [new RenameListSortKey(RenameListTestHelpers.FullFileNameKey, Descending: true)],
@@ -120,7 +120,7 @@ namespace Mfr.Tests.Models
             Assert.Contains("*.flac", ConfigStore.FileList.MaskSuggestions!);
             Assert.Equal(FileListViewMode.List, ConfigStore.FileList.ViewMode);
             Assert.Equal(128, ConfigStore.FileList.ThumbnailSize);
-            Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
+            Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
             Assert.NotNull(ConfigStore.RenameList);
             Assert.NotNull(ConfigStore.RenameList.SortFields);
             Assert.Single(ConfigStore.RenameList.SortFields);
@@ -189,14 +189,14 @@ namespace Mfr.Tests.Models
         public void SetDefault_pin_save_rewrites_whole_config()
         {
             using var temp = ConfigStoreTempFile.CreateReady();
-            ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
+            ConfigStore.Options.DoubleClickAddsToRenameList = true;
             ConfigStore.MainWindow = new MainWindowPrefs { Width = 900 };
             ConfigStore.Save(temp.Path);
 
             FilterDefaultsStore.CreateEmpty().SetDefault(new LettersCaseFilter());
 
             ConfigStore.Load(temp.Path);
-            Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
+            Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
             Assert.Equal(900, ConfigStore.MainWindow?.Width);
             Assert.True(ConfigStore.FilterDefaultsJson.ContainsKey("LettersCase"));
         }
@@ -220,6 +220,7 @@ namespace Mfr.Tests.Models
             );
             ConfigStore.Load(temp.Path);
             Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
+            Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
             Assert.Null(ConfigStore.FileList);
             Assert.Equal(50, ConfigStore.Log.MaxSessionFiles);
         }

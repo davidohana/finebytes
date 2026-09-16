@@ -7,35 +7,38 @@ using Mfr.Utils.Config;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Loads and saves process-wide preferences as a single <c>config.json</c>
-    /// (<c>log</c>/<c>ui</c>/<c>renameLog</c> string leaves, UI session sections, and opaque <c>filterDefaults</c>).
+    /// Loads and saves process-wide preferences as a single <c>config.json</c>:
+    /// app config sections (<c>log</c>/<c>options</c>/<c>renameLog</c> string leaves), UI session sections
+    /// (<c>mainWindow</c>/<c>fileList</c>/<c>renameList</c>/<c>filterEditor</c>/<c>dialogs</c>), and opaque
+    /// <c>filterDefaults</c>.
     /// <para>Default file: <see cref="_DefaultConfigFilePath"/>.</para>
     /// </summary>
     /// <remarks>
     /// <para>
     /// Soft-load dialect for the whole prefs file: missing default AppData file → in-memory defaults.
-    /// Corrupt / unreadable → defaults (app continues). Missing keys → field initializers / null session
+    /// Corrupt / unreadable → defaults (app continues). Missing keys → field initializers / null UI session
     /// sections / empty <see cref="FilterDefaultsJson"/>. Invalid <c>log</c>/<c>options</c>/<c>renameLog</c>
     /// leaf → that leaf is skipped. Unknown members inside <c>options.suppressedConfirmations</c> are skipped;
-    /// obsolete <c>options.confirmationPrompts</c> / root <c>ui</c> are ignored (no migration). Bad <c>filterDefaults</c> entries
+    /// obsolete <c>options.confirmationPrompts</c> / root <c>ui</c> / Options fields formerly under
+    /// <c>fileList</c> / <c>renameList</c> are ignored (no migration). Bad <c>filterDefaults</c> entries
     /// are skipped later by <c>FilterDefaultsStore</c> (Engine). Explicit <c>--config PATH</c> missing →
     /// hard-fail (CLI typo). Explicit path corrupt → soft to defaults. Opposite of hard-fail
     /// <c>PresetManager</c> (Engine) and CLI <c>--set</c> (<see cref="ApplyCliOverrides"/>).
     /// </para>
     /// <para>
     /// When the default AppData file is missing, <see cref="EnsureDefaultFile"/> writes one with current
-    /// defaults so the user can hand-edit log settings. Empty session sections / <c>filterDefaults</c> are
+    /// defaults so the user can hand-edit log settings. Empty UI session sections / <c>filterDefaults</c> are
     /// omitted (same as first launch). Options, session close-save, and filter-default pin all persist via
-    /// <see cref="Save"/> (whole document overwrite). Null session section properties are omitted on write.
+    /// <see cref="Save"/> (whole document overwrite). Null UI session section properties are omitted on write.
     /// When a property is omitted, values still come from <see cref="LogConfig"/> / <see cref="OptionsConfig"/> /
     /// <see cref="RenameLogConfig"/> field initializers.
     /// </para>
     /// <para>
-    /// Document shape: root object with <c>log</c>/<c>options</c>/<c>renameLog</c> (string leaves and enum-list
-    /// arrays via <see cref="ConfigJsonApplier"/> / <see cref="ConfigJsonWriter"/>), sibling session sections
-    /// (<c>mainWindow</c>, <c>fileList</c>, <c>renameList</c>, <c>filterEditor</c>, <c>dialogs</c> via STJ), and
-    /// <c>filterDefaults</c> (opaque map of type → filter JSON; not nested under <c>defaults</c>).
-    /// Nested <c>session</c> is not read (no migration).
+    /// Document shape: root object with app config sections <c>log</c>/<c>options</c>/<c>renameLog</c>
+    /// (string leaves and enum-list arrays via <see cref="ConfigJsonApplier"/> / <see cref="ConfigJsonWriter"/>),
+    /// sibling UI session sections (<c>mainWindow</c>, <c>fileList</c>, <c>renameList</c>, <c>filterEditor</c>,
+    /// <c>dialogs</c> via STJ), and <c>filterDefaults</c> (opaque map of type → filter JSON; not nested under
+    /// <c>defaults</c>). Nested <c>session</c> is not read (no migration).
     /// </para>
     /// </remarks>
     public static class ConfigStore
@@ -58,7 +61,7 @@ namespace Mfr.Models.Config
         public static LogConfig Log => s_Prefs.Log;
 
         /// <summary>
-        /// Gets the Options prefs (<c>options.suppressedConfirmations</c>, <c>options.rememberWindowState</c>).
+        /// Gets the Options prefs (<c>options</c> app config section: confirms, remember flags, add policy).
         /// </summary>
         public static OptionsConfig Options => s_Prefs.Options;
 
@@ -74,12 +77,12 @@ namespace Mfr.Models.Config
         public static MainWindowPrefs? MainWindow { get; set; }
 
         /// <summary>
-        /// Gets or sets the last File List folder, masks, view, and double-click behavior.
+        /// Gets or sets the last File List folder, masks, and view chrome.
         /// </summary>
         public static FileListPrefs? FileList { get; set; }
 
         /// <summary>
-        /// Gets or sets the last Rename List Auto-Sort and related session fields.
+        /// Gets or sets the last Rename List Auto-Sort and related UI session fields.
         /// </summary>
         public static RenameListPrefs? RenameList { get; set; }
 
@@ -237,7 +240,7 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Writes prefs and session sections to JSON, creating the directory when needed.
+        /// Writes prefs and UI session sections to JSON, creating the directory when needed.
         /// <para>Always overwrites. Used by Options OK, session close-save, and filter-default pin.</para>
         /// </summary>
         /// <param name="configFilePath">
@@ -293,7 +296,7 @@ namespace Mfr.Models.Config
         /// Writes defaults to JSON when the file is missing, so it can be hand-edited.
         /// <para>
         /// Existing files are left unchanged. Failures are swallowed so a missing AppData write does not
-        /// crash the app. Empty session sections / <c>filterDefaults</c> are omitted until first real save.
+        /// crash the app. Empty UI session sections / <c>filterDefaults</c> are omitted until first real save.
         /// </para>
         /// </summary>
         /// <param name="configFilePath">
@@ -368,9 +371,9 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Reads a root session section, or <see langword="null"/> when missing or unreadable.
+        /// Reads a root UI session section, or <see langword="null"/> when missing or unreadable.
         /// </summary>
-        /// <typeparam name="T">Session section type.</typeparam>
+        /// <typeparam name="T">UI session section type.</typeparam>
         /// <param name="root">Document root object.</param>
         /// <param name="propertyName">Root property name.</param>
         /// <returns>Deserialized section, or <see langword="null"/>.</returns>
@@ -403,9 +406,9 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Writes a session section when non-null and non-empty after null-ignore serialization.
+        /// Writes a UI session section when non-null and non-empty after null-ignore serialization.
         /// </summary>
-        /// <typeparam name="T">Session section type.</typeparam>
+        /// <typeparam name="T">UI session section type.</typeparam>
         /// <param name="root">Document root object.</param>
         /// <param name="propertyName">Root property name.</param>
         /// <param name="section">Section to write, or <see langword="null"/> to omit.</param>
@@ -457,7 +460,8 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Private root for string-leaf <c>log</c>/<c>options</c>/<c>renameLog</c> binding via <see cref="ConfigJsonApplier"/>.
+        /// Private root for string-leaf <c>log</c>/<c>options</c>/<c>renameLog</c> app config binding via
+        /// <see cref="ConfigJsonApplier"/>.
         /// </summary>
         private sealed class PrefsRoot
         {
@@ -468,7 +472,7 @@ namespace Mfr.Models.Config
             public LogConfig Log = new();
 
             /// <summary>
-            /// Options dialog prefs (<c>suppressedConfirmations</c>, <c>rememberWindowState</c>).
+            /// Options dialog prefs (confirms, remember flags, File List double-click, Rename List add policy).
             /// </summary>
             [ConfigSection("options")]
             public OptionsConfig Options = new();

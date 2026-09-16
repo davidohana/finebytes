@@ -9,29 +9,29 @@ namespace Mfr.Tests.Models
     public sealed class ConfigStoreSaveTests
     {
         [Fact]
-        public void Save_round_trips_mutated_ui_and_file_list_leaves()
+        public void Save_round_trips_mutated_options_leaves()
         {
             using var temp = ConfigStoreTempFile.CreateReady();
-            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset];
-            ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
+            ConfigStore.Options.SuppressedConfirmations =
+            [
+                ConfirmationKind.ClearRenameList,
+                ConfirmationKind.DeletePreset,
+            ];
+            ConfigStore.Options.DoubleClickAddsToRenameList = true;
             ConfigStore.Save(temp.Path);
 
             Assert.True(File.Exists(temp.Path));
             using (var doc = JsonDocument.Parse(File.ReadAllText(temp.Path)))
             {
-                var suppressed = doc
-                    .RootElement.GetProperty("options")
+                var options = doc.RootElement.GetProperty("options");
+                var suppressed = options
                     .GetProperty("suppressedConfirmations")
                     .EnumerateArray()
                     .Select(e => e.GetString()!)
                     .ToArray();
                 Assert.Equal(["clearRenameList", "deletePreset"], suppressed);
-                Assert.True(
-                    doc.RootElement.GetProperty("fileList").GetProperty("doubleClickAddsToRenameList").GetBoolean()
-                );
-                Assert.False(
-                    doc.RootElement.GetProperty("options").TryGetProperty("doubleClickAddsToRenameList", out _)
-                );
+                Assert.Equal("true", options.GetProperty("doubleClickAddsToRenameList").GetString());
+                Assert.False(doc.RootElement.TryGetProperty("fileList", out _));
                 Assert.False(doc.RootElement.TryGetProperty("filters", out _));
             }
 
@@ -40,7 +40,8 @@ namespace Mfr.Tests.Models
                 [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset],
                 ConfigStore.Options.SuppressedConfirmations
             );
-            Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
+            Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
+            Assert.Null(ConfigStore.FileList);
         }
 
         [Fact]
@@ -51,30 +52,26 @@ namespace Mfr.Tests.Models
                 """
                 {
                   "options": {
-                    "suppressedConfirmations": ["goWithPreviewErrors"]
-                  },
-                  "fileList": {
-                    "doubleClickAddsToRenameList": false
+                    "suppressedConfirmations": ["goWithPreviewErrors"],
+                    "doubleClickAddsToRenameList": "false"
                   }
                 }
                 """
             );
             ConfigStoreTestReset.LoadEmpty();
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearRenameList];
-            ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
+            ConfigStore.Options.DoubleClickAddsToRenameList = true;
             ConfigStore.Save(temp.Path);
 
             using var doc = JsonDocument.Parse(File.ReadAllText(temp.Path));
-            var suppressed = doc
-                .RootElement.GetProperty("options")
+            var options = doc.RootElement.GetProperty("options");
+            var suppressed = options
                 .GetProperty("suppressedConfirmations")
                 .EnumerateArray()
                 .Select(e => e.GetString()!)
                 .ToArray();
             Assert.Equal(["clearRenameList"], suppressed);
-            Assert.True(
-                doc.RootElement.GetProperty("fileList").GetProperty("doubleClickAddsToRenameList").GetBoolean()
-            );
+            Assert.Equal("true", options.GetProperty("doubleClickAddsToRenameList").GetString());
         }
 
         [Fact]
@@ -83,13 +80,13 @@ namespace Mfr.Tests.Models
             using var temp = ConfigStoreTempFile.CreateUnderNewDirectory("nested", "config.json");
             ConfigStoreTestReset.LoadEmpty();
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.UndoRename];
-            ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
+            ConfigStore.Options.DoubleClickAddsToRenameList = true;
             ConfigStore.Save(temp.Path);
 
             Assert.True(File.Exists(temp.Path));
             ConfigStore.Load(temp.Path);
             Assert.Equal([ConfirmationKind.UndoRename], ConfigStore.Options.SuppressedConfirmations);
-            Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
+            Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
         }
 
         [Fact]
@@ -112,6 +109,7 @@ namespace Mfr.Tests.Models
             );
             ConfigStore.Load(temp.Path);
             Assert.Equal([ConfirmationKind.OverwritePreset], ConfigStore.Options.SuppressedConfirmations);
+            Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
             Assert.Null(ConfigStore.FileList);
         }
     }

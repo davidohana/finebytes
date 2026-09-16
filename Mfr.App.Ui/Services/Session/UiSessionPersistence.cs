@@ -5,7 +5,7 @@ using Mfr.Models.Config;
 namespace Mfr.App.Ui.Services.Session
 {
     /// <summary>
-    /// Merges UI preferences with in-memory window/folder state into <see cref="ConfigStore"/> sections.
+    /// Restores and saves UI session sections on <see cref="ConfigStore"/>.
     /// </summary>
     internal static class UiSessionPersistence
     {
@@ -38,7 +38,7 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Merges layout into <see cref="ConfigStore"/> then saves the whole prefs document:
+        /// Writes UI session sections into <see cref="ConfigStore"/> then saves the whole prefs document:
         /// window/folder when their remember flags are on; File List masks/view and Rename List always.
         /// </summary>
         /// <param name="window">Main window providing layout to capture.</param>
@@ -61,10 +61,9 @@ namespace Mfr.App.Ui.Services.Session
 
             try
             {
-                var rememberWindow = ConfigStore.Options.RememberWindowState;
-                var rememberLastFolder = ConfigStore.FileList?.RememberLastFolder ?? true;
+                var options = ConfigStore.Options;
 
-                if (rememberWindow)
+                if (options.RememberWindowState)
                 {
                     var captured = WindowSession.Capture(window);
                     captured.Splitters = SplitterSession.Capture(panes);
@@ -73,37 +72,18 @@ namespace Mfr.App.Ui.Services.Session
 
                 if (fileList is not null)
                 {
-                    // Merge layout fields only — Options-owned prefs (e.g. DoubleClickAddsToRenameList) stay.
-                    var saved = ConfigStore.EnsureFileList();
-                    saved.RememberLastFolder = rememberLastFolder;
-
-                    if (rememberLastFolder && _IsPersistableFolder(fileList.LastOpenedDirectory))
+                    var toSave = fileList;
+                    if (!options.RememberLastFolder || !_IsPersistableFolder(fileList.LastOpenedDirectory))
                     {
-                        saved.LastOpenedDirectory = fileList.LastOpenedDirectory;
+                        toSave.LastOpenedDirectory = ConfigStore.FileList?.LastOpenedDirectory;
                     }
 
-                    saved.FileMask = fileList.FileMask;
-
-                    saved.ExcludeMasks = fileList.ExcludeMasks is null ? null : [.. fileList.ExcludeMasks];
-
-                    saved.ExcludeMasksEnabled = fileList.ExcludeMasksEnabled;
-
-                    saved.MaskSuggestions = fileList.MaskSuggestions is null ? null : [.. fileList.MaskSuggestions];
-
-                    saved.ViewMode = fileList.ViewMode;
-                    saved.ThumbnailSize = fileList.ThumbnailSize;
+                    ConfigStore.FileList = toSave;
                 }
 
                 if (renameList is not null)
                 {
-                    // Merge pane fields only — Options-owned add policy stays on ConfigStore.
-                    var saved = ConfigStore.EnsureRenameList();
-                    saved.SortFields = renameList.SortFields is null ? null : [.. renameList.SortFields];
-                    saved.VisibleColumns = renameList.VisibleColumns is null ? null : [.. renameList.VisibleColumns];
-                    saved.UseFixedWidthFont = renameList.UseFixedWidthFont;
-                    saved.PreviewEnabled = renameList.PreviewEnabled;
-                    saved.AbModeEnabled = renameList.AbModeEnabled;
-                    saved.AbSide = RenameListPrefs.NormalizeAbSide(renameList.AbSide);
+                    ConfigStore.RenameList = renameList;
                 }
 
                 ConfigStore.TrySave();

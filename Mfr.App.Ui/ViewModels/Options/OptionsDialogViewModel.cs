@@ -31,12 +31,13 @@ namespace Mfr.App.Ui.ViewModels.Options
         /// </summary>
         public OptionsDialogViewModel()
         {
-            RememberLastFolder = ConfigStore.FileList?.RememberLastFolder ?? true;
-            RememberWindowState = ConfigStore.Options.RememberWindowState;
-            SuppressedConfirmations = [.. ConfigStore.Options.SuppressedConfirmations];
-            DoubleClickAddsToRenameList = ConfigStore.FileList?.DoubleClickAddsToRenameList ?? false;
-            AddMode = ConfigStore.RenameList?.AddMode ?? RenameListAddMode.Files;
-            AddFolderContents = ConfigStore.RenameList?.AddFolderContents ?? true;
+            var options = ConfigStore.Options;
+            RememberLastFolder = options.RememberLastFolder;
+            RememberWindowState = options.RememberWindowState;
+            SuppressedConfirmations = [.. options.SuppressedConfirmations];
+            DoubleClickAddsToRenameList = options.DoubleClickAddsToRenameList;
+            AddMode = options.AddMode;
+            AddFolderContents = options.AddFolderContents;
             _LoadRenameLogRetention(ConfigStore.RenameLog.Limit);
         }
 
@@ -133,14 +134,13 @@ namespace Mfr.App.Ui.ViewModels.Options
         /// </summary>
         public void Commit()
         {
-            var fileList = ConfigStore.EnsureFileList();
-            fileList.RememberLastFolder = RememberLastFolder;
-            fileList.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
-            ConfigStore.Options.RememberWindowState = RememberWindowState;
-            ConfigStore.Options.SuppressedConfirmations = [.. SuppressedConfirmations];
-            var renameList = ConfigStore.EnsureRenameList();
-            renameList.AddMode = AddMode;
-            renameList.AddFolderContents = AddFolderContents;
+            var options = ConfigStore.Options;
+            options.RememberLastFolder = RememberLastFolder;
+            options.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
+            options.RememberWindowState = RememberWindowState;
+            options.SuppressedConfirmations = [.. SuppressedConfirmations];
+            options.AddMode = AddMode;
+            options.AddFolderContents = AddFolderContents;
             ConfigStore.RenameLog.Limit = _LimitFromDraft();
         }
 

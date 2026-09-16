@@ -254,14 +254,12 @@ namespace Mfr.Tests.Ui.Options
 
             Assert.NotNull(shown);
             Assert.True(saved);
-            Assert.NotNull(ConfigStore.FileList);
-            Assert.NotNull(ConfigStore.RenameList);
-            Assert.False(ConfigStore.FileList.RememberLastFolder);
+            Assert.False(ConfigStore.Options.RememberLastFolder);
             Assert.False(ConfigStore.Options.RememberWindowState);
             Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
-            Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
-            Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
-            Assert.False(ConfigStore.RenameList.AddFolderContents);
+            Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
+            Assert.Equal(RenameListAddMode.Folders, ConfigStore.Options.AddMode);
+            Assert.False(ConfigStore.Options.AddFolderContents);
             Assert.Equal(0, ConfigStore.RenameLog.Limit);
 
             viewModel.SuppressSessionSaveOnClose = true;
@@ -339,14 +337,12 @@ namespace Mfr.Tests.Ui.Options
             await _InvokeShowOptionsAsync(viewModel);
 
             Assert.False(saved);
-            Assert.NotNull(ConfigStore.FileList);
-            Assert.NotNull(ConfigStore.RenameList);
-            Assert.True(ConfigStore.FileList.RememberLastFolder);
+            Assert.True(ConfigStore.Options.RememberLastFolder);
             Assert.True(ConfigStore.Options.RememberWindowState);
             Assert.Equal([ConfirmationKind.GoWithPreviewErrors], ConfigStore.Options.SuppressedConfirmations);
-            Assert.False(ConfigStore.FileList.DoubleClickAddsToRenameList);
-            Assert.Equal(RenameListAddMode.Files, ConfigStore.RenameList.AddMode);
-            Assert.True(ConfigStore.RenameList.AddFolderContents);
+            Assert.False(ConfigStore.Options.DoubleClickAddsToRenameList);
+            Assert.Equal(RenameListAddMode.Files, ConfigStore.Options.AddMode);
+            Assert.True(ConfigStore.Options.AddFolderContents);
             Assert.Equal(10, ConfigStore.RenameLog.Limit);
 
             viewModel.SuppressSessionSaveOnClose = true;
@@ -387,13 +383,11 @@ namespace Mfr.Tests.Ui.Options
         private static void _SeedOptionsPrefs()
         {
             ConfigStore.Options.RememberWindowState = true;
-            ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
+            ConfigStore.Options.RememberLastFolder = true;
+            ConfigStore.Options.DoubleClickAddsToRenameList = false;
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
-            ConfigStore.RenameList = new RenameListPrefs
-            {
-                AddMode = RenameListAddMode.Files,
-                AddFolderContents = true,
-            };
+            ConfigStore.Options.AddMode = RenameListAddMode.Files;
+            ConfigStore.Options.AddFolderContents = true;
             ConfigStore.RenameLog.Limit = RenameLogConfig.DefaultLimit;
         }
 

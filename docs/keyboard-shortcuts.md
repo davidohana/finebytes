@@ -16,8 +16,7 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 | Options              | Ctrl+,          |
 | Exit                 | Alt+F4          |
 | Refresh focused pane | F5              |
-| Go to folder          | Ctrl+L or Alt+D |
-
+| Go to folder         | Ctrl+L or Alt+D |
 
 Undo last (Ctrl+Z) prepares an undo session from the last GO when a rename log exists: it replaces the Rename List with reverse OldValues, clears Filter Chain, and leaves disk unchanged until you press GO. Rename Log (Ctrl+Shift+L) opens the dialog (disk history + last operation); Undo there uses the same prepare path. Options (Ctrl+,) is live. GO previews the current list, warns before ignoring preview errors, applies valid renames, and clears manual field overrides on rows that were applied or hit a commit error (preview-error and skipped rows keep theirs).
 

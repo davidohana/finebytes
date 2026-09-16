@@ -1091,14 +1091,9 @@ namespace Mfr.App.Ui.ViewModels.FileList
         }
 
         /// <summary>
-        /// Captures current mask, exclude-mask, suggestion, view-mode, and thumbnail-size fields for session save.
-        /// <para>
-        /// Omits Options-owned prefs (<see cref="FileListPrefs.RememberLastFolder"/>,
-        /// <see cref="FileListPrefs.DoubleClickAddsToRenameList"/>); close-save merges those from
-        /// <see cref="ConfigStore.FileList"/>.
-        /// </para>
+        /// Captures current folder, mask, exclude-mask, suggestion, view-mode, and thumbnail-size fields for session save.
         /// </summary>
-        /// <returns>File List session section matching the current view model.</returns>
+        /// <returns>File List UI session section matching the current view model.</returns>
         internal FileListPrefs CaptureSession()
         {
             return new FileListPrefs
