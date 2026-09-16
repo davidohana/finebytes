@@ -14,6 +14,7 @@ namespace Mfr.Utils
     {
         private static readonly char[] s_invalidName = _BuildInvalidName();
         private static readonly char[] s_invalidPath = _BuildInvalidPath();
+        private static readonly HashSet<char> s_invalidNameSet = [.. s_invalidName];
 
         /// <summary>
         /// Whether <paramref name="value"/> contains a character illegal in Windows file names.
@@ -23,6 +24,50 @@ namespace Mfr.Utils
         public static bool ContainsInvalid(string value)
         {
             return value.AsSpan().IndexOfAny(s_invalidName) >= 0;
+        }
+
+        /// <summary>
+        /// Distinct Windows-illegal file-name characters in <paramref name="value"/>, in first-seen order.
+        /// </summary>
+        /// <param name="value">Candidate file or folder name segment.</param>
+        /// <returns>Illegal characters found; empty when none.</returns>
+        public static IReadOnlyList<char> FindInvalid(string value)
+        {
+            List<char>? found = null;
+            HashSet<char>? seen = null;
+            foreach (var c in value)
+            {
+                if (!s_invalidNameSet.Contains(c))
+                {
+                    continue;
+                }
+
+                seen ??= [];
+                if (!seen.Add(c))
+                {
+                    continue;
+                }
+
+                found ??= [];
+                found.Add(c);
+            }
+
+            return found is null ? [] : found;
+        }
+
+        /// <summary>
+        /// Formats illegal characters from <see cref="FindInvalid"/> for error messages.
+        /// </summary>
+        /// <param name="invalidChars">Illegal characters (typically from <see cref="FindInvalid"/>).</param>
+        /// <returns>Display text such as <c>':'</c> or <c>':' '*'</c>; empty when <paramref name="invalidChars"/> is empty.</returns>
+        public static string FormatInvalidForMessage(IReadOnlyList<char> invalidChars)
+        {
+            if (invalidChars.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            return string.Join(' ', invalidChars.Select(_FormatCharForMessage));
         }
 
         /// <summary>
@@ -45,6 +90,16 @@ namespace Mfr.Utils
             {
                 chars.Add(c);
             }
+        }
+
+        private static string _FormatCharForMessage(char c)
+        {
+            if (char.IsControl(c))
+            {
+                return $"U+{(int)c:X4}";
+            }
+
+            return $"'{c}'";
         }
 
         private static char[] _BuildInvalidName()

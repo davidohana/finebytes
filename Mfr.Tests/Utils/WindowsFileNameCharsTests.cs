@@ -39,5 +39,26 @@ namespace Mfr.Tests.Utils
         {
             Assert.Equal(expected, WindowsFileNameChars.ContainsInvalidPath(path));
         }
+
+        /// <summary>
+        /// Verifies distinct illegal characters are reported in first-seen order.
+        /// </summary>
+        [Fact]
+        public void FindInvalid_returns_distinct_chars_in_first_seen_order()
+        {
+            Assert.Equal([':', '*', '?'], WindowsFileNameChars.FindInvalid("a:b*a:c?"));
+            Assert.Empty(WindowsFileNameChars.FindInvalid("ok-name"));
+        }
+
+        /// <summary>
+        /// Verifies illegal characters are formatted for preview/commit error text.
+        /// </summary>
+        [Fact]
+        public void FormatInvalidForMessage_quotes_printable_and_codes_controls()
+        {
+            Assert.Equal("':' '*'", WindowsFileNameChars.FormatInvalidForMessage([':', '*']));
+            Assert.Equal("U+0000", WindowsFileNameChars.FormatInvalidForMessage(['\0']));
+            Assert.Equal(string.Empty, WindowsFileNameChars.FormatInvalidForMessage([]));
+        }
     }
 }

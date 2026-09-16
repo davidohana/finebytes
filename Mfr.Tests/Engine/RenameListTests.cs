@@ -1434,13 +1434,10 @@ namespace Mfr.Tests.Engine
             Assert.Equal("0:00:44", item.Preview.FileName);
             Assert.Equal("0:00:44.txt", item.Preview.FullFileName);
             Assert.Equal(RenameStatus.PreviewError, item.Status);
-            Assert.NotNull(item.PreviewError);
-            Assert.Contains(
-                "illegal characters",
-                item.PreviewError.Message,
-                StringComparison.OrdinalIgnoreCase
+            Assert.Equal(
+                "Target name '0:00:44.txt' contains illegal characters: ':'.",
+                item.PreviewError!.Message
             );
-            Assert.Contains("0:00:44.txt", item.PreviewError.Message, StringComparison.Ordinal);
         }
 
         [Fact]

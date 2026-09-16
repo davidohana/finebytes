@@ -29,13 +29,15 @@ namespace Mfr.Engine.Preview
                 }
 
                 var fullFileName = item.Preview.FullFileName;
-                if (!WindowsFileNameChars.ContainsInvalid(fullFileName))
+                var invalidChars = WindowsFileNameChars.FindInvalid(fullFileName);
+                if (invalidChars.Count == 0)
                 {
                     continue;
                 }
 
+                var formattedChars = WindowsFileNameChars.FormatInvalidForMessage(invalidChars);
                 item.SetPreviewError(
-                    message: $"Target name contains illegal characters: '{fullFileName}'.",
+                    message: $"Target name '{fullFileName}' contains illegal characters: {formattedChars}.",
                     cause: null
                 );
             }
