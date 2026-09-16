@@ -50,7 +50,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000001",
-                name: "Beautify Names",
+                name: "General: Beautify Names",
                 description: "Beautify file names by fixing casing and spaces",
                 chain: _Chain(
                     _On(
@@ -120,7 +120,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000002",
-                name: "Counter Prefix",
+                name: "General: Counter Prefix",
                 description: "Adds a number before each item in Rename List.",
                 chain: _Chain(
                     _On(
@@ -152,7 +152,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000003",
-                name: "Tags from Filename",
+                name: "Audio: Tags from Filename",
                 description: "Set ID3 tags for MP3 files according to filenames.\nFilename format should be: Track - Title.mp3\nParent folder name format should be: Artist - Album",
                 chain: _Chain(
                     _On(
@@ -208,7 +208,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000004",
-                name: "Artist - Track - Title",
+                name: "Audio: Artist - Track - Title",
                 description: "Set track titles for MP3 files from ID3 tag.\nFormat: Artist - Track Number - Track Title.mp3",
                 chain: _Chain(
                     _On(new FormatterFilter(FilePrefix, new FormatterOptions("<audio-track>")), "Track Number"),
@@ -266,7 +266,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000005",
-                name: "Date Taken Prefix",
+                name: "Image: Date Taken Prefix",
                 description: "Rename JPEG digital images according to date picture taken.",
                 chain: _Chain(
                     _On(
@@ -291,7 +291,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000015",
-                name: "PIC Date Taken Make Model",
+                name: "Image: PIC Date Taken Make Model",
                 description: "Rename JPEG images as PIC_date taken_two random lowercase letters_make_model.\nRandom letters reduce name collisions when date/make/model match.",
                 chain: _Chain(
                     _On(
@@ -320,7 +320,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000006",
-                name: "Name from Image",
+                name: "Image: Name from Image",
                 description: "Set filename according to basic image properties",
                 chain: _Chain(
                     _On(
@@ -351,7 +351,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000007",
-                name: "Flatten Path",
+                name: "General: Flatten Path",
                 description: "Use path name as file name.\nPath hierarchies (\\) are separated by periods (.)\nE.g: c:\\pictures\\David\\sep04\\pic1.jpg -->\npictures.David.sep04.pic1.jpg",
                 chain: _Chain(
                     _On(
@@ -377,7 +377,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000008",
-                name: "Date Taken Folders",
+                name: "Image: Date Taken Folders",
                 description: "Move photos into folders by date taken (year\\month\\day).\nEdit the Path Mover root (default C:\\Photos) before Apply.",
                 chain: _Chain(
                     _On(
@@ -404,7 +404,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000009",
-                name: "Artist Album Folders",
+                name: "Audio: Artist Album Folders",
                 description: "Move audio files into Artist\\Album folders from tags.\nEdit the Path Mover root (default C:\\Music) before Apply.",
                 chain: _Chain(
                     _On(
@@ -429,7 +429,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000014",
-                name: "Artist Year Album Bitrate Folder",
+                name: "Audio: Artist Year Album Bitrate Folder",
                 description: "Move audio files into a folder named from tags.\nFormat: Artist - Year - Album [bitrate]\nE.g: Miles Davis and Sonny Rollins - 1951 - Dig [128]\nEdit the Path Mover root (default C:\\Music) before Apply.",
                 chain: _Chain(
                     _On(
@@ -459,7 +459,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000010",
-                name: "Swap Around Hyphen",
+                name: "General: Swap Around Hyphen",
                 description: "Swap the two parts of a name separated by \" - \".\nE.g: Title - Artist --> Artist - Title",
                 chain: _Chain(
                     _On(
@@ -483,7 +483,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000011",
-                name: "Safe Filename",
+                name: "General: Safe Filename",
                 description: "Replace Windows-illegal filename characters \\ / : * ? \" < > | with a hyphen.",
                 chain: _Chain(
                     _On(
@@ -516,7 +516,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000012",
-                name: "Strip Bracket Junk",
+                name: "General: Strip Bracket Junk",
                 description: "Remove (…) and […] segments from the name, then shrink leftover spaces.\nE.g: Song (Official Video) [HD] --> Song",
                 chain: _Chain(
                     _On(
@@ -551,7 +551,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000013",
-                name: "Year - Title from Tags",
+                name: "Audio: Year - Title from Tags",
                 description: "Set the name from audio tags as Year - Title.",
                 chain: _Chain(
                     _On(new FormatterFilter(FilePrefix, new FormatterOptions("<audio-year> - <audio-title>")))

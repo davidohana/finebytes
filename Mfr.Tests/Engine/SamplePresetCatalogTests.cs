@@ -59,41 +59,41 @@ namespace Mfr.Tests.Engine
         public void Catalog_visible_columns_include_relevant_domain_fields()
         {
             Assert.Contains(
-                _Preset("Tags from Filename").VisibleColumns!,
+                _Preset("Audio: Tags from Filename").VisibleColumns!,
                 column => column.Key == RenameListFieldKey.Preview(AudioTagRenameListFields.Group, "Title")
             );
             Assert.Contains(
-                _Preset("Artist - Track - Title").VisibleColumns!,
+                _Preset("Audio: Artist - Track - Title").VisibleColumns!,
                 column => column.Key == RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Performers")
             );
             Assert.Contains(
-                _Preset("Date Taken Prefix").VisibleColumns!,
+                _Preset("Image: Date Taken Prefix").VisibleColumns!,
                 column =>
                     column.Key == RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*36867")
                     && column.Width == 140
             );
             Assert.Contains(
-                _Preset("PIC Date Taken Make Model").VisibleColumns!,
+                _Preset("Image: PIC Date Taken Make Model").VisibleColumns!,
                 column => column.Key == RenameListFieldKey.Original(JpegRenameListFields.Group, JpegRenameListFields.Key.Make)
             );
             Assert.Contains(
-                _Preset("Name from Image").VisibleColumns!,
+                _Preset("Image: Name from Image").VisibleColumns!,
                 column => column.Key == RenameListFieldKey.Original(ImageRenameListFields.Group, "Width")
             );
             Assert.Contains(
-                _Preset("Flatten Path").VisibleColumns!,
+                _Preset("General: Flatten Path").VisibleColumns!,
                 column =>
                     column.Key
                     == RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullPath)
             );
             Assert.Contains(
-                _Preset("Date Taken Folders").VisibleColumns!,
+                _Preset("Image: Date Taken Folders").VisibleColumns!,
                 column =>
                     column.Key
                     == RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Folder)
             );
             Assert.Contains(
-                _Preset("Artist Year Album Bitrate Folder").VisibleColumns!,
+                _Preset("Audio: Artist Year Album Bitrate Folder").VisibleColumns!,
                 column => column.Key == RenameListFieldKey.Original(MediaRenameListFields.Group, "AudioBitrate")
             );
         }
@@ -166,7 +166,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Beautify_Names_has_locked_chain_and_common_words()
         {
-            var preset = _Preset("Beautify Names");
+            var preset = _Preset("General: Beautify Names");
             string[] expectedTypes =
             [
                 "SpaceCharacter",
@@ -193,7 +193,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Date_Taken_Folders_has_locked_path_mover()
         {
-            var step = Assert.Single(_Preset("Date Taken Folders").Chain.Steps);
+            var step = Assert.Single(_Preset("Image: Date Taken Folders").Chain.Steps);
             Assert.True(step.Enabled);
             var pathMover = Assert.IsType<PathMoverFilter>(step.Filter);
             Assert.Equal(@"C:\Photos", pathMover.Options.RootFolder);
@@ -206,7 +206,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void PIC_Date_Taken_Make_Model_has_locked_formatter()
         {
-            var step = Assert.Single(_Preset("PIC Date Taken Make Model").Chain.Steps);
+            var step = Assert.Single(_Preset("Image: PIC Date Taken Make Model").Chain.Steps);
             Assert.True(step.Enabled);
             var formatter = Assert.IsType<FormatterFilter>(step.Filter);
             Assert.Equal(
@@ -222,7 +222,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Artist_Year_Album_Bitrate_Folder_has_locked_path_mover()
         {
-            var step = Assert.Single(_Preset("Artist Year Album Bitrate Folder").Chain.Steps);
+            var step = Assert.Single(_Preset("Audio: Artist Year Album Bitrate Folder").Chain.Steps);
             Assert.True(step.Enabled);
             var pathMover = Assert.IsType<PathMoverFilter>(step.Filter);
             Assert.Equal(@"C:\Music", pathMover.Options.RootFolder);
@@ -238,7 +238,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Swap_Around_Hyphen_has_locked_token_move()
         {
-            var step = Assert.Single(_Preset("Swap Around Hyphen").Chain.Steps);
+            var step = Assert.Single(_Preset("General: Swap Around Hyphen").Chain.Steps);
             var tokenMover = Assert.IsType<TokenMoverFilter>(step.Filter);
             Assert.Equal(" - ", tokenMover.Options.Delimiter);
             Assert.Equal(2, tokenMover.Options.TokenNumber);
@@ -251,7 +251,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Safe_Filename_has_locked_regex_replacer()
         {
-            var step = Assert.Single(_Preset("Safe Filename").Chain.Steps);
+            var step = Assert.Single(_Preset("General: Safe Filename").Chain.Steps);
             var replacer = Assert.IsType<ReplacerFilter>(step.Filter);
             Assert.Equal(@"[\\/:*?""<>|]", replacer.Options.Find);
             Assert.Equal("-", replacer.Options.Replacement);
@@ -266,13 +266,13 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Duplicate_type_samples_use_meaningful_step_names()
         {
-            var bracketJunk = _Preset("Strip Bracket Junk");
+            var bracketJunk = _Preset("General: Strip Bracket Junk");
             Assert.Equal(
                 ["Strip Round Parentheses", "Strip Square Brackets", null, null, null],
                 bracketJunk.Chain.Steps.Select(step => step.Name)
             );
 
-            var artistTrackTitle = _Preset("Artist - Track - Title");
+            var artistTrackTitle = _Preset("Audio: Artist - Track - Title");
             Assert.Equal(
                 ["Track Number", "Pad Track Number", "Append Title", "Prepend Artist"],
                 artistTrackTitle.Chain.Steps.Select(step => step.Name)
@@ -290,7 +290,7 @@ namespace Mfr.Tests.Engine
         [Fact]
         public void Tags_from_Filename_has_locked_audio_chain()
         {
-            var preset = _Preset("Tags from Filename");
+            var preset = _Preset("Audio: Tags from Filename");
             Assert.Equal(
                 ["TagRemover", "AudioTagSetter", "Id3v2FieldSetter"],
                 preset.Chain.Steps.Select(s => s.Filter.Type)
