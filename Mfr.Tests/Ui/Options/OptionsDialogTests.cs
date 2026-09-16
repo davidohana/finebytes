@@ -126,6 +126,7 @@ namespace Mfr.Tests.Ui.Options
                     .ToList();
                 Assert.Contains(AppTips.OptionsRememberLastFolder, checkTips);
                 Assert.Contains(AppTips.OptionsRememberWindowState, checkTips);
+                Assert.Contains("dialog", AppTips.OptionsRememberWindowState, StringComparison.OrdinalIgnoreCase);
                 Assert.Contains(AppTips.OptionsAddFolderContents, checkTips);
 
                 var radioTips = dialog
