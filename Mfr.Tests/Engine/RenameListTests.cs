@@ -1408,7 +1408,7 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies a File Name write with Windows-illegal characters surfaces PreviewError instead of PreviewOk.
+        /// Verifies illegal File Name preview keeps the attempted name and marks PreviewError at preview end.
         /// </summary>
         public void Preview_IllegalFileNameChars_HasPreviewError()
         {
@@ -1431,13 +1431,16 @@ namespace Mfr.Tests.Engine
             };
             _ = _SetupPreview(renameList, preset);
 
+            Assert.Equal("0:00:44", item.Preview.FileName);
+            Assert.Equal("0:00:44.txt", item.Preview.FullFileName);
             Assert.Equal(RenameStatus.PreviewError, item.Status);
             Assert.NotNull(item.PreviewError);
             Assert.Contains(
-                "invalid characters for Windows file names",
+                "illegal characters",
                 item.PreviewError.Message,
-                StringComparison.Ordinal
+                StringComparison.OrdinalIgnoreCase
             );
+            Assert.Contains("0:00:44.txt", item.PreviewError.Message, StringComparison.Ordinal);
         }
 
         [Fact]

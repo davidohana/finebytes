@@ -80,10 +80,10 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies a name-illegal leaf is rejected even when the path-char check would pass.
+        /// Verifies a name-illegal leaf is accepted on write so preview can display the attempted name.
         /// </summary>
         [Fact]
-        public void SetFromAbsoluteFullPath_rejects_windows_illegal_file_name_leaf()
+        public void SetFromAbsoluteFullPath_accepts_windows_illegal_file_name_leaf()
         {
             var meta = new FileMeta(
                 renameListIndex: 0,
@@ -95,20 +95,27 @@ namespace Mfr.Tests.Models
 
             // '*' is illegal in file names but not in Windows path-char validation.
             var bad = TestPaths.Absolute("album", "bad*name.txt");
-            var ex = Assert.Throws<ArgumentException>(() => meta.SetFromAbsoluteFullPath(bad));
-            Assert.Contains("invalid characters for Windows file names", ex.Message);
+            meta.SetFromAbsoluteFullPath(bad);
+
+            Assert.Equal("bad*name", meta.FileName);
+            Assert.Equal("txt", meta.Extension);
         }
 
         /// <summary>
-        /// Verifies File Name / Extension / Full File Name writes reject Windows-illegal characters.
+        /// Verifies File Name / Extension / Full File Name writes accept Windows-illegal characters (validated at preview end).
         /// </summary>
         [Theory]
-        [InlineData(typeof(FileNameTarget), "0:00:44")]
-        [InlineData(typeof(FileNameTarget), "bad*name")]
-        [InlineData(typeof(FileExtensionTarget), "mp3:x")]
-        [InlineData(typeof(FileFullNameTarget), "0:00:44.mp3")]
-        [InlineData(typeof(FileFullNameTarget), "song?.mp3")]
-        public void SetTargetString_rejects_windows_illegal_file_name_chars(Type targetType, string value)
+        [InlineData(typeof(FileNameTarget), "0:00:44", "0:00:44", "mp3")]
+        [InlineData(typeof(FileNameTarget), "bad*name", "bad*name", "mp3")]
+        [InlineData(typeof(FileExtensionTarget), "mp3:x", "track", "mp3:x")]
+        [InlineData(typeof(FileFullNameTarget), "0:00:44.mp3", "0:00:44", "mp3")]
+        [InlineData(typeof(FileFullNameTarget), "song?.mp3", "song?", "mp3")]
+        public void SetTargetString_accepts_windows_illegal_file_name_chars(
+            Type targetType,
+            string value,
+            string expectedFileName,
+            string expectedExtension
+        )
         {
             var meta = new FileMeta(
                 renameListIndex: 0,
@@ -119,8 +126,10 @@ namespace Mfr.Tests.Models
             );
             var target = (FilterTarget)Activator.CreateInstance(targetType)!;
 
-            var ex = Assert.Throws<ArgumentException>(() => meta.SetTargetString(target, value));
-            Assert.Contains("invalid characters for Windows file names", ex.Message);
+            meta.SetTargetString(target, value);
+
+            Assert.Equal(expectedFileName, meta.FileName);
+            Assert.Equal(expectedExtension, meta.Extension);
         }
 
         /// <summary>

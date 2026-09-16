@@ -727,13 +727,14 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
-        /// Rebases folder descendants, marks conflicts and unresolvable cycles, then returns the counted commit plan.
+        /// Rebases folder descendants, marks illegal file names and conflicts, then returns the counted commit plan.
         /// </summary>
         /// <param name="tracker">Progress sink to flush after planning.</param>
         /// <returns>The commit plan with outcome counts attached.</returns>
         private CommitPlan _CompletePreviewPlan(RenameListProgressTracker tracker)
         {
             RenamePreviewFolderRebaser.RebaseDescendants(_renameItems);
+            PreviewIllegalFileNameDetector.MarkIllegalNames(_renameItems);
             PreviewConflictDetector.MarkConflicts(_renameItems);
 
             var commitPlan = CommitPlanner.Build(_renameItems);
