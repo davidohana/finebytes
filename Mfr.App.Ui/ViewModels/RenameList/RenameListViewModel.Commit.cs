@@ -165,7 +165,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return StatusBarText.Combine(
                 StatusBarText.Error(leading),
                 StyledTextDisplay.FromRuns(
-                    new StyledTextRun("Show Rename Error")
+                    new StyledTextRun("Show rename error")
                     {
                         FontWeight = FontWeight.Bold,
                         ForegroundResourceKey = StatusBarText.ErrorForegroundResourceKey,

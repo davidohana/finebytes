@@ -22,29 +22,29 @@
       <Thickness x:Key="DataGridTextColumnCellTextBlockMargin">6,0,6,0</Thickness>
       <ContextMenu x:Key="RenameListRowContextMenu" x:Shared="False">
         <MenuItem
-          Header="Show Rename Error"
+          Header="Show rename error"
           Command="{Binding ShowCommitErrorCommand}"
           IsVisible="{Binding CanShowCommitError}"
         />
         <MenuItem
-          Header="Show Preview Error"
+          Header="Show preview error"
           Command="{Binding ShowPreviewErrorCommand}"
           IsVisible="{Binding CanShowPreviewError}"
         />
         <MenuItem
-          Header="Show Error Details"
+          Header="Show error details"
           Command="{Binding ShowLoadErrorsCommand}"
           IsVisible="{Binding CanShowLoadErrors}"
         />
         <Separator IsVisible="{Binding CanShowRowErrorMenu}" />
         <MenuItem
-          Header="Manual Override Field"
+          Header="Manual override field"
           Command="{Binding ManualOverrideFieldCommand}"
           InputGesture="{x:Static input:AppShortcuts.ManualOverride}"
           ToolTip.Tip="{x:Static resources:AppTips.ManualOverrideField}"
         />
         <MenuItem
-          Header="Cancel Manual Override"
+          Header="Cancel manual override"
           Command="{Binding CancelManualOverrideCommand}"
           IsVisible="{Binding CanShowCancelManualOverride}"
         />
@@ -66,41 +66,41 @@
         />
         <Separator />
         <MenuItem
-          Header="Move Selected Up"
+          Header="Move selected up"
           Command="{Binding MoveSelectedUpCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveSelectedUp}"
         />
         <MenuItem
-          Header="Move Selected Down"
+          Header="Move selected down"
           Command="{Binding MoveSelectedDownCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveSelectedDown}"
         />
         <Separator />
         <MenuItem
-          Header="Select Fields..."
+          Header="Select fields..."
           Command="{Binding OpenFieldShuttleCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
         />
         <Separator />
         <MenuItem
-          Header="Use Fixed-Width Font"
+          Header="Use fixed-width font"
           Command="{Binding ToggleUseFixedWidthFontCommand}"
           ToggleType="CheckBox"
           IsChecked="{Binding UseFixedWidthFont, Mode=OneWay}"
         />
         <Separator />
         <MenuItem
-          Header="Remove Selected Item(s)"
+          Header="Remove selected item(s)"
           Command="{Binding RemoveSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.RemoveSelectedDelete}"
         />
         <MenuItem
-          Header="Remove All But Selected"
+          Header="Remove all but selected"
           Command="{Binding RemoveAllButSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.RemoveAllButSelected}"
         />
         <MenuItem
-          Header="Remove All"
+          Header="Remove all"
           Command="{Binding ClearCommand}"
           InputGesture="{x:Static input:AppShortcuts.ClearRenameList}"
         />
@@ -358,6 +358,7 @@
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Clear.png" />
           </Button>
+          <Separator />
           <Button
             Classes="tool-action"
             Command="{Binding MoveSelectedUpCommand}"
@@ -372,6 +373,7 @@
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/MoveDown.png" />
           </Button>
+          <Separator />
           <Button
             Classes="tool-action"
             Command="{Binding RefreshCommand}"
@@ -379,6 +381,7 @@
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/Refresh.png" />
           </Button>
+          <Separator />
           <Button
             Classes="tool-action"
             Command="{Binding OpenFieldShuttleCommand}"
@@ -402,6 +405,7 @@
           >
             <Image Width="24" Height="24" Stretch="None" Source="/Assets/RenameList/ReplaceFieldsByFilters.png" />
           </Button>
+          <Separator />
           <ToggleButton
             Classes="tool-action"
             IsChecked="{Binding IsAutoSort, Mode=OneWay}"
@@ -471,17 +475,17 @@
         ToolTip.Tip="{x:Static resources:AppTips.ColorLegendPanel}"
       >
         <StackPanel>
-          <TextBlock Classes="rename-list-legend-title" Text="Color Legend" />
+          <TextBlock Classes="rename-list-legend-title" Text="Color legend" />
           <StackPanel Classes="rename-list-legend-swatches">
             <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendOriginalValue}">
-              <TextBlock Text="Original Value" Foreground="{DynamicResource AppChromeForegroundBrush}" />
+              <TextBlock Text="Original value" Foreground="{DynamicResource AppChromeForegroundBrush}" />
             </Border>
             <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendValueChanged}">
-              <TextBlock Text="Value Changed" Foreground="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
+              <TextBlock Text="Value changed" Foreground="{DynamicResource RenameListPreviewChangedForegroundBrush}" />
             </Border>
             <Border Classes="rename-list-legend-swatch" ToolTip.Tip="{x:Static resources:AppTips.LegendManualOverride}">
               <TextBlock
-                Text="Manual Override"
+                Text="Manual override"
                 Foreground="{DynamicResource RenameListManualOverrideForegroundBrush}"
               />
             </Border>
@@ -498,14 +502,14 @@
               Background="{DynamicResource RenameListPreviewErrorRowBrush}"
               ToolTip.Tip="{x:Static resources:AppTips.LegendPreviewError}"
             >
-              <TextBlock Text="Preview Error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
+              <TextBlock Text="Preview error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
             </Border>
             <Border
               Classes="rename-list-legend-swatch"
               Background="{DynamicResource RenameListCommitErrorRowBrush}"
               ToolTip.Tip="{x:Static resources:AppTips.LegendRenameError}"
             >
-              <TextBlock Text="Rename Error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
+              <TextBlock Text="Rename error" Foreground="{DynamicResource AppChromeForegroundBrush}" />
             </Border>
           </StackPanel>
           <TextBlock

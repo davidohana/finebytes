@@ -81,7 +81,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 eligible.Count > 1 ? $"'{field.DisplayName}' in {eligible.Count} items" : $"'{field.DisplayName}'";
             var prompt = new TextInputPrompt
             {
-                Title = "Manual Set Value",
+                Title = "Manual set value",
                 DefaultValue = defaultValue,
                 Prompt = StyledTextDisplay.FromRuns(
                     new StyledTextRun("Set the "),

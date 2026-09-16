@@ -16,7 +16,8 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 | Options              | Ctrl+,          |
 | Exit                 | Alt+F4          |
 | Refresh focused pane | F5              |
-| Go to address bar    | Ctrl+L or Alt+D |
+| Go to folder          | Ctrl+L or Alt+D |
+
 
 Undo last (Ctrl+Z) prepares an undo session from the last GO when a rename log exists: it replaces the Rename List with reverse OldValues, clears Filter Chain, and leaves disk unchanged until you press GO. Rename Log (Ctrl+Shift+L) opens the dialog (disk history + last operation); Undo there uses the same prepare path. Options (Ctrl+,) is live. GO previews the current list, warns before ignoring preview errors, applies valid renames, and clears manual field overrides on rows that were applied or hit a commit error (preview-error and skipped rows keep theirs).
 
@@ -26,11 +27,11 @@ Ctrl+L is the address bar (Explorer / Chrome). Rename Log is Ctrl+Shift+L so the
 
 | Action                | Shortcut                                           | Where it works                         |
 | --------------------- | -------------------------------------------------- | -------------------------------------- |
-| Go to address bar     | Ctrl+L, Alt+D                                      | Main window                            |
+| Go to folder          | Ctrl+L, Alt+D                                      | Main window                            |
 | Up (parent folder)    | Backspace                                          | File listing focused, not while typing |
 | Refresh               | F5                                                 | Main window                            |
-| Large Icons           | Ctrl+1                                             | Main window                            |
-| Small Icons           | Ctrl+2                                             | Main window                            |
+| Large icons           | Ctrl+1                                             | Main window                            |
+| Small icons           | Ctrl+2                                             | Main window                            |
 | Report                | Ctrl+3                                             | Main window                            |
 | List                  | Ctrl+4                                             | Main window                            |
 | Tiles                 | Ctrl+5                                             | Main window                            |
@@ -49,9 +50,9 @@ Ctrl+L is the address bar (Explorer / Chrome). Rename Log is Ctrl+Shift+L so the
 | Commit typed path     | Enter                                              | Address bar edit                       |
 | Cancel typed path     | Esc                                                | Address bar edit                       |
 
-Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
+Ctrl+1 through Ctrl+6 follow **File List → File List type** menu order.
 
-**File List → Go Up** runs from the menu anywhere; Backspace is only handled when the listing has focus so it does not steal from text boxes.
+**File List → Go up** runs from the menu anywhere; Backspace is only handled when the listing has focus so it does not steal from text boxes.
 
 ### Rename List
 
@@ -69,8 +70,8 @@ Ctrl+1 through Ctrl+6 follow **File List → File List Type** menu order.
 | Refresh                 | F5           | Rename List grid focused  |
 | Move selected up        | Ctrl+↑       | Rename List grid focused  |
 | Move selected down      | Ctrl+↓       | Rename List grid focused  |
-| Toggle Before           | Ctrl+\[      | Main window               |
-| Toggle After            | Ctrl+\]      | Main window               |
+| Toggle before           | Ctrl+\[      | Main window               |
+| Toggle after            | Ctrl+\]      | Main window               |
 | First item              | Home         | Rename List grid focused  |
 | Last item               | End          | Rename List grid focused  |
 | Add/toggle sort level   | Shift+click  | Rename List column header |
@@ -79,11 +80,11 @@ Selecting or focusing a Rename List cell shows the full cell value in the status
 
 Shift+click a column header to append a sort key, toggle its direction, or remove it from the sort list. A plain header click replaces the sort list with that column only. Any **original** (non-preview) catalog column supports header sort; preview columns do not.
 
-Click the **Select Fields** toolbar button on the Rename List, or choose **Select Fields...** from the **Rename List** menu, the grid right-click menu, or a column-header right-click menu, to open the field shuttle (visible columns and Auto-Sort tabs). **Select Sort Fields...** on the **Rename List** menu opens the same dialog on the Sort tab. Right-click a column header and choose **Hide Field** to hide that column (persisted layout keys only — After-side preview headers map to the same stored field). **Export Rename List (csv)...** on the **Rename List** menu (or **Export → Export Visible Columns (csv)** on a column header) writes a CSV of the on-screen columns (preview values while the After side is showing).
+Click the **Select fields** toolbar button on the Rename List, or choose **Select fields...** from the **Rename List** menu, the grid right-click menu, or a column-header right-click menu, to open the field shuttle (visible columns and Auto-Sort tabs). **Select sort fields...** on the **Rename List** menu opens the same dialog on the Sort tab. Right-click a column header and choose **Hide field** to hide that column (persisted layout keys only — After-side preview headers map to the same stored field). **Export Rename List (csv)...** on the **Rename List** menu (or **Export → Export visible columns (csv)** on a column header) writes a CSV of the on-screen columns (preview values while the After side is showing).
 
-**Before/After Mode** is available on the field shuttle Columns tab and the **Rename List** menu. When on, the stored layout is originals-only; use the Rename List toolbar **Before/After** toggle (◀ / ▶), matching **Rename List** menu radios (**Toggle Before** / **Toggle After**, icons ◀ / ▶), or **Ctrl+\[** / **Ctrl+\]** to flip between original and preview values for the same fields. The side control is hidden when Before/After Mode is off. There is no dedicated shortcut for enabling Before/After Mode itself.
+**Before/after mode** is available on the field shuttle Columns tab and the **Rename List** menu. When on, the stored layout is originals-only; use the Rename List toolbar **Before/After** toggle (◀ / ▶), matching **Rename List** menu radios (**Toggle before** / **Toggle after**, icons ◀ / ▶), or **Ctrl+\[** / **Ctrl+\]** to flip between original and preview values for the same fields. The side control is hidden when Before/after mode is off. There is no dedicated shortcut for enabling Before/after mode itself.
 
-**Add columns from filters** / **Set columns from filters** (Rename List toolbar after **Select Fields**, Rename List menu, or **Add** / **Set** on the field shuttle Columns tab) infer columns from the full Filter Chain (write targets and format tokens). In the shuttle they update the draft Selected fields until you press OK. Toolbar and menu apply immediately to the live column layout. There is no dedicated keyboard shortcut in v1.
+**Add columns from filters** / **Set columns from filters** (Rename List toolbar after **Select fields**, Rename List menu, or **Add** / **Set** on the field shuttle Columns tab) infer columns from the full Filter Chain (write targets and format tokens). In the shuttle they update the draft Selected fields until you press OK. Toolbar and menu apply immediately to the live column layout. There is no dedicated keyboard shortcut in v1.
 
 ### Filter Chain
 
@@ -93,7 +94,7 @@ Click the **Select Fields** toolbar button on the Rename List, or choose **Selec
 | Move selected up   | Ctrl+↑   | Filter Chain list focused |
 | Move selected down | Ctrl+↓   | Filter Chain list focused |
 
-**Filters → Add Selected Filter** appends the selected Available Filters row (same as Enter on the palette or the Filter Chain add shuttle). **Remove Selected Filter**, **Remove All Filters**, and **Move Filter Up/Down** are on the **Filters** menu and the Filter Chain shuttle column.
+**Filters → Add selected filter** appends the selected Available Filters row (same as Enter on the palette or the Filter Chain add shuttle). **Remove selected filter**, **Remove all filters**, and **Move filter up/down** are on the **Filters** menu and the Filter Chain shuttle column.
 
 ### Field shuttle (Select Fields dialog)
 

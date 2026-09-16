@@ -37,11 +37,11 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Contains("Locate in File List", headers);
             Assert.Contains("Show in Explorer", headers);
             Assert.Contains("Properties", headers);
-            Assert.Contains("Manual Override Field", headers);
-            Assert.Contains("Cancel Manual Override", headers);
+            Assert.Contains("Manual override field", headers);
+            Assert.Contains("Cancel manual override", headers);
 
-            var overrideIndex = headers.IndexOf("Manual Override Field");
-            var cancelIndex = headers.IndexOf("Cancel Manual Override");
+            var overrideIndex = headers.IndexOf("Manual override field");
+            var cancelIndex = headers.IndexOf("Cancel manual override");
             var locateIndex = headers.IndexOf("Locate in File List");
             var refreshIndex = headers.IndexOf("Refresh");
             Assert.True(overrideIndex < cancelIndex);
@@ -117,7 +117,7 @@ namespace Mfr.Tests.Ui.RenameList
 
             var menuItem = grid
                 .ContextMenu.Items.OfType<MenuItem>()
-                .Single(item => Equals(item.Header, "Show Rename Error"));
+                .Single(item => Equals(item.Header, "Show rename error"));
 
             Assert.True(menuItem.IsVisible);
 

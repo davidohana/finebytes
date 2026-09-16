@@ -16,19 +16,19 @@
   <UserControl.Resources>
     <ResourceDictionary>
       <ContextMenu x:Key="FilterChainContextMenu" x:Shared="False">
-        <MenuItem Header="Check All Filters" Command="{Binding CheckAllFiltersCommand}" />
-        <MenuItem Header="Uncheck All Filters" Command="{Binding UncheckAllFiltersCommand}" />
-        <MenuItem Header="Invert Check" Command="{Binding InvertCheckCommand}" />
+        <MenuItem Header="Check all filters" Command="{Binding CheckAllFiltersCommand}" />
+        <MenuItem Header="Uncheck all filters" Command="{Binding UncheckAllFiltersCommand}" />
+        <MenuItem Header="Invert check" Command="{Binding InvertCheckCommand}" />
         <Separator />
         <MenuItem
-          Header="Remove Selected Filter"
+          Header="Remove selected filter"
           Command="{Binding RemoveSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.RemoveSelectedFilterDelete}"
         />
-        <MenuItem Header="Remove All But Selected" Command="{Binding RemoveAllButSelectedCommand}" />
-        <MenuItem Header="Remove All Filters" Command="{Binding ClearCommand}" />
+        <MenuItem Header="Remove all but selected" Command="{Binding RemoveAllButSelectedCommand}" />
+        <MenuItem Header="Remove all filters" Command="{Binding ClearCommand}" />
         <Separator />
-        <MenuItem Header="Filter Options" Click="_OnFilterOptionsClick" IsEnabled="{Binding CanShowFilterOptions}" />
+        <MenuItem Header="Filter options" Click="_OnFilterOptionsClick" IsEnabled="{Binding CanShowFilterOptions}" />
       </ContextMenu>
     </ResourceDictionary>
   </UserControl.Resources>
@@ -205,7 +205,7 @@
               Stretch="None"
               Source="/Assets/FilterChain/SavePreset.png"
             />
-            <TextBlock Text="Save Preset" VerticalAlignment="Center" />
+            <TextBlock Text="Save preset" VerticalAlignment="Center" />
           </StackPanel>
         </Button>
       </Grid>

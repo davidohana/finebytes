@@ -5,7 +5,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   x:Class="Mfr.App.Ui.Views.Presets.SavePresetDialog"
   x:DataType="vm:SavePresetDialogViewModel"
-  Title="Save Preset"
+  Title="Save preset"
   Icon="/Assets/mfr.ico"
   Width="420"
   Height="260"

@@ -173,7 +173,7 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Color legend: Rename Error swatch (plum row).</summary>
         public const string LegendRenameError =
-            "Last GO failed for this row — right-click Show Rename Error; F5 clears";
+            "Last GO failed for this row — right-click Show rename error; F5 clears";
 
         /// <summary>Rename List status glyph when the highest-priority issue is load/missing.</summary>
         public const string RenameListLoadErrorGlyph =
@@ -181,11 +181,11 @@ namespace Mfr.App.Ui.Resources
 
         /// <summary>Rename List status glyph when the highest-priority issue is a preview failure.</summary>
         public const string RenameListPreviewErrorGlyph =
-            "This row has a preview error. Right-click and choose Show Preview Error.";
+            "This row has a preview error. Right-click and choose Show preview error.";
 
         /// <summary>Rename List status glyph when the highest-priority issue is a rename/commit failure.</summary>
         public const string RenameListCommitErrorGlyph =
-            "This row has a rename error. Right-click and choose Show Rename Error.";
+            "This row has a rename error. Right-click and choose Show rename error.";
 
         /// <summary>Rename List status column header tip.</summary>
         public const string RenameListRowErrorColumn = "Error column — marks rows with load, preview, or rename errors";

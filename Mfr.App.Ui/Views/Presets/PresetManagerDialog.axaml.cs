@@ -118,13 +118,13 @@ namespace Mfr.App.Ui.Views.Presets
                 }
 
                 await new OkMessageDialog(
-                    "Import Sample Presets",
+                    "Import sample presets",
                     $"Added {AddedCount}. Skipped {SkippedCount} (name already exists)."
                 ).ShowDialog(this);
             }
             catch (Exception ex)
             {
-                await _ShowErrorAsync("Import Sample Presets", ex);
+                await _ShowErrorAsync("Import sample presets", ex);
             }
         }
 
@@ -172,7 +172,7 @@ namespace Mfr.App.Ui.Views.Presets
             }
 
             var names = _ViewModel.SelectedPresets.Select(preset => preset.Name).ToList();
-            var title = names.Count == 1 ? "Delete Preset" : "Delete Presets";
+            var title = names.Count == 1 ? "Delete preset" : "Delete presets";
             var message =
                 names.Count == 1
                     ? $"Delete preset '{names[0]}'? This cannot be undone."
@@ -224,7 +224,7 @@ namespace Mfr.App.Ui.Views.Presets
             var preset = _ViewModel.SelectedPresets[0];
             var prompt = new TextInputPrompt
             {
-                Title = "Rename Preset",
+                Title = "Rename preset",
                 Prompt = StyledTextDisplay.FromPlain("New preset name:"),
                 DefaultValue = preset.Name,
             };
@@ -242,17 +242,17 @@ namespace Mfr.App.Ui.Views.Presets
                     case PresetRenameStatus.Unchanged:
                         return;
                     case PresetRenameStatus.BlankName:
-                        await new OkMessageDialog("Rename Preset", "Preset name cannot be blank.").ShowDialog(this);
+                        await new OkMessageDialog("Rename preset", "Preset name cannot be blank.").ShowDialog(this);
                         return;
                     case PresetRenameStatus.NameTaken:
                         await new OkMessageDialog(
-                            "Rename Preset",
+                            "Rename preset",
                             $"A preset named '{result.Trim()}' already exists."
                         ).ShowDialog(this);
                         return;
                     case PresetRenameStatus.NotFound:
                         await new OkMessageDialog(
-                            "Rename Preset",
+                            "Rename preset",
                             "The selected preset is no longer available."
                         ).ShowDialog(this);
                         _ViewModel.Refresh();
@@ -266,7 +266,7 @@ namespace Mfr.App.Ui.Views.Presets
             }
             catch (Exception ex)
             {
-                await _ShowErrorAsync("Rename Preset", ex);
+                await _ShowErrorAsync("Rename preset", ex);
             }
         }
 

@@ -132,7 +132,7 @@ namespace Mfr.App.Ui.Views.RenameList
             var isPersistedColumn = viewModel.VisibleColumns.Any(column => column.Key == hideKey);
             if (isPersistedColumn)
             {
-                var hideField = new MenuItem { Header = "Hide Field", IsEnabled = viewModel.VisibleColumns.Count > 1 };
+                var hideField = new MenuItem { Header = "Hide field", IsEnabled = viewModel.VisibleColumns.Count > 1 };
                 hideField.Click += (_, _) => viewModel.HideColumn(hideKey);
                 menu.Items.Add(hideField);
             }
@@ -141,7 +141,7 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 menu.Items.Add(
                     _CreateTipMenuItem(
-                        "Remove Unchanged Items",
+                        "Remove unchanged items",
                         AppTips.RemoveUnchangedItems,
                         () => viewModel.RemoveUnchanged(fieldKey)
                     )
@@ -150,7 +150,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             menu.Items.Add(
                 _CreateCommandMenuItem(
-                    "Select Fields...",
+                    "Select fields...",
                     AppTips.SelectRenameListFields,
                     viewModel.OpenFieldShuttleCommand
                 )
@@ -172,7 +172,7 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 menu.Items.Add(
                     _CreateTipMenuItem(
-                        "Cancel Manual Override",
+                        "Cancel manual override",
                         AppTips.CancelManualOverrideColumn,
                         () => viewModel.CancelManualOverrideForColumn(fieldKey)
                     )
@@ -182,14 +182,14 @@ namespace Mfr.App.Ui.Views.RenameList
             var exportMenu = new MenuItem { Header = "Export" };
             exportMenu.Items.Add(
                 _CreateTipMenuItem(
-                    "Export This Column (txt)",
+                    "Export this column (txt)",
                     AppTips.ExportThisColumn,
                     () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportThisColumnAsync(fieldKey))
                 )
             );
             exportMenu.Items.Add(
                 _CreateTipMenuItem(
-                    "Export Visible Columns (csv)",
+                    "Export visible columns (csv)",
                     AppTips.ExportVisibleColumns,
                     () => Dispatcher.UIThread.Post(() => _ = viewModel.ExportVisibleColumnsAsync())
                 )

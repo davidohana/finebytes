@@ -8,14 +8,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     internal static class RenameListRowErrorDisplay
     {
         /// <summary>Window title for Show Preview Error.</summary>
-        internal const string PreviewDialogTitle = "Preview Error";
+        internal const string PreviewDialogTitle = "Preview error";
 
         /// <summary>Short summary for Show Preview Error.</summary>
         internal const string PreviewSummary =
             "Preview failed for this item. It will be skipped when applying changes.";
 
         /// <summary>Window title for Show Rename Error.</summary>
-        internal const string CommitDialogTitle = "Rename Error";
+        internal const string CommitDialogTitle = "Rename error";
 
         /// <summary>Short summary for Show Rename Error.</summary>
         internal const string CommitSummary = "This item could not be renamed.";

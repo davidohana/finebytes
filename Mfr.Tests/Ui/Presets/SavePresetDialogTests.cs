@@ -33,7 +33,7 @@ namespace Mfr.Tests.Ui.Presets
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(dialog.IsVisible);
-            Assert.Equal("Save Preset", dialog.Title);
+            Assert.Equal("Save preset", dialog.Title);
             Assert.True(dialog.CanResize);
 
             var nameBox = dialog.FindControl<ComboBox>("NameBox");

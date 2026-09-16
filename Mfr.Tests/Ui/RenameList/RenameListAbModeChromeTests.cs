@@ -145,21 +145,21 @@ namespace Mfr.Tests.Ui.RenameList
                 .First(header => RenameListGridColumns.TryResolveFieldKey(header) == previewKey);
 
             _RaiseHeaderContextMenu(previewHeader);
-            Assert.Contains("Hide Field", _MenuHeaders(previewHeader.ContextMenu));
-            Assert.Contains("Remove Unchanged Items", _MenuHeaders(previewHeader.ContextMenu));
-            Assert.DoesNotContain("Cancel Manual Override", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.Contains("Hide field", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.Contains("Remove unchanged items", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.DoesNotContain("Cancel manual override", _MenuHeaders(previewHeader.ContextMenu));
 
             renameListViewModel.Entries[0].EngineItem.SetOverride(previewKey, "forced");
             _RaiseHeaderContextMenu(previewHeader);
-            Assert.Contains("Cancel Manual Override", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.Contains("Cancel manual override", _MenuHeaders(previewHeader.ContextMenu));
             Assert.Equal(
                 [
                     "(Full File Name)",
-                    "Hide Field",
-                    "Remove Unchanged Items",
-                    "Select Fields...",
+                    "Hide field",
+                    "Remove unchanged items",
+                    "Select fields...",
                     "Edit as Name List",
-                    "Cancel Manual Override",
+                    "Cancel manual override",
                     "Export",
                 ],
                 _MenuHeaders(previewHeader.ContextMenu)

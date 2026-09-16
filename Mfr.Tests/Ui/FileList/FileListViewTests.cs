@@ -74,8 +74,8 @@ namespace Mfr.Tests.Ui.FileList
                     .Select(item => item.Header?.ToString())
                     .ToList();
                 Assert.Contains("Open", headers);
-                Assert.Contains("Add Selected", headers);
-                Assert.Contains("Add All", headers);
+                Assert.Contains("Add selected", headers);
+                Assert.Contains("Add all", headers);
                 Assert.Contains("Show in Explorer", headers);
                 Assert.Contains("Properties", headers);
                 Assert.Contains("Cut", headers);
@@ -84,7 +84,7 @@ namespace Mfr.Tests.Ui.FileList
                 Assert.Contains("Copy path", headers);
                 Assert.Contains("Delete", headers);
                 Assert.Contains("Refresh", headers);
-                Assert.Contains("Go Up", headers);
+                Assert.Contains("Go up", headers);
             }
         }
 
@@ -1313,7 +1313,7 @@ namespace Mfr.Tests.Ui.FileList
             Assert.True(goUp.IsEffectivelyVisible);
             Assert.True(goUp.IsEnabled);
             Assert.True(root.IsEffectivelyVisible);
-            Assert.Equal("Go Up", goUp.Content?.ToString());
+            Assert.Equal("Go up", goUp.Content?.ToString());
             Assert.Equal(viewModel.RootTargetPath, root.Content?.ToString());
 
             window.Close();

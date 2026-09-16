@@ -211,27 +211,27 @@ namespace Mfr.Tests.Ui.MainWindow
 
             Assert.Equal(
                 [
-                    "Add Selected",
-                    "Add All",
+                    "Add selected",
+                    "Add all",
                     "Remove",
-                    "Remove All But Selected",
+                    "Remove all but selected",
                     "Clear",
-                    "Move Selected Up",
-                    "Move Selected Down",
+                    "Move selected up",
+                    "Move selected down",
                     "Locate in File List",
                     "Refresh",
-                    "Select Fields...",
+                    "Select fields...",
                     "Add columns from filters",
                     "Set columns from filters",
-                    "Select Sort Fields...",
+                    "Select sort fields...",
                     "Export Rename List (csv)...",
-                    "Use Fixed-Width Font",
+                    "Use fixed-width font",
                     "Auto-Sort",
                     "Auto-Preview",
-                    "Before/After Mode",
-                    "Toggle _Before",
-                    "Toggle _After",
-                    "Color _Legend",
+                    "Before/after mode",
+                    "Toggle _before",
+                    "Toggle _after",
+                    "Color _legend",
                 ],
                 headers
             );
@@ -250,10 +250,10 @@ namespace Mfr.Tests.Ui.MainWindow
             var renameListMenu = _RenameListMenu(window);
             var beforeItem = renameListMenu
                 .Items.OfType<MenuItem>()
-                .Single(item => item.Header?.ToString() == "Toggle _Before");
+                .Single(item => item.Header?.ToString() == "Toggle _before");
             var afterItem = renameListMenu
                 .Items.OfType<MenuItem>()
-                .Single(item => item.Header?.ToString() == "Toggle _After");
+                .Single(item => item.Header?.ToString() == "Toggle _after");
 
             Assert.False(viewModel.RenameListViewModel.IsAbModeEnabled);
             Assert.False(beforeItem.IsVisible);

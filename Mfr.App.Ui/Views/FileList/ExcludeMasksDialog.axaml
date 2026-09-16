@@ -5,7 +5,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   x:Class="Mfr.App.Ui.Views.FileList.ExcludeMasksDialog"
   x:DataType="vm:ExcludeMasksDialogViewModel"
-  Title="Exclude Masks"
+  Title="Exclude masks"
   Icon="/Assets/mfr.ico"
   Width="460"
   Height="240"

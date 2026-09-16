@@ -192,7 +192,7 @@ namespace Mfr.App.Ui.Views.RenameList
         private async Task<bool> _ConfirmPreviewErrorsAsync(int errorCount)
         {
             return await _ConfirmMessageAsync(
-                    title: "Preview Errors",
+                    title: "Preview errors",
                     message: $"{errorCount} items with preview errors will be ignored. Do you want to continue?",
                     kind: ConfirmationKind.GoWithPreviewErrors
                 )

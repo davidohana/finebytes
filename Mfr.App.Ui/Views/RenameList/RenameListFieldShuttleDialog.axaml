@@ -13,7 +13,7 @@
   d:DesignHeight="490"
   x:Class="Mfr.App.Ui.Views.RenameList.RenameListFieldShuttleDialog"
   x:DataType="vm:RenameListFieldShuttleDialogViewModel"
-  Title="Rename List Fields"
+  Title="Rename List fields"
   Icon="/Assets/mfr.ico"
   Width="720"
   Height="490"
@@ -171,7 +171,7 @@
               <controls:CompactCheckBox
                 Grid.Column="1"
                 x:Name="AbModeCheckBox"
-                Content="Before/After Mode"
+                Content="Before/after mode"
                 VerticalAlignment="Center"
                 IsChecked="{Binding IsAbModeEnabled}"
                 ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterMode}"
@@ -199,14 +199,14 @@
                 <controls:CompactRadioButton
                   Classes="field-shuttle-subtab"
                   GroupName="ColumnAvailableFields"
-                  Content="Original Fields"
+                  Content="Original fields"
                   IsChecked="{Binding IsOriginalColumnsTab}"
                 />
                 <controls:CompactRadioButton
                   x:Name="PreviewColumnsSubtab"
                   Classes="field-shuttle-subtab"
                   GroupName="ColumnAvailableFields"
-                  Content="Preview Fields"
+                  Content="Preview fields"
                   IsChecked="{Binding IsPreviewColumnsTab}"
                 />
               </StackPanel>

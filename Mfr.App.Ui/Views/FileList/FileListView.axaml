@@ -23,8 +23,8 @@
       <ContextMenu x:Key="FileListContextMenu" x:Shared="False">
         <MenuItem Header="Open" Command="{Binding OpenSelectedCommand}" />
         <Separator />
-        <MenuItem Header="Add Selected" Command="{Binding #FileListRoot.AddSelectedCommand}" />
-        <MenuItem Header="Add All" Command="{Binding #FileListRoot.AddAllCommand}" />
+        <MenuItem Header="Add selected" Command="{Binding #FileListRoot.AddSelectedCommand}" />
+        <MenuItem Header="Add all" Command="{Binding #FileListRoot.AddAllCommand}" />
         <Separator />
         <MenuItem Header="Show in Explorer" Command="{Binding ShowInExplorerCommand}" />
         <MenuItem
@@ -55,7 +55,7 @@
         />
         <Separator />
         <MenuItem Header="Refresh" Command="{Binding RefreshCommand}" />
-        <MenuItem Header="Go Up" Command="{Binding GoUpCommand}" />
+        <MenuItem Header="Go up" Command="{Binding GoUpCommand}" />
       </ContextMenu>
     </ResourceDictionary>
   </UserControl.Resources>
@@ -485,7 +485,7 @@
           <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
             <Button
               x:Name="ListingErrorGoUpButton"
-              Content="Go Up"
+              Content="Go up"
               IsVisible="{Binding CanGoUp}"
               Command="{Binding GoUpCommand}"
             />

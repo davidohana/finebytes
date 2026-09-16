@@ -221,11 +221,11 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.True(commitStarted);
             var status = viewModel.RenameListViewModel.LastStatusMessage;
             Assert.Contains("could not be renamed", status.ToPlainText());
-            Assert.Contains("Show Rename Error", status.ToPlainText());
+            Assert.Contains("Show rename error", status.ToPlainText());
             Assert.Contains(
                 status.Runs,
                 run =>
-                    run.Text == "Show Rename Error"
+                    run.Text == "Show rename error"
                     && run.FontWeight == FontWeight.Bold
                     && run.ForegroundResourceKey == StatusBarText.ErrorForegroundResourceKey
             );

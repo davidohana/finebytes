@@ -100,7 +100,7 @@ namespace Mfr.App.Ui.Views.FilterChainPane
             return await SuppressibleConfirm
                 .ConfirmAsync(
                     owner,
-                    title: "Remove All Filters",
+                    title: "Remove all filters",
                     message: "Clear the Filter Chain?",
                     kind: ConfirmationKind.ClearFilterChain
                 )

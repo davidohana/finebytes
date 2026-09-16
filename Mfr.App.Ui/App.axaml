@@ -159,6 +159,11 @@
     <Style Selector="Border.pane-action-rail Button.tool-action, Border.pane-action-rail ToggleButton.tool-action">
       <Setter Property="Margin" Value="0,0,0,2" />
     </Style>
+    <Style Selector="Border.pane-action-rail Separator">
+      <Setter Property="Height" Value="1" />
+      <Setter Property="Margin" Value="2,4" />
+      <Setter Property="Background" Value="{DynamicResource AppChromeSeparatorBrush}" />
+    </Style>
 
     <!-- Horizontal tool strip (main window GO/Undo/…, Filter Palette groups). -->
     <Style Selector="Border.pane-action-strip">

@@ -96,13 +96,13 @@ namespace Mfr.Tests.Ui.FilterChainPane
             var headers = list.ContextMenu.Items.OfType<MenuItem>().Select(item => item.Header?.ToString()).ToList();
             Assert.Equal(
                 [
-                    "Check All Filters",
-                    "Uncheck All Filters",
-                    "Invert Check",
-                    "Remove Selected Filter",
-                    "Remove All But Selected",
-                    "Remove All Filters",
-                    "Filter Options",
+                    "Check all filters",
+                    "Uncheck all filters",
+                    "Invert check",
+                    "Remove selected filter",
+                    "Remove all but selected",
+                    "Remove all filters",
+                    "Filter options",
                 ],
                 headers
             );

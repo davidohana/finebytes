@@ -249,11 +249,11 @@ namespace Mfr.Tests.Ui.RenameList
 
             _RaiseHeaderContextMenu(originalHeader);
             Assert.Equal(
-                ["(Parent Directory)", "Hide Field", "Select Fields...", "Edit as Name List", "Export"],
+                ["(Parent Directory)", "Hide field", "Select fields...", "Edit as Name List", "Export"],
                 _MenuHeaders(originalHeader.ContextMenu)
             );
             Assert.Equal(
-                ["Export This Column (txt)", "Export Visible Columns (csv)"],
+                ["Export this column (txt)", "Export visible columns (csv)"],
                 _SubmenuHeaders(originalHeader.ContextMenu, "Export")
             );
 
@@ -261,16 +261,16 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(
                 [
                     "(Full File Name)",
-                    "Hide Field",
-                    "Remove Unchanged Items",
-                    "Select Fields...",
+                    "Hide field",
+                    "Remove unchanged items",
+                    "Select fields...",
                     "Edit as Name List",
                     "Export",
                 ],
                 _MenuHeaders(previewHeader.ContextMenu)
             );
             Assert.Equal(
-                ["Export This Column (txt)", "Export Visible Columns (csv)"],
+                ["Export this column (txt)", "Export visible columns (csv)"],
                 _SubmenuHeaders(previewHeader.ContextMenu, "Export")
             );
 
@@ -293,19 +293,19 @@ namespace Mfr.Tests.Ui.RenameList
                 .First(header => RenameListGridColumns.TryResolveFieldKey(header) == previewKey);
 
             _RaiseHeaderContextMenu(previewHeader);
-            Assert.DoesNotContain("Cancel Manual Override", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.DoesNotContain("Cancel manual override", _MenuHeaders(previewHeader.ContextMenu));
 
             renameListViewModel.Entries[1].EngineItem.SetOverride(previewKey, "forced");
             _RaiseHeaderContextMenu(previewHeader);
-            Assert.Contains("Cancel Manual Override", _MenuHeaders(previewHeader.ContextMenu));
+            Assert.Contains("Cancel manual override", _MenuHeaders(previewHeader.ContextMenu));
             Assert.Equal(
                 [
                     "(Full File Name)",
-                    "Hide Field",
-                    "Remove Unchanged Items",
-                    "Select Fields...",
+                    "Hide field",
+                    "Remove unchanged items",
+                    "Select fields...",
                     "Edit as Name List",
-                    "Cancel Manual Override",
+                    "Cancel manual override",
                     "Export",
                 ],
                 _MenuHeaders(previewHeader.ContextMenu)
@@ -349,12 +349,12 @@ namespace Mfr.Tests.Ui.RenameList
 
             _RaiseHeaderContextMenu(lengthHeader);
             Assert.Equal(
-                ["(File Name Length)", "Hide Field", "Select Fields...", "Export"],
+                ["(File Name Length)", "Hide field", "Select fields...", "Export"],
                 _MenuHeaders(lengthHeader.ContextMenu)
             );
             Assert.DoesNotContain("Edit as Name List", _MenuHeaders(lengthHeader.ContextMenu));
             Assert.Equal(
-                ["Export This Column (txt)", "Export Visible Columns (csv)"],
+                ["Export this column (txt)", "Export visible columns (csv)"],
                 _SubmenuHeaders(lengthHeader.ContextMenu, "Export")
             );
             window.Close();

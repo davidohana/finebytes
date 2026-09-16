@@ -114,7 +114,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="_Undo Last"
+          Header="_Undo last"
           Command="{Binding UndoLastCommand}"
           InputGesture="{x:Static input:AppShortcuts.UndoLast}"
         >
@@ -135,9 +135,9 @@
         <MenuItem Header="E_xit" Command="{Binding ExitCommand}" InputGesture="{x:Static input:AppShortcuts.Exit}" />
       </MenuItem>
       <MenuItem Header="_File List">
-        <MenuItem Header="_File List Type">
+        <MenuItem Header="_File List type">
           <MenuItem
-            Header="Large _Icons"
+            Header="Large _icons"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelistconfig:FileListViewMode.LargeIcons}"
             InputGesture="{x:Static input:AppShortcuts.ViewLargeIcons}"
@@ -145,7 +145,7 @@
             IsChecked="{Binding FileListViewModel.IsLargeIconsView, Mode=OneWay}"
           />
           <MenuItem
-            Header="_Small Icons"
+            Header="_Small icons"
             Command="{Binding FileListViewModel.SetViewModeCommand}"
             CommandParameter="{x:Static filelistconfig:FileListViewMode.SmallIcons}"
             InputGesture="{x:Static input:AppShortcuts.ViewSmallIcons}"
@@ -185,9 +185,9 @@
             IsChecked="{Binding FileListViewModel.IsThumbnailsView, Mode=OneWay}"
           />
         </MenuItem>
-        <MenuItem Header="Thumbnail _Size" IsEnabled="{Binding FileListViewModel.IsThumbnailsView}">
+        <MenuItem Header="Thumbnail _size" IsEnabled="{Binding FileListViewModel.IsThumbnailsView}">
           <MenuItem
-            Header="_Extra Small"
+            Header="_Extra small"
             Command="{Binding FileListViewModel.SetThumbnailSizeCommand}"
             CommandParameter="{x:Static filelist:ThumbnailSizes.ExtraSmall}"
             ToggleType="Radio"
@@ -215,7 +215,7 @@
             IsChecked="{Binding FileListViewModel.IsThumbnailSizeLarge, Mode=OneWay}"
           />
           <MenuItem
-            Header="E_xtra Large"
+            Header="E_xtra large"
             Command="{Binding FileListViewModel.SetThumbnailSizeCommand}"
             CommandParameter="{x:Static filelist:ThumbnailSizes.ExtraLarge}"
             ToggleType="Radio"
@@ -230,37 +230,37 @@
           />
         </MenuItem>
         <MenuItem
-          Header="Zoom _In"
+          Header="Zoom _in"
           Command="{Binding FileListViewModel.ZoomThumbnailsInCommand}"
           InputGesture="{x:Static input:AppShortcuts.ZoomIn}"
         />
         <MenuItem
-          Header="Zoom _Out"
+          Header="Zoom _out"
           Command="{Binding FileListViewModel.ZoomThumbnailsOutCommand}"
           InputGesture="{x:Static input:AppShortcuts.ZoomOut}"
         />
         <MenuItem
-          Header="_Reset Size"
+          Header="_Reset size"
           Command="{Binding FileListViewModel.ResetThumbnailSizeCommand}"
           InputGesture="{x:Static input:AppShortcuts.ResetZoom}"
         />
         <MenuItem
-          Header="Go to _Address"
+          Header="Go to _folder"
           Command="{Binding FileListViewModel.BeginPathEditCommand}"
           InputGesture="{x:Static input:AppShortcuts.GoToAddress}"
         />
-        <MenuItem Header="Go _Up" Command="{Binding FileListViewModel.GoUpCommand}" />
+        <MenuItem Header="Go _up" Command="{Binding FileListViewModel.GoUpCommand}" />
         <MenuItem
           Header="_Refresh"
           Command="{Binding FileListViewModel.RefreshCommand}"
           InputGesture="{x:Static input:AppShortcuts.Refresh}"
         />
         <Separator />
-        <MenuItem Header="Show Hidden/System Files" IsEnabled="False" />
+        <MenuItem Header="Show hidden/system files" IsEnabled="False" />
       </MenuItem>
       <MenuItem Header="_Rename List">
         <MenuItem
-          Header="Add Selected"
+          Header="Add selected"
           Command="{Binding RenameListViewModel.AddSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.AddSelected}"
         >
@@ -269,7 +269,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Add All"
+          Header="Add all"
           Command="{Binding RenameListViewModel.AddAllCommand}"
           InputGesture="{x:Static input:AppShortcuts.AddAll}"
         >
@@ -287,7 +287,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Remove All But Selected"
+          Header="Remove all but selected"
           Command="{Binding RenameListViewModel.RemoveAllButSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.RemoveAllButSelected}"
         />
@@ -302,7 +302,7 @@
         </MenuItem>
         <Separator />
         <MenuItem
-          Header="Move Selected Up"
+          Header="Move selected up"
           Command="{Binding RenameListViewModel.MoveSelectedUpCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveSelectedUp}"
         >
@@ -311,7 +311,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Move Selected Down"
+          Header="Move selected down"
           Command="{Binding RenameListViewModel.MoveSelectedDownCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveSelectedDown}"
         >
@@ -335,7 +335,7 @@
         </MenuItem>
         <Separator />
         <MenuItem
-          Header="Select Fields..."
+          Header="Select fields..."
           Command="{Binding RenameListViewModel.OpenFieldShuttleCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.SelectRenameListFields}"
         >
@@ -362,7 +362,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Select Sort Fields..."
+          Header="Select sort fields..."
           Command="{Binding RenameListViewModel.OpenEditSortFieldsCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.EditRenameListSortFields}"
         />
@@ -373,7 +373,7 @@
         />
         <Separator />
         <MenuItem
-          Header="Use Fixed-Width Font"
+          Header="Use fixed-width font"
           Command="{Binding RenameListViewModel.ToggleUseFixedWidthFontCommand}"
           ToggleType="CheckBox"
           IsChecked="{Binding RenameListViewModel.UseFixedWidthFont, Mode=OneWay}"
@@ -401,7 +401,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Before/After Mode"
+          Header="Before/after mode"
           Command="{Binding RenameListViewModel.ToggleAbModeCommand}"
           ToggleType="CheckBox"
           IsChecked="{Binding RenameListViewModel.IsAbModeEnabled, Mode=OneWay}"
@@ -415,7 +415,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Toggle _Before"
+          Header="Toggle _before"
           Command="{Binding RenameListViewModel.SetAbSideCommand}"
           CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSideOriginal}"
           ToggleType="Radio"
@@ -429,7 +429,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Toggle _After"
+          Header="Toggle _after"
           Command="{Binding RenameListViewModel.SetAbSideCommand}"
           CommandParameter="{x:Static filelistconfig:RenameListPrefs.AbSidePreview}"
           ToggleType="Radio"
@@ -443,7 +443,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Color _Legend"
+          Header="Color _legend"
           Command="{Binding RenameListViewModel.ToggleLegendCommand}"
           ToggleType="CheckBox"
           IsChecked="{Binding RenameListViewModel.IsLegendVisible, Mode=OneWay}"
@@ -455,13 +455,13 @@
         </MenuItem>
       </MenuItem>
       <MenuItem Header="F_ilters">
-        <MenuItem Header="Add Selected Filter" Command="{Binding AddSelectedFilterFromPaletteCommand}">
+        <MenuItem Header="Add selected filter" Command="{Binding AddSelectedFilterFromPaletteCommand}">
           <MenuItem.Icon>
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/AddSelected.png" />
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Remove Selected Filter"
+          Header="Remove selected filter"
           Command="{Binding FilterChainViewModel.RemoveSelectedCommand}"
           InputGesture="{x:Static input:AppShortcuts.RemoveSelectedFilterDelete}"
         >
@@ -469,14 +469,14 @@
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/RemoveSelected.png" />
           </MenuItem.Icon>
         </MenuItem>
-        <MenuItem Header="Remove All Filters" Command="{Binding FilterChainViewModel.ClearCommand}">
+        <MenuItem Header="Remove all filters" Command="{Binding FilterChainViewModel.ClearCommand}">
           <MenuItem.Icon>
             <Image Width="16" Height="16" Stretch="Uniform" Source="/Assets/RenameList/Clear.png" />
           </MenuItem.Icon>
         </MenuItem>
         <Separator />
         <MenuItem
-          Header="Move Filter Up"
+          Header="Move filter up"
           Command="{Binding FilterChainViewModel.MoveSelectedUpCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveFilterUp}"
         >
@@ -485,7 +485,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Move Filter Down"
+          Header="Move filter down"
           Command="{Binding FilterChainViewModel.MoveSelectedDownCommand}"
           InputGesture="{x:Static input:AppShortcuts.MoveFilterDown}"
         >
@@ -500,7 +500,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Save Preset"
+          Header="Save preset"
           Click="_OnSavePresetMenuClick"
           ToolTip.Tip="{x:Static resources:AppTips.SavePreset}"
         >
@@ -509,7 +509,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Filter Options"
+          Header="Filter options"
           Click="_OnFilterOptionsMenuClick"
           IsEnabled="{Binding FilterChainViewModel.CanShowFilterOptions}"
         >
@@ -529,7 +529,7 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
-          Header="Reset _Configuration"
+          Header="Reset _configuration"
           Command="{Binding ResetConfigurationCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.ResetConfiguration}"
         />
@@ -610,7 +610,7 @@
           VerticalAlignment="Center"
           Classes="status-bar-preview-errors"
           Classes.has-errors="{Binding HasPreviewErrors}"
-          Text="{Binding PreviewErrorCount, StringFormat='Preview Errors: {0}'}"
+          Text="{Binding PreviewErrorCount, StringFormat='Preview errors: {0}'}"
         />
       </Grid>
     </Border>

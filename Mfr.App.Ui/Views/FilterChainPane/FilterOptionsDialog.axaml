@@ -7,7 +7,7 @@
   xmlns:avConv="using:Avalonia.Data.Converters"
   x:Class="Mfr.App.Ui.Views.FilterChainPane.FilterOptionsDialog"
   x:DataType="vm:FilterOptionsDialogViewModel"
-  Title="Filter Options"
+  Title="Filter options"
   Icon="/Assets/mfr.ico"
   Width="540"
   MinWidth="460"

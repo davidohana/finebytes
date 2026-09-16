@@ -5,7 +5,7 @@
   xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   x:Class="Mfr.App.Ui.Views.Presets.ImportSamplePresetsDialog"
   x:DataType="vm:ImportSamplePresetsDialogViewModel"
-  Title="Import Sample Presets"
+  Title="Import sample presets"
   Icon="/Assets/mfr.ico"
   Width="720"
   Height="560"

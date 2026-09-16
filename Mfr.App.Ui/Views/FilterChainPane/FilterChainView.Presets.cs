@@ -169,7 +169,7 @@ namespace Mfr.App.Ui.Views.FilterChainPane
             catch (Exception ex)
             {
                 var message = ex is UserException userEx ? userEx.Message : ex.Message;
-                await new OkMessageDialog("Load Preset", message).ShowDialog(owner);
+                await new OkMessageDialog("Load preset", message).ShowDialog(owner);
                 return false;
             }
         }
@@ -219,7 +219,7 @@ namespace Mfr.App.Ui.Views.FilterChainPane
             catch (Exception ex)
             {
                 var message = ex is UserException userEx ? userEx.Message : ex.Message;
-                await new OkMessageDialog("Save Preset", message).ShowDialog(owner);
+                await new OkMessageDialog("Save preset", message).ShowDialog(owner);
             }
         }
 
@@ -271,7 +271,7 @@ namespace Mfr.App.Ui.Views.FilterChainPane
             return await SuppressibleConfirm
                 .ConfirmAsync(
                     owner,
-                    title: "Overwrite Preset",
+                    title: "Overwrite preset",
                     message: $"A preset named '{name}' already exists. Overwrite it?",
                     kind: ConfirmationKind.OverwritePreset,
                     confirmHook: confirmHook
