@@ -12,50 +12,49 @@ namespace Mfr.Models.Tags.Xiph
     /// </remarks>
     public static class XiphKeyLabels
     {
-        private static readonly Dictionary<string, SemanticAudioField> s_KeyToSemanticField =
-            new(StringComparer.Ordinal)
-            {
-                [XiphKnownKeys.Title] = SemanticAudioField.Title,
-                [XiphKnownKeys.Album] = SemanticAudioField.Album,
-                [XiphKnownKeys.Artist] = SemanticAudioField.Performers,
-                [XiphKnownKeys.AlbumArtist] = SemanticAudioField.AlbumArtists,
-                [XiphKnownKeys.Composer] = SemanticAudioField.Composers,
-                [XiphKnownKeys.Genre] = SemanticAudioField.Genre,
-                [XiphKnownKeys.Comment] = SemanticAudioField.Comment,
-                [XiphKnownKeys.Lyrics] = SemanticAudioField.Lyrics,
-                [XiphKnownKeys.Copyright] = SemanticAudioField.Copyright,
-                [XiphKnownKeys.Grouping] = SemanticAudioField.Grouping,
-                [XiphKnownKeys.Year] = SemanticAudioField.Year,
-                [XiphKnownKeys.BeatsPerMinute] = SemanticAudioField.BeatsPerMinute,
-                [XiphKnownKeys.Conductor] = SemanticAudioField.Conductor,
-            };
+        private static readonly Dictionary<string, SemanticAudioField> s_KeyToSemanticField = new(
+            StringComparer.Ordinal
+        )
+        {
+            [XiphKnownKeys.Title] = SemanticAudioField.Title,
+            [XiphKnownKeys.Album] = SemanticAudioField.Album,
+            [XiphKnownKeys.Artist] = SemanticAudioField.Performers,
+            [XiphKnownKeys.AlbumArtist] = SemanticAudioField.AlbumArtists,
+            [XiphKnownKeys.Composer] = SemanticAudioField.Composers,
+            [XiphKnownKeys.Genre] = SemanticAudioField.Genre,
+            [XiphKnownKeys.Comment] = SemanticAudioField.Comment,
+            [XiphKnownKeys.Lyrics] = SemanticAudioField.Lyrics,
+            [XiphKnownKeys.Copyright] = SemanticAudioField.Copyright,
+            [XiphKnownKeys.Grouping] = SemanticAudioField.Grouping,
+            [XiphKnownKeys.Year] = SemanticAudioField.Year,
+            [XiphKnownKeys.BeatsPerMinute] = SemanticAudioField.BeatsPerMinute,
+            [XiphKnownKeys.Conductor] = SemanticAudioField.Conductor,
+        };
 
-        private static readonly Dictionary<string, string> s_DistinctLabels =
-            new(StringComparer.Ordinal)
-            {
-                [XiphKnownKeys.Description] = "Description",
-                [XiphKnownKeys.UnsyncedLyrics] = "Unsynced Lyrics",
-                [XiphKnownKeys.ContentGroup] = "Content Group",
-                [XiphKnownKeys.Date] = "Date",
-                [XiphKnownKeys.TrackNumber] = "Track Number",
-                [XiphKnownKeys.TrackTotal] = "Track Total",
-                [XiphKnownKeys.TotalTracks] = "Total Tracks",
-                [XiphKnownKeys.DiscNumber] = "Disc Number",
-                [XiphKnownKeys.DiscTotal] = "Disc Total",
-                [XiphKnownKeys.TotalDiscs] = "Total Discs",
-                [XiphKnownKeys.Tempo] = "Tempo",
-            };
+        private static readonly Dictionary<string, string> s_DistinctLabels = new(StringComparer.Ordinal)
+        {
+            [XiphKnownKeys.Description] = "Description",
+            [XiphKnownKeys.UnsyncedLyrics] = "Unsynced Lyrics",
+            [XiphKnownKeys.ContentGroup] = "Content Group",
+            [XiphKnownKeys.Date] = "Date",
+            [XiphKnownKeys.TrackNumber] = "Track Number",
+            [XiphKnownKeys.TrackTotal] = "Track Total",
+            [XiphKnownKeys.TotalTracks] = "Total Tracks",
+            [XiphKnownKeys.DiscNumber] = "Disc Number",
+            [XiphKnownKeys.DiscTotal] = "Disc Total",
+            [XiphKnownKeys.TotalDiscs] = "Total Discs",
+            [XiphKnownKeys.Tempo] = "Tempo",
+        };
 
-        private static readonly Dictionary<string, string> s_KeyToTip =
-            new(StringComparer.Ordinal)
-            {
-                [XiphKnownKeys.Artist] = SemanticAudioFieldTips.Artist,
-                [XiphKnownKeys.AlbumArtist] = SemanticAudioFieldTips.AlbumArtist,
-                [XiphKnownKeys.Composer] = SemanticAudioFieldTips.Composer,
-                [XiphKnownKeys.Genre] = SemanticAudioFieldTips.Genre,
-                [XiphKnownKeys.AmazonId] = SemanticAudioFieldTips.Asin,
-                [XiphKnownKeys.BeatsPerMinute] = SemanticAudioFieldTips.Bpm,
-            };
+        private static readonly Dictionary<string, string> s_KeyToTip = new(StringComparer.Ordinal)
+        {
+            [XiphKnownKeys.Artist] = SemanticAudioFieldTips.Artist,
+            [XiphKnownKeys.AlbumArtist] = SemanticAudioFieldTips.AlbumArtist,
+            [XiphKnownKeys.Composer] = SemanticAudioFieldTips.Composer,
+            [XiphKnownKeys.Genre] = SemanticAudioFieldTips.Genre,
+            [XiphKnownKeys.AmazonId] = SemanticAudioFieldTips.Asin,
+            [XiphKnownKeys.BeatsPerMinute] = SemanticAudioFieldTips.Bpm,
+        };
 
         /// <summary>
         /// Returns the Apply-To label for <paramref name="key"/>.

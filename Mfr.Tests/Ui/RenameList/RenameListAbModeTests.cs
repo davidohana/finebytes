@@ -152,10 +152,7 @@ namespace Mfr.Tests.Ui.RenameList
                     new RenameListVisibleColumn(nameKey),
                     new RenameListVisibleColumn(titleKey),
                 ],
-                [
-                    new RenameListVisibleColumn(folderKey, Width: 180),
-                    new RenameListVisibleColumn(nameKey, Width: 90),
-                ]
+                [new RenameListVisibleColumn(folderKey, Width: 180), new RenameListVisibleColumn(nameKey, Width: 90)]
             );
 
             Assert.Equal(

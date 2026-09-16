@@ -826,10 +826,7 @@ namespace Mfr.Tests.Ui.FilterChainPane
             var viewModel = new FilterChainViewModel();
             viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
 
-            var count = _CountChainChanged(
-                viewModel,
-                () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] })
-            );
+            var count = _CountChainChanged(viewModel, () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] }));
 
             Assert.Equal(1, count);
             Assert.Equal(0, viewModel.Count);
@@ -843,10 +840,7 @@ namespace Mfr.Tests.Ui.FilterChainPane
         public void ReplaceFromChain_Empty_When_Already_Empty_Raises_No_ChainChanged()
         {
             var viewModel = new FilterChainViewModel();
-            var count = _CountChainChanged(
-                viewModel,
-                () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] })
-            );
+            var count = _CountChainChanged(viewModel, () => viewModel.ReplaceFromChain(new FilterChain { Steps = [] }));
             Assert.Equal(0, count);
         }
 
