@@ -22,9 +22,9 @@ namespace Mfr.Tests.Engine
         /// Verifies the catalog exposes the complete locked set of samples.
         /// </summary>
         [Fact]
-        public void Catalog_contains_all_14_samples()
+        public void Catalog_contains_all_15_samples()
         {
-            Assert.Equal(14, SamplePresetCatalog.Presets.Count);
+            Assert.Equal(15, SamplePresetCatalog.Presets.Count);
             Assert.All(SamplePresetCatalog.Presets, preset => Assert.NotEmpty(preset.Chain.Steps));
         }
 
@@ -71,6 +71,10 @@ namespace Mfr.Tests.Engine
                 column =>
                     column.Key == RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*36867")
                     && column.Width == 140
+            );
+            Assert.Contains(
+                _Preset("PIC Date Taken Make Model").VisibleColumns!,
+                column => column.Key == RenameListFieldKey.Original(JpegRenameListFields.Group, JpegRenameListFields.Key.Make)
             );
             Assert.Contains(
                 _Preset("Name from Image").VisibleColumns!,
@@ -194,6 +198,22 @@ namespace Mfr.Tests.Engine
             var pathMover = Assert.IsType<PathMoverFilter>(step.Filter);
             Assert.Equal(@"C:\Photos", pathMover.Options.RootFolder);
             Assert.Equal(@"<exif-date:yyyy>\<exif-date:MM>\<exif-date:dd>", pathMover.Options.SubFolder);
+        }
+
+        /// <summary>
+        /// Verifies the PIC Date Taken Make Model sample uses date, collision letters, and camera tags.
+        /// </summary>
+        [Fact]
+        public void PIC_Date_Taken_Make_Model_has_locked_formatter()
+        {
+            var step = Assert.Single(_Preset("PIC Date Taken Make Model").Chain.Steps);
+            Assert.True(step.Enabled);
+            var formatter = Assert.IsType<FormatterFilter>(step.Filter);
+            Assert.Equal(
+                "PIC_<exif-date:yyyy-MM-dd HH-mm-ss>_<random-char:a,z><random-char:a,z>_<exif-make>_<exif-model>",
+                formatter.Options.Template
+            );
+            formatter.Setup();
         }
 
         /// <summary>

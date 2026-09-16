@@ -21,7 +21,7 @@ namespace Mfr.Engine.Presets.Samples
         private static readonly FilePrefixTarget FilePrefix = new();
 
         /// <summary>
-        /// Builds the locked 14-sample catalog (unsorted).
+        /// Builds the locked 15-sample catalog (unsorted).
         /// </summary>
         /// <returns>All sample presets.</returns>
         public static IReadOnlyList<FilterPreset> CreateAll()
@@ -33,6 +33,7 @@ namespace Mfr.Engine.Presets.Samples
                 _TagsFromFilename(),
                 _ArtistTrackTitle(),
                 _DateTakenPrefix(),
+                _PicDateTakenMakeModel(),
                 _NameFromImage(),
                 _FlattenPath(),
                 _DateTakenFolders(),
@@ -282,6 +283,35 @@ namespace Mfr.Engine.Presets.Samples
                     _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
                     _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 300),
                     _Jpeg("ExifDirectory*36867", preview: false, width: 140),
+                ]
+            );
+        }
+
+        private static FilterPreset _PicDateTakenMakeModel()
+        {
+            return _Preset(
+                id: "10000000-0000-4000-8000-000000000015",
+                name: "PIC Date Taken Make Model",
+                description: "Rename JPEG images as PIC_date taken_two random lowercase letters_make_model.\nRandom letters reduce name collisions when date/make/model match.",
+                chain: _Chain(
+                    _On(
+                        new FormatterFilter(
+                            FilePrefix,
+                            new FormatterOptions(
+                                "PIC_<exif-date:yyyy-MM-dd HH-mm-ss>_<random-char:a,z><random-char:a,z>_<exif-make>_<exif-model>"
+                            )
+                        )
+                    )
+                ),
+                columns:
+                [
+                    _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 320),
+                    _Jpeg(JpegRenameListFields.Key.DateTaken, preview: false, width: 140),
+                    _Jpeg(JpegRenameListFields.Key.Make, preview: false, width: 80),
+                    _Jpeg(JpegRenameListFields.Key.Model, preview: false, width: 100),
                 ]
             );
         }
