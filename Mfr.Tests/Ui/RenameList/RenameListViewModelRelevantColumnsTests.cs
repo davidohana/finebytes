@@ -302,5 +302,76 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(captured.ColumnWidths);
             Assert.Contains(captured.ColumnWidths, spec => spec.Key == nameOriginal && spec.Width == 155);
         }
+
+        /// <summary>
+        /// Verifies session restore fills catalog-default visible widths from the remembered map.
+        /// </summary>
+        [Fact]
+        public void ApplySessionSection_fills_catalog_default_visible_from_remembered()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.Options.RememberColumnWidths = true;
+
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.ApplySessionSection(
+                new RenameListPrefs
+                {
+                    VisibleColumns = [new RenameListVisibleColumnSpec(nameOriginal)],
+                    ColumnWidths = [new RenameListVisibleColumnSpec(nameOriginal, Width: 188)],
+                }
+            );
+
+            Assert.Equal(188, renameListViewModel.VisibleColumns[0].Width);
+            Assert.Equal(188, renameListViewModel.RememberedColumnWidths[nameOriginal]);
+        }
+
+        /// <summary>
+        /// Verifies session restore does not fill catalog-default visible widths when remembering is off.
+        /// </summary>
+        [Fact]
+        public void ApplySessionSection_skips_fill_when_option_off()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.Options.RememberColumnWidths = false;
+
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.ApplySessionSection(
+                new RenameListPrefs
+                {
+                    VisibleColumns = [new RenameListVisibleColumnSpec(nameOriginal)],
+                    ColumnWidths = [new RenameListVisibleColumnSpec(nameOriginal, Width: 188)],
+                }
+            );
+
+            Assert.Equal(RenameListVisibleColumn.UseCatalogDefaultWidth, renameListViewModel.VisibleColumns[0].Width);
+            Assert.Equal(188, renameListViewModel.RememberedColumnWidths[nameOriginal]);
+        }
+
+        /// <summary>
+        /// Verifies preset-style column apply does not overlay the remembered map onto omitted widths.
+        /// </summary>
+        [Fact]
+        public void ApplyVisibleColumnSpecs_does_not_fill_from_remembered_map()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.Options.RememberColumnWidths = true;
+
+            var renameListViewModel = _context.CreateRenameListViewModel();
+            var nameOriginal = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.ApplySessionSection(
+                new RenameListPrefs
+                {
+                    VisibleColumns = [new RenameListVisibleColumnSpec(nameOriginal, Width: 90)],
+                    ColumnWidths = [new RenameListVisibleColumnSpec(nameOriginal, Width: 188)],
+                }
+            );
+
+            renameListViewModel.ApplyVisibleColumnSpecs([new RenameListVisibleColumnSpec(nameOriginal)]);
+
+            Assert.Equal(RenameListVisibleColumn.UseCatalogDefaultWidth, renameListViewModel.VisibleColumns[0].Width);
+            Assert.Equal(188, renameListViewModel.RememberedColumnWidths[nameOriginal]);
+        }
     }
 }

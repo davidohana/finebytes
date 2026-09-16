@@ -413,7 +413,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Appends columns for keys not already in <paramref name="keyToIsPresent"/> (catalog default width).
+        /// Appends catalog-default-width columns for keys not already in <paramref name="keyToIsPresent"/>.
+        /// <para>Callers that honor Options remembering apply remembered widths after this append.</para>
         /// </summary>
         /// <returns><see langword="true"/> when at least one column was appended.</returns>
         private static bool _AppendMissingRelevantColumns(
@@ -453,7 +454,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Gets a snapshot of remembered absolute widths for shuttle / helpers.
+        /// Gets the live remembered absolute widths (session capture and field-shuttle input).
         /// </summary>
         internal IReadOnlyDictionary<RenameListFieldKey, int> RememberedColumnWidths => _rememberedColumnWidths;
 
@@ -470,6 +471,21 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return RenameListVisibleColumn.WithRememberedWidths(columns, _rememberedColumnWidths);
+        }
+
+        /// <summary>
+        /// Fills catalog-default entries on the current visible list from the remembered map (session restore).
+        /// </summary>
+        private void _ApplyRememberedWidthsToCurrentVisibleColumns()
+        {
+            var applied = _ApplyRememberedWidthsIfEnabled(_visibleColumns);
+            if (ReferenceEquals(applied, _visibleColumns) || applied.SequenceEqual(_visibleColumns))
+            {
+                return;
+            }
+
+            _visibleColumns = [.. applied];
+            _NotifyVisibleAndProjectedColumnsChanged();
         }
 
         /// <summary>
@@ -532,7 +548,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Restores visible columns from session data.
+        /// Restores visible columns from session or preset data.
+        /// <para>
+        /// Does not overlay <see cref="RememberedColumnWidths"/> — session restore does that in
+        /// <see cref="ApplySessionSection"/> so preset loads keep catalog defaults when widths are omitted.
+        /// </para>
         /// </summary>
         /// <param name="columns">
         /// Saved columns in grid order, or <see langword="null"/> for MFR7 defaults.
@@ -541,12 +561,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         {
             if (columns is null)
             {
-                _visibleColumns =
-                [
-                    .. _ApplyRememberedWidthsIfEnabled(
-                        _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())
-                    ),
-                ];
+                _visibleColumns = [.. _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())];
                 _NotifyVisibleAndProjectedColumnsChanged();
                 return;
             }
@@ -565,12 +580,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             if (validColumns.Count == 0)
             {
-                _visibleColumns =
-                [
-                    .. _ApplyRememberedWidthsIfEnabled(
-                        _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())
-                    ),
-                ];
+                _visibleColumns = [.. _NormalizeColumnsIfAbMode(RenameListVisibleColumn.CreateDefaults())];
                 _NotifyVisibleAndProjectedColumnsChanged();
                 return;
             }

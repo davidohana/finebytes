@@ -69,7 +69,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Restores sort, columns, and display prefs from a UI session section.
         /// <para>
         /// A/B Mode is applied before columns so leftover preview keys normalize to originals when mode is on.
-        /// Add policy lives on <see cref="ConfigStore.Options"/> and is not applied here.
+        /// Remembered widths load before visible columns, then fill any catalog-default entries when the Options
+        /// toggle is on. Preset column apply uses <see cref="ApplyVisibleColumnSpecs"/> alone and does not
+        /// overlay the remembered map. Add policy lives on <see cref="ConfigStore.Options"/> and is not applied here.
         /// </para>
         /// </summary>
         /// <param name="renameList">
@@ -83,6 +85,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _ApplyRememberedColumnWidthSpecs(section.ColumnWidths);
             ApplySession(renameList?.SortFields);
             ApplyVisibleColumnSpecs(renameList?.VisibleColumns);
+            _ApplyRememberedWidthsToCurrentVisibleColumns();
             UseFixedWidthFont = section.UseFixedWidthFont;
             IsAutoPreview = section.PreviewEnabled;
         }
