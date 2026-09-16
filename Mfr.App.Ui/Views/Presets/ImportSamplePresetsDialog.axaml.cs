@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.Presets;
 
 namespace Mfr.App.Ui.Views.Presets
@@ -16,6 +17,7 @@ namespace Mfr.App.Ui.Views.Presets
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
+            DialogSession.Attach(this, "importSamplePresets");
         }
 
         /// <summary>

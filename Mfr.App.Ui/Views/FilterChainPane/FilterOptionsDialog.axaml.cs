@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 
 namespace Mfr.App.Ui.Views.FilterChainPane
@@ -19,6 +20,7 @@ namespace Mfr.App.Ui.Views.FilterChainPane
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
+            DialogSession.Attach(this, "filterOptions", DialogGeometryMode.WidthAndPosition);
             ModalDialogHorizontalResize.Attach(this);
             ModalDialogHorizontalResize.RelockOnDataContextProperties(
                 this,

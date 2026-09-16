@@ -2,6 +2,13 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.Services.Session;
+using Mfr.App.Ui.Views.Crash;
+using Mfr.App.Ui.Views.FileList;
+using Mfr.App.Ui.Views.FilterChainPane;
+using Mfr.App.Ui.Views.FormatEditor;
+using Mfr.App.Ui.Views.LogDialog;
+using Mfr.App.Ui.Views.Presets;
+using Mfr.App.Ui.Views.RenameList;
 
 namespace Mfr.Tests.Ui.Services.Session
 {
@@ -196,6 +203,26 @@ namespace Mfr.Tests.Ui.Services.Session
             window.Close();
 
             Assert.Null(ConfigStore.MainWindow?.Dialogs);
+        }
+
+        /// <summary>
+        /// Verifies each live resizable dialog constructs with DialogSession attached.
+        /// </summary>
+        [AvaloniaFact]
+        public void LiveDialogs_Construct_WithDialogSessionAttached()
+        {
+            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
+
+            Assert.Null(Record.Exception(() => new RenameListFieldShuttleDialog().Close()));
+            Assert.Null(Record.Exception(() => new RenameLogDialog().Close()));
+            Assert.Null(Record.Exception(() => new PresetManagerDialog().Close()));
+            Assert.Null(Record.Exception(() => new ImportSamplePresetsDialog().Close()));
+            Assert.Null(Record.Exception(() => new SavePresetDialog().Close()));
+            Assert.Null(Record.Exception(() => new FilterOptionsDialog().Close()));
+            Assert.Null(Record.Exception(() => new FormatTokenEditorDialog().Close()));
+            Assert.Null(Record.Exception(() => new ExcludeMasksDialog().Close()));
+            Assert.Null(Record.Exception(() => new RenameListRowErrorDialog().Close()));
+            Assert.Null(Record.Exception(() => new CrashDialog().Close()));
         }
 
         private static Window _CreateDialog(double width, double height)

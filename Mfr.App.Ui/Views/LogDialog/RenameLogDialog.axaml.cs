@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Input;
+using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.LogDialog;
 
 namespace Mfr.App.Ui.Views.LogDialog
@@ -16,6 +17,7 @@ namespace Mfr.App.Ui.Views.LogDialog
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
+            DialogSession.Attach(this, "renameLog");
         }
 
         /// <summary>

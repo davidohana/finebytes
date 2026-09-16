@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.FileList;
 
 namespace Mfr.App.Ui.Views.FileList
@@ -15,6 +16,7 @@ namespace Mfr.App.Ui.Views.FileList
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
+            DialogSession.Attach(this, "excludeMasks");
         }
 
         /// <summary>

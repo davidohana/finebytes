@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.RenameList;
 
 namespace Mfr.App.Ui.Views.RenameList
@@ -17,6 +18,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
+            DialogSession.Attach(this, "fieldShuttle");
         }
 
         /// <summary>
