@@ -21,12 +21,13 @@ namespace Mfr.Tests.Models
             Assert.Equal(string.Empty, doc.RootElement.GetProperty("log").GetProperty("directoryPath").GetString());
             Assert.Equal("session-", doc.RootElement.GetProperty("log").GetProperty("filePrefix").GetString());
             Assert.Empty(
-                doc.RootElement.GetProperty("ui").GetProperty("suppressedConfirmations").EnumerateArray().ToArray()
+                doc.RootElement.GetProperty("options").GetProperty("suppressedConfirmations").EnumerateArray().ToArray()
             );
+            Assert.Equal("true", doc.RootElement.GetProperty("options").GetProperty("rememberWindowState").GetString());
             Assert.Equal("10", doc.RootElement.GetProperty("renameLog").GetProperty("limit").GetString());
-            Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("confirmationPrompts", out _));
-            Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("doubleClickAddsToRenameList", out _));
-            Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("presets", out _));
+            Assert.False(doc.RootElement.GetProperty("options").TryGetProperty("confirmationPrompts", out _));
+            Assert.False(doc.RootElement.GetProperty("options").TryGetProperty("doubleClickAddsToRenameList", out _));
+            Assert.False(doc.RootElement.GetProperty("options").TryGetProperty("presets", out _));
             Assert.False(doc.RootElement.TryGetProperty("session", out _));
             Assert.False(doc.RootElement.TryGetProperty("mainWindow", out _));
             Assert.False(doc.RootElement.TryGetProperty("fileList", out _));
@@ -49,7 +50,7 @@ namespace Mfr.Tests.Models
             ConfigStore.EnsureDefaultFile(temp.Path);
             using var doc = JsonDocument.Parse(File.ReadAllText(temp.Path));
             Assert.Equal("50", doc.RootElement.GetProperty("log").GetProperty("maxSessionFiles").GetString());
-            Assert.False(doc.RootElement.TryGetProperty("ui", out _));
+            Assert.False(doc.RootElement.TryGetProperty("options", out _));
         }
     }
 }

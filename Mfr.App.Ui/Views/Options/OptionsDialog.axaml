@@ -25,18 +25,11 @@
 
     <StackPanel Spacing="10" Grid.IsSharedSizeScope="True">
       <controls:FieldsetGroup Header="Session">
-        <StackPanel Spacing="6">
-          <controls:CompactCheckBox
-            IsChecked="{Binding RememberLastFolder}"
-            Content="Save File List last position"
-            ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberLastFolder}"
-          />
-          <controls:CompactCheckBox
-            IsChecked="{Binding RememberWindowState}"
-            Content="Remember window size and position"
-            ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberWindowState}"
-          />
-        </StackPanel>
+        <controls:CompactCheckBox
+          IsChecked="{Binding RememberWindowState}"
+          Content="Remember window size and position"
+          ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberWindowState}"
+        />
       </controls:FieldsetGroup>
 
       <controls:FieldsetGroup Header="Confirmations">
@@ -63,22 +56,29 @@
       </controls:FieldsetGroup>
 
       <controls:FieldsetGroup Header="File List">
-        <controls:FilterEditorLabeledRow Label="Double-click:">
-          <StackPanel Orientation="Horizontal" Spacing="12">
-            <controls:CompactRadioButton
-              GroupName="DoubleClickInFileList"
-              Content="Open"
-              ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickOpen}"
-              IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.False}, Mode=TwoWay}"
-            />
-            <controls:CompactRadioButton
-              GroupName="DoubleClickInFileList"
-              Content="Add to Rename List"
-              ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickAdd}"
-              IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.True}, Mode=TwoWay}"
-            />
-          </StackPanel>
-        </controls:FilterEditorLabeledRow>
+        <StackPanel Spacing="8">
+          <controls:CompactCheckBox
+            IsChecked="{Binding RememberLastFolder}"
+            Content="Remember last folder"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberLastFolder}"
+          />
+          <controls:FilterEditorLabeledRow Label="Double-click:">
+            <StackPanel Orientation="Horizontal" Spacing="12">
+              <controls:CompactRadioButton
+                GroupName="DoubleClickInFileList"
+                Content="Open"
+                ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickOpen}"
+                IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.False}, Mode=TwoWay}"
+              />
+              <controls:CompactRadioButton
+                GroupName="DoubleClickInFileList"
+                Content="Add to Rename List"
+                ToolTip.Tip="{x:Static resources:AppTips.OptionsDoubleClickAdd}"
+                IsChecked="{Binding DoubleClickAddsToRenameList, Converter={x:Static converters:BooleanToRadioConverter.Instance}, ConverterParameter={x:Static converters:BooleanToRadioConverter.True}, Mode=TwoWay}"
+              />
+            </StackPanel>
+          </controls:FilterEditorLabeledRow>
+        </StackPanel>
       </controls:FieldsetGroup>
 
       <controls:FieldsetGroup Header="Rename List">

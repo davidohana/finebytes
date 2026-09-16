@@ -50,7 +50,7 @@ namespace Mfr.Models.Config
     }
 
     /// <summary>
-    /// Saved main-window size, position, state, pane splitter ratios, and dialog geometries.
+    /// Saved main-window size, position, state, and pane splitter ratios.
     /// </summary>
     public sealed class MainWindowPrefs
     {
@@ -92,19 +92,6 @@ namespace Mfr.Models.Config
         /// </summary>
         [JsonPropertyName("splitters")]
         public MainWindowSplitters? Splitters { get; set; }
-
-        /// <summary>
-        /// Last size/position per resizable modal dialog id, when remembered.
-        /// </summary>
-        [JsonPropertyName("dialogs")]
-        public Dictionary<string, WindowGeometryPrefs>? Dialogs { get; set; }
-
-        /// <summary>
-        /// When true, restore and save main-window size, position, maximized state, pane splitters,
-        /// and resizable dialog geometries across launches.
-        /// </summary>
-        [JsonPropertyName("rememberWindowState")]
-        public bool RememberWindowState { get; set; } = true;
     }
 
     /// <summary>

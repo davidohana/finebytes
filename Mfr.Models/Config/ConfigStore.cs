@@ -15,9 +15,9 @@ namespace Mfr.Models.Config
     /// <para>
     /// Soft-load dialect for the whole prefs file: missing default AppData file → in-memory defaults.
     /// Corrupt / unreadable → defaults (app continues). Missing keys → field initializers / null session
-    /// sections / empty <see cref="FilterDefaultsJson"/>. Invalid <c>log</c>/<c>ui</c>/<c>renameLog</c>
-    /// leaf → that leaf is skipped. Unknown members inside <c>ui.suppressedConfirmations</c> are skipped;
-    /// obsolete <c>ui.confirmationPrompts</c> is ignored (no migration). Bad <c>filterDefaults</c> entries
+    /// sections / empty <see cref="FilterDefaultsJson"/>. Invalid <c>log</c>/<c>options</c>/<c>renameLog</c>
+    /// leaf → that leaf is skipped. Unknown members inside <c>options.suppressedConfirmations</c> are skipped;
+    /// obsolete <c>options.confirmationPrompts</c> / root <c>ui</c> are ignored (no migration). Bad <c>filterDefaults</c> entries
     /// are skipped later by <c>FilterDefaultsStore</c> (Engine). Explicit <c>--config PATH</c> missing →
     /// hard-fail (CLI typo). Explicit path corrupt → soft to defaults. Opposite of hard-fail
     /// <c>PresetManager</c> (Engine) and CLI <c>--set</c> (<see cref="ApplyCliOverrides"/>).
@@ -27,13 +27,13 @@ namespace Mfr.Models.Config
     /// defaults so the user can hand-edit log settings. Empty session sections / <c>filterDefaults</c> are
     /// omitted (same as first launch). Options, session close-save, and filter-default pin all persist via
     /// <see cref="Save"/> (whole document overwrite). Null session section properties are omitted on write.
-    /// When a property is omitted, values still come from <see cref="LogConfig"/> / <see cref="UiConfig"/> /
+    /// When a property is omitted, values still come from <see cref="LogConfig"/> / <see cref="OptionsConfig"/> /
     /// <see cref="RenameLogConfig"/> field initializers.
     /// </para>
     /// <para>
-    /// Document shape: root object with <c>log</c>/<c>ui</c>/<c>renameLog</c> (string leaves and enum-list
+    /// Document shape: root object with <c>log</c>/<c>options</c>/<c>renameLog</c> (string leaves and enum-list
     /// arrays via <see cref="ConfigJsonApplier"/> / <see cref="ConfigJsonWriter"/>), sibling session sections
-    /// (<c>mainWindow</c>, <c>fileList</c>, <c>renameList</c>, <c>filterEditor</c> via STJ), and
+    /// (<c>mainWindow</c>, <c>fileList</c>, <c>renameList</c>, <c>filterEditor</c>, <c>dialogs</c> via STJ), and
     /// <c>filterDefaults</c> (opaque map of type → filter JSON; not nested under <c>defaults</c>).
     /// Nested <c>session</c> is not read (no migration).
     /// </para>
@@ -58,9 +58,9 @@ namespace Mfr.Models.Config
         public static LogConfig Log => s_Prefs.Log;
 
         /// <summary>
-        /// Gets the UI options persisted by the Options dialog (<c>ui.suppressedConfirmations</c>).
+        /// Gets the Options prefs (<c>options.suppressedConfirmations</c>, <c>options.rememberWindowState</c>).
         /// </summary>
-        public static UiConfig Ui => s_Prefs.Ui;
+        public static OptionsConfig Options => s_Prefs.Options;
 
         /// <summary>
         /// Gets rename-commit undo log retention (<c>renameLog.limit</c>).
@@ -89,6 +89,12 @@ namespace Mfr.Models.Config
         public static FilterEditorPrefs? FilterEditor { get; set; }
 
         /// <summary>
+        /// Gets or sets size/position per resizable modal dialog id, when remembered.
+        /// <para>Root <c>dialogs</c> map; gated by <see cref="OptionsConfig.RememberWindowState"/>.</para>
+        /// </summary>
+        public static Dictionary<string, WindowGeometryPrefs>? Dialogs { get; set; }
+
+        /// <summary>
         /// Gets or sets the opaque <c>filterDefaults</c> map (type discriminator → filter JSON object).
         /// <para>Empty when omitted or unset. Typed deserialization lives in Engine <c>FilterDefaultsStore</c>.</para>
         /// </summary>
@@ -101,6 +107,15 @@ namespace Mfr.Models.Config
         public static MainWindowPrefs EnsureMainWindow()
         {
             return MainWindow ??= new MainWindowPrefs();
+        }
+
+        /// <summary>
+        /// Returns <see cref="Dialogs"/>, creating it when missing.
+        /// </summary>
+        /// <returns>The root dialog-geometry map.</returns>
+        public static Dictionary<string, WindowGeometryPrefs> EnsureDialogs()
+        {
+            return Dialogs ??= new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal);
         }
 
         /// <summary>
@@ -197,6 +212,7 @@ namespace Mfr.Models.Config
                 FileList = _ReadSection<FileListPrefs>(doc.RootElement, "fileList");
                 RenameList = _ReadSection<RenameListPrefs>(doc.RootElement, "renameList");
                 FilterEditor = _ReadSection<FilterEditorPrefs>(doc.RootElement, "filterEditor");
+                Dialogs = _ReadSection<Dictionary<string, WindowGeometryPrefs>>(doc.RootElement, "dialogs");
                 FilterDefaultsJson = _ReadFilterDefaults(doc.RootElement);
             }
             catch
@@ -244,6 +260,7 @@ namespace Mfr.Models.Config
             _WriteSection(root, "fileList", FileList);
             _WriteSection(root, "renameList", RenameList);
             _WriteSection(root, "filterEditor", FilterEditor);
+            _WriteSection(root, "dialogs", Dialogs);
 
             if (FilterDefaultsJson is { Count: > 0 })
             {
@@ -301,7 +318,7 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Applies CLI <c>--set</c> overrides to <see cref="Log"/> / <see cref="Ui"/> / <see cref="RenameLog"/> (after <see cref="Load"/>).
+        /// Applies CLI <c>--set</c> overrides to <see cref="Log"/> / <see cref="Options"/> / <see cref="RenameLog"/> (after <see cref="Load"/>).
         /// <para>Keys are dotted paths (e.g. <c>log.maxSessionFiles</c>) matching <c>config.json</c>.</para>
         /// </summary>
         /// <param name="assignments">Raw <c>key=value</c> strings from the CLI; blank entries are skipped.</param>
@@ -336,6 +353,7 @@ namespace Mfr.Models.Config
             FileList = null;
             RenameList = null;
             FilterEditor = null;
+            Dialogs = null;
             FilterDefaultsJson = [];
         }
 
@@ -439,7 +457,7 @@ namespace Mfr.Models.Config
         }
 
         /// <summary>
-        /// Private root for string-leaf <c>log</c>/<c>ui</c>/<c>renameLog</c> binding via <see cref="ConfigJsonApplier"/>.
+        /// Private root for string-leaf <c>log</c>/<c>options</c>/<c>renameLog</c> binding via <see cref="ConfigJsonApplier"/>.
         /// </summary>
         private sealed class PrefsRoot
         {
@@ -450,10 +468,10 @@ namespace Mfr.Models.Config
             public LogConfig Log = new();
 
             /// <summary>
-            /// UI options (<c>suppressedConfirmations</c>).
+            /// Options dialog prefs (<c>suppressedConfirmations</c>, <c>rememberWindowState</c>).
             /// </summary>
-            [ConfigSection]
-            public UiConfig Ui = new();
+            [ConfigSection("options")]
+            public OptionsConfig Options = new();
 
             /// <summary>
             /// Rename-commit undo log retention (<c>limit</c>).

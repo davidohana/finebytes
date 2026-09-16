@@ -3,22 +3,28 @@ using Mfr.Utils.Config;
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// UI prefs from the Options dialog, loaded from the <c>ui</c> section of the config file.
+    /// Options-dialog prefs from the <c>options</c> section of the config file.
     /// <para>
     /// <see cref="SuppressedConfirmations"/> gates optional confirms via <see cref="ConfirmationPolicy"/>.
-    /// Obsolete <c>ui.confirmationPrompts</c> is ignored on soft-load (no migration).
+    /// Obsolete <c>options.confirmationPrompts</c> / <c>ui</c> section names are ignored on soft-load (no migration).
     /// </para>
     /// </summary>
-    public sealed class UiConfig
+    public sealed class OptionsConfig
     {
         /// <summary>
         /// Confirmation kinds the user chose not to see again (empty = show all suppressible confirms).
         /// <para>
-        /// Persisted as <c>ui.suppressedConfirmations</c> (JSON array of camelCase enum names). Unknown members
+        /// Persisted as <c>options.suppressedConfirmations</c> (JSON array of camelCase enum names). Unknown members
         /// are skipped on soft-load. Default empty.
         /// </para>
         /// </summary>
         public List<ConfirmationKind> SuppressedConfirmations = [];
+
+        /// <summary>
+        /// When true, restore and save main-window size/position/splitters and dialog geometries across launches.
+        /// <para>Persisted as <c>options.rememberWindowState</c> (JSON string <c>true</c>/<c>false</c>).</para>
+        /// </summary>
+        public bool RememberWindowState = true;
     }
 
     /// <summary>

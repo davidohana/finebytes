@@ -1,7 +1,7 @@
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Suppressible confirmation gates controlled by <see cref="UiConfig.SuppressedConfirmations"/> via
+    /// Suppressible confirmation gates controlled by <see cref="OptionsConfig.SuppressedConfirmations"/> via
     /// <see cref="ConfirmationPolicy"/>.
     /// <para>
     /// Reset Configuration is not a kind — it always confirms and cannot be suppressed.

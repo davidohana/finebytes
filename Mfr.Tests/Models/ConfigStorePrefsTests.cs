@@ -28,7 +28,7 @@ namespace Mfr.Tests.Models
             using var temp = ConfigStoreTempFile.CreateWithContent("{ not-json");
             ConfigStore.Load(temp.Path);
             Assert.Null(ConfigStore.MainWindow);
-            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
             Assert.Empty(ConfigStore.FilterDefaultsJson);
         }
 
@@ -50,15 +50,16 @@ namespace Mfr.Tests.Models
                     FilterLists = 0.55,
                     TopPanes = 0.65,
                 },
-                Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+            };
+            ConfigStore.Options.RememberWindowState = true;
+            ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+            {
+                ["fieldShuttle"] = new WindowGeometryPrefs
                 {
-                    ["fieldShuttle"] = new WindowGeometryPrefs
-                    {
-                        X = 100,
-                        Y = 80,
-                        Width = 820,
-                        Height = 560,
-                    },
+                    X = 100,
+                    Y = 80,
+                    Width = 820,
+                    Height = 560,
                 },
             };
             ConfigStore.FileList = new FileListPrefs
@@ -102,8 +103,9 @@ namespace Mfr.Tests.Models
             Assert.Equal(0.45, ConfigStore.MainWindow.Splitters.AvailableApplied);
             Assert.Equal(0.55, ConfigStore.MainWindow.Splitters.FilterLists);
             Assert.Equal(0.65, ConfigStore.MainWindow.Splitters.TopPanes);
-            Assert.NotNull(ConfigStore.MainWindow.Dialogs);
-            Assert.True(ConfigStore.MainWindow.Dialogs.TryGetValue("fieldShuttle", out var dialog));
+            Assert.True(ConfigStore.Options.RememberWindowState);
+            Assert.NotNull(ConfigStore.Dialogs);
+            Assert.True(ConfigStore.Dialogs.TryGetValue("fieldShuttle", out var dialog));
             Assert.Equal(100, dialog.X);
             Assert.Equal(80, dialog.Y);
             Assert.Equal(820, dialog.Width);
@@ -145,13 +147,14 @@ namespace Mfr.Tests.Models
             Assert.True(doc.RootElement.TryGetProperty("fileList", out _));
             Assert.True(doc.RootElement.TryGetProperty("renameList", out _));
             Assert.True(doc.RootElement.TryGetProperty("filterEditor", out _));
+            Assert.True(doc.RootElement.TryGetProperty("dialogs", out _));
         }
 
         [Fact]
         public void Save_and_Load_round_trips_session_and_filter_default_in_one_file()
         {
             using var temp = ConfigStoreTempFile.CreateReady();
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearFilterChain];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearFilterChain];
             ConfigStore.FileList = new FileListPrefs { FileMask = "*.flac" };
             ConfigStore.Save(temp.Path);
 
@@ -163,7 +166,7 @@ namespace Mfr.Tests.Models
             using (var doc = JsonDocument.Parse(File.ReadAllText(temp.Path)))
             {
                 var suppressed = doc
-                    .RootElement.GetProperty("ui")
+                    .RootElement.GetProperty("options")
                     .GetProperty("suppressedConfirmations")
                     .EnumerateArray()
                     .Select(e => e.GetString()!)
@@ -175,7 +178,7 @@ namespace Mfr.Tests.Models
             }
 
             ConfigStore.Load(temp.Path);
-            Assert.Equal([ConfirmationKind.ClearFilterChain], ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Equal([ConfirmationKind.ClearFilterChain], ConfigStore.Options.SuppressedConfirmations);
             Assert.Equal("*.flac", ConfigStore.FileList?.FileMask);
             var reloaded = FilterDefaultsStore.FromConfigStore();
             Assert.True(reloaded.TryGetDefault("LettersCase", out var filter));
@@ -205,7 +208,7 @@ namespace Mfr.Tests.Models
                 /*lang=json,strict*/
                 """
                 {
-                  "ui": {
+                  "options": {
                     "suppressedConfirmations": "not-an-array",
                     "doubleClickAddsToRenameList": "true"
                   },
@@ -216,7 +219,7 @@ namespace Mfr.Tests.Models
                 """
             );
             ConfigStore.Load(temp.Path);
-            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
             Assert.Null(ConfigStore.FileList);
             Assert.Equal(50, ConfigStore.Log.MaxSessionFiles);
         }

@@ -39,7 +39,7 @@ namespace Mfr.Tests.Ui.RenameList
             await viewModel.RenameListViewModel.AddPathsAsync([source]).ConfigureAwait(true);
             viewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("Replacer"));
             viewModel.FilterChainViewModel.Steps[0].SetFilter(PrefixReplacer("alpha", "renamed"));
-            ConfigStore.Ui.SuppressedConfirmations =
+            ConfigStore.Options.SuppressedConfirmations =
             [
                 ConfirmationKind.GoWithPreviewErrors,
                 ConfirmationKind.UndoRename,

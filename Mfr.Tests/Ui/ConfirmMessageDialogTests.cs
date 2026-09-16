@@ -205,7 +205,7 @@ namespace Mfr.Tests.Ui
             Assert.True(await resultTask);
             Assert.True(saved);
             Assert.False(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
-            Assert.Contains(ConfirmationKind.ClearRenameList, ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Contains(ConfirmationKind.ClearRenameList, ConfigStore.Options.SuppressedConfirmations);
             owner.Close();
         }
 
@@ -242,7 +242,7 @@ namespace Mfr.Tests.Ui
             Assert.True(await resultTask);
             Assert.False(saved);
             Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
-            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
             owner.Close();
         }
 
@@ -279,7 +279,7 @@ namespace Mfr.Tests.Ui
             Assert.False(await resultTask);
             Assert.False(saved);
             Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
-            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
             owner.Close();
         }
     }

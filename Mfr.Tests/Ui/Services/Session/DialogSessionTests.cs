@@ -29,18 +29,15 @@ namespace Mfr.Tests.Ui.Services.Session
         [AvaloniaFact]
         public void Attach_RememberOn_RestoresSizeAndPosition()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs
+            ConfigStore.Options.RememberWindowState = true;
+            ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
             {
-                RememberWindowState = true,
-                Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+                ["fieldShuttle"] = new WindowGeometryPrefs
                 {
-                    ["fieldShuttle"] = new WindowGeometryPrefs
-                    {
-                        X = 40,
-                        Y = 60,
-                        Width = 820,
-                        Height = 560,
-                    },
+                    X = 40,
+                    Y = 60,
+                    Width = 820,
+                    Height = 560,
                 },
             };
 
@@ -59,18 +56,15 @@ namespace Mfr.Tests.Ui.Services.Session
         [AvaloniaFact]
         public void Attach_WidthAndPosition_DoesNotRestoreHeight()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs
+            ConfigStore.Options.RememberWindowState = true;
+            ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
             {
-                RememberWindowState = true,
-                Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+                ["filterOptions"] = new WindowGeometryPrefs
                 {
-                    ["filterOptions"] = new WindowGeometryPrefs
-                    {
-                        X = 10,
-                        Y = 20,
-                        Width = 640,
-                        Height = 999,
-                    },
+                    X = 10,
+                    Y = 20,
+                    Width = 640,
+                    Height = 999,
                 },
             };
 
@@ -88,18 +82,15 @@ namespace Mfr.Tests.Ui.Services.Session
         [AvaloniaFact]
         public void Attach_RememberOff_DoesNotRestore()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs
+            ConfigStore.Options.RememberWindowState = false;
+            ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
             {
-                RememberWindowState = false,
-                Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+                ["renameLog"] = new WindowGeometryPrefs
                 {
-                    ["renameLog"] = new WindowGeometryPrefs
-                    {
-                        X = 40,
-                        Y = 60,
-                        Width = 820,
-                        Height = 560,
-                    },
+                    X = 40,
+                    Y = 60,
+                    Width = 820,
+                    Height = 560,
                 },
             };
 
@@ -117,18 +108,15 @@ namespace Mfr.Tests.Ui.Services.Session
         [AvaloniaFact]
         public void Attach_InvalidSavedSize_DoesNotRestore()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs
+            ConfigStore.Options.RememberWindowState = true;
+            ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
             {
-                RememberWindowState = true,
-                Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+                ["crash"] = new WindowGeometryPrefs
                 {
-                    ["crash"] = new WindowGeometryPrefs
-                    {
-                        X = 40,
-                        Y = 60,
-                        Width = 0,
-                        Height = 560,
-                    },
+                    X = 40,
+                    Y = 60,
+                    Width = 0,
+                    Height = 560,
                 },
             };
 
@@ -146,7 +134,7 @@ namespace Mfr.Tests.Ui.Services.Session
         [AvaloniaFact]
         public void Closing_RememberOn_CapturesIntoConfigStore()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
+            ConfigStore.Options.RememberWindowState = true;
 
             var window = _CreateDialog(width: 700, height: 450);
             DialogSession.Attach(window, "presetManager");
@@ -157,7 +145,7 @@ namespace Mfr.Tests.Ui.Services.Session
             window.Height = 450;
             window.Close();
 
-            var saved = Assert.Contains("presetManager", ConfigStore.MainWindow!.Dialogs!);
+            var saved = Assert.Contains("presetManager", ConfigStore.Dialogs!);
             Assert.Equal(33, saved.X);
             Assert.Equal(44, saved.Y);
             Assert.Equal(700, saved.Width);
@@ -170,7 +158,7 @@ namespace Mfr.Tests.Ui.Services.Session
         [AvaloniaFact]
         public void Closing_WidthAndPosition_CapturesSizeAndPosition()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
+            ConfigStore.Options.RememberWindowState = true;
 
             var window = _CreateDialog(width: 640, height: 300);
             DialogSession.Attach(window, "filterOptions", DialogGeometryMode.WidthAndPosition);
@@ -181,7 +169,7 @@ namespace Mfr.Tests.Ui.Services.Session
             window.Height = 310;
             window.Close();
 
-            var saved = Assert.Contains("filterOptions", ConfigStore.MainWindow!.Dialogs!);
+            var saved = Assert.Contains("filterOptions", ConfigStore.Dialogs!);
             Assert.Equal(15, saved.X);
             Assert.Equal(25, saved.Y);
             Assert.Equal(680, saved.Width);
@@ -194,7 +182,7 @@ namespace Mfr.Tests.Ui.Services.Session
         [AvaloniaFact]
         public void Closing_RememberOff_DoesNotCapture()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
+            ConfigStore.Options.RememberWindowState = false;
 
             var window = _CreateDialog(width: 700, height: 450);
             window.Position = new PixelPoint(33, 44);
@@ -202,7 +190,7 @@ namespace Mfr.Tests.Ui.Services.Session
             window.Show();
             window.Close();
 
-            Assert.Null(ConfigStore.MainWindow?.Dialogs);
+            Assert.Null(ConfigStore.Dialogs);
         }
 
         /// <summary>
@@ -211,7 +199,7 @@ namespace Mfr.Tests.Ui.Services.Session
         [AvaloniaFact]
         public void LiveDialogs_Construct_CapturesOnClose()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
+            ConfigStore.Options.RememberWindowState = true;
 
             _SmokeCapture(new RenameListFieldShuttleDialog(), "fieldShuttle");
             _SmokeCapture(new RenameLogDialog(), "renameLog");
@@ -238,7 +226,7 @@ namespace Mfr.Tests.Ui.Services.Session
 
             window.Close();
 
-            Assert.Contains(id, ConfigStore.MainWindow!.Dialogs!);
+            Assert.Contains(id, ConfigStore.Dialogs!);
         }
 
         private static Window _CreateDialog(double width, double height)

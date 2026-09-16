@@ -13,7 +13,7 @@ namespace Mfr.Tests.Models
             try
             {
                 ConfigStoreTestReset.LoadEmpty();
-                ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
+                ConfigStore.Options.RememberWindowState = false;
                 ConfigStore.FileList = new FileListPrefs { RememberLastFolder = false };
                 ConfigStore.RenameList = new RenameListPrefs
                 {
@@ -25,7 +25,7 @@ namespace Mfr.Tests.Models
                 ConfigStore.Save(path);
                 ConfigStore.Load(path);
 
-                Assert.False(ConfigStore.MainWindow?.RememberWindowState);
+                Assert.False(ConfigStore.Options.RememberWindowState);
                 Assert.False(ConfigStore.FileList?.RememberLastFolder);
                 Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList?.AddMode);
                 Assert.False(ConfigStore.RenameList?.AddFolderContents);

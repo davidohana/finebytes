@@ -56,7 +56,7 @@ namespace Mfr.Tests.Ui.Options
                     .Select(box => box.Content?.ToString())
                     .ToList();
 
-                Assert.Contains("Save File List last position", labels);
+                Assert.Contains("Remember last folder", labels);
                 Assert.Contains("Remember window size and position", labels);
                 Assert.Contains("Add folder contents", labels);
 
@@ -155,7 +155,7 @@ namespace Mfr.Tests.Ui.Options
         [AvaloniaFact]
         public void OptionsDialog_ResetConfirmations_clears_draft_only()
         {
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearFilterChain];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearFilterChain];
             var dialogVm = new OptionsDialogViewModel();
             var dialog = new OptionsDialog(dialogVm);
             dialog.Show();
@@ -180,7 +180,7 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Empty(dialogVm.SuppressedConfirmations);
                 Assert.Equal("No confirmations are currently suppressed.", dialogVm.SuppressedConfirmationsSummary);
                 Assert.Equal("No confirmations are currently suppressed.", summary.Text);
-                Assert.Equal([ConfirmationKind.ClearFilterChain], ConfigStore.Ui.SuppressedConfirmations);
+                Assert.Equal([ConfirmationKind.ClearFilterChain], ConfigStore.Options.SuppressedConfirmations);
             }
             finally
             {
@@ -255,11 +255,10 @@ namespace Mfr.Tests.Ui.Options
             Assert.NotNull(shown);
             Assert.True(saved);
             Assert.NotNull(ConfigStore.FileList);
-            Assert.NotNull(ConfigStore.MainWindow);
             Assert.NotNull(ConfigStore.RenameList);
             Assert.False(ConfigStore.FileList.RememberLastFolder);
-            Assert.False(ConfigStore.MainWindow.RememberWindowState);
-            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.False(ConfigStore.Options.RememberWindowState);
+            Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);
@@ -341,11 +340,10 @@ namespace Mfr.Tests.Ui.Options
 
             Assert.False(saved);
             Assert.NotNull(ConfigStore.FileList);
-            Assert.NotNull(ConfigStore.MainWindow);
             Assert.NotNull(ConfigStore.RenameList);
             Assert.True(ConfigStore.FileList.RememberLastFolder);
-            Assert.True(ConfigStore.MainWindow.RememberWindowState);
-            Assert.Equal([ConfirmationKind.GoWithPreviewErrors], ConfigStore.Ui.SuppressedConfirmations);
+            Assert.True(ConfigStore.Options.RememberWindowState);
+            Assert.Equal([ConfirmationKind.GoWithPreviewErrors], ConfigStore.Options.SuppressedConfirmations);
             Assert.False(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Files, ConfigStore.RenameList.AddMode);
             Assert.True(ConfigStore.RenameList.AddFolderContents);
@@ -388,9 +386,9 @@ namespace Mfr.Tests.Ui.Options
         /// </summary>
         private static void _SeedOptionsPrefs()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
+            ConfigStore.Options.RememberWindowState = true;
             ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
             ConfigStore.RenameList = new RenameListPrefs
             {
                 AddMode = RenameListAddMode.Files,

@@ -12,7 +12,7 @@ namespace Mfr.Tests.Models
         public void Save_round_trips_mutated_ui_and_file_list_leaves()
         {
             using var temp = ConfigStoreTempFile.CreateReady();
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset];
             ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
             ConfigStore.Save(temp.Path);
 
@@ -20,7 +20,7 @@ namespace Mfr.Tests.Models
             using (var doc = JsonDocument.Parse(File.ReadAllText(temp.Path)))
             {
                 var suppressed = doc
-                    .RootElement.GetProperty("ui")
+                    .RootElement.GetProperty("options")
                     .GetProperty("suppressedConfirmations")
                     .EnumerateArray()
                     .Select(e => e.GetString()!)
@@ -29,14 +29,16 @@ namespace Mfr.Tests.Models
                 Assert.True(
                     doc.RootElement.GetProperty("fileList").GetProperty("doubleClickAddsToRenameList").GetBoolean()
                 );
-                Assert.False(doc.RootElement.GetProperty("ui").TryGetProperty("doubleClickAddsToRenameList", out _));
+                Assert.False(
+                    doc.RootElement.GetProperty("options").TryGetProperty("doubleClickAddsToRenameList", out _)
+                );
                 Assert.False(doc.RootElement.TryGetProperty("filters", out _));
             }
 
             ConfigStore.Load(temp.Path);
             Assert.Equal(
                 [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset],
-                ConfigStore.Ui.SuppressedConfirmations
+                ConfigStore.Options.SuppressedConfirmations
             );
             Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
         }
@@ -48,7 +50,7 @@ namespace Mfr.Tests.Models
                 // lang=json,strict
                 """
                 {
-                  "ui": {
+                  "options": {
                     "suppressedConfirmations": ["goWithPreviewErrors"]
                   },
                   "fileList": {
@@ -58,13 +60,13 @@ namespace Mfr.Tests.Models
                 """
             );
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearRenameList];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearRenameList];
             ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
             ConfigStore.Save(temp.Path);
 
             using var doc = JsonDocument.Parse(File.ReadAllText(temp.Path));
             var suppressed = doc
-                .RootElement.GetProperty("ui")
+                .RootElement.GetProperty("options")
                 .GetProperty("suppressedConfirmations")
                 .EnumerateArray()
                 .Select(e => e.GetString()!)
@@ -80,13 +82,13 @@ namespace Mfr.Tests.Models
         {
             using var temp = ConfigStoreTempFile.CreateUnderNewDirectory("nested", "config.json");
             ConfigStoreTestReset.LoadEmpty();
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.UndoRename];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.UndoRename];
             ConfigStore.FileList = new FileListPrefs { DoubleClickAddsToRenameList = true };
             ConfigStore.Save(temp.Path);
 
             Assert.True(File.Exists(temp.Path));
             ConfigStore.Load(temp.Path);
-            Assert.Equal([ConfirmationKind.UndoRename], ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Equal([ConfirmationKind.UndoRename], ConfigStore.Options.SuppressedConfirmations);
             Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
         }
 
@@ -97,7 +99,7 @@ namespace Mfr.Tests.Models
                 // lang=json,strict
                 """
                 {
-                  "ui": {
+                  "options": {
                     "presets": {
                       "confirmReplaceFilterChainOnLoad": "true"
                     },
@@ -109,7 +111,7 @@ namespace Mfr.Tests.Models
                 """
             );
             ConfigStore.Load(temp.Path);
-            Assert.Equal([ConfirmationKind.OverwritePreset], ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Equal([ConfirmationKind.OverwritePreset], ConfigStore.Options.SuppressedConfirmations);
             Assert.Null(ConfigStore.FileList);
         }
     }

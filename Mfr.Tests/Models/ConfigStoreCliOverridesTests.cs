@@ -91,10 +91,10 @@ namespace Mfr.Tests.Models
         public void ApplyCliOverrides_Rejects_Enum_List_Leaf()
         {
             var ex = Assert.Throws<InvalidDataException>(() =>
-                ConfigStore.ApplyCliOverrides(["ui.suppressedConfirmations=clearRenameList"])
+                ConfigStore.ApplyCliOverrides(["options.suppressedConfirmations=clearRenameList"])
             );
             Assert.Contains("enum list", ex.Message, StringComparison.OrdinalIgnoreCase);
-            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Mfr.Tests.Models
 
             Assert.False(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
             Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.GoWithPreviewErrors));
-            Assert.Contains(ConfirmationKind.ClearRenameList, ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Contains(ConfirmationKind.ClearRenameList, ConfigStore.Options.SuppressedConfirmations);
         }
 
         [Fact]
@@ -40,7 +40,7 @@ namespace Mfr.Tests.Models
             ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
             ConfirmationPolicy.Suppress(ConfirmationKind.UndoRename);
 
-            Assert.Equal([ConfirmationKind.UndoRename], ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Equal([ConfirmationKind.UndoRename], ConfigStore.Options.SuppressedConfirmations);
         }
 
         [Fact]
@@ -50,7 +50,7 @@ namespace Mfr.Tests.Models
             ConfirmationPolicy.Suppress(ConfirmationKind.DeletePreset);
             ConfirmationPolicy.ClearSuppressions();
 
-            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
             Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.GoWithPreviewErrors));
             Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.DeletePreset));
         }
@@ -62,7 +62,7 @@ namespace Mfr.Tests.Models
                 /*lang=json,strict*/
                 """
                 {
-                  "ui": {
+                  "options": {
                     "confirmationPrompts": "fewer",
                     "suppressedConfirmations": ["clearRenameList"]
                   }
@@ -71,7 +71,7 @@ namespace Mfr.Tests.Models
             );
             ConfigStore.Load(temp.Path);
 
-            Assert.Equal([ConfirmationKind.ClearRenameList], ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Equal([ConfirmationKind.ClearRenameList], ConfigStore.Options.SuppressedConfirmations);
             Assert.False(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.ClearRenameList));
             Assert.True(ConfirmationPolicy.ShouldConfirm(ConfirmationKind.GoWithPreviewErrors));
         }

@@ -24,7 +24,7 @@ namespace Mfr.App.Ui.Services.Session
 
             var windowRestored = false;
 
-            if (ConfigStore.MainWindow?.RememberWindowState ?? true)
+            if (ConfigStore.Options.RememberWindowState)
             {
                 windowRestored = WindowSession.TryRestore(window, ConfigStore.MainWindow);
 
@@ -61,17 +61,13 @@ namespace Mfr.App.Ui.Services.Session
 
             try
             {
-                var rememberWindow = ConfigStore.MainWindow?.RememberWindowState ?? true;
+                var rememberWindow = ConfigStore.Options.RememberWindowState;
                 var rememberLastFolder = ConfigStore.FileList?.RememberLastFolder ?? true;
 
                 if (rememberWindow)
                 {
-                    // WindowSession.Capture rebuilds MainWindow; keep dialog geometries written by DialogSession.
-                    var existingDialogs = ConfigStore.MainWindow?.Dialogs;
                     var captured = WindowSession.Capture(window);
-                    captured.RememberWindowState = rememberWindow;
                     captured.Splitters = SplitterSession.Capture(panes);
-                    captured.Dialogs = existingDialogs;
                     ConfigStore.MainWindow = captured;
                 }
 

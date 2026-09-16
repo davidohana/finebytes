@@ -32,8 +32,8 @@ namespace Mfr.App.Ui.ViewModels.Options
         public OptionsDialogViewModel()
         {
             RememberLastFolder = ConfigStore.FileList?.RememberLastFolder ?? true;
-            RememberWindowState = ConfigStore.MainWindow?.RememberWindowState ?? true;
-            SuppressedConfirmations = [.. ConfigStore.Ui.SuppressedConfirmations];
+            RememberWindowState = ConfigStore.Options.RememberWindowState;
+            SuppressedConfirmations = [.. ConfigStore.Options.SuppressedConfirmations];
             DoubleClickAddsToRenameList = ConfigStore.FileList?.DoubleClickAddsToRenameList ?? false;
             AddMode = ConfigStore.RenameList?.AddMode ?? RenameListAddMode.Files;
             AddFolderContents = ConfigStore.RenameList?.AddFolderContents ?? true;
@@ -47,7 +47,7 @@ namespace Mfr.App.Ui.ViewModels.Options
         private bool _rememberLastFolder;
 
         /// <summary>
-        /// When <see langword="true"/>, restore and save main-window size, position, and splitters.
+        /// When <see langword="true"/>, restore and save main-window and dialog size/position across launches.
         /// </summary>
         [ObservableProperty]
         private bool _rememberWindowState;
@@ -136,8 +136,8 @@ namespace Mfr.App.Ui.ViewModels.Options
             var fileList = ConfigStore.EnsureFileList();
             fileList.RememberLastFolder = RememberLastFolder;
             fileList.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
-            ConfigStore.EnsureMainWindow().RememberWindowState = RememberWindowState;
-            ConfigStore.Ui.SuppressedConfirmations = [.. SuppressedConfirmations];
+            ConfigStore.Options.RememberWindowState = RememberWindowState;
+            ConfigStore.Options.SuppressedConfirmations = [.. SuppressedConfirmations];
             var renameList = ConfigStore.EnsureRenameList();
             renameList.AddMode = AddMode;
             renameList.AddFolderContents = AddFolderContents;

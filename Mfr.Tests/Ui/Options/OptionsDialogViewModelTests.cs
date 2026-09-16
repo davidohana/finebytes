@@ -32,9 +32,9 @@ namespace Mfr.Tests.Ui.Options
         [Fact]
         public void Constructor_loads_prefs_drafts()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
+            ConfigStore.Options.RememberWindowState = false;
             ConfigStore.FileList = new FileListPrefs { RememberLastFolder = false, DoubleClickAddsToRenameList = true };
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearRenameList];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearRenameList];
             ConfigStore.RenameList = new RenameListPrefs
             {
                 AddMode = RenameListAddMode.Folders,
@@ -72,9 +72,9 @@ namespace Mfr.Tests.Ui.Options
         [Fact]
         public void Commit_writes_prefs_memory()
         {
-            ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
+            ConfigStore.Options.RememberWindowState = true;
             ConfigStore.FileList = new FileListPrefs { RememberLastFolder = true, DoubleClickAddsToRenameList = false };
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
             ConfigStore.RenameList = new RenameListPrefs
             {
                 AddMode = RenameListAddMode.Files,
@@ -97,8 +97,8 @@ namespace Mfr.Tests.Ui.Options
             vm.Commit();
 
             Assert.False(ConfigStore.FileList.RememberLastFolder);
-            Assert.False(ConfigStore.MainWindow.RememberWindowState);
-            Assert.Equal([ConfirmationKind.DeletePreset], ConfigStore.Ui.SuppressedConfirmations);
+            Assert.False(ConfigStore.Options.RememberWindowState);
+            Assert.Equal([ConfirmationKind.DeletePreset], ConfigStore.Options.SuppressedConfirmations);
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.FilesAndFolders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);
@@ -108,7 +108,7 @@ namespace Mfr.Tests.Ui.Options
         [Fact]
         public void Commit_creates_missing_prefs_sections()
         {
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.UndoRename];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.UndoRename];
 
             var vm = new OptionsDialogViewModel()
             {
@@ -124,11 +124,10 @@ namespace Mfr.Tests.Ui.Options
             vm.Commit();
 
             Assert.NotNull(ConfigStore.FileList);
-            Assert.NotNull(ConfigStore.MainWindow);
             Assert.NotNull(ConfigStore.RenameList);
             Assert.False(ConfigStore.FileList.RememberLastFolder);
-            Assert.False(ConfigStore.MainWindow.RememberWindowState);
-            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.False(ConfigStore.Options.RememberWindowState);
+            Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
             Assert.True(ConfigStore.FileList.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, ConfigStore.RenameList.AddMode);
             Assert.False(ConfigStore.RenameList.AddFolderContents);
@@ -169,7 +168,7 @@ namespace Mfr.Tests.Ui.Options
         [Fact]
         public void ResetConfirmations_clears_draft_only()
         {
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset];
 
             var vm = new OptionsDialogViewModel();
             Assert.Equal([ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset], vm.SuppressedConfirmations);
@@ -181,21 +180,21 @@ namespace Mfr.Tests.Ui.Options
             Assert.Equal("No confirmations are currently suppressed.", vm.SuppressedConfirmationsSummary);
             Assert.Equal(
                 [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset],
-                ConfigStore.Ui.SuppressedConfirmations
+                ConfigStore.Options.SuppressedConfirmations
             );
         }
 
         [Fact]
         public void Commit_after_ResetConfirmations_writes_empty_suppress_list()
         {
-            ConfigStore.Ui.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
+            ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
             var vm = new OptionsDialogViewModel();
 
             vm.ResetConfirmations();
             vm.Commit();
 
             Assert.Empty(vm.SuppressedConfirmations);
-            Assert.Empty(ConfigStore.Ui.SuppressedConfirmations);
+            Assert.Empty(ConfigStore.Options.SuppressedConfirmations);
         }
     }
 }

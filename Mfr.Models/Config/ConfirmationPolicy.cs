@@ -1,7 +1,7 @@
 namespace Mfr.Models.Config
 {
     /// <summary>
-    /// Reads and mutates <see cref="UiConfig.SuppressedConfirmations"/> on <see cref="ConfigStore.Ui"/> to decide
+    /// Reads and mutates <see cref="OptionsConfig.SuppressedConfirmations"/> on <see cref="ConfigStore.Options"/> to decide
     /// whether a gated confirm should show.
     /// <para>
     /// <see cref="Suppress"/> / <see cref="ClearSuppressions"/> update in-memory prefs only; callers persist via
@@ -19,7 +19,7 @@ namespace Mfr.Models.Config
         /// </returns>
         public static bool ShouldConfirm(ConfirmationKind kind)
         {
-            return !ConfigStore.Ui.SuppressedConfirmations.Contains(kind);
+            return !ConfigStore.Options.SuppressedConfirmations.Contains(kind);
         }
 
         /// <summary>
@@ -28,7 +28,7 @@ namespace Mfr.Models.Config
         /// <param name="kind">Confirmation kind to stop showing.</param>
         public static void Suppress(ConfirmationKind kind)
         {
-            var suppressed = ConfigStore.Ui.SuppressedConfirmations;
+            var suppressed = ConfigStore.Options.SuppressedConfirmations;
             if (suppressed.Contains(kind))
             {
                 return;
@@ -42,7 +42,7 @@ namespace Mfr.Models.Config
         /// </summary>
         public static void ClearSuppressions()
         {
-            ConfigStore.Ui.SuppressedConfirmations.Clear();
+            ConfigStore.Options.SuppressedConfirmations.Clear();
         }
     }
 }

@@ -30,13 +30,13 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Toolbar tip for Options.</summary>
         public const string ShowOptions = "Options (Ctrl+,)";
 
-        /// <summary>Options: save File List last folder across launches.</summary>
+        /// <summary>Options: restore File List last folder across launches.</summary>
         public const string OptionsRememberLastFolder =
-            "Save the File List folder when closing and restore it next launch";
+            "Open the last File List folder again the next time you start the app";
 
         /// <summary>Options: remember main-window and dialog layout across launches.</summary>
         public const string OptionsRememberWindowState =
-            "Restore main window and dialog size/position (and splitters) next launch";
+            "Restore main window and dialog sizes, positions, and pane splitters next launch";
 
         /// <summary>Options: Confirmations section — how suppressions work.</summary>
         public const string OptionsConfirmations =

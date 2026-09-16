@@ -33,7 +33,8 @@ namespace Mfr.Tests.Ui.Services.Session
                     DoubleClickAddsToRenameList = true,
                     FileMask = "*.old",
                 };
-                ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
+                ConfigStore.MainWindow = null;
+                ConfigStore.Options.RememberWindowState = false;
 
                 var window = new AppMainWindow
                 {
@@ -57,7 +58,7 @@ namespace Mfr.Tests.Ui.Services.Session
                 Assert.True(ConfigStore.FileList?.DoubleClickAddsToRenameList);
                 Assert.False(ConfigStore.FileList?.RememberLastFolder);
                 Assert.Equal("*.wav", ConfigStore.FileList?.FileMask);
-                Assert.False(ConfigStore.MainWindow?.RememberWindowState);
+                Assert.False(ConfigStore.Options.RememberWindowState);
             }
             finally
             {
@@ -91,7 +92,7 @@ namespace Mfr.Tests.Ui.Services.Session
                     AbModeEnabled = false,
                     AbSide = RenameListPrefs.AbSideOriginal,
                 };
-                ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = false };
+                ConfigStore.Options.RememberWindowState = false;
 
                 var window = new AppMainWindow
                 {
@@ -136,28 +137,25 @@ namespace Mfr.Tests.Ui.Services.Session
         }
 
         /// <summary>
-        /// Verifies close-save keeps dialog geometries when rewriting main-window capture.
+        /// Verifies close-save leaves root dialog geometries untouched when rewriting main-window capture.
         /// </summary>
         [AvaloniaFact]
-        public void SaveOnClose_Preserves_DialogGeometries()
+        public void SaveOnClose_Leaves_RootDialogGeometries()
         {
             var configPath = Path.Combine(Path.GetTempPath(), "mfr-test-session-dialogs-" + Guid.NewGuid() + ".json");
             File.WriteAllText(configPath, "{}");
             try
             {
                 ConfigStore.Load(configPath);
-                ConfigStore.MainWindow = new MainWindowPrefs
+                ConfigStore.Options.RememberWindowState = true;
+                ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
                 {
-                    RememberWindowState = true,
-                    Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+                    ["renameLog"] = new WindowGeometryPrefs
                     {
-                        ["renameLog"] = new WindowGeometryPrefs
-                        {
-                            X = 11,
-                            Y = 22,
-                            Width = 700,
-                            Height = 500,
-                        },
+                        X = 11,
+                        Y = 22,
+                        Width = 700,
+                        Height = 500,
                     },
                 };
 
@@ -172,7 +170,7 @@ namespace Mfr.Tests.Ui.Services.Session
 
                 UiSessionPersistence.SaveOnClose(window, window.GetPaneGrids(), fileList: null);
 
-                var saved = Assert.Contains("renameLog", ConfigStore.MainWindow!.Dialogs!);
+                var saved = Assert.Contains("renameLog", ConfigStore.Dialogs!);
                 Assert.Equal(11, saved.X);
                 Assert.Equal(22, saved.Y);
                 Assert.Equal(700, saved.Width);

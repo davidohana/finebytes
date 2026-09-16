@@ -6,7 +6,7 @@ using Mfr.Models.Config;
 namespace Mfr.App.Ui.Services.Session
 {
     /// <summary>
-    /// Applies and captures resizable-modal geometry under <see cref="MainWindowPrefs.Dialogs"/>.
+    /// Applies and captures resizable-modal geometry under root <see cref="ConfigStore.Dialogs"/>.
     /// </summary>
     internal static class DialogSession
     {
@@ -20,7 +20,7 @@ namespace Mfr.App.Ui.Services.Session
         /// </para>
         /// </summary>
         /// <param name="window">Modal dialog to configure.</param>
-        /// <param name="id">Stable key under <see cref="MainWindowPrefs.Dialogs"/>.</param>
+        /// <param name="id">Stable key under root <c>dialogs</c>.</param>
         /// <param name="mode">Which size fields to restore (height is ignored for width-only dialogs).</param>
         public static void Attach(
             Window window,
@@ -83,7 +83,7 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Writes current size and position into <see cref="MainWindowPrefs.Dialogs"/> when remember is on.
+        /// Writes current size and position into root <see cref="ConfigStore.Dialogs"/> when remember is on.
         /// <para>Always stores height; <see cref="DialogGeometryMode.WidthAndPosition"/> restore ignores it.</para>
         /// </summary>
         private static void _Capture(Window window, string id)
@@ -107,8 +107,7 @@ namespace Mfr.App.Ui.Services.Session
                 return;
             }
 
-            var mainWindow = ConfigStore.EnsureMainWindow();
-            var dialogs = mainWindow.Dialogs ??= new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal);
+            var dialogs = ConfigStore.EnsureDialogs();
             if (!dialogs.TryGetValue(id, out var entry))
             {
                 entry = new WindowGeometryPrefs();
@@ -123,7 +122,7 @@ namespace Mfr.App.Ui.Services.Session
 
         private static WindowGeometryPrefs? _TryGetSaved(string id)
         {
-            var dialogs = ConfigStore.MainWindow?.Dialogs;
+            var dialogs = ConfigStore.Dialogs;
             if (dialogs is null)
             {
                 return null;
@@ -134,7 +133,7 @@ namespace Mfr.App.Ui.Services.Session
 
         private static bool _RememberWindowState()
         {
-            return ConfigStore.MainWindow?.RememberWindowState ?? true;
+            return ConfigStore.Options.RememberWindowState;
         }
 
         private static bool _IsValidSize(double width, double height)

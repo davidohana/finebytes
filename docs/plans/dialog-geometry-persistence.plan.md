@@ -3,7 +3,7 @@
 ## Decisions (locked)
 
 - **Scope:** All **resizable** modal `Window`s (`CanResize="True"`). Fixed-size dialogs (Options, OK/Confirm/TextInput, Progress) stay `CenterOwner` with XAML defaults.
-- **Gating:** Reuse `mainWindow.rememberWindowState` (Options checkbox). When false: do not restore or capture dialog geometry (same as main window).
+- **Gating:** `options.rememberWindowState` (Options checkbox). When false: do not restore or capture main-window or dialog geometry.
 - **Coords:** Absolute screen pixels for `x`/`y` (same as main window), not owner-relative.
 - **Flush:** Update in-memory `ConfigStore` on dialog **close**; disk flush stays with existing `ConfigStore.TrySave` paths (app close / Options OK). No per-dialog disk write.
 - **Horizontal-only / content-height dialogs:** For `ModalDialogHorizontalResize` windows and `SizeToContent=Height` modals (`renameListRowError`), restore **width + position** only; keep height content-driven. Capture still stores height for a complete prefs entry; restore ignores it.
@@ -17,24 +17,27 @@
 
 ## Approach
 
-Mirror [WindowSession.cs](../../Mfr.App.Ui/Services/Session/WindowSession.cs) with `DialogSession` and nest a keyed map under `mainWindow`:
+Root `dialogs` holds modal geometries; `options.rememberWindowState` gates main-window and dialog restore/capture:
 
 ```json
+"options": {
+  "suppressedConfirmations": [],
+  "rememberWindowState": "true"
+},
 "mainWindow": {
-  "rememberWindowState": true,
   "x": …, "y": …, "width": …, "height": …, "state": "Normal",
-  "splitters": { … },
-  "dialogs": {
-    "fieldShuttle": { "x": 100, "y": 80, "width": 820, "height": 560 },
-    "renameLog": { "x": …, "y": …, "width": …, "height": … }
-  }
+  "splitters": { … }
+},
+"dialogs": {
+  "fieldShuttle": { "x": 100, "y": 80, "width": 820, "height": 560 },
+  "renameLog": { "x": …, "y": …, "width": …, "height": … }
 }
 ```
 
-- Soft-load: unknown/missing keys ignored; invalid off-screen/size → fall back to current `CenterOwner` + XAML size.
+- Soft-load: unknown/missing keys ignored; invalid off-screen/size → fall back to current `CenterOwner` + XAML size. Prior `ui` / `windows` / nested `mainWindow.dialogs` shapes are not read.
 - On successful restore: set `WindowStartupLocation = Manual` before/at open so CenterOwner does not override.
 - Capture on `Closing` when remember is on and size/position are valid.
-- `SaveOnClose` merges `Dialogs` when `WindowSession.Capture` rewrites `MainWindow`.
+- Root `dialogs` is independent of `WindowSession.Capture` / `SaveOnClose` main-window rewrite.
 
 ## Dialog IDs (live views)
 
@@ -63,12 +66,11 @@ Mirror [WindowSession.cs](../../Mfr.App.Ui/Services/Session/WindowSession.cs) wi
 
 ### P1 — Prefs + DialogSession
 
-- Add `WindowGeometryPrefs` and `MainWindowPrefs.Dialogs` in [SessionPrefs.cs](../../Mfr.Models/Config/SessionPrefs.cs).
+- Add `WindowGeometryPrefs` and root `ConfigStore.Dialogs` (was briefly nested under `MainWindowPrefs`; moved to root).
 - Add [DialogSession.cs](../../Mfr.App.Ui/Services/Session/DialogSession.cs) + `DialogGeometryMode`.
-- Merge `Dialogs` in [UiSessionPersistence.SaveOnClose](../../Mfr.App.Ui/Services/Session/UiSessionPersistence.cs).
 - Tip: [AppTips.OptionsRememberWindowState](../../Mfr.App.Ui/Resources/AppTips.cs) mentions dialogs.
 - Exit: prefs JSON round-trip; DialogSession restore/capture/skip-when-remember-off tests.
-- Status: done (SHA `63e73916`, reviewed)
+- Status: done (SHA `63e73916`, reviewed; root-map follow-up below)
 
 ### P2 — Wire all resizable dialogs
 
@@ -82,3 +84,8 @@ Mirror [WindowSession.cs](../../Mfr.App.Ui/Services/Session/WindowSession.cs) wi
 - Assert Options remember-window tip mentions dialogs.
 - Exit: plan on disk; tip/tests green.
 - Status: done (SHA `e51a6f4a`, reviewed with P2)
+
+### Follow-up — `options` + root `dialogs`
+
+- Rename prefs section `ui` → `options`; put `rememberWindowState` there; keep modal geometries on root `dialogs`.
+- Status: done (this change)

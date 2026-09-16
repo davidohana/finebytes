@@ -11,7 +11,7 @@ namespace Mfr.Tests.Models
     {
         [Theory]
         [InlineData(typeof(LogConfig))]
-        [InlineData(typeof(UiConfig))]
+        [InlineData(typeof(OptionsConfig))]
         [InlineData(typeof(RenameLogConfig))]
         public void Every_public_instance_field_participates_in_config_binding(Type configType)
         {
@@ -44,39 +44,42 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies <c>ui.suppressedConfirmations</c> binds from a JSON string array.
+        /// Verifies <c>options.suppressedConfirmations</c> binds from a JSON string array.
         /// </summary>
         [Fact]
-        public void Ui_suppressed_confirmations_binds_from_json_array()
+        public void Options_suppressed_confirmations_binds_from_json_array()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """
                 {
-                  "ui": {
+                  "options": {
                     "suppressedConfirmations": ["clearRenameList", "deletePreset"]
                   }
                 }
                 """
             );
-            var ui = new UiConfig();
-            Assert.Empty(ui.SuppressedConfirmations);
+            var options = new OptionsConfig();
+            Assert.Empty(options.SuppressedConfirmations);
 
-            var root = new PrefsRootForTest { Ui = ui };
+            var root = new PrefsRootForTest { Options = options };
             ConfigJsonApplier.Apply(doc.RootElement, root);
 
-            Assert.Equal([ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset], ui.SuppressedConfirmations);
+            Assert.Equal(
+                [ConfirmationKind.ClearRenameList, ConfirmationKind.DeletePreset],
+                options.SuppressedConfirmations
+            );
         }
 
         /// <summary>
         /// Verifies soft-load skips unknown enum members and keeps known ones.
         /// </summary>
         [Fact]
-        public void Ui_suppressed_confirmations_soft_skips_unknown_members()
+        public void Options_suppressed_confirmations_soft_skips_unknown_members()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """
                 {
-                  "ui": {
+                  "options": {
                     "suppressedConfirmations": ["clearRenameList", "notARealKind", "undoRename"]
                   }
                 }
@@ -87,7 +90,7 @@ namespace Mfr.Tests.Models
 
             Assert.Equal(
                 [ConfirmationKind.ClearRenameList, ConfirmationKind.UndoRename],
-                root.Ui.SuppressedConfirmations
+                root.Options.SuppressedConfirmations
             );
         }
 
@@ -95,12 +98,12 @@ namespace Mfr.Tests.Models
         /// Verifies hard Apply rejects unknown enum-list members (CLI / strict binding).
         /// </summary>
         [Fact]
-        public void Ui_suppressed_confirmations_hard_rejects_unknown_members()
+        public void Options_suppressed_confirmations_hard_rejects_unknown_members()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """
                 {
-                  "ui": {
+                  "options": {
                     "suppressedConfirmations": ["clearRenameList", "notARealKind"]
                   }
                 }
@@ -108,7 +111,7 @@ namespace Mfr.Tests.Models
             );
             var root = new PrefsRootForTest();
             Assert.Throws<InvalidDataException>(() => ConfigJsonApplier.Apply(doc.RootElement, root));
-            Assert.Empty(root.Ui.SuppressedConfirmations);
+            Assert.Empty(root.Options.SuppressedConfirmations);
         }
 
         /// <summary>
@@ -135,17 +138,18 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies omitted <c>ui</c> leaves stay at their defaults.
+        /// Verifies omitted <c>options</c> leaves stay at their defaults.
         /// </summary>
         [Fact]
-        public void Ui_suppressed_confirmations_defaults_when_omitted()
+        public void Options_suppressed_confirmations_defaults_when_omitted()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """{"log":{"maxSessionFiles":"100"}}"""
             );
             var root = new PrefsRootForTest();
             ConfigJsonApplier.Apply(doc.RootElement, root);
-            Assert.Empty(root.Ui.SuppressedConfirmations);
+            Assert.Empty(root.Options.SuppressedConfirmations);
+            Assert.True(root.Options.RememberWindowState);
         }
 
         /// <summary>
@@ -156,8 +160,8 @@ namespace Mfr.Tests.Models
             [ConfigSection]
             public LogConfig Log = new();
 
-            [ConfigSection]
-            public UiConfig Ui = new();
+            [ConfigSection("options")]
+            public OptionsConfig Options = new();
 
             [ConfigSection]
             public RenameLogConfig RenameLog = new();
