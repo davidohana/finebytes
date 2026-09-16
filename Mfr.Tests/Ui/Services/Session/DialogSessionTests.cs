@@ -206,23 +206,39 @@ namespace Mfr.Tests.Ui.Services.Session
         }
 
         /// <summary>
-        /// Verifies each live resizable dialog constructs with DialogSession attached.
+        /// Verifies each live resizable dialog constructs and captures geometry on close.
         /// </summary>
         [AvaloniaFact]
-        public void LiveDialogs_Construct_WithDialogSessionAttached()
+        public void LiveDialogs_Construct_CapturesOnClose()
         {
             ConfigStore.MainWindow = new MainWindowPrefs { RememberWindowState = true };
 
-            Assert.Null(Record.Exception(() => new RenameListFieldShuttleDialog().Close()));
-            Assert.Null(Record.Exception(() => new RenameLogDialog().Close()));
-            Assert.Null(Record.Exception(() => new PresetManagerDialog().Close()));
-            Assert.Null(Record.Exception(() => new ImportSamplePresetsDialog().Close()));
-            Assert.Null(Record.Exception(() => new SavePresetDialog().Close()));
-            Assert.Null(Record.Exception(() => new FilterOptionsDialog().Close()));
-            Assert.Null(Record.Exception(() => new FormatTokenEditorDialog().Close()));
-            Assert.Null(Record.Exception(() => new ExcludeMasksDialog().Close()));
-            Assert.Null(Record.Exception(() => new RenameListRowErrorDialog().Close()));
-            Assert.Null(Record.Exception(() => new CrashDialog().Close()));
+            _SmokeCapture(new RenameListFieldShuttleDialog(), "fieldShuttle");
+            _SmokeCapture(new RenameLogDialog(), "renameLog");
+            _SmokeCapture(new PresetManagerDialog(), "presetManager");
+            _SmokeCapture(new ImportSamplePresetsDialog(), "importSamplePresets");
+            _SmokeCapture(new SavePresetDialog(), "savePreset");
+            _SmokeCapture(new FilterOptionsDialog(), "filterOptions");
+            _SmokeCapture(new FormatTokenEditorDialog(), "formatTokenEditor");
+            _SmokeCapture(new ExcludeMasksDialog(), "excludeMasks");
+            _SmokeCapture(new RenameListRowErrorDialog(), "renameListRowError");
+            _SmokeCapture(new CrashDialog(), "crash");
+        }
+
+        private static void _SmokeCapture(Window window, string id)
+        {
+            window.Show();
+            window.UpdateLayout();
+            window.Position = new PixelPoint(12, 34);
+            // SizeToContent=Height dialogs may still report NaN height before content lock.
+            if (double.IsNaN(window.Height) || window.Height <= 0)
+            {
+                window.Height = 300;
+            }
+
+            window.Close();
+
+            Assert.Contains(id, ConfigStore.MainWindow!.Dialogs!);
         }
 
         private static Window _CreateDialog(double width, double height)

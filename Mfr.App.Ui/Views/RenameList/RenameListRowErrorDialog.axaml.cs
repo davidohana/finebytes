@@ -23,7 +23,7 @@ namespace Mfr.App.Ui.Views.RenameList
 
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "renameListRowError");
+            DialogSession.Attach(this, "renameListRowError", DialogGeometryMode.WidthAndPosition);
             Title = content.Title;
             SummaryText.Text = content.Summary;
             PrimaryDetailsText.Text = RenameListRowErrorDisplay.FormatPrimaryDetails(
@@ -46,7 +46,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "renameListRowError");
+            DialogSession.Attach(this, "renameListRowError", DialogGeometryMode.WidthAndPosition);
             _copyText = string.Empty;
         }
 

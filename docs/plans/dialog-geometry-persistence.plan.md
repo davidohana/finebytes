@@ -6,7 +6,7 @@
 - **Gating:** Reuse `mainWindow.rememberWindowState` (Options checkbox). When false: do not restore or capture dialog geometry (same as main window).
 - **Coords:** Absolute screen pixels for `x`/`y` (same as main window), not owner-relative.
 - **Flush:** Update in-memory `ConfigStore` on dialog **close**; disk flush stays with existing `ConfigStore.TrySave` paths (app close / Options OK). No per-dialog disk write.
-- **Horizontal-only dialogs:** For `ModalDialogHorizontalResize` windows, restore **width + position** only; keep height content-locked. Capture still stores height for a complete prefs entry; restore ignores it.
+- **Horizontal-only / content-height dialogs:** For `ModalDialogHorizontalResize` windows and `SizeToContent=Height` modals (`renameListRowError`), restore **width + position** only; keep height content-driven. Capture still stores height for a complete prefs entry; restore ignores it.
 - **Maximize:** Do not persist dialog `WindowState`; modals stay normal.
 
 ## MFR7 reference brief
@@ -48,7 +48,7 @@ Mirror [WindowSession.cs](../../Mfr.App.Ui/Services/Session/WindowSession.cs) wi
 | `filterOptions`       | [FilterOptionsDialog](../../Mfr.App.Ui/Views/FilterChainPane/FilterOptionsDialog.axaml)              | width+pos |
 | `formatTokenEditor`   | [FormatTokenEditorDialog](../../Mfr.App.Ui/Views/FormatEditor/FormatTokenEditorDialog.axaml)         | width+pos |
 | `excludeMasks`        | [ExcludeMasksDialog](../../Mfr.App.Ui/Views/FileList/ExcludeMasksDialog.axaml)                       | size+pos  |
-| `renameListRowError`  | [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml)         | size+pos  |
+| `renameListRowError`  | [RenameListRowErrorDialog](../../Mfr.App.Ui/Views/RenameList/RenameListRowErrorDialog.axaml)         | width+pos |
 | `crash`               | [CrashDialog](../../Mfr.App.Ui/Views/Crash/CrashDialog.axaml)                                        | size+pos  |
 
 ## Non-goals
@@ -74,11 +74,11 @@ Mirror [WindowSession.cs](../../Mfr.App.Ui/Services/Session/WindowSession.cs) wi
 
 - `DialogSession.Attach` in each listed dialog ctor; width+pos before `ModalDialogHorizontalResize`.
 - Exit: each listed dialog attaches; smoke construct test.
-- Status: done (SHA `e015aa3c`, review deferred)
+- Status: done (SHA `e015aa3c`, reviewed with P3)
 
 ### P3 — Plan doc + tip assertion
 
 - Write this plan under `docs/plans/dialog-geometry-persistence.plan.md`.
 - Assert Options remember-window tip mentions dialogs.
 - Exit: plan on disk; tip/tests green.
-- Status: done (this commit)
+- Status: done (SHA `e51a6f4a`, reviewed with P2)
