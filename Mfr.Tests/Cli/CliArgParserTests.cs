@@ -176,6 +176,26 @@ namespace Mfr.Tests.Cli
 
         [Fact]
         /// <summary>
+        /// Verifies that omitted <c>--include-hidden</c> defaults to excluding hidden/system items.
+        /// </summary>
+        public void ParseArgs_Defaults_IncludeHidden_To_False()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music\\*.mp3", "-p", "clean"])!;
+            Assert.False(options.IncludeHidden);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies that <c>--include-hidden</c> enables Hidden|System inclusion when adding sources.
+        /// </summary>
+        public void ParseArgs_Accepts_IncludeHidden_Long_Option()
+        {
+            var options = CliArgParser.ParseArgs(["C:\\Music", "-p", "clean", "--include-hidden"])!;
+            Assert.True(options.IncludeHidden);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that omitted <c>--confirm</c> defaults to <c>false</c>.
         /// </summary>
         public void ParseArgs_Defaults_ConfirmBeforeCommit_To_False()

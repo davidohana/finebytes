@@ -947,6 +947,48 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
+        /// Verifies recursive folder walks skip Hidden|System descendants unless <c>includeHidden</c> is true.
+        /// </summary>
+        public void AddSources_Recursive_Folder_Honors_IncludeHidden()
+        {
+            var folderPath = Directory.CreateDirectory(_tempRoot.CombinePath("Album")).FullName;
+            var subFolderPath = Directory.CreateDirectory(folderPath.CombinePath("Sub")).FullName;
+            var visiblePath = TestHelpers.CreateFile(subFolderPath, "visible.txt");
+            var hiddenFileName = OperatingSystem.IsWindows() ? "hidden.txt" : ".hidden.txt";
+            var hiddenPath = TestHelpers.CreateFile(subFolderPath, hiddenFileName);
+            if (OperatingSystem.IsWindows())
+            {
+                var hiddenAttrs = File.GetAttributes(hiddenPath);
+                File.SetAttributes(hiddenPath, hiddenAttrs | FileAttributes.Hidden);
+            }
+
+            var excludeHiddenList = new RenameList();
+            excludeHiddenList.AddSources(
+                sources: [folderPath],
+                includeFiles: true,
+                includeFolders: false,
+                includeSubdirs: true
+            );
+            var excluded = excludeHiddenList.RenameItems.Select(x => x.Original.FullPath).ToList();
+
+            var includeHiddenList = new RenameList();
+            includeHiddenList.AddSources(
+                sources: [folderPath],
+                includeFiles: true,
+                includeFolders: false,
+                includeSubdirs: true,
+                includeHidden: true
+            );
+            var included = includeHiddenList.RenameItems.Select(x => x.Original.FullPath).ToList();
+
+            Assert.Equal([visiblePath], excluded);
+            Assert.Equal(2, included.Count);
+            Assert.Contains(visiblePath, included);
+            Assert.Contains(hiddenPath, included);
+        }
+
+        [Fact]
+        /// <summary>
         /// Verifies that file entries are excluded when file inclusion is disabled.
         /// </summary>
         public void AddSources_Excludes_Files_When_File_Inclusion_Is_Disabled()

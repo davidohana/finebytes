@@ -100,6 +100,7 @@ namespace Mfr.Engine.RenameList
                 includeFiles: resolveOptions.IncludeFiles,
                 includeFolders: resolveOptions.IncludeFolders,
                 includeSubdirs: resolveOptions.IncludeSubdirs,
+                includeHidden: resolveOptions.IncludeHidden,
                 excludeMasks: resolveOptions.ExcludeMasks,
                 cancellationToken: tracker.Token
             );

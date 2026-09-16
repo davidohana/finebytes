@@ -14,6 +14,7 @@ namespace Mfr.Engine.RenameList
         /// <param name="includeFiles">Whether discovered file entries should be included.</param>
         /// <param name="includeFolders">Whether folder entries should be included from resolved paths.</param>
         /// <param name="includeSubdirs">Whether directory expansion should recurse into subdirectories.</param>
+        /// <param name="includeHidden">Whether Hidden and System entries are yielded from directory walks.</param>
         /// <param name="excludeMasks">Exclusive file-name masks for discovered entries.</param>
         /// <param name="cancellationToken">When canceled, stops enumeration and returns without throwing.</param>
         /// <returns>Resolved paths for the source.</returns>
@@ -22,6 +23,7 @@ namespace Mfr.Engine.RenameList
             bool includeFiles,
             bool includeFolders,
             bool includeSubdirs,
+            bool includeHidden = false,
             IReadOnlyList<string>? excludeMasks = null,
             CancellationToken cancellationToken = default
         )
@@ -40,6 +42,7 @@ namespace Mfr.Engine.RenameList
                     includeFiles: includeFiles,
                     includeFolders: includeFolders,
                     includeSubdirs: includeSubdirs,
+                    includeHidden: includeHidden,
                     includeMask: lastSegment,
                     excludeMasks: excludeMasks,
                     cancellationToken: cancellationToken
@@ -53,6 +56,7 @@ namespace Mfr.Engine.RenameList
                     includeFiles: includeFiles,
                     includeFolders: includeFolders,
                     includeSubdirs: includeSubdirs,
+                    includeHidden: includeHidden,
                     includeMask: null,
                     excludeMasks: excludeMasks,
                     cancellationToken: cancellationToken
@@ -84,6 +88,7 @@ namespace Mfr.Engine.RenameList
             bool includeFiles,
             bool includeFolders,
             bool includeSubdirs,
+            bool includeHidden,
             string? includeMask,
             IReadOnlyList<string>? excludeMasks,
             CancellationToken cancellationToken
@@ -104,11 +109,13 @@ namespace Mfr.Engine.RenameList
             }
 
             // Skip entries we cannot open instead of failing the whole add (File List does the same).
+            // Default AttributesToSkip is Hidden|System; clear it only when includeHidden is on.
             var enumerationOptions = new EnumerationOptions
             {
                 IgnoreInaccessible = true,
                 RecurseSubdirectories = includeSubdirs,
                 ReturnSpecialDirectories = false,
+                AttributesToSkip = includeHidden ? 0 : FileAttributes.Hidden | FileAttributes.System,
             };
 
             if (includeFiles)
