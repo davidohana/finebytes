@@ -253,18 +253,29 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies the Video Resolution Duration Suffix sample appends width, height, and duration.
+        /// Verifies the Video Resolution Duration Suffix sample appends width/height/duration then
+        /// replaces duration colons (illegal in Windows names) with dots.
         /// </summary>
         [Fact]
-        public void Resolution_Duration_Suffix_has_locked_formatter()
+        public void Resolution_Duration_Suffix_has_locked_formatter_then_colon_replacer()
         {
-            var step = Assert.Single(_Preset("Video: Resolution Duration Suffix").Chain.Steps);
-            var formatter = Assert.IsType<FormatterFilter>(step.Filter);
+            var steps = _Preset("Video: Resolution Duration Suffix").Chain.Steps;
+            Assert.Equal(2, steps.Count);
+
+            var formatter = Assert.IsType<FormatterFilter>(steps[0].Filter);
             Assert.Equal(
                 "<file-name> [<media-video-width>x<media-video-height>] [<media-duration>]",
                 formatter.Options.Template
             );
             formatter.Setup();
+
+            var replacer = Assert.IsType<ReplacerFilter>(steps[1].Filter);
+            Assert.Equal("Colon to Dot", steps[1].Name);
+            Assert.Equal(":", replacer.Options.Find);
+            Assert.Equal(".", replacer.Options.Replacement);
+            Assert.Equal(ReplacerMode.Literal, replacer.Options.Match.Mode);
+            Assert.True(replacer.Options.Match.ReplaceAll);
+            replacer.Setup();
         }
 
         /// <summary>

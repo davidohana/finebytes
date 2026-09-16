@@ -38,6 +38,9 @@ namespace Mfr.App.Ui.Services.Session
 
             s_attached.Add(window, string.Empty);
 
+            // Plan: do not persist maximized dialog state; keep modals normal-sized.
+            window.CanMaximize = false;
+
             if (_RememberWindowState())
             {
                 _TryRestore(window, id, mode);
@@ -74,6 +77,12 @@ namespace Mfr.App.Ui.Services.Session
                 return;
             }
 
+            // Drop maximized-frame leftovers (e.g. x/y = -8) that still pass the screen-bounds check.
+            if (!WindowGeometryChecks.IsPositionInWorkingArea(window, saved.X, saved.Y))
+            {
+                return;
+            }
+
             window.WindowStartupLocation = WindowStartupLocation.Manual;
             window.Width = saved.Width;
             if (restoreHeight)
@@ -87,10 +96,16 @@ namespace Mfr.App.Ui.Services.Session
         /// <summary>
         /// Writes current size and position into root <see cref="ConfigStore.Dialogs"/> when remember is on.
         /// <para>Always stores height; <see cref="DialogGeometryMode.WidthAndPosition"/> restore ignores it.</para>
+        /// <para>Skips capture while maximized/fullscreen so Windows chrome insets are not persisted.</para>
         /// </summary>
         private static void _Capture(Window window, string id)
         {
             if (!_RememberWindowState())
+            {
+                return;
+            }
+
+            if (window.WindowState != WindowState.Normal)
             {
                 return;
             }
@@ -104,7 +119,10 @@ namespace Mfr.App.Ui.Services.Session
 
             var x = window.Position.X;
             var y = window.Position.Y;
-            if (!WindowGeometryChecks.IsOnScreen(window, x, y, width, height))
+            if (
+                !WindowGeometryChecks.IsOnScreen(window, x, y, width, height)
+                || !WindowGeometryChecks.IsPositionInWorkingArea(window, x, y)
+            )
             {
                 return;
             }

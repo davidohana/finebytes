@@ -93,21 +93,19 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
-        /// Verifies maximized restore only sets maximized state.
+        /// Verifies maximized restore applies normal geometry as restore bounds, then maximizes.
         /// </summary>
         [AvaloniaFact]
-        public void TryRestore_Maximized_SetsWindowStateOnly()
+        public void TryRestore_Maximized_AppliesRestoreBoundsThenMaximizes()
         {
             var window = _CreateWindow();
-            var beforeWidth = window.Width;
-            var beforeHeight = window.Height;
 
             var restored = WindowSession.TryRestore(
                 window,
                 new MainWindowPrefs
                 {
-                    X = 0,
-                    Y = 0,
+                    X = 40,
+                    Y = 60,
                     Width = 960,
                     Height = 640,
                     State = "Maximized",
@@ -116,8 +114,41 @@ namespace Mfr.Tests.Ui.MainWindow
 
             Assert.True(restored);
             Assert.Equal(WindowState.Maximized, window.WindowState);
+            Assert.Equal(960, window.Width);
+            Assert.Equal(640, window.Height);
+            Assert.Equal(new PixelPoint(40, 60), window.Position);
+        }
+
+        /// <summary>
+        /// Verifies maximized restore still maximizes when saved coords are maximized-frame leftovers.
+        /// </summary>
+        [AvaloniaFact]
+        public void TryRestore_Maximized_WithNegativeFrameCoords_StillMaximizes()
+        {
+            var window = _CreateWindow();
+            window.Show();
+            window.UpdateLayout();
+            var beforeWidth = window.Width;
+            var beforeHeight = window.Height;
+            var beforePosition = window.Position;
+
+            var restored = WindowSession.TryRestore(
+                window,
+                new MainWindowPrefs
+                {
+                    X = -8,
+                    Y = -8,
+                    Width = 2560,
+                    Height = 1369,
+                    State = "Maximized",
+                }
+            );
+
+            Assert.True(restored);
+            Assert.Equal(WindowState.Maximized, window.WindowState);
             Assert.Equal(beforeWidth, window.Width);
             Assert.Equal(beforeHeight, window.Height);
+            Assert.Equal(beforePosition, window.Position);
         }
 
         /// <summary>

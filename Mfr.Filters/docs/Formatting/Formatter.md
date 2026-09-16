@@ -94,7 +94,7 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties a
 | ------------------------- | -------------------------------------------------------------- |
 | `<media-mime>`            | MIME type; empty when unset.                                   |
 | `<media-corrupt>`         | `Yes` or `No`.                                                 |
-| `<media-duration>`        | Duration as `h:mm:ss` (total hours unpadded); empty when zero. |
+| `<media-duration>`        | Duration as `h:mm:ss` (total hours unpadded); empty when zero. Colons are illegal in Windows file names — the **Video: Resolution Duration Suffix** sample replaces them with `.`. |
 | `<media-duration-sec>`    | Whole seconds (floor); empty when zero.                        |
 | `<media-types>`           | TagLib media-type flags text (e.g. `Audio`); empty when none.  |
 | `<media-description>`     | Codec description; empty when unset.                           |

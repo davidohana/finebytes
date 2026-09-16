@@ -55,25 +55,29 @@ namespace Mfr.Models.Config
     public sealed class MainWindowPrefs
     {
         /// <summary>
-        /// Window left edge in screen pixels (used when <see cref="State"/> is <c>Normal</c>).
+        /// Window left edge in screen pixels (used when <see cref="State"/> is <c>Normal</c>, and as
+        /// restore bounds when maximized).
         /// </summary>
         [JsonPropertyName("x")]
         public int X { get; set; }
 
         /// <summary>
-        /// Window top edge in screen pixels (used when <see cref="State"/> is <c>Normal</c>).
+        /// Window top edge in screen pixels (used when <see cref="State"/> is <c>Normal</c>, and as
+        /// restore bounds when maximized).
         /// </summary>
         [JsonPropertyName("y")]
         public int Y { get; set; }
 
         /// <summary>
-        /// Window width in device-independent pixels (used when <see cref="State"/> is <c>Normal</c>).
+        /// Window width in device-independent pixels (used when <see cref="State"/> is <c>Normal</c>,
+        /// and as restore bounds when maximized).
         /// </summary>
         [JsonPropertyName("width")]
         public double Width { get; set; }
 
         /// <summary>
-        /// Window height in device-independent pixels (used when <see cref="State"/> is <c>Normal</c>).
+        /// Window height in device-independent pixels (used when <see cref="State"/> is <c>Normal</c>,
+        /// and as restore bounds when maximized).
         /// </summary>
         [JsonPropertyName("height")]
         public double Height { get; set; }
@@ -81,7 +85,8 @@ namespace Mfr.Models.Config
         /// <summary>
         /// <c>Normal</c> or <c>Maximized</c>.
         /// <para>
-        /// When maximized, restore skips size/position and keeps the current dimensions as restore bounds.
+        /// When maximized, restore applies valid size/position first as restore bounds, then maximizes.
+        /// Capture keeps the previous normal geometry instead of Windows maximized-frame coords.
         /// </para>
         /// </summary>
         [JsonPropertyName("state")]

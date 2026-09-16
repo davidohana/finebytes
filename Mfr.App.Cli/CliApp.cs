@@ -113,10 +113,7 @@ namespace Mfr.App.Cli
             );
             if (commitPlan.ErrorCount > 0)
             {
-                Log.Error(
-                    "Aborting without commit: {PreviewErrorCount} preview error(s).",
-                    commitPlan.ErrorCount
-                );
+                Log.Error("Aborting without commit: {PreviewErrorCount} preview error(s).", commitPlan.ErrorCount);
                 return CliExitCode.UserError;
             }
 

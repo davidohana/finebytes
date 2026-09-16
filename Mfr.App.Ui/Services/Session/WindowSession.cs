@@ -22,8 +22,9 @@ namespace Mfr.App.Ui.Services.Session
         /// <summary>
         /// Restores window size, position, and state from <paramref name="saved"/> when valid.
         /// <para>
-        /// When the saved state is maximized, only maximization is restored (current size remains as restore bounds).
-        /// Otherwise size and position are applied when they are valid and on-screen.
+        /// When the saved state is maximized, valid normal size/position are applied first as restore
+        /// bounds, then maximization is set. Otherwise size and position are applied when valid and
+        /// on-screen.
         /// </para>
         /// </summary>
         /// <param name="window">Main window to configure.</param>
@@ -39,23 +40,16 @@ namespace Mfr.App.Ui.Services.Session
             var isMaximized = string.Equals(saved.State, "Maximized", StringComparison.OrdinalIgnoreCase);
             if (isMaximized)
             {
+                _TryApplyNormalGeometry(window, saved);
                 window.WindowState = WindowState.Maximized;
                 return true;
             }
 
-            if (!WindowGeometryChecks.IsValidSize(saved.Width, saved.Height))
+            if (!_TryApplyNormalGeometry(window, saved))
             {
                 return false;
             }
 
-            if (!WindowGeometryChecks.IsOnScreen(window, saved.X, saved.Y, saved.Width, saved.Height))
-            {
-                return false;
-            }
-
-            window.Width = saved.Width;
-            window.Height = saved.Height;
-            window.Position = new PixelPoint(saved.X, saved.Y);
             window.WindowState = WindowState.Normal;
             return true;
         }
@@ -92,19 +86,67 @@ namespace Mfr.App.Ui.Services.Session
 
         /// <summary>
         /// Builds a <see cref="MainWindowPrefs"/> from the window's current geometry and state.
+        /// <para>
+        /// When maximized, keeps the previous normal size/position from <see cref="ConfigStore.MainWindow"/>
+        /// as restore bounds instead of Windows maximized-frame coords (often slightly negative).
+        /// </para>
         /// </summary>
         /// <param name="window">Window being closed.</param>
         /// <returns>Session payload ready to persist (splitters are captured separately).</returns>
         public static MainWindowPrefs Capture(Window window)
         {
+            var isMaximized = window.WindowState == WindowState.Maximized;
+            if (isMaximized)
+            {
+                var prior = ConfigStore.MainWindow;
+                if (
+                    prior is not null
+                    && WindowGeometryChecks.IsValidSize(prior.Width, prior.Height)
+                    && WindowGeometryChecks.IsPositionInWorkingArea(window, prior.X, prior.Y)
+                )
+                {
+                    return new MainWindowPrefs
+                    {
+                        X = prior.X,
+                        Y = prior.Y,
+                        Width = prior.Width,
+                        Height = prior.Height,
+                        State = "Maximized",
+                    };
+                }
+            }
+
             return new MainWindowPrefs
             {
                 X = window.Position.X,
                 Y = window.Position.Y,
                 Width = window.Width,
                 Height = window.Height,
-                State = window.WindowState == WindowState.Maximized ? "Maximized" : "Normal",
+                State = isMaximized ? "Maximized" : "Normal",
             };
+        }
+
+        private static bool _TryApplyNormalGeometry(Window window, MainWindowPrefs saved)
+        {
+            if (!WindowGeometryChecks.IsValidSize(saved.Width, saved.Height))
+            {
+                return false;
+            }
+
+            if (!WindowGeometryChecks.IsOnScreen(window, saved.X, saved.Y, saved.Width, saved.Height))
+            {
+                return false;
+            }
+
+            if (!WindowGeometryChecks.IsPositionInWorkingArea(window, saved.X, saved.Y))
+            {
+                return false;
+            }
+
+            window.Width = saved.Width;
+            window.Height = saved.Height;
+            window.Position = new PixelPoint(saved.X, saved.Y);
+            return true;
         }
 
         private static bool _TryApplyDefaultSizeAndCenter(Window window)

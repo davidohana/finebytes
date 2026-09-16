@@ -44,10 +44,72 @@ namespace Mfr.Tests.Ui.Services.Session
             var window = _CreateDialog(width: 500, height: 400);
             DialogSession.Attach(window, DialogIds.FieldShuttle);
 
+            Assert.False(window.CanMaximize);
             Assert.Equal(WindowStartupLocation.Manual, window.WindowStartupLocation);
             Assert.Equal(820, window.Width);
             Assert.Equal(560, window.Height);
             Assert.Equal(new PixelPoint(40, 60), window.Position);
+        }
+
+        /// <summary>
+        /// Verifies maximized-frame leftovers (negative top) are not restored.
+        /// </summary>
+        [AvaloniaFact]
+        public void Attach_MaximizedFrameCoords_DoesNotRestore()
+        {
+            ConfigStore.Options.RememberWindowState = true;
+            ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+            {
+                [DialogIds.RenameLog] = new WindowGeometryPrefs
+                {
+                    X = -8,
+                    Y = -8,
+                    Width = 2560,
+                    Height = 1369,
+                },
+            };
+
+            var window = _CreateDialog(width: 500, height: 400);
+            DialogSession.Attach(window, DialogIds.RenameLog);
+
+            Assert.Equal(WindowStartupLocation.CenterOwner, window.WindowStartupLocation);
+            Assert.Equal(500, window.Width);
+            Assert.Equal(400, window.Height);
+        }
+
+        /// <summary>
+        /// Verifies Closing does not overwrite saved geometry while the dialog is maximized.
+        /// </summary>
+        [AvaloniaFact]
+        public void Closing_Maximized_DoesNotCapture()
+        {
+            ConfigStore.Options.RememberWindowState = true;
+            ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
+            {
+                [DialogIds.RenameLog] = new WindowGeometryPrefs
+                {
+                    X = 40,
+                    Y = 60,
+                    Width = 820,
+                    Height = 560,
+                },
+            };
+
+            var window = _CreateDialog(width: 700, height: 450);
+            DialogSession.Attach(window, DialogIds.RenameLog);
+            window.Show();
+            window.UpdateLayout();
+            window.Position = new PixelPoint(-8, -8);
+            window.Width = 2560;
+            window.Height = 1369;
+            window.WindowState = WindowState.Maximized;
+            window.Close();
+
+            var saved = Assert.Contains(DialogIds.RenameLog, ConfigStore.Dialogs!);
+            Assert.Equal(40, saved.X);
+            Assert.Equal(60, saved.Y);
+            Assert.Equal(820, saved.Width);
+            Assert.Equal(560, saved.Height);
         }
 
         /// <summary>

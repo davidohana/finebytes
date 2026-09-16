@@ -49,5 +49,37 @@ namespace Mfr.App.Ui.Services.Session
             var bounds = new PixelRect(x, y, (int)Math.Ceiling(width), (int)Math.Ceiling(height));
             return screens.ScreenFromBounds(bounds) is not null;
         }
+
+        /// <summary>
+        /// Returns true when the top-left lies in a screen working area.
+        /// <para>
+        /// Rejects Windows maximized-frame coords (often slightly negative) that still intersect the
+        /// monitor via <see cref="IsOnScreen"/> but place the title bar above the work area.
+        /// When screen info is unavailable, still rejects negative <paramref name="y"/> (maximize inset).
+        /// </para>
+        /// </summary>
+        /// <param name="window">Window whose screen list is used for the hit test.</param>
+        /// <param name="x">Left edge in screen pixels.</param>
+        /// <param name="y">Top edge in screen pixels.</param>
+        /// <returns>True when the position is usable as a normal-window origin.</returns>
+        public static bool IsPositionInWorkingArea(Window window, int x, int y)
+        {
+            var screens = window.Screens;
+            if (screens is null || screens.ScreenCount == 0)
+            {
+                return y >= 0;
+            }
+
+            var point = new PixelPoint(x, y);
+            foreach (var screen in screens.All)
+            {
+                if (screen.WorkingArea.Contains(point))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

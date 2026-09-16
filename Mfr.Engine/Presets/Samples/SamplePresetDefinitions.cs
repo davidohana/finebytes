@@ -353,7 +353,7 @@ namespace Mfr.Engine.Presets.Samples
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000016",
                 name: "Video: Resolution Duration Suffix",
-                description: "Append video resolution and duration after the filename.\nE.g: interview.mp4 --> interview [1920x1080] [1:05:03].mp4",
+                description: "Append video resolution and duration after the filename.\nE.g: interview.mp4 --> interview [1920x1080] [1.05.03].mp4",
                 chain: _Chain(
                     _On(
                         new FormatterFilter(
@@ -362,6 +362,23 @@ namespace Mfr.Engine.Presets.Samples
                                 "<file-name> [<media-video-width>x<media-video-height>] [<media-duration>]"
                             )
                         )
+                    ),
+                    // <media-duration> is h:mm:ss; colon is illegal in Windows file names.
+                    _On(
+                        new ReplacerFilter(
+                            FileName,
+                            new ReplacerOptions(
+                                Find: ":",
+                                Replacement: ".",
+                                Match: new ReplacerMatchOptions(
+                                    Mode: ReplacerMode.Literal,
+                                    CaseSensitive: true,
+                                    ReplaceAll: true,
+                                    WholeWord: false
+                                )
+                            )
+                        ),
+                        "Colon to Dot"
                     )
                 ),
                 columns:
