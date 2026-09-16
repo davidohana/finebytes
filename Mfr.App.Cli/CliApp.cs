@@ -113,6 +113,10 @@ namespace Mfr.App.Cli
             );
             if (commitPlan.ErrorCount > 0)
             {
+                Log.Error(
+                    "Aborting without commit: {PreviewErrorCount} preview error(s).",
+                    commitPlan.ErrorCount
+                );
                 return CliExitCode.UserError;
             }
 
@@ -139,7 +143,19 @@ namespace Mfr.App.Cli
             var hasCommitErrors = renameResults.Any(item =>
                 item.Status is RenameStatus.PreviewError or RenameStatus.CommitError
             );
-            return hasCommitErrors ? CliExitCode.UserError : CliExitCode.Success;
+            if (!hasCommitErrors)
+            {
+                return CliExitCode.Success;
+            }
+
+            if (commitFailFast)
+            {
+                Log.Error(
+                    "Exiting due to rename (commit) error(s). Re-run with --continue-on-rename-error to keep going after the first failure."
+                );
+            }
+
+            return CliExitCode.UserError;
         }
 
         private static bool _ConfirmApplyRenameItem(RenameItem item)

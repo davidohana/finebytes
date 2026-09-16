@@ -138,7 +138,7 @@ namespace Mfr.Engine.Commit
                     // (and the rest of the plan) are not attempted against a path that never vacated.
                     if (failFast)
                     {
-                        stopped = true;
+                        _StopDueToFailFast(ref stopped);
                     }
 
                     continue;
@@ -163,10 +163,22 @@ namespace Mfr.Engine.Commit
                     _ReportItemProcessed(finalizeStep.Item, processedItems, tracker);
                     if (stepFailed && failFast)
                     {
-                        stopped = true;
+                        _StopDueToFailFast(ref stopped);
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Marks the plan loop as stopped and logs that remaining items will not be attempted.
+        /// </summary>
+        /// <param name="stopped">Fail-fast stop flag for the plan loop.</param>
+        private static void _StopDueToFailFast(ref bool stopped)
+        {
+            Log.Warning(
+                "Stopping commit after the first rename error (fail-fast); remaining items were not attempted."
+            );
+            stopped = true;
         }
 
         /// <summary>
