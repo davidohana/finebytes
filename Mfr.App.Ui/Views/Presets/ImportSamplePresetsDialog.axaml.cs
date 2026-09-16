@@ -17,7 +17,7 @@ namespace Mfr.App.Ui.Views.Presets
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "importSamplePresets");
+            DialogSession.Attach(this, DialogIds.ImportSamplePresets);
         }
 
         /// <summary>

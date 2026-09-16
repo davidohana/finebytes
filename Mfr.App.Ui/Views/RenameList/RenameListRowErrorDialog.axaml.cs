@@ -18,12 +18,8 @@ namespace Mfr.App.Ui.Views.RenameList
         /// </summary>
         /// <param name="content">Title, summary, path, user message, and optional technical details.</param>
         public RenameListRowErrorDialog(RenameListRowErrorDialogContent content)
+            : this(_CopyTextFrom(content))
         {
-            ArgumentNullException.ThrowIfNull(content);
-
-            InitializeComponent();
-            ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "renameListRowError", DialogGeometryMode.WidthAndPosition);
             Title = content.Title;
             SummaryText.Text = content.Summary;
             PrimaryDetailsText.Text = RenameListRowErrorDisplay.FormatPrimaryDetails(
@@ -37,17 +33,27 @@ namespace Mfr.App.Ui.Views.RenameList
             {
                 TechnicalDetailsText.Text = content.TechnicalDetails;
             }
-
-            _copyText = RenameListRowErrorDisplay.FormatCopyText(content);
         }
 
         /// <inheritdoc />
         public RenameListRowErrorDialog()
+            : this(string.Empty) { }
+
+        private RenameListRowErrorDialog(string copyText)
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "renameListRowError", DialogGeometryMode.WidthAndPosition);
-            _copyText = string.Empty;
+            DialogSession.Attach(this, DialogIds.RenameListRowError, DialogGeometryMode.WidthAndPosition);
+            _copyText = copyText;
+        }
+
+        /// <summary>
+        /// Validates <paramref name="content"/> and builds the clipboard payload for the private ctor.
+        /// </summary>
+        private static string _CopyTextFrom(RenameListRowErrorDialogContent content)
+        {
+            ArgumentNullException.ThrowIfNull(content);
+            return RenameListRowErrorDisplay.FormatCopyText(content);
         }
 
         private async void _OnCopyDetailsClick(object? sender, RoutedEventArgs e)

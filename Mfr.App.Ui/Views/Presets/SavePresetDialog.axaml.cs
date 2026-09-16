@@ -17,7 +17,7 @@ namespace Mfr.App.Ui.Views.Presets
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "savePreset");
+            DialogSession.Attach(this, DialogIds.SavePreset);
             NameBox.SelectionChanged += _OnNameSuggestionSelected;
         }
 

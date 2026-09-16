@@ -20,7 +20,7 @@ namespace Mfr.App.Ui.Views.FilterChainPane
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "filterOptions", DialogGeometryMode.WidthAndPosition);
+            DialogSession.Attach(this, DialogIds.FilterOptions, DialogGeometryMode.WidthAndPosition);
             ModalDialogHorizontalResize.Attach(this);
             ModalDialogHorizontalResize.RelockOnDataContextProperties(
                 this,

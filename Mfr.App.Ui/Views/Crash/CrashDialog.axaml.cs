@@ -20,7 +20,7 @@ namespace Mfr.App.Ui.Views.Crash
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "crash");
+            DialogSession.Attach(this, DialogIds.Crash);
         }
 
         /// <summary>

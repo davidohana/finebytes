@@ -27,7 +27,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "formatTokenEditor", DialogGeometryMode.WidthAndPosition);
+            DialogSession.Attach(this, DialogIds.FormatTokenEditor, DialogGeometryMode.WidthAndPosition);
             ModalDialogHorizontalResize.Attach(this);
             ModalDialogHorizontalResize.RelockOnDataContextProperties(
                 this,

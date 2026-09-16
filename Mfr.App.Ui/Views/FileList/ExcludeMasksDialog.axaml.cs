@@ -16,7 +16,7 @@ namespace Mfr.App.Ui.Views.FileList
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "excludeMasks");
+            DialogSession.Attach(this, DialogIds.ExcludeMasks);
         }
 
         /// <summary>

@@ -20,7 +20,7 @@ namespace Mfr.App.Ui.Services.Session
         /// </para>
         /// </summary>
         /// <param name="window">Modal dialog to configure.</param>
-        /// <param name="id">Stable key under root <c>dialogs</c>.</param>
+        /// <param name="id">Stable key under root <c>dialogs</c> (see <see cref="DialogIds"/>).</param>
         /// <param name="mode">Which size fields to restore (height is ignored for width-only dialogs).</param>
         public static void Attach(
             Window window,
@@ -55,19 +55,21 @@ namespace Mfr.App.Ui.Services.Session
             }
 
             var restoreHeight = mode == DialogGeometryMode.SizeAndPosition;
-            if (!_IsPositiveFinite(saved.Width))
+            if (!WindowGeometryChecks.IsPositiveFinite(saved.Width))
             {
                 return;
             }
 
-            if (restoreHeight && !_IsPositiveFinite(saved.Height))
+            if (restoreHeight && !WindowGeometryChecks.IsPositiveFinite(saved.Height))
             {
                 return;
             }
 
             // Width-only restore ignores saved height; use the dialog's current height for the on-screen check.
-            var heightForBounds = restoreHeight ? saved.Height : (_IsPositiveFinite(window.Height) ? window.Height : 1);
-            if (!_IsOnScreen(window, saved.X, saved.Y, saved.Width, heightForBounds))
+            var heightForBounds = restoreHeight
+                ? saved.Height
+                : (WindowGeometryChecks.IsPositiveFinite(window.Height) ? window.Height : 1);
+            if (!WindowGeometryChecks.IsOnScreen(window, saved.X, saved.Y, saved.Width, heightForBounds))
             {
                 return;
             }
@@ -95,14 +97,14 @@ namespace Mfr.App.Ui.Services.Session
 
             var width = window.Width;
             var height = window.Height;
-            if (!_IsValidSize(width, height))
+            if (!WindowGeometryChecks.IsValidSize(width, height))
             {
                 return;
             }
 
             var x = window.Position.X;
             var y = window.Position.Y;
-            if (!_IsOnScreen(window, x, y, width, height))
+            if (!WindowGeometryChecks.IsOnScreen(window, x, y, width, height))
             {
                 return;
             }
@@ -134,28 +136,6 @@ namespace Mfr.App.Ui.Services.Session
         private static bool _RememberWindowState()
         {
             return ConfigStore.Options.RememberWindowState;
-        }
-
-        private static bool _IsValidSize(double width, double height)
-        {
-            return _IsPositiveFinite(width) && _IsPositiveFinite(height);
-        }
-
-        private static bool _IsPositiveFinite(double value)
-        {
-            return !double.IsNaN(value) && !double.IsInfinity(value) && value > 0;
-        }
-
-        private static bool _IsOnScreen(Window window, int x, int y, double width, double height)
-        {
-            var screens = window.Screens;
-            if (screens is null || screens.ScreenCount == 0)
-            {
-                return true;
-            }
-
-            var bounds = new PixelRect(x, y, (int)Math.Ceiling(width), (int)Math.Ceiling(height));
-            return screens.ScreenFromBounds(bounds) is not null;
         }
     }
 }

@@ -43,12 +43,12 @@ namespace Mfr.App.Ui.Services.Session
                 return true;
             }
 
-            if (!_IsValidSize(saved.Width, saved.Height))
+            if (!WindowGeometryChecks.IsValidSize(saved.Width, saved.Height))
             {
                 return false;
             }
 
-            if (!_IsOnScreen(window, saved.X, saved.Y, saved.Width, saved.Height))
+            if (!WindowGeometryChecks.IsOnScreen(window, saved.X, saved.Y, saved.Width, saved.Height))
             {
                 return false;
             }
@@ -142,28 +142,6 @@ namespace Mfr.App.Ui.Services.Session
             }
 
             return screens.Primary ?? (screens.All.Count > 0 ? screens.All[0] : null);
-        }
-
-        private static bool _IsValidSize(double width, double height)
-        {
-            if (double.IsNaN(width) || double.IsNaN(height) || double.IsInfinity(width) || double.IsInfinity(height))
-            {
-                return false;
-            }
-
-            return width > 0 && height > 0;
-        }
-
-        private static bool _IsOnScreen(Window window, int x, int y, double width, double height)
-        {
-            var screens = window.Screens;
-            if (screens is null || screens.ScreenCount == 0)
-            {
-                return true;
-            }
-
-            var bounds = new PixelRect(x, y, (int)Math.Ceiling(width), (int)Math.Ceiling(height));
-            return screens.ScreenFromBounds(bounds) is not null;
         }
     }
 }

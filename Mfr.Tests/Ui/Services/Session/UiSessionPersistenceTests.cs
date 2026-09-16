@@ -150,7 +150,7 @@ namespace Mfr.Tests.Ui.Services.Session
                 ConfigStore.Options.RememberWindowState = true;
                 ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
                 {
-                    ["renameLog"] = new WindowGeometryPrefs
+                    [DialogIds.RenameLog] = new WindowGeometryPrefs
                     {
                         X = 11,
                         Y = 22,
@@ -170,7 +170,7 @@ namespace Mfr.Tests.Ui.Services.Session
 
                 UiSessionPersistence.SaveOnClose(window, window.GetPaneGrids(), fileList: null);
 
-                var saved = Assert.Contains("renameLog", ConfigStore.Dialogs!);
+                var saved = Assert.Contains(DialogIds.RenameLog, ConfigStore.Dialogs!);
                 Assert.Equal(11, saved.X);
                 Assert.Equal(22, saved.Y);
                 Assert.Equal(700, saved.Width);

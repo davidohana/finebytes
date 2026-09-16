@@ -17,7 +17,7 @@ namespace Mfr.App.Ui.Views.LogDialog
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "renameLog");
+            DialogSession.Attach(this, DialogIds.RenameLog);
         }
 
         /// <summary>

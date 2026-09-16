@@ -32,7 +32,7 @@ namespace Mfr.Tests.Ui.Services.Session
             ConfigStore.Options.RememberWindowState = true;
             ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
             {
-                ["fieldShuttle"] = new WindowGeometryPrefs
+                [DialogIds.FieldShuttle] = new WindowGeometryPrefs
                 {
                     X = 40,
                     Y = 60,
@@ -42,7 +42,7 @@ namespace Mfr.Tests.Ui.Services.Session
             };
 
             var window = _CreateDialog(width: 500, height: 400);
-            DialogSession.Attach(window, "fieldShuttle");
+            DialogSession.Attach(window, DialogIds.FieldShuttle);
 
             Assert.Equal(WindowStartupLocation.Manual, window.WindowStartupLocation);
             Assert.Equal(820, window.Width);
@@ -59,7 +59,7 @@ namespace Mfr.Tests.Ui.Services.Session
             ConfigStore.Options.RememberWindowState = true;
             ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
             {
-                ["filterOptions"] = new WindowGeometryPrefs
+                [DialogIds.FilterOptions] = new WindowGeometryPrefs
                 {
                     X = 10,
                     Y = 20,
@@ -69,7 +69,7 @@ namespace Mfr.Tests.Ui.Services.Session
             };
 
             var window = _CreateDialog(width: 500, height: 300);
-            DialogSession.Attach(window, "filterOptions", DialogGeometryMode.WidthAndPosition);
+            DialogSession.Attach(window, DialogIds.FilterOptions, DialogGeometryMode.WidthAndPosition);
 
             Assert.Equal(640, window.Width);
             Assert.Equal(300, window.Height);
@@ -85,7 +85,7 @@ namespace Mfr.Tests.Ui.Services.Session
             ConfigStore.Options.RememberWindowState = false;
             ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
             {
-                ["renameLog"] = new WindowGeometryPrefs
+                [DialogIds.RenameLog] = new WindowGeometryPrefs
                 {
                     X = 40,
                     Y = 60,
@@ -95,7 +95,7 @@ namespace Mfr.Tests.Ui.Services.Session
             };
 
             var window = _CreateDialog(width: 500, height: 400);
-            DialogSession.Attach(window, "renameLog");
+            DialogSession.Attach(window, DialogIds.RenameLog);
 
             Assert.Equal(WindowStartupLocation.CenterOwner, window.WindowStartupLocation);
             Assert.Equal(500, window.Width);
@@ -111,7 +111,7 @@ namespace Mfr.Tests.Ui.Services.Session
             ConfigStore.Options.RememberWindowState = true;
             ConfigStore.Dialogs = new Dictionary<string, WindowGeometryPrefs>(StringComparer.Ordinal)
             {
-                ["crash"] = new WindowGeometryPrefs
+                [DialogIds.Crash] = new WindowGeometryPrefs
                 {
                     X = 40,
                     Y = 60,
@@ -121,7 +121,7 @@ namespace Mfr.Tests.Ui.Services.Session
             };
 
             var window = _CreateDialog(width: 500, height: 400);
-            DialogSession.Attach(window, "crash");
+            DialogSession.Attach(window, DialogIds.Crash);
 
             Assert.Equal(WindowStartupLocation.CenterOwner, window.WindowStartupLocation);
             Assert.Equal(500, window.Width);
@@ -137,7 +137,7 @@ namespace Mfr.Tests.Ui.Services.Session
             ConfigStore.Options.RememberWindowState = true;
 
             var window = _CreateDialog(width: 700, height: 450);
-            DialogSession.Attach(window, "presetManager");
+            DialogSession.Attach(window, DialogIds.PresetManager);
             window.Show();
             window.UpdateLayout();
             window.Position = new PixelPoint(33, 44);
@@ -145,7 +145,7 @@ namespace Mfr.Tests.Ui.Services.Session
             window.Height = 450;
             window.Close();
 
-            var saved = Assert.Contains("presetManager", ConfigStore.Dialogs!);
+            var saved = Assert.Contains(DialogIds.PresetManager, ConfigStore.Dialogs!);
             Assert.Equal(33, saved.X);
             Assert.Equal(44, saved.Y);
             Assert.Equal(700, saved.Width);
@@ -161,7 +161,7 @@ namespace Mfr.Tests.Ui.Services.Session
             ConfigStore.Options.RememberWindowState = true;
 
             var window = _CreateDialog(width: 640, height: 300);
-            DialogSession.Attach(window, "filterOptions", DialogGeometryMode.WidthAndPosition);
+            DialogSession.Attach(window, DialogIds.FilterOptions, DialogGeometryMode.WidthAndPosition);
             window.Show();
             window.UpdateLayout();
             window.Position = new PixelPoint(15, 25);
@@ -169,7 +169,7 @@ namespace Mfr.Tests.Ui.Services.Session
             window.Height = 310;
             window.Close();
 
-            var saved = Assert.Contains("filterOptions", ConfigStore.Dialogs!);
+            var saved = Assert.Contains(DialogIds.FilterOptions, ConfigStore.Dialogs!);
             Assert.Equal(15, saved.X);
             Assert.Equal(25, saved.Y);
             Assert.Equal(680, saved.Width);
@@ -186,7 +186,7 @@ namespace Mfr.Tests.Ui.Services.Session
 
             var window = _CreateDialog(width: 700, height: 450);
             window.Position = new PixelPoint(33, 44);
-            DialogSession.Attach(window, "savePreset");
+            DialogSession.Attach(window, DialogIds.SavePreset);
             window.Show();
             window.Close();
 
@@ -201,16 +201,16 @@ namespace Mfr.Tests.Ui.Services.Session
         {
             ConfigStore.Options.RememberWindowState = true;
 
-            _SmokeCapture(new RenameListFieldShuttleDialog(), "fieldShuttle");
-            _SmokeCapture(new RenameLogDialog(), "renameLog");
-            _SmokeCapture(new PresetManagerDialog(), "presetManager");
-            _SmokeCapture(new ImportSamplePresetsDialog(), "importSamplePresets");
-            _SmokeCapture(new SavePresetDialog(), "savePreset");
-            _SmokeCapture(new FilterOptionsDialog(), "filterOptions");
-            _SmokeCapture(new FormatTokenEditorDialog(), "formatTokenEditor");
-            _SmokeCapture(new ExcludeMasksDialog(), "excludeMasks");
-            _SmokeCapture(new RenameListRowErrorDialog(), "renameListRowError");
-            _SmokeCapture(new CrashDialog(), "crash");
+            _SmokeCapture(new RenameListFieldShuttleDialog(), DialogIds.FieldShuttle);
+            _SmokeCapture(new RenameLogDialog(), DialogIds.RenameLog);
+            _SmokeCapture(new PresetManagerDialog(), DialogIds.PresetManager);
+            _SmokeCapture(new ImportSamplePresetsDialog(), DialogIds.ImportSamplePresets);
+            _SmokeCapture(new SavePresetDialog(), DialogIds.SavePreset);
+            _SmokeCapture(new FilterOptionsDialog(), DialogIds.FilterOptions);
+            _SmokeCapture(new FormatTokenEditorDialog(), DialogIds.FormatTokenEditor);
+            _SmokeCapture(new ExcludeMasksDialog(), DialogIds.ExcludeMasks);
+            _SmokeCapture(new RenameListRowErrorDialog(), DialogIds.RenameListRowError);
+            _SmokeCapture(new CrashDialog(), DialogIds.Crash);
         }
 
         private static void _SmokeCapture(Window window, string id)

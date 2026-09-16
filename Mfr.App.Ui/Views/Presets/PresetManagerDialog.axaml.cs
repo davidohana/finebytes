@@ -36,7 +36,7 @@ namespace Mfr.App.Ui.Views.Presets
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "presetManager");
+            DialogSession.Attach(this, DialogIds.PresetManager);
             _WireSelectionHandlers();
             _WireDragDropHandlers();
         }

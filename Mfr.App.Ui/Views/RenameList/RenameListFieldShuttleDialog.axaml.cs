@@ -18,7 +18,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             InitializeComponent();
             ModalDialogKeyboard.Attach(this);
-            DialogSession.Attach(this, "fieldShuttle");
+            DialogSession.Attach(this, DialogIds.FieldShuttle);
         }
 
         /// <summary>
