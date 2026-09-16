@@ -22,9 +22,9 @@ namespace Mfr.Tests.Engine
         /// Verifies the catalog exposes the complete locked set of samples.
         /// </summary>
         [Fact]
-        public void Catalog_contains_all_15_samples()
+        public void Catalog_contains_all_16_samples()
         {
-            Assert.Equal(15, SamplePresetCatalog.Presets.Count);
+            Assert.Equal(16, SamplePresetCatalog.Presets.Count);
             Assert.All(SamplePresetCatalog.Presets, preset => Assert.NotEmpty(preset.Chain.Steps));
         }
 
@@ -96,6 +96,12 @@ namespace Mfr.Tests.Engine
             Assert.Contains(
                 _Preset("Audio: Artist Year Album Bitrate Folder").VisibleColumns!,
                 column => column.Key == RenameListFieldKey.Original(MediaRenameListFields.Group, "AudioBitrate")
+            );
+            Assert.Contains(
+                _Preset("Video: Resolution Duration Suffix").VisibleColumns!,
+                column =>
+                    column.Key
+                    == RenameListFieldKey.Original(MediaRenameListFields.Group, MediaRenameListFields.Key.VideoWidth)
             );
         }
 
@@ -244,6 +250,21 @@ namespace Mfr.Tests.Engine
             Assert.Equal(" - ", tokenMover.Options.Delimiter);
             Assert.Equal(2, tokenMover.Options.TokenNumber);
             Assert.Equal(-1, tokenMover.Options.MoveBy);
+        }
+
+        /// <summary>
+        /// Verifies the Video Resolution Duration Suffix sample appends width, height, and duration.
+        /// </summary>
+        [Fact]
+        public void Resolution_Duration_Suffix_has_locked_formatter()
+        {
+            var step = Assert.Single(_Preset("Video: Resolution Duration Suffix").Chain.Steps);
+            var formatter = Assert.IsType<FormatterFilter>(step.Filter);
+            Assert.Equal(
+                "<file-name> [<media-video-width>x<media-video-height>] [<media-duration>]",
+                formatter.Options.Template
+            );
+            formatter.Setup();
         }
 
         /// <summary>

@@ -70,9 +70,9 @@ namespace Mfr.Tests.Ui.Options
                 Assert.DoesNotContain("More", radioLabels);
                 Assert.Contains("Open", radioLabels);
                 Assert.Contains("Add to Rename List", radioLabels);
-                Assert.Contains("Files", radioLabels);
-                Assert.Contains("Folders", radioLabels);
-                Assert.Contains("Files and folders", radioLabels);
+                Assert.Contains("Add files", radioLabels);
+                Assert.Contains("Add folders", radioLabels);
+                Assert.Contains("Add files and folders", radioLabels);
                 Assert.Contains("Rename Log disabled (Undo for last renaming operation only)", radioLabels);
                 Assert.Contains("Limited to:", radioLabels);
                 Assert.Contains("Unlimited", radioLabels);
@@ -115,7 +115,7 @@ namespace Mfr.Tests.Ui.Options
                     .Select(row => row.Label)
                     .ToList();
                 Assert.Contains("Double-click:", rowLabels);
-                Assert.Contains("Add:", rowLabels);
+                Assert.DoesNotContain("Add:", rowLabels);
 
                 Assert.NotNull(dialog.FindControl<CompactNumericUpDown>("RenameLogLimitSpinner"));
 

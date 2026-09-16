@@ -62,6 +62,11 @@
             Content="Remember last folder"
             ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberLastFolder}"
           />
+          <controls:CompactCheckBox
+            IsChecked="{Binding IncludeHidden}"
+            Content="Include hidden/system files"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsIncludeHidden}"
+          />
           <controls:FilterEditorLabeledRow Label="Double-click:">
             <StackPanel Orientation="Horizontal" Spacing="12">
               <controls:CompactRadioButton
@@ -83,49 +88,36 @@
 
       <controls:FieldsetGroup Header="Rename List">
         <StackPanel Spacing="8">
-          <controls:FilterEditorLabeledRow Label="Add:">
-            <StackPanel Orientation="Horizontal" Spacing="12">
-              <controls:CompactRadioButton
-                GroupName="RenameListAddMode"
-                Content="Files"
-                ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFiles}"
-                IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Files}, Mode=TwoWay}"
-              />
-              <controls:CompactRadioButton
-                GroupName="RenameListAddMode"
-                Content="Folders"
-                ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFolders}"
-                IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Folders}, Mode=TwoWay}"
-              />
-              <controls:CompactRadioButton
-                GroupName="RenameListAddMode"
-                Content="Files and folders"
-                ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFilesAndFolders}"
-                IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.FilesAndFolders}, Mode=TwoWay}"
-              />
-            </StackPanel>
-          </controls:FilterEditorLabeledRow>
-          <controls:FilterEditorLabeledRow Label="">
-            <controls:CompactCheckBox
-              IsChecked="{Binding AddFolderContents}"
-              Content="Add folder contents"
-              ToolTip.Tip="{x:Static resources:AppTips.OptionsAddFolderContents}"
+          <StackPanel Orientation="Horizontal" Spacing="12">
+            <controls:CompactRadioButton
+              GroupName="RenameListAddMode"
+              Content="Add files"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFiles}"
+              IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Files}, Mode=TwoWay}"
             />
-          </controls:FilterEditorLabeledRow>
-          <controls:FilterEditorLabeledRow Label="">
-            <controls:CompactCheckBox
-              IsChecked="{Binding IncludeHidden}"
-              Content="Include hidden/system files"
-              ToolTip.Tip="{x:Static resources:AppTips.OptionsIncludeHidden}"
+            <controls:CompactRadioButton
+              GroupName="RenameListAddMode"
+              Content="Add folders"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFolders}"
+              IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.Folders}, Mode=TwoWay}"
             />
-          </controls:FilterEditorLabeledRow>
-          <controls:FilterEditorLabeledRow Label="">
-            <controls:CompactCheckBox
-              IsChecked="{Binding RememberColumnWidths}"
-              Content="Remember column widths"
-              ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberColumnWidths}"
+            <controls:CompactRadioButton
+              GroupName="RenameListAddMode"
+              Content="Add files and folders"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsAddModeFilesAndFolders}"
+              IsChecked="{Binding AddMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static cfg:RenameListAddMode.FilesAndFolders}, Mode=TwoWay}"
             />
-          </controls:FilterEditorLabeledRow>
+          </StackPanel>
+          <controls:CompactCheckBox
+            IsChecked="{Binding AddFolderContents}"
+            Content="Add folder contents"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsAddFolderContents}"
+          />
+          <controls:CompactCheckBox
+            IsChecked="{Binding RememberColumnWidths}"
+            Content="Remember column widths"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberColumnWidths}"
+          />
         </StackPanel>
       </controls:FieldsetGroup>
 

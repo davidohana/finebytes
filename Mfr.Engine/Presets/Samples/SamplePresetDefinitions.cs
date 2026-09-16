@@ -21,7 +21,7 @@ namespace Mfr.Engine.Presets.Samples
         private static readonly FileNameTarget FileName = new();
 
         /// <summary>
-        /// Builds the locked 15-sample catalog (unsorted).
+        /// Builds the locked 16-sample catalog (unsorted).
         /// </summary>
         /// <returns>All sample presets.</returns>
         public static IReadOnlyList<FilterPreset> CreateAll()
@@ -35,6 +35,7 @@ namespace Mfr.Engine.Presets.Samples
                 _DateTakenPrefix(),
                 _PicDateTakenMakeModel(),
                 _NameFromImage(),
+                _ResolutionDurationSuffix(),
                 _FlattenPath(),
                 _DateTakenFolders(),
                 _ArtistAlbumFolders(),
@@ -343,6 +344,35 @@ namespace Mfr.Engine.Presets.Samples
                     _Image("Height", preview: false, width: 55),
                     _Image("BitDepth", preview: false, width: 60),
                     _Image("HorzRes", preview: false, width: 70),
+                ]
+            );
+        }
+
+        private static FilterPreset _ResolutionDurationSuffix()
+        {
+            return _Preset(
+                id: "10000000-0000-4000-8000-000000000016",
+                name: "Video: Resolution Duration Suffix",
+                description: "Append video resolution and duration after the filename.\nE.g: interview.mp4 --> interview [1920x1080] [1:05:03].mp4",
+                chain: _Chain(
+                    _On(
+                        new FormatterFilter(
+                            FileName,
+                            new FormatterOptions(
+                                "<file-name> [<media-video-width>x<media-video-height>] [<media-duration>]"
+                            )
+                        )
+                    )
+                ),
+                columns:
+                [
+                    _Basic(BasicRenameListFields.Key.ItemType, preview: false, width: 50),
+                    _Basic(BasicRenameListFields.Key.Folder, preview: false, width: 280),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: false, width: 220),
+                    _Basic(BasicRenameListFields.Key.FullName, preview: true, width: 340),
+                    _Media(MediaRenameListFields.Key.VideoWidth, preview: false, width: 55),
+                    _Media(MediaRenameListFields.Key.VideoHeight, preview: false, width: 55),
+                    _Media(MediaRenameListFields.Key.Duration, preview: false, width: 80),
                 ]
             );
         }

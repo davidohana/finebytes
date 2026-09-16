@@ -46,6 +46,7 @@ namespace Mfr.App.Ui.ViewModels.FileList
         [
             "*",
             "*.mp3",
+            "*.mp4",
             "*.jpg",
             "*.gif",
             "*.bmp",
