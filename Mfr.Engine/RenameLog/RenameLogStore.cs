@@ -313,7 +313,7 @@ namespace Mfr.Engine.RenameLog
                 directoryPath: logDirectoryPath,
                 keepCount: Math.Max(0, maxFiles),
                 searchPattern: $"*{FileExtension}",
-                onDeleted: path => Log.Information("Deleted old rename log '{RenameLogPath}' during pruning.", path),
+                onDeleted: path => Log.Debug("Deleted old rename log '{RenameLogPath}' during pruning.", path),
                 onFailed: (path, ex) =>
                     Log.Warning(ex, "Failed to delete old rename log '{RenameLogPath}' during pruning.", path)
             );

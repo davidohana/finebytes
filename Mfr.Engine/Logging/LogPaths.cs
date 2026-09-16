@@ -91,7 +91,7 @@ namespace Mfr.Engine.Logging
                 directoryPath: logDirectoryPath,
                 keepCount: maxSessionFiles,
                 searchPattern: $"{prefix}*{extension}",
-                onDeleted: path => Log.Information("Deleted old log file '{LogFilePath}' during pruning.", path),
+                onDeleted: path => Log.Debug("Deleted old log file '{LogFilePath}' during pruning.", path),
                 onFailed: (path, ex) =>
                     Log.Warning(ex, "Failed to delete old log file '{LogFilePath}' during pruning.", path)
             );

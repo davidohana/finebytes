@@ -195,8 +195,8 @@ namespace Mfr.App.Cli
             [Description("Expand directory sources recursively into subdirectories.")]
             public bool IncludeSubdirs { get; init; }
 
-            [CommandOption("--core")]
-            [Description("Continue on rename (commit) errors instead of stopping at the first failure (CORE).")]
+            [CommandOption("--continue-on-rename-error")]
+            [Description("Continue on rename (commit) errors instead of stopping at the first failure.")]
             public bool ContinueOnRenameError { get; init; }
 
             [CommandOption("-c|--confirm")]
