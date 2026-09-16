@@ -74,7 +74,7 @@ Mirror [WindowSession.cs](../../Mfr.App.Ui/Services/Session/WindowSession.cs) wi
 
 - `DialogSession.Attach` in each listed dialog ctor; width+pos before `ModalDialogHorizontalResize`.
 - Exit: each listed dialog attaches; smoke construct test.
-- Status: done (SHA `e015aa3c`, reviewed with P3)
+- Status: done (SHA `e015aa3c`, reviewed with P3; follow-up `057e4a92` width+pos for row-error)
 
 ### P3 — Plan doc + tip assertion
 
