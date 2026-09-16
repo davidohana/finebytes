@@ -279,6 +279,33 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies Add Selected includes a Hidden file when Options IncludeHidden is on.
+        /// </summary>
+        [Fact]
+        public async Task AddSelected_Includes_Hidden_When_IncludeHidden()
+        {
+            ConfigStore.Options.IncludeHidden = true;
+            var dir = _context.CreateTempDir();
+            File.WriteAllText(Path.Combine(dir, "visible.txt"), "v");
+            var hiddenName = OperatingSystem.IsWindows() ? "secret.txt" : ".secret.txt";
+            var hiddenPath = Path.Combine(dir, hiddenName);
+            File.WriteAllText(hiddenPath, "h");
+            if (OperatingSystem.IsWindows())
+            {
+                File.SetAttributes(hiddenPath, FileAttributes.Hidden);
+            }
+
+            var fileListViewModel = _context.CreateFileListViewModel(dir);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            var hiddenEntry = Assert.Single(fileListViewModel.Entries, e => e.Name == hiddenName);
+            fileListViewModel.SetSelectedEntries([hiddenEntry]);
+
+            await renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+
+            Assert.Equal([hiddenPath], renameListViewModel.Entries.Select(e => e.FullPath));
+        }
+
+        /// <summary>
         /// Verifies Add All expands listed folder rows the same way as Add Selected (nested via contents).
         /// </summary>
         [Fact]

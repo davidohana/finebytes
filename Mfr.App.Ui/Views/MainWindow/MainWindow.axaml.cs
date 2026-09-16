@@ -173,6 +173,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                 }
 
                 viewModel.RenameListViewModel.NotifyAddPolicyChanged();
+                viewModel.FileListViewModel.Refresh();
                 try
                 {
                     ConfigStoreSave.Invoke(hooks?.SaveConfig);

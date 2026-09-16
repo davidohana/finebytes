@@ -86,6 +86,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
             var addMode = _AddMode();
             var addFolderContents = _AddFolderContents();
+            var includeHidden = _IncludeHidden();
             var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
             var metadataRequirement = _CurrentMetadataRequirement();
             var addSummary = new RenameListAddSummary(0);
@@ -106,6 +107,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                                 includeFiles: addMode.IncludesFiles(),
                                 includeFolders: addMode.IncludesFolders(),
                                 includeSubdirs: addFolderContents,
+                                includeHidden: includeHidden,
                                 excludeMasks: excludeMasks,
                                 cancellationToken: token,
                                 progress: progress,
@@ -334,6 +336,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private static bool _AddFolderContents()
         {
             return ConfigStore.Options.AddFolderContents;
+        }
+
+        /// <summary>
+        /// Options-owned Hidden|System include flag from <see cref="ConfigStore.Options"/>.
+        /// </summary>
+        private static bool _IncludeHidden()
+        {
+            return ConfigStore.Options.IncludeHidden;
         }
 
         private static IReadOnlyList<FileListSourceItem> _ToSourceItems(IEnumerable<FileListEntry> entries)

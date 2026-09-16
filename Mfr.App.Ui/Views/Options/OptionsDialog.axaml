@@ -114,6 +114,13 @@
           </controls:FilterEditorLabeledRow>
           <controls:FilterEditorLabeledRow Label="">
             <controls:CompactCheckBox
+              IsChecked="{Binding IncludeHidden}"
+              Content="Include hidden/system files"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsIncludeHidden}"
+            />
+          </controls:FilterEditorLabeledRow>
+          <controls:FilterEditorLabeledRow Label="">
+            <controls:CompactCheckBox
               IsChecked="{Binding RememberColumnWidths}"
               Content="Remember column widths"
               ToolTip.Tip="{x:Static resources:AppTips.OptionsRememberColumnWidths}"

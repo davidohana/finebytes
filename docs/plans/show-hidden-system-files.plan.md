@@ -63,7 +63,7 @@ flowchart LR
 - **Exit:** CLI/engine recursive include-hidden works for Hidden|System children.
 
 ### P2 — Pref + Options checkbox + listing/add wiring
-- [ ] Add `OptionsConfig.IncludeHidden` (`JsonPropertyName("includeHidden")`, default false).
+- [x] Add `OptionsConfig.IncludeHidden` (`JsonPropertyName("includeHidden")`, default false).
 - Wire [`OptionsDialogViewModel`](Mfr.App.Ui/ViewModels/Options/OptionsDialogViewModel.cs) load/save + checkbox in [`OptionsDialog.axaml`](Mfr.App.Ui/Views/Options/OptionsDialog.axaml) under the Add fieldset (after **Add folder contents**), with tip text (show in File List + include when adding).
 - [`FileListCatalog`](Mfr.App.Ui/Services/FileList/FileListCatalog.cs): listing options depend on `ConfigStore.Options.IncludeHidden` (or passed flag); refresh current folder when Options apply changes the value.
 - [`RenameListViewModel.Add.cs`](Mfr.App.Ui/ViewModels/RenameList/RenameListViewModel.Add.cs): pass `includeHidden: ConfigStore.Options.IncludeHidden`.

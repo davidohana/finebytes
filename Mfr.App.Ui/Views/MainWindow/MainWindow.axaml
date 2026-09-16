@@ -255,8 +255,6 @@
           Command="{Binding FileListViewModel.RefreshCommand}"
           InputGesture="{x:Static input:AppShortcuts.Refresh}"
         />
-        <Separator />
-        <MenuItem Header="Show hidden/system files" IsEnabled="False" />
       </MenuItem>
       <MenuItem Header="_Rename List">
         <MenuItem

@@ -128,6 +128,7 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains(AppTips.OptionsRememberWindowState, checkTips);
                 Assert.Contains("dialog", AppTips.OptionsRememberWindowState, StringComparison.OrdinalIgnoreCase);
                 Assert.Contains(AppTips.OptionsAddFolderContents, checkTips);
+                Assert.Contains(AppTips.OptionsIncludeHidden, checkTips);
                 Assert.Contains(AppTips.OptionsRememberColumnWidths, checkTips);
 
                 var radioTips = dialog
@@ -262,6 +263,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.Equal(RenameListAddMode.Folders, ConfigStore.Options.AddMode);
             Assert.False(ConfigStore.Options.AddFolderContents);
             Assert.Equal(0, ConfigStore.RenameLog.Limit);
+            Assert.True(ConfigStore.Options.IncludeHidden);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
@@ -344,7 +346,51 @@ namespace Mfr.Tests.Ui.Options
             Assert.False(ConfigStore.Options.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Files, ConfigStore.Options.AddMode);
             Assert.True(ConfigStore.Options.AddFolderContents);
+            Assert.False(ConfigStore.Options.IncludeHidden);
             Assert.Equal(10, ConfigStore.RenameLog.Limit);
+
+            viewModel.SuppressSessionSaveOnClose = true;
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies Options OK reloads the File List so IncludeHidden visibility applies without restart.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task ShowOptions_Ok_refreshes_file_list_for_include_hidden()
+        {
+            using var tempDirs = new TempDirectoryFixture();
+            var dir = tempDirs.CreateTempDir();
+            var hiddenName = OperatingSystem.IsWindows() ? "secret.txt" : ".secret.txt";
+            var hiddenPath = Path.Combine(dir, hiddenName);
+            File.WriteAllText(hiddenPath, "hidden");
+            if (OperatingSystem.IsWindows())
+            {
+                File.SetAttributes(hiddenPath, FileAttributes.Hidden);
+            }
+
+            _SeedOptionsPrefs();
+            var (viewModel, window) = _ShowMainWindow(
+                persistSession: true,
+                new OptionsDialogHooks
+                {
+                    Show = vm =>
+                    {
+                        vm.IncludeHidden = true;
+                        return Task.FromResult<bool?>(true);
+                    },
+                    SaveConfig = () => { },
+                }
+            );
+            viewModel.FileListViewModel.NavigateTo(dir);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+            Assert.DoesNotContain(viewModel.FileListViewModel.Entries, e => e.Name == hiddenName);
+
+            await _InvokeShowOptionsAsync(viewModel);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+
+            Assert.True(ConfigStore.Options.IncludeHidden);
+            Assert.Contains(viewModel.FileListViewModel.Entries, e => e.Name == hiddenName);
 
             viewModel.SuppressSessionSaveOnClose = true;
             window.Close();
@@ -389,6 +435,7 @@ namespace Mfr.Tests.Ui.Options
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
             ConfigStore.Options.AddMode = RenameListAddMode.Files;
             ConfigStore.Options.AddFolderContents = true;
+            ConfigStore.Options.IncludeHidden = false;
             ConfigStore.RenameLog.Limit = RenameLogConfig.DefaultLimit;
         }
 
@@ -403,6 +450,7 @@ namespace Mfr.Tests.Ui.Options
             vm.DoubleClickAddsToRenameList = true;
             vm.AddMode = RenameListAddMode.Folders;
             vm.AddFolderContents = false;
+            vm.IncludeHidden = true;
             vm.RenameLogRetentionMode = RenameLogRetentionMode.Disabled;
         }
 

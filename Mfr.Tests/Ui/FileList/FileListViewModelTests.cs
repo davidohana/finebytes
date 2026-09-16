@@ -10,10 +10,19 @@ namespace Mfr.Tests.Ui.FileList
     /// <summary>
     /// Tests File List listing, mask, and navigation in <see cref="FileListViewModel"/>.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class FileListViewModelTests : IDisposable
     {
         private readonly TempDirectoryFixture _tempDirectoryFixture = new();
         private readonly List<FileListViewModel> _viewModels = [];
+
+        /// <summary>
+        /// Resets Options so IncludeHidden defaults apply per test.
+        /// </summary>
+        public FileListViewModelTests()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+        }
 
         /// <inheritdoc />
         public void Dispose()
@@ -224,7 +233,7 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
-        /// Verifies hidden and system items are omitted from the listing.
+        /// Verifies hidden and system items are omitted from the listing by default.
         /// </summary>
         [Fact]
         public void Skips_Hidden_Items()
@@ -241,6 +250,27 @@ namespace Mfr.Tests.Ui.FileList
             var viewModel = _CreateViewModel(dir);
 
             Assert.DoesNotContain(hiddenName, _Names(viewModel));
+        }
+
+        /// <summary>
+        /// Verifies Hidden|System items appear when <see cref="ConfigStore.Options.IncludeHidden"/> is on.
+        /// </summary>
+        [Fact]
+        public void Shows_Hidden_Items_When_IncludeHidden()
+        {
+            ConfigStore.Options.IncludeHidden = true;
+            var dir = _CreateTree();
+            var hiddenName = OperatingSystem.IsWindows() ? "secret.txt" : ".secret.txt";
+            var hiddenPath = Path.Combine(dir, hiddenName);
+            File.WriteAllText(hiddenPath, "hidden");
+            if (OperatingSystem.IsWindows())
+            {
+                File.SetAttributes(hiddenPath, FileAttributes.Hidden);
+            }
+
+            var viewModel = _CreateViewModel(dir);
+
+            Assert.Contains(hiddenName, _Names(viewModel));
         }
 
         /// <summary>

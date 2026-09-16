@@ -68,6 +68,10 @@ namespace Mfr.App.Ui.Resources
         public const string OptionsAddFolderContents =
             "When adding a folder, also include matching items from its subfolders recursively";
 
+        /// <summary>Options: show Hidden|System in File List and include them when adding.</summary>
+        public const string OptionsIncludeHidden =
+            "Show hidden and system files in the File List, and include them when adding to the Rename List";
+
         /// <summary>Options: remember Rename List column widths across hide/re-add and launches.</summary>
         public const string OptionsRememberColumnWidths =
             "Reuse the last resized width when a Rename List column is shown again";

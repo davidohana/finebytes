@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
+using Mfr.Models.Config;
 using Mfr.Utils;
 using Serilog;
 
@@ -11,14 +12,6 @@ namespace Mfr.App.Ui.Services.FileList
     /// </summary>
     internal static class FileListCatalog
     {
-        private static readonly EnumerationOptions _ListingOptions = new()
-        {
-            IgnoreInaccessible = true,
-            RecurseSubdirectories = false,
-            ReturnSpecialDirectories = false,
-            AttributesToSkip = FileAttributes.Hidden | FileAttributes.System,
-        };
-
         private const int _VolumeListingGroup = 0;
         private const int _KnownPlaceListingGroup = 1;
 
@@ -504,18 +497,35 @@ namespace Mfr.App.Ui.Services.FileList
             // IgnoreInaccessible would treat an unreadable directory as empty; probe first so browse can show an error.
             _EnsureDirectoryReadable(path);
 
+            var listingOptions = _CreateListingOptions();
             var folders = Directory
-                .EnumerateDirectories(path, "*", _ListingOptions)
+                .EnumerateDirectories(path, "*", listingOptions)
                 .Select(folderPath => _CreateListedItem(folderPath, isDirectory: true))
                 .ToList();
 
             var files = Directory
-                .EnumerateFiles(path, "*", _ListingOptions)
+                .EnumerateFiles(path, "*", listingOptions)
                 .Where(filePath => _PassesFileMasks(filePath, maskFilter))
                 .Select(filePath => _CreateListedItem(filePath, isDirectory: false))
                 .ToList();
 
             return (folders, files);
+        }
+
+        /// <summary>
+        /// Builds folder enumeration options from <c>ConfigStore.Options.IncludeHidden</c>.
+        /// </summary>
+        private static EnumerationOptions _CreateListingOptions()
+        {
+            return new EnumerationOptions
+            {
+                IgnoreInaccessible = true,
+                RecurseSubdirectories = false,
+                ReturnSpecialDirectories = false,
+                AttributesToSkip = ConfigStore.Options.IncludeHidden
+                    ? 0
+                    : FileAttributes.Hidden | FileAttributes.System,
+            };
         }
 
         /// <summary>

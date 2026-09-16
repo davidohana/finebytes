@@ -25,6 +25,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.False(vm.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Files, vm.AddMode);
             Assert.True(vm.AddFolderContents);
+            Assert.False(vm.IncludeHidden);
             Assert.True(vm.RememberColumnWidths);
             Assert.Equal(RenameLogRetentionMode.Limited, vm.RenameLogRetentionMode);
             Assert.Equal(OptionsDialogViewModel.DefaultLimitedCount, vm.RenameLogLimitedCount);
@@ -39,6 +40,7 @@ namespace Mfr.Tests.Ui.Options
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.ClearRenameList];
             ConfigStore.Options.AddMode = RenameListAddMode.Folders;
             ConfigStore.Options.AddFolderContents = false;
+            ConfigStore.Options.IncludeHidden = true;
             ConfigStore.Options.RememberColumnWidths = false;
             ConfigStore.RenameLog.Limit = 25;
 
@@ -51,6 +53,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(vm.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.Folders, vm.AddMode);
             Assert.False(vm.AddFolderContents);
+            Assert.True(vm.IncludeHidden);
             Assert.False(vm.RememberColumnWidths);
             Assert.Equal(RenameLogRetentionMode.Limited, vm.RenameLogRetentionMode);
             Assert.Equal(25, vm.RenameLogLimitedCount);
@@ -79,6 +82,7 @@ namespace Mfr.Tests.Ui.Options
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.GoWithPreviewErrors];
             ConfigStore.Options.AddMode = RenameListAddMode.Files;
             ConfigStore.Options.AddFolderContents = true;
+            ConfigStore.Options.IncludeHidden = false;
             ConfigStore.Options.RememberColumnWidths = true;
             ConfigStore.RenameLog.Limit = RenameLogConfig.DefaultLimit;
 
@@ -90,6 +94,7 @@ namespace Mfr.Tests.Ui.Options
                 DoubleClickAddsToRenameList = true,
                 AddMode = RenameListAddMode.FilesAndFolders,
                 AddFolderContents = false,
+                IncludeHidden = true,
                 RememberColumnWidths = false,
                 RenameLogLimitedCount = 3,
                 RenameLogRetentionMode = RenameLogRetentionMode.Limited,
@@ -103,6 +108,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(ConfigStore.Options.DoubleClickAddsToRenameList);
             Assert.Equal(RenameListAddMode.FilesAndFolders, ConfigStore.Options.AddMode);
             Assert.False(ConfigStore.Options.AddFolderContents);
+            Assert.True(ConfigStore.Options.IncludeHidden);
             Assert.False(ConfigStore.Options.RememberColumnWidths);
             Assert.Equal(3, ConfigStore.RenameLog.Limit);
         }

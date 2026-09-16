@@ -38,6 +38,7 @@ namespace Mfr.App.Ui.ViewModels.Options
             DoubleClickAddsToRenameList = options.DoubleClickAddsToRenameList;
             AddMode = options.AddMode;
             AddFolderContents = options.AddFolderContents;
+            IncludeHidden = options.IncludeHidden;
             RememberColumnWidths = options.RememberColumnWidths;
             _LoadRenameLogRetention(ConfigStore.RenameLog.Limit);
         }
@@ -102,6 +103,12 @@ namespace Mfr.App.Ui.ViewModels.Options
         private bool _addFolderContents;
 
         /// <summary>
+        /// When <see langword="true"/>, show Hidden|System in the File List and include them when adding.
+        /// </summary>
+        [ObservableProperty]
+        private bool _includeHidden;
+
+        /// <summary>
         /// When <see langword="true"/>, reuse last resized Rename List column widths when a column returns.
         /// </summary>
         [ObservableProperty]
@@ -148,6 +155,7 @@ namespace Mfr.App.Ui.ViewModels.Options
             options.SuppressedConfirmations = [.. SuppressedConfirmations];
             options.AddMode = AddMode;
             options.AddFolderContents = AddFolderContents;
+            options.IncludeHidden = IncludeHidden;
             options.RememberColumnWidths = RememberColumnWidths;
             ConfigStore.RenameLog.Limit = _LimitFromDraft();
         }
