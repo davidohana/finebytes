@@ -714,35 +714,22 @@ namespace Mfr.Engine.RenameList
         /// </summary>
         /// <param name="entry">Undoable log row whose <see cref="RenameLogEntry.Changes"/> may list path fields.</param>
         /// <returns>
-        /// Original changes when no path property was logged; otherwise non-path rows plus FileName /
-        /// Extension / DirectoryPath OldValues parsed from <see cref="RenameLogEntry.OriginalPath"/>.
+        /// Original changes when no path property was logged, or when OriginalPath and DestinationPath
+        /// Path-parse to the same DirectoryPath / FileName / Extension. Otherwise non-path rows plus
+        /// only the path fields that differ, with OldValues from <see cref="RenameLogEntry.OriginalPath"/>.
         /// </returns>
         /// <remarks>
         /// <para>
         /// Needed when GO stored a multi-dot Extension (or empty Extension with dots in FileName): after
         /// reload, <c>Path.GetExtension</c> re-splits the name so applying Extension alone cannot
         /// restore the pre-commit path. <see cref="RenameLogEntry.OriginalPath"/> is authoritative.
+        /// Only differing path fields are rewritten so ForceValue mirrors stay limited to what changed.
         /// </para>
         /// </remarks>
         private static IReadOnlyList<RenamePropertyChange> _ExpandStickyChangesForPathUndo(RenameLogEntry entry)
         {
             var changes = entry.Changes;
-            var hasPathChange = false;
-            foreach (var change in changes)
-            {
-                if (
-                    change.Property
-                    is RenamePropertyNames.FileName
-                        or RenamePropertyNames.Extension
-                        or RenamePropertyNames.DirectoryPath
-                )
-                {
-                    hasPathChange = true;
-                    break;
-                }
-            }
-
-            if (!hasPathChange)
+            if (!changes.Any(static change => _IsPathProperty(change.Property)))
             {
                 return changes;
             }
@@ -756,15 +743,25 @@ namespace Mfr.Engine.RenameList
             var newFileName = Path.GetFileNameWithoutExtension(destinationPath);
             var newExtension = FileMeta.ExtensionWithoutDot(destinationPath);
 
-            var expanded = new List<RenamePropertyChange>(changes.Count + 3);
+            var pathReplacements = new List<RenamePropertyChange>(3);
+            _AddPathChangeIfDiffers(
+                pathReplacements,
+                RenamePropertyNames.DirectoryPath,
+                oldDirectoryPath,
+                newDirectoryPath
+            );
+            _AddPathChangeIfDiffers(pathReplacements, RenamePropertyNames.FileName, oldFileName, newFileName);
+            _AddPathChangeIfDiffers(pathReplacements, RenamePropertyNames.Extension, oldExtension, newExtension);
+            if (pathReplacements.Count == 0)
+            {
+                // Paths Path-parse equal — keep logged path OldValues rather than dropping them.
+                return changes;
+            }
+
+            var expanded = new List<RenamePropertyChange>(changes.Count + pathReplacements.Count);
             foreach (var change in changes)
             {
-                if (
-                    change.Property
-                    is RenamePropertyNames.FileName
-                        or RenamePropertyNames.Extension
-                        or RenamePropertyNames.DirectoryPath
-                )
+                if (_IsPathProperty(change.Property))
                 {
                     continue;
                 }
@@ -772,28 +769,37 @@ namespace Mfr.Engine.RenameList
                 expanded.Add(change);
             }
 
-            expanded.Add(
-                new RenamePropertyChange(
-                    Property: RenamePropertyNames.DirectoryPath,
-                    OldValue: oldDirectoryPath,
-                    NewValue: newDirectoryPath
-                )
-            );
-            expanded.Add(
-                new RenamePropertyChange(
-                    Property: RenamePropertyNames.FileName,
-                    OldValue: oldFileName,
-                    NewValue: newFileName
-                )
-            );
-            expanded.Add(
-                new RenamePropertyChange(
-                    Property: RenamePropertyNames.Extension,
-                    OldValue: oldExtension,
-                    NewValue: newExtension
-                )
-            );
+            expanded.AddRange(pathReplacements);
             return expanded;
+        }
+
+        /// <summary>
+        /// Whether <paramref name="property"/> is a structured path field rewritten from OriginalPath on undo.
+        /// </summary>
+        private static bool _IsPathProperty(string property)
+        {
+            return property
+                is RenamePropertyNames.FileName
+                    or RenamePropertyNames.Extension
+                    or RenamePropertyNames.DirectoryPath;
+        }
+
+        /// <summary>
+        /// Appends a path sticky row when Old and New differ under ordinal comparison.
+        /// </summary>
+        private static void _AddPathChangeIfDiffers(
+            List<RenamePropertyChange> changes,
+            string property,
+            string oldValue,
+            string newValue
+        )
+        {
+            if (string.Equals(oldValue, newValue, StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            changes.Add(new RenamePropertyChange(Property: property, OldValue: oldValue, NewValue: newValue));
         }
 
         /// <summary>

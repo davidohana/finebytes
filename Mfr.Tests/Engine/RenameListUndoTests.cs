@@ -131,12 +131,58 @@ namespace Mfr.Tests.Engine
             var prepared = Assert.Single(renameList.RenameItems);
             Assert.Equal(renamedPath, prepared.Original.FullPath);
             Assert.Equal(sourcePath, prepared.Preview.FullPath);
+            Assert.Contains(
+                prepared.StickyUndoChanges!,
+                change => change.Property == RenamePropertyNames.FileName && change.OldValue == "song"
+            );
+            Assert.Contains(
+                prepared.StickyUndoChanges!,
+                change => change.Property == RenamePropertyNames.Extension && change.OldValue == "mp3"
+            );
+            Assert.DoesNotContain(
+                prepared.StickyUndoChanges!,
+                change => change.Property == RenamePropertyNames.DirectoryPath
+            );
 
             var results = renameList.Commit(prepare.Plan, failFast: false);
             Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
             Assert.True(File.Exists(sourcePath));
             Assert.False(File.Exists(renamedPath));
             Assert.Equal(sourcePath, Assert.Single(results).DestinationPath);
+        }
+
+        /// <summary>
+        /// Verifies Path-round-trippable Extension-only undo does not invent sticky FileName / DirectoryPath rows.
+        /// </summary>
+        [Fact]
+        public void PrepareUndo_extension_only_does_not_expand_unchanged_path_fields()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("song.mp3");
+            var renamedPath = dir.CombinePath("song.txt");
+            File.WriteAllText(sourcePath, "x");
+
+            var renameList = new RenameList();
+            renameList.AddSources([sourcePath]);
+            Assert.Equal(
+                RenameStatus.CommitOk,
+                Assert
+                    .Single(
+                        renameList.Commit(
+                            renameList.Preview(_ExtensionFormatterPreset("go", "txt").Chain),
+                            failFast: false
+                        )
+                    )
+                    .Status
+            );
+
+            renameList.PrepareUndo(RenameLogStore.LastOperation!);
+            var sticky = Assert.Single(renameList.RenameItems).StickyUndoChanges!;
+            Assert.Contains(sticky, change => change.Property == RenamePropertyNames.Extension);
+            Assert.DoesNotContain(sticky, change => change.Property == RenamePropertyNames.FileName);
+            Assert.DoesNotContain(sticky, change => change.Property == RenamePropertyNames.DirectoryPath);
+            Assert.Equal(renamedPath, Assert.Single(renameList.RenameItems).Original.FullPath);
+            Assert.Equal(sourcePath, Assert.Single(renameList.RenameItems).Preview.FullPath);
         }
 
         /// <summary>
@@ -667,10 +713,7 @@ namespace Mfr.Tests.Engine
                 Name = name,
                 Description = null,
                 Chain = FilterChain.CreateAllEnabled([
-                    new FormatterFilter(
-                        Target: new FileExtensionTarget(),
-                        Options: new FormatterOptions(extension)
-                    ),
+                    new FormatterFilter(Target: new FileExtensionTarget(), Options: new FormatterOptions(extension)),
                 ]),
             };
         }
@@ -683,10 +726,7 @@ namespace Mfr.Tests.Engine
                 Name = name,
                 Description = null,
                 Chain = FilterChain.CreateAllEnabled([
-                    new FormatterFilter(
-                        Target: new FileNameTarget(),
-                        Options: new FormatterOptions("file.backup")
-                    ),
+                    new FormatterFilter(Target: new FileNameTarget(), Options: new FormatterOptions("file.backup")),
                     new FormatterFilter(Target: new FileExtensionTarget(), Options: new FormatterOptions("")),
                 ]),
             };
