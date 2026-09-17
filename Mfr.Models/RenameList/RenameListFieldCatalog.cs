@@ -9,6 +9,7 @@ using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Utils;
 
 namespace Mfr.Models.RenameList
@@ -28,6 +29,7 @@ namespace Mfr.Models.RenameList
                 .. AudioTagRenameListFields.All,
                 .. Id3v1RenameListFields.All,
                 .. Id3v2RenameListFields.All,
+                .. XiphRenameListFields.All,
                 .. MediaRenameListFields.All,
                 .. MpegRenameListFields.All,
                 .. ImageRenameListFields.All,

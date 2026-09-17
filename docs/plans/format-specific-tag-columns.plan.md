@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: xiph-fields
     content: "P3: XiphRenameListFields from XiphKnownKeys + XiphFieldTarget WriteTargets + relevant columns"
-    status: pending
+    status: completed
 isProject: false
 ---
 

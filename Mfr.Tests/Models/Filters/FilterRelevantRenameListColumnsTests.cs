@@ -19,6 +19,7 @@ using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Models.Tags.Id3v1;
 
 namespace Mfr.Tests.Models.Filters
@@ -92,6 +93,61 @@ namespace Mfr.Tests.Models.Filters
                 keys
             );
             Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies Xiph Apply-To maps to the Xiph catalog field (Original + Preview), not MediaTag.
+        /// </summary>
+        [Fact]
+        public void Collect_StringTarget_XiphTitle_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([new RemoveSpacesFilter(new XiphFieldTarget("TITLE"))]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(XiphRenameListFields.Group, "TITLE"),
+                    RenameListFieldKey.Preview(XiphRenameListFields.Group, "TITLE"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies Formatter on Xiph maps to Xiph Original + Preview only (not MediaTag).
+        /// </summary>
+        [Fact]
+        public void Collect_Formatter_XiphArtist_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([
+                new FormatterFilter(new XiphFieldTarget("ARTIST"), new FormatterOptions("x")),
+            ]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(XiphRenameListFields.Group, "ARTIST"),
+                    RenameListFieldKey.Preview(XiphRenameListFields.Group, "ARTIST"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies mixed-case Xiph keys still map to the uppercase catalog column.
+        /// </summary>
+        [Fact]
+        public void Collect_StringTarget_XiphTitle_MixedCase_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([new RemoveSpacesFilter(new XiphFieldTarget("title"))]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(XiphRenameListFields.Group, "TITLE"),
+                    RenameListFieldKey.Preview(XiphRenameListFields.Group, "TITLE"),
+                ],
+                keys
+            );
         }
 
         /// <summary>

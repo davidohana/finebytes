@@ -8,6 +8,7 @@ using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.RenameList.Fields.Id3v2;
+using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Models.Tags;
 
 namespace Mfr.Filters
@@ -353,6 +354,8 @@ namespace Mfr.Filters
         /// <see cref="Id3v2FrameTarget"/> maps by normalized frame id only (see
         /// <see cref="_AddId3v2FrameWriteKey"/>) so language/description instances still hit the
         /// primary COMM/USLT/TXXX catalog column — not MediaTag, and not a dictionary equality miss.
+        /// <see cref="XiphFieldTarget"/> maps by uppercase key so mixed-case presets still hit the
+        /// catalog column (apply I/O is case-insensitive; record equality is not).
         /// </para>
         /// </remarks>
         private static void _AddFieldForWriteTarget(
@@ -364,6 +367,12 @@ namespace Mfr.Filters
             if (target is Id3v2FrameTarget id3v2)
             {
                 _AddId3v2FrameWriteKey(id3v2.FrameId, keys, keyToIsSeen);
+                return;
+            }
+
+            if (target is XiphFieldTarget xiph)
+            {
+                _AddXiphFieldWriteKey(xiph.Key, keys, keyToIsSeen);
                 return;
             }
 
@@ -398,6 +407,29 @@ namespace Mfr.Filters
             }
 
             _AddCatalogField(Id3v2RenameListFields.Group, frameId.Trim().ToUpperInvariant(), keys, keyToIsSeen);
+        }
+
+        /// <summary>
+        /// Appends the Xiph catalog column for <paramref name="key"/> (Original + Preview).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Unknown / blank keys are skipped via catalog lookup. Keys are uppercased to match
+        /// Xiph property keys and Apply-To I/O normalization.
+        /// </para>
+        /// </remarks>
+        private static void _AddXiphFieldWriteKey(
+            string key,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            if (string.IsNullOrWhiteSpace(key))
+            {
+                return;
+            }
+
+            _AddCatalogField(XiphRenameListFields.Group, key.Trim().ToUpperInvariant(), keys, keyToIsSeen);
         }
 
         /// <summary>
