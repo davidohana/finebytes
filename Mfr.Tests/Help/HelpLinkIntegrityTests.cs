@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using Mfr.Filters.Formatting.FormatString;
 
 namespace Mfr.Tests.Help
 {
@@ -57,6 +58,95 @@ namespace Mfr.Tests.Help
                 broken.Count == 0,
                 "Broken Help href(s):" + Environment.NewLine + string.Join(Environment.NewLine, broken)
             );
+        }
+
+        /// <summary>
+        /// Verifies each public Format Editor token's canonical name appears in the Formatting Tokens
+        /// Help tree rooted at <c>fp.html</c>.
+        /// </summary>
+        [Fact]
+        public void Every_Public_Format_Token_Is_Documented_From_Fp_Help_Tree()
+        {
+            var helpRoot = _ResolveRepoHelpRoot();
+            var fpPath = Path.Combine(helpRoot, "fp.html");
+            Assert.True(File.Exists(fpPath), "Expected help/fp.html");
+
+            var pageToIsIncluded = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase) { [fpPath] = true };
+            _CollectLinkedHelpPages(helpRoot, fpPath, pageToIsIncluded);
+
+            var corpus = string.Join(
+                '\n',
+                pageToIsIncluded.Keys.OrderBy(path => path, StringComparer.OrdinalIgnoreCase).Select(File.ReadAllText)
+            );
+
+            var missing = FormatTokenCatalog
+                .Entries.Select(entry => entry.CanonicalName)
+                .Where(name => !_CorpusMentionsToken(corpus, name))
+                .OrderBy(name => name, StringComparer.Ordinal)
+                .ToList();
+
+            Assert.True(
+                missing.Count == 0,
+                "Format tokens missing from fp.html Help tree:"
+                    + Environment.NewLine
+                    + string.Join(Environment.NewLine, missing)
+            );
+        }
+
+        private static bool _CorpusMentionsToken(string corpus, string canonicalName)
+        {
+            // Pages encode angle brackets as entities in signatures: &lt;file-name&gt;
+            return corpus.Contains("&lt;" + canonicalName, StringComparison.Ordinal)
+                || corpus.Contains("<" + canonicalName, StringComparison.Ordinal);
+        }
+
+        private static void _CollectLinkedHelpPages(
+            string helpRoot,
+            string sourceHtmlPath,
+            Dictionary<string, bool> pageToIsIncluded
+        )
+        {
+            var html = File.ReadAllText(sourceHtmlPath);
+            foreach (Match match in _HrefRegex().Matches(html))
+            {
+                var href = match.Groups["url"].Value.Trim();
+                if (href.Length == 0 || _IsAllowedAbsoluteUrl(href))
+                {
+                    continue;
+                }
+
+                if (!_TryResolveLocalTarget(helpRoot, sourceHtmlPath, href, out var targetPath))
+                {
+                    continue;
+                }
+
+                if (!File.Exists(targetPath))
+                {
+                    continue;
+                }
+
+                if (!targetPath.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (!pageToIsIncluded.TryAdd(targetPath, true))
+                {
+                    continue;
+                }
+
+                // Follow one hop from fp hub into group pages and their leaf *fp.html links.
+                var sourceName = Path.GetFileName(sourceHtmlPath);
+                var shouldRecurse =
+                    sourceName.Equals("fp.html", StringComparison.OrdinalIgnoreCase)
+                    || sourceName.Equals("generalfp.html", StringComparison.OrdinalIgnoreCase);
+                if (!shouldRecurse)
+                {
+                    continue;
+                }
+
+                _CollectLinkedHelpPages(helpRoot, targetPath, pageToIsIncluded);
+            }
         }
 
         private static bool _IsAllowedAbsoluteUrl(string href)

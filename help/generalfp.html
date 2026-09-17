@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>General Tokens</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="index.html">Index</a>
+      &gt;
+      <a href="index.html#reference">Reference</a>
+      &gt;
+      <a href="fp.html">Formatting Tokens</a>
+      &gt;
+      <strong>General</strong>
+    </nav>
+    <hr />
+    <h1>General Tokens</h1>
+    <p>Session, generator, and meta tokens that are not tied to a single metadata group.</p>
+    <ul class="group-list">
+      <li><a href="counterfp.html">Counter</a> — <code class="sig">&lt;counter&gt;</code></li>
+      <li><a href="itemcountfp.html">Item Count</a> — <code class="sig">&lt;item-count&gt;</code></li>
+      <li><a href="substringfp.html">Substring</a> — <code class="sig">&lt;substr&gt;</code></li>
+      <li><a href="tokenfp.html">Token</a> — <code class="sig">&lt;token&gt;</code></li>
+    </ul>
+
+    <div class="token-block" id="now">
+      <h2>Now</h2>
+      <p>
+        Current UTC time. Bare <code class="sig">&lt;now&gt;</code> uses
+        <code>yyyy-MM-dd_HH-mm-ss</code>. Pass a custom .NET format after the colon.
+      </p>
+      <p>
+        Signature: <code class="sig">&lt;now&gt;</code> or
+        <code class="sig">&lt;now:format-string&gt;</code>
+      </p>
+      <p>See <a href="dateformat.html">Date and Time Format Strings</a>.</p>
+    </div>
+
+    <div class="token-block" id="random-char">
+      <h2>Random Char</h2>
+      <p>
+        One uniformly random character between two single-character endpoints (inclusive). Bounds are
+        swapped if low &gt; high.
+      </p>
+      <p>Signature: <code class="sig">&lt;random-char:low,high&gt;</code></p>
+      <p>
+        Examples: <code class="sig">&lt;random-char:A,Z&gt;</code>,
+        <code class="sig">&lt;random-char:0,9&gt;</code>
+      </p>
+    </div>
+  </body>
+</html>

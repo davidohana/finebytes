@@ -13,7 +13,7 @@ todos:
     status: completed
   - id: p4-reference-fp
     content: "P4: fields/regex/dateformat + formatter token help for ported tokens"
-    status: pending
+    status: completed
   - id: p5-general-cli-faqs
     content: "P5: license/site/contact/credits/FAQs/CLI help pages"
     status: pending

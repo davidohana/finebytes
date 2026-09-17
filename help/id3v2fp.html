@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Audio ID3 Tokens</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="index.html">Index</a>
+      &gt;
+      <a href="index.html#reference">Reference</a>
+      &gt;
+      <a href="fp.html">Formatting Tokens</a>
+      &gt;
+      <strong>Audio ID3</strong>
+    </nav>
+    <hr />
+    <h1>Audio ID3 Tokens</h1>
+    <p>
+      Low-level ID3v2 access from the audio tag overlay. For everyday title/artist/album values prefer
+      <a href="audiofp.html">Audio Tag tokens</a>.
+    </p>
+
+    <div class="token-block" id="id3v2">
+      <h2>ID3v2 Custom Field</h2>
+      <p>
+        Reads one modeled ID3v2 frame by four-character frame id (for example <code>TALB</code>,
+        <code>TIT2</code>, <code>TXXX</code>).
+      </p>
+      <p>
+        Signature: <code class="sig">&lt;id3v2:field-code&gt;</code> or
+        <code class="sig">&lt;id3v2:field-code:content-descriptor&gt;</code>
+      </p>
+      <ul>
+        <li>
+          Bare <code class="sig">&lt;id3v2:TXXX&gt;</code> returns the first <code>TXXX</code> frame.
+          Add a content descriptor to target a specific frame:
+          <code class="sig">&lt;id3v2:TXXX:catalog&gt;</code>.
+        </li>
+        <li>
+          For <code>COMM</code> / <code>USLT</code>, bare ids use the primary instance; an optional
+          content-descriptor suffix selects another instance.
+        </li>
+      </ul>
+      <p>Example: <code class="sig">&lt;id3v2:TIT2&gt;</code></p>
+    </div>
+
+    <div class="token-block" id="id3v2-version">
+      <h2>ID3v2 Version</h2>
+      <p>ID3v2 tag version text (for example 2.3 / 2.4), or empty when no ID3v2 tag is present.</p>
+      <p>Signature: <code class="sig">&lt;id3v2-version&gt;</code></p>
+    </div>
+  </body>
+</html>

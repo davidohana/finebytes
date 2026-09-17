@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Token Extract Token</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="index.html">Index</a>
+      &gt;
+      <a href="index.html#reference">Reference</a>
+      &gt;
+      <a href="fp.html">Formatting Tokens</a>
+      &gt;
+      <a href="generalfp.html">General</a>
+      &gt;
+      <strong>Token</strong>
+    </nav>
+    <hr />
+    <h1>Token</h1>
+    <p>
+      Splits a resolved source string by a separator and returns the selected part (or a range of
+      parts).
+    </p>
+    <p>
+      Signature (named options, order-independent):
+      <code class="sig"
+        >&lt;token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=&lt;full-name&gt;&gt;</code
+      >
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>tokenNumber</code></td>
+          <td>1-based part index.</td>
+        </tr>
+        <tr>
+          <td><code>separator</code></td>
+          <td>String used to split the source.</td>
+        </tr>
+        <tr>
+          <td><code>includeNext</code></td>
+          <td>
+            <code>true</code>/<code>false</code> — join from the selected part through the end.
+          </td>
+        </tr>
+        <tr>
+          <td><code>includePrev</code></td>
+          <td>
+            <code>true</code>/<code>false</code> — join from the start through the selected part.
+          </td>
+        </tr>
+        <tr>
+          <td><code>source</code></td>
+          <td>Nested format string or literal to split.</td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Examples</h2>
+    <p>For <code>C:\music\13_-_Smog_-_Cold_Blooded_Old_Times.mp3</code>:</p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Token</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <code class="sig"
+              >&lt;token:tokenNumber=1,separator=-,includeNext=false,includePrev=false,source=&lt;full-name&gt;&gt;</code
+            >
+          </td>
+          <td><code>13_</code></td>
+        </tr>
+        <tr>
+          <td>
+            <code class="sig"
+              >&lt;token:tokenNumber=2,separator=_-_,includeNext=false,includePrev=false,source=&lt;full-name&gt;&gt;</code
+            >
+          </td>
+          <td><code>Smog</code></td>
+        </tr>
+        <tr>
+          <td>
+            <code class="sig"
+              >&lt;token:tokenNumber=2,separator=_-_,includeNext=true,includePrev=false,source=&lt;full-name&gt;&gt;</code
+            >
+          </td>
+          <td><code>Smog_-_Cold_Blooded_Old_Times.mp3</code></td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

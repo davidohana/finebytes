@@ -129,3 +129,39 @@ ul.options li {
   text-align: center;
   font-weight: bold;
 }
+
+code.sig {
+  color: #b00b0b;
+}
+
+.ref-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 52rem;
+  margin: 0.75rem 0 1.25rem;
+  font-size: 0.95em;
+}
+
+.ref-table th,
+.ref-table td {
+  border: 1px solid #ccc;
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.ref-table th {
+  background: #e8e8e8;
+}
+
+.ref-table .center {
+  text-align: center;
+}
+
+.token-block {
+  margin: 0 0 1.5rem;
+}
+
+.token-block h2 {
+  margin-top: 1.4rem;
+}
