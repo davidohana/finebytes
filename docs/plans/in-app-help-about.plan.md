@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: p3-shell-operation
     content: "P3: Operation/shell/howto HTML for current MFR8 UI"
-    status: pending
+    status: completed
   - id: p4-reference-fp
     content: "P4: fields/regex/dateformat + formatter token help for ported tokens"
     status: pending
