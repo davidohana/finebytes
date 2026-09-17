@@ -28,7 +28,7 @@ Parent: Cursor backlog MFR7 feature parity item **11** (P2).
 
 - Help: `Help/batchfile.html` (install or `D:\Devl\mfr7\Site\finebytes\mfr\Help\`)
 - Code: `RenameItemList.GenerateBatchRenamingFile`, `RenameItem.GenerateBatchApplyCommand`, `BasicPG` / `ExtendedPG.GenerateBatchApplyCommand`; UI `Main.cs` `mniBatch_Click`
-- finebytes status: **none** (CSV/txt export only; Tools = Options + Reset)
+- finebytes status: **shipped** — Tools → Generate Rename Script… (`.bat` / `.ps1`); see Status above
 
 ### Behavior
 
@@ -47,10 +47,8 @@ Parent: Cursor backlog MFR7 feature parity item **11** (P2).
 
 ## Existing stubs (finebytes)
 
-- Export siblings: `RenameList.ExportCsv` / `ExportNameList`; UI via `FileSavePicker` + Rename List export commands.
-- Change detection: `RenameItem.HasPreviewChanges` / `IsPreviewPathUnchanged` — script export needs a **narrower** “path or RAHS attrs changed” predicate.
-- Attrs: `FileAttributesRahs` (R/A/H/S).
-- Tools menu: `MainWindow.axaml` Options + Reset only.
+- Script export: `Mfr.Engine/RenameScript/` + `RenameList.ExportRenameScript` / `CountRenameScriptItems`; Tools menu + multi-type `FileSavePicker`.
+- Still related: `RenameList.ExportCsv` / `ExportNameList`; `FileAttributesRahs` (R/A/H/S).
 
 ## Non-goals
 
