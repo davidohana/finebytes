@@ -71,7 +71,23 @@ namespace Mfr.Tests.Utils
             Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.ContainsInvalidPath(null!));
             Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.FindInvalid(null!));
             Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.FormatInvalidForMessage(null!));
+            Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.DescribeIllegality(null!));
             Assert.Throws<ArgumentNullException>(() => WindowsFileNameChars.AddInvalidTo(null!));
+        }
+
+        /// <summary>
+        /// Verifies empty names and trailing space/period are reported with specific messages.
+        /// </summary>
+        [Theory]
+        [InlineData("", "Target name is empty.")]
+        [InlineData("foo.", "Target name 'foo.' ends with a space or period.")]
+        [InlineData("foo ", "Target name 'foo ' ends with a space or period.")]
+        [InlineData("a:b", "Target name 'a:b' contains illegal characters: ':'.")]
+        [InlineData("ok-name", null)]
+        [InlineData("ok.txt", null)]
+        public void DescribeIllegality_empty_trailing_and_chars(string value, string? expected)
+        {
+            Assert.Equal(expected, WindowsFileNameChars.DescribeIllegality(value));
         }
     }
 }

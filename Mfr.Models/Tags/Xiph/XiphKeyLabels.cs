@@ -5,56 +5,15 @@ namespace Mfr.Models.Tags.Xiph
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Catalog IDs follow <see cref="SemanticAudioFieldLabels"/> via <see cref="AudioCatalogFieldMaps"/>.
-    /// Overlapping common keys reuse that map; Xiph-only aliases keep distinct wording
-    /// (e.g. Track Number vs Track).
+    /// One static map owns every known key: semantic common fields, Xiph-only distinct wording
+    /// (e.g. Track Number vs Track), and catalog/MusicBrainz rows from <see cref="AudioCatalogFieldMaps"/>.
     /// </para>
     /// </remarks>
     public static class XiphKeyLabels
     {
-        private static readonly Dictionary<string, SemanticAudioField> s_KeyToSemanticField = new(
-            StringComparer.Ordinal
-        )
-        {
-            [XiphKnownKeys.Title] = SemanticAudioField.Title,
-            [XiphKnownKeys.Album] = SemanticAudioField.Album,
-            [XiphKnownKeys.Artist] = SemanticAudioField.Performers,
-            [XiphKnownKeys.AlbumArtist] = SemanticAudioField.AlbumArtists,
-            [XiphKnownKeys.Composer] = SemanticAudioField.Composers,
-            [XiphKnownKeys.Genre] = SemanticAudioField.Genre,
-            [XiphKnownKeys.Comment] = SemanticAudioField.Comment,
-            [XiphKnownKeys.Lyrics] = SemanticAudioField.Lyrics,
-            [XiphKnownKeys.Copyright] = SemanticAudioField.Copyright,
-            [XiphKnownKeys.Grouping] = SemanticAudioField.Grouping,
-            [XiphKnownKeys.Year] = SemanticAudioField.Year,
-            [XiphKnownKeys.BeatsPerMinute] = SemanticAudioField.BeatsPerMinute,
-            [XiphKnownKeys.Conductor] = SemanticAudioField.Conductor,
-        };
+        private readonly record struct LabelTip(string Label, string? Tip);
 
-        private static readonly Dictionary<string, string> s_DistinctLabels = new(StringComparer.Ordinal)
-        {
-            [XiphKnownKeys.Description] = "Description",
-            [XiphKnownKeys.UnsyncedLyrics] = "Unsynced Lyrics",
-            [XiphKnownKeys.ContentGroup] = "Content Group",
-            [XiphKnownKeys.Date] = "Date",
-            [XiphKnownKeys.TrackNumber] = "Track Number",
-            [XiphKnownKeys.TrackTotal] = "Track Total",
-            [XiphKnownKeys.TotalTracks] = "Total Tracks",
-            [XiphKnownKeys.DiscNumber] = "Disc Number",
-            [XiphKnownKeys.DiscTotal] = "Disc Total",
-            [XiphKnownKeys.TotalDiscs] = "Total Discs",
-            [XiphKnownKeys.Tempo] = "Tempo",
-        };
-
-        private static readonly Dictionary<string, string> s_KeyToTip = new(StringComparer.Ordinal)
-        {
-            [XiphKnownKeys.Artist] = SemanticAudioFieldTips.Artist,
-            [XiphKnownKeys.AlbumArtist] = SemanticAudioFieldTips.AlbumArtist,
-            [XiphKnownKeys.Composer] = SemanticAudioFieldTips.Composer,
-            [XiphKnownKeys.Genre] = SemanticAudioFieldTips.Genre,
-            [XiphKnownKeys.AmazonId] = SemanticAudioFieldTips.Asin,
-            [XiphKnownKeys.BeatsPerMinute] = SemanticAudioFieldTips.Bpm,
-        };
+        private static readonly Dictionary<string, LabelTip> s_KeyToLabelTip = _BuildMap();
 
         /// <summary>
         /// Returns the Apply-To label for <paramref name="key"/>.
@@ -69,27 +28,7 @@ namespace Mfr.Models.Tags.Xiph
             }
 
             var normalized = key.Trim().ToUpperInvariant();
-
-            // Common keys hit O(1) maps first; MusicBrainz/ASIN catalog rows are a small linear fallback.
-            if (s_KeyToSemanticField.TryGetValue(normalized, out var field))
-            {
-                return SemanticAudioFieldLabels.For(field);
-            }
-
-            if (s_DistinctLabels.TryGetValue(normalized, out var label))
-            {
-                return label;
-            }
-
-            var catalogRow = AudioCatalogFieldMaps.All.FirstOrDefault(row =>
-                string.Equals(row.XiphKey, normalized, StringComparison.OrdinalIgnoreCase)
-            );
-            if (catalogRow is not null)
-            {
-                return SemanticAudioFieldLabels.For(catalogRow.Field);
-            }
-
-            return key;
+            return s_KeyToLabelTip.TryGetValue(normalized, out var entry) ? entry.Label : key;
         }
 
         /// <summary>
@@ -111,7 +50,56 @@ namespace Mfr.Models.Tags.Xiph
             }
 
             var normalized = key.Trim().ToUpperInvariant();
-            return s_KeyToTip.TryGetValue(normalized, out var tip) ? tip : null;
+            return s_KeyToLabelTip.TryGetValue(normalized, out var entry) ? entry.Tip : null;
+        }
+
+        private static Dictionary<string, LabelTip> _BuildMap()
+        {
+            var keyToLabelTip = new Dictionary<string, LabelTip>(StringComparer.Ordinal);
+
+            void Add(string key, string label, string? tip = null)
+            {
+                keyToLabelTip[key] = new LabelTip(label, tip);
+            }
+
+            void AddSemantic(string key, SemanticAudioField field, string? tip = null)
+            {
+                Add(key, SemanticAudioFieldLabels.For(field), tip);
+            }
+
+            AddSemantic(XiphKnownKeys.Title, SemanticAudioField.Title);
+            AddSemantic(XiphKnownKeys.Album, SemanticAudioField.Album);
+            AddSemantic(XiphKnownKeys.Artist, SemanticAudioField.Performers, SemanticAudioFieldTips.Artist);
+            AddSemantic(XiphKnownKeys.AlbumArtist, SemanticAudioField.AlbumArtists, SemanticAudioFieldTips.AlbumArtist);
+            AddSemantic(XiphKnownKeys.Composer, SemanticAudioField.Composers, SemanticAudioFieldTips.Composer);
+            AddSemantic(XiphKnownKeys.Genre, SemanticAudioField.Genre, SemanticAudioFieldTips.Genre);
+            AddSemantic(XiphKnownKeys.Comment, SemanticAudioField.Comment);
+            AddSemantic(XiphKnownKeys.Lyrics, SemanticAudioField.Lyrics);
+            AddSemantic(XiphKnownKeys.Copyright, SemanticAudioField.Copyright);
+            AddSemantic(XiphKnownKeys.Grouping, SemanticAudioField.Grouping);
+            AddSemantic(XiphKnownKeys.Year, SemanticAudioField.Year);
+            AddSemantic(XiphKnownKeys.BeatsPerMinute, SemanticAudioField.BeatsPerMinute, SemanticAudioFieldTips.Bpm);
+            AddSemantic(XiphKnownKeys.Conductor, SemanticAudioField.Conductor);
+
+            Add(XiphKnownKeys.Description, "Description");
+            Add(XiphKnownKeys.UnsyncedLyrics, "Unsynced Lyrics");
+            Add(XiphKnownKeys.ContentGroup, "Content Group");
+            Add(XiphKnownKeys.Date, "Date");
+            Add(XiphKnownKeys.TrackNumber, "Track Number");
+            Add(XiphKnownKeys.TrackTotal, "Track Total");
+            Add(XiphKnownKeys.TotalTracks, "Total Tracks");
+            Add(XiphKnownKeys.DiscNumber, "Disc Number");
+            Add(XiphKnownKeys.DiscTotal, "Disc Total");
+            Add(XiphKnownKeys.TotalDiscs, "Total Discs");
+            Add(XiphKnownKeys.Tempo, "Tempo");
+
+            foreach (var row in AudioCatalogFieldMaps.All)
+            {
+                var tip = row.Field == SemanticAudioField.AmazonId ? SemanticAudioFieldTips.Asin : null;
+                AddSemantic(row.XiphKey, row.Field, tip);
+            }
+
+            return keyToLabelTip;
         }
     }
 }

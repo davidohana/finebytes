@@ -49,6 +49,50 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies an empty full file name is marked PreviewError (MFR7 empty-name parity).
+        /// </summary>
+        [Fact]
+        public void Empty_full_file_name_marks_preview_error()
+        {
+            var item = _CreatePreviewOkItem(fileName: "", extension: "");
+
+            PreviewIllegalFileNameDetector.MarkIllegalNames([item]);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.Equal("Target name is empty.", item.PreviewError!.Message);
+        }
+
+        /// <summary>
+        /// Verifies a trailing period on the full file name is marked PreviewError.
+        /// </summary>
+        [Fact]
+        public void Trailing_period_marks_preview_error_and_keeps_preview_name()
+        {
+            var item = _CreatePreviewOkItem(fileName: "track.", extension: "");
+
+            PreviewIllegalFileNameDetector.MarkIllegalNames([item]);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.Equal("track.", item.Preview.FullFileName);
+            Assert.Equal("Target name 'track.' ends with a space or period.", item.PreviewError!.Message);
+        }
+
+        /// <summary>
+        /// Verifies a trailing space on the full file name is marked PreviewError.
+        /// </summary>
+        [Fact]
+        public void Trailing_space_marks_preview_error_and_keeps_preview_name()
+        {
+            var item = _CreatePreviewOkItem(fileName: "track", extension: "txt ");
+
+            PreviewIllegalFileNameDetector.MarkIllegalNames([item]);
+
+            Assert.Equal(RenameStatus.PreviewError, item.Status);
+            Assert.Equal("track.txt ", item.Preview.FullFileName);
+            Assert.Equal("Target name 'track.txt ' ends with a space or period.", item.PreviewError!.Message);
+        }
+
+        /// <summary>
         /// Verifies items already in PreviewError are not overwritten.
         /// </summary>
         [Fact]

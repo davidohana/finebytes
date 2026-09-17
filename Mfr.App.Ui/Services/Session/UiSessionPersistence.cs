@@ -66,8 +66,16 @@ namespace Mfr.App.Ui.Services.Session
                 if (options.RememberWindowState)
                 {
                     var captured = WindowSession.Capture(window);
-                    captured.Splitters = SplitterSession.Capture(panes);
-                    ConfigStore.MainWindow = captured;
+                    if (captured is not null)
+                    {
+                        captured.Splitters = SplitterSession.Capture(panes);
+                        ConfigStore.MainWindow = captured;
+                    }
+                    else if (ConfigStore.MainWindow is { } existing)
+                    {
+                        // Maximized without usable restore bounds: keep prior geometry, refresh splitters.
+                        existing.Splitters = SplitterSession.Capture(panes);
+                    }
                 }
 
                 if (fileList is not null)

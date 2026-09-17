@@ -9,6 +9,11 @@ namespace Mfr.Utils
     /// characters even when unit tests run on Linux CI, so host
     /// <see cref="Path.GetInvalidFileNameChars"/> / <see cref="Path.GetInvalidPathChars"/> are not used here.
     /// </para>
+    /// <para>
+    /// Beyond <see cref="Path.GetInvalidFileNameChars"/>, Windows also rejects empty names and names that
+    /// end with a space or period (<c>CreateFile</c> rules). Preview uses <see cref="DescribeIllegality"/> for
+    /// those cases (MFR7 <c>VerifyCurrentValues</c> empty-name parity plus trailing space/period).
+    /// </para>
     /// </remarks>
     public static class WindowsFileNameChars
     {
@@ -76,6 +81,37 @@ namespace Mfr.Utils
         }
 
         /// <summary>
+        /// Describes why <paramref name="fullFileName"/> is illegal on Windows, or <see langword="null"/> when legal.
+        /// </summary>
+        /// <param name="fullFileName">Candidate full file name (name + extension, no directory).</param>
+        /// <returns>
+        /// Empty-name, illegal-character, or trailing space/period message; <see langword="null"/> when usable.
+        /// </returns>
+        public static string? DescribeIllegality(string fullFileName)
+        {
+            ArgumentNullException.ThrowIfNull(fullFileName);
+
+            if (fullFileName.Length == 0)
+            {
+                return "Target name is empty.";
+            }
+
+            var invalidChars = FindInvalid(fullFileName);
+            if (invalidChars.Count > 0)
+            {
+                var formattedChars = FormatInvalidForMessage(invalidChars);
+                return $"Target name '{fullFileName}' contains illegal characters: {formattedChars}.";
+            }
+
+            if (_EndsWithSpaceOrPeriod(fullFileName))
+            {
+                return $"Target name '{fullFileName}' ends with a space or period.";
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Whether <paramref name="path"/> contains a character illegal in Windows paths.
         /// </summary>
         /// <param name="path">Candidate absolute or relative path (may include separators and drive letters).</param>
@@ -98,6 +134,12 @@ namespace Mfr.Utils
             {
                 chars.Add(c);
             }
+        }
+
+        private static bool _EndsWithSpaceOrPeriod(string value)
+        {
+            var last = value[^1];
+            return last is ' ' or '.';
         }
 
         private static string _FormatCharForMessage(char c)

@@ -40,12 +40,13 @@ namespace Mfr.App.Ui.Services.Session
             var isMaximized = string.Equals(saved.State, "Maximized", StringComparison.OrdinalIgnoreCase);
             if (isMaximized)
             {
-                _TryApplyNormalGeometry(window, saved);
+                // Still maximize when restore bounds are unusable (legacy maximized-frame leftovers).
+                _ = WindowGeometryChecks.TryApplyNormalBounds(window, saved.X, saved.Y, saved.Width, saved.Height);
                 window.WindowState = WindowState.Maximized;
                 return true;
             }
 
-            if (!_TryApplyNormalGeometry(window, saved))
+            if (!WindowGeometryChecks.TryApplyNormalBounds(window, saved.X, saved.Y, saved.Width, saved.Height))
             {
                 return false;
             }
@@ -89,64 +90,57 @@ namespace Mfr.App.Ui.Services.Session
         /// <para>
         /// When maximized, keeps the previous normal size/position from <see cref="ConfigStore.MainWindow"/>
         /// as restore bounds instead of Windows maximized-frame coords (often slightly negative).
+        /// Maximize without prior usable restore bounds returns <see langword="null"/> so callers leave
+        /// the previous prefs unchanged.
         /// </para>
         /// </summary>
         /// <param name="window">Window being closed.</param>
-        /// <returns>Session payload ready to persist (splitters are captured separately).</returns>
-        public static MainWindowPrefs Capture(Window window)
+        /// <returns>Session payload ready to persist, or <see langword="null"/> when maximized without restore bounds.</returns>
+        public static MainWindowPrefs? Capture(Window window)
         {
             var isMaximized = window.WindowState == WindowState.Maximized;
             if (isMaximized)
             {
                 var prior = ConfigStore.MainWindow;
                 if (
-                    prior is not null
-                    && WindowGeometryChecks.IsValidSize(prior.Width, prior.Height)
-                    && WindowGeometryChecks.IsPositionInWorkingArea(window, prior.X, prior.Y)
+                    prior is null
+                    || !WindowGeometryChecks.IsUsableRestoreBounds(window, prior.X, prior.Y, prior.Width, prior.Height)
                 )
                 {
-                    return new MainWindowPrefs
-                    {
-                        X = prior.X,
-                        Y = prior.Y,
-                        Width = prior.Width,
-                        Height = prior.Height,
-                        State = "Maximized",
-                    };
+                    return null;
                 }
+
+                return new MainWindowPrefs
+                {
+                    X = prior.X,
+                    Y = prior.Y,
+                    Width = prior.Width,
+                    Height = prior.Height,
+                    State = "Maximized",
+                };
+            }
+
+            var width = window.Width;
+            var height = window.Height;
+            var x = window.Position.X;
+            var y = window.Position.Y;
+            if (
+                !WindowGeometryChecks.IsValidSize(width, height)
+                || !WindowGeometryChecks.IsOnScreen(window, x, y, width, height)
+                || !WindowGeometryChecks.IsPositionInWorkingArea(window, x, y)
+            )
+            {
+                return null;
             }
 
             return new MainWindowPrefs
             {
-                X = window.Position.X,
-                Y = window.Position.Y,
-                Width = window.Width,
-                Height = window.Height,
-                State = isMaximized ? "Maximized" : "Normal",
+                X = x,
+                Y = y,
+                Width = width,
+                Height = height,
+                State = "Normal",
             };
-        }
-
-        private static bool _TryApplyNormalGeometry(Window window, MainWindowPrefs saved)
-        {
-            if (!WindowGeometryChecks.IsValidSize(saved.Width, saved.Height))
-            {
-                return false;
-            }
-
-            if (!WindowGeometryChecks.IsOnScreen(window, saved.X, saved.Y, saved.Width, saved.Height))
-            {
-                return false;
-            }
-
-            if (!WindowGeometryChecks.IsPositionInWorkingArea(window, saved.X, saved.Y))
-            {
-                return false;
-            }
-
-            window.Width = saved.Width;
-            window.Height = saved.Height;
-            window.Position = new PixelPoint(saved.X, saved.Y);
-            return true;
         }
 
         private static bool _TryApplyDefaultSizeAndCenter(Window window)

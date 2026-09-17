@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.MainWindow;
+using Mfr.Models.Config;
 using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
 
 namespace Mfr.Tests.Ui.MainWindow
@@ -10,6 +11,7 @@ namespace Mfr.Tests.Ui.MainWindow
     /// <summary>
     /// Headless tests for main-window geometry restore and first-run defaults.
     /// </summary>
+    [Collection(ConfigStoreCollection.Name)]
     public sealed class WindowSessionTests
     {
         /// <summary>
@@ -165,11 +167,61 @@ namespace Mfr.Tests.Ui.MainWindow
 
             var captured = WindowSession.Capture(window);
 
+            Assert.NotNull(captured);
             Assert.Equal(12, captured.X);
             Assert.Equal(34, captured.Y);
             Assert.Equal(900, captured.Width);
             Assert.Equal(600, captured.Height);
             Assert.Equal("Normal", captured.State);
+        }
+
+        /// <summary>
+        /// Verifies maximized capture without prior restore bounds returns null (no maximized-frame coords).
+        /// </summary>
+        [AvaloniaFact]
+        public void Capture_MaximizedWithoutPrior_ReturnsNull()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.MainWindow = null;
+
+            var window = _CreateWindow();
+            window.Width = 900;
+            window.Height = 600;
+            window.Position = new PixelPoint(12, 34);
+            window.WindowState = WindowState.Maximized;
+
+            Assert.Null(WindowSession.Capture(window));
+        }
+
+        /// <summary>
+        /// Verifies maximized capture keeps prior normal restore bounds.
+        /// </summary>
+        [AvaloniaFact]
+        public void Capture_Maximized_KeepsPriorRestoreBounds()
+        {
+            ConfigStoreTestReset.LoadEmpty();
+            ConfigStore.MainWindow = new MainWindowPrefs
+            {
+                X = 40,
+                Y = 60,
+                Width = 960,
+                Height = 640,
+                State = "Normal",
+            };
+
+            var window = _CreateWindow();
+            window.Show();
+            window.UpdateLayout();
+            window.WindowState = WindowState.Maximized;
+
+            var captured = WindowSession.Capture(window);
+
+            Assert.NotNull(captured);
+            Assert.Equal(40, captured.X);
+            Assert.Equal(60, captured.Y);
+            Assert.Equal(960, captured.Width);
+            Assert.Equal(640, captured.Height);
+            Assert.Equal("Maximized", captured.State);
         }
 
         /// <summary>

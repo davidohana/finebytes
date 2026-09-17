@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using Avalonia;
 using Avalonia.Controls;
 using Mfr.Models.Config;
 
@@ -55,7 +54,17 @@ namespace Mfr.App.Ui.Services.Session
             }
 
             // Maximize only after restore bounds apply — maximize-only entries (zero size) leave XAML defaults.
-            if (!_TryApplyNormalGeometry(window, saved, mode))
+            if (
+                !WindowGeometryChecks.TryApplyNormalBounds(
+                    window,
+                    saved.X,
+                    saved.Y,
+                    saved.Width,
+                    saved.Height,
+                    applyHeight: mode == DialogGeometryMode.SizeAndPosition,
+                    setManualStartupLocation: true
+                )
+            )
             {
                 return;
             }
@@ -67,56 +76,16 @@ namespace Mfr.App.Ui.Services.Session
         }
 
         /// <summary>
-        /// Applies saved normal size/position when valid; returns whether geometry was applied.
-        /// </summary>
-        private static bool _TryApplyNormalGeometry(Window window, WindowGeometryPrefs saved, DialogGeometryMode mode)
-        {
-            var restoreHeight = mode == DialogGeometryMode.SizeAndPosition;
-            if (!WindowGeometryChecks.IsPositiveFinite(saved.Width))
-            {
-                return false;
-            }
-
-            if (restoreHeight && !WindowGeometryChecks.IsPositiveFinite(saved.Height))
-            {
-                return false;
-            }
-
-            // Width-only restore ignores saved height; use the dialog's current height for the on-screen check.
-            var heightForBounds = restoreHeight
-                ? saved.Height
-                : (WindowGeometryChecks.IsPositiveFinite(window.Height) ? window.Height : 1);
-            if (!WindowGeometryChecks.IsOnScreen(window, saved.X, saved.Y, saved.Width, heightForBounds))
-            {
-                return false;
-            }
-
-            // Drop maximized-frame leftovers (e.g. x/y = -8) that still pass the screen-bounds check.
-            if (!WindowGeometryChecks.IsPositionInWorkingArea(window, saved.X, saved.Y))
-            {
-                return false;
-            }
-
-            window.WindowStartupLocation = WindowStartupLocation.Manual;
-            window.Width = saved.Width;
-            if (restoreHeight)
-            {
-                window.Height = saved.Height;
-            }
-
-            window.Position = new PixelPoint(saved.X, saved.Y);
-            return true;
-        }
-
-        /// <summary>
         /// Writes current size, position, and maximized flag into root <see cref="ConfigStore.Dialogs"/>
         /// when remember is on.
+        /// </summary>
+        /// <remarks>
         /// <para>Always stores height; <see cref="DialogGeometryMode.WidthAndPosition"/> restore ignores it.</para>
         /// <para>
         /// When maximized, keeps prior normal restore bounds and only sets <see cref="WindowGeometryPrefs.Maximized"/>;
-        /// Windows maximized-frame coords are not written. Maximize without prior valid size is not persisted.
+        /// Windows maximized-frame coords are not written. Maximize without prior usable restore bounds is not persisted.
         /// </para>
-        /// </summary>
+        /// </remarks>
         private static void _Capture(Window window, string id)
         {
             if (!_RememberWindowState())
@@ -135,8 +104,10 @@ namespace Mfr.App.Ui.Services.Session
 
             if (isMaximized)
             {
-                // Need prior normal bounds; otherwise a later restore would maximize with no size/position.
-                if (entry is null || !WindowGeometryChecks.IsValidSize(entry.Width, entry.Height))
+                if (
+                    entry is null
+                    || !WindowGeometryChecks.IsUsableRestoreBounds(window, entry.X, entry.Y, entry.Width, entry.Height)
+                )
                 {
                     return;
                 }
@@ -147,15 +118,11 @@ namespace Mfr.App.Ui.Services.Session
 
             var width = window.Width;
             var height = window.Height;
-            if (!WindowGeometryChecks.IsValidSize(width, height))
-            {
-                return;
-            }
-
             var x = window.Position.X;
             var y = window.Position.Y;
             if (
-                !WindowGeometryChecks.IsOnScreen(window, x, y, width, height)
+                !WindowGeometryChecks.IsValidSize(width, height)
+                || !WindowGeometryChecks.IsOnScreen(window, x, y, width, height)
                 || !WindowGeometryChecks.IsPositionInWorkingArea(window, x, y)
             )
             {

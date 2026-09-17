@@ -14,7 +14,8 @@ namespace Mfr.Engine.Preview
     internal static class PreviewIllegalFileNameDetector
     {
         /// <summary>
-        /// Marks each PreviewOk item whose <see cref="FileMeta.FullFileName"/> contains Windows-illegal characters.
+        /// Marks each PreviewOk item whose <see cref="FileMeta.FullFileName"/> is empty, has illegal characters,
+        /// or ends with a space or period.
         /// </summary>
         /// <param name="items">All rename items participating in the current preview pass.</param>
         internal static void MarkIllegalNames(IReadOnlyList<RenameItem> items)
@@ -28,18 +29,13 @@ namespace Mfr.Engine.Preview
                     continue;
                 }
 
-                var fullFileName = item.Preview.FullFileName;
-                var invalidChars = WindowsFileNameChars.FindInvalid(fullFileName);
-                if (invalidChars.Count == 0)
+                var message = WindowsFileNameChars.DescribeIllegality(item.Preview.FullFileName);
+                if (message is null)
                 {
                     continue;
                 }
 
-                var formattedChars = WindowsFileNameChars.FormatInvalidForMessage(invalidChars);
-                item.SetPreviewError(
-                    message: $"Target name '{fullFileName}' contains illegal characters: {formattedChars}.",
-                    cause: null
-                );
+                item.SetPreviewError(message: message, cause: null);
             }
         }
     }
