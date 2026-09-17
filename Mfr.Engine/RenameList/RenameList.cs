@@ -379,6 +379,44 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
+        /// Writes a UTF-8 rename script for path and RAHS attribute preview deltas.
+        /// </summary>
+        /// <param name="path">Destination file path (created or overwritten).</param>
+        /// <param name="format">Bat or PowerShell dialect; PowerShell files include a UTF-8 BOM.</param>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is null or whitespace.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="format"/> is not a supported value.</exception>
+        /// <exception cref="IOException">The file could not be written.</exception>
+        /// <remarks>
+        /// <para>
+        /// Skips <see cref="RenameStatus.PreviewError"/> rows and rows with only tag/date changes.
+        /// Attribute commands target the preview full path after any rename/move for that row.
+        /// </para>
+        /// </remarks>
+        public void ExportRenameScript(string path, RenameScriptFormat format)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(path);
+            if (format is not (RenameScriptFormat.Bat or RenameScriptFormat.PowerShell))
+            {
+                throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported rename script format.");
+            }
+
+            var opGroups = RenameScriptCollector.Collect(_renameItems);
+            var text = RenameScriptFormatter.Format(opGroups, format);
+            // Format validated above; encode Bat without BOM and PowerShell with BOM.
+            UTF8Encoding encoding;
+            if (format == RenameScriptFormat.PowerShell)
+            {
+                encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
+            }
+            else
+            {
+                encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
+            }
+
+            File.WriteAllText(path, text, encoding);
+        }
+
+        /// <summary>
         /// Moves the given items one position by <paramref name="offset"/>.
         /// </summary>
         /// <param name="items">Items to move; entries not in the list are ignored.</param>
