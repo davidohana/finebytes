@@ -18,6 +18,10 @@ Parent: Cursor backlog MFR7 feature parity item **11** (P2).
   - Same-folder rename → `ren` / `Rename-Item`; folder change → `mkdir`/`New-Item` + `move`/`Move-Item` (keep MFR7 case-only folder rename via rename, not move).
 - **Non-goals (v1):** CLI `--export-script`, undo scripts, running the script from the app, dates/tags in scripts, multi-format beyond bat/ps1.
 
+## Status
+
+**Done** (P1–P3). Shipped modernized script export: Tools → Generate Rename Script… writes Windows `.bat` or PowerShell `.ps1` from Rename List path/RAHS deltas (IR + emitters + UI). Parity backlog item **11** points here.
+
 ## MFR7 reference brief
 
 ### Sources
@@ -83,4 +87,4 @@ Parent: Cursor backlog MFR7 feature parity item **11** (P2).
 - **Scope / files:** Short note in `docs/` or design doc only if needed; mark parity item 11 addressed in Cursor backlog / future `mfr7-feature-parity.plan.md` when that doc is saved. No new user Help site required unless Help/About lands first.
 - **Exit criteria:** Plan + parity backlog point at this feature as shipped modernized script export.
 - **Tests:** none.
-- **Status:** Open
+- **Status:** Done
