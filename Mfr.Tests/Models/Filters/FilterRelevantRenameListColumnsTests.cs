@@ -13,11 +13,13 @@ using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Id3v1;
 using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.Tags.Id3v1;
 
 namespace Mfr.Tests.Models.Filters
 {
@@ -50,6 +52,46 @@ namespace Mfr.Tests.Models.Filters
                 ],
                 keys
             );
+        }
+
+        /// <summary>
+        /// Verifies ID3v1 Apply-To maps to the MP3 ID3v1 catalog field (Original + Preview), not MediaTag.
+        /// </summary>
+        [Fact]
+        public void Collect_StringTarget_Id3v1Title_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([
+                new RemoveSpacesFilter(new Id3v1FieldTarget(Id3v1Field.Title)),
+            ]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Title"),
+                    RenameListFieldKey.Preview(Id3v1RenameListFields.Group, "Title"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies Formatter on ID3v1 maps to ID3v1 Original + Preview only (not MediaTag).
+        /// </summary>
+        [Fact]
+        public void Collect_Formatter_Id3v1Artist_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([
+                new FormatterFilter(new Id3v1FieldTarget(Id3v1Field.Artist), new FormatterOptions("x")),
+            ]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Artist"),
+                    RenameListFieldKey.Preview(Id3v1RenameListFields.Group, "Artist"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
         }
 
         /// <summary>

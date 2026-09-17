@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: id3v1-fields
     content: "P2: Id3v1RenameListFields (ID3v1) + Id3v1FieldTarget WriteTargets + relevant columns"
-    status: pending
+    status: completed
   - id: xiph-fields
     content: "P3: XiphRenameListFields from XiphKnownKeys + XiphFieldTarget WriteTargets + relevant columns"
     status: pending

@@ -2,6 +2,7 @@ using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Id3v1;
 using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
@@ -450,6 +451,7 @@ namespace Mfr.Tests.Ui.RenameList
                     BasicRenameListField.GroupLabel,
                     ExtendedRenameListFields.GroupLabel,
                     AudioTagRenameListFields.GroupLabel,
+                    Id3v1RenameListFields.GroupLabel,
                     Id3v2RenameListFields.GroupLabel,
                     MediaRenameListFields.GroupLabel,
                     MpegRenameListFields.GroupLabel,
