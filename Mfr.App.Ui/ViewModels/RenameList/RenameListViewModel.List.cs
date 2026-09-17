@@ -187,7 +187,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Counts Rename List rows that would emit path or RAHS ops in a rename script.
         /// </summary>
         /// <returns>Number of scriptable rows.</returns>
-        public int CountRenameScriptItems()
+        internal int CountRenameScriptItems()
         {
             return _renameList.CountRenameScriptItems();
         }
@@ -198,7 +198,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="path">Destination file path.</param>
         /// <param name="format">Bat or PowerShell dialect.</param>
         /// <returns>Scriptable row count written, or <c>0</c> when nothing was written.</returns>
-        public int ExportRenameScript(string path, RenameScriptFormat format)
+        internal int ExportRenameScript(string path, RenameScriptFormat format)
         {
             return _renameList.ExportRenameScript(path, format);
         }

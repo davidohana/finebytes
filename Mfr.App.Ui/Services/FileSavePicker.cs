@@ -28,8 +28,7 @@ namespace Mfr.App.Ui.Services
             CancellationToken cancellationToken = default
         )
         {
-            ArgumentNullException.ThrowIfNull(visual);
-            var storage = TopLevel.GetTopLevel(visual)?.StorageProvider;
+            var storage = _TryGetStorageProvider(visual);
             if (storage is null)
             {
                 return Task.FromResult<string?>(null);
@@ -64,8 +63,7 @@ namespace Mfr.App.Ui.Services
             CancellationToken cancellationToken = default
         )
         {
-            ArgumentNullException.ThrowIfNull(visual);
-            var storage = TopLevel.GetTopLevel(visual)?.StorageProvider;
+            var storage = _TryGetStorageProvider(visual);
             if (storage is null)
             {
                 return Task.FromResult<string?>(null);
@@ -79,6 +77,15 @@ namespace Mfr.App.Ui.Services
                 suggestedFileName,
                 cancellationToken
             );
+        }
+
+        /// <summary>
+        /// Resolves <see cref="IStorageProvider"/> from <paramref name="visual"/>'s top-level window.
+        /// </summary>
+        private static IStorageProvider? _TryGetStorageProvider(Visual visual)
+        {
+            ArgumentNullException.ThrowIfNull(visual);
+            return TopLevel.GetTopLevel(visual)?.StorageProvider;
         }
 
         /// <summary>
