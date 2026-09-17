@@ -36,6 +36,33 @@ namespace Mfr.Tests.Ui.Services.Help
         }
 
         /// <summary>
+        /// Verifies Index and Tips basenames resolve the same way as filter pages.
+        /// </summary>
+        [Theory]
+        [InlineData("index.html")]
+        [InlineData("tips.html")]
+        public void TryOpen_resolves_index_and_tips(string helpFileName)
+        {
+            var helpDir = Path.Combine(Path.GetTempPath(), $"mfr-help-shell-{Guid.NewGuid():N}");
+            Directory.CreateDirectory(helpDir);
+            try
+            {
+                var helpFile = Path.Combine(helpDir, helpFileName);
+                File.WriteAllText(helpFile, "<html></html>");
+                var opener = new RecordingShellOpener();
+                var host = new FilterHelpHost(opener, [helpDir]);
+
+                Assert.True(host.TryOpen(helpFileName, out var fullPath));
+                Assert.Equal(helpFile, fullPath);
+                Assert.Equal([helpFile], opener.OpenedPaths);
+            }
+            finally
+            {
+                Directory.Delete(helpDir, recursive: true);
+            }
+        }
+
+        /// <summary>
         /// Verifies missing help files do not open and return false.
         /// </summary>
         [Fact]

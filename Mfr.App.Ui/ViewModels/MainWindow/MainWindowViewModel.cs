@@ -1,9 +1,10 @@
 using System.ComponentModel;
-using System.Reflection;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.Services;
+using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors;
@@ -22,6 +23,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
     /// </summary>
     public partial class MainWindowViewModel : ViewModelBase
     {
+        private readonly FilterHelpHost _helpHost;
         private bool _previewDirty;
         private bool _previewRunning;
         private Task _previewDrainTask = Task.CompletedTask;
@@ -45,14 +47,19 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// Named presets store. When null, uses an empty manager that does not read AppData
         /// (production passes <see cref="PresetManager.OpenDefault"/>).
         /// </param>
+        /// <param name="helpHost">
+        /// Opens Index / Tips Help HTML. When null, uses a default <see cref="FilterHelpHost"/>.
+        /// </param>
         public MainWindowViewModel(
             string? initialFileListPath = null,
             bool persistSession = false,
             FilterDefaultsStore? filterDefaults = null,
-            PresetManager? presetManager = null
+            PresetManager? presetManager = null,
+            FilterHelpHost? helpHost = null
         )
         {
             PersistSession = persistSession;
+            _helpHost = helpHost ?? new FilterHelpHost();
             FilterChainViewModel = new FilterChainViewModel(
                 filterDefaults ?? FilterDefaultsStore.CreateEmpty(),
                 presetManager ?? PresetManager.CreateEmpty()
@@ -98,7 +105,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             FilterCount = FilterChainViewModel.Count;
             ChangeCount = RenameListViewModel.ChangeCount;
             PreviewErrorCount = RenameListViewModel.PreviewErrorCount;
-            WindowTitle = $"Magic File Renamer {_GetDisplayVersion()}";
+            WindowTitle = $"{AppProductInfo.GetProductName()} {AppProductInfo.GetDisplayVersion()}";
         }
 
         /// <summary>
@@ -306,6 +313,33 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
+        /// Opens Help Index (<c>help/index.html</c>) in the default browser.
+        /// </summary>
+        [RelayCommand]
+        public void ShowHelp()
+        {
+            _OpenHelpFile("index.html");
+        }
+
+        /// <summary>
+        /// Opens Tips (<c>help/tips.html</c>) in the default browser.
+        /// </summary>
+        [RelayCommand]
+        public void ShowTips()
+        {
+            _OpenHelpFile("tips.html");
+        }
+
+        /// <summary>
+        /// Opens the About dialog.
+        /// </summary>
+        [RelayCommand]
+        public void ShowAbout()
+        {
+            AboutRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
         /// When <see langword="true"/>, closing this window does not write session into <c>config.json</c>
         /// (Reset Configuration after deleting persisted files).
         /// </summary>
@@ -315,6 +349,16 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// Raised when the user chooses Tools → Options; the main window hosts the dialog.
         /// </summary>
         internal event EventHandler? OptionsRequested;
+
+        /// <summary>
+        /// Raised when Help Index or Tips HTML is missing; the main window shows the missing-help dialog.
+        /// </summary>
+        internal event EventHandler<string>? HelpMissing;
+
+        /// <summary>
+        /// Raised when the user chooses Help → About; the main window hosts the dialog.
+        /// </summary>
+        internal event EventHandler? AboutRequested;
 
         /// <summary>
         /// Raised when the user chooses MFR → Log; the main window hosts the dialog.
@@ -539,17 +583,14 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             StatusHint = message;
         }
 
-        private static string _GetDisplayVersion()
+        private void _OpenHelpFile(string helpFileName)
         {
-            var informational = typeof(MainWindowViewModel)
-                .Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()
-                ?.InformationalVersion;
-            if (!string.IsNullOrWhiteSpace(informational))
+            if (_helpHost.TryOpen(helpFileName, out _))
             {
-                return informational;
+                return;
             }
 
-            return typeof(MainWindowViewModel).Assembly.GetName().Version?.ToString(3) ?? "unknown";
+            HelpMissing?.Invoke(this, helpFileName);
         }
     }
 }
