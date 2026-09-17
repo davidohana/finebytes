@@ -16,7 +16,7 @@ todos:
     status: completed
   - id: p5-general-cli-faqs
     content: "P5: license/site/contact/credits/FAQs/CLI help pages"
-    status: pending
+    status: completed
   - id: p6-polish-nav
     content: "P6: filter breadcrumbs to Index, figcaption cleanup, skills/layering sync"
     status: pending
