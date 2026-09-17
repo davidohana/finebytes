@@ -107,6 +107,72 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Verifies PrepareUndo restores a multi-dot Extension write that Path re-splits after GO.
+        /// </summary>
+        [Fact]
+        public void PrepareUndo_then_Commit_restores_multi_dot_extension()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("song.mp3");
+            var renamedPath = dir.CombinePath("song..mp.3");
+            File.WriteAllText(sourcePath, "x");
+
+            var renameList = new RenameList();
+            renameList.AddSources([sourcePath]);
+            var goPlan = renameList.Preview(_ExtensionFormatterPreset("go", ".mp.3").Chain);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(renameList.Commit(goPlan, failFast: false)).Status);
+            Assert.True(File.Exists(renamedPath));
+            Assert.False(File.Exists(sourcePath));
+
+            var prepare = renameList.PrepareUndo(RenameLogStore.LastOperation!);
+            Assert.Equal(0, prepare.NotLoadedCount);
+            Assert.Equal(1, prepare.PreparedCount);
+
+            var prepared = Assert.Single(renameList.RenameItems);
+            Assert.Equal(renamedPath, prepared.Original.FullPath);
+            Assert.Equal(sourcePath, prepared.Preview.FullPath);
+
+            var results = renameList.Commit(prepare.Plan, failFast: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+            Assert.True(File.Exists(sourcePath));
+            Assert.False(File.Exists(renamedPath));
+            Assert.Equal(sourcePath, Assert.Single(results).DestinationPath);
+        }
+
+        /// <summary>
+        /// Verifies PrepareUndo restores empty Extension with dots left in FileName after Path re-split.
+        /// </summary>
+        [Fact]
+        public void PrepareUndo_then_Commit_restores_dotted_filename_with_empty_extension()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("file.txt");
+            var renamedPath = dir.CombinePath("file.backup");
+            File.WriteAllText(sourcePath, "x");
+
+            var renameList = new RenameList();
+            renameList.AddSources([sourcePath]);
+            var goPlan = renameList.Preview(_DottedFileNameEmptyExtensionPreset("go").Chain);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(renameList.Commit(goPlan, failFast: false)).Status);
+            Assert.True(File.Exists(renamedPath));
+            Assert.False(File.Exists(sourcePath));
+
+            var prepare = renameList.PrepareUndo(RenameLogStore.LastOperation!);
+            Assert.Equal(0, prepare.NotLoadedCount);
+            Assert.Equal(1, prepare.PreparedCount);
+
+            var prepared = Assert.Single(renameList.RenameItems);
+            Assert.Equal(renamedPath, prepared.Original.FullPath);
+            Assert.Equal(sourcePath, prepared.Preview.FullPath);
+
+            var results = renameList.Commit(prepare.Plan, failFast: false);
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
+            Assert.True(File.Exists(sourcePath));
+            Assert.False(File.Exists(renamedPath));
+            Assert.Equal(sourcePath, Assert.Single(results).DestinationPath);
+        }
+
+        /// <summary>
         /// Verifies empty-chain re-preview keeps sticky OldValues after PrepareUndo.
         /// </summary>
         [Fact]
@@ -589,6 +655,39 @@ namespace Mfr.Tests.Engine
                 Description = null,
                 Chain = FilterChain.CreateAllEnabled([
                     new FormatterFilter(Target: new FileNameTarget(), Options: new FormatterOptions(prefix)),
+                ]),
+            };
+        }
+
+        private static FilterPreset _ExtensionFormatterPreset(string name, string extension)
+        {
+            return new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled([
+                    new FormatterFilter(
+                        Target: new FileExtensionTarget(),
+                        Options: new FormatterOptions(extension)
+                    ),
+                ]),
+            };
+        }
+
+        private static FilterPreset _DottedFileNameEmptyExtensionPreset(string name)
+        {
+            return new FilterPreset
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                Description = null,
+                Chain = FilterChain.CreateAllEnabled([
+                    new FormatterFilter(
+                        Target: new FileNameTarget(),
+                        Options: new FormatterOptions("file.backup")
+                    ),
+                    new FormatterFilter(Target: new FileExtensionTarget(), Options: new FormatterOptions("")),
                 ]),
             };
         }

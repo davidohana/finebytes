@@ -709,6 +709,94 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
+        /// Expands sticky path OldValues from <see cref="RenameLogEntry.OriginalPath"/> when the log
+        /// recorded any path-field change.
+        /// </summary>
+        /// <param name="entry">Undoable log row whose <see cref="RenameLogEntry.Changes"/> may list path fields.</param>
+        /// <returns>
+        /// Original changes when no path property was logged; otherwise non-path rows plus FileName /
+        /// Extension / DirectoryPath OldValues parsed from <see cref="RenameLogEntry.OriginalPath"/>.
+        /// </returns>
+        /// <remarks>
+        /// <para>
+        /// Needed when GO stored a multi-dot Extension (or empty Extension with dots in FileName): after
+        /// reload, <c>Path.GetExtension</c> re-splits the name so applying Extension alone cannot
+        /// restore the pre-commit path. <see cref="RenameLogEntry.OriginalPath"/> is authoritative.
+        /// </para>
+        /// </remarks>
+        private static IReadOnlyList<RenamePropertyChange> _ExpandStickyChangesForPathUndo(RenameLogEntry entry)
+        {
+            var changes = entry.Changes;
+            var hasPathChange = false;
+            foreach (var change in changes)
+            {
+                if (
+                    change.Property
+                    is RenamePropertyNames.FileName
+                        or RenamePropertyNames.Extension
+                        or RenamePropertyNames.DirectoryPath
+                )
+                {
+                    hasPathChange = true;
+                    break;
+                }
+            }
+
+            if (!hasPathChange)
+            {
+                return changes;
+            }
+
+            var originalPath = entry.OriginalPath;
+            var destinationPath = entry.DestinationPath;
+            var oldDirectoryPath = Path.GetDirectoryName(originalPath) ?? string.Empty;
+            var oldFileName = Path.GetFileNameWithoutExtension(originalPath);
+            var oldExtension = FileMeta.ExtensionWithoutDot(originalPath);
+            var newDirectoryPath = Path.GetDirectoryName(destinationPath) ?? string.Empty;
+            var newFileName = Path.GetFileNameWithoutExtension(destinationPath);
+            var newExtension = FileMeta.ExtensionWithoutDot(destinationPath);
+
+            var expanded = new List<RenamePropertyChange>(changes.Count + 3);
+            foreach (var change in changes)
+            {
+                if (
+                    change.Property
+                    is RenamePropertyNames.FileName
+                        or RenamePropertyNames.Extension
+                        or RenamePropertyNames.DirectoryPath
+                )
+                {
+                    continue;
+                }
+
+                expanded.Add(change);
+            }
+
+            expanded.Add(
+                new RenamePropertyChange(
+                    Property: RenamePropertyNames.DirectoryPath,
+                    OldValue: oldDirectoryPath,
+                    NewValue: newDirectoryPath
+                )
+            );
+            expanded.Add(
+                new RenamePropertyChange(
+                    Property: RenamePropertyNames.FileName,
+                    OldValue: oldFileName,
+                    NewValue: newFileName
+                )
+            );
+            expanded.Add(
+                new RenamePropertyChange(
+                    Property: RenamePropertyNames.Extension,
+                    OldValue: oldExtension,
+                    NewValue: newExtension
+                )
+            );
+            return expanded;
+        }
+
+        /// <summary>
         /// Mirrors sticky OldValues onto preview-side ForceValue overrides for writable mapped fields.
         /// </summary>
         /// <param name="item">Row whose Preview already has sticky OldValues applied.</param>
@@ -839,7 +927,7 @@ namespace Mfr.Engine.RenameList
 
                 try
                 {
-                    item.SetStickyUndoChanges(logEntry.Changes);
+                    item.SetStickyUndoChanges(_ExpandStickyChangesForPathUndo(logEntry));
                     _ReapplyStickyUndo(item);
                     item.Status = RenameStatus.PreviewOk;
                     preparedCount++;
