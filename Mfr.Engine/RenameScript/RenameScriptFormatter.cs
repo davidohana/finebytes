@@ -10,6 +10,14 @@ namespace Mfr.Engine.RenameScript
         private const string _AppName = "Magic File Renamer";
         private const string _AppUrl = "http://www.finebytes.com/mfr";
 
+        private static readonly (FileAttributes Flag, char Letter, string Name)[] _RahsFlags =
+        [
+            (FileAttributes.ReadOnly, 'R', "ReadOnly"),
+            (FileAttributes.Archive, 'A', "Archive"),
+            (FileAttributes.Hidden, 'H', "Hidden"),
+            (FileAttributes.System, 'S', "System"),
+        ];
+
         /// <summary>
         /// Renders <paramref name="opGroups"/> as a complete script for <paramref name="format"/>.
         /// </summary>
@@ -22,38 +30,25 @@ namespace Mfr.Engine.RenameScript
 
             return format switch
             {
-                RenameScriptFormat.Bat => _FormatBat(opGroups),
-                RenameScriptFormat.PowerShell => _FormatPowerShell(opGroups),
+                RenameScriptFormat.Bat => _Format(opGroups, _AppendBatHeader, _AppendBatOp),
+                RenameScriptFormat.PowerShell => _Format(opGroups, _AppendPowerShellHeader, _AppendPowerShellOp),
                 _ => throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported rename script format."),
             };
         }
 
-        private static string _FormatBat(IReadOnlyList<IReadOnlyList<RenameScriptOp>> opGroups)
+        private static string _Format(
+            IReadOnlyList<IReadOnlyList<RenameScriptOp>> opGroups,
+            Action<StringBuilder> appendHeader,
+            Action<StringBuilder, RenameScriptOp> appendOp
+        )
         {
             var sb = new StringBuilder();
-            _AppendBatHeader(sb);
+            appendHeader(sb);
             foreach (var group in opGroups)
             {
                 foreach (var op in group)
                 {
-                    _AppendBatOp(sb, op);
-                }
-
-                sb.AppendLine();
-            }
-
-            return sb.ToString();
-        }
-
-        private static string _FormatPowerShell(IReadOnlyList<IReadOnlyList<RenameScriptOp>> opGroups)
-        {
-            var sb = new StringBuilder();
-            _AppendPowerShellHeader(sb);
-            foreach (var group in opGroups)
-            {
-                foreach (var op in group)
-                {
-                    _AppendPowerShellOp(sb, op);
+                    appendOp(sb, op);
                 }
 
                 sb.AppendLine();
@@ -140,7 +135,7 @@ namespace Mfr.Engine.RenameScript
 
         private static void _AppendPowerShellFlagOps(StringBuilder sb, FileAttributes flags, bool set)
         {
-            foreach (var (flag, name) in _RahsFlagNames())
+            foreach (var (flag, _, name) in _RahsFlags)
             {
                 if ((flags & flag) == 0)
                 {
@@ -163,7 +158,7 @@ namespace Mfr.Engine.RenameScript
         private static string _FormatBatAttribArgs(SetRahsAttributes attrs)
         {
             var sb = new StringBuilder();
-            foreach (var (flag, letter) in _RahsFlagLetters())
+            foreach (var (flag, letter, _) in _RahsFlags)
             {
                 if ((attrs.SetFlags & flag) != 0)
                 {
@@ -182,27 +177,17 @@ namespace Mfr.Engine.RenameScript
             return sb.ToString();
         }
 
-        private static IEnumerable<(FileAttributes Flag, char Letter)> _RahsFlagLetters()
-        {
-            yield return (FileAttributes.ReadOnly, 'R');
-            yield return (FileAttributes.Archive, 'A');
-            yield return (FileAttributes.Hidden, 'H');
-            yield return (FileAttributes.System, 'S');
-        }
-
-        private static IEnumerable<(FileAttributes Flag, string Name)> _RahsFlagNames()
-        {
-            yield return (FileAttributes.ReadOnly, "ReadOnly");
-            yield return (FileAttributes.Archive, "Archive");
-            yield return (FileAttributes.Hidden, "Hidden");
-            yield return (FileAttributes.System, "System");
-        }
-
+        /// <summary>
+        /// Quotes a cmd.exe path/name, doubling embedded double quotes.
+        /// </summary>
         private static string _BatQuote(string value)
         {
             return $"\"{value.Replace("\"", "\"\"", StringComparison.Ordinal)}\"";
         }
 
+        /// <summary>
+        /// Quotes a PowerShell single-quoted literal, doubling embedded single quotes.
+        /// </summary>
         private static string _PsQuote(string value)
         {
             return $"'{value.Replace("'", "''", StringComparison.Ordinal)}'";

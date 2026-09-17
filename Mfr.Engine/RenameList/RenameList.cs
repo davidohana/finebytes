@@ -403,16 +403,7 @@ namespace Mfr.Engine.RenameList
             var opGroups = RenameScriptCollector.Collect(_renameItems);
             var text = RenameScriptFormatter.Format(opGroups, format);
             // Format validated above; encode Bat without BOM and PowerShell with BOM.
-            UTF8Encoding encoding;
-            if (format == RenameScriptFormat.PowerShell)
-            {
-                encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: true);
-            }
-            else
-            {
-                encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: false);
-            }
-
+            var encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: format == RenameScriptFormat.PowerShell);
             File.WriteAllText(path, text, encoding);
         }
 

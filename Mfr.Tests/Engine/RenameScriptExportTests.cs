@@ -174,6 +174,85 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Clearing RAHS bits emits <c>-Letter</c> / <c>-band -bnot</c> on the path.
+        /// </summary>
+        [Fact]
+        public void Format_attrs_clear_matches_golden_bat_and_ps1()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                fileName: "notes",
+                extension: "txt",
+                directory: @"D:\Docs",
+                attributes: FileAttributes.ReadOnly | FileAttributes.Archive
+            );
+            item.Preview.Attributes = FileAttributes.Archive;
+
+            _AssertFormats(
+                [item],
+                expectedBat: _HeaderBat + "attrib -R \"D:\\Docs\\notes.txt\"\n" + "\n",
+                expectedPs1: _HeaderPs1
+                    + "$item = Get-Item -LiteralPath 'D:\\Docs\\notes.txt' -Force\n"
+                    + "$item.Attributes = $item.Attributes -band (-bnot [System.IO.FileAttributes]::ReadOnly)\n"
+                    + "\n"
+            );
+        }
+
+        /// <summary>
+        /// Move plus attrs applies attrib / set on the preview destination path (not the source).
+        /// </summary>
+        [Fact]
+        public void Format_move_plus_attrs_targets_preview_path()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                fileName: "song",
+                extension: "mp3",
+                directory: @"D:\In",
+                attributes: FileAttributes.Normal
+            );
+            item.Preview.DirectoryPath = @"D:\Out";
+            item.Preview.Attributes = FileAttributes.Hidden;
+
+            _AssertFormats(
+                [item],
+                expectedBat: _HeaderBat
+                    + "if not exist \"D:\\Out\" mkdir \"D:\\Out\"\n"
+                    + "move \"D:\\In\\song.mp3\" \"D:\\Out\\song.mp3\"\n"
+                    + "attrib +H \"D:\\Out\\song.mp3\"\n"
+                    + "\n",
+                expectedPs1: _HeaderPs1
+                    + "if (-not (Test-Path -LiteralPath 'D:\\Out')) { New-Item -ItemType Directory -Path 'D:\\Out' | Out-Null }\n"
+                    + "Move-Item -LiteralPath 'D:\\In\\song.mp3' -Destination 'D:\\Out\\song.mp3'\n"
+                    + "$item = Get-Item -LiteralPath 'D:\\Out\\song.mp3' -Force\n"
+                    + "$item.Attributes = $item.Attributes -bor [System.IO.FileAttributes]::Hidden\n"
+                    + "\n"
+            );
+        }
+
+        /// <summary>
+        /// Embedded quotes in paths are escaped for cmd (<c>""</c>) and PowerShell (<c>''</c>).
+        /// </summary>
+        [Fact]
+        public void Format_escapes_quotes_in_paths()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                fileName: "O'Brien \"quote\"",
+                extension: "txt",
+                directory: @"D:\Artist's ""Folder"""
+            );
+            item.Preview.FileName = "done";
+
+            _AssertFormats(
+                [item],
+                expectedBat: _HeaderBat
+                    + "ren \"D:\\Artist's \"\"Folder\"\"\\O'Brien \"\"quote\"\".txt\" \"done.txt\"\n"
+                    + "\n",
+                expectedPs1: _HeaderPs1
+                    + "Rename-Item -LiteralPath 'D:\\Artist''s \"Folder\"\\O''Brien \"quote\".txt' -NewName 'done.txt'\n"
+                    + "\n"
+            );
+        }
+
+        /// <summary>
         /// PreviewError rows are omitted from the script.
         /// </summary>
         [Fact]

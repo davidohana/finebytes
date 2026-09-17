@@ -5,9 +5,6 @@ namespace Mfr.Engine.RenameScript
     /// </summary>
     public static class RenameScriptCollector
     {
-        private const FileAttributes _RahsFlags =
-            FileAttributes.ReadOnly | FileAttributes.Archive | FileAttributes.Hidden | FileAttributes.System;
-
         /// <summary>
         /// Collects script operations for each scriptable row, preserving list order.
         /// </summary>
@@ -63,6 +60,9 @@ namespace Mfr.Engine.RenameScript
             return ops;
         }
 
+        /// <summary>
+        /// Same-parent ordinal path → <see cref="RenameSameFolder"/> (includes case-only); otherwise <see cref="MoveWithParent"/>.
+        /// </summary>
         private static RenameScriptOp _CreatePathOp(RenameItem item)
         {
             var originalDir = item.Original.DirectoryPath;
@@ -80,13 +80,16 @@ namespace Mfr.Engine.RenameScript
             );
         }
 
+        /// <summary>
+        /// RAHS bits to turn on/off so preview matches original for the MFR7 attribute set only.
+        /// </summary>
         private static (FileAttributes SetFlags, FileAttributes ClearFlags) _RahsDelta(
             FileAttributes original,
             FileAttributes preview
         )
         {
-            var originalRahs = original & _RahsFlags;
-            var previewRahs = preview & _RahsFlags;
+            var originalRahs = original & FileAttributesRahs.Mask;
+            var previewRahs = preview & FileAttributesRahs.Mask;
             var setFlags = previewRahs & ~originalRahs;
             var clearFlags = originalRahs & ~previewRahs;
             return (setFlags, clearFlags);
