@@ -186,7 +186,7 @@ Use `Help/Images/hotspots.gif` for labeled shell regions.
 ## Related finebytes skills and docs
 
 - Feature plans: [mfr-feature-plan](../mfr-feature-plan/SKILL.md)
-- Phase / backlog orchestration: [mfr-plan-phase](../mfr-plan-phase/SKILL.md)
+- Phase / backlog orchestration: [mfr-impl-plan](../mfr-impl-plan/SKILL.md)
 - Implement filters: [mfr-implement-filter](../mfr-implement-filter/SKILL.md)
 - Implement filter editors: [mfr-implement-filter-editor](../mfr-implement-filter-editor/SKILL.md)
 - Filter name / group map: [filter-map.md](filter-map.md)

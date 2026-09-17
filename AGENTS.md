@@ -78,4 +78,4 @@ Cloud Agents run on Linux (Ubuntu 24.04), but Magic File Renamer is a Windows-ta
 - `docs/debts.md` (deferred / later-work list)
 - `docs/plans/` (implementation / feature plans)
 - `.editorconfig`
-- Skills: `.agents/skills/` — `mfr-code-review`, `mfr-feature-plan`, `mfr-implement-filter`, `mfr-implement-filter-editor`, `mfr-plan-phase`, `mfr-queue`, `mfr7-reference`, `mfr-ui-headless-tests`
+- Skills: `.agents/skills/` — `mfr-code-review`, `mfr-feature-plan`, `mfr-implement-filter`, `mfr-implement-filter-editor`, `mfr-impl-plan`, `mfr-queue`, `mfr7-reference`, `mfr-ui-headless-tests`

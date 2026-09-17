@@ -1,17 +1,17 @@
 ---
-name: mfr-plan-phase
+name: mfr-impl-plan
 description: >-
   Orchestrates the finebytes/MFR phase machine (implement → optional review →
   commit → next) for plan slices. Use ONLY when the user explicitly asks for that
-  machine: @mfr-plan-phase, “phase machine”, “each phase then review then commit”,
-  “do all pending phases”, or “review and commit after each”. Do NOT use for a
-  plain “implement phase X / do item N / do it” request — that is implement-only
-  (no auto-review, no auto-commit). Not for writing a new feature plan
-  (mfr-feature-plan) or a single filter/editor without orchestration
+  machine: @mfr-impl-plan, “impl plan”, “phase machine”, “each phase then review
+  then commit”, “do all pending phases”, or “review and commit after each”. Do
+  NOT use for a plain “implement phase X / do item N / do it” request — that is
+  implement-only (no auto-review, no auto-commit). Not for writing a new feature
+  plan (mfr-feature-plan) or a single filter/editor without orchestration
   (mfr-implement-filter / mfr-implement-filter-editor).
 ---
 
-# MFR plan phase orchestration
+# MFR impl plan
 
 Drive **one plan slice at a time** with compact subagent briefs. Do not paste skill
 bodies or `AGENTS.md` into Task prompts — tell agents to **read** the skill path.
@@ -20,7 +20,7 @@ Canonical plans: `docs/plans/*.plan.md` only (never `.cursor/plans/`).
 
 ## When this skill applies
 
-- **Yes (full machine)** — `@mfr-plan-phase`, “phase machine”, “each phase then review then commit”, “do all pending”, “review and commit after each” → implement → (review if needed) → commit → mark → next; deferred reviews batch at end
+- **Yes (full machine)** — `@mfr-impl-plan`, “impl plan”, “phase machine”, “each phase then review then commit”, “do all pending”, “review and commit after each” → implement → (review if needed) → commit → mark → next; deferred reviews batch at end
 - **No (implement-only)** — “implement phase X”, “do P3”, “Open — do #N”, “do it”, paste a plan section → implement that slice only; stop. No review subagent, no commit unless the user separately asked to commit
 
 Plain implement work still follows the plan section’s exit criteria and may mark the plan todo done; it is **not** the phase machine.

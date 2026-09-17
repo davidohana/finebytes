@@ -5,7 +5,7 @@ description: >-
   MFR7 once via mfr7-reference, lock blocking decisions, split phases. Use when
   the user says plan in details, handover a plan, or designs a new Rename List /
   Filter Chain / FormatEditor / presets / export feature before coding — not
-  for implementing phases (use mfr-plan-phase) or a single filter/editor
+  for implementing phases (use mfr-impl-plan) or a single filter/editor
   (use mfr-implement-filter / mfr-implement-filter-editor).
 ---
 
@@ -26,7 +26,7 @@ Feature plan:
 - [ ] 4. Blocking decisions — ask at most 1–2 critical questions; lock answers in the plan
 - [ ] 5. Phase split — small shippable slices with file scope + exit criteria
 - [ ] 6. Write plan — todos, locked decisions, MFR7 brief, non-goals
-- [ ] 7. Stop — wait for implement / mfr-plan-phase unless user said implement now
+- [ ] 7. Stop — wait for implement / mfr-impl-plan unless user said implement now
 ```
 
 ## Blocking decisions only
@@ -73,5 +73,5 @@ Link the parent plan section when this is a child (e.g. rename-list 14d).
 
 ## Exit
 
-Hand the user: plan path, locked decisions, phase list. Suggest `mfr-plan-phase`
+Hand the user: plan path, locked decisions, phase list. Suggest `mfr-impl-plan`
 for execution. Do not start coding in the same turn unless asked.
