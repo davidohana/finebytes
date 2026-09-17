@@ -72,8 +72,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         private async Task _AddSourcesAsync(IReadOnlyList<string> sources)
         {
-            if (sources.Count == 0 || IsBusy)
+            if (IsBusy)
             {
+                LastStatusMessage = StatusBarText.Warning("Rename List is busy.");
+                return;
+            }
+
+            if (sources.Count == 0)
+            {
+                LastStatusMessage = StatusBarText.Warning("No items were added.");
                 return;
             }
 
@@ -303,7 +310,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanAddAll()
         {
-            if (IsBusy)
+            if (IsBusy || _fileListViewModel.IsListing)
             {
                 return false;
             }

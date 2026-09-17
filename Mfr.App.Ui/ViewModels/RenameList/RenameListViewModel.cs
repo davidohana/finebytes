@@ -408,6 +408,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 is nameof(FileListViewModel.SelectedEntry)
                     or nameof(FileListViewModel.SelectedEntries)
                     or nameof(FileListViewModel.CurrentPath)
+                    or nameof(FileListViewModel.IsListing)
                     or nameof(FileListViewModel.Mask)
                     or nameof(FileListViewModel.ExcludeMasksEnabled)
                     or nameof(FileListViewModel.ExcludeMasks);

@@ -115,9 +115,11 @@ namespace Mfr.Tests.Ui.RenameList
 
             await renameListViewModel.AddPathsAsync([]);
             Assert.Empty(renameListViewModel.Entries);
+            Assert.Equal("No items were added.", renameListViewModel.LastStatusMessage.ToPlainText());
 
             await renameListViewModel.AddPathsAsync([FileListPath.ComputerPath]);
             Assert.Empty(renameListViewModel.Entries);
+            Assert.Equal("No items were added.", renameListViewModel.LastStatusMessage.ToPlainText());
         }
 
         /// <summary>
@@ -144,9 +146,36 @@ namespace Mfr.Tests.Ui.RenameList
             await _WaitUntil(() => renameListViewModel.IsBusy);
 
             await renameListViewModel.AddPathsAsync([Path.Combine(tree, "d000", "f000.txt")]);
+            Assert.Equal("Rename List is busy.", renameListViewModel.LastStatusMessage.ToPlainText());
+            Assert.Equal(
+                StatusBarText.WarningForegroundResourceKey,
+                renameListViewModel.LastStatusMessage.Runs[0].ForegroundResourceKey
+            );
+
             await addSelected;
 
             Assert.Equal(200, renameListViewModel.Entries.Count);
+        }
+
+        /// <summary>
+        /// Verifies Add All is disabled while the File List is still listing.
+        /// </summary>
+        [Fact]
+        public void AddAll_Disabled_While_FileList_IsListing()
+        {
+            var dir = _CreateSampleFolder();
+            var fileListViewModel = FileListListingWait.CreateWithGatedList(dir, out var gate);
+            _context.Track(fileListViewModel);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+
+            Assert.True(gate.Started.Wait(TimeSpan.FromSeconds(10)));
+            Assert.True(fileListViewModel.IsListing);
+            Assert.False(renameListViewModel.AddAllCommand.CanExecute(null));
+
+            gate.Release.Set();
+            FileListListingWait.WaitUntilIdle(fileListViewModel);
+
+            Assert.True(renameListViewModel.AddAllCommand.CanExecute(null));
         }
 
         /// <summary>

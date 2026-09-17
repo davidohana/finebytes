@@ -240,6 +240,16 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Takes ownership of an externally created File List for dispose with this context.
+        /// </summary>
+        /// <param name="fileListViewModel">File List to dispose with the context.</param>
+        public void Track(FileListViewModel fileListViewModel)
+        {
+            ArgumentNullException.ThrowIfNull(fileListViewModel);
+            _fileListViewModels.Add(fileListViewModel);
+        }
+
+        /// <summary>
         /// Creates a Rename List view model over a File List at <paramref name="directoryPath"/>.
         /// </summary>
         /// <param name="directoryPath">Directory path, or a new temp dir when omitted.</param>
