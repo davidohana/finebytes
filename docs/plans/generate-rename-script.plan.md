@@ -76,7 +76,7 @@ Parent: Cursor backlog MFR7 feature parity item **11** (P2).
   - Optional thin VM test; headless only if picker hooks already exist for export patterns.
 - **Exit criteria:** Menu path writes `.bat` or `.ps1` from current list; cancel leaves list unchanged.
 - **Tests:** VM or picker-hook test for format inference + status text; reuse engine fixtures.
-- **Status:** Open
+- **Status:** Done
 
 ### P3 — Docs / backlog note
 

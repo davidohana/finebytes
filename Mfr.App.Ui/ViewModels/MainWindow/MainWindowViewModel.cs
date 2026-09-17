@@ -11,6 +11,7 @@ using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Engine.Presets;
 using Mfr.Engine.RenameLog;
+using Mfr.Engine.RenameScript;
 using Mfr.Models.Config;
 using Mfr.Models.Rename;
 using Mfr.Utils;
@@ -333,6 +334,103 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         public void ResetConfiguration()
         {
             ResetConfigurationRequested?.Invoke(this, EventArgs.Empty);
+        }
+
+        /// <summary>
+        /// Save-path picker for Tools → Generate Rename Script (wired by the main window; set in tests).
+        /// </summary>
+        /// <remarks>
+        /// <para>When null, Generate Rename Script is a no-op after the empty-list gate.</para>
+        /// </remarks>
+        internal Func<Task<string?>>? PickRenameScriptPathAsync { get; set; }
+
+        /// <summary>
+        /// Exports pending path and RAHS attribute changes as a <c>.bat</c> or <c>.ps1</c> script.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Gates empty Collect before the save dialog. Format follows the chosen extension.
+        /// Outcomes land on <see cref="RenameListViewModel.LastStatusMessage"/> (success, cancel,
+        /// no scriptable changes, invalid extension, or IO error).
+        /// </para>
+        /// </remarks>
+        [RelayCommand]
+        public async Task GenerateRenameScriptAsync()
+        {
+            var renameList = RenameListViewModel;
+            if (renameList.IsBusy)
+            {
+                return;
+            }
+
+            if (renameList.CountRenameScriptItems() == 0)
+            {
+                renameList.LastStatusMessage = StatusBarText.Warning("No scriptable changes to export.");
+                return;
+            }
+
+            var pick = PickRenameScriptPathAsync;
+            if (pick is null)
+            {
+                return;
+            }
+
+            var path = await pick().ConfigureAwait(true);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                renameList.LastStatusMessage = StatusBarText.Neutral("Generate Rename Script cancelled.");
+                return;
+            }
+
+            if (!_TryInferRenameScriptFormat(path, out var format))
+            {
+                renameList.LastStatusMessage = StatusBarText.Error("Choose a .bat or .ps1 file.");
+                return;
+            }
+
+            if (renameList.IsBusy)
+            {
+                return;
+            }
+
+            try
+            {
+                var count = renameList.ExportRenameScript(path, format);
+                if (count == 0)
+                {
+                    renameList.LastStatusMessage = StatusBarText.Warning("No scriptable changes to export.");
+                    return;
+                }
+
+                renameList.LastStatusMessage = StatusBarText.Neutral($"Generated rename script for {count} item(s).");
+                renameList.RevealExportedPath(path);
+            }
+            catch (Exception ex)
+            {
+                renameList.LastStatusMessage = StatusBarText.Error($"Failed to generate rename script: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Maps a save path extension to bat or PowerShell.
+        /// </summary>
+        private static bool _TryInferRenameScriptFormat(string path, out RenameScriptFormat format)
+        {
+            var extension = Path.GetExtension(path);
+            if (extension.Equals(".bat", StringComparison.OrdinalIgnoreCase))
+            {
+                format = RenameScriptFormat.Bat;
+                return true;
+            }
+
+            if (extension.Equals(".ps1", StringComparison.OrdinalIgnoreCase))
+            {
+                format = RenameScriptFormat.PowerShell;
+                return true;
+            }
+
+            format = default;
+            return false;
         }
 
         /// <summary>

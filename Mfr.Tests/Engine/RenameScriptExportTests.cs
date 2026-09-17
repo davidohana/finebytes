@@ -308,8 +308,8 @@ namespace Mfr.Tests.Engine
 
             var batPath = Path.Combine(_tempRoot, "out.bat");
             var ps1Path = Path.Combine(_tempRoot, "out.ps1");
-            renameList.ExportRenameScript(batPath, RenameScriptFormat.Bat);
-            renameList.ExportRenameScript(ps1Path, RenameScriptFormat.PowerShell);
+            Assert.Equal(1, renameList.ExportRenameScript(batPath, RenameScriptFormat.Bat));
+            Assert.Equal(1, renameList.ExportRenameScript(ps1Path, RenameScriptFormat.PowerShell));
 
             var batBytes = File.ReadAllBytes(batPath);
             var ps1Bytes = File.ReadAllBytes(ps1Path);
@@ -324,6 +324,27 @@ namespace Mfr.Tests.Engine
                 ps1Text,
                 StringComparison.Ordinal
             );
+        }
+
+        /// <summary>
+        /// Empty Collect returns 0 and does not create the destination file.
+        /// </summary>
+        [Fact]
+        public void ExportRenameScript_empty_collect_returns_zero_without_writing()
+        {
+            var dir = Path.Combine(_tempRoot, "empty");
+            Directory.CreateDirectory(dir);
+            var sourcePath = Path.Combine(dir, "same.txt");
+            File.WriteAllText(sourcePath, "x");
+
+            var renameList = new RenameList();
+            renameList.AddSources([sourcePath]);
+            Assert.Single(renameList.RenameItems);
+
+            var outPath = Path.Combine(_tempRoot, "empty.bat");
+            Assert.Equal(0, renameList.ExportRenameScript(outPath, RenameScriptFormat.Bat));
+            Assert.False(File.Exists(outPath));
+            Assert.Equal(0, renameList.CountRenameScriptItems());
         }
 
         private static void _AssertFormats(IEnumerable<RenameItem> items, string expectedBat, string expectedPs1)
