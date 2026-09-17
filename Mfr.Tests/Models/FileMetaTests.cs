@@ -13,6 +13,8 @@ namespace Mfr.Tests.Models
         [InlineData("track", "", "track")]
         [InlineData("", "txt", ".txt")]
         [InlineData("", "", "")]
+        [InlineData("song", ".mp.3", "song.mp.3")]
+        [InlineData("song", "mp.3", "song.mp.3")]
         public void FullFileName_composes_file_name_and_extension(string fileName, string extension, string expected)
         {
             var meta = new FileMeta(
@@ -24,6 +26,82 @@ namespace Mfr.Tests.Models
             );
 
             Assert.Equal(expected, meta.FullFileName);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="FileMeta.CanonicalizeFileNameAndExtension"/> Path-folds multi-dot and leading-dot Extension.
+        /// </summary>
+        [Theory]
+        [InlineData("song", ".mp.3", "song.mp", "3")]
+        [InlineData("song", "mp.3", "song.mp", "3")]
+        [InlineData("song", "mp3", "song", "mp3")]
+        [InlineData("my.cool.song", "mp3", "my.cool.song", "mp3")]
+        [InlineData("file.backup", "", "file", "backup")]
+        public void CanonicalizeFileNameAndExtension_folds_to_path_round_trip(
+            string fileName,
+            string extension,
+            string expectedFileName,
+            string expectedExtension
+        )
+        {
+            var meta = new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: TestPaths.Absolute("album"),
+                fileName: fileName,
+                extension: extension
+            );
+
+            meta.CanonicalizeFileNameAndExtension();
+
+            Assert.Equal(expectedFileName, meta.FileName);
+            Assert.Equal(expectedExtension, meta.Extension);
+            Assert.Equal(FileMeta.ComposeFullFileName(expectedFileName, expectedExtension), meta.FullFileName);
+            Assert.Equal(Path.GetFileNameWithoutExtension(meta.FullFileName), meta.FileName);
+            Assert.Equal(FileMeta.ExtensionWithoutDot(meta.FullFileName), meta.Extension);
+        }
+
+        /// <summary>
+        /// Verifies canonicalize leaves trailing space/period full names alone for illegal-name detection.
+        /// </summary>
+        [Theory]
+        [InlineData("track.", "")]
+        [InlineData("track", "txt ")]
+        public void CanonicalizeFileNameAndExtension_skips_trailing_space_or_period(string fileName, string extension)
+        {
+            var meta = new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: TestPaths.Absolute("album"),
+                fileName: fileName,
+                extension: extension
+            );
+
+            meta.CanonicalizeFileNameAndExtension();
+
+            Assert.Equal(fileName, meta.FileName);
+            Assert.Equal(extension, meta.Extension);
+        }
+
+        /// <summary>
+        /// Verifies Extension target writes fold leading-dot multi-segment values.
+        /// </summary>
+        [Fact]
+        public void SetTargetString_extension_folds_leading_dot_multi_segment()
+        {
+            var meta = new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: TestPaths.Absolute("album"),
+                fileName: "song",
+                extension: "mp3"
+            );
+
+            meta.SetTargetString(new FileExtensionTarget(), ".mp.3");
+
+            Assert.Equal("song.mp", meta.FileName);
+            Assert.Equal("3", meta.Extension);
+            Assert.Equal("song.mp.3", meta.FullFileName);
         }
 
         /// <summary>

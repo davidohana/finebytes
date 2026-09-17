@@ -69,9 +69,11 @@ namespace Mfr.Models.Rename
             {
                 case FileNameTarget:
                     meta.FileName = value;
+                    meta.CanonicalizeFileNameAndExtension();
                     return;
                 case FileExtensionTarget:
                     meta.Extension = value;
+                    meta.CanonicalizeFileNameAndExtension();
                     return;
                 case FileFullNameTarget:
                     _SetFullFileNameFromValue(meta, value);
@@ -99,8 +101,9 @@ namespace Mfr.Models.Rename
         private static void _SetFullFileNameFromValue(FileMeta meta, string fullValue)
         {
             var fullName = Path.GetFileName(fullValue);
-            meta.Extension = FileMeta.ExtensionWithoutDot(fullName);
-            meta.FileName = Path.GetFileNameWithoutExtension(fullName);
+            meta.FileName = fullName;
+            meta.Extension = string.Empty;
+            meta.CanonicalizeFileNameAndExtension();
         }
 
         /// <summary>
@@ -156,8 +159,9 @@ namespace Mfr.Models.Rename
             }
 
             meta.DirectoryPath = directory;
-            meta.Extension = FileMeta.ExtensionWithoutDot(fileName);
-            meta.FileName = Path.GetFileNameWithoutExtension(fileName);
+            meta.FileName = fileName;
+            meta.Extension = string.Empty;
+            meta.CanonicalizeFileNameAndExtension();
         }
 
         /// <summary>

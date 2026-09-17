@@ -114,7 +114,7 @@ namespace Mfr.Tests.Engine
         {
             var dir = _tempDirectoryFixture.CreateTempDir();
             var sourcePath = dir.CombinePath("song.mp3");
-            var renamedPath = dir.CombinePath("song..mp.3");
+            var renamedPath = dir.CombinePath("song.mp.3");
             File.WriteAllText(sourcePath, "x");
 
             var renameList = new RenameList();
@@ -130,6 +130,8 @@ namespace Mfr.Tests.Engine
 
             var prepared = Assert.Single(renameList.RenameItems);
             Assert.Equal(renamedPath, prepared.Original.FullPath);
+            Assert.Equal("song.mp", prepared.Original.FileName);
+            Assert.Equal("3", prepared.Original.Extension);
             Assert.Equal(sourcePath, prepared.Preview.FullPath);
             Assert.Contains(
                 prepared.StickyUndoChanges!,
@@ -149,6 +151,55 @@ namespace Mfr.Tests.Engine
             Assert.True(File.Exists(sourcePath));
             Assert.False(File.Exists(renamedPath));
             Assert.Equal(sourcePath, Assert.Single(results).DestinationPath);
+        }
+
+        /// <summary>
+        /// Verifies PrepareUndo path expansion still fixes pre-canonicalize Ext-only logs (DestinationPath re-split).
+        /// </summary>
+        [Fact]
+        public void PrepareUndo_expands_legacy_extension_only_log_with_double_dot_destination()
+        {
+            var dir = _tempDirectoryFixture.CreateTempDir();
+            var sourcePath = dir.CombinePath("song.mp3");
+            var renamedPath = dir.CombinePath("song..mp.3");
+            File.WriteAllText(renamedPath, "x");
+
+            var log = new RenameLog(
+                CommittedAt: DateTimeOffset.UtcNow,
+                Entries:
+                [
+                    new RenameLogEntry(
+                        DestinationPath: renamedPath,
+                        OriginalPath: sourcePath,
+                        IsFolder: false,
+                        Changes:
+                        [
+                            new RenamePropertyChange(
+                                Property: RenamePropertyNames.Extension,
+                                OldValue: "mp3",
+                                NewValue: ".mp.3"
+                            ),
+                        ]
+                    ),
+                ]
+            );
+
+            var renameList = new RenameList();
+            var prepare = renameList.PrepareUndo(log);
+            Assert.Equal(0, prepare.NotLoadedCount);
+            Assert.Equal(1, prepare.PreparedCount);
+
+            var prepared = Assert.Single(renameList.RenameItems);
+            Assert.Equal(renamedPath, prepared.Original.FullPath);
+            Assert.Equal(sourcePath, prepared.Preview.FullPath);
+            Assert.Contains(
+                prepared.StickyUndoChanges!,
+                change => change.Property == RenamePropertyNames.FileName && change.OldValue == "song"
+            );
+
+            Assert.Equal(RenameStatus.CommitOk, Assert.Single(renameList.Commit(prepare.Plan, failFast: false)).Status);
+            Assert.True(File.Exists(sourcePath));
+            Assert.False(File.Exists(renamedPath));
         }
 
         /// <summary>
@@ -726,8 +777,7 @@ namespace Mfr.Tests.Engine
                 Name = name,
                 Description = null,
                 Chain = FilterChain.CreateAllEnabled([
-                    new FormatterFilter(Target: new FileNameTarget(), Options: new FormatterOptions("file.backup")),
-                    new FormatterFilter(Target: new FileExtensionTarget(), Options: new FormatterOptions("")),
+                    new FormatterFilter(Target: new FileFullNameTarget(), Options: new FormatterOptions("file.backup")),
                 ]),
             };
         }

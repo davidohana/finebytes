@@ -40,6 +40,8 @@ namespace Mfr.Engine.Preview
             {
                 _ApplyOne(item, change);
             }
+
+            item.Preview.CanonicalizeFileNameAndExtension();
         }
 
         private static void _ApplyOne(RenameItem item, RenamePropertyChange change)

@@ -51,7 +51,13 @@ namespace Mfr.Models.Rename
         /// <summary>
         /// Gets the file name including extension (<see cref="FileName"/>, a separator dot when needed, and <see cref="Extension"/>).
         /// </summary>
-        public string FullFileName => Extension.Length == 0 ? FileName : FileName + "." + Extension;
+        /// <remarks>
+        /// <para>
+        /// Uses <see cref="ComposeFullFileName"/> so a leading-dot <see cref="Extension"/> does not insert an extra
+        /// separator (<c>song</c> + <c>.mp.3</c> → <c>song.mp.3</c>, not <c>song..mp.3</c>).
+        /// </para>
+        /// </remarks>
+        public string FullFileName => ComposeFullFileName(FileName, Extension);
 
         /// <summary>
         /// Gets or sets the absolute parent directory path.
@@ -67,6 +73,61 @@ namespace Mfr.Models.Rename
         /// Gets or sets the file extension without the leading dot.
         /// </summary>
         public string Extension { get; set; } = extension;
+
+        /// <summary>
+        /// Composes a full file name from prefix and extension fields.
+        /// </summary>
+        /// <param name="fileName">File name without extension (may contain dots).</param>
+        /// <param name="extension">Extension; empty, without a leading dot, or with a leading dot.</param>
+        /// <returns>
+        /// <paramref name="fileName"/> alone when <paramref name="extension"/> is empty; otherwise
+        /// <paramref name="fileName"/> plus <paramref name="extension"/> when it already starts with
+        /// <c>.</c>, else <paramref name="fileName"/> + <c>.</c> + <paramref name="extension"/>.
+        /// </returns>
+        public static string ComposeFullFileName(string fileName, string extension)
+        {
+            ArgumentNullException.ThrowIfNull(fileName);
+            ArgumentNullException.ThrowIfNull(extension);
+
+            if (extension.Length == 0)
+            {
+                return fileName;
+            }
+
+            if (extension[0] == '.')
+            {
+                return fileName + extension;
+            }
+
+            return fileName + "." + extension;
+        }
+
+        /// <summary>
+        /// Rewrites <see cref="FileName"/> and <see cref="Extension"/> so they Path-round-trip the composed full name.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// After filter / override / undo OldValue writes, multi-dot or leading-dot Extension values (and empty
+        /// Extension with dots in FileName) are folded via <c>Path.GetFileNameWithoutExtension</c> so
+        /// preview columns match post-reload disk shape. Skips rewrite when the composed name ends with a space
+        /// or period so Windows illegal-name detection still sees the attempted name.
+        /// </para>
+        /// </remarks>
+        public void CanonicalizeFileNameAndExtension()
+        {
+            var fullFileName = ComposeFullFileName(FileName, Extension);
+            if (fullFileName.Length > 0)
+            {
+                var last = fullFileName[^1];
+                if (last is ' ' or '.')
+                {
+                    return;
+                }
+            }
+
+            FileName = Path.GetFileNameWithoutExtension(fullFileName);
+            Extension = ExtensionWithoutDot(fullFileName);
+        }
 
         /// <summary>
         /// Returns the extension of <paramref name="path"/> without a leading dot (empty when none).
