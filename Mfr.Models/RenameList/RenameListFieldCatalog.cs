@@ -3,6 +3,7 @@ using Mfr.Models.Rename;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
@@ -24,6 +25,7 @@ namespace Mfr.Models.RenameList
                 .. BasicRenameListFields.All,
                 .. ExtendedRenameListFields.All,
                 .. AudioTagRenameListFields.All,
+                .. Id3v2RenameListFields.All,
                 .. MediaRenameListFields.All,
                 .. MpegRenameListFields.All,
                 .. ImageRenameListFields.All,

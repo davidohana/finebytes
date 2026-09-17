@@ -13,6 +13,7 @@ using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
@@ -52,14 +53,20 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
-        /// Verifies unmapped Apply-To targets (e.g. Id3v2) are skipped silently.
+        /// Verifies ID3v2 frame Apply-To maps to the MP3 ID3v2 catalog field (Original + Preview).
         /// </summary>
         [Fact]
-        public void Collect_StringTarget_UnmappedId3v2_SkipsWrites()
+        public void Collect_StringTarget_Id3v2Tit2_AddsOriginalAndPreview()
         {
             var keys = FilterRelevantRenameListColumns.Collect([new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2"))]);
 
-            Assert.Empty(keys);
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2"),
+                ],
+                keys
+            );
         }
 
         /// <summary>

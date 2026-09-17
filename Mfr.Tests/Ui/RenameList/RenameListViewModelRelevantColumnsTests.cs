@@ -4,6 +4,7 @@ using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Id3v2;
 
 namespace Mfr.Tests.Ui.RenameList
 {
@@ -163,7 +164,7 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new AncestorFolderTarget(1)), "Remove Spaces");
 
             renameListViewModel.SetVisibleColumns([
                 new RenameListVisibleColumn(
@@ -185,12 +186,49 @@ namespace Mfr.Tests.Ui.RenameList
         {
             var filterChain = new FilterChainViewModel();
             var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
-            filterChain.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new AncestorFolderTarget(1)), "Remove Spaces");
 
             var before = renameListViewModel.VisibleColumns.ToList();
             await renameListViewModel.AddRelevantColumnsCommand.ExecuteAsync(null);
 
             Assert.Equal(before, renameListViewModel.VisibleColumns);
+        }
+
+        /// <summary>
+        /// Verifies Replace with an ID3v2 frame target resets to defaults then appends TIT2 Original+Preview.
+        /// </summary>
+        [Fact]
+        public async Task ReplaceWithRelevantColumns_id3v2_tit2_appends_after_defaults()
+        {
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
+
+            await renameListViewModel.ReplaceWithRelevantColumnsCommand.ExecuteAsync(null);
+
+            var expected = RenameListVisibleColumn.CreateDefaults().ToList();
+            expected.Add(new RenameListVisibleColumn(RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2")));
+            expected.Add(new RenameListVisibleColumn(RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2")));
+            Assert.Equal(expected, renameListViewModel.VisibleColumns);
+        }
+
+        /// <summary>
+        /// Verifies Add with an ID3v2 frame target appends TIT2 Original+Preview.
+        /// </summary>
+        [Fact]
+        public async Task AddRelevantColumns_id3v2_tit2_appends_at_end()
+        {
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2")), "Remove Spaces");
+
+            var before = renameListViewModel.VisibleColumns.ToList();
+            await renameListViewModel.AddRelevantColumnsCommand.ExecuteAsync(null);
+
+            var expected = before.ToList();
+            expected.Add(new RenameListVisibleColumn(RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2")));
+            expected.Add(new RenameListVisibleColumn(RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2")));
+            Assert.Equal(expected, renameListViewModel.VisibleColumns);
         }
 
         /// <summary>
