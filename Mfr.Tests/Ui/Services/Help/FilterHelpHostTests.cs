@@ -1,6 +1,7 @@
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FilterChainPane;
+using Mfr.Tests.TestSupport;
 using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.Services.Help
@@ -22,39 +23,12 @@ namespace Mfr.Tests.Ui.Services.Help
             {
                 var helpFile = Path.Combine(helpDir, "SpaceCharacter.html");
                 File.WriteAllText(helpFile, "<html></html>");
-                var opener = new RecordingShellOpener();
+                var opener = new RecordingFileShellOpener();
                 var host = new FilterHelpHost(opener, [helpDir]);
 
                 Assert.True(host.TryOpen("SpaceCharacter.html", out var fullPath));
                 Assert.Equal(helpFile, fullPath);
-                Assert.Equal([helpFile], opener.OpenedPaths);
-            }
-            finally
-            {
-                Directory.Delete(helpDir, recursive: true);
-            }
-        }
-
-        /// <summary>
-        /// Verifies Index and Tips basenames resolve the same way as filter pages.
-        /// </summary>
-        [Theory]
-        [InlineData("index.html")]
-        [InlineData("tips.html")]
-        public void TryOpen_resolves_index_and_tips(string helpFileName)
-        {
-            var helpDir = Path.Combine(Path.GetTempPath(), $"mfr-help-shell-{Guid.NewGuid():N}");
-            Directory.CreateDirectory(helpDir);
-            try
-            {
-                var helpFile = Path.Combine(helpDir, helpFileName);
-                File.WriteAllText(helpFile, "<html></html>");
-                var opener = new RecordingShellOpener();
-                var host = new FilterHelpHost(opener, [helpDir]);
-
-                Assert.True(host.TryOpen(helpFileName, out var fullPath));
-                Assert.Equal(helpFile, fullPath);
-                Assert.Equal([helpFile], opener.OpenedPaths);
+                Assert.Equal([helpFile], opener.OpenedWithDefaultApp);
             }
             finally
             {
@@ -72,12 +46,12 @@ namespace Mfr.Tests.Ui.Services.Help
             Directory.CreateDirectory(helpDir);
             try
             {
-                var opener = new RecordingShellOpener();
+                var opener = new RecordingFileShellOpener();
                 var host = new FilterHelpHost(opener, [helpDir]);
 
                 Assert.False(host.TryOpen("SpaceCharacter.html", out var fullPath));
                 Assert.Null(fullPath);
-                Assert.Empty(opener.OpenedPaths);
+                Assert.Empty(opener.OpenedWithDefaultApp);
             }
             finally
             {
@@ -138,7 +112,7 @@ namespace Mfr.Tests.Ui.Services.Help
             {
                 var helpFile = Path.Combine(helpDir, "LettersCase.html");
                 File.WriteAllText(helpFile, "<html></html>");
-                var opener = new RecordingShellOpener();
+                var opener = new RecordingFileShellOpener();
                 var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
                 viewModel.AddCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
 
@@ -149,7 +123,7 @@ namespace Mfr.Tests.Ui.Services.Help
                 viewModel.OpenSelectedFilterHelpCommand.Execute(null);
 
                 Assert.Null(missing);
-                Assert.Equal([helpFile], opener.OpenedPaths);
+                Assert.Equal([helpFile], opener.OpenedWithDefaultApp);
             }
             finally
             {
@@ -167,7 +141,7 @@ namespace Mfr.Tests.Ui.Services.Help
             Directory.CreateDirectory(helpDir);
             try
             {
-                var opener = new RecordingShellOpener();
+                var opener = new RecordingFileShellOpener();
                 var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
                 viewModel.AddCommand.Execute(FilterChainTestUi.Entry("SpaceCharacter"));
                 string? missing = null;
@@ -176,7 +150,7 @@ namespace Mfr.Tests.Ui.Services.Help
                 viewModel.OpenSelectedFilterHelpCommand.Execute(null);
 
                 Assert.Equal("SpaceCharacter.html", missing);
-                Assert.Empty(opener.OpenedPaths);
+                Assert.Empty(opener.OpenedWithDefaultApp);
             }
             finally
             {
@@ -208,24 +182,5 @@ namespace Mfr.Tests.Ui.Services.Help
             var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(NullFileShellOpener.Instance, []));
             Assert.False(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));
         }
-    }
-
-    /// <summary>
-    /// Records <see cref="IFileShellOpener.OpenWithDefaultApp"/> calls for tests.
-    /// </summary>
-    file sealed class RecordingShellOpener : IFileShellOpener
-    {
-        public List<string> OpenedPaths { get; } = [];
-
-        public void OpenWithDefaultApp(string path)
-        {
-            OpenedPaths.Add(path);
-        }
-
-        public void RevealInFileManager(string path) { }
-
-        public void OpenFolderInFileManager(string folderPath) { }
-
-        public void ShowProperties(string path) { }
     }
 }

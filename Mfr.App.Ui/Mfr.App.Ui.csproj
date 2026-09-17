@@ -35,7 +35,7 @@
     <AvaloniaResource Include="Assets\RenameList\*.png" />
   </ItemGroup>
 
-  <!-- Ship filter Help HTML beside the exe (repo-root help/). Exclude capture notes. -->
+  <!-- Ship Help HTML beside the exe (repo-root help/). Exclude capture notes. -->
   <ItemGroup>
     <Content
       Include="..\help\**\*"

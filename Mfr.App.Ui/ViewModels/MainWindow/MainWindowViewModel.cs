@@ -583,6 +583,10 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             StatusHint = message;
         }
 
+        /// <summary>
+        /// Opens <paramref name="helpFileName"/> via the help host, or raises <see cref="HelpMissing"/>.
+        /// </summary>
+        /// <param name="helpFileName">Help HTML basename under the app <c>help/</c> folder.</param>
         private void _OpenHelpFile(string helpFileName)
         {
             if (_helpHost.TryOpen(helpFileName, out _))
