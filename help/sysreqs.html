@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>System Requirements and Installation</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="index.html">Index</a>
+      &gt; <a href="index.html#introduction">Introduction</a>
+      &gt; <strong>System Requirements and Installation</strong>
+    </nav>
+    <hr />
+    <h1>System Requirements and Installation</h1>
+
+    <h2>Minimum system requirements</h2>
+    <ul>
+      <li>IBM-compatible PC.</li>
+      <li>
+        Microsoft Windows 10 or later (64-bit). Magic File Renamer 8 is a Windows desktop application
+        (<span class="quote">WinExe</span>).
+      </li>
+      <li>
+        <u>.NET 10 runtime</u> (or a self-contained build that bundles it). The UI is built with
+        Avalonia on .NET&nbsp;10.
+      </li>
+    </ul>
+
+    <h2 id="install">Installation</h2>
+    <ul>
+      <li>
+        Install from the package or build you received (setup program, portable folder, or
+        development build). Follow the instructions that accompany that package.
+      </li>
+      <li>
+        Do <strong>not</strong> install MFR 8 into the same folder as an existing MFR 7 (or earlier)
+        installation. Keep versions in separate directories so program files do not overwrite each
+        other.
+      </li>
+      <li>
+        After install, launch Magic File Renamer from the Start menu shortcut, desktop shortcut, or
+        the application executable in the install folder.
+      </li>
+      <li>
+        On first launch the app writes preferences under
+        <span class="quote">%AppData%\finebytes\mfr\</span> (for example
+        <span class="quote">config.json</span>). Presets and logs use the same finebytes data area.
+      </li>
+    </ul>
+
+    <h2 id="uninstall">Uninstallation</h2>
+    <ul>
+      <li>
+        If you used a setup program, uninstall from Windows
+        <span class="quote">Apps &amp; features</span> / <span class="quote">Installed apps</span>.
+      </li>
+      <li>
+        Removing the program does not always delete AppData preferences, presets, or logs. Delete
+        the finebytes MFR folder under AppData if you want a clean slate.
+      </li>
+    </ul>
+
+    <h2 id="vercompt">Version compatibility</h2>
+    <ul>
+      <li>
+        MFR 8 is a new product generation. It does <strong>not</strong> load MFR 7 XML presets or
+        the old shared configuration layout. Prefer exporting or re-creating presets in MFR 8.
+      </li>
+      <li>
+        MFR 7 and MFR 8 can sit side-by-side on the same PC when installed in different folders.
+        Shortcuts and window titles include version information so you can tell them apart.
+      </li>
+      <li>
+        You can keep MFR 7 installed while you move workflows to MFR 8, then uninstall the older
+        version when you no longer need it.
+      </li>
+    </ul>
+
+    <h2 id="contextmenu">Windows Explorer context menu</h2>
+    <p>
+      Explorer right-click (“Rename with MFR…”) integration from MFR 7 is
+      <strong>not</strong> enabled in this build. You can still add files by browsing in the File
+      List or by dragging items onto the Rename List.
+    </p>
+
+    <p class="note">
+      Web site, updates, and support contact pages will appear under General Information in a later
+      Help update. Until then, use <span class="quote">Help → About</span> for the product site and
+      support e-mail links.
+    </p>
+  </body>
+</html>

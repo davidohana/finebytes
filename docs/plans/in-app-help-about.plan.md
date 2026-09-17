@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-index-intro-tips
     content: "P2: index.html + intro pages + tips.html + link-integrity test seed"
-    status: pending
+    status: completed
   - id: p3-shell-operation
     content: "P3: Operation/shell/howto HTML for current MFR8 UI"
     status: pending
