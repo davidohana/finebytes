@@ -67,6 +67,90 @@ namespace Mfr.Tests.Models.Filters
                 ],
                 keys
             );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies multi-instance COMM with language/description maps to the primary COMM column only.
+        /// </summary>
+        [Fact]
+        public void Collect_StringTarget_Id3v2CommWithLanguageDescription_MapsPrimaryCommColumn()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([
+                new RemoveSpacesFilter(new Id3v2FrameTarget("comm", "eng", "Album")),
+            ]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "COMM"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "COMM"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies ID3v2 Field Setter maps FrameId to ID3v2 Original + Preview (not MediaTag).
+        /// </summary>
+        [Fact]
+        public void Collect_Id3v2FieldSetter_AddsId3v2Columns()
+        {
+            var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(FrameId: "tit2", Text: "New"));
+
+            var keys = FilterRelevantRenameListColumns.Collect([filter]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies ID3v2 Field Setter COMM with language/description still maps the primary COMM column.
+        /// </summary>
+        [Fact]
+        public void Collect_Id3v2FieldSetter_CommWithLanguageDescription_MapsPrimaryCommColumn()
+        {
+            var filter = new Id3v2FieldSetterFilter(
+                new Id3v2FieldSetterOptions(FrameId: "COMM", Text: "Note", Language: "eng", Description: "Album")
+            );
+
+            var keys = FilterRelevantRenameListColumns.Collect([filter]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "COMM"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "COMM"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies ID3v2 Field Setter write keys precede format tokens from Text.
+        /// </summary>
+        [Fact]
+        public void Collect_Id3v2FieldSetter_FieldTextTokens_AppendAfterWrites()
+        {
+            var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(FrameId: "TIT2", Text: "<file-name>"));
+
+            var keys = FilterRelevantRenameListColumns.Collect([filter]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2"),
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                ],
+                keys
+            );
         }
 
         /// <summary>

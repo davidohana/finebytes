@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: collect-id3v2
     content: "P1b: Wire Id3v2FieldSetter + Id3v2FrameTarget into FilterRelevantRenameListColumns; tests"
-    status: pending
+    status: completed
   - id: id3v1-fields
     content: "P2: Id3v1RenameListFields (ID3v1) + Id3v1FieldTarget WriteTargets + relevant columns"
     status: pending

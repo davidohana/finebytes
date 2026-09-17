@@ -7,6 +7,7 @@ using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.Tags;
 
 namespace Mfr.Filters
@@ -62,6 +63,12 @@ namespace Mfr.Filters
             if (filter is AudioTagSetterFilter audioTagSetter)
             {
                 _AddAudioTagSetterWriteKeys(audioTagSetter.Options, keys, keyToIsSeen);
+                return;
+            }
+
+            if (filter is Id3v2FieldSetterFilter id3v2FieldSetter)
+            {
+                _AddId3v2FrameWriteKey(id3v2FieldSetter.Options.FrameId, keys, keyToIsSeen);
                 return;
             }
 
@@ -341,18 +348,56 @@ namespace Mfr.Filters
         /// <summary>
         /// Reverse-looks up a catalog write target and appends Original (+ Preview when supported).
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <see cref="Id3v2FrameTarget"/> maps by normalized frame id only (see
+        /// <see cref="_AddId3v2FrameWriteKey"/>) so language/description instances still hit the
+        /// primary COMM/USLT/TXXX catalog column — not MediaTag, and not a dictionary equality miss.
+        /// </para>
+        /// </remarks>
         private static void _AddFieldForWriteTarget(
             FilterTarget target,
             List<RenameListFieldKey> keys,
             HashSet<RenameListFieldKey> keyToIsSeen
         )
         {
+            if (target is Id3v2FrameTarget id3v2)
+            {
+                _AddId3v2FrameWriteKey(id3v2.FrameId, keys, keyToIsSeen);
+                return;
+            }
+
             if (!_writeTargetToField.TryGetValue(target, out var field))
             {
                 return;
             }
 
             _AddFieldKeys(field, keys, keyToIsSeen);
+        }
+
+        /// <summary>
+        /// Appends the primary ID3v2 catalog column for <paramref name="frameId"/> (Original + Preview).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Used by string <see cref="Id3v2FrameTarget"/> Apply-To and by
+        /// <see cref="Id3v2FieldSetterFilter"/> (not a <see cref="StringTargetFilter"/>). Multi-instance
+        /// language/description frames share one COMM/USLT/TXXX column. Unmodeled ids are skipped via
+        /// catalog lookup.
+        /// </para>
+        /// </remarks>
+        private static void _AddId3v2FrameWriteKey(
+            string frameId,
+            List<RenameListFieldKey> keys,
+            HashSet<RenameListFieldKey> keyToIsSeen
+        )
+        {
+            if (string.IsNullOrWhiteSpace(frameId))
+            {
+                return;
+            }
+
+            _AddCatalogField(Id3v2RenameListFields.Group, frameId.Trim().ToUpperInvariant(), keys, keyToIsSeen);
         }
 
         /// <summary>

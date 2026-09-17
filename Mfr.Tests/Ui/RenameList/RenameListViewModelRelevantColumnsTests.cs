@@ -1,5 +1,6 @@
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
@@ -229,6 +230,34 @@ namespace Mfr.Tests.Ui.RenameList
             expected.Add(new RenameListVisibleColumn(RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2")));
             expected.Add(new RenameListVisibleColumn(RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2")));
             Assert.Equal(expected, renameListViewModel.VisibleColumns);
+        }
+
+        /// <summary>
+        /// Verifies Add with ID3v2 Field Setter appends the frame Original+Preview (not MediaTag).
+        /// </summary>
+        [Fact]
+        public async Task AddRelevantColumns_id3v2_field_setter_appends_at_end()
+        {
+            var filterChain = new FilterChainViewModel();
+            var renameListViewModel = _context.CreateRenameListViewModel(filterChain: filterChain);
+            filterChain.AddAndSelect(
+                new Id3v2FieldSetterFilter(
+                    new Id3v2FieldSetterOptions(FrameId: "COMM", Text: "Note", Language: "eng", Description: "Album")
+                ),
+                "ID3v2 Field Setter"
+            );
+
+            var before = renameListViewModel.VisibleColumns.ToList();
+            await renameListViewModel.AddRelevantColumnsCommand.ExecuteAsync(null);
+
+            var expected = before.ToList();
+            expected.Add(new RenameListVisibleColumn(RenameListFieldKey.Original(Id3v2RenameListFields.Group, "COMM")));
+            expected.Add(new RenameListVisibleColumn(RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "COMM")));
+            Assert.Equal(expected, renameListViewModel.VisibleColumns);
+            Assert.DoesNotContain(
+                renameListViewModel.VisibleColumns,
+                static column => column.Key.GroupId == AudioTagRenameListFields.Group
+            );
         }
 
         /// <summary>
