@@ -228,6 +228,24 @@ namespace Mfr.Tests.Ui
             Assert.Contains("Unknown option", viewModel.StatusHint.ToPlainText(), StringComparison.Ordinal);
         }
 
+        /// <summary>
+        /// Verifies App-style apply skips browse navigate when <c>--initial-folder</c> already opened the File List.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Apply_Skips_InitialFolder_Navigate_When_Already_Applied()
+        {
+            var sourceDir = _CreateSampleFolder();
+            var browseDir = _tempDirectoryFixture.CreateTempDir();
+            var viewModel = _CreateMain(browseDir);
+            var alphaPath = Path.Combine(sourceDir, "alpha.txt");
+            var startupArgs = UiStartupArgsParser.Parse([alphaPath, "--initial-folder", browseDir]);
+
+            await UiStartupArgsApplier.ApplyAsync(viewModel, startupArgs, initialFolderAlreadyApplied: true);
+
+            Assert.Single(viewModel.RenameListViewModel.Entries);
+            Assert.True(PathComparers.Os.Equals(browseDir, viewModel.FileListViewModel.CurrentPath));
+        }
+
         private MainWindowViewModel _CreateMain(string initialPath)
         {
             var viewModel = new MainWindowViewModel(initialPath, shellOpener: NullFileShellOpener.Instance);
