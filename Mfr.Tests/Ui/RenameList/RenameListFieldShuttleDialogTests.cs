@@ -147,7 +147,8 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies setting search text refreshes the available-fields ListBox and disables Groups.
+        /// Verifies setting search text refreshes the available-fields ListBox, disables Groups,
+        /// and shows group-name subtitles on hits.
         /// </summary>
         [AvaloniaFact]
         public void Setting_SearchText_refreshes_available_list()
@@ -174,6 +175,24 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(dialogVm.AvailableOriginalFields.Count, availableList.ItemCount);
             Assert.NotEqual(groupScopedCount, availableList.ItemCount);
             Assert.True(availableList.ItemCount > 0);
+
+            var firstField = dialogVm.AvailableOriginalFields[0];
+            var firstItem = availableList.ContainerFromIndex(0) as ListBoxItem;
+            Assert.NotNull(firstItem);
+            var groupSubtitle = firstItem
+                .GetVisualDescendants()
+                .OfType<TextBlock>()
+                .FirstOrDefault(text => text.Text == firstField.GroupDisplayName);
+            Assert.NotNull(groupSubtitle);
+            Assert.True(groupSubtitle.IsVisible);
+
+            dialogVm.SearchText = "";
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(dialogVm.IsFieldSearchActive);
+            Assert.True(groupsList.IsEnabled);
+            Assert.Equal(groupScopedCount, availableList.ItemCount);
 
             dialog.Close();
         }

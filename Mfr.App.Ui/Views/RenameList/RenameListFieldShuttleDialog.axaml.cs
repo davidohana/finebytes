@@ -36,6 +36,9 @@ namespace Mfr.App.Ui.Views.RenameList
             _WireDragDropHandlers();
         }
 
+        /// <summary>
+        /// Focuses the search box for the active Columns or Sort tab when the dialog opens.
+        /// </summary>
         private void _FocusSearchBox()
         {
             if (_ViewModel is null)

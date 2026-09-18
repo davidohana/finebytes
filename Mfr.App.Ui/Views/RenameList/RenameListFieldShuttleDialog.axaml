@@ -138,6 +138,43 @@
       <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
     </Style>
   </Window.Styles>
+  <Window.Resources>
+    <DataTemplate x:Key="FieldShuttleAvailableFieldTemplate" x:DataType="models:RenameListField">
+      <StackPanel
+        Spacing="0"
+        ToolTip.Tip="{Binding Tip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+      >
+        <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
+        <TextBlock
+          Text="{Binding GroupDisplayName}"
+          Opacity="0.7"
+          FontSize="11"
+          TextTrimming="CharacterEllipsis"
+          IsVisible="{Binding $parent[Window].((vm:RenameListFieldShuttleDialogViewModel)DataContext).IsFieldSearchActive}"
+        />
+      </StackPanel>
+    </DataTemplate>
+    <DataTemplate x:Key="FieldShuttleAvailablePreviewFieldTemplate" x:DataType="models:RenameListField">
+      <StackPanel
+        Spacing="0"
+        ToolTip.Tip="{Binding Tip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
+      >
+        <StackPanel Orientation="Horizontal" Spacing="4">
+          <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+          <Border Classes="rename-list-preview-glyph">
+            <TextBlock Text="P" />
+          </Border>
+        </StackPanel>
+        <TextBlock
+          Text="{Binding GroupDisplayName}"
+          Opacity="0.7"
+          FontSize="11"
+          TextTrimming="CharacterEllipsis"
+          IsVisible="{Binding $parent[Window].((vm:RenameListFieldShuttleDialogViewModel)DataContext).IsFieldSearchActive}"
+        />
+      </StackPanel>
+    </DataTemplate>
+  </Window.Resources>
   <DockPanel Margin="12">
     <StackPanel
       DockPanel.Dock="Bottom"
@@ -241,58 +278,19 @@
                   Classes="field-shuttle-list"
                   IsVisible="{Binding IsOriginalColumnsTab}"
                   ItemsSource="{Binding AvailableOriginalFields}"
+                  ItemTemplate="{StaticResource FieldShuttleAvailableFieldTemplate}"
                   SelectionMode="Multiple"
                   DoubleTapped="_OnAddOriginalDoubleTapped"
-                >
-                  <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="models:RenameListField">
-                      <StackPanel
-                        Spacing="0"
-                        ToolTip.Tip="{Binding Tip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
-                      >
-                        <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
-                        <TextBlock
-                          Text="{Binding GroupDisplayName}"
-                          Opacity="0.7"
-                          FontSize="11"
-                          TextTrimming="CharacterEllipsis"
-                          IsVisible="{Binding $parent[Window].((vm:RenameListFieldShuttleDialogViewModel)DataContext).IsFieldSearchActive}"
-                        />
-                      </StackPanel>
-                    </DataTemplate>
-                  </ListBox.ItemTemplate>
-                </ListBox>
+                />
                 <ListBox
                   x:Name="AvailablePreviewFieldsList"
                   Classes="field-shuttle-list"
                   IsVisible="{Binding IsPreviewColumnsTab}"
                   ItemsSource="{Binding AvailablePreviewFields}"
+                  ItemTemplate="{StaticResource FieldShuttleAvailablePreviewFieldTemplate}"
                   SelectionMode="Multiple"
                   DoubleTapped="_OnAddPreviewDoubleTapped"
-                >
-                  <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="models:RenameListField">
-                      <StackPanel
-                        Spacing="0"
-                        ToolTip.Tip="{Binding Tip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
-                      >
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                          <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
-                          <Border Classes="rename-list-preview-glyph">
-                            <TextBlock Text="P" />
-                          </Border>
-                        </StackPanel>
-                        <TextBlock
-                          Text="{Binding GroupDisplayName}"
-                          Opacity="0.7"
-                          FontSize="11"
-                          TextTrimming="CharacterEllipsis"
-                          IsVisible="{Binding $parent[Window].((vm:RenameListFieldShuttleDialogViewModel)DataContext).IsFieldSearchActive}"
-                        />
-                      </StackPanel>
-                    </DataTemplate>
-                  </ListBox.ItemTemplate>
-                </ListBox>
+                />
               </DockPanel>
               <StackPanel
                 Grid.Row="1"
@@ -407,6 +405,7 @@
             <TextBlock Grid.Row="0" Classes="field-shuttle-hint" Text="Select fields to sort Rename List by." />
             <Grid Grid.Row="1" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="Auto,*" RowSpacing="4">
               <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-shuttle-label" Text="Groups:" />
+              <TextBlock Grid.Row="0" Grid.Column="1" Classes="field-shuttle-label" Text="Fields:" />
               <TextBlock Grid.Row="0" Grid.Column="3" Classes="field-shuttle-label" Text="Selected fields:" />
               <ListBox
                 x:Name="SortGroupsList"
@@ -437,27 +436,10 @@
                   x:Name="AvailableSortFieldsList"
                   Classes="field-shuttle-list"
                   ItemsSource="{Binding AvailableSortFields}"
+                  ItemTemplate="{StaticResource FieldShuttleAvailableFieldTemplate}"
                   SelectionMode="Multiple"
                   DoubleTapped="_OnAddSortDoubleTapped"
-                >
-                  <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="models:RenameListField">
-                      <StackPanel
-                        Spacing="0"
-                        ToolTip.Tip="{Binding Tip, Converter={x:Static converters:RichToolTipConverter.Instance}}"
-                      >
-                        <TextBlock Text="{Binding DisplayName}" TextTrimming="CharacterEllipsis" />
-                        <TextBlock
-                          Text="{Binding GroupDisplayName}"
-                          Opacity="0.7"
-                          FontSize="11"
-                          TextTrimming="CharacterEllipsis"
-                          IsVisible="{Binding $parent[Window].((vm:RenameListFieldShuttleDialogViewModel)DataContext).IsFieldSearchActive}"
-                        />
-                      </StackPanel>
-                    </DataTemplate>
-                  </ListBox.ItemTemplate>
-                </ListBox>
+                />
               </DockPanel>
               <StackPanel
                 Grid.Row="1"
