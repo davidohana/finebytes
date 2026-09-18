@@ -55,12 +55,58 @@ figure.screenshot img {
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0;
   min-height: 48px;
+  cursor: zoom-in;
 }
 
 figure.screenshot figcaption {
   color: #666;
   font-size: 0.85em;
   margin-top: 0.35rem;
+}
+
+html.screenshot-lightbox-open,
+html.screenshot-lightbox-open body {
+  overflow: hidden;
+}
+
+.screenshot-lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(0, 0, 0, 0.78);
+}
+
+.screenshot-lightbox.is-open {
+  display: flex;
+}
+
+.screenshot-lightbox img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  border: 1px solid #fff;
+  background: #fff;
+  cursor: zoom-out;
+}
+
+.screenshot-lightbox-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  margin: 0;
+  padding: 0.15rem 0.55rem;
+  border: none;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #222;
+  font: 1.4rem/1 Verdana, Geneva, sans-serif;
+  cursor: pointer;
 }
 
 ul.options {

@@ -60,7 +60,7 @@ When adding a filter, also ship Help next to the exe (refresh the same page if o
 change later — editors follow this section via `mfr-implement-filter-editor`):
 
 1. Add `help/filters/{group}/{Type}.html` where `{group}` is the lowercase `FilterGroup` name (e.g. `space`, `trimming`); display name = `FilterPalette` label; options use Filter Configuration UI labels. Help basename is convention: `{Type}.html` (no map; `HelpHost` resolves by unique basename under `help/`).
-1. Breadcrumb: `Index` → `Filters` → group → display name (`../../index.html` / `../filters.html` / `../filters.html#{group}`). Figcaption is user-facing (`Filter options.`); keep screenshot capture notes in `help/SCREENSHOTS.md` only — not in shipped HTML. Use `../../help.css` and `../../images/{Type}.png`.
+1. Breadcrumb: `Index` → `Filters` → group → display name (`../../index.html` / `../filters.html` / `../filters.html#{group}`). Figcaption is user-facing (`Filter options.`); keep screenshot capture notes in `help/SCREENSHOTS.md` only — not in shipped HTML. Use `../../help.css`, `../../help.js` (defer, beside the stylesheet), and `../../images/{Type}.png`.
 1. Link the page from `help/filters/filters.html` under the right group (that hub breadcrumbs to Index).
 1. Add a checklist row in `help/SCREENSHOTS.md` for `images/{Type}.png` (screenshot optional).
 
