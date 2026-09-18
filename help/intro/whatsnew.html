@@ -148,9 +148,11 @@
             Image property tokens no longer cover WMF or EMF
           </li>
           <li>
-            Read-only Image Tag columns and <span class="quote">&lt;imagetag-*&gt;</span> tokens
-            (Keywords, Rating, Creator, …) are not ported yet — MFR 7 had them read-only for JPEG /
-            TIFF / PNG / GIF (and similar); writing image tags was never supported there either
+            TagLib Image Tag columns and <span class="quote">&lt;imagetag-*&gt;</span> tokens are
+            not ported (Rating, Orientation, Creator, Tag Types, …). For many camera and keyword
+            fields, use the Jpeg / EXIF Rename List columns and
+            <span class="quote">&lt;exif-*&gt;</span> /
+            <span class="quote">&lt;image-*&gt;</span> tokens instead
           </li>
         </ul>
       </li>
