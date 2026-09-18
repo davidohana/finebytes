@@ -28,8 +28,7 @@ namespace Mfr.App.Ui.Services
             CancellationToken cancellationToken = default
         )
         {
-            ArgumentNullException.ThrowIfNull(visual);
-            var storage = TopLevel.GetTopLevel(visual)?.StorageProvider;
+            var storage = _TryGetStorageProvider(visual);
             if (storage is null)
             {
                 return Task.FromResult<string?>(null);
@@ -46,6 +45,50 @@ namespace Mfr.App.Ui.Services
         }
 
         /// <summary>
+        /// Opens a save-file picker owned by <paramref name="visual"/>'s top-level window with explicit type filters.
+        /// </summary>
+        /// <param name="visual">Control used to resolve <see cref="TopLevel.StorageProvider"/>.</param>
+        /// <param name="title">Dialog title.</param>
+        /// <param name="defaultExtension">Extension without dot (e.g. <c>bat</c>).</param>
+        /// <param name="fileTypeChoices">Save dialog type filters (e.g. bat, ps1, all).</param>
+        /// <param name="suggestedFileName">Optional suggested file name.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
+        public static Task<string?> PickSaveFileAsync(
+            Visual visual,
+            string title,
+            string defaultExtension,
+            IReadOnlyList<FilePickerFileType> fileTypeChoices,
+            string? suggestedFileName = null,
+            CancellationToken cancellationToken = default
+        )
+        {
+            var storage = _TryGetStorageProvider(visual);
+            if (storage is null)
+            {
+                return Task.FromResult<string?>(null);
+            }
+
+            return PickSaveFileAsync(
+                storage,
+                title,
+                defaultExtension,
+                fileTypeChoices,
+                suggestedFileName,
+                cancellationToken
+            );
+        }
+
+        /// <summary>
+        /// Resolves <see cref="IStorageProvider"/> from <paramref name="visual"/>'s top-level window.
+        /// </summary>
+        private static IStorageProvider? _TryGetStorageProvider(Visual visual)
+        {
+            ArgumentNullException.ThrowIfNull(visual);
+            return TopLevel.GetTopLevel(visual)?.StorageProvider;
+        }
+
+        /// <summary>
         /// Opens a save-file picker on <paramref name="storage"/>.
         /// </summary>
         /// <param name="storage">Avalonia storage provider.</param>
@@ -55,7 +98,7 @@ namespace Mfr.App.Ui.Services
         /// <param name="fileTypeName">Primary filter label (e.g. <c>Text files</c> or <c>CSV files</c>).</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
-        public static async Task<string?> PickSaveFileAsync(
+        public static Task<string?> PickSaveFileAsync(
             IStorageProvider storage,
             string title = "Save as",
             string defaultExtension = "txt",
@@ -69,6 +112,48 @@ namespace Mfr.App.Ui.Services
             ArgumentException.ThrowIfNullOrWhiteSpace(defaultExtension);
             ArgumentException.ThrowIfNullOrWhiteSpace(fileTypeName);
 
+            return PickSaveFileAsync(
+                storage,
+                title,
+                defaultExtension,
+                fileTypeChoices:
+                [
+                    new FilePickerFileType(fileTypeName) { Patterns = [$"*.{defaultExtension}"] },
+                    new FilePickerFileType("All files") { Patterns = ["*.*"] },
+                ],
+                suggestedFileName,
+                cancellationToken
+            );
+        }
+
+        /// <summary>
+        /// Opens a save-file picker on <paramref name="storage"/> with explicit type filters.
+        /// </summary>
+        /// <param name="storage">Avalonia storage provider.</param>
+        /// <param name="title">Dialog title.</param>
+        /// <param name="defaultExtension">Extension without dot (e.g. <c>bat</c>).</param>
+        /// <param name="fileTypeChoices">Save dialog type filters (e.g. bat, ps1, all).</param>
+        /// <param name="suggestedFileName">Optional suggested file name.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
+        public static async Task<string?> PickSaveFileAsync(
+            IStorageProvider storage,
+            string title,
+            string defaultExtension,
+            IReadOnlyList<FilePickerFileType> fileTypeChoices,
+            string? suggestedFileName = null,
+            CancellationToken cancellationToken = default
+        )
+        {
+            ArgumentNullException.ThrowIfNull(storage);
+            ArgumentException.ThrowIfNullOrWhiteSpace(title);
+            ArgumentException.ThrowIfNullOrWhiteSpace(defaultExtension);
+            ArgumentNullException.ThrowIfNull(fileTypeChoices);
+            if (fileTypeChoices.Count == 0)
+            {
+                throw new ArgumentException("At least one file type choice is required.", nameof(fileTypeChoices));
+            }
+
             if (cancellationToken.IsCancellationRequested)
             {
                 return null;
@@ -81,11 +166,7 @@ namespace Mfr.App.Ui.Services
                         Title = title,
                         DefaultExtension = defaultExtension,
                         SuggestedFileName = suggestedFileName,
-                        FileTypeChoices =
-                        [
-                            new FilePickerFileType(fileTypeName) { Patterns = [$"*.{defaultExtension}"] },
-                            new FilePickerFileType("All files") { Patterns = ["*.*"] },
-                        ],
+                        FileTypeChoices = fileTypeChoices,
                     }
                 )
                 .ConfigureAwait(true);

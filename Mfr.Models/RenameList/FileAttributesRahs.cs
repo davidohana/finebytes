@@ -5,7 +5,10 @@ namespace Mfr.Models.RenameList
     /// </summary>
     internal static class FileAttributesRahs
     {
-        private const FileAttributes _RahsFlags =
+        /// <summary>
+        /// Read-only, Archive, Hidden, and System bits (MFR7 RAHS set).
+        /// </summary>
+        internal const FileAttributes Mask =
             FileAttributes.ReadOnly | FileAttributes.Archive | FileAttributes.Hidden | FileAttributes.System;
 
         /// <summary>
@@ -45,7 +48,7 @@ namespace Mfr.Models.RenameList
 
             if (_TryParseRahs(trimmed, out var rahs))
             {
-                return (current & ~_RahsFlags) | rahs;
+                return (current & ~Mask) | rahs;
             }
 
             if (

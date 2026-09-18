@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
 using Avalonia.Threading;
+using Mfr.App.Ui.Services;
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.LogDialog;
@@ -74,6 +76,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                 _boundViewModel.OptionsRequested -= _OnOptionsRequested;
                 _boundViewModel.LogRequested -= _OnLogRequested;
                 _boundViewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
+                _boundViewModel.PickRenameScriptPathAsync = null;
                 _boundViewModel = null;
             }
 
@@ -88,6 +91,23 @@ namespace Mfr.App.Ui.Views.MainWindow
             viewModel.OptionsRequested += _OnOptionsRequested;
             viewModel.LogRequested += _OnLogRequested;
             viewModel.ResetConfigurationRequested += _OnResetConfigurationRequested;
+            viewModel.PickRenameScriptPathAsync = _PickRenameScriptPathAsync;
+        }
+
+        private Task<string?> _PickRenameScriptPathAsync()
+        {
+            return FileSavePicker.PickSaveFileAsync(
+                this,
+                title: "Generate Rename Script",
+                defaultExtension: "bat",
+                fileTypeChoices:
+                [
+                    new FilePickerFileType("Batch files") { Patterns = ["*.bat"] },
+                    new FilePickerFileType("PowerShell scripts") { Patterns = ["*.ps1"] },
+                    new FilePickerFileType("All files") { Patterns = ["*.*"] },
+                ],
+                suggestedFileName: "rename"
+            );
         }
 
         private void _OnFilterDefaultSaved(object? sender, string catalogDisplayName)
@@ -402,6 +422,7 @@ namespace Mfr.App.Ui.Views.MainWindow
             viewModel.OptionsRequested -= _OnOptionsRequested;
             viewModel.LogRequested -= _OnLogRequested;
             viewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
+            viewModel.PickRenameScriptPathAsync = null;
 
             if (viewModel.SuppressSessionSaveOnClose)
             {

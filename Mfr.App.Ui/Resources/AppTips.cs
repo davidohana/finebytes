@@ -91,6 +91,9 @@ namespace Mfr.App.Ui.Resources
         /// <summary>Tools → Reset Configuration menu tip (MFR7 ResetConfiguration).</summary>
         public const string ResetConfiguration = "Reset configuration to default values";
 
+        /// <summary>Tools → Generate Rename Script menu tip.</summary>
+        public const string GenerateRenameScript = "Export pending path and attribute changes as a .bat or .ps1 script";
+
         /// <summary>Rename List Add Selected button and menu tip.</summary>
         public const string AddSelected = "Add selected (Ctrl+Shift+S)";
 
