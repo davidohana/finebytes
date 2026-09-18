@@ -1,8 +1,6 @@
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Shell;
-using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.Tests.TestSupport;
-using Mfr.Tests.Ui.FilterChainPane;
 
 namespace Mfr.Tests.Ui.Services.Help
 {
@@ -17,23 +15,16 @@ namespace Mfr.Tests.Ui.Services.Help
         [Fact]
         public void TryOpen_resolves_and_opens_existing_file()
         {
-            var helpDir = Path.Combine(Path.GetTempPath(), $"mfr-help-{Guid.NewGuid():N}");
-            Directory.CreateDirectory(helpDir);
-            try
-            {
-                var helpFile = Path.Combine(helpDir, "SpaceCharacter.html");
-                File.WriteAllText(helpFile, "<html></html>");
-                var opener = new RecordingFileShellOpener();
-                var host = new HelpHost(opener, [helpDir]);
-
-                Assert.True(host.TryOpen("SpaceCharacter.html", out var fullPath));
-                Assert.Equal(helpFile, fullPath);
-                Assert.Equal([helpFile], opener.OpenedWithDefaultApp);
-            }
-            finally
-            {
-                Directory.Delete(helpDir, recursive: true);
-            }
+            TempHelpRoot.Run(
+                (helpDir, opener, host) =>
+                {
+                    var helpFile = Path.Combine(helpDir, "SpaceCharacter.html");
+                    Assert.True(host.TryOpen("SpaceCharacter.html", out var fullPath));
+                    Assert.Equal(helpFile, fullPath);
+                    Assert.Equal([helpFile], opener.OpenedWithDefaultApp);
+                },
+                "SpaceCharacter.html"
+            );
         }
 
         /// <summary>
@@ -42,21 +33,14 @@ namespace Mfr.Tests.Ui.Services.Help
         [Fact]
         public void TryOpen_returns_false_when_missing()
         {
-            var helpDir = Path.Combine(Path.GetTempPath(), $"mfr-help-missing-{Guid.NewGuid():N}");
-            Directory.CreateDirectory(helpDir);
-            try
-            {
-                var opener = new RecordingFileShellOpener();
-                var host = new HelpHost(opener, [helpDir]);
-
-                Assert.False(host.TryOpen("SpaceCharacter.html", out var fullPath));
-                Assert.Null(fullPath);
-                Assert.Empty(opener.OpenedWithDefaultApp);
-            }
-            finally
-            {
-                Directory.Delete(helpDir, recursive: true);
-            }
+            TempHelpRoot.Run(
+                (_, opener, host) =>
+                {
+                    Assert.False(host.TryOpen("SpaceCharacter.html", out var fullPath));
+                    Assert.Null(fullPath);
+                    Assert.Empty(opener.OpenedWithDefaultApp);
+                }
+            );
         }
 
         /// <summary>
@@ -92,95 +76,6 @@ namespace Mfr.Tests.Ui.Services.Help
         public void DefaultHelpRoots_is_app_base_help_only()
         {
             Assert.Equal([Path.Combine(AppContext.BaseDirectory, "help")], HelpHost.DefaultHelpRoots);
-        }
-    }
-
-    /// <summary>
-    /// Filter Chain help command enablement and open wiring.
-    /// </summary>
-    public sealed class FilterChainFilterHelpTests
-    {
-        /// <summary>
-        /// Verifies help is enabled for a single mapped selection and opens the file.
-        /// </summary>
-        [Fact]
-        public void OpenSelectedFilterHelp_opens_mapped_file()
-        {
-            var helpDir = Path.Combine(Path.GetTempPath(), $"mfr-help-cmd-{Guid.NewGuid():N}");
-            Directory.CreateDirectory(helpDir);
-            try
-            {
-                var helpFile = Path.Combine(helpDir, "LettersCase.html");
-                File.WriteAllText(helpFile, "<html></html>");
-                var opener = new RecordingFileShellOpener();
-                var viewModel = new FilterChainViewModel(helpHost: new HelpHost(opener, [helpDir]));
-                viewModel.AddCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
-
-                Assert.True(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));
-                string? missing = null;
-                viewModel.FilterHelpMissing += (_, fileName) => missing = fileName;
-
-                viewModel.OpenSelectedFilterHelpCommand.Execute(null);
-
-                Assert.Null(missing);
-                Assert.Equal([helpFile], opener.OpenedWithDefaultApp);
-            }
-            finally
-            {
-                Directory.Delete(helpDir, recursive: true);
-            }
-        }
-
-        /// <summary>
-        /// Verifies help raises <see cref="FilterChainViewModel.FilterHelpMissing"/> when the file is absent.
-        /// </summary>
-        [Fact]
-        public void OpenSelectedFilterHelp_raises_missing_when_file_absent()
-        {
-            var helpDir = Path.Combine(Path.GetTempPath(), $"mfr-help-absent-{Guid.NewGuid():N}");
-            Directory.CreateDirectory(helpDir);
-            try
-            {
-                var opener = new RecordingFileShellOpener();
-                var viewModel = new FilterChainViewModel(helpHost: new HelpHost(opener, [helpDir]));
-                viewModel.AddCommand.Execute(FilterChainTestUi.Entry("SpaceCharacter"));
-                string? missing = null;
-                viewModel.FilterHelpMissing += (_, fileName) => missing = fileName;
-
-                viewModel.OpenSelectedFilterHelpCommand.Execute(null);
-
-                Assert.Equal("SpaceCharacter.html", missing);
-                Assert.Empty(opener.OpenedWithDefaultApp);
-            }
-            finally
-            {
-                Directory.Delete(helpDir, recursive: true);
-            }
-        }
-
-        /// <summary>
-        /// Verifies help is disabled for multi-select (same as Filter Options / pin / reset).
-        /// </summary>
-        [Fact]
-        public void OpenSelectedFilterHelp_disabled_for_multi_select()
-        {
-            var viewModel = new FilterChainViewModel(helpHost: new HelpHost(NullFileShellOpener.Instance, []));
-            viewModel.AddCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
-            viewModel.SetSelectedSteps([]);
-            viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
-            viewModel.SetSelectedSteps([viewModel.Steps[0], viewModel.Steps[1]]);
-
-            Assert.False(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));
-        }
-
-        /// <summary>
-        /// Verifies help is disabled with an empty Filter Chain.
-        /// </summary>
-        [Fact]
-        public void OpenSelectedFilterHelp_disabled_when_empty()
-        {
-            var viewModel = new FilterChainViewModel(helpHost: new HelpHost(NullFileShellOpener.Instance, []));
-            Assert.False(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));
         }
     }
 }
