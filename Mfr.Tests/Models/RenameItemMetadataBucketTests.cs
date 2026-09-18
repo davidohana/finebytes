@@ -1,5 +1,3 @@
-using Mfr.Models.RenameList;
-
 namespace Mfr.Tests.Models
 {
     /// <summary>

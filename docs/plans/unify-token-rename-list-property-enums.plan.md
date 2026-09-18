@@ -16,10 +16,10 @@ already exists for Image. Internal cleanup — not a product feature.
 For Image and PDF, formatter tokens and Rename List columns each keep a **parallel
 property enum + formatter** for the same DTO fields:
 
-| Domain | Token (Filters) | Rename List (Models) |
-|--------|-----------------|----------------------|
-| Image | `ImagePropertyField` + `ImagePropertiesFormatting` | `ImageRenameListProperty` + `ImageRenameListFieldDisplay` |
-| PDF | `PdfDocumentField` + `PdfDocumentInfoFormatting` | `PdfRenameListProperty` + `PdfRenameListFieldDisplay` |
+| Domain | Token (Filters)                                    | Rename List (Models)                                      |
+| ------ | -------------------------------------------------- | --------------------------------------------------------- |
+| Image  | `ImagePropertyField` + `ImagePropertiesFormatting` | `ImageRenameListProperty` + `ImageRenameListFieldDisplay` |
+| PDF    | `PdfDocumentField` + `PdfDocumentInfoFormatting`   | `PdfRenameListProperty` + `PdfRenameListFieldDisplay`     |
 
 Enums already match 1:1 (same member names/order). Format logic is near-copy; the
 only intentional Token vs Grid behavior fork is **PDF Created/Modified**:
@@ -44,24 +44,24 @@ but are **out of scope** here — apply the Image/PDF pattern later if useful
    `RenameList/Fields/<Domain>/` next to the field type + key map. Filters tokens
    consume that enum; delete the Rename List duplicate enum
    (`ImageRenameListProperty` / `PdfRenameListProperty`).
-2. **One formatter per domain** in Models, with an explicit
+1. **One formatter per domain** in Models, with an explicit
    **`PropertyDisplayContext { Token, Grid }`** (name flexible). Do **not** use
    bare `IFormatProvider` alone — PDF dates also differ by
    `DateTimeOffset` vs `LocalDateTime`, not only culture. Image has no
    context-sensitive arms today; still take the context parameter so P1 proves
    the PDF-ready signature (Image may ignore it until a fork appears).
    Do **not** force tokens and grid to the same culture/date representation.
-3. **Catalog keys stay string constants** on `*RenameListFields.Key`; field enum →
+1. **Catalog keys stay string constants** on `*RenameListFields.Key`; field enum →
    key map lives once next to the Rename List field type (tokens call that map
    from `TryGetFixedField`).
-4. **Sort comparers stay on the Rename List field type** (numeric/date vs string);
+1. **Sort comparers stay on the Rename List field type** (numeric/date vs string);
    formatter is display-only. PDF sort keeps UTC chronological compare — do not
    route sort through the culture formatter.
-5. **Unknown enum arm:** exhaustive `switch` → `throw UnreachableException()`
+1. **Unknown enum arm:** exhaustive `switch` → `throw UnreachableException()`
    (token style). Drop the grid’s `_ => string.Empty` fallback.
-6. **Ship Image first, then PDF** — Image proves the pattern; PDF is the smaller
+1. **Ship Image first, then PDF** — Image proves the pattern; PDF is the smaller
    recent twin and is where context actually branches.
-7. **No Help / whatsnew** unless a user-visible string accidentally changes (should
+1. **No Help / whatsnew** unless a user-visible string accidentally changes (should
    not).
 
 ## MFR7 reference brief
@@ -104,6 +104,7 @@ No new MFR7 crawl required.
 
 ### P1 — Image: single enum + context-aware formatter
 
+- **Status:** done (reviewed)
 - **Scope / files:** Move `ImagePropertyField` + `ImagePropertiesFormatting` into
   Models under `RenameList/Fields/Image/`; signature
   `Format(image, field, PropertyDisplayContext)` (context unused for Image arms);

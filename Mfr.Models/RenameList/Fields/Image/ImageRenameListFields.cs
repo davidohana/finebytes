@@ -47,21 +47,21 @@ namespace Mfr.Models.RenameList.Fields.Image
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
-            new ImagePropertyRenameListField(Key.Format, "Format", ImageRenameListProperty.Format, defaultWidth: 60),
-            new ImagePropertyRenameListField(Key.Width, "Width", ImageRenameListProperty.Width),
-            new ImagePropertyRenameListField(Key.Height, "Height", ImageRenameListProperty.Height),
-            new ImagePropertyRenameListField(Key.BitDepth, "Bit Depth", ImageRenameListProperty.BitDepth),
+            new ImagePropertyRenameListField(Key.Format, "Format", ImagePropertyField.Format, defaultWidth: 60),
+            new ImagePropertyRenameListField(Key.Width, "Width", ImagePropertyField.Width),
+            new ImagePropertyRenameListField(Key.Height, "Height", ImagePropertyField.Height),
+            new ImagePropertyRenameListField(Key.BitDepth, "Bit Depth", ImagePropertyField.BitDepth),
             new ImagePropertyRenameListField(
                 Key.HorzRes,
                 "Horizontal Resolution",
-                ImageRenameListProperty.HorizontalResolutionDpi
+                ImagePropertyField.HorizontalResolutionDpi
             ),
             new ImagePropertyRenameListField(
                 Key.VertRes,
                 "Vertical Resolution",
-                ImageRenameListProperty.VerticalResolutionDpi
+                ImagePropertyField.VerticalResolutionDpi
             ),
-            new ImagePropertyRenameListField(Key.Frames, "Frames Count", ImageRenameListProperty.FrameCount),
+            new ImagePropertyRenameListField(Key.Frames, "Frames Count", ImagePropertyField.FrameCount),
         ];
     }
 }

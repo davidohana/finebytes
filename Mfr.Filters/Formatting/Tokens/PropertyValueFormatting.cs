@@ -5,7 +5,7 @@ namespace Mfr.Filters.Formatting.Tokens
     /// <summary>
     /// Shared token-value formatting for numeric, duration, and boolean properties.
     /// <para>
-    /// Used by media, image, and MPEG formatters. Zero means a numeric or duration property is absent.
+    /// Used by media and MPEG formatters. Zero means a numeric or duration property is absent.
     /// Boolean flags always emit <c>Yes</c> or <c>No</c>.
     /// </para>
     /// </summary>
