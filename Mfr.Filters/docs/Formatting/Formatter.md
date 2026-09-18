@@ -134,6 +134,8 @@ Reads from **`Original.Media.Mpeg`** (nested read-only TagLib `Mpeg.AudioHeader`
 
 Reads from **`Original.Image`** (read-only MetadataExtractor raster cache). Properties load from disk (**`ImageFileReader.Read`**) **on first `image-*` or `exif-*` token use** for that **file** row inside a **`Preview`** run (one MetadataExtractor open fills **`Image`** and **`Exif`**); **`RenameList.Commit`** clears the cache afterward so later previews reload from disk.
 
+Display strings come from Models **`ImagePropertiesFormatting`** (`PropertyDisplayContext.Token`), shared with Rename List Image columns (`Grid`). See [image-metadata-model.md](../../../docs/image-metadata-model.md).
+
 **Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** (exception as **`Cause`**). Mapped rasters are JPEG, PNG, GIF, BMP, TIFF, ICO, and WebP. MetadataExtractor **does** open MP3/WAV (and other audio/video), but **`image-*` still errors** on those types. A missing field on a mapped raster (no DPI, WebP bit depth, `0` dimensions) expands **empty**, not an error.
 
 Keep **`<media-photo-width>`** / **`<media-photo-height>`** for TagLib photo dims; values may differ from **`<image-width>`** / **`<image-height>`**.
@@ -157,6 +159,11 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image properties as
 Reads from **`Original.Pdf`** (read-only PdfPig Info + page-count cache). Properties load from disk
 (**`PdfFileReader.Read`**) **on first `pdf-*` token use** for that **file** row inside a **`Preview`**
 run; **`RenameList.Commit`** clears the cache afterward so later previews reload from disk.
+
+Display strings come from Models **`PdfDocumentInfoFormatting`** (`PropertyDisplayContext.Token`),
+shared with Rename List PDF columns (`Grid`). Created/Modified keep the Token Invariant
+`DateTimeOffset` `"G"` vs Grid `FormatFileDate(LocalDateTime)` split — see
+[pdf-metadata-model.md](../../../docs/pdf-metadata-model.md).
 
 **Directory rows**, non-PDF files, and corrupt/unreadable PDFs surface **`RenameStatus.PreviewError`**
 (exception as **`Cause`**). A successful open with a missing Info field (or unparseable date) expands

@@ -25,7 +25,7 @@ flowchart LR
   me --> mapExif["ExifDataReader.MapFrom"]
   mapImage --> cacheImage["FileMeta.Image"]
   mapExif --> cacheExif["FileMeta.Exif"]
-  cacheImage --> formatImage["ImagePropertiesFormatting"]
+  cacheImage --> formatImage["ImagePropertiesFormatting (Models)"]
   cacheExif --> formatExif["ExifDataFormatting / ExifDateToken / ExifToken"]
 ```
 
@@ -51,6 +51,10 @@ flowchart LR
 - **Disk read / raster + EXIF map** — `Mfr.Metadata` — `ImageFileReader`, `ImagePropertiesReader`, `ExifDataReader`
 - **Lazy load (formatter preview)** — `Mfr.Filters` — `RenameItemImagePropertiesExtensions.EnsureImagePropertiesLoaded`
 - **Rename List grid** — eager-loads image buckets for visible columns and Auto-Sort keys via `RenameList.EnsureMetadataLoaded`
+- **Shared field enum + display** — `Mfr.Models` — `ImagePropertyField` and
+  `ImagePropertiesFormatting.Format(..., PropertyDisplayContext)` under
+  `RenameList/Fields/Image/` (tokens use `Token`; Rename List columns use `Grid`;
+  Image arms are culture-identical today)
 - **Tokens**
   - `Mfr.Filters` — `ImagePropertyTokenBase` (`image-*`); `ExifPropertyTokenBase`, `ExifDateToken`, `ExifToken`
 - **Commit cache clear** — `Mfr.Engine` — `RenameList.Commit` calls `ClearMetadataCaches`

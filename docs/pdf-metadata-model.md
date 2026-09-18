@@ -20,7 +20,7 @@ flowchart LR
   reader --> pig["PdfPig PdfDocument.Open"]
   pig --> map["PdfDocumentInfo map"]
   map --> cache["FileMeta.Pdf"]
-  cache --> format["PdfDocumentInfoFormatting"]
+  cache --> format["PdfDocumentInfoFormatting (Models)"]
 ```
 
 ## Design principles
@@ -44,6 +44,11 @@ flowchart LR
 - **Rename List grid** — eager-loads via `RenameList.EnsureMetadataLoaded`
   (`RenameListMetadataRequirement.Pdf`); attempt/error state shares the
   `RenameItem` / `RenameListMetadataBuckets` single-flag API with TagLib and Image
+- **Shared field enum + display** — `Mfr.Models` — `PdfDocumentField` and
+  `PdfDocumentInfoFormatting.Format(..., PropertyDisplayContext)` under
+  `RenameList/Fields/Pdf/` (tokens use `Token`; Rename List columns use `Grid`).
+  Created/Modified fork: Token = Invariant `DateTimeOffset` `"G"`; Grid =
+  `RenameListFieldDisplay.FormatFileDate(LocalDateTime)`
 - **Tokens** — `Mfr.Filters` — `PdfDocumentTokenBase` (`pdf-*`)
 - **Commit cache clear** — `Mfr.Engine` — `RenameList.Commit` calls `ClearMetadataCaches` →
   `ClearPdfCache`
@@ -81,4 +86,5 @@ file.
 | PageCount | `PdfDocument.NumberOfPages`           |
 
 Dates use PdfPig `GetCreatedDateTimeOffset` / `GetModifiedDateTimeOffset`. When the Info string is
-absent or unparseable, the DTO stores `null` and tokens/columns expand empty.
+absent or unparseable, the DTO stores `null` and tokens/columns expand empty. Display formatting is
+shared via Models `PdfDocumentInfoFormatting` (see Layer map for the Token vs Grid date split).

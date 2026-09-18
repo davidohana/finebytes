@@ -3,6 +3,7 @@ title: Unify token and Rename List property enums
 description: >-
   Collapse Image and PDF twin field enums/formatters (token vs Rename List) into
   one Models-owned property enum + context-aware formatter each.
+status: done
 ---
 
 # Unify token and Rename List property enums
@@ -83,20 +84,18 @@ No new MFR7 crawl required.
 
 ## Existing stubs (finebytes)
 
-- Image token stack: `Mfr.Filters/Formatting/Tokens/Image/ImagePropertiesFormatting.cs`,
-  `ImagePropertyTokens.cs`
-- Image RL stack: `Mfr.Models/RenameList/Fields/Image/ImageRenameListField.cs`
-  (`ImageRenameListProperty`, `ImageRenameListFieldDisplay`)
-- PDF token stack: `Mfr.Filters/Formatting/Tokens/Pdf/PdfDocumentInfoFormatting.cs`,
-  `PdfDocumentTokens.cs`
-- PDF RL stack: `Mfr.Models/RenameList/Fields/Pdf/PdfRenameListField.cs`
-  (`PdfRenameListProperty`, `PdfRenameListFieldDisplay`)
+- Image: `Mfr.Models/RenameList/Fields/Image/` — `ImagePropertyField`,
+  `ImagePropertiesFormatting`, `ImagePropertyRenameListField.CatalogPropertyKey`;
+  tokens in `Mfr.Filters/.../Image/ImagePropertyTokens.cs`
+- PDF: `Mfr.Models/RenameList/Fields/Pdf/` — `PdfDocumentField`,
+  `PdfDocumentInfoFormatting`, `PdfPropertyRenameListField.CatalogPropertyKey`;
+  tokens in `Mfr.Filters/.../Pdf/PdfDocumentTokens.cs`
+- Shared: `Mfr.Models/RenameList/PropertyDisplayContext.cs` (`Token` / `Grid`)
 - Shared grid helpers: `RenameListFieldDisplay` (optional text, positive int, DPI,
   file date)
-- Token helpers: `PropertyValueFormatting` in Filters (ints/duration/YesNo; no
-  DPI/date — Image/PDF tokens inline those today)
-- Layering: Filters → Models allowed; Models must not reference Filters (formatter
-  in Models is the correct direction)
+- Token helpers: `PropertyValueFormatting` in Filters (ints/duration/YesNo; Image/PDF
+  display now uses Models helpers)
+- Layering: Filters → Models allowed; Models must not reference Filters
 - Docs: `docs/image-metadata-model.md`, `docs/pdf-metadata-model.md`,
   `Mfr.Filters/docs/Formatting/Formatter.md`
 
@@ -132,6 +131,7 @@ No new MFR7 crawl required.
 
 ### P3 — Docs only
 
+- **Status:** done
 - **Scope / files:** Note single field enum + display context in
   `docs/image-metadata-model.md`, `docs/pdf-metadata-model.md`, and a short
   Formatter.md cross-link; mark this plan done.
