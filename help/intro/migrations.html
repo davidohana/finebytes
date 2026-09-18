@@ -216,6 +216,60 @@
       </tbody>
     </table>
 
+    <h2 id="lists">Name List, Replace List, and Casing List</h2>
+    <p>
+      In MFR 7 these filters pointed at an external text file (browse / New / Reload). In MFR 8 the
+      list text lives <strong>inside the filter</strong> — edit it in Filter Configuration; it is
+      saved with the Filter Chain and JSON presets. There is no separate list file path, and no
+      Reload step after editing outside the app.
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>MFR 7</th>
+          <th>MFR 8</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Name List (path to a <span class="quote">.txt</span> file)</td>
+          <td><a href="../filters/formatting/NameList.html">Name List</a> — embedded Entries</td>
+          <td>
+            One name per line in the filter options. Prefix / Suffix still support formatter
+            tokens. Paste from an old list file, or use Rename List
+            <a href="../ui/renamelist.html#freeedit">Edit as Name List</a>.
+          </td>
+        </tr>
+        <tr>
+          <td>Replace List (path to a replace-list file)</td>
+          <td><a href="../filters/replace/ReplaceList.html">Replace List</a> — embedded Entries</td>
+          <td>
+            Pairs are one line each: <span class="quote">search =&gt; replacement</span> (not the
+            MFR 7 two-line-per-pair file layout). Match mode and flags stay on the filter.
+          </td>
+        </tr>
+        <tr>
+          <td>Casing List (path to a word list, e.g. <span class="quote">MFRCaser.txt</span>)</td>
+          <td><a href="../filters/case/CasingList.html">Casing List</a> — embedded Words</td>
+          <td>
+            One word per line (or comma-separated) in the filter options. Paste from an old casing
+            file if you still have one.
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="quote">&lt;name-list-entry:path&gt;</span> formatter parameter
+          </td>
+          <td><a href="../filters/formatting/NameList.html">Name List</a> filter</td>
+          <td>
+            There is no Name List formatting token in MFR 8. Use the Name List filter (embedded
+            entries) instead of a path inside a Formatter string.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
     <h2 id="tokens">Formatting tokens and Rename List fields</h2>
     <table class="ref-table">
       <thead>
@@ -256,13 +310,6 @@
           <td>
             Image property tokens no longer cover WMF or EMF. WebP (and EXIF on PNG / TIFF / WebP)
             are supported instead where MetadataExtractor can read them.
-          </td>
-        </tr>
-        <tr>
-          <td>Name List formatter parameter</td>
-          <td><a href="../filters/formatting/NameList.html">Name List</a> filter</td>
-          <td>
-            Per-line names live on the filter; there is no separate Name List formatting token.
           </td>
         </tr>
       </tbody>
