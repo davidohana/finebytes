@@ -59,59 +59,59 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
-            new MpegPropertyRenameListField(Key.Bitrate, "Bitrate", MpegRenameListProperty.Bitrate, defaultWidth: 40),
-            new MpegPropertyRenameListField(Key.VBR, "VBR", MpegRenameListProperty.Vbr, defaultWidth: 40),
+            new MpegPropertyRenameListField(Key.Bitrate, "Bitrate", MpegAudioPropertyField.Bitrate, defaultWidth: 40),
+            new MpegPropertyRenameListField(Key.VBR, "VBR", MpegAudioPropertyField.Encoding, defaultWidth: 40),
             new MpegPropertyRenameListField(
                 Key.Frequency,
                 "Frequency",
-                MpegRenameListProperty.Frequency,
+                MpegAudioPropertyField.Frequency,
                 tip: MpegRenameListFieldTips.Frequency
             ),
             new MpegPropertyRenameListField(
                 Key.Duration,
                 "Duration",
-                MpegRenameListProperty.Duration,
+                MpegAudioPropertyField.Duration,
                 tip: MpegRenameListFieldTips.Duration
             ),
             new MpegPropertyRenameListField(
                 Key.DurationSecs,
                 "Duration (Seconds)",
-                MpegRenameListProperty.DurationSecs,
+                MpegAudioPropertyField.DurationSec,
                 tip: MpegRenameListFieldTips.DurationSecs
             ),
             new MpegPropertyRenameListField(
                 Key.Layer,
                 "Layer",
-                MpegRenameListProperty.Layer,
+                MpegAudioPropertyField.Layer,
                 defaultWidth: 40,
                 tip: MpegRenameListFieldTips.Layer
             ),
             new MpegPropertyRenameListField(
                 Key.Level,
                 "Level",
-                MpegRenameListProperty.Level,
+                MpegAudioPropertyField.MpegVer,
                 defaultWidth: 40,
                 tip: MpegRenameListFieldTips.Level
             ),
-            new MpegPropertyRenameListField(Key.Mode, "Mode", MpegRenameListProperty.Mode),
+            new MpegPropertyRenameListField(Key.Mode, "Mode", MpegAudioPropertyField.Mode),
             new MpegPropertyRenameListField(
                 Key.Copyright,
                 "Copyright",
-                MpegRenameListProperty.Copyright,
+                MpegAudioPropertyField.Copyright,
                 defaultWidth: 40,
                 tip: MpegRenameListFieldTips.Copyright
             ),
             new MpegPropertyRenameListField(
                 Key.Original,
                 "Original",
-                MpegRenameListProperty.Original,
+                MpegAudioPropertyField.Original,
                 defaultWidth: 40,
                 tip: MpegRenameListFieldTips.Original
             ),
             new MpegPropertyRenameListField(
                 Key.Protection,
                 "Protection",
-                MpegRenameListProperty.Protection,
+                MpegAudioPropertyField.Protection,
                 defaultWidth: 40,
                 tip: MpegRenameListFieldTips.Protection
             ),

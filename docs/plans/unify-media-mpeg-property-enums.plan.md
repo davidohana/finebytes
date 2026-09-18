@@ -130,6 +130,7 @@ shipped Image/PDF unify. No new MFR7 crawl required (parent brief still applies)
 
 ### P2 — MPEG: same pattern (prio: medium)
 
+- **Status:** done (reviewed)
 - **Scope / files:** Same as P1 for `MpegAudioPropertyField` / `MpegAudioPropertiesFormatting`;
   delete `MpegRenameListProperty`; keep bitrate/VBR prefix and layer Roman helpers once in Models;
   map Encoding→VBR key, MpegVer→Level, DurationSec→DurationSecs.
