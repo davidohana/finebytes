@@ -1,5 +1,6 @@
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.Tokens.Media;
+using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
@@ -9,6 +10,39 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
     /// </summary>
     public sealed class MediaPropertyTokenTests
     {
+        /// <summary>
+        /// Token enum member names that drift from catalog keys must map explicitly.
+        /// </summary>
+        [Fact]
+        public void CatalogPropertyKey_NameDriftArms_MapExplicitly()
+        {
+            Assert.Equal(
+                MediaRenameListFields.Key.PossiblyCorrupt,
+                MediaPropertyRenameListField.CatalogPropertyKey(MediaPropertyField.Corrupt)
+            );
+            Assert.Equal(
+                MediaRenameListFields.Key.DurationSeconds,
+                MediaPropertyRenameListField.CatalogPropertyKey(MediaPropertyField.DurationSec)
+            );
+            Assert.Equal(
+                MediaRenameListFields.Key.AudioSampleRate,
+                MediaPropertyRenameListField.CatalogPropertyKey(MediaPropertyField.SampleRate)
+            );
+            Assert.Equal(
+                MediaRenameListFields.Key.AudioChannels,
+                MediaPropertyRenameListField.CatalogPropertyKey(MediaPropertyField.Channels)
+            );
+        }
+
+        [Fact]
+        public void TryGetFixedField_CorruptToken_MapsPossiblyCorruptCatalogKey()
+        {
+            var token = new MediaCorruptToken();
+            Assert.True(token.TryGetFixedField(out var groupId, out var propertyKey));
+            Assert.Equal(MediaRenameListFields.Group, groupId);
+            Assert.Equal(MediaRenameListFields.Key.PossiblyCorrupt, propertyKey);
+        }
+
         private static MediaProperties _SampleMedia()
         {
             return new MediaProperties

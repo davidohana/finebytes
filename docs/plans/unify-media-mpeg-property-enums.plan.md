@@ -118,6 +118,7 @@ shipped Image/PDF unify. No new MFR7 crawl required (parent brief still applies)
 
 ### P1 — Media: single enum + context-aware formatter (prio: high)
 
+- **Status:** done (reviewed)
 - **Scope / files:** Move `MediaPropertyField` + `MediaPropertiesFormatting` into Models under
   `RenameList/Fields/Media/`; `Format(media, field, PropertyDisplayContext)`; wire
   `MediaPropertyRenameListField` + `MediaPropertyTokenBase`; delete `MediaRenameListProperty` /

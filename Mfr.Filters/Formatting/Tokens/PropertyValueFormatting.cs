@@ -5,8 +5,9 @@ namespace Mfr.Filters.Formatting.Tokens
     /// <summary>
     /// Shared token-value formatting for numeric, duration, and boolean properties.
     /// <para>
-    /// Used by media and MPEG formatters. Zero means a numeric or duration property is absent.
-    /// Boolean flags always emit <c>Yes</c> or <c>No</c>.
+    /// Used by MPEG audio token formatters. Media uses Models
+    /// <c>RenameListFieldDisplay</c> instead. Zero means a numeric or duration property is
+    /// absent. Boolean flags always emit <c>Yes</c> or <c>No</c>.
     /// </para>
     /// </summary>
     internal static class PropertyValueFormatting
