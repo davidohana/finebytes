@@ -14,7 +14,7 @@ namespace Mfr.Tests.Engine
             "REM **********************************************************\n"
             + "REM *\n"
             + "REM This file was created by Magic File Renamer\n"
-            + "REM http://www.finebytes.com/mfr\n"
+            + "REM https://www.finebytes.com/mfr\n"
             + "REM *\n"
             + "REM **********************************************************\n"
             + "\n";
@@ -23,7 +23,7 @@ namespace Mfr.Tests.Engine
             "# **********************************************************\n"
             + "# *\n"
             + "# This file was created by Magic File Renamer\n"
-            + "# http://www.finebytes.com/mfr\n"
+            + "# https://www.finebytes.com/mfr\n"
             + "# *\n"
             + "# **********************************************************\n"
             + "\n";

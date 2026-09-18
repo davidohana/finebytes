@@ -1,4 +1,5 @@
 using System.Reflection;
+using Mfr.Utils;
 #if BETA
 using System.Globalization;
 using Mfr.Engine.Beta;
@@ -12,7 +13,7 @@ namespace Mfr.App.Ui.Services
     public static class AppProductInfo
     {
         /// <summary>Product web site opened from About.</summary>
-        public const string WebSiteUrl = "https://www.finebytes.com/mfr";
+        public const string WebSiteUrl = ProductUrls.WebSite;
 
         /// <summary>Support mailbox opened from About (<c>mailto:</c>).</summary>
         public const string SupportEmailUrl = "mailto:support@finebytes.com";

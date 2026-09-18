@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Mfr.Utils;
 
 namespace Mfr.Engine.Beta
 {
@@ -11,10 +12,6 @@ namespace Mfr.Engine.Beta
     /// Commit enforcement is active in <c>BETA</c> builds; non-BETA builds stay inactive unless
     /// tests opt in via <see cref="SetEnforceForTests"/>.
     /// </para>
-    /// <para>
-    /// Probe URL matches <c>AppProductInfo.WebSiteUrl</c> (duplicated here because Engine cannot
-    /// reference App.Ui).
-    /// </para>
     /// </remarks>
     public static class BetaExpiryGate
     {
@@ -23,7 +20,6 @@ namespace Mfr.Engine.Beta
         /// </summary>
         public static readonly DateTime ExpiresUtc = new(2027, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-        private const string NetworkTimeUrl = "https://www.finebytes.com/mfr";
         private static readonly TimeSpan ProbeTimeout = TimeSpan.FromSeconds(2);
 
         private static readonly Lock Sync = new();
@@ -248,7 +244,7 @@ namespace Mfr.Engine.Beta
         private static DateTime? _FetchNetworkUtcViaHttp(CancellationToken cancellationToken)
         {
             using var client = new HttpClient { Timeout = ProbeTimeout };
-            using var request = new HttpRequestMessage(HttpMethod.Head, NetworkTimeUrl);
+            using var request = new HttpRequestMessage(HttpMethod.Head, ProductUrls.WebSite);
             using var response = client.Send(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
             if (response.Headers.Date is not { } date)

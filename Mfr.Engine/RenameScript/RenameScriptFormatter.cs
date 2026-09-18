@@ -1,4 +1,5 @@
 using System.Text;
+using Mfr.Utils;
 
 namespace Mfr.Engine.RenameScript
 {
@@ -8,7 +9,7 @@ namespace Mfr.Engine.RenameScript
     public static class RenameScriptFormatter
     {
         private const string _AppName = "Magic File Renamer";
-        private const string _AppUrl = "http://www.finebytes.com/mfr";
+        private const string _AppUrl = ProductUrls.WebSite;
 
         private static readonly (FileAttributes Flag, char Letter, string Name)[] _RahsFlags =
         [

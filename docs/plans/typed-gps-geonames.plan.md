@@ -96,6 +96,18 @@ flowchart TD
 
 Effective username in every cache key. Sync lookup on preview path (~10s HttpClient timeout).
 
+### Throttling / rate limits (locked)
+
+GeoNames free tier (~1 000 credits/hour, ~10 000/day per username; `findNearby` = 4 credits). When the service rejects or throttles (HTTP 4xx/5xx, status payload like “the hourly limit…”, empty/error XML):
+
+1. **Do not** write L3 (failures never persisted).
+2. **Do not** retry in a tight loop on the same preview pass (one attempt per cache miss).
+3. Surface **PreviewError** (geo token) / Rename List metadata error for that row — message should be understandable (e.g. “GeoNames rate limit exceeded” / include truncated service text when safe).
+4. Lat/Lon and other tokens unaffected.
+5. Later previews may succeed after the window resets; L1/L2 for *other* coords still work; user can switch Options override to their own username to leave the shared `fbmfr` pool.
+
+No client-side global QPS throttle in v1 beyond “one HTTP per L3 miss” (L1/L2/L3 already cut repeat calls). Optional later: polite delay between bursts — YAGNI unless we see bans.
+
 ## MFR7 reference brief
 
 - Sources: `JpegGeoPG.cs`, `NearbyPlaceFP.cs`, Help Nearby / jpeg-geo
