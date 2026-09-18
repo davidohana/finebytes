@@ -3,17 +3,24 @@ using Mfr.Models.Tags.Id3v2;
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
 {
     /// <summary>
-    /// ComboBox row for a modeled ID3v2 frame id with a user-visible label.
+    /// ComboBox row for a modeled ID3v2 frame id with a user-visible label and tip.
     /// </summary>
     /// <param name="FrameId">Four-character frame id (uppercase).</param>
     /// <param name="DisplayName">Label shown in the field picker (e.g. <c>TIT2 (Title)</c>).</param>
-    internal sealed record Id3v2FrameChoice(string FrameId, string DisplayName)
+    /// <param name="Tip">Tooltip clarifying the frame (from <see cref="Id3v2FrameTips"/>).</param>
+    internal sealed record Id3v2FrameChoice(string FrameId, string DisplayName, string Tip)
     {
         /// <summary>
         /// Modeled frame rows in Apply-To order (<see cref="Id3v2ModeledFrame.AllModeledFrameIds"/>).
         /// </summary>
         public static IReadOnlyList<Id3v2FrameChoice> All { get; } =
-        [.. Id3v2ModeledFrame.AllModeledFrameIds.Select(id => new Id3v2FrameChoice(id, Id3v2FrameLabels.For(id)))];
+        [
+            .. Id3v2ModeledFrame.AllModeledFrameIds.Select(id => new Id3v2FrameChoice(
+                id,
+                Id3v2FrameLabels.For(id),
+                Id3v2FrameTips.For(id)
+            )),
+        ];
 
         /// <summary>
         /// Default frame row (<c>TIT2</c>) used for empty/unknown ids.

@@ -1,6 +1,7 @@
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.Filters.Audio;
+using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.Tests.Ui.FilterEditors.Audio
 {
@@ -19,6 +20,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             var editor = new Id3v2FieldSetterFilterEditorViewModel(step);
 
             Assert.Equal("TIT2", editor.SelectedFrame.FrameId);
+            Assert.Equal(Id3v2FrameTips.For("TIT2"), editor.SelectedFrame.Tip);
             Assert.Equal(string.Empty, editor.Text);
             Assert.False(editor.OnlyIfEmpty);
             Assert.False(editor.ShowsLanguage);
@@ -132,6 +134,20 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.False(editor.ShowsLanguage);
             Assert.True(editor.ShowsDescription);
             Assert.Equal("key", editor.Description);
+        }
+
+        /// <summary>
+        /// Verifies every modeled frame combo row carries the catalog tip text.
+        /// </summary>
+        [Fact]
+        public void Id3v2_frame_choices_include_frame_tips()
+        {
+            Assert.NotEmpty(Id3v2FrameChoice.All);
+            foreach (var choice in Id3v2FrameChoice.All)
+            {
+                Assert.Equal(Id3v2FrameTips.For(choice.FrameId), choice.Tip);
+                Assert.False(string.IsNullOrWhiteSpace(choice.Tip));
+            }
         }
     }
 }
