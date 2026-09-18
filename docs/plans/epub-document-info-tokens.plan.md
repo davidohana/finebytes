@@ -10,7 +10,7 @@ Parent: [`docs/plans/more-read-only-metadata-formats.plan.md`](docs/plans/more-r
 ## Status
 
 - [x] P1 — Reader + FileMeta bucket
-- [ ] P2 — Tokens + Rename List columns
+- [x] P2 — Tokens + Rename List columns
 - [ ] P3 — Docs + help
 
 ## Decisions (locked)

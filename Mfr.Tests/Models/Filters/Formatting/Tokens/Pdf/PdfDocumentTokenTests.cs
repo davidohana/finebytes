@@ -1,5 +1,6 @@
 using System.Globalization;
 using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 using Mfr.Filters.Formatting.Tokens.Pdf;
 using Mfr.Models.RenameList.Fields.Pdf;
 
@@ -10,6 +11,16 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Pdf
     /// </summary>
     public sealed class PdfDocumentTokenTests
     {
+        [Fact]
+        public void Catalog_PdfTokens_UseDocumentPdfGroupPath()
+        {
+            var pdfEntries = FormatTokenCatalog
+                .Entries.Where(e => e.CanonicalName.StartsWith("pdf-", StringComparison.Ordinal))
+                .ToList();
+            Assert.Equal(Enum.GetValues<PdfDocumentField>().Length, pdfEntries.Count);
+            Assert.All(pdfEntries, e => Assert.Equal("Document\\Pdf", e.GroupPath));
+        }
+
         private static PdfDocumentInfo _SamplePdf()
         {
             return new PdfDocumentInfo

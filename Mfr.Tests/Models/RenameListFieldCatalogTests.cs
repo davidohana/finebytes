@@ -3,6 +3,7 @@ using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Epub;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.RenameList.Fields.Id3v1;
 using Mfr.Models.RenameList.Fields.Id3v2;
@@ -39,7 +40,8 @@ namespace Mfr.Tests.Models
                     + Mp3RenameListFields.All.Count
                     + ImageRenameListFields.All.Count
                     + JpegRenameListFields.All.Count
-                    + PdfRenameListFields.All.Count,
+                    + PdfRenameListFields.All.Count
+                    + EpubRenameListFields.All.Count,
                 RenameListFieldCatalog.All.Count
             );
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(BasicRenameListField.Group).Count);
@@ -63,6 +65,7 @@ namespace Mfr.Tests.Models
             Assert.Equal(7, RenameListFieldCatalog.GetFieldsForGroup(ImageRenameListFields.Group).Count);
             Assert.Equal(17, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(PdfRenameListFields.Group).Count);
+            Assert.Equal(8, RenameListFieldCatalog.GetFieldsForGroup(EpubRenameListFields.Group).Count);
         }
 
         /// <summary>
@@ -96,6 +99,18 @@ namespace Mfr.Tests.Models
                 PdfRenameListFields.All,
                 f => f.PropertyKey == PdfRenameListFields.Key.Producer
             );
+            var epubCreator = Assert.Single(
+                EpubRenameListFields.All,
+                f => f.PropertyKey == EpubRenameListFields.Key.Creator
+            );
+            var epubIdentifier = Assert.Single(
+                EpubRenameListFields.All,
+                f => f.PropertyKey == EpubRenameListFields.Key.Identifier
+            );
+            var epubDescription = Assert.Single(
+                EpubRenameListFields.All,
+                f => f.PropertyKey == EpubRenameListFields.Key.Description
+            );
 
             Assert.Equal(
                 $"{SemanticAudioFieldTips.Artist} ({AudioTagRenameListFields.SemanticTipQualifier})",
@@ -122,6 +137,9 @@ namespace Mfr.Tests.Models
             Assert.Equal(PdfRenameListFieldTips.Author, pdfAuthor.Tip);
             Assert.Equal(PdfRenameListFieldTips.Creator, pdfCreator.Tip);
             Assert.Equal(PdfRenameListFieldTips.Producer, pdfProducer.Tip);
+            Assert.Equal(EpubRenameListFieldTips.Creator, epubCreator.Tip);
+            Assert.Equal(EpubRenameListFieldTips.Identifier, epubIdentifier.Tip);
+            Assert.Equal(EpubRenameListFieldTips.Description, epubDescription.Tip);
         }
 
         [Fact]
@@ -140,6 +158,7 @@ namespace Mfr.Tests.Models
                     ImageRenameListFields.GroupLabel,
                     JpegRenameListFields.GroupLabel,
                     PdfRenameListFields.GroupLabel,
+                    EpubRenameListFields.GroupLabel,
                 ],
                 RenameListFieldCatalog.All.Select(field => field.GroupDisplayName).Distinct()
             );
@@ -527,6 +546,38 @@ namespace Mfr.Tests.Models
             Assert.Equal(
                 RenameListMetadataRequirement.None,
                 RenameListFieldCatalog.GetMetadataRequirement(RenameListFieldKey.Original("Unknown", "Missing"))
+            );
+        }
+
+        [Fact]
+        public void Epub_fields_resolve_cached_metadata_and_require_epub_bucket()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "epub",
+                configureOriginal: meta =>
+                    meta.Epub = new EpubDocumentInfo
+                    {
+                        Title = "Report",
+                        Creator = "Author",
+                        Date = "2024",
+                        Identifier = "urn:uuid:test",
+                    }
+            );
+
+            _AssertField(item, EpubRenameListFields.Group, EpubRenameListFields.Key.Title, "Report");
+            _AssertField(item, EpubRenameListFields.Group, EpubRenameListFields.Key.Creator, "Author");
+            _AssertField(item, EpubRenameListFields.Group, EpubRenameListFields.Key.Date, "2024");
+            _AssertField(item, EpubRenameListFields.Group, EpubRenameListFields.Key.Identifier, "urn:uuid:test");
+            Assert.False(
+                RenameListFieldCatalog
+                    .GetField(EpubRenameListFields.Group, EpubRenameListFields.Key.Title)
+                    .SupportsPreview
+            );
+            Assert.Equal(
+                RenameListMetadataRequirement.Epub,
+                RenameListFieldCatalog.GetMetadataRequirement(
+                    RenameListFieldKey.Original(EpubRenameListFields.Group, EpubRenameListFields.Key.Title)
+                )
             );
         }
 
@@ -1332,6 +1383,23 @@ namespace Mfr.Tests.Models
                 PdfRenameListFields.Key.PageCount
             );
             Assert.True(RenameListFieldCatalog.CompareForSort(twoPages, pageCountKey, tenPages) < 0);
+        }
+
+        [Fact]
+        public void CompareForSort_orders_epub_title_string()
+        {
+            var betaTitle = FilterTestHelpers.CreateRenameItem(
+                fileName: "beta",
+                extension: "epub",
+                configureOriginal: meta => meta.Epub = new EpubDocumentInfo { Title = "Beta" }
+            );
+            var alphaTitle = FilterTestHelpers.CreateRenameItem(
+                fileName: "alpha",
+                extension: "epub",
+                configureOriginal: meta => meta.Epub = new EpubDocumentInfo { Title = "Alpha" }
+            );
+            var titleKey = RenameListFieldKey.Original(EpubRenameListFields.Group, EpubRenameListFields.Key.Title);
+            Assert.True(RenameListFieldCatalog.CompareForSort(betaTitle, titleKey, alphaTitle) > 0);
         }
 
         [Fact]

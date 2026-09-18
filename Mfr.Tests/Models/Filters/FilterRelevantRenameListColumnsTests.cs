@@ -4,6 +4,7 @@ using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.FormatString;
 using Mfr.Filters.Formatting.Tokens;
+using Mfr.Filters.Formatting.Tokens.Epub;
 using Mfr.Filters.Formatting.Tokens.Exif;
 using Mfr.Filters.Formatting.Tokens.Image;
 using Mfr.Filters.Formatting.Tokens.Media;
@@ -13,6 +14,7 @@ using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Epub;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.RenameList.Fields.Id3v1;
 using Mfr.Models.RenameList.Fields.Id3v2;
@@ -533,6 +535,8 @@ namespace Mfr.Tests.Models.Filters
         [InlineData("<exif-date:yyyy-MM-dd>", JpegRenameListFields.Group, JpegRenameListFields.Key.DateTaken)]
         [InlineData("<pdf-title>", PdfRenameListFields.Group, PdfRenameListFields.Key.Title)]
         [InlineData("<pdf-page-count>", PdfRenameListFields.Group, PdfRenameListFields.Key.PageCount)]
+        [InlineData("<epub-title>", EpubRenameListFields.Group, EpubRenameListFields.Key.Title)]
+        [InlineData("<epub-creator>", EpubRenameListFields.Group, EpubRenameListFields.Key.Creator)]
         public void Collect_Formatter_MediaMpegImageExifTokens_MapOriginalCatalogColumns(
             string template,
             string expectedGroupId,
@@ -572,6 +576,7 @@ namespace Mfr.Tests.Models.Filters
                             or ExifPropertyTokenBase
                             or ExifDateToken
                             or PdfDocumentTokenBase
+                            or EpubDocumentTokenBase
                 )
                 .ToList();
 
