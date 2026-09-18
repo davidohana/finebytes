@@ -1,3 +1,5 @@
+using Mfr.Models.Tags;
+
 namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
 {
     /// <summary>
@@ -27,127 +29,134 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
         /// </summary>
         public static IReadOnlyList<AudioTagSetterFieldChoice> All { get; } =
         [
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Performers,
                 AudioTagSetterFieldGroup.Basic,
                 "Set artist:",
-                "Primary artists. Use ';' to separate multiple values.",
-                Watermark: "<parent-folder:1>"
+                SemanticAudioField.Performers,
+                watermark: "<parent-folder:1>"
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.AlbumArtists,
                 AudioTagSetterFieldGroup.Basic,
                 "Set album artist:",
-                "Album artists. Use ';' to separate multiple values.",
-                Watermark: "<parent-folder:1>"
+                SemanticAudioField.AlbumArtists,
+                watermark: "<parent-folder:1>"
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Title,
                 AudioTagSetterFieldGroup.Basic,
                 "Set title:",
-                "Track title.",
-                Watermark: "<file-name>"
+                SemanticAudioField.Title,
+                watermark: "<file-name>"
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Album,
                 AudioTagSetterFieldGroup.Basic,
                 "Set album:",
-                "Album name.",
-                Watermark: "<parent-folder:1>"
+                SemanticAudioField.Album,
+                watermark: "<parent-folder:1>"
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Year,
                 AudioTagSetterFieldGroup.Basic,
                 "Set year:",
-                "Release year 1–9999 after formatting. Empty or 0 clears.",
-                Watermark: "2004"
+                SemanticAudioField.Year,
+                watermark: "2004",
+                setterNote: "1–9999 after formatting. Empty or 0 clears."
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Genre,
                 AudioTagSetterFieldGroup.Basic,
                 "Set genre:",
-                "Use ';' to separate multiple values. ID3v1 accepts only predefined genre names.",
-                Watermark: "Rock",
-                UsesGenreCombo: true
+                SemanticAudioField.Genre,
+                watermark: "Rock",
+                setterNote: "ID3v1 accepts only predefined genre names.",
+                usesGenreCombo: true
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Comment,
                 AudioTagSetterFieldGroup.Basic,
                 "Set comment:",
-                "Comment text.",
-                Watermark: "Tagged via MFR"
+                SemanticAudioField.Comment,
+                watermark: "Tagged via MFR"
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Track,
                 AudioTagSetterFieldGroup.TrackDisc,
                 "Set track number:",
-                "Track index after formatting (0–255 base). Empty always clears. With auto-increment, Rename List index is added to the base before clamping to 255.",
-                Watermark: "1",
-                ShowsAutoIncrement: true
+                SemanticAudioField.Track,
+                watermark: "1",
+                setterNote: "Empty always clears. With auto-increment, Rename List index is added to the base before clamping to 255.",
+                showsAutoIncrement: true
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.TrackCount,
                 AudioTagSetterFieldGroup.TrackDisc,
                 "Set track count:",
-                "Total tracks (n of m). Empty or 0 clears; otherwise 1–255.",
-                Watermark: "12"
+                SemanticAudioField.TrackCount,
+                watermark: "12",
+                setterNote: "Empty or 0 clears; otherwise 1–255."
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Disc,
                 AudioTagSetterFieldGroup.TrackDisc,
                 "Set disc:",
-                "Disc index. Empty or 0 clears; otherwise 1–255.",
-                Watermark: "1"
+                SemanticAudioField.Disc,
+                watermark: "1",
+                setterNote: "Empty or 0 clears; otherwise 1–255."
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.DiscCount,
                 AudioTagSetterFieldGroup.TrackDisc,
                 "Set disc count:",
-                "Total discs. Empty or 0 clears; otherwise 1–255.",
-                Watermark: "2"
+                SemanticAudioField.DiscCount,
+                watermark: "2",
+                setterNote: "Empty or 0 clears; otherwise 1–255."
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Composers,
                 AudioTagSetterFieldGroup.Extended,
                 "Set composer:",
-                "Composers. Use ';' to separate multiple values.",
-                Watermark: "J. S. Bach"
+                SemanticAudioField.Composers,
+                watermark: "J. S. Bach"
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Conductor,
                 AudioTagSetterFieldGroup.Extended,
                 "Set conductor:",
-                "Conductor or director.",
-                Watermark: "Karajan"
+                SemanticAudioField.Conductor,
+                watermark: "Karajan"
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Grouping,
                 AudioTagSetterFieldGroup.Extended,
                 "Set grouping:",
-                "Content group / work title.",
-                Watermark: "Suite"
+                SemanticAudioField.Grouping,
+                watermark: "Suite"
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Copyright,
                 AudioTagSetterFieldGroup.Extended,
                 "Set copyright:",
-                "Copyright notice.",
-                Watermark: "© 2004"
+                SemanticAudioField.Copyright,
+                watermark: "© 2004"
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.BeatsPerMinute,
                 AudioTagSetterFieldGroup.Extended,
                 "Set BPM:",
-                "Tempo 1–65535 after formatting. Empty or 0 clears.",
-                Watermark: "120"
+                SemanticAudioField.BeatsPerMinute,
+                watermark: "120",
+                setterNote: "1–65535 after formatting. Empty or 0 clears."
             ),
-            new(
+            _Row(
                 AudioTagSetterFieldKind.Lyrics,
                 AudioTagSetterFieldGroup.Extended,
                 "Set lyrics:",
-                "Unsynchronised lyrics.",
-                Watermark: "Verse one",
-                Multiline: true
+                SemanticAudioField.Lyrics,
+                watermark: "Verse one",
+                multiline: true
             ),
         ];
 
@@ -165,6 +174,26 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Audio
                 AudioTagSetterFieldGroup.Extended => "Extended",
                 _ => throw new ArgumentOutOfRangeException(nameof(group), group, null),
             };
+        }
+
+        /// <summary>
+        /// Builds a catalog row whose tip is the shared semantic meaning plus an optional setter note.
+        /// </summary>
+        private static AudioTagSetterFieldChoice _Row(
+            AudioTagSetterFieldKind kind,
+            AudioTagSetterFieldGroup group,
+            string label,
+            SemanticAudioField field,
+            string watermark = "",
+            string? setterNote = null,
+            bool showsAutoIncrement = false,
+            bool multiline = false,
+            bool usesGenreCombo = false
+        )
+        {
+            var meaning = SemanticAudioFieldTips.For(field);
+            var tip = setterNote is null ? meaning : $"{meaning} {setterNote}";
+            return new(kind, group, label, tip, watermark, showsAutoIncrement, multiline, usesGenreCombo);
         }
     }
 }

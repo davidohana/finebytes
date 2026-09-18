@@ -746,7 +746,7 @@ namespace Mfr.Tests.Models
             {
                 Assert.True(field.SupportsPreview, field.PropertyKey);
                 Assert.True(field.SupportsWrite, field.PropertyKey);
-                Assert.Equal($"{expected} (ID3v1)", field.DisplayName);
+                Assert.Equal($"{Id3v1FieldLabels.For(expected)} (ID3v1)", field.DisplayName);
                 Assert.Equal($"{Id3v1FieldTips.For(expected)} ({Id3v1RenameListFields.GroupLabel})", field.Tip);
                 var target = Assert.IsType<Id3v1FieldTarget>(field.WriteTarget);
                 Assert.Equal(expected, target.Field);

@@ -8,7 +8,7 @@ namespace Mfr.Models.Tags.Id3v2
         private static readonly Dictionary<string, string> s_FrameIdToTip = _BuildMap();
 
         /// <summary>
-        /// Tooltip for the read-only ID3v2 version Rename List column.
+        /// Tooltip for the read-only ID3v2 version Rename List column and <c>&lt;id3v2-version&gt;</c> token.
         /// </summary>
         public const string Version = "ID3v2 tag major version on disk (shown as 2.3 / 2.4).";
 
@@ -37,57 +37,49 @@ namespace Mfr.Models.Tags.Id3v2
                 frameIdToTip[frameId] = tip;
             }
 
-            // Prefer specific wording for common / multi-instance / structured frames.
-            Add("TIT2", "Track title (ID3v2 TIT2).");
-            Add("TIT1", "Content group / work set (ID3v2 TIT1).");
-            Add("TIT3", "Subtitle / description refinement (ID3v2 TIT3).");
-            Add("TALB", "Album / release title (ID3v2 TALB).");
-            Add("TPE1", "Lead performer(s) / artist (ID3v2 TPE1).");
-            Add("TPE2", "Band / orchestra / album artist (ID3v2 TPE2).");
-            Add("TPE3", "Conductor / performer refinement (ID3v2 TPE3).");
-            Add("TPE4", "Interpreted, remixed, or otherwise modified by (ID3v2 TPE4).");
-            Add("TCOM", "Composer (ID3v2 TCOM).");
-            Add("TCON", "Content type / genre (ID3v2 TCON).");
-            Add("TCOP", "Copyright message (ID3v2 TCOP).");
-            Add("TBPM", "Beats per minute (ID3v2 TBPM).");
-            Add("TRCK", "Track number, optionally as n/total (ID3v2 TRCK).");
-            Add("TPOS", "Disc number, optionally as n/total (ID3v2 TPOS).");
-            Add("TYER", "Year of recording (ID3v2 TYER; v2.3).");
+            void AddSemantic(string frameId, SemanticAudioField field)
+            {
+                Add(frameId, _WithFrameId(SemanticAudioFieldTips.For(field), frameId));
+            }
+
+            AddSemantic("TIT2", SemanticAudioField.Title);
+            AddSemantic("TIT1", SemanticAudioField.Grouping);
+            AddSemantic("TALB", SemanticAudioField.Album);
+            AddSemantic("TPE1", SemanticAudioField.Performers);
+            AddSemantic("TPE2", SemanticAudioField.AlbumArtists);
+            AddSemantic("TPE3", SemanticAudioField.Conductor);
+            AddSemantic("TCOM", SemanticAudioField.Composers);
+            AddSemantic("TCON", SemanticAudioField.Genre);
+            AddSemantic("TCOP", SemanticAudioField.Copyright);
+            AddSemantic("TBPM", SemanticAudioField.BeatsPerMinute);
+
+            Add("TRCK", _WithFrameId("Track number, optionally as n/total", "TRCK"));
+            Add("TPOS", _WithFrameId("Disc number, optionally as n/total", "TPOS"));
+            Add("TYER", _WithFrameId(SemanticAudioFieldTips.Year, "TYER; v2.3"));
             Add("TDRC", "Recording time (ID3v2 TDRC; v2.4).");
             Add("TDAT", "Date (ID3v2 TDAT; v2.3 DDMM).");
-            Add("TORY", "Original release year (ID3v2 TORY).");
             Add("TDOR", "Original release time (ID3v2 TDOR; v2.4).");
             Add("TDRL", "Release time (ID3v2 TDRL; v2.4).");
             Add("TDEN", "Encoding time (ID3v2 TDEN; v2.4).");
             Add("TDTG", "Tagging time (ID3v2 TDTG; v2.4).");
-            Add("COMM", "Comment; Rename List / primary Apply-To use the primary instance (ID3v2 COMM).");
-            Add("USLT", "Unsynchronised lyrics; primary instance when language/description omitted (ID3v2 USLT).");
+            Add(
+                "COMM",
+                _WithFrameId(
+                    $"{SemanticAudioFieldTips.Comment.TrimEnd('.')}; Rename List / primary Apply-To use the primary instance",
+                    "COMM"
+                )
+            );
+            Add(
+                "USLT",
+                _WithFrameId(
+                    $"{SemanticAudioFieldTips.Lyrics.TrimEnd('.')}; primary instance when language/description omitted",
+                    "USLT"
+                )
+            );
             Add("TXXX", "User-defined text; primary instance when description omitted (ID3v2 TXXX).");
-            Add("TEXT", "Lyricist / text writer (ID3v2 TEXT).");
-            Add("TOLY", "Original lyricist / text writer (ID3v2 TOLY).");
-            Add("TOPE", "Original artist / performer (ID3v2 TOPE).");
-            Add("TOAL", "Original album title (ID3v2 TOAL).");
-            Add("TOFN", "Original filename (ID3v2 TOFN).");
-            Add("TOWN", "File owner / licensee (ID3v2 TOWN).");
-            Add("TPUB", "Publisher (ID3v2 TPUB).");
-            Add("TRSN", "Internet radio station name (ID3v2 TRSN).");
-            Add("TRSO", "Internet radio station owner (ID3v2 TRSO).");
-            Add("TENC", "Encoded by (ID3v2 TENC).");
-            Add("TSSE", "Software / hardware and settings used for encoding (ID3v2 TSSE).");
-            Add("TFLT", "File type (ID3v2 TFLT).");
-            Add("TMED", "Media type (ID3v2 TMED).");
-            Add("TMOO", "Mood (ID3v2 TMOO).");
-            Add("TKEY", "Initial musical key (ID3v2 TKEY).");
-            Add("TLAN", "Language(s) (ID3v2 TLAN).");
-            Add("TLEN", "Length of the audio in milliseconds (ID3v2 TLEN).");
             Add("TSIZ", "Size of the audio in bytes (ID3v2 TSIZ; obsolete in v2.4).");
-            Add("TIPL", "Involved people list (ID3v2 TIPL).");
             Add("TRDA", "Recording dates (ID3v2 TRDA; obsolete in v2.4).");
-            Add("TSOA", "Album sort order (ID3v2 TSOA).");
-            Add("TSOP", "Performer sort order (ID3v2 TSOP).");
-            Add("TSST", "Set subtitle (ID3v2 TSST).");
 
-            // Any modeled frame missing above still gets a short-name-based tip.
             foreach (var (frameId, shortName) in Id3v2ModeledFrame.FrameIdToShortName)
             {
                 if (!frameIdToTip.ContainsKey(frameId))
@@ -97,6 +89,14 @@ namespace Mfr.Models.Tags.Id3v2
             }
 
             return frameIdToTip;
+        }
+
+        /// <summary>
+        /// Appends the frame id in parentheses after a field meaning (strips a trailing period first).
+        /// </summary>
+        private static string _WithFrameId(string meaning, string frameId)
+        {
+            return $"{meaning.TrimEnd('.')} (ID3v2 {frameId}).";
         }
     }
 }

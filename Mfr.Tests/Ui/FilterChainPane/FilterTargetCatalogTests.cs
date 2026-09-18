@@ -179,6 +179,24 @@ namespace Mfr.Tests.Ui.FilterChainPane
         }
 
         /// <summary>
+        /// Verifies ID3v1 Apply-To labels come from <see cref="Id3v1FieldLabels"/>.
+        /// </summary>
+        [Fact]
+        public void Id3v1_options_use_field_labels_and_tips()
+        {
+            var id3v1Group = FilterTargetCatalog.Groups.First(group => group.Label == "ID3v1");
+            foreach (var field in Enum.GetValues<Id3v1Field>())
+            {
+                var option = Assert.Single(
+                    id3v1Group.Targets,
+                    t => t.Prototype is Id3v1FieldTarget target && target.Field == field
+                );
+                Assert.Equal(Id3v1FieldLabels.For(field), option.Label);
+                Assert.Equal(Id3v1FieldTips.For(field), option.Tip);
+            }
+        }
+
+        /// <summary>
         /// Verifies Path Apply-To options tip Parent Directory vs Parent Folder.
         /// </summary>
         [Fact]

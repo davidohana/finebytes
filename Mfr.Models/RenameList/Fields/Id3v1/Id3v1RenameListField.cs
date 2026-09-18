@@ -15,7 +15,7 @@ namespace Mfr.Models.RenameList.Fields.Id3v1
             Id3v1RenameListFields.Group,
             Id3v1RenameListFields.GroupLabel,
             field.ToString(),
-            $"{field} (ID3v1)",
+            $"{Id3v1FieldLabels.For(field)} (ID3v1)",
             defaultWidth,
             isSortable: true,
             supportsPreview: true,

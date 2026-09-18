@@ -187,7 +187,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChainPane
             [
                 .. Enum.GetValues<Id3v1Field>()
                     .Select(field => new FilterTargetOption(
-                        field.ToString(),
+                        Id3v1FieldLabels.For(field),
                         new Id3v1FieldTarget(field),
                         Id3v1FieldTips.For(field)
                     )),
