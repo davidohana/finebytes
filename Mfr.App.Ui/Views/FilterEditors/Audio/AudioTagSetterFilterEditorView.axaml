@@ -22,7 +22,7 @@
             SharedSizeGroup="{x:Static controls:FilterEditorLabeledRow.LabelSharedSizeGroup}"
           />
           <ColumnDefinition Width="8" />
-          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="*" MinWidth="100" />
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <controls:CompactCheckBox
@@ -118,6 +118,16 @@
                 </controls:RichToolTip>
               </ToolTip.Tip>
               <StackPanel Spacing="4" Grid.IsSharedSizeScope="True">
+                <ItemsControl
+                  ItemsSource="{Binding WideCompactRows}"
+                  ItemTemplate="{StaticResource AudioTagSetterFieldRowTemplate}"
+                >
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Spacing="4" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                </ItemsControl>
                 <Grid ColumnDefinitions="*,24,*">
                   <ItemsControl
                     ItemsSource="{Binding LeftCompactRows}"
