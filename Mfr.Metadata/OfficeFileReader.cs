@@ -16,6 +16,7 @@ namespace Mfr.Metadata
         /// <exception cref="ArgumentException"><paramref name="absolutePath"/> is empty, relative, missing, or a directory.</exception>
         /// <exception cref="InvalidDataException">The path is not a <c>.docx</c> file.</exception>
         /// <exception cref="OpenXmlPackageException">The file is not a readable WordprocessingDocument package.</exception>
+        /// <exception cref="FileFormatException">The path is not a valid OPC/ZIP package.</exception>
         public static OfficeDocumentInfo Read(string absolutePath)
         {
             absolutePath.RequireExistingRegularFile();
@@ -57,8 +58,14 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Maps package <see cref="DateTime"/> to <see cref="DateTimeOffset"/>; unspecified kind uses UTC offset 0.
+        /// Maps package <see cref="DateTime"/> to UTC <see cref="DateTimeOffset"/> (PDF-stable token times).
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// OpenXml often surfaces Zulu core props as <see cref="DateTimeKind.Local"/>. Unspecified kind is treated as
+        /// UTC offset 0; Local/Utc keep the same instant and normalize to offset 0.
+        /// </para>
+        /// </remarks>
         private static DateTimeOffset? _MapDate(DateTime? value)
         {
             if (value is not { } dt)
@@ -66,17 +73,12 @@ namespace Mfr.Metadata
                 return null;
             }
 
-            if (dt.Kind == DateTimeKind.Utc)
+            if (dt.Kind == DateTimeKind.Unspecified)
             {
-                return new DateTimeOffset(dt);
+                return new DateTimeOffset(dt, TimeSpan.Zero);
             }
 
-            if (dt.Kind == DateTimeKind.Local)
-            {
-                return new DateTimeOffset(dt);
-            }
-
-            return new DateTimeOffset(dt, TimeSpan.Zero);
+            return new DateTimeOffset(dt).ToUniversalTime();
         }
     }
 }

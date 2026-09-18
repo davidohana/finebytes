@@ -21,14 +21,8 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("Sample Category", office.Category);
             Assert.Equal("Sample Office Description", office.Description);
             Assert.Equal("Sample Last Modified By", office.LastModifiedBy);
-            Assert.NotNull(office.Created);
-            Assert.NotNull(office.Modified);
-            Assert.Equal(2024, office.Created.Value.Year);
-            Assert.Equal(1, office.Created.Value.Month);
-            Assert.Equal(15, office.Created.Value.Day);
-            Assert.Equal(2024, office.Modified.Value.Year);
-            Assert.Equal(2, office.Modified.Value.Month);
-            Assert.Equal(20, office.Modified.Value.Day);
+            Assert.Equal(new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.Zero), office.Created);
+            Assert.Equal(new DateTimeOffset(2024, 2, 20, 14, 45, 0, TimeSpan.Zero), office.Modified);
         }
 
         [Fact]

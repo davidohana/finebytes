@@ -191,6 +191,30 @@ namespace Mfr.Tests.Models.Filters
         }
 
         [Fact]
+        public void Corrupt_docx_soft_fails_office_bucket()
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            Directory.CreateDirectory(tempDir);
+            try
+            {
+                var path = Path.Combine(tempDir, "corrupt.docx");
+                File.WriteAllText(path, "not-a-zip-or-opc-package");
+                var item = RenameItemFixtures.UnmarkedFromPath(path);
+
+                RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Office);
+
+                Assert.True(item.OfficeLoadAttempted);
+                Assert.NotNull(item.OfficeLoadError);
+                Assert.Null(item.Original.Office);
+                Assert.Equal("FileFormatException", item.OfficeLoadError.GetType().Name);
+            }
+            finally
+            {
+                Directory.Delete(tempDir, recursive: true);
+            }
+        }
+
+        [Fact]
         public void Clear_epub_cache_resets_flag_and_dto()
         {
             var item = RenameItemFixtures.Unmarked("tiny-info.epub");
