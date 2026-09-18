@@ -15,91 +15,88 @@
     </nav>
     <hr />
     <h1>Feature List</h1>
-    <ul>
-      <li>
-        Can modify names, extensions, attributes, and dates (creation / last write / last access)
-        for files and folders.
-      </li>
-      <li>
-        Modify tags for audio files.
-        <ul>
-          <li>
-            Common audio formats and tag standards are supported (for example MP3 with
-            ID3v1/ID3v2, Ogg Vorbis / FLAC, APE, Apple, ASF, and RIFF-style tags where available).
-          </li>
-          <li>Preview shows planned tag changes before you press GO.</li>
-        </ul>
-      </li>
-      <li>
-        Path Mover can relocate files into different folders and build folder hierarchies from
-        patterns (for example <span class="quote">\(artist)\(album)\(track)</span>).
-      </li>
-      <li>
-        When adding files, you can:
-        <ul>
-          <li>Browse with the built-in File List (path combo, back / forward / up / refresh).</li>
-          <li>Use mask and exclude filters to include or skip file types.</li>
-          <li>Add recursively from folders, including network paths Windows can reach.</li>
-          <li>Drag and drop files onto the Rename List from Explorer or other apps.</li>
-        </ul>
-      </li>
-      <li>
-        Shows a real-time preview of expected results, including changes to audio tags, dates, and
-        attributes. Highlights changed cells and predicted errors.
-      </li>
-      <li>
-        Powerful pattern renaming (Formatter) lets you rewrite text fields — including audio tag
-        text — from patterns you define. Properties you can use as tokens include:
-        <ul>
-          <li>Audio tag fields and MPEG/media properties</li>
-          <li>Image properties (width, height, format, and related facts)</li>
-          <li>JPEG / EXIF metadata (read-only for formatting)</li>
-          <li>Basic file properties: dates, size, parent folder, file count, and more</li>
-          <li>Counters, random characters, and session item counts</li>
-        </ul>
-      </li>
-      <li>
-        String-processing filters can target any part of a name or other writeable field (for
-        example uppercase only the first token, using <span class="quote">-</span> as a separator).
-      </li>
-      <li>
-        Case, space, trimming, replace, formatting, audio, attributes, and misc filter groups —
-        dozens of filters in total. See <a href="../filters/filters.html">Filters</a>.
-      </li>
-      <li>
-        Audio Tag Setter, ID3v2 Field Setter, and Audio Tag Remover for embedded tags, with
-        auto-increment track numbers and format patterns where supported.
-      </li>
-      <li>
-        Presets let you save a Filter Chain (ordered filters plus options) and reload it later.
-      </li>
-      <li>
-        Rename List lets you choose visible fields (including audio, dates, EXIF, and more), sort by
-        one or more columns, export visible columns to CSV, and manually override cells with F2.
-      </li>
-      <li>
-        Before/after mode can flip the grid between original and preview values for the same fields.
-      </li>
-      <li>
-        Undo Last prepares a reverse preview from the last GO (disk is unchanged until you press GO
-        again). Rename Log keeps history of past operations.
-      </li>
-      <li>
-        Options dialog for preferences; configuration lives under your AppData finebytes folder.
-      </li>
-      <li>
-        Local Help opens in your default browser (F1 / Help menu). Filter Configuration
-        <strong>?</strong> opens that filter’s topic.
-      </li>
-      <li>
-        Command-line / console mode for automated renaming with presets
-        (<a href="../guide/console.html">Console</a>, <a href="../guide/cml.html">parameters</a>).
-      </li>
-    </ul>
-    <p class="note">
-      Features from MFR 7 that are not in this build (for example FreeDB album lookup and Explorer
-      shell context-menu integration) are omitted here on purpose. They may return in a later
-      release. See <a href="migrations.html">Migrating from MFR 7</a> for renames and replacements.
+    <p>
+      Magic File Renamer batches rename files and folders, update attributes and dates, and write
+      audio tags — with a live preview before anything hits disk.
     </p>
+
+    <h2>Names, dates, and attributes</h2>
+    <p>
+      Change names, extensions, attributes, and creation / last-write / last-access dates for files
+      and folders in one pass.
+    </p>
+
+    <h2>Audio tags</h2>
+    <p>
+      Edit tags for common formats (MP3 ID3v1/ID3v2, Ogg Vorbis / FLAC, APE, Apple, ASF, RIFF, and
+      more). Use Audio Tag Setter, ID3v2 Field Setter, and Audio Tag Remover — including
+      auto-increment track numbers and format patterns where supported. Preview shows planned tag
+      changes before GO.
+    </p>
+
+    <h2>Path Mover</h2>
+    <p>
+      Relocate files into other folders and build hierarchies from patterns, for example
+      <span class="quote">\(artist)\(album)\(track)</span>.
+    </p>
+
+    <h2>Adding files</h2>
+    <p>
+      Browse with the built-in File List (path combo, back / forward / up / refresh). Mask and
+      exclude filters control what is included. Add recursively — including network paths Windows
+      can reach — or drag and drop from Explorer.
+    </p>
+
+    <h2>Live preview</h2>
+    <p>
+      See expected results in real time for names, tags, dates, and attributes. Changed cells and
+      predicted errors are highlighted. Before/after mode flips the same columns between original
+      and preview values.
+    </p>
+
+    <h2>Formatter and tokens</h2>
+    <p>
+      Pattern renaming rewrites text fields — including audio tag text — from patterns you define.
+      Tokens can pull audio and media properties, image facts, JPEG / EXIF metadata (read-only),
+      file dates and size, parent folder, counters, random characters, and session counts.
+    </p>
+
+    <h2>Filters</h2>
+    <p>
+      Case, space, trimming, replace, formatting, audio, attributes, and misc groups — dozens of
+      filters you can chain and target to any writeable field. See
+      <a href="../filters/filters.html">Filters</a>.
+    </p>
+
+    <h2>Rename List</h2>
+    <p>
+      Choose visible fields (audio, dates, EXIF, and more), sort by one or more columns, export
+      visible columns to CSV, and override cells with F2.
+    </p>
+
+    <h2>Presets</h2>
+    <p>
+      Save a Filter Chain (ordered filters plus options) and reload it later for repeat jobs.
+    </p>
+
+    <h2>Undo and history</h2>
+    <p>
+      Undo Last prepares a reverse preview from the last GO; disk is unchanged until you press GO
+      again. Rename Log keeps a history of past operations.
+    </p>
+
+    <h2>Options and Help</h2>
+    <p>
+      Preferences live under your AppData finebytes folder. Local Help opens in your browser (F1 /
+      Help menu); Filter Configuration <strong>?</strong> opens that filter’s topic.
+    </p>
+
+    <h2>Console automation</h2>
+    <p>
+      Command-line / console mode runs automated renaming with presets. See
+      <a href="../guide/console.html">Console</a> and
+      <a href="../guide/cml.html">parameters</a>.
+    </p>
+
   </body>
 </html>
