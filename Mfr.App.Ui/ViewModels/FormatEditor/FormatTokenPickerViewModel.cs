@@ -39,7 +39,25 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
         /// </summary>
         public bool IsGrouped => SearchText.Trim().Length == 0;
 
-        partial void OnSearchTextChanged(string value) => _RefreshVisibleItems();
+        partial void OnSearchTextChanged(string value)
+        {
+            _RefreshVisibleItems();
+            ClearSearchCommand.NotifyCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Clears <see cref="SearchText"/> and returns the picker to grouped browse.
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanClearSearch))]
+        public void ClearSearch()
+        {
+            SearchText = string.Empty;
+        }
+
+        private bool _CanClearSearch()
+        {
+            return SearchText.Trim().Length > 0;
+        }
 
         /// <summary>
         /// Inserts a catalog row's default text at the caret.

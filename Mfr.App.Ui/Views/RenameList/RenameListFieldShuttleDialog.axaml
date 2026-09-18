@@ -296,7 +296,17 @@
                 PlaceholderText="Search fields…"
                 VerticalAlignment="Center"
                 Text="{Binding SearchText}"
-              />
+              >
+                <TextBox.InnerRightContent>
+                  <Button
+                    Classes="catalog-search-clear"
+                    ToolTip.Tip="Clear search"
+                    Command="{Binding ClearSearchCommand}"
+                    IsVisible="{Binding IsFieldSearchActive}"
+                    Content="✕"
+                  />
+                </TextBox.InnerRightContent>
+              </TextBox>
               <StackPanel
                 Grid.Row="1"
                 Grid.Column="2"
@@ -451,7 +461,17 @@
                 PlaceholderText="Search fields…"
                 VerticalAlignment="Center"
                 Text="{Binding SearchText}"
-              />
+              >
+                <TextBox.InnerRightContent>
+                  <Button
+                    Classes="catalog-search-clear"
+                    ToolTip.Tip="Clear search"
+                    Command="{Binding ClearSearchCommand}"
+                    IsVisible="{Binding IsFieldSearchActive}"
+                    Content="✕"
+                  />
+                </TextBox.InnerRightContent>
+              </TextBox>
               <StackPanel
                 Grid.Row="1"
                 Grid.Column="2"

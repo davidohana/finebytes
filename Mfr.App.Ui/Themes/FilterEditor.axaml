@@ -354,6 +354,25 @@
   >
     <Setter Property="Foreground" Value="{DynamicResource FilterEditorWatermarkBrush}" />
   </Style>
+  <Style Selector="Button.catalog-search-clear">
+    <Setter Property="MinWidth" Value="22" />
+    <Setter Property="MinHeight" Value="22" />
+    <Setter Property="Width" Value="22" />
+    <Setter Property="Height" Value="22" />
+    <Setter Property="Padding" Value="0" />
+    <Setter Property="Margin" Value="0,0,2,0" />
+    <Setter Property="Background" Value="Transparent" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="FontSize" Value="11" />
+    <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+    <Setter Property="VerticalAlignment" Value="Center" />
+    <Setter Property="HorizontalContentAlignment" Value="Center" />
+    <Setter Property="VerticalContentAlignment" Value="Center" />
+    <Setter Property="Cursor" Value="Hand" />
+  </Style>
+  <Style Selector="Button.catalog-search-clear:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />
+  </Style>
 
   <Style Selector="TreeView.format-token-picker">
     <Setter Property="Background" Value="{DynamicResource AppChromeSurfaceBrush}" />

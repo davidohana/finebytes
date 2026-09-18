@@ -16,6 +16,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private readonly bool _canUseFilterChain;
         private bool _suppressSelectionSync;
         private bool _isAbModeEnabled;
+        private RenameListFieldGroupOption? _browseSelectedGroup;
 
         /// <summary>
         /// Initializes the shuttle from the Rename List's current column layout and sort keys.
@@ -106,19 +107,29 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         public IReadOnlyList<RenameListFieldGroupOption> Groups { get; }
 
         /// <summary>
-        /// Gets or sets the selected property group.
+        /// Gets or sets the selected property group for group browse.
+        /// <para>
+        /// While <see cref="IsFieldSearchActive"/>, returns <see langword="null"/> so the Groups list
+        /// shows no highlight (browse selection is kept and restored when search clears).
+        /// </para>
         /// </summary>
         public RenameListFieldGroupOption? SelectedGroup
         {
-            get;
+            get => IsFieldSearchActive ? null : _browseSelectedGroup;
             set
             {
-                if (field == value)
+                if (IsFieldSearchActive)
+                {
+                    // ListBox may push null when the bound value clears for search; keep browse group.
+                    return;
+                }
+
+                if (_browseSelectedGroup == value)
                 {
                     return;
                 }
 
-                field = value;
+                _browseSelectedGroup = value;
                 OnPropertyChanged();
                 _ClearAvailableSelections();
                 _RefreshLists();
@@ -144,9 +155,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     return;
                 }
 
+                var wasSearchActive = field.Trim().Length > 0;
                 field = value;
+                var isSearchActive = field.Trim().Length > 0;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(IsFieldSearchActive));
+                if (wasSearchActive != isSearchActive)
+                {
+                    OnPropertyChanged(nameof(SelectedGroup));
+                }
+
+                ClearSearchCommand.NotifyCanExecuteChanged();
                 _RefreshLists();
             }
         } = string.Empty;
@@ -155,6 +174,20 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// Gets whether available fields are filtered across groups (non-empty trimmed <see cref="SearchText"/>).
         /// </summary>
         public bool IsFieldSearchActive => SearchText.Trim().Length > 0;
+
+        /// <summary>
+        /// Clears <see cref="SearchText"/> and restores group browse (including the previous group highlight).
+        /// </summary>
+        [RelayCommand(CanExecute = nameof(_CanClearSearch))]
+        public void ClearSearch()
+        {
+            SearchText = string.Empty;
+        }
+
+        private bool _CanClearSearch()
+        {
+            return IsFieldSearchActive;
+        }
 
         /// <summary>
         /// Gets or sets the top-level tab index (0 = Columns, 1 = Sort).
@@ -927,7 +960,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private IReadOnlyList<RenameListField> _FieldsInSelectedGroup()
         {
-            var groupId = SelectedGroup?.GroupId;
+            var groupId = _browseSelectedGroup?.GroupId;
             if (string.IsNullOrEmpty(groupId))
             {
                 return [];
