@@ -3,6 +3,7 @@ title: Unify Media and MPEG property enums
 description: >-
   Apply the Image/PDF Models-owned field enum + PropertyDisplayContext formatter
   pattern to Media and MPEG token/Rename List twins; optional helper collapse.
+status: done
 ---
 
 # Unify Media and MPEG property enums
@@ -108,8 +109,8 @@ shipped Image/PDF unify. No new MFR7 crawl required (parent brief still applies)
   `MpegAudioPropertyTokens.cs`
 - MPEG RL: `Mfr.Models/RenameList/Fields/Mpeg/MpegRenameListField.cs`
   (`MpegRenameListProperty`, `MpegRenameListFieldDisplay`)
-- Helpers: Filters `PropertyValueFormatting` (ints/duration/YesNo); Models
-  `RenameListFieldDisplay` (same rules + optional text)
+- Helpers: Models `RenameListFieldDisplay` (ints/duration/YesNo/optional text); Filters
+  `PropertyValueFormatting` removed in P3 (was unused after Media/MPEG move)
 - Tests: `MediaPropertyTokenTests`, `MpegAudioPropertyTokenTests`, Rename List catalog/sort
 - Docs (P3 or phase docs): media sections in Formatter.md if stubs still point at Filters
   formatters; no dedicated media-metadata-model.md today
@@ -141,12 +142,15 @@ shipped Image/PDF unify. No new MFR7 crawl required (parent brief still applies)
 
 ### P3 — Optional: collapse Filters `PropertyValueFormatting` (prio: low)
 
+- **Status:** done (deferred review → batch)
 - **Scope / files:** If Media+MPEG no longer call `PropertyValueFormatting`, delete it or leave
   only remaining callers; optionally extract a tiny shared `CatalogPropertyKey` helper only if
   Image/PDF/Media/MPEG copies are identical enough (rule of three — prefer after P2). Short
   Formatter.md / plan stub updates if paths drifted.
 - **Exit criteria:** No orphan dead helper, or documented thin remainder; no behavior change.
 - **Tests:** none beyond existing token suites if code touched; else docs-only.
+- **Done:** deleted orphan `PropertyValueFormatting` (0 callers). Skipped shared
+  `CatalogPropertyKey` helper — four domain switches stay domain-specific (low cost-to-value).
 
 ## Open (tidy)
 
