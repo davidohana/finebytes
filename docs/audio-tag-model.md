@@ -93,7 +93,12 @@ tag. `ContainerFormat` is stamped at Read and preserved across `Clone` / `ClearA
 can still create the recommended block). It is **excluded** from equality (dirty checks compare tag content).
 
 - **Id3v1** — Scalars: Title, Artist, Album, Year, Comment, Track, Genre (`byte?`;
-  `null` = unset, `0` = Blues — never use `0` as an empty sentinel)
+  `null` = unset, `0` = Blues — never use `0` as an empty sentinel). Overlay/preview writes truncate
+  text to TagLib’s Latin-1 field sizes via `Id3v1OnDiskText` (Title/Artist/Album **30** bytes,
+  Comment **28**). Genre is a Winamp-extended table index (`Id3v1Genres`); unrecognized names map to
+  **255** and clear on Apply (empty genre list). Multi-value `;` genre strings that are not an exact
+  table name are treated as unrecognized for this block.
+
 - **Id3v2**
   - `byte Version` + modeled text frames. Singletons keyed by FrameId; multi-instance by FrameId + language/description
 - **Xiph** — Known-key multimap (covers `SemanticAudioTag` fields). Unknown keys left on disk

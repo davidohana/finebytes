@@ -26,3 +26,7 @@ Deferred work. Short bullets only; grow this list when skipping a feature.
 ## Options dialog (deferred from v1)
 
 - Explorer shell integrate
+
+## Audio Tag Setter editor
+
+- Push/Drag fill-from (seed option fields from the first Rename List row or a dropped audio file) — MFR7 parity; type values manually for now

@@ -21,18 +21,48 @@
       <img src="../../images/AudioTagSetter.png" alt="Audio Tag Setter options" width="542" height="588" />
       <figcaption>Filter options.</figcaption>
     </figure>
-        <p>Sets common embedded audio-tag fields on each file in one step. Values update the preview tags; Apply writes them to the files.</p>
-        <p>Checked fields are written. Gray (indeterminate) checkboxes set a field only when it is currently empty.</p>
+    <p>Sets common embedded audio-tag fields on each file in one step.</p>
+    <ul>
+      <li>Preview updates immediately; Apply writes tags to the files.</li>
+      <li>Only tag types already present on the file are updated.</li>
+      <li>
+        Untagged files get the recommended type for the format (for example ID3v2 on MP3).
+      </li>
+      <li>Checked — write the field.</li>
+      <li>Gray (indeterminate) — write only if the field is currently empty.</li>
+      <li>Unchecked — leave the field unchanged.</li>
+    </ul>
     <h2>Options</h2>
-        <ul class="options">
-          <li><span class="quote">Title / Artist / Album / …</span> — Common tag fields with Set / only-if-empty controls.</li>
-          <li><span class="quote">Text values</span> — Plain text or formatter templates when tokens are present.</li>
-        </ul>
-    <h2>Examples</h2>
-    <div class="examples">
-          <code>(empty Title → set Blue Moon Revisited) >>> Blue Moon Revisited</code>
-          <code>(Artist already Cowboy Junkies → only if empty: New Artist) >>> Cowboy Junkies</code>
-    </div>
-
+    <ul class="options">
+      <li>
+        <span class="quote">Title / Artist / Album / …</span> — Common tag fields with Set /
+        only-if-empty controls.
+      </li>
+      <li>
+        <span class="quote">Text values</span> — Plain text or formatter templates when tokens are
+        present (see <a href="../../tokens/audiofp.html">Audio Tag Tokens</a>).
+      </li>
+      <li>
+        <span class="quote">Performers / genres / composers</span> — Multiple values in one field:
+        separate with <span class="quote">;</span>.
+      </li>
+      <li>
+        <span class="quote">Track</span> — Number 1–255, or <span class="quote">0</span> / empty to
+        clear. Optional auto-increment raises the track by one for each Rename List row, starting
+        from the value you enter.
+      </li>
+      <li>
+        <span class="quote">Year</span> — Number 1–9999, or <span class="quote">0</span> / empty to
+        clear.
+      </li>
+    </ul>
+    <p>
+      To set a single field with a Formatter or other string filter, choose an audio-tag
+      <a href="../../ui/filteropts.html">Apply To</a> target instead.
+    </p>
+    <p>
+      For one modeled ID3v2 frame, prefer
+      <a href="Id3v2FieldSetter.html">ID3v2 Field Setter</a>.
+    </p>
   </body>
 </html>
