@@ -16,87 +16,100 @@
     <hr />
     <h1>Feature List</h1>
     <p>
-      Magic File Renamer batches rename files and folders, update attributes and dates, and write
-      audio tags — with a live preview before anything hits disk.
+      Magic File Renamer applies a Filter Chain to files and folders and previews the result before
+      anything is written. GO commits names, extensions, attributes, dates, folder moves, and
+      audio-tag updates.
     </p>
 
     <h2>Names, dates, and attributes</h2>
-    <p>
-      Change names, extensions, attributes, and creation / last-write / last-access dates for files
-      and folders in one pass.
-    </p>
+    <ul>
+      <li>Rename files and folders, including extensions</li>
+      <li>Set or clear file attributes</li>
+      <li>Modify creation, last-write, and last-access timestamps</li>
+    </ul>
 
     <h2>Audio tags</h2>
-    <p>
-      Edit tags for common formats (MP3 ID3v1/ID3v2, Ogg Vorbis / FLAC, APE, Apple, ASF, RIFF, and
-      more). Use Audio Tag Setter, ID3v2 Field Setter, and Audio Tag Remover — including
-      auto-increment track numbers and format patterns where supported. Preview shows planned tag
-      changes before GO.
-    </p>
+    <ul>
+      <li>
+        Common formats and tag standards: MP3 (ID3v1/ID3v2), Ogg Vorbis / FLAC, APE, Apple, ASF,
+        RIFF, and related types where available
+      </li>
+      <li>
+        Audio Tag Setter, ID3v2 Field Setter, and Audio Tag Remover, including auto-increment track
+        numbers and format patterns
+      </li>
+      <li>Tag changes appear in the preview before GO</li>
+    </ul>
 
     <h2>Path Mover</h2>
-    <p>
-      Relocate files into other folders and build hierarchies from patterns, for example
-      <span class="quote">\(artist)\(album)\(track)</span>.
-    </p>
+    <ul>
+      <li>Relocate files into different folders as part of the same operation</li>
+      <li>
+        Build folder hierarchies from patterns, for example
+        <span class="quote">\(artist)\(album)\(track)</span>
+      </li>
+    </ul>
 
     <h2>Adding files</h2>
-    <p>
-      Browse with the built-in File List (path combo, back / forward / up / refresh). Mask and
-      exclude filters control what is included. Add recursively — including network paths Windows
-      can reach — or drag and drop from Explorer.
-    </p>
+    <ul>
+      <li>Browse with the File List (path combo, back / forward / up / refresh)</li>
+      <li>Mask and exclude filters to include or skip file types</li>
+      <li>Add recursively from folders, including network paths Windows can reach</li>
+      <li>Drag and drop onto the Rename List from Explorer or other apps</li>
+    </ul>
 
     <h2>Live preview</h2>
-    <p>
-      See expected results in real time for names, tags, dates, and attributes. Changed cells and
-      predicted errors are highlighted. Before/after mode flips the same columns between original
-      and preview values.
-    </p>
+    <ul>
+      <li>Real-time preview of names, tags, dates, and attributes</li>
+      <li>Changed cells and predicted errors are highlighted</li>
+      <li>Before/after mode flips the same columns between original and preview values</li>
+    </ul>
 
     <h2>Formatter and tokens</h2>
-    <p>
-      Pattern renaming rewrites text fields — including audio tag text — from patterns you define.
-      Tokens can pull audio and media properties, image facts, JPEG / EXIF metadata (read-only),
-      file dates and size, parent folder, counters, random characters, and session counts.
-    </p>
+    <ul>
+      <li>Pattern-rename text fields, including audio tag text, from user-defined formats</li>
+      <li>Audio tag fields and MPEG / media properties</li>
+      <li>Image properties (width, height, format) and JPEG / EXIF metadata (read-only)</li>
+      <li>File dates, size, parent folder, counters, random characters, and session counts</li>
+    </ul>
 
     <h2>Filters</h2>
-    <p>
-      Case, space, trimming, replace, formatting, audio, attributes, and misc groups — dozens of
-      filters you can chain and target to any writeable field. See
-      <a href="../filters/filters.html">Filters</a>.
-    </p>
+    <ul>
+      <li>
+        Case, space, trimming, replace, formatting, audio, attributes, and misc groups
+      </li>
+      <li>Filters can target any writeable field (name, extension, tags, and others)</li>
+      <li>Full catalog: <a href="../filters/filters.html">Filters</a></li>
+    </ul>
 
     <h2>Rename List</h2>
-    <p>
-      Choose visible fields (audio, dates, EXIF, and more), sort by one or more columns, export
-      visible columns to CSV, and override cells with F2.
-    </p>
+    <ul>
+      <li>Choose visible fields, including audio, dates, and EXIF</li>
+      <li>Sort by one or more columns</li>
+      <li>Export visible columns to CSV</li>
+      <li>Manual cell override with F2</li>
+    </ul>
 
     <h2>Presets</h2>
-    <p>
-      Save a Filter Chain (ordered filters plus options) and reload it later for repeat jobs.
-    </p>
+    <ul>
+      <li>Save a Filter Chain (ordered filters plus options)</li>
+      <li>Reload the same chain later</li>
+    </ul>
 
     <h2>Undo and history</h2>
-    <p>
-      Undo Last prepares a reverse preview from the last GO; disk is unchanged until you press GO
-      again. Rename Log keeps a history of past operations.
-    </p>
-
-    <h2>Options and Help</h2>
-    <p>
-      Preferences live under your AppData finebytes folder. Local Help opens in your browser (F1 /
-      Help menu); Filter Configuration <strong>?</strong> opens that filter’s topic.
-    </p>
+    <ul>
+      <li>Undo Last loads a reverse preview from the last GO</li>
+      <li>Disk is unchanged until GO is pressed again</li>
+      <li>Rename Log records past operations</li>
+    </ul>
 
     <h2>Console automation</h2>
-    <p>
-      Command-line / console mode runs automated renaming with presets. See
-      <a href="../guide/console.html">Console</a> and
-      <a href="../guide/cml.html">parameters</a>.
-    </p>
-
+    <ul>
+      <li>Command-line / console mode for automated renaming with presets</li>
+      <li>
+        See <a href="../guide/console.html">Console</a> and
+        <a href="../guide/cml.html">parameters</a>
+      </li>
+    </ul>
   </body>
 </html>
