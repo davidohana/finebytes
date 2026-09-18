@@ -60,7 +60,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             Groups = _BuildGroups();
             SelectedGroup =
                 Groups.FirstOrDefault(group => group.GroupId == BasicRenameListField.Group)
-                ?? Groups.FirstOrDefault();
+                ?? (Groups.Count > 0 ? Groups[0] : null);
             SelectedTabIndex = (int)initialTab;
             _RefreshLists();
         }
