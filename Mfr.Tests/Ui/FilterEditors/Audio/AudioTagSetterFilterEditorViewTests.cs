@@ -122,6 +122,42 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         }
 
         /// <summary>
+        /// Verifies track value + Auto-increment stay usable on a full-width row (not crushed in a half column).
+        /// </summary>
+        [AvaloniaFact]
+        public void Audio_tag_setter_track_auto_increment_does_not_crush_value_field()
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("AudioTagSetter"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var editor = editorView.GetVisualDescendants().OfType<AudioTagSetterFilterEditorView>().Single();
+            var trackEditor = _FindVisibleFieldFormatEditor(editor, AudioTagSetterFieldKind.Track);
+            var autoInc = editor
+                .GetVisualDescendants()
+                .OfType<CompactCheckBox>()
+                .Single(box =>
+                    box.IsVisible && (box.Tag as string) == AudioTagSetterFieldRowViewModel.AutoIncrementTag
+                );
+            var trackCheck = _FindFieldCheckBox(editor, AudioTagSetterFieldKind.Track);
+
+            Assert.True(autoInc.IsChecked);
+            Assert.True(trackEditor.Bounds.Width >= 100, $"track editor width {trackEditor.Bounds.Width}");
+            var trackLabel = trackCheck
+                .GetVisualDescendants()
+                .OfType<TextBlock>()
+                .Single(block => block.Text == "Set track number:");
+            Assert.Equal("Set track number:", trackLabel.Text);
+
+            var trackRight = _LeftInEditor(editor, trackEditor) + trackEditor.Bounds.Width;
+            var autoIncLeft = _LeftInEditor(editor, autoInc);
+            Assert.True(autoIncLeft >= trackRight - 1, $"auto-inc left {autoIncLeft} vs track right {trackRight}");
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies clicking a field label toggles that row’s three-state checkbox.
         /// </summary>
         [AvaloniaFact]

@@ -167,6 +167,12 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
             Assert.All(editor.Sections[1].Rows, row => Assert.Equal(AudioTagSetterFieldGroup.TrackDisc, row.Group));
             Assert.All(editor.Sections[2].Rows, row => Assert.Equal(AudioTagSetterFieldGroup.Extended, row.Group));
             Assert.Empty(editor.Sections[0].FullWidthRows);
+            Assert.Empty(editor.Sections[0].WideCompactRows);
+            Assert.Equal([AudioTagSetterFieldKind.Track], editor.Sections[1].WideCompactRows.Select(row => row.Kind));
+            Assert.Equal(
+                [AudioTagSetterFieldKind.TrackCount, AudioTagSetterFieldKind.Disc, AudioTagSetterFieldKind.DiscCount],
+                editor.Sections[1].CompactRows.Select(row => row.Kind)
+            );
             Assert.Equal([AudioTagSetterFieldKind.Lyrics], editor.Sections[2].FullWidthRows.Select(row => row.Kind));
             Assert.Equal(
                 editor.Sections[0].CompactRows.Where((_, i) => i % 2 == 0).Select(r => r.Kind),
