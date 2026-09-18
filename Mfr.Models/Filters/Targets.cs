@@ -134,15 +134,11 @@ namespace Mfr.Models.Filters
         /// <summary>
         /// Gets the four-character frame id (always trimmed uppercase; blank → empty).
         /// </summary>
-        public string FrameId { get; init; } = _NormalizeId3v2FrameId(FrameId);
-
-        /// <summary>
-        /// Trims and uppercases a frame id for storage / equality.
-        /// </summary>
-        private static string _NormalizeId3v2FrameId(string frameId)
+        public string FrameId
         {
-            return string.IsNullOrWhiteSpace(frameId) ? string.Empty : frameId.Trim().ToUpperInvariant();
-        }
+            get;
+            init => field = OverlayTargetKeys.Normalize(value);
+        } = OverlayTargetKeys.Normalize(FrameId);
     }
 
     /// <summary>
@@ -159,14 +155,21 @@ namespace Mfr.Models.Filters
         /// <summary>
         /// Gets the comment field key (always trimmed uppercase; blank → empty).
         /// </summary>
-        public string Key { get; init; } = _NormalizeXiphKey(Key);
-
-        /// <summary>
-        /// Trims and uppercases a Xiph key for storage / equality.
-        /// </summary>
-        private static string _NormalizeXiphKey(string key)
+        public string Key
         {
-            return string.IsNullOrWhiteSpace(key) ? string.Empty : key.Trim().ToUpperInvariant();
+            get;
+            init => field = OverlayTargetKeys.Normalize(value);
+        } = OverlayTargetKeys.Normalize(Key);
+    }
+
+    /// <summary>
+    /// Shared trim + uppercase for ID3v2 frame ids and Xiph keys (blank → empty).
+    /// </summary>
+    file static class OverlayTargetKeys
+    {
+        public static string Normalize(string value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? string.Empty : value.Trim().ToUpperInvariant();
         }
     }
 }

@@ -20,6 +20,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.Equal("TIT2", new Id3v2FrameTarget("tit2").FrameId);
             Assert.Equal("COMM", new Id3v2FrameTarget(" Comm ", "eng", "x").FrameId);
             Assert.Equal(string.Empty, new Id3v2FrameTarget("  ").FrameId);
+            Assert.Equal("TIT2", (new Id3v2FrameTarget("TIT2") with { FrameId = "tit2" }).FrameId);
         }
 
         /// <summary>
@@ -31,6 +32,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.Equal("TITLE", new XiphFieldTarget("title").Key);
             Assert.Equal("ARTIST", new XiphFieldTarget(" Artist ").Key);
             Assert.Equal(string.Empty, new XiphFieldTarget("\t").Key);
+            Assert.Equal("TITLE", (new XiphFieldTarget("TITLE") with { Key = "title" }).Key);
         }
 
         /// <summary>

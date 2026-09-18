@@ -63,5 +63,56 @@ namespace Mfr.Tests.Models.Tags.Id3v1
 
             Assert.Equal(new string('D', 30), AudioOverlayBlockFieldIo.GetId3v1FieldString(overlay, Id3v1Field.Title));
         }
+
+        /// <summary>
+        /// Verifies semantic merge into a present ID3v1 block stores the on-disk clipped form.
+        /// </summary>
+        [Fact]
+        public void SemanticMerge_clips_id3v1_title_artist_album_comment()
+        {
+            var overlay = new AudioTagOverlay
+            {
+                ContainerFormat = AudioContainerFormat.Mpeg,
+                Id3v1 = new Id3v1TagData(),
+            };
+
+            AudioTagSemanticMerge.MergeIntoPresentBlocks(
+                overlay,
+                new SemanticAudioTag(
+                    Title: new string('T', 40),
+                    Album: new string('A', 40),
+                    Performers: new string('P', 40),
+                    AlbumArtists: null,
+                    Composers: null,
+                    Genre: null,
+                    Comment: new string('C', 40),
+                    Lyrics: null,
+                    Copyright: null,
+                    Grouping: null,
+                    Year: null,
+                    Track: null,
+                    TrackCount: null,
+                    Disc: null,
+                    DiscCount: null,
+                    BeatsPerMinute: null,
+                    Conductor: null,
+                    MusicBrainzArtistId: null,
+                    MusicBrainzReleaseId: null,
+                    MusicBrainzReleaseArtistId: null,
+                    MusicBrainzTrackId: null,
+                    MusicBrainzDiscId: null,
+                    MusicBrainzReleaseStatus: null,
+                    MusicBrainzReleaseType: null,
+                    MusicBrainzReleaseCountry: null,
+                    MusicIpId: null,
+                    AmazonId: null
+                )
+            );
+
+            Assert.Equal(new string('T', 30), overlay.Id3v1!.Title);
+            Assert.Equal(new string('A', 30), overlay.Id3v1.Album);
+            Assert.Equal(new string('P', 30), overlay.Id3v1.Artist);
+            Assert.Equal(new string('C', 28), overlay.Id3v1.Comment);
+        }
     }
 }
