@@ -132,10 +132,6 @@
           <li>Windows Explorer shell context-menu integration</li>
           <li>Clipboard text formatter token</li>
           <li>
-            Editable image tags and <span class="quote">&lt;imagetag-*&gt;</span> tokens (EXIF /
-            image properties stay read-only)
-          </li>
-          <li>
             GeoNames reverse geocoding and typed GPS / <span class="quote">&lt;geo-*&gt;</span>
             tokens
           </li>
@@ -150,6 +146,11 @@
         <ul>
           <li>
             Image property tokens no longer cover WMF or EMF (MFR 7 did)
+          </li>
+          <li>
+            Read-only Image Tag columns and <span class="quote">&lt;imagetag-*&gt;</span> tokens
+            (Keywords, Rating, Creator, …) are not ported yet — MFR 7 had them read-only; writing
+            image tags was never supported there either
           </li>
           <li>
             JPEG 2000 and PDF image-tag / XMP reading from MFR 7 is not in the current image
