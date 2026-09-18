@@ -34,5 +34,21 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
             Assert.Equal(["and", "or", "RMX"], options.Words);
             Assert.False(options.UppercaseSentenceInitial);
         }
+
+        /// <summary>
+        /// Verifies Load defaults replaces existing custom Words with the factory list.
+        /// </summary>
+        [Fact]
+        public void LoadDefaults_ReplacesCustomWordsText()
+        {
+            var step = new FilterChainStepViewModel("Casing List", new CasingListFilter());
+            var editor = new CasingListFilterEditorViewModel(step) { WordsText = "custom foo BAR" };
+            Assert.Equal(["custom", "foo", "BAR"], ((CasingListFilter)step.Filter).Options.Words);
+
+            editor.LoadDefaultsCommand.Execute(null);
+
+            Assert.Equal(CasingListParser.FormatEditorText(CasingListOptions.DefaultWords), editor.WordsText);
+            Assert.Equal(CasingListOptions.DefaultWords, ((CasingListFilter)step.Filter).Options.Words);
+        }
     }
 }

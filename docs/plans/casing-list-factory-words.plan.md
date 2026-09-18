@@ -5,7 +5,7 @@
 | Todo | Status |
 |------|--------|
 | curate-default-words | Done |
-| editor-load-button | Open |
+| editor-load-button | Done |
 | sample-reuse | Done |
 | docs-tests | Open |
 

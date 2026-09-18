@@ -36,6 +36,23 @@
             PlaceholderText="and or with RMX"
             Text="{Binding WordsText}"
           />
+          <Button
+            x:Name="LoadDefaultsButton"
+            Classes="tool-chrome filter-editor-button"
+            Content="Load defaults"
+            HorizontalAlignment="Left"
+            Command="{Binding LoadDefaultsCommand}"
+          >
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-title" Text="Replace Words with the factory casing list." />
+                <TextBlock
+                  Classes="rich-tip-body"
+                  Text="Loads the curated title-case exceptions, particles, and media acronyms. Existing Words text is replaced (not merged)."
+                />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+          </Button>
         </StackPanel>
         <controls:CompactCheckBox
           x:Name="UppercaseSentenceInitialCheckBox"
