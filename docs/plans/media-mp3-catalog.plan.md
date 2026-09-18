@@ -26,12 +26,12 @@ Shipped and **done** (do not redo):
 
 Media/MPEG now share one Models-owned field enum + `PropertyDisplayContext` formatter each (Image/PDF pattern):
 
-| Domain | Enum + formatter (Models) | Tokens (Filters) | Catalog |
-| ------ | ------------------------- | ---------------- | ------- |
-| Media | [`MediaPropertyField`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertyField.cs) + [`MediaPropertiesFormatting`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertiesFormatting.cs) | [`MediaPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Media/MediaPropertyTokens.cs) | [`MediaRenameListFields`](../../Mfr.Models/RenameList/Fields/Media/MediaRenameListFields.cs) (`Group` = `MediaProperties`, label **Media Properties**) |
-| MPEG | [`MpegAudioPropertyField`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegAudioPropertyField.cs) + [`MpegAudioPropertiesFormatting`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegAudioPropertiesFormatting.cs) | [`MpegAudioPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Mpeg/MpegAudioPropertyTokens.cs) (`mpeg-*`, picker `Audio\MP3`) | [`MpegRenameListFields`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegRenameListFields.cs) (`Group` = **`MPEG`**, label **MP3 Properties**) |
+| Domain | Enum + formatter (Models)                                                                                                                                                                                   | Tokens (Filters)                                                                                                                   | Catalog                                                                                                                                                |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Media  | [`MediaPropertyField`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertyField.cs) + [`MediaPropertiesFormatting`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertiesFormatting.cs)               | [`MediaPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Media/MediaPropertyTokens.cs)                                       | [`MediaRenameListFields`](../../Mfr.Models/RenameList/Fields/Media/MediaRenameListFields.cs) (`Group` = `MediaProperties`, label **Media Properties**) |
+| MPEG   | [`MpegAudioPropertyField`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegAudioPropertyField.cs) + [`MpegAudioPropertiesFormatting`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegAudioPropertiesFormatting.cs) | [`MpegAudioPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Mpeg/MpegAudioPropertyTokens.cs) (`mpeg-*`, picker `Audio\MP3`) | [`MpegRenameListFields`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegRenameListFields.cs) (`Group` = **`MPEG`**, label **MP3 Properties**)             |
 
-Tokens call `*Formatting.Format(..., PropertyDisplayContext.Token)` and `*RenameListField.CatalogPropertyKey` for shuttle mapping. Photo fields still exist on Media enum/DTO/catalog/tokens — P1 below.
+Tokens call `*Formatting.Format(..., PropertyDisplayContext.Token)` and `*RenameListField.CatalogPropertyKey` for shuttle mapping. Media photo width/height/quality fields and `media-photo-*` tokens are removed (P1 done).
 
 Image vs TagLib split: [`docs/image-metadata-model.md`](../image-metadata-model.md).
 
@@ -47,25 +47,30 @@ Image vs TagLib split: [`docs/image-metadata-model.md`](../image-metadata-model.
 ## MFR7 reference brief
 
 ### Sources
+
 - Help: `D:\Devl\mfr7\Site\finebytes\mfr\Help\fields.html` (`#mediaproperties`, `#MP3MPEG`); `id3fp.html` (legacy `mp3-*` table); formatter classes `Core/MfrFilters/FormattingParams/Audio/MpegFP.cs`
 - Code: `PropertyGroups/Media/MediaPropertiesPgInfo.cs` (includes Photo Width + Video Width); `PropertyGroups/Audio/Mp3PGInfo.cs` (`mName = "MP3 Properties"`); tokens registered under `"Audio\\MP3"` with names `mp3-bitrate`, `mp3-duration`, …
 - finebytes status: Media + MP3 catalogs ported; token/RL property enums unified in Models; tokens still `mpeg-*`; shuttle already uses **MP3 Properties**
 
 ### Behavior
+
 - Media Properties: read-only TagLib stream facts for image, audio, and video (same field list as today minus our photo deletion).
 - MP3 Properties: MPEG **audio header** for MP3-style files, not MP4. MFR7 token picker group is `Audio\MP3`; shuttle group name is **MP3 Properties**.
 - MFR7 tokens used `mp3-*`. finebytes `mpeg-*` was an intentional rewrite rename; this plan reverts the **prefix** to MFR7.
 
 ### UX notes
+
 - Shuttle: Media Properties then MP3 Properties (keep this sibling order).
 - Format picker: Audio → MP3 (keep nest). Media picker currently a flat **Media** folder — align label to **Media Properties**.
 
 ### Parity gaps / intentional diffs
+
 - Drop MFR7 Media photo columns (overlap with Image / MetadataExtractor).
 - Do not port unused MFR7 tokens (`mp3-tag-versions`, `mp3-vbrq`).
 - Keep finebytes `mp3-encoding` / `mp3-duration-sec` / `mp3-original` / `mp3-protection` (not all had MFR7 names).
 
 ## Non-goals
+
 - Renaming Media → Video, or deleting video width/height
 - Merging Image/EXIF into TagLib, or deleting `image-*`
 - Token aliases / JSON converters for old `mpeg-*` or group `"MPEG"`
@@ -91,7 +96,7 @@ Media catalog after P1: MIME, Possibly Corrupt, Duration, Duration (Seconds), Me
 
 ### P1 — Drop Media photo fields and tokens
 
-- **Status:** pending
+- **Status:** done
 - **Scope / files:** Remove `PhotoWidth` / `PhotoHeight` / `PhotoQuality` from [`MediaPropertyField`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertyField.cs), [`MediaPropertiesFormatting`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertiesFormatting.cs), [`MediaRenameListField`](../../Mfr.Models/RenameList/Fields/Media/MediaRenameListField.cs) (key map + sort), [`MediaRenameListFields`](../../Mfr.Models/RenameList/Fields/Media/MediaRenameListFields.cs), tips; delete photo token classes in [`MediaPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Media/MediaPropertyTokens.cs); strip DTO props from [`MediaProperties.cs`](../../Mfr.Models/Media/MediaProperties.cs) + mapping in [`MediaPropertiesReader.cs`](../../Mfr.Metadata/MediaPropertiesReader.cs); tests (`MediaPropertyTokenTests`, `RenameListFieldCatalogTests`, reader tests); [`Formatter.md`](../../Mfr.Filters/docs/Formatting/Formatter.md), [`image-metadata-model.md`](../image-metadata-model.md), [`help/tokens/mediafp.html`](../../help/tokens/mediafp.html), [`help/reference/fields.html`](../../help/reference/fields.html).
 - **Exit criteria:** Shuttle Media group has no photo columns; those three tokens gone; Image still covers raster size; Help/docs no longer mention `media-photo-*`.
 - **Tests:** Catalog count/order; token compile list; reader no longer asserts photo mapping; `CatalogPropertyKey` / formatting switches stay exhaustive without photo arms.

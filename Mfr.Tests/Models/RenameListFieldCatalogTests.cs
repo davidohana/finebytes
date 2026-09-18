@@ -58,7 +58,7 @@ namespace Mfr.Tests.Models
                 XiphKnownKeys.All.Count,
                 RenameListFieldCatalog.GetFieldsForGroup(XiphRenameListFields.Group).Count
             );
-            Assert.Equal(15, RenameListFieldCatalog.GetFieldsForGroup(MediaRenameListFields.Group).Count);
+            Assert.Equal(12, RenameListFieldCatalog.GetFieldsForGroup(MediaRenameListFields.Group).Count);
             Assert.Equal(11, RenameListFieldCatalog.GetFieldsForGroup(MpegRenameListFields.Group).Count);
             Assert.Equal(7, RenameListFieldCatalog.GetFieldsForGroup(ImageRenameListFields.Group).Count);
             Assert.Equal(17, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
@@ -548,9 +548,8 @@ namespace Mfr.Tests.Models
                         AudioSampleRate = 44100,
                         BitsPerSample = 16,
                         AudioChannels = 2,
-                        PhotoWidth = 1920,
-                        PhotoHeight = 1080,
-                        PhotoQuality = 85,
+                        VideoWidth = 1920,
+                        VideoHeight = 1080,
                         Mpeg = new MpegAudioProperties
                         {
                             Bitrate = 128,
@@ -582,7 +581,8 @@ namespace Mfr.Tests.Models
             _AssertField(item, MediaRenameListFields.Group, "DurationSeconds", "225");
             _AssertField(item, MediaRenameListFields.Group, "MediaTypes", "Audio");
             _AssertField(item, MediaRenameListFields.Group, "AudioBitrate", "128");
-            _AssertField(item, MediaRenameListFields.Group, "PhotoWidth", "1920");
+            _AssertField(item, MediaRenameListFields.Group, "VideoWidth", "1920");
+            _AssertField(item, MediaRenameListFields.Group, "VideoHeight", "1080");
             _AssertField(item, MpegRenameListFields.Group, "Bitrate", "128");
             _AssertField(item, MpegRenameListFields.Group, "Copyright", "Yes");
             _AssertField(item, MpegRenameListFields.Group, "Duration", "0:03:45");

@@ -56,11 +56,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
                 AudioSampleRate = 44100,
                 BitsPerSample = 16,
                 AudioChannels = 2,
-                VideoWidth = 0,
-                VideoHeight = 0,
-                PhotoWidth = 1920,
-                PhotoHeight = 1080,
-                PhotoQuality = 85,
+                VideoWidth = 1920,
+                VideoHeight = 1080,
             };
         }
 
@@ -79,11 +76,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
             Assert.Equal("44100", new MediaSampleRateToken().Compile(string.Empty)(item));
             Assert.Equal("16", new MediaBitsPerSampleToken().Compile(string.Empty)(item));
             Assert.Equal("2", new MediaChannelsToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MediaVideoWidthToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MediaVideoHeightToken().Compile(string.Empty)(item));
-            Assert.Equal("1920", new MediaPhotoWidthToken().Compile(string.Empty)(item));
-            Assert.Equal("1080", new MediaPhotoHeightToken().Compile(string.Empty)(item));
-            Assert.Equal("85", new MediaPhotoQualityToken().Compile(string.Empty)(item));
+            Assert.Equal("1920", new MediaVideoWidthToken().Compile(string.Empty)(item));
+            Assert.Equal("1080", new MediaVideoHeightToken().Compile(string.Empty)(item));
         }
 
         [Fact]

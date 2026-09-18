@@ -104,9 +104,6 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties a
 | `<media-channels>`        | Channel count; empty when `0`.                                                                                                                                                     |
 | `<media-video-width>`     | Video width (px); empty when `0`.                                                                                                                                                  |
 | `<media-video-height>`    | Video height (px); empty when `0`.                                                                                                                                                 |
-| `<media-photo-width>`     | Photo width (px); empty when `0`.                                                                                                                                                  |
-| `<media-photo-height>`    | Photo height (px); empty when `0`.                                                                                                                                                 |
-| `<media-photo-quality>`   | Photo quality; empty when `0`.                                                                                                                                                     |
 
 **Arguments:** No argument (`<media-mime>` only). A stray **`<media-mime:…>`** fails at compile.
 
@@ -138,7 +135,7 @@ Display strings come from Models **`ImagePropertiesFormatting`** (`PropertyDispl
 
 **Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** (exception as **`Cause`**). Mapped rasters are JPEG, PNG, GIF, BMP, TIFF, ICO, and WebP. MetadataExtractor **does** open MP3/WAV (and other audio/video), but **`image-*` still errors** on those types. A missing field on a mapped raster (no DPI, WebP bit depth, `0` dimensions) expands **empty**, not an error.
 
-Keep **`<media-photo-width>`** / **`<media-photo-height>`** for TagLib photo dims; values may differ from **`<image-width>`** / **`<image-height>`**.
+Raster size uses **`<image-width>`** / **`<image-height>`** (MetadataExtractor). TagLib **`<media-video-width>`** / **`<media-video-height>`** are video frame size only.
 
 Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image properties as already loaded so seeded **`FileMeta.Image`** is used without disk I/O.
 

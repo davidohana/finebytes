@@ -6,7 +6,7 @@ using TagLib.Mpeg;
 namespace Mfr.Metadata
 {
     /// <summary>
-    /// Reads TagLib stream and image properties into a detached <see cref="MediaProperties"/> snapshot.
+    /// Reads TagLib stream properties into a detached <see cref="MediaProperties"/> snapshot.
     /// </summary>
     public static class MediaPropertiesReader
     {
@@ -64,9 +64,6 @@ namespace Mfr.Metadata
                 AudioChannels = properties.AudioChannels,
                 VideoWidth = properties.VideoWidth,
                 VideoHeight = properties.VideoHeight,
-                PhotoWidth = properties.PhotoWidth,
-                PhotoHeight = properties.PhotoHeight,
-                PhotoQuality = properties.PhotoQuality,
                 Mpeg = _TryMapMpeg(properties),
             };
         }

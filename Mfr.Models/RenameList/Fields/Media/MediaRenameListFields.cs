@@ -55,19 +55,10 @@ namespace Mfr.Models.RenameList.Fields.Media
 
             /// <summary>Video height.</summary>
             public const string VideoHeight = "VideoHeight";
-
-            /// <summary>Photo width.</summary>
-            public const string PhotoWidth = "PhotoWidth";
-
-            /// <summary>Photo height.</summary>
-            public const string PhotoHeight = "PhotoHeight";
-
-            /// <summary>Photo quality.</summary>
-            public const string PhotoQuality = "PhotoQuality";
         }
 
         /// <summary>
-        /// Media Properties group fields in catalog order (identity, duration, audio, video, photo).
+        /// Media Properties group fields in catalog order (identity, duration, audio, video).
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
@@ -123,24 +114,6 @@ namespace Mfr.Models.RenameList.Fields.Media
                 "Video Height",
                 MediaPropertyField.VideoHeight,
                 tip: MediaRenameListFieldTips.VideoHeight
-            ),
-            new MediaPropertyRenameListField(
-                Key.PhotoWidth,
-                "Photo Width",
-                MediaPropertyField.PhotoWidth,
-                tip: MediaRenameListFieldTips.PhotoWidth
-            ),
-            new MediaPropertyRenameListField(
-                Key.PhotoHeight,
-                "Photo Height",
-                MediaPropertyField.PhotoHeight,
-                tip: MediaRenameListFieldTips.PhotoHeight
-            ),
-            new MediaPropertyRenameListField(
-                Key.PhotoQuality,
-                "Photo Quality",
-                MediaPropertyField.PhotoQuality,
-                defaultWidth: 40
             ),
         ];
     }

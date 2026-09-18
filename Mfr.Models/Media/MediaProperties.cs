@@ -1,7 +1,7 @@
 namespace Mfr.Models.Media
 {
     /// <summary>
-    /// Read-only TagLib stream/image snapshot for media formatter tokens.
+    /// Read-only TagLib stream snapshot for media formatter tokens.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -64,21 +64,6 @@ namespace Mfr.Models.Media
         /// Gets video frame height in pixels; <c>0</c> when absent.
         /// </summary>
         public int VideoHeight { get; init; }
-
-        /// <summary>
-        /// Gets photo width in pixels; <c>0</c> when absent.
-        /// </summary>
-        public int PhotoWidth { get; init; }
-
-        /// <summary>
-        /// Gets photo height in pixels; <c>0</c> when absent.
-        /// </summary>
-        public int PhotoHeight { get; init; }
-
-        /// <summary>
-        /// Gets format-specific photo quality; <c>0</c> when absent.
-        /// </summary>
-        public int PhotoQuality { get; init; }
 
         /// <summary>
         /// Gets MPEG audio-header properties when a codec is <c>TagLib.Mpeg.AudioHeader</c>; otherwise <see langword="null"/>.

@@ -145,31 +145,4 @@ namespace Mfr.Filters.Formatting.Tokens.Media
         public MediaVideoHeightToken()
             : base(["media-video-height"], MediaPropertyField.VideoHeight) { }
     }
-
-    /// <inheritdoc />
-    [FormatTokenInfo("Photo Width", "Media", MediaRenameListFieldTips.PhotoWidth, "media-photo-width")]
-    internal sealed class MediaPhotoWidthToken : MediaPropertyTokenBase
-    {
-        /// <summary>Registers <c>&lt;media-photo-width&gt;</c>.</summary>
-        public MediaPhotoWidthToken()
-            : base(["media-photo-width"], MediaPropertyField.PhotoWidth) { }
-    }
-
-    /// <inheritdoc />
-    [FormatTokenInfo("Photo Height", "Media", MediaRenameListFieldTips.PhotoHeight, "media-photo-height")]
-    internal sealed class MediaPhotoHeightToken : MediaPropertyTokenBase
-    {
-        /// <summary>Registers <c>&lt;media-photo-height&gt;</c>.</summary>
-        public MediaPhotoHeightToken()
-            : base(["media-photo-height"], MediaPropertyField.PhotoHeight) { }
-    }
-
-    /// <inheritdoc />
-    [FormatTokenInfo("Photo Quality", "Media", "Photo quality value", "media-photo-quality")]
-    internal sealed class MediaPhotoQualityToken : MediaPropertyTokenBase
-    {
-        /// <summary>Registers <c>&lt;media-photo-quality&gt;</c>.</summary>
-        public MediaPhotoQualityToken()
-            : base(["media-photo-quality"], MediaPropertyField.PhotoQuality) { }
-    }
 }

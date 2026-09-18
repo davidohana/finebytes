@@ -20,7 +20,6 @@ namespace Mfr.Tests.Metadata
             Assert.True(media.AudioSampleRate > 0);
             Assert.True(media.Duration > TimeSpan.Zero || media.AudioBitrate > 0);
             Assert.Equal(0, media.VideoWidth);
-            Assert.Equal(0, media.PhotoWidth);
         }
 
         [Fact]

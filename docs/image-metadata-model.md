@@ -11,8 +11,8 @@ formatter tokens: a lazy MetadataExtractor open, mapped `ImageProperties` and `E
 snapshots on `FileMeta`, and empty vs PreviewError rules.
 
 Product/UI sketches live in [magic-file-renamer-design.md](magic-file-renamer-design.md) (§7.7, §7.8).
-Folder layering is in [mfr-folder-layering.md](mfr-folder-layering.md). TagLib photo fields
-(`<media-photo-width>` / `<media-photo-height>`) are a separate cache; see media tokens in
+Folder layering is in [mfr-folder-layering.md](mfr-folder-layering.md). TagLib Media Properties
+(`<media-*>`) are a separate stream cache (audio/video/duration); see media tokens in
 [Formatter.md](../Mfr.Filters/docs/Formatting/Formatter.md). TagLib Image Tag (`<imagetag-*>`)
 is a later slice and is not this cache.
 
@@ -42,8 +42,9 @@ flowchart LR
    missing (`0` / null). Anything that is not JPEG, PNG, GIF, BMP, TIFF, ICO, or WebP is PreviewError —
    including types MetadataExtractor will open (MP3, WAV, MP4, HEIF, RAW, …). Missing EXIF on a mapped
    raster is an **empty** snapshot, not PreviewError. PNG/TIFF/WebP with EXIF are supported (not JPEG-only).
-1. **Separate from TagLib.** `<media-photo-*>` stays on the TagLib `FileMeta.Media` cache. `<image-*>`
-   and `<exif-*>` values may differ from TagLib/GDI+.
+1. **Separate from TagLib.** Raster size and EXIF live on the MetadataExtractor `FileMeta.Image` /
+   `FileMeta.Exif` caches. TagLib `FileMeta.Media` holds stream facts (including video frame size);
+   `<image-*>` / `<exif-*>` values may differ from TagLib/GDI+.
 
 ## Layer map
 

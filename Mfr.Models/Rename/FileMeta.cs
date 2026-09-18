@@ -198,7 +198,7 @@ namespace Mfr.Models.Rename
         public AudioTagOverlay AudioTagOverlay { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets the lazy TagLib media-properties read cache (duration, bitrate, dimensions, optional MPEG header).
+        /// Gets or sets the lazy TagLib media-properties read cache (duration, bitrate, video frame size, optional MPEG header).
         /// </summary>
         /// <remarks>
         /// <para>
@@ -215,7 +215,7 @@ namespace Mfr.Models.Rename
         /// <para>
         /// Read-only; never written on commit. <see langword="null"/> until first <c>image-*</c> or <c>exif-*</c>
         /// formatter load (one MetadataExtractor open fills <see cref="Image"/> and <see cref="Exif"/>).
-        /// Separate from TagLib <see cref="Media"/> photo fields; values may differ.
+        /// Separate from TagLib <see cref="Media"/> stream facts (including video frame size); values may differ.
         /// </para>
         /// </remarks>
         public ImageProperties? Image { get; set; }
