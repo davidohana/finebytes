@@ -227,17 +227,26 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Gets original fields available to add on the Columns tab for the selected group.
+        /// Gets original fields available to add on the Columns tab.
+        /// <para>
+        /// Selected group when search is idle; catalog matches when <see cref="IsFieldSearchActive"/>.
+        /// </para>
         /// </summary>
         public IReadOnlyList<RenameListField> AvailableOriginalFields { get; private set; } = [];
 
         /// <summary>
-        /// Gets preview fields available to add on the Columns tab for the selected group.
+        /// Gets preview fields available to add on the Columns tab.
+        /// <para>
+        /// Selected group when search is idle; catalog matches when <see cref="IsFieldSearchActive"/>.
+        /// </para>
         /// </summary>
         public IReadOnlyList<RenameListField> AvailablePreviewFields { get; private set; } = [];
 
         /// <summary>
-        /// Gets sortable fields available to add on the Sort tab for the selected group.
+        /// Gets sortable fields available to add on the Sort tab.
+        /// <para>
+        /// Selected group when search is idle; catalog matches when <see cref="IsFieldSearchActive"/>.
+        /// </para>
         /// </summary>
         public IReadOnlyList<RenameListField> AvailableSortFields { get; private set; } = [];
 
@@ -388,7 +397,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Adds all available original fields in the current group/tab to the visible-column list.
+        /// Adds all fields currently shown in <see cref="AvailableOriginalFields"/> to the visible-column list.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_HasAvailableOriginalFields))]
         public void AddAllOriginalFields()
@@ -398,7 +407,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Adds all available preview fields in the current group/tab to the visible-column list.
+        /// Adds all fields currently shown in <see cref="AvailablePreviewFields"/> to the visible-column list.
         /// </summary>
         [RelayCommand(CanExecute = nameof(_HasAvailablePreviewFields))]
         public void AddAllPreviewFields()
