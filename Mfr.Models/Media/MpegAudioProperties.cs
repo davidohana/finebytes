@@ -1,7 +1,7 @@
 namespace Mfr.Models.Media
 {
     /// <summary>
-    /// Read-only TagLib MPEG audio-header snapshot for <c>mpeg-*</c> formatter tokens.
+    /// Read-only TagLib MPEG audio-header snapshot for <c>mp3-*</c> formatter tokens.
     /// </summary>
     /// <remarks>
     /// <para>

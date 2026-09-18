@@ -10,7 +10,7 @@ Parent: advisory notes in Cursor plan `image_tag_editing_0562126d` (same feature
   is `RenameItem.TagLibLoadAttempted`. `FileMeta.Image` / `Exif` are the **nullable ME** caches with
   `ImagePropertiesLoadAttempted`.
 - `TagLibFileAccess.Read` maps **audio overlay + media only** from one TagLib open.
-  `EnsureTagLibLoaded` is the only TagLib hydrate path (filters, `media-*` / `mpeg-*` tokens, Rename
+  `EnsureTagLibLoaded` is the only TagLib hydrate path (filters, `media-*` / `mp3-*` tokens, Rename
   List `RenameListMetadataRequirement.TagLib`).
 - `CommitExecutor` Apply is audio-only (`AudioTagPersistence` after optional
   `StripAllEmbeddedTagsOnCommit`). `ClearMetadataCaches` already clears TagLib + ME caches.

@@ -1,4 +1,5 @@
 using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 using Mfr.Filters.Formatting.Tokens.Mpeg;
 using Mfr.Models.RenameList.Fields.Mpeg;
 using Mfr.Models.Tags;
@@ -6,10 +7,31 @@ using Mfr.Models.Tags;
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
 {
     /// <summary>
-    /// Tests for <c>mpeg-*</c> formatter tokens.
+    /// Tests for <c>mp3-*</c> formatter tokens.
     /// </summary>
     public sealed class MpegAudioPropertyTokenTests
     {
+        /// <summary>
+        /// Verifies catalog rows use the <c>mp3-*</c> prefix under <c>Audio\MP3</c> with no <c>mpeg-*</c> alias.
+        /// </summary>
+        [Fact]
+        public void Catalog_Mp3Prefix_NoMpegAlias()
+        {
+            var mp3Entries = FormatTokenCatalog
+                .Entries.Where(e => e.CanonicalName.StartsWith("mp3-", StringComparison.Ordinal))
+                .ToList();
+            Assert.Equal(Enum.GetValues<MpegAudioPropertyField>().Length, mp3Entries.Count);
+            Assert.All(mp3Entries, e => Assert.Equal("Audio\\MP3", e.GroupPath));
+
+            Assert.DoesNotContain(
+                FormatTokenCatalog.Entries,
+                e => e.CanonicalName.StartsWith("mpeg-", StringComparison.Ordinal)
+            );
+
+            var ex = Assert.Throws<NotSupportedException>(() => FormatStringCompiler.Compile("<mpeg-bitrate>"));
+            Assert.Contains("mpeg-bitrate", ex.Message, StringComparison.OrdinalIgnoreCase);
+        }
+
         /// <summary>
         /// Token enum member names that drift from catalog keys must map explicitly.
         /// </summary>
@@ -152,7 +174,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
             foreach (var bad in new[] { "0", "1", "x" })
             {
                 var ex = Assert.Throws<ArgumentException>(() => token.Compile(tokenArgs: bad)(item));
-                Assert.Contains("mpeg-bitrate", ex.Message, StringComparison.OrdinalIgnoreCase);
+                Assert.Contains("mp3-bitrate", ex.Message, StringComparison.OrdinalIgnoreCase);
             }
         }
 
@@ -173,7 +195,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
 
             var filter = new FormatterFilter(
                 Target: new FileNameTarget(),
-                Options: new FormatterOptions("<mpeg-bitrate>_<mpeg-layer>_<mpeg-duration>")
+                Options: new FormatterOptions("<mp3-bitrate>_<mp3-layer>_<mp3-duration>")
             );
             filter.Setup();
             filter.Apply(item);

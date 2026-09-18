@@ -26,10 +26,10 @@ Shipped and **done** (do not redo):
 
 Media/MPEG now share one Models-owned field enum + `PropertyDisplayContext` formatter each (Image/PDF pattern):
 
-| Domain | Enum + formatter (Models)                                                                                                                                                                                   | Tokens (Filters)                                                                                                                   | Catalog                                                                                                                                                |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Media  | [`MediaPropertyField`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertyField.cs) + [`MediaPropertiesFormatting`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertiesFormatting.cs)               | [`MediaPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Media/MediaPropertyTokens.cs)                                       | [`MediaRenameListFields`](../../Mfr.Models/RenameList/Fields/Media/MediaRenameListFields.cs) (`Group` = `MediaProperties`, label **Media Properties**) |
-| MPEG   | [`MpegAudioPropertyField`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegAudioPropertyField.cs) + [`MpegAudioPropertiesFormatting`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegAudioPropertiesFormatting.cs) | [`MpegAudioPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Mpeg/MpegAudioPropertyTokens.cs) (`mpeg-*`, picker `Audio\MP3`) | [`MpegRenameListFields`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegRenameListFields.cs) (`Group` = **`MPEG`**, label **MP3 Properties**)             |
+| Domain | Enum + formatter (Models)                                                                                                                                                                                   | Tokens (Filters)                                                                                                                  | Catalog                                                                                                                                                |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Media  | [`MediaPropertyField`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertyField.cs) + [`MediaPropertiesFormatting`](../../Mfr.Models/RenameList/Fields/Media/MediaPropertiesFormatting.cs)               | [`MediaPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Media/MediaPropertyTokens.cs)                                      | [`MediaRenameListFields`](../../Mfr.Models/RenameList/Fields/Media/MediaRenameListFields.cs) (`Group` = `MediaProperties`, label **Media Properties**) |
+| MPEG   | [`MpegAudioPropertyField`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegAudioPropertyField.cs) + [`MpegAudioPropertiesFormatting`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegAudioPropertiesFormatting.cs) | [`MpegAudioPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Mpeg/MpegAudioPropertyTokens.cs) (`mp3-*`, picker `Audio\MP3`) | [`MpegRenameListFields`](../../Mfr.Models/RenameList/Fields/Mpeg/MpegRenameListFields.cs) (`Group` = **`MPEG`**, label **MP3 Properties**)             |
 
 Tokens call `*Formatting.Format(..., PropertyDisplayContext.Token)` and `*RenameListField.CatalogPropertyKey` for shuttle mapping. Media photo width/height/quality fields and `media-photo-*` tokens are removed (P1 done).
 
@@ -50,7 +50,7 @@ Image vs TagLib split: [`docs/image-metadata-model.md`](../image-metadata-model.
 
 - Help: `D:\Devl\mfr7\Site\finebytes\mfr\Help\fields.html` (`#mediaproperties`, `#MP3MPEG`); `id3fp.html` (legacy `mp3-*` table); formatter classes `Core/MfrFilters/FormattingParams/Audio/MpegFP.cs`
 - Code: `PropertyGroups/Media/MediaPropertiesPgInfo.cs` (includes Photo Width + Video Width); `PropertyGroups/Audio/Mp3PGInfo.cs` (`mName = "MP3 Properties"`); tokens registered under `"Audio\\MP3"` with names `mp3-bitrate`, `mp3-duration`, …
-- finebytes status: Media + MP3 catalogs ported; token/RL property enums unified in Models; tokens still `mpeg-*`; shuttle already uses **MP3 Properties**
+- finebytes status: Media + MP3 catalogs ported; token/RL property enums unified in Models; tokens use `mp3-*` (P2); shuttle already uses **MP3 Properties**; persist group id still `MPEG` until P3
 
 ### Behavior
 
@@ -103,7 +103,7 @@ Media catalog after P1: MIME, Possibly Corrupt, Duration, Duration (Seconds), Me
 
 ### P2 — `mpeg-*` → `mp3-*` tokens and Help
 
-- **Status:** pending
+- **Status:** done
 - **Scope / files:** [`MpegAudioPropertyTokens.cs`](../../Mfr.Filters/Formatting/Tokens/Mpeg/MpegAudioPropertyTokens.cs) names + `[FormatTokenInfo]`; token tests; [`FilterRelevantRenameListColumnsTests.cs`](../../Mfr.Tests/Models/Filters/FilterRelevantRenameListColumnsTests.cs); [`Formatter.md`](../../Mfr.Filters/docs/Formatting/Formatter.md); move/rewrite [`help/tokens/mpegfp.html`](../../help/tokens/mpegfp.html) → `mp3fp.html`; [`help/tokens/fp.html`](../../help/tokens/fp.html), fields.html, whatsnew if token names are listed; comments on `FileMeta` / [`image-tag-editing.plan.md`](image-tag-editing.plan.md) that say `mpeg-*`.
 - **Exit criteria:** Catalog insert text is `<mp3-bitrate>` etc.; unknown `mpeg-*` fails compile (no alias). Help hub links **MP3 Properties**.
 - **Tests:** Existing MPEG token tests renamed to `mp3-*`; picker search still finds `Audio\\MP3`.

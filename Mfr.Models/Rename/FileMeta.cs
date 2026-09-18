@@ -202,7 +202,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Read-only; never written on commit. <see langword="null"/> until first <c>media-*</c> or <c>mpeg-*</c>
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>media-*</c> or <c>mp3-*</c>
         /// formatter load. When present, <see cref="MediaProperties.Mpeg"/> is set only if an MPEG audio header exists.
         /// </para>
         /// </remarks>

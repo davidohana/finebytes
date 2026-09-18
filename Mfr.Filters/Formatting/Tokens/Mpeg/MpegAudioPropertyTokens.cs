@@ -4,7 +4,7 @@ using Mfr.Models.RenameList.Fields.Mpeg;
 namespace Mfr.Filters.Formatting.Tokens.Mpeg
 {
     /// <summary>
-    /// Shared implementation for no-arg <c>mpeg-*</c> formatter tokens.
+    /// Shared implementation for no-arg <c>mp3-*</c> formatter tokens.
     /// </summary>
     internal abstract class MpegAudioPropertyTokenBase(
         IReadOnlyList<string> names,
@@ -40,101 +40,101 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Bitrate", "Audio\\MP3", "Bitrate of MPEG audio (VBR-prefixed when applicable)", "mpeg-bitrate")]
+    [FormatTokenInfo("Bitrate", "Audio\\MP3", "Bitrate of MPEG audio (VBR-prefixed when applicable)", "mp3-bitrate")]
     internal sealed class MpegBitrateToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-bitrate&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-bitrate&gt;</c>.</summary>
         public MpegBitrateToken()
-            : base(["mpeg-bitrate"], MpegAudioPropertyField.Bitrate) { }
+            : base(["mp3-bitrate"], MpegAudioPropertyField.Bitrate) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Copyright", "Audio\\MP3", MpegRenameListFieldTips.Copyright, "mpeg-copyright")]
+    [FormatTokenInfo("Copyright", "Audio\\MP3", MpegRenameListFieldTips.Copyright, "mp3-copyright")]
     internal sealed class MpegCopyrightToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-copyright&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-copyright&gt;</c>.</summary>
         public MpegCopyrightToken()
-            : base(["mpeg-copyright"], MpegAudioPropertyField.Copyright) { }
+            : base(["mp3-copyright"], MpegAudioPropertyField.Copyright) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Duration", "Audio\\MP3", MpegRenameListFieldTips.Duration, "mpeg-duration")]
+    [FormatTokenInfo("Duration", "Audio\\MP3", MpegRenameListFieldTips.Duration, "mp3-duration")]
     internal sealed class MpegDurationToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-duration&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-duration&gt;</c>.</summary>
         public MpegDurationToken()
-            : base(["mpeg-duration"], MpegAudioPropertyField.Duration) { }
+            : base(["mp3-duration"], MpegAudioPropertyField.Duration) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Duration Seconds", "Audio\\MP3", MpegRenameListFieldTips.DurationSecs, "mpeg-duration-sec")]
+    [FormatTokenInfo("Duration Seconds", "Audio\\MP3", MpegRenameListFieldTips.DurationSecs, "mp3-duration-sec")]
     internal sealed class MpegDurationSecToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-duration-sec&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-duration-sec&gt;</c>.</summary>
         public MpegDurationSecToken()
-            : base(["mpeg-duration-sec"], MpegAudioPropertyField.DurationSec) { }
+            : base(["mp3-duration-sec"], MpegAudioPropertyField.DurationSec) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Encoding", "Audio\\MP3", "CBR or VBR encoding", "mpeg-encoding")]
+    [FormatTokenInfo("Encoding", "Audio\\MP3", "CBR or VBR encoding", "mp3-encoding")]
     internal sealed class MpegEncodingToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-encoding&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-encoding&gt;</c>.</summary>
         public MpegEncodingToken()
-            : base(["mpeg-encoding"], MpegAudioPropertyField.Encoding) { }
+            : base(["mp3-encoding"], MpegAudioPropertyField.Encoding) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Frequency", "Audio\\MP3", MpegRenameListFieldTips.Frequency, "mpeg-frequency")]
+    [FormatTokenInfo("Frequency", "Audio\\MP3", MpegRenameListFieldTips.Frequency, "mp3-frequency")]
     internal sealed class MpegFrequencyToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-frequency&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-frequency&gt;</c>.</summary>
         public MpegFrequencyToken()
-            : base(["mpeg-frequency"], MpegAudioPropertyField.Frequency) { }
+            : base(["mp3-frequency"], MpegAudioPropertyField.Frequency) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Layer", "Audio\\MP3", MpegRenameListFieldTips.Layer, "mpeg-layer")]
+    [FormatTokenInfo("Layer", "Audio\\MP3", MpegRenameListFieldTips.Layer, "mp3-layer")]
     internal sealed class MpegLayerToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-layer&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-layer&gt;</c>.</summary>
         public MpegLayerToken()
-            : base(["mpeg-layer"], MpegAudioPropertyField.Layer) { }
+            : base(["mp3-layer"], MpegAudioPropertyField.Layer) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Version", "Audio\\MP3", MpegRenameListFieldTips.Level, "mpeg-ver")]
+    [FormatTokenInfo("Version", "Audio\\MP3", MpegRenameListFieldTips.Level, "mp3-ver")]
     internal sealed class MpegVerToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-ver&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-ver&gt;</c>.</summary>
         public MpegVerToken()
-            : base(["mpeg-ver"], MpegAudioPropertyField.MpegVer) { }
+            : base(["mp3-ver"], MpegAudioPropertyField.MpegVer) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Mode", "Audio\\MP3", "Channel mode", "mpeg-mode")]
+    [FormatTokenInfo("Mode", "Audio\\MP3", "Channel mode", "mp3-mode")]
     internal sealed class MpegModeToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-mode&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-mode&gt;</c>.</summary>
         public MpegModeToken()
-            : base(["mpeg-mode"], MpegAudioPropertyField.Mode) { }
+            : base(["mp3-mode"], MpegAudioPropertyField.Mode) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Original", "Audio\\MP3", MpegRenameListFieldTips.Original, "mpeg-original")]
+    [FormatTokenInfo("Original", "Audio\\MP3", MpegRenameListFieldTips.Original, "mp3-original")]
     internal sealed class MpegOriginalToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-original&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-original&gt;</c>.</summary>
         public MpegOriginalToken()
-            : base(["mpeg-original"], MpegAudioPropertyField.Original) { }
+            : base(["mp3-original"], MpegAudioPropertyField.Original) { }
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Protection", "Audio\\MP3", MpegRenameListFieldTips.Protection, "mpeg-protection")]
+    [FormatTokenInfo("Protection", "Audio\\MP3", MpegRenameListFieldTips.Protection, "mp3-protection")]
     internal sealed class MpegProtectionToken : MpegAudioPropertyTokenBase
     {
-        /// <summary>Registers <c>&lt;mpeg-protection&gt;</c>.</summary>
+        /// <summary>Registers <c>&lt;mp3-protection&gt;</c>.</summary>
         public MpegProtectionToken()
-            : base(["mpeg-protection"], MpegAudioPropertyField.Protection) { }
+            : base(["mp3-protection"], MpegAudioPropertyField.Protection) { }
     }
 }

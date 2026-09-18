@@ -526,8 +526,8 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="expectedPropertyKey">Catalog property key for the first mapped token field.</param>
         [Theory]
         [InlineData("<media-duration>", MediaRenameListFields.Group, MediaRenameListFields.Key.Duration)]
-        [InlineData("<mpeg-bitrate>", MpegRenameListFields.Group, MpegRenameListFields.Key.Bitrate)]
-        [InlineData("<mpeg-encoding>", MpegRenameListFields.Group, MpegRenameListFields.Key.VBR)]
+        [InlineData("<mp3-bitrate>", MpegRenameListFields.Group, MpegRenameListFields.Key.Bitrate)]
+        [InlineData("<mp3-encoding>", MpegRenameListFields.Group, MpegRenameListFields.Key.VBR)]
         [InlineData("<image-width>", ImageRenameListFields.Group, ImageRenameListFields.Key.Width)]
         [InlineData("<exif-make>", JpegRenameListFields.Group, JpegRenameListFields.Key.Make)]
         [InlineData("<exif-date:yyyy-MM-dd>", JpegRenameListFields.Group, JpegRenameListFields.Key.DateTaken)]

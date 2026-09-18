@@ -3,7 +3,7 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
     /// <summary>
     /// MPEG audio-header properties shared by formatter tokens and Rename List columns.
     /// <para>
-    /// Member names match <c>mpeg-*</c> token vocabulary (including
+    /// Member names match <c>mp3-*</c> token vocabulary (including
     /// <see cref="Encoding"/>, <see cref="MpegVer"/>, <see cref="DurationSec"/>). Catalog
     /// keys that differ are mapped in
     /// <see cref="MpegPropertyRenameListField.CatalogPropertyKey"/>; DTO accessors live in
