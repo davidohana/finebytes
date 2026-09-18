@@ -16,26 +16,17 @@
     <hr />
     <h1>Command Line Parameters</h1>
     <p>
-      Magic File Renamer 8 has two command-line entry points:
+      This page documents launching the <strong>desktop UI</strong> with optional paths and flags.
+      For the console program (<span class="quote">mfr</span>) that renames with a saved preset, see
+      <a href="console.html">Console (Automatic) Mode</a>.
     </p>
-    <ul>
-      <li>
-        The <strong>desktop UI</strong> — open the app and optionally seed the
-        <a href="../ui/renamelist.html">Rename List</a> or browse a folder in the
-        <a href="../ui/fileexp.html">File List</a> (interactive work; no automatic rename).
-      </li>
-      <li>
-        The <strong>console</strong> program (<span class="quote">mfr</span>) — automatic rename
-        with a saved preset. See <a href="console.html">Console (Automatic) Mode</a>.
-      </li>
-    </ul>
 
     <h2 id="desktop">Desktop UI</h2>
     <p>
       Launch the graphical app with optional paths and flags. Paths on the command line add items to
-      the Rename List so you can preview and press GO in the UI. The desktop app does
-      <strong>not</strong> accept preset, dry-run, confirm, or commit options — those belong to
-      <span class="quote">mfr</span>.
+      the <a href="../ui/renamelist.html">Rename List</a> so you can preview and press GO in the UI.
+      The desktop app does <strong>not</strong> accept preset, dry-run, confirm, or commit options —
+      those belong to <span class="quote">mfr</span>.
     </p>
 
     <h3>Usage</h3>
@@ -66,9 +57,10 @@
         <tr>
           <td><code>--initial-folder &lt;PATH&gt;</code></td>
           <td>
-            Open the File List at this directory. Does not add paths by itself (UI-only; the console
-            has no File List). When both sources and this option are set, sources still seed the
-            Rename List and this path wins for File List location.
+            Open the <a href="../ui/fileexp.html">File List</a> at this directory. Does not add
+            paths by itself (UI-only; the console has no File List). When both sources and this
+            option are set, sources still seed the Rename List and this path wins for File List
+            location.
           </td>
         </tr>
       </tbody>
@@ -123,165 +115,6 @@
       <code>Mfr.App.Ui.exe D:\photos --files yes --folders no -r</code>
       <code>Mfr.App.Ui.exe --initial-folder D:\photos</code>
       <code>Mfr.App.Ui.exe D:\batch\a.jpg D:\batch\b.jpg --initial-folder D:\batch</code>
-    </div>
-
-    <h2 id="console">Console (<span class="quote">mfr</span>)</h2>
-    <p>
-      This section documents the console program (<span class="quote">mfr</span>). For an overview
-      of automatic renaming, see <a href="console.html">Console (Automatic) Mode</a>.
-    </p>
-
-    <h3>Usage</h3>
-    <p>
-      <code>mfr &lt;SOURCES&gt;… -p|--preset &lt;NAME&gt; [options]</code>
-    </p>
-    <p>
-      <span class="quote">SOURCES</span> are one or more files, directories, or filemasks
-      (space-separated). Quote paths that contain spaces. Run
-      <span class="quote">mfr --help</span> for the built-in summary.
-    </p>
-
-    <h3>Required</h3>
-    <table class="ref-table">
-      <thead>
-        <tr>
-          <th>Argument / option</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>&lt;SOURCES&gt;</code></td>
-          <td>One or more files, directories, or wildcards to process.</td>
-        </tr>
-        <tr>
-          <td><code>-p</code>, <code>--preset &lt;NAME&gt;</code></td>
-          <td>
-            Preset name from the presets file (required). Save presets in the UI first. See
-            <a href="savepreset.html">Save Preset</a>.
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>Options</h3>
-    <table class="ref-table">
-      <thead>
-        <tr>
-          <th>Option</th>
-          <th>Description</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>--presets-file &lt;PATH&gt;</code></td>
-          <td>Override the presets JSON file path (default: AppData finebytes MFR presets).</td>
-        </tr>
-        <tr>
-          <td><code>-o</code>, <code>--output-file &lt;PATH&gt;</code></td>
-          <td>Write rename results as JSON to this path.</td>
-        </tr>
-        <tr>
-          <td><code>--include-hidden</code></td>
-          <td>Include hidden and system files when expanding sources.</td>
-        </tr>
-        <tr>
-          <td><code>--files &lt;yes|no&gt;</code></td>
-          <td>Include files from sources (default: <span class="quote">yes</span>).</td>
-        </tr>
-        <tr>
-          <td><code>--folders &lt;yes|no&gt;</code></td>
-          <td>Include folders from sources (default: <span class="quote">no</span>).</td>
-        </tr>
-        <tr>
-          <td><code>-r</code>, <code>--recursive</code></td>
-          <td>Expand directory sources recursively into subdirectories.</td>
-        </tr>
-        <tr>
-          <td><code>--continue-on-rename-error</code></td>
-          <td>
-            Continue committing after per-item rename errors instead of stopping at the first
-            failure.
-          </td>
-        </tr>
-        <tr>
-          <td><code>-c</code>, <code>--confirm</code></td>
-          <td>Prompt for confirmation before applying each rename.</td>
-        </tr>
-        <tr>
-          <td><code>--dry-run</code></td>
-          <td>Preview and report commit outcomes without changing files on disk.</td>
-        </tr>
-        <tr>
-          <td><code>-l</code>, <code>--log-level &lt;LEVEL&gt;</code></td>
-          <td>
-            Minimum log level: <span class="quote">debug</span>, <span class="quote">info</span>,
-            <span class="quote">warn</span>, or <span class="quote">error</span>.
-          </td>
-        </tr>
-        <tr>
-          <td><code>--config &lt;PATH&gt;</code></td>
-          <td>
-            Path to <span class="quote">config.json</span> (default: AppData). The file must exist
-            when this option is set.
-          </td>
-        </tr>
-        <tr>
-          <td><code>--set &lt;KEY=VALUE&gt;</code></td>
-          <td>
-            Override a config field (repeatable). Key is
-            <span class="quote">section.leaf</span>; the value is everything after the first
-            <span class="quote">=</span> (example:
-            <span class="quote">log.maxSessionFiles=200</span>).
-          </td>
-        </tr>
-      </tbody>
-    </table>
-    <p>
-      At least one of <span class="quote">--files</span> or <span class="quote">--folders</span>
-      must be <span class="quote">yes</span>.
-    </p>
-
-    <h3>Exit codes</h3>
-    <table class="ref-table">
-      <thead>
-        <tr>
-          <th>Code</th>
-          <th>Meaning</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>0</td>
-          <td>Success (including when help/version output was requested).</td>
-        </tr>
-        <tr>
-          <td>1</td>
-          <td>
-            User or configuration error (invalid arguments, missing preset, no matching sources,
-            Preview errors, commit failure when fail-fast applies, and similar).
-          </td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>Unexpected application fault.</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <h3>Examples</h3>
-    <div class="examples">
-      <code>mfr C:\Music\*.mp3 -p clean --dry-run</code>
-      <code>mfr C:\Music\*.flac -r -p lowercase-extension --log-level debug</code>
-      <code>mfr C:\Music -p name_from_id3 -r</code>
-      <code
-        >mfr C:\Music C:\Podcasts -p my_preset --files yes --folders yes --output-file
-        C:\Temp\mfr-results.json</code
-      >
-      <code
-        >mfr C:\Music -p clean --config C:\Temp\config.json --set
-        log.maxSessionFiles=50</code
-      >
     </div>
 
     <p class="note">
