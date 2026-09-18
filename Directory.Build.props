@@ -5,4 +5,9 @@
         <AvaloniaEditVersion>12.0.0</AvaloniaEditVersion>
         <AvaloniaDiagnosticsSupportVersion>2.2.3</AvaloniaDiagnosticsSupportVersion>
     </PropertyGroup>
+
+    <!-- Beta builds: dotnet build -p:BETA=true (defines BETA for #if / commit enforcement). -->
+    <PropertyGroup Condition="'$(BETA)' == 'true'">
+        <DefineConstants>$(DefineConstants);BETA</DefineConstants>
+    </PropertyGroup>
 </Project>

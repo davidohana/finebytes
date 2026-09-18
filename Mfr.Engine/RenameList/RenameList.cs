@@ -1,4 +1,5 @@
 using System.Text;
+using Mfr.Engine.Beta;
 using Mfr.Engine.RenameLog;
 using Mfr.Filters;
 using Mfr.Utils;
@@ -1039,6 +1040,10 @@ namespace Mfr.Engine.RenameList
         /// </para>
         /// </remarks>
         /// <exception cref="ArgumentNullException">Thrown when <paramref name="plan"/> is <c>null</c>.</exception>
+        /// <exception cref="BetaExpiredException">
+        /// Thrown on non-dry-run commit when beta enforcement is on and the effective UTC is on or after
+        /// <see cref="BetaExpiryGate.ExpiresUtc"/>.
+        /// </exception>
         public IReadOnlyList<RenameResultItem> Commit(
             CommitPlan plan,
             bool failFast,
@@ -1049,6 +1054,9 @@ namespace Mfr.Engine.RenameList
         )
         {
             ArgumentNullException.ThrowIfNull(plan);
+
+            // BETA builds always enforce; non-BETA is a no-op unless tests call SetEnforceForTests.
+            BetaExpiryGate.ThrowIfCommitDisallowed(dryRun);
 
             var isUndo = !dryRun && _pendingUndoCommit;
 
