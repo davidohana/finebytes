@@ -69,16 +69,59 @@ ul.options li {
   margin: 0.35rem 0;
 }
 
+/* Example cards: setup paragraph + following .examples read as one block */
+p:has(+ .examples) {
+  margin: 1.15rem 0 0;
+  padding: 0.65rem 0.9rem 0.3rem;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-left: 3px solid #888;
+  border-radius: 3px 3px 0 0;
+  background: #f7f7f7;
+  color: #444;
+}
+
+p:has(+ .examples) + .examples {
+  margin: 0 0 0.25rem;
+  padding: 0.2rem 0.9rem 0.75rem;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-left: 3px solid #888;
+  border-radius: 0 0 3px 3px;
+  background: #f7f7f7;
+}
+
+/* Standalone example blocks (no setup caption above) */
+.examples:not(p + .examples) {
+  margin: 0.85rem 0;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid #ccc;
+  border-left: 3px solid #888;
+  border-radius: 3px;
+  background: #f7f7f7;
+}
+
 .examples code {
   display: block;
-  margin: 0.35rem 0 0.85rem;
+  margin: 0.35rem 0 0.55rem;
   white-space: pre-wrap;
   font-family: Consolas, "Courier New", monospace;
   font-size: 0.95em;
 }
 
+.examples code:last-child {
+  margin-bottom: 0;
+}
+
+/* Separate multiple before>>>after lines inside one block */
+.examples code + code {
+  margin-top: 0.75rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed #c8c8c8;
+}
+
 .note {
-  margin-top: 1rem;
+  margin-top: 1.15rem;
   color: #444;
 }
 
