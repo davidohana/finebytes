@@ -10,11 +10,6 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
         : IFormatToken,
             IRenameListMappedFormatToken
     {
-        /// <summary>
-        /// Gets the PDF property this token formats.
-        /// </summary>
-        internal PdfDocumentField Field => propertyField;
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
 

@@ -10,11 +10,6 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         : IFormatToken,
             IRenameListMappedFormatToken
     {
-        /// <summary>
-        /// Gets the EXIF property this token formats.
-        /// </summary>
-        internal ExifPropertyField Field => propertyField;
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
 

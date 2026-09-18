@@ -10,11 +10,6 @@ namespace Mfr.Filters.Formatting.Tokens.Image
         : IFormatToken,
             IRenameListMappedFormatToken
     {
-        /// <summary>
-        /// Gets the image property this token formats.
-        /// </summary>
-        internal ImagePropertyField Field => propertyField;
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
 

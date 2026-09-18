@@ -11,11 +11,6 @@ namespace Mfr.Filters.Formatting.Tokens.Mpeg
         MpegAudioPropertyField propertyField
     ) : IFormatToken, IRenameListMappedFormatToken
     {
-        /// <summary>
-        /// Gets the MPEG audio property this token formats.
-        /// </summary>
-        internal MpegAudioPropertyField Field => propertyField;
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
 

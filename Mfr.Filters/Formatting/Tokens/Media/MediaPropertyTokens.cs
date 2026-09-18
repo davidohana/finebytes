@@ -10,11 +10,6 @@ namespace Mfr.Filters.Formatting.Tokens.Media
         : IFormatToken,
             IRenameListMappedFormatToken
     {
-        /// <summary>
-        /// Gets the media property this token formats.
-        /// </summary>
-        internal MediaPropertyField Field => propertyField;
-
         /// <inheritdoc />
         public IReadOnlyList<string> Names => names;
 
