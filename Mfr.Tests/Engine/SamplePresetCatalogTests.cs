@@ -168,12 +168,12 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies the Beautify Names sample keeps its ordered cleanup and curated casing list.
+        /// Verifies the Pretty Names sample keeps its ordered cleanup and curated casing list.
         /// </summary>
         [Fact]
-        public void Beautify_Names_has_locked_chain_and_default_casing_words()
+        public void Pretty_Names_has_locked_chain_and_default_casing_words()
         {
-            var preset = _Preset("General: Beautify Names");
+            var preset = _Preset("General: Pretty Names");
             string[] expectedTypes =
             [
                 "SpaceCharacter",

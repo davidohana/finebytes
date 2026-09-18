@@ -17,7 +17,7 @@ namespace Mfr.Filters.Case
     public sealed record CasingListOptions(IReadOnlyList<string> Words, bool UppercaseSentenceInitial = false)
     {
         /// <summary>
-        /// Curated factory casing list shared by the editor Load defaults action and the Beautify Names sample.
+        /// Curated factory casing list shared by the editor Load defaults action and the Pretty Names sample.
         /// </summary>
         /// <remarks>
         /// English title-case exceptions, multilingual particles, and common rename/media acronyms.
