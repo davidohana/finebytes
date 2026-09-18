@@ -945,16 +945,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         /// <summary>
         /// Candidate fields for available lists: selected group when search is idle; catalog matches when active.
+        /// <para>
+        /// Always ordered A–Z by <see cref="RenameListField.DisplayName"/> (case-insensitive).
+        /// </para>
         /// </summary>
         private IReadOnlyList<RenameListField> _CandidateAvailableFields()
         {
             var query = SearchText.Trim();
-            if (query.Length == 0)
-            {
-                return _FieldsInSelectedGroup();
-            }
+            IEnumerable<RenameListField> fields =
+                query.Length == 0
+                    ? _FieldsInSelectedGroup()
+                    : RenameListFieldCatalog.All.Where(field => _FieldMatchesSearch(field, query));
 
-            return [.. RenameListFieldCatalog.All.Where(field => _FieldMatchesSearch(field, query))];
+            return [.. fields.OrderBy(field => field.DisplayName, StringComparer.OrdinalIgnoreCase)];
         }
 
         /// <summary>

@@ -468,6 +468,49 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         [Fact]
+        public void Available_fields_are_sorted_alphabetically_by_display_name()
+        {
+            var dialogVm = _CreateDefaultDialog();
+
+            Assert.Equal(
+                dialogVm
+                    .AvailableOriginalFields.OrderBy(field => field.DisplayName, StringComparer.OrdinalIgnoreCase)
+                    .Select(field => field.DisplayName),
+                dialogVm.AvailableOriginalFields.Select(field => field.DisplayName)
+            );
+
+            dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == ExtendedRenameListFields.Group);
+
+            Assert.Equal(
+                [
+                    "Attributes",
+                    "Creation Date",
+                    "Folder File Count",
+                    "Last Access Date",
+                    "Last Write Date",
+                    "Size",
+                ],
+                dialogVm.AvailableOriginalFields.Select(field => field.DisplayName)
+            );
+            Assert.Equal(
+                dialogVm
+                    .AvailableSortFields.OrderBy(field => field.DisplayName, StringComparer.OrdinalIgnoreCase)
+                    .Select(field => field.DisplayName),
+                dialogVm.AvailableSortFields.Select(field => field.DisplayName)
+            );
+
+            dialogVm.SearchText = "date";
+
+            Assert.Equal(
+                dialogVm
+                    .AvailableOriginalFields.OrderBy(field => field.DisplayName, StringComparer.OrdinalIgnoreCase)
+                    .Select(field => field.DisplayName),
+                dialogVm.AvailableOriginalFields.Select(field => field.DisplayName)
+            );
+            Assert.True(dialogVm.AvailableOriginalFields.Count > 1);
+        }
+
+        [Fact]
         public void Extended_group_offers_date_and_attrs_preview_fields()
         {
             var dialogVm = new RenameListFieldShuttleDialogViewModel(
@@ -483,10 +526,10 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(6, dialogVm.AvailableOriginalFields.Count);
             Assert.Equal(
                 [
-                    ExtendedCreationDateField.CreationDateKey,
-                    ExtendedLastWriteDateField.LastWriteDateKey,
-                    ExtendedLastAccessDateField.LastAccessDateKey,
                     ExtendedAttributesField.AttributesKey,
+                    ExtendedCreationDateField.CreationDateKey,
+                    ExtendedLastAccessDateField.LastAccessDateKey,
+                    ExtendedLastWriteDateField.LastWriteDateKey,
                 ],
                 dialogVm.AvailablePreviewFields.Select(field => field.PropertyKey)
             );

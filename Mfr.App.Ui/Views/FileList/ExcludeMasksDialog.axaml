@@ -6,7 +6,7 @@
   x:Class="Mfr.App.Ui.Views.FileList.ExcludeMasksDialog"
   x:DataType="vm:ExcludeMasksDialogViewModel"
   Title="Exclude masks"
-  Icon="/Assets/mfr.ico"
+  Icon="/Assets/ExcludeMasks.png"
   Width="460"
   Height="240"
   MinWidth="420"
