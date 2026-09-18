@@ -19,9 +19,7 @@ isProject: false
 
 # More read-only metadata formats
 
-Parent / sibling: shipped [`docs/plans/pdf-document-info-tokens.plan.md`](docs/plans/pdf-document-info-tokens.plan.md). Clone that bucket pattern for EPUB/Office. HEIF extends [`docs/image-metadata-model.md`](docs/image-metadata-model.md), not a new `FileMeta` bucket.
-
-**Save as:** [`docs/plans/more-read-only-metadata-formats.plan.md`](docs/plans/more-read-only-metadata-formats.plan.md) when implementing (or copy from this plan file).
+Parent / sibling: shipped PDF Info tokens ([`docs/pdf-metadata-model.md`](docs/pdf-metadata-model.md)). Clone that bucket pattern for Office. HEIF extends [`docs/image-metadata-model.md`](docs/image-metadata-model.md), not a new `FileMeta` bucket.
 
 ## Decisions (locked)
 
@@ -113,7 +111,7 @@ Key PDF template files:
 - **Fields (v1):** Title, Creator, Publisher, Language, Date, Identifier, Subject, Description (first/primary string where lists exist).
 - **Exit criteria:** Valid EPUB expands tokens/columns; missing DC fields empty; non-EPUB/corrupt → PreviewError; format + targeted tests green.
 - **Tests:** Minimal EPUB fixture + reader/token/catalog/loader tests mirroring PDF.
-- **Shipped:** Child plan [`docs/plans/epub-document-info-tokens.plan.md`](docs/plans/epub-document-info-tokens.plan.md) P1–P3 (reader/bucket, tokens/columns, docs/help).
+- **Shipped:** EPUB reader/bucket, tokens/columns, docs/help ([`docs/epub-metadata-model.md`](docs/epub-metadata-model.md)).
 
 ### P3 — Office DOCX PackageProperties (read-only)
 
