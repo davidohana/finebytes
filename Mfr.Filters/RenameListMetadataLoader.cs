@@ -31,6 +31,11 @@ namespace Mfr.Filters
             {
                 _TryEnsureImagePropertiesLoaded(item);
             }
+
+            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.Pdf))
+            {
+                _TryEnsurePdfLoaded(item);
+            }
         }
 
         /// <summary>
@@ -62,6 +67,11 @@ namespace Mfr.Filters
             if (
                 requirement.HasFlag(RenameListMetadataRequirement.ImageProperties) && !item.ImagePropertiesLoadAttempted
             )
+            {
+                return false;
+            }
+
+            if (requirement.HasFlag(RenameListMetadataRequirement.Pdf) && !item.PdfLoadAttempted)
             {
                 return false;
             }
@@ -129,6 +139,27 @@ namespace Mfr.Filters
             }
         }
 
+        private static void _TryEnsurePdfLoaded(RenameItem item)
+        {
+            if (
+                item.PdfLoadAttempted
+                || item.Original.Attributes.IsDirectory()
+                || RenameListDiskPaths.IsMissingFromDisk(item)
+            )
+            {
+                return;
+            }
+
+            try
+            {
+                item.EnsurePdfLoaded();
+            }
+            catch (Exception ex) when (_IsMetadataReadFailure(ex))
+            {
+                item.SetPdfLoadError(ex);
+            }
+        }
+
         private static bool _IsMetadataReadFailure(Exception ex)
         {
             if (ex is InvalidOperationException or IOException or ArgumentException or UnauthorizedAccessException)
@@ -136,9 +167,14 @@ namespace Mfr.Filters
                 return true;
             }
 
-            // TagLib / MetadataExtractor exceptions without taking a Filters package reference on those libraries.
+            // TagLib / MetadataExtractor / PdfPig exceptions without taking a Filters package reference on those libraries.
             var typeName = ex.GetType().Name;
-            return typeName is "UnsupportedFormatException" or "CorruptFileException" or "ImageProcessingException";
+            return typeName
+                is "UnsupportedFormatException"
+                    or "CorruptFileException"
+                    or "ImageProcessingException"
+                    or "PdfDocumentFormatException"
+                    or "PdfDocumentEncryptedException";
         }
     }
 }

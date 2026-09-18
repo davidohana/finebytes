@@ -8,6 +8,7 @@ using Mfr.Filters.Formatting.Tokens.Exif;
 using Mfr.Filters.Formatting.Tokens.Image;
 using Mfr.Filters.Formatting.Tokens.Media;
 using Mfr.Filters.Formatting.Tokens.Mpeg;
+using Mfr.Filters.Formatting.Tokens.Pdf;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
@@ -19,6 +20,7 @@ using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Models.Tags.Id3v1;
 
@@ -529,6 +531,8 @@ namespace Mfr.Tests.Models.Filters
         [InlineData("<image-width>", ImageRenameListFields.Group, ImageRenameListFields.Key.Width)]
         [InlineData("<exif-make>", JpegRenameListFields.Group, JpegRenameListFields.Key.Make)]
         [InlineData("<exif-date:yyyy-MM-dd>", JpegRenameListFields.Group, JpegRenameListFields.Key.DateTaken)]
+        [InlineData("<pdf-title>", PdfRenameListFields.Group, PdfRenameListFields.Key.Title)]
+        [InlineData("<pdf-page-count>", PdfRenameListFields.Group, PdfRenameListFields.Key.PageCount)]
         public void Collect_Formatter_MediaMpegImageExifTokens_MapOriginalCatalogColumns(
             string template,
             string expectedGroupId,
@@ -567,6 +571,7 @@ namespace Mfr.Tests.Models.Filters
                             or ImagePropertyTokenBase
                             or ExifPropertyTokenBase
                             or ExifDateToken
+                            or PdfDocumentTokenBase
                 )
                 .ToList();
 

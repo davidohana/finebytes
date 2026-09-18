@@ -1,11 +1,11 @@
-// Package ownership: docs/mfr-folder-layering.md (TagLib / MetadataExtractor stay in L2)
+// Package ownership: docs/mfr-folder-layering.md (TagLib / MetadataExtractor / PdfPig stay in L2)
 
 using System.Xml.Linq;
 
 namespace Mfr.Tests.Architecture
 {
     /// <summary>
-    /// Verifies TagLib Sharp and MetadataExtractor packages stay in allowed projects.
+    /// Verifies TagLib Sharp, MetadataExtractor, and PdfPig packages stay in allowed projects.
     /// </summary>
     public sealed class PackageOwnershipArchitectureTests
     {
@@ -15,6 +15,8 @@ namespace Mfr.Tests.Architecture
         {
             "TagLibSharp",
             "MetadataExtractor",
+            "PdfPig",
+            "UglyToad.PdfPig",
         };
 
         /// <summary>
@@ -27,10 +29,10 @@ namespace Mfr.Tests.Architecture
         };
 
         /// <summary>
-        /// No layered project outside Metadata (and Tests fixtures) may take a TagLib/ME PackageReference.
+        /// No layered project outside Metadata (and Tests fixtures) may take a TagLib/ME/PdfPig PackageReference.
         /// </summary>
         [Fact]
-        public void TagLib_And_MetadataExtractor_Only_In_Allowed_Projects()
+        public void TagLib_MetadataExtractor_And_PdfPig_Only_In_Allowed_Projects()
         {
             var repoRoot = ArchitectureRepoPaths.FindRepoRoot();
             var violations = Directory
@@ -38,6 +40,10 @@ namespace Mfr.Tests.Architecture
                 .Where(path =>
                     !path.Contains(
                         $"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}",
+                        StringComparison.Ordinal
+                    )
+                    && !path.Contains(
+                        $"{Path.DirectorySeparatorChar}.tmp{Path.DirectorySeparatorChar}",
                         StringComparison.Ordinal
                     )
                 )
@@ -52,7 +58,7 @@ namespace Mfr.Tests.Architecture
 
             Assert.True(
                 violations.Count == 0,
-                "TagLibSharp / MetadataExtractor must stay in Mfr.Metadata (and Mfr.Tests fixtures). Violations:"
+                "TagLibSharp / MetadataExtractor / PdfPig must stay in Mfr.Metadata (and Mfr.Tests fixtures). Violations:"
                     + Environment.NewLine
                     + string.Join(Environment.NewLine, violations)
             );

@@ -20,5 +20,10 @@ namespace Mfr.Models.RenameList
         /// Field reads MetadataExtractor image properties and/or EXIF from disk.
         /// </summary>
         ImageProperties = 2,
+
+        /// <summary>
+        /// Field reads PdfPig PDF Info and/or page count from disk.
+        /// </summary>
+        Pdf = 4,
     }
 }

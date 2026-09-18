@@ -10,6 +10,7 @@ using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
@@ -37,7 +38,8 @@ namespace Mfr.Tests.Models
                     + MediaRenameListFields.All.Count
                     + MpegRenameListFields.All.Count
                     + ImageRenameListFields.All.Count
-                    + JpegRenameListFields.All.Count,
+                    + JpegRenameListFields.All.Count
+                    + PdfRenameListFields.All.Count,
                 RenameListFieldCatalog.All.Count
             );
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(BasicRenameListField.Group).Count);
@@ -60,6 +62,7 @@ namespace Mfr.Tests.Models
             Assert.Equal(11, RenameListFieldCatalog.GetFieldsForGroup(MpegRenameListFields.Group).Count);
             Assert.Equal(7, RenameListFieldCatalog.GetFieldsForGroup(ImageRenameListFields.Group).Count);
             Assert.Equal(17, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
+            Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(PdfRenameListFields.Group).Count);
         }
 
         /// <summary>
@@ -81,6 +84,18 @@ namespace Mfr.Tests.Models
             var mpegCopyright = Assert.Single(MpegRenameListFields.All, f => f.PropertyKey == "Copyright");
             var jpegAuthor = Assert.Single(JpegRenameListFields.All, f => f.PropertyKey == "ExifDirectory*40093");
             var jpegArtist = Assert.Single(JpegRenameListFields.All, f => f.PropertyKey == "ExifDirectory*315");
+            var pdfAuthor = Assert.Single(
+                PdfRenameListFields.All,
+                f => f.PropertyKey == PdfRenameListFields.Key.Author
+            );
+            var pdfCreator = Assert.Single(
+                PdfRenameListFields.All,
+                f => f.PropertyKey == PdfRenameListFields.Key.Creator
+            );
+            var pdfProducer = Assert.Single(
+                PdfRenameListFields.All,
+                f => f.PropertyKey == PdfRenameListFields.Key.Producer
+            );
 
             Assert.Equal(
                 $"{SemanticAudioFieldTips.Artist} ({AudioTagRenameListFields.SemanticTipQualifier})",
@@ -104,6 +119,9 @@ namespace Mfr.Tests.Models
             Assert.Equal(MpegRenameListFieldTips.Copyright, mpegCopyright.Tip);
             Assert.Equal(JpegRenameListFieldTips.Author, jpegAuthor.Tip);
             Assert.Equal(JpegRenameListFieldTips.Artist, jpegArtist.Tip);
+            Assert.Equal(PdfRenameListFieldTips.Author, pdfAuthor.Tip);
+            Assert.Equal(PdfRenameListFieldTips.Creator, pdfCreator.Tip);
+            Assert.Equal(PdfRenameListFieldTips.Producer, pdfProducer.Tip);
         }
 
         [Fact]
@@ -121,6 +139,7 @@ namespace Mfr.Tests.Models
                     MpegRenameListFields.GroupLabel,
                     ImageRenameListFields.GroupLabel,
                     JpegRenameListFields.GroupLabel,
+                    PdfRenameListFields.GroupLabel,
                 ],
                 RenameListFieldCatalog.All.Select(field => field.GroupDisplayName).Distinct()
             );
@@ -1280,6 +1299,39 @@ namespace Mfr.Tests.Models
             );
             var widthKey = RenameListFieldKey.Original(ImageRenameListFields.Group, "Width");
             Assert.True(RenameListFieldCatalog.CompareForSort(widthTwo, widthKey, widthTen) < 0);
+        }
+
+        [Fact]
+        public void CompareForSort_orders_pdf_title_string_and_page_count_numeric()
+        {
+            var betaTitle = FilterTestHelpers.CreateRenameItem(
+                fileName: "beta",
+                extension: "pdf",
+                configureOriginal: meta => meta.Pdf = new PdfDocumentInfo { Title = "Beta" }
+            );
+            var alphaTitle = FilterTestHelpers.CreateRenameItem(
+                fileName: "alpha",
+                extension: "pdf",
+                configureOriginal: meta => meta.Pdf = new PdfDocumentInfo { Title = "Alpha" }
+            );
+            var titleKey = RenameListFieldKey.Original(PdfRenameListFields.Group, PdfRenameListFields.Key.Title);
+            Assert.True(RenameListFieldCatalog.CompareForSort(betaTitle, titleKey, alphaTitle) > 0);
+
+            var tenPages = FilterTestHelpers.CreateRenameItem(
+                fileName: "ten",
+                extension: "pdf",
+                configureOriginal: meta => meta.Pdf = new PdfDocumentInfo { PageCount = 10 }
+            );
+            var twoPages = FilterTestHelpers.CreateRenameItem(
+                fileName: "two",
+                extension: "pdf",
+                configureOriginal: meta => meta.Pdf = new PdfDocumentInfo { PageCount = 2 }
+            );
+            var pageCountKey = RenameListFieldKey.Original(
+                PdfRenameListFields.Group,
+                PdfRenameListFields.Key.PageCount
+            );
+            Assert.True(RenameListFieldCatalog.CompareForSort(twoPages, pageCountKey, tenPages) < 0);
         }
 
         [Fact]

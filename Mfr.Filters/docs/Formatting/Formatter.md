@@ -42,7 +42,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`TagLibFileAccess.Read`**) **on first `audio-*` / `id3v2` / `id3v2-version` token use** (or first `media-*` / `mpeg-*` token, which shares that open) for that **file** row inside a **`Preview`** run; the same open also fills the media cache when it is not already marked loaded. **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
-**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mpeg-*`, `image-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
+**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mpeg-*`, `image-*`, `exif-*`, `pdf-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
 
 Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateRenameItem`**, which marks TagLib load as already attempted (`TagLibLoadAttempted`) so **`EnsureTagLibLoaded`** does not touch pre-seeded **`AudioTagOverlay`**; integration-style tests use real tagged temp files when exercising disk read.
 
@@ -151,6 +151,33 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image properties as
 | `<image-frame-count>` | Frame count; empty when `0`. Stills with known dims are `1`.                                              |
 
 **Arguments:** No argument (`<image-width>` only). A stray **`<image-width:…>`** fails at compile.
+
+#### PDF Document
+
+Reads from **`Original.Pdf`** (read-only PdfPig Info + page-count cache). Properties load from disk
+(**`PdfFileReader.Read`**) **on first `pdf-*` token use** for that **file** row inside a **`Preview`**
+run; **`RenameList.Commit`** clears the cache afterward so later previews reload from disk.
+
+**Directory rows**, non-PDF files, and corrupt/unreadable PDFs surface **`RenameStatus.PreviewError`**
+(exception as **`Cause`**). A successful open with a missing Info field (or unparseable date) expands
+**empty**, not an error. There is no XMP fallback and no write/Apply path.
+
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark PDF load as already attempted so seeded
+**`FileMeta.Pdf`** is used without disk I/O.
+
+| Token              | Output                                                                                          |
+| ------------------ | ----------------------------------------------------------------------------------------------- |
+| `<pdf-title>`      | Info Title; empty when unset.                                                                   |
+| `<pdf-author>`     | Info Author; empty when unset.                                                                  |
+| `<pdf-subject>`    | Info Subject; empty when unset.                                                                 |
+| `<pdf-keywords>`   | Info Keywords; empty when unset.                                                                |
+| `<pdf-creator>`    | Info Creator (creating app); empty when unset.                                                  |
+| `<pdf-producer>`   | Info Producer; empty when unset.                                                                |
+| `<pdf-created>`    | Parsed CreationDate as general date/time (`G`, InvariantCulture); empty when unset/unparseable. |
+| `<pdf-modified>`   | Parsed ModDate as general date/time (`G`, InvariantCulture); empty when unset/unparseable.      |
+| `<pdf-page-count>` | Page count; empty when `0`.                                                                     |
+
+**Arguments:** No argument (`<pdf-title>` only). A stray **`<pdf-title:…>`** fails at compile.
 
 #### EXIF
 

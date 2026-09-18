@@ -1,6 +1,7 @@
 using Mfr.Filters;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Pdf;
 
 namespace Mfr.Tests.Models
 {
@@ -55,22 +56,40 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies listing returns both TagLib and image failures for one row.
+        /// Verifies PDF load failures use the PDF-bucket explanation.
         /// </summary>
         [Fact]
-        public void ListLoadErrors_returns_taglib_and_image_failures()
+        public void DescribeLoadError_uses_pdf_bucket_message()
+        {
+            var item = _UnmarkedItem(@"D:\Docs\notes.txt");
+            var titleKey = RenameListFieldKey.Original(PdfRenameListFields.Group, PdfRenameListFields.Key.Title);
+            item.SetPdfLoadError(new InvalidOperationException("Cannot read PDF Info"));
+
+            var explanation = RenameListFieldCatalog.DescribeLoadError(item, titleKey);
+
+            Assert.Equal("This file could not be read as PDF document Info.", explanation);
+        }
+
+        /// <summary>
+        /// Verifies listing returns TagLib, image, and PDF failures for one row.
+        /// </summary>
+        [Fact]
+        public void ListLoadErrors_returns_taglib_image_and_pdf_failures()
         {
             var item = _UnmarkedItem(@"D:\Music\PLAYLIST.M3U");
             item.SetTagLibMetadataLoadError(new InvalidOperationException(@"D:\Music\PLAYLIST.M3U (taglib/m3u)"));
             item.SetImagePropertiesLoadError(new InvalidOperationException("Cannot read image properties"));
+            item.SetPdfLoadError(new InvalidOperationException("Cannot read PDF Info"));
 
             Assert.True(RenameListFieldCatalog.HasAnyLoadError(item));
             var errors = RenameListFieldCatalog.ListLoadErrors(item);
-            Assert.Equal(2, errors.Count);
+            Assert.Equal(3, errors.Count);
             Assert.Equal("This file could not be read as audio or media metadata.", errors[0].UserExplanation);
             Assert.Contains("taglib/m3u", errors[0].TechnicalDetails, StringComparison.Ordinal);
             Assert.Equal("This file could not be read as image or EXIF metadata.", errors[1].UserExplanation);
             Assert.Equal("Cannot read image properties", errors[1].TechnicalDetails);
+            Assert.Equal("This file could not be read as PDF document Info.", errors[2].UserExplanation);
+            Assert.Equal("Cannot read PDF Info", errors[2].TechnicalDetails);
         }
 
         /// <summary>

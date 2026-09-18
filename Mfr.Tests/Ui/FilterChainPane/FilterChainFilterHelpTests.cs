@@ -1,7 +1,6 @@
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FilterChainPane;
-using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Ui.FilterChainPane
 {

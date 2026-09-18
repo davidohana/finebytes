@@ -8,6 +8,7 @@ using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 
 namespace Mfr.Tests.Ui.RenameList
@@ -459,6 +460,7 @@ namespace Mfr.Tests.Ui.RenameList
                     MpegRenameListFields.GroupLabel,
                     ImageRenameListFields.GroupLabel,
                     JpegRenameListFields.GroupLabel,
+                    PdfRenameListFields.GroupLabel,
                 ],
                 dialogVm.Groups.Select(group => group.DisplayName)
             );

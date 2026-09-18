@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using Mfr.Filters;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
@@ -11,6 +10,7 @@ using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 
 namespace Mfr.Tests.Help
@@ -36,9 +36,7 @@ namespace Mfr.Tests.Help
         /// Catalog group ids that intentionally have no Write/Preview table in
         /// <c>fields.html</c> (prose or Field/Description only).
         /// </summary>
-        private static readonly HashSet<string> _GroupsWithoutWritePreviewTable = new(
-            StringComparer.Ordinal
-        )
+        private static readonly HashSet<string> _GroupsWithoutWritePreviewTable = new(StringComparer.Ordinal)
         {
             AudioTagRenameListFields.Group,
             Id3v1RenameListFields.Group,
@@ -48,6 +46,7 @@ namespace Mfr.Tests.Help
             MpegRenameListFields.Group,
             ImageRenameListFields.Group,
             JpegRenameListFields.Group,
+            PdfRenameListFields.Group,
         };
 
         /// <summary>
@@ -88,6 +87,7 @@ namespace Mfr.Tests.Help
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline
         )]
         private static partial Regex _AnchorRegex();
+
         /// <summary>
         /// Verifies relative Help <c>href</c> values resolve to files under <c>help/</c>.
         /// </summary>
@@ -268,65 +268,56 @@ namespace Mfr.Tests.Help
                     continue;
                 }
 
-                var match = links.Find(link =>
+                var (Href, Text) = links.Find(link =>
                     string.Equals(link.Href, expectedHref, StringComparison.OrdinalIgnoreCase)
                 );
-                if (match.Href is null)
+                if (Href is null)
                 {
                     issues.Add($"{entry.Type}: missing hub link '{expectedHref}'");
                     continue;
                 }
 
-                if (!string.Equals(match.Text, entry.DisplayName, StringComparison.Ordinal))
+                if (!string.Equals(Text, entry.DisplayName, StringComparison.Ordinal))
                 {
-                    issues.Add(
-                        $"{entry.Type}: hub label '{match.Text}' != catalog DisplayName '{entry.DisplayName}'"
-                    );
+                    issues.Add($"{entry.Type}: hub label '{Text}' != catalog DisplayName '{entry.DisplayName}'");
                 }
             }
 
-            var catalogTypeToEntry = FilterCatalog.Entries.ToDictionary(
-                entry => entry.Type,
-                StringComparer.Ordinal
-            );
+            var catalogTypeToEntry = FilterCatalog.Entries.ToDictionary(entry => entry.Type, StringComparer.Ordinal);
             foreach (var (sectionId, links) in sectionIdToLinks)
             {
-                foreach (var link in links)
+                foreach (var (Href, Text) in links)
                 {
-                    var typeName = Path.GetFileNameWithoutExtension(link.Href.Replace('\\', '/'));
+                    var typeName = Path.GetFileNameWithoutExtension(Href.Replace('\\', '/'));
                     if (typeName.Length == 0)
                     {
-                        issues.Add($"#{sectionId}: empty filter href '{link.Href}'");
+                        issues.Add($"#{sectionId}: empty filter href '{Href}'");
                         continue;
                     }
 
                     if (!catalogTypeToEntry.TryGetValue(typeName, out var entry))
                     {
-                        issues.Add($"#{sectionId}: stale hub link '{link.Href}' (not in FilterCatalog)");
+                        issues.Add($"#{sectionId}: stale hub link '{Href}' (not in FilterCatalog)");
                         continue;
                     }
 
                     var expectedSection = entry.Group.ToString().ToLowerInvariant();
                     if (!string.Equals(sectionId, expectedSection, StringComparison.OrdinalIgnoreCase))
                     {
-                        issues.Add(
-                            $"{entry.Type}: hub section #{sectionId} != catalog group '{entry.Group}'"
-                        );
+                        issues.Add($"{entry.Type}: hub section #{sectionId} != catalog group '{entry.Group}'");
                     }
 
                     var expectedHref = $"{expectedSection}/{entry.HelpFileName}";
-                    if (!string.Equals(link.Href, expectedHref, StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(Href, expectedHref, StringComparison.OrdinalIgnoreCase))
                     {
-                        issues.Add($"{entry.Type}: hub href '{link.Href}' != '{expectedHref}'");
+                        issues.Add($"{entry.Type}: hub href '{Href}' != '{expectedHref}'");
                     }
                 }
             }
 
             Assert.True(
                 issues.Count == 0,
-                "filters.html hub vs FilterCatalog:"
-                    + Environment.NewLine
-                    + string.Join(Environment.NewLine, issues)
+                "filters.html hub vs FilterCatalog:" + Environment.NewLine + string.Join(Environment.NewLine, issues)
             );
         }
 
@@ -361,7 +352,9 @@ namespace Mfr.Tests.Help
                         continue;
                     }
 
-                    if (!_TryResolveLocalTarget(helpRoot, current, href, out var targetPath) || !File.Exists(targetPath))
+                    if (
+                        !_TryResolveLocalTarget(helpRoot, current, href, out var targetPath) || !File.Exists(targetPath)
+                    )
                     {
                         continue;
                     }
@@ -417,8 +410,7 @@ namespace Mfr.Tests.Help
                 .Distinct(StringComparer.Ordinal)
                 .OrderBy(id => id, StringComparer.Ordinal)
                 .ToList();
-            var documentedGroupIds = _FieldsWritePreviewSectionToGroup
-                .Values.ToHashSet(StringComparer.Ordinal);
+            var documentedGroupIds = _FieldsWritePreviewSectionToGroup.Values.ToHashSet(StringComparer.Ordinal);
 
             foreach (var groupId in catalogGroupIds)
             {
@@ -442,9 +434,7 @@ namespace Mfr.Tests.Help
             {
                 if (!_FieldsWritePreviewSectionToGroup.ContainsKey(sectionId))
                 {
-                    mismatches.Add(
-                        $"fields.html#{sectionId} has Write/Preview rows but is not in the documented map"
-                    );
+                    mismatches.Add($"fields.html#{sectionId} has Write/Preview rows but is not in the documented map");
                 }
             }
 
@@ -548,7 +538,10 @@ namespace Mfr.Tests.Help
             }
         }
 
-        private static string _MarkerLabel(bool supported) => supported ? "+" : "empty";
+        private static string _MarkerLabel(bool supported)
+        {
+            return supported ? "+" : "empty";
+        }
 
         private static Dictionary<string, Dictionary<string, (bool Write, bool Preview)>> _ParseWritePreviewSections(
             string html
@@ -592,8 +585,10 @@ namespace Mfr.Tests.Help
             return sectionIdToRows;
         }
 
-        private static bool _CellHasPlus(string cellHtml) =>
-            _StripHtml(cellHtml).Contains('+', StringComparison.Ordinal);
+        private static bool _CellHasPlus(string cellHtml)
+        {
+            return _StripHtml(cellHtml).Contains('+', StringComparison.Ordinal);
+        }
 
         private static string _StripHtml(string value)
         {

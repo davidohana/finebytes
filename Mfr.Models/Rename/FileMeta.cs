@@ -232,6 +232,17 @@ namespace Mfr.Models.Rename
         public ExifData? Exif { get; set; }
 
         /// <summary>
+        /// Gets or sets the lazy PdfPig PDF Info + page-count read cache.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>pdf-*</c> formatter load.
+        /// Successful opens with missing Info fields store an empty/partial snapshot, not <see langword="null"/>.
+        /// </para>
+        /// </remarks>
+        public PdfDocumentInfo? Pdf { get; set; }
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -256,6 +267,7 @@ namespace Mfr.Models.Rename
                 Media = Media,
                 Image = Image,
                 Exif = Exif,
+                Pdf = Pdf,
             };
         }
     }

@@ -69,6 +69,15 @@ namespace Mfr.Models.RenameList
                 }
             }
 
+            if (requirement.HasFlag(RenameListMetadataRequirement.Pdf))
+            {
+                error = item.PdfLoadError;
+                if (error is not null)
+                {
+                    return true;
+                }
+            }
+
             error = null;
             return false;
         }
@@ -88,15 +97,17 @@ namespace Mfr.Models.RenameList
         /// Returns whether the row has any original metadata load failure.
         /// </summary>
         /// <param name="item">Rename row.</param>
-        /// <returns><see langword="true"/> when TagLib or image metadata failed to load.</returns>
+        /// <returns><see langword="true"/> when TagLib, image, or PDF metadata failed to load.</returns>
         internal static bool HasAny(RenameItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
-            return item.TagLibMetadataLoadError is not null || item.ImagePropertiesLoadError is not null;
+            return item.TagLibMetadataLoadError is not null
+                || item.ImagePropertiesLoadError is not null
+                || item.PdfLoadError is not null;
         }
 
         /// <summary>
-        /// Lists distinct reader failures stored on the row (at most one TagLib and one image).
+        /// Lists distinct reader failures stored on the row (at most one TagLib, one image, and one PDF).
         /// </summary>
         /// <param name="item">Rename row.</param>
         /// <returns>User-facing entries for Show Load Errors, in reader order.</returns>
@@ -104,7 +115,7 @@ namespace Mfr.Models.RenameList
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            var errors = new List<RenameListLoadError>(2);
+            var errors = new List<RenameListLoadError>(3);
             if (item.TagLibMetadataLoadError is { } tagLibError)
             {
                 errors.Add(
@@ -121,6 +132,16 @@ namespace Mfr.Models.RenameList
                     new RenameListLoadError(
                         DescribeUserMessage(imageError, RenameListMetadataRequirement.ImageProperties),
                         imageError.Message
+                    )
+                );
+            }
+
+            if (item.PdfLoadError is { } pdfError)
+            {
+                errors.Add(
+                    new RenameListLoadError(
+                        DescribeUserMessage(pdfError, RenameListMetadataRequirement.Pdf),
+                        pdfError.Message
                     )
                 );
             }
@@ -151,6 +172,11 @@ namespace Mfr.Models.RenameList
             if (requirement.HasFlag(RenameListMetadataRequirement.ImageProperties))
             {
                 return "This file could not be read as image or EXIF metadata.";
+            }
+
+            if (requirement.HasFlag(RenameListMetadataRequirement.Pdf))
+            {
+                return "This file could not be read as PDF document Info.";
             }
 
             return "This field could not be loaded from disk.";

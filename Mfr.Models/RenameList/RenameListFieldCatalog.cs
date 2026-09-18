@@ -9,6 +9,7 @@ using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Utils;
 
@@ -34,6 +35,7 @@ namespace Mfr.Models.RenameList
                 .. MpegRenameListFields.All,
                 .. ImageRenameListFields.All,
                 .. JpegRenameListFields.All,
+                .. PdfRenameListFields.All,
             ]);
 
         private static readonly Dictionary<(string GroupId, string PropertyKey), RenameListField> _fieldByKey =

@@ -3,6 +3,7 @@ using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Pdf;
 
 namespace Mfr.Tests.Models.Filters
 {
@@ -22,9 +23,14 @@ namespace Mfr.Tests.Models.Filters
             RenameListMetadataLoader.TryEnsureLoaded(item, audioKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, imageKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, mediaKey);
+            RenameListMetadataLoader.TryEnsureLoaded(
+                item,
+                RenameListFieldKey.Original(PdfRenameListFields.Group, PdfRenameListFields.Key.Title)
+            );
 
             Assert.False(item.TagLibLoadAttempted);
             Assert.False(item.ImagePropertiesLoadAttempted);
+            Assert.False(item.PdfLoadAttempted);
         }
 
         [Fact]
@@ -47,18 +53,23 @@ namespace Mfr.Tests.Models.Filters
             var audioKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
             var imageKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
             var mediaKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType");
+            var pdfKey = RenameListFieldKey.Original(PdfRenameListFields.Group, PdfRenameListFields.Key.Title);
 
             RenameListMetadataLoader.TryEnsureLoaded(item, audioKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, imageKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, mediaKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, pdfKey);
 
             Assert.True(item.TagLibLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
+            Assert.True(item.PdfLoadAttempted);
             Assert.NotNull(item.TagLibMetadataLoadError);
             Assert.NotNull(item.ImagePropertiesLoadError);
+            Assert.NotNull(item.PdfLoadError);
             Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, audioKey));
             Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, imageKey));
             Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, mediaKey));
+            Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, pdfKey));
         }
 
         [Fact]
@@ -100,6 +111,19 @@ namespace Mfr.Tests.Models.Filters
 
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.Equal("Canon", RenameListFieldCatalog.Resolve(item, makeKey));
+        }
+
+        [Fact]
+        public void Loads_pdf_info_from_fixture()
+        {
+            var item = _UnmarkedFixtureItem("tiny-info.pdf");
+            var titleKey = RenameListFieldKey.Original(PdfRenameListFields.Group, PdfRenameListFields.Key.Title);
+
+            Assert.False(item.PdfLoadAttempted);
+            RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
+
+            Assert.True(item.PdfLoadAttempted);
+            Assert.Equal("Sample Title", RenameListFieldCatalog.Resolve(item, titleKey));
         }
 
         [Fact]
@@ -184,13 +208,17 @@ namespace Mfr.Tests.Models.Filters
         public void Combined_requirement_loads_each_flagged_bucket()
         {
             var item = _UnmarkedFixtureItem("tiny-exif.jpeg");
-            var requirement = RenameListMetadataRequirement.TagLib | RenameListMetadataRequirement.ImageProperties;
+            var requirement =
+                RenameListMetadataRequirement.TagLib
+                | RenameListMetadataRequirement.ImageProperties
+                | RenameListMetadataRequirement.Pdf;
 
             Assert.True(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
             RenameListMetadataLoader.TryEnsureLoaded(item, requirement);
 
             Assert.True(item.TagLibLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
+            Assert.True(item.PdfLoadAttempted);
             Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
         }
 

@@ -75,6 +75,7 @@ Cloud Agents run on Linux (Ubuntu 24.04), but Magic File Renamer is a Windows-ta
 - `docs/keyboard-shortcuts.md` (menu/toolbar/File List keys; keep in sync with `AppShortcuts`)
 - `docs/audio-tag-model.md` (embedded audio tag read/write/Apply)
 - `docs/image-metadata-model.md` (lazy MetadataExtractor image properties + EXIF cache)
+- `docs/pdf-metadata-model.md` (lazy PdfPig PDF Info + page count cache)
 - `docs/debts.md` (deferred / later-work list)
 - `docs/plans/` (implementation / feature plans)
 - `.editorconfig`

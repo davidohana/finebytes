@@ -148,6 +148,11 @@ namespace Mfr.Models.Rename
         internal bool ImagePropertiesLoadAttempted { get; private set; }
 
         /// <summary>
+        /// Gets whether PdfPig PDF Info was loaded for this preview cycle.
+        /// </summary>
+        internal bool PdfLoadAttempted { get; private set; }
+
+        /// <summary>
         /// Gets the last TagLib read failure for audio-tag and media columns on this row, when present.
         /// </summary>
         internal Exception? TagLibMetadataLoadError { get; private set; }
@@ -156,6 +161,11 @@ namespace Mfr.Models.Rename
         /// Gets the last image-metadata read failure for this row, when present.
         /// </summary>
         internal Exception? ImagePropertiesLoadError { get; private set; }
+
+        /// <summary>
+        /// Gets the last PDF-metadata read failure for this row, when present.
+        /// </summary>
+        internal Exception? PdfLoadError { get; private set; }
 
         /// <summary>
         /// Records a TagLib read failure for audio-tag and media columns on this row.
@@ -178,6 +188,16 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Records a PDF-metadata read failure for this row.
+        /// </summary>
+        /// <param name="ex">Failure from PdfPig while reading the row path.</param>
+        internal void SetPdfLoadError(Exception ex)
+        {
+            ArgumentNullException.ThrowIfNull(ex);
+            PdfLoadError = ex;
+        }
+
+        /// <summary>
         /// Marks TagLib metadata load as attempted for this preview cycle.
         /// </summary>
         internal void MarkTagLibLoadAttempted()
@@ -191,6 +211,14 @@ namespace Mfr.Models.Rename
         internal void MarkImagePropertiesLoadAttempted()
         {
             ImagePropertiesLoadAttempted = true;
+        }
+
+        /// <summary>
+        /// Marks PDF Info load as attempted for this preview cycle.
+        /// </summary>
+        internal void MarkPdfLoadAttempted()
+        {
+            PdfLoadAttempted = true;
         }
 
         /// <summary>
@@ -248,6 +276,18 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Stores a PDF Info snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
+        /// </summary>
+        /// <param name="pdf">Read-only PDF Info + page count from PdfPig.</param>
+        internal void SetPdfDocumentInfo(PdfDocumentInfo pdf)
+        {
+            ArgumentNullException.ThrowIfNull(pdf);
+
+            Original.Pdf = pdf;
+            Preview.Pdf = pdf;
+        }
+
+        /// <summary>
         /// Clears lazy metadata caches after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearMetadataCaches()
@@ -255,6 +295,7 @@ namespace Mfr.Models.Rename
             ClearEmbeddedTagsCache();
             ClearMediaPropertiesCache();
             ClearImagePropertiesCache();
+            ClearPdfCache();
         }
 
         /// <summary>
@@ -291,6 +332,17 @@ namespace Mfr.Models.Rename
             Preview.Image = null;
             Original.Exif = null;
             Preview.Exif = null;
+        }
+
+        /// <summary>
+        /// Clears the PDF Info cache after commit so subsequent previews reload from disk.
+        /// </summary>
+        internal void ClearPdfCache()
+        {
+            PdfLoadAttempted = false;
+            PdfLoadError = null;
+            Original.Pdf = null;
+            Preview.Pdf = null;
         }
 
         /// <summary>
