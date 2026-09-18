@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.Services;
 using Mfr.Engine.RenameScript;
 using Mfr.Filters.Formatting;
 using Mfr.Models.Config;
@@ -157,7 +158,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var path = await hooks.PickSavePathAsync(title, defaultExtension, fileTypeName).ConfigureAwait(true);
+            var path = await hooks
+                .PickSavePathAsync(
+                    new SaveFilePickOptions
+                    {
+                        Title = title,
+                        DefaultExtension = defaultExtension,
+                        FileTypeName = fileTypeName,
+                    }
+                )
+                .ConfigureAwait(true);
             if (string.IsNullOrWhiteSpace(path) || IsBusy)
             {
                 return;

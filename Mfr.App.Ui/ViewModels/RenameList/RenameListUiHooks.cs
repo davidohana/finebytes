@@ -1,3 +1,5 @@
+using Mfr.App.Ui.Services;
+
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
     /// <summary>
@@ -6,8 +8,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     /// <remarks>
     /// <para>
     /// When <see cref="RenameListViewModel.UiHooks"/> is null, or a feature's delegate is null,
-    /// that feature is a no-op (export needs <see cref="PickSavePathAsync"/>; Manual Override
-    /// needs <see cref="PromptAsync"/>; GO preview-error confirm needs
+    /// that feature is a no-op (export and Generate Rename Script need <see cref="PickSavePathAsync"/>;
+    /// Manual Override needs <see cref="PromptAsync"/>; GO preview-error confirm needs
     /// <see cref="ConfirmPreviewErrorsAsync"/> and aborts when missing; Clear confirm needs
     /// <see cref="ConfirmClearAsync"/> when policy requires it and aborts when missing).
     /// </para>
@@ -15,12 +17,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
     public sealed class RenameListUiHooks
     {
         /// <summary>
-        /// Save-path picker; arguments are dialog title, extension without dot, and primary filter label.
+        /// Save-path picker for column/CSV export and Tools → Generate Rename Script.
         /// </summary>
         /// <remarks>
-        /// <para>When null, export is a no-op.</para>
+        /// <para>When null, export and Generate Rename Script are a no-op (after any empty gate).</para>
         /// </remarks>
-        public Func<string, string, string, Task<string?>>? PickSavePathAsync { get; init; }
+        public Func<SaveFilePickOptions, Task<string?>>? PickSavePathAsync { get; init; }
 
         /// <summary>
         /// Error UI when an export write fails; arguments are dialog title and message body.

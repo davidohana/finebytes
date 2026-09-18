@@ -19,6 +19,7 @@ namespace Mfr.Tests.Models
         [InlineData(ConfirmationKind.ClearFilterChain)]
         [InlineData(ConfirmationKind.OverwritePreset)]
         [InlineData(ConfirmationKind.DeletePreset)]
+        [InlineData(ConfirmationKind.GenerateRenameScriptUnsupportedFilters)]
         public void ShouldConfirm_true_by_default(ConfirmationKind kind)
         {
             Assert.True(ConfirmationPolicy.ShouldConfirm(kind));
