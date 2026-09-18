@@ -21,31 +21,67 @@
     <hr />
     <h1>User Interface Elements</h1>
     <figure class="screenshot">
-      <img src="../images/ui/main-window.png" alt="Main window" width="1280" height="860" />
-      <figcaption>Main window regions.</figcaption>
+      <img
+        src="../images/ui/hotspots.png"
+        alt="Main window with labeled regions"
+        width="1280"
+        height="860"
+        usemap="#ui-parts-map"
+      />
+      <map name="ui-parts-map">
+        <area shape="rect" coords="2,70,508,528" href="fileexp.html" alt="File List" title="File List" />
+        <area
+          shape="rect"
+          coords="518,70,832,203"
+          href="availfilterlist.html"
+          alt="Available Filters"
+          title="Available Filters"
+        />
+        <area
+          shape="rect"
+          coords="842,70,1276,203"
+          href="appliedfilterlist.html"
+          alt="Filter Chain"
+          title="Filter Chain"
+        />
+        <area
+          shape="rect"
+          coords="518,213,1276,528"
+          href="filterconfigpanel.html"
+          alt="Filter Configuration"
+          title="Filter Configuration"
+        />
+        <area shape="rect" coords="2,538,1276,829" href="renamelist.html" alt="Rename List" title="Rename List" />
+        <area shape="rect" coords="2,832,1276,857" href="statusbar.html" alt="Status Bar" title="Status Bar" />
+        <area shape="circle" coords="96,46,20" href="log.html" alt="Rename Log" title="Rename Log" />
+        <area shape="circle" coords="132,46,20" href="optionswin.html" alt="Options" title="Options" />
+      </map>
+      <figcaption>Click a labeled region for details.</figcaption>
     </figure>
-    <p>
-      Main-window regions. Click a name for details.
-    </p>
+    <p>Main-window regions. Click a colored area (or a name below) for details.</p>
     <ul>
       <li>
-        <strong>Menu / toolbar</strong> — GO, Undo Last, Rename Log, Options, File List view modes,
-        Rename List and Filters commands.
+        <strong>Menu / toolbar</strong> — GO, Undo Last, Rename Log, Options, File List view modes, Rename List
+        and Filters commands.
       </li>
       <li><a href="fileexp.html">File List</a> — browse the current folder; add files to Rename List.</li>
       <li><a href="renamelist.html">Rename List</a> — items to process, preview, sort, export.</li>
       <li><a href="availfilterlist.html">Available Filters</a> — filter palette by group.</li>
-      <li><a href="appliedfilterlist.html">Filter Chain</a> — ordered filters to apply (was “Applied Filters” in MFR 7).</li>
+      <li>
+        <a href="appliedfilterlist.html">Filter Chain</a> — ordered filters to apply (was “Applied Filters” in MFR
+        7).
+      </li>
       <li><a href="filterconfigpanel.html">Filter Configuration</a> — options for the selected chain step.</li>
       <li><a href="statusbar.html">Status bar</a> — hint text plus Items / Filters / Changes / Preview errors.</li>
       <li><a href="optionswin.html">Options</a> and <a href="log.html">Rename Log</a> — Tools / MFR menu.</li>
-      <li><a href="presetmanager.html">Presets</a> / <a href="../guide/savepreset.html">Save Preset</a> — Filter Chain toolbar.</li>
+      <li>
+        <a href="presetmanager.html">Presets</a> / <a href="../guide/savepreset.html">Save Preset</a> — Filter Chain
+        toolbar.
+      </li>
     </ul>
     <p class="note">
-      Dialogs such as <a href="fieldselector.html">Select fields</a>,
-      <a href="filteropts.html">Filter Options</a>, and the <a href="formateditor.html">Format Editor</a>
-      open from those panes.
+      Dialogs such as <a href="fieldselector.html">Select fields</a>, <a href="filteropts.html">Filter Options</a>,
+      and the <a href="formateditor.html">Format Editor</a> open from those panes.
     </p>
-
   </body>
 </html>
