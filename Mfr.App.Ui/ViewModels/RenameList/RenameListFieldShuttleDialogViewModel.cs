@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 using Mfr.Models.RenameList;
+using Mfr.Models.RenameList.Fields.Basic;
 
 namespace Mfr.App.Ui.ViewModels.RenameList
 {
@@ -57,7 +58,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _isAbModeEnabled = abModeEnabled;
 
             Groups = _BuildGroups();
-            SelectedGroup = Groups.Count > 0 ? Groups[0] : null;
+            SelectedGroup =
+                Groups.FirstOrDefault(group => group.GroupId == BasicRenameListField.Group)
+                ?? Groups.FirstOrDefault();
             SelectedTabIndex = (int)initialTab;
             _RefreshLists();
         }
@@ -885,7 +888,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             [
                 .. RenameListFieldCatalog
                     .All.GroupBy(field => field.GroupId)
-                    .Select(group => new RenameListFieldGroupOption(group.Key, group.First().GroupDisplayName)),
+                    .Select(group => new RenameListFieldGroupOption(group.Key, group.First().GroupDisplayName))
+                    .OrderBy(group => group.DisplayName, StringComparer.OrdinalIgnoreCase),
             ];
         }
     }

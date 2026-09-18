@@ -450,20 +450,21 @@ namespace Mfr.Tests.Ui.RenameList
 
             Assert.Equal(
                 [
+                    AudioTagRenameListFields.GroupLabel,
                     BasicRenameListField.GroupLabel,
                     ExtendedRenameListFields.GroupLabel,
-                    AudioTagRenameListFields.GroupLabel,
-                    Id3v1RenameListFields.GroupLabel,
-                    Id3v2RenameListFields.GroupLabel,
-                    XiphRenameListFields.GroupLabel,
-                    MediaRenameListFields.GroupLabel,
-                    Mp3RenameListFields.GroupLabel,
                     ImageRenameListFields.GroupLabel,
                     JpegRenameListFields.GroupLabel,
+                    MediaRenameListFields.GroupLabel,
+                    Id3v1RenameListFields.GroupLabel,
+                    Id3v2RenameListFields.GroupLabel,
+                    Mp3RenameListFields.GroupLabel,
                     PdfRenameListFields.GroupLabel,
+                    XiphRenameListFields.GroupLabel,
                 ],
                 dialogVm.Groups.Select(group => group.DisplayName)
             );
+            Assert.Equal(BasicRenameListField.Group, dialogVm.SelectedGroup?.GroupId);
         }
 
         [Fact]

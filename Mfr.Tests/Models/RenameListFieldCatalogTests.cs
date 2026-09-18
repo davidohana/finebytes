@@ -125,7 +125,7 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void Catalog_group_order_matches_shuttle_dropdown()
+        public void Catalog_registers_groups_in_feature_order()
         {
             Assert.Equal(
                 [
