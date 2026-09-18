@@ -10,7 +10,7 @@ todos:
     status: completed
   - id: p2-howto
     content: "P2: tutorial/howto step shots (optional)"
-    status: pending
+    status: completed
   - id: wire-html
     content: "Add <figure> refs + expand help/SCREENSHOTS.md (or split ui checklist)"
     status: completed
@@ -104,11 +104,12 @@ Extend [`help/SCREENSHOTS.md`](../../help/SCREENSHOTS.md) with a **UI / dialogs*
 
 1. Regenerate with
    `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpUiScreenshotCaptureTests`
-   (`HelpUiScreenshotCaptureTests` — P0 shell panes + P1 dialogs/tools).
-1. Or `just run-ui` on Xvfb / Windows; crop to subject; save under `help/images/ui/`.
+   (`HelpUiScreenshotCaptureTests` — P0 shell panes + P1 dialogs/tools + P2 guide).
+1. Or `just run-ui` on Xvfb / Windows; crop to subject; save under `help/images/ui/` or `help/images/guide/`.
 
 ## Exit criteria
 
 - Every P0 page has a real PNG (no checkerboard).
 - Every P1 page has a real PNG (no checkerboard).
+- Every P2 guide page has a real PNG (no checkerboard).
 - Link/img paths resolve; `height: auto` CSS still in effect.
