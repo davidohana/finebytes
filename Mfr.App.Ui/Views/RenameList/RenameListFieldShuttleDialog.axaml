@@ -196,7 +196,7 @@
     <TabControl Classes="field-shuttle-tabs" SelectedIndex="{Binding SelectedTabIndex}">
       <TabItem Header="Columns">
         <Border Classes="field-shuttle-panel" Margin="0,8,0,0">
-          <Grid RowDefinitions="Auto,*,Auto" RowSpacing="10">
+          <Grid RowDefinitions="Auto,*" RowSpacing="10">
             <Grid Grid.Row="0" ColumnDefinitions="*,Auto">
               <TextBlock
                 Grid.Column="0"
@@ -214,7 +214,7 @@
                 ToolTip.Tip="{x:Static resources:AppTips.BeforeAfterMode}"
               />
             </Grid>
-            <Grid Grid.Row="1" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="22,*" RowSpacing="4">
+            <Grid Grid.Row="1" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="22,*,Auto" RowSpacing="4">
               <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-shuttle-label" Text="Groups:" />
               <!-- Before/After on: plain label (no lone radio). Off: Original|Preview subtabs. -->
               <TextBlock
@@ -264,34 +264,39 @@
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
-              <DockPanel Grid.Row="1" Grid.Column="1">
-                <TextBox
-                  x:Name="ColumnFieldSearchBox"
-                  DockPanel.Dock="Top"
-                  Classes="filter-editor-field field-shuttle-search"
-                  PlaceholderText="Search fields…"
-                  Margin="0,0,0,4"
-                  Text="{Binding SearchText}"
-                />
-                <ListBox
-                  x:Name="AvailableOriginalFieldsList"
-                  Classes="field-shuttle-list"
-                  IsVisible="{Binding IsOriginalColumnsTab}"
-                  ItemsSource="{Binding AvailableOriginalFields}"
-                  ItemTemplate="{StaticResource FieldShuttleAvailableFieldTemplate}"
-                  SelectionMode="Multiple"
-                  DoubleTapped="_OnAddOriginalDoubleTapped"
-                />
-                <ListBox
-                  x:Name="AvailablePreviewFieldsList"
-                  Classes="field-shuttle-list"
-                  IsVisible="{Binding IsPreviewColumnsTab}"
-                  ItemsSource="{Binding AvailablePreviewFields}"
-                  ItemTemplate="{StaticResource FieldShuttleAvailablePreviewFieldTemplate}"
-                  SelectionMode="Multiple"
-                  DoubleTapped="_OnAddPreviewDoubleTapped"
-                />
-              </DockPanel>
+              <ListBox
+                x:Name="AvailableOriginalFieldsList"
+                Grid.Row="1"
+                Grid.Column="1"
+                Classes="field-shuttle-list"
+                IsVisible="{Binding IsOriginalColumnsTab}"
+                ItemsSource="{Binding AvailableOriginalFields}"
+                ItemTemplate="{StaticResource FieldShuttleAvailableFieldTemplate}"
+                SelectionMode="Multiple"
+                DoubleTapped="_OnAddOriginalDoubleTapped"
+              />
+              <ListBox
+                x:Name="AvailablePreviewFieldsList"
+                Grid.Row="1"
+                Grid.Column="1"
+                Classes="field-shuttle-list"
+                IsVisible="{Binding IsPreviewColumnsTab}"
+                ItemsSource="{Binding AvailablePreviewFields}"
+                ItemTemplate="{StaticResource FieldShuttleAvailablePreviewFieldTemplate}"
+                SelectionMode="Multiple"
+                DoubleTapped="_OnAddPreviewDoubleTapped"
+              />
+              <TextBox
+                x:Name="ColumnFieldSearchBox"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="0,6,0,0"
+                Classes="filter-editor-field field-shuttle-search"
+                PlaceholderText="Search fields…"
+                VerticalAlignment="Center"
+                Text="{Binding SearchText}"
+              />
               <StackPanel
                 Grid.Row="1"
                 Grid.Column="2"
@@ -364,46 +369,49 @@
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
-            </Grid>
-            <StackPanel
-              Grid.Row="2"
-              Orientation="Horizontal"
-              Spacing="8"
-              HorizontalAlignment="Right"
-              VerticalAlignment="Center"
-            >
-              <TextBlock
-                Classes="field-shuttle-label"
-                Margin="0"
-                MinHeight="0"
+              <StackPanel
+                Grid.Row="2"
+                Grid.Column="2"
+                Grid.ColumnSpan="2"
+                Orientation="Horizontal"
+                Spacing="8"
+                Margin="12,6,0,0"
+                HorizontalAlignment="Right"
                 VerticalAlignment="Center"
-                Text="From Filter Chain:"
-              />
-              <Button
-                Classes="message-dialog-footer"
-                MinWidth="72"
-                Content="Add"
-                ToolTip.Tip="{x:Static resources:AppTips.AddColumnsFromFilters}"
-                ToolTip.ShowOnDisabled="True"
-                Command="{Binding AddColumnsFromFiltersCommand}"
-              />
-              <Button
-                Classes="message-dialog-footer"
-                MinWidth="72"
-                Content="Set"
-                ToolTip.Tip="{x:Static resources:AppTips.SetColumnsFromFilters}"
-                ToolTip.ShowOnDisabled="True"
-                Command="{Binding SetColumnsFromFiltersCommand}"
-              />
-            </StackPanel>
+              >
+                <TextBlock
+                  Classes="field-shuttle-label"
+                  Margin="0"
+                  MinHeight="0"
+                  VerticalAlignment="Center"
+                  Text="From Filter Chain:"
+                />
+                <Button
+                  Classes="message-dialog-footer"
+                  MinWidth="72"
+                  Content="Add"
+                  ToolTip.Tip="{x:Static resources:AppTips.AddColumnsFromFilters}"
+                  ToolTip.ShowOnDisabled="True"
+                  Command="{Binding AddColumnsFromFiltersCommand}"
+                />
+                <Button
+                  Classes="message-dialog-footer"
+                  MinWidth="72"
+                  Content="Set"
+                  ToolTip.Tip="{x:Static resources:AppTips.SetColumnsFromFilters}"
+                  ToolTip.ShowOnDisabled="True"
+                  Command="{Binding SetColumnsFromFiltersCommand}"
+                />
+              </StackPanel>
+            </Grid>
           </Grid>
         </Border>
       </TabItem>
       <TabItem Header="Sort">
         <Border Classes="field-shuttle-panel" Margin="0,8,0,0">
-          <Grid RowDefinitions="Auto,*">
+          <Grid RowDefinitions="Auto,*" RowSpacing="10">
             <TextBlock Grid.Row="0" Classes="field-shuttle-hint" Text="Select fields to sort Rename List by." />
-            <Grid Grid.Row="1" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="Auto,*" RowSpacing="4">
+            <Grid Grid.Row="1" ColumnDefinitions="0.65*,*,Auto,*" RowDefinitions="Auto,*,Auto" RowSpacing="4">
               <TextBlock Grid.Row="0" Grid.Column="0" Classes="field-shuttle-label" Text="Groups:" />
               <TextBlock Grid.Row="0" Grid.Column="1" Classes="field-shuttle-label" Text="Fields:" />
               <TextBlock Grid.Row="0" Grid.Column="3" Classes="field-shuttle-label" Text="Selected fields:" />
@@ -423,24 +431,27 @@
                   </DataTemplate>
                 </ListBox.ItemTemplate>
               </ListBox>
-              <DockPanel Grid.Row="1" Grid.Column="1">
-                <TextBox
-                  x:Name="SortFieldSearchBox"
-                  DockPanel.Dock="Top"
-                  Classes="filter-editor-field field-shuttle-search"
-                  PlaceholderText="Search fields…"
-                  Margin="0,0,0,4"
-                  Text="{Binding SearchText}"
-                />
-                <ListBox
-                  x:Name="AvailableSortFieldsList"
-                  Classes="field-shuttle-list"
-                  ItemsSource="{Binding AvailableSortFields}"
-                  ItemTemplate="{StaticResource FieldShuttleAvailableFieldTemplate}"
-                  SelectionMode="Multiple"
-                  DoubleTapped="_OnAddSortDoubleTapped"
-                />
-              </DockPanel>
+              <ListBox
+                x:Name="AvailableSortFieldsList"
+                Grid.Row="1"
+                Grid.Column="1"
+                Classes="field-shuttle-list"
+                ItemsSource="{Binding AvailableSortFields}"
+                ItemTemplate="{StaticResource FieldShuttleAvailableFieldTemplate}"
+                SelectionMode="Multiple"
+                DoubleTapped="_OnAddSortDoubleTapped"
+              />
+              <TextBox
+                x:Name="SortFieldSearchBox"
+                Grid.Row="2"
+                Grid.Column="0"
+                Grid.ColumnSpan="2"
+                Margin="0,6,0,0"
+                Classes="filter-editor-field field-shuttle-search"
+                PlaceholderText="Search fields…"
+                VerticalAlignment="Center"
+                Text="{Binding SearchText}"
+              />
               <StackPanel
                 Grid.Row="1"
                 Grid.Column="2"

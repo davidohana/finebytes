@@ -29,13 +29,13 @@
           <li><span class="quote">Match case / Whole word / First only</span> — Match flags that control which occurrences are replaced.</li>
         </ul>
     <h2>Examples</h2>
-    <p>Find <code>a</code>, replace with <code>X</code> (literal, replace all)</p>
+    <p>Find <code>feat.</code>, replace with <code>ft.</code> (literal, replace all)</p>
     <div class="examples">
-          <code>aba >>> XbX</code>
+          <code>Portishead - Glory Box feat. Guest >>> Portishead - Glory Box ft. Guest</code>
     </div>
-    <p>Find <code>\d+</code>, replace with <code>N</code> (regular expression, replace all)</p>
+    <p>Find <code>\s*\(\d{4}\)</code>, replace with empty (regular expression, replace all)</p>
     <div class="examples">
-          <code>a12bc34 >>> aNbcN</code>
+          <code>Blue Moon Revisited (1988) >>> Blue Moon Revisited</code>
     </div>
 
   </body>

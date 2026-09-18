@@ -27,7 +27,7 @@
     </p>
     <p>
       To open the desktop UI with paths (seed the Rename List or browse a folder) without running a
-      preset, see <a href="cml.html#desktop">Command Line Parameters — Desktop UI</a>. Console
+      preset, see <a href="cml.html">Command Line Parameters</a>. Console
       <span class="quote">mfr</span> remains the path for scripted rename automation.
     </p>
     <p>
@@ -39,26 +39,165 @@
 
     <h2>What it does</h2>
     <ol>
-      <li>Loads configuration (<span class="quote">config.json</span>) and optional
-        <span class="quote">--set</span> overrides.</li>
-      <li>Resolves sources into a Rename List (files and/or folders, optional recursion / hidden).</li>
+      <li>
+        Loads configuration (<span class="quote">config.json</span>) and optional
+        <span class="quote">--set</span> overrides.
+      </li>
+      <li>
+        Resolves sources into a Rename List (files and/or folders, optional recursion / hidden).
+      </li>
       <li>Runs Preview with the preset’s Filter Chain.</li>
-      <li>If Preview has no errors, commits changes (unless <span class="quote">--dry-run</span>).</li>
-      <li>Optionally writes a JSON results file (<span class="quote">--output-file</span>).</li>
+      <li>
+        If Preview has no errors, commits changes (unless <span class="quote">--dry-run</span>).
+      </li>
+      <li>
+        Optionally writes a JSON results file (<span class="quote">--output-file</span>).
+      </li>
     </ol>
     <p>
       If Preview reports any errors, the console aborts without committing. Session logging follows
       your config (same AppData log area as the UI).
     </p>
 
-    <h2>Basic usage</h2>
+    <h2 id="parameters">Command-line parameters</h2>
+
+    <h3>Usage</h3>
     <p>
-      <code>mfr SOURCES… -p PRESET [options]</code>
+      <code>mfr &lt;SOURCES&gt;… -p|--preset &lt;NAME&gt; [options]</code>
     </p>
     <p>
-      Full console flag list, defaults, and exit codes:
-      <a href="cml.html#console">Command Line Parameters — Console</a>.
+      <span class="quote">SOURCES</span> are one or more files, directories, or filemasks
+      (space-separated). Quote paths that contain spaces. Run
+      <span class="quote">mfr --help</span> for the built-in summary.
     </p>
+
+    <h3>Required</h3>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Argument / option</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>&lt;SOURCES&gt;</code></td>
+          <td>One or more files, directories, or wildcards to process.</td>
+        </tr>
+        <tr>
+          <td><code>-p</code>, <code>--preset &lt;NAME&gt;</code></td>
+          <td>
+            Preset name from the presets file (required). Save presets in the UI first. See
+            <a href="savepreset.html">Save Preset</a>.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Options</h3>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>--presets-file &lt;PATH&gt;</code></td>
+          <td>Override the presets JSON file path (default: AppData finebytes MFR presets).</td>
+        </tr>
+        <tr>
+          <td><code>-o</code>, <code>--output-file &lt;PATH&gt;</code></td>
+          <td>Write rename results as JSON to this path.</td>
+        </tr>
+        <tr>
+          <td><code>--include-hidden</code></td>
+          <td>Include hidden and system files when expanding sources.</td>
+        </tr>
+        <tr>
+          <td><code>--files &lt;yes|no&gt;</code></td>
+          <td>Include files from sources (default: <span class="quote">yes</span>).</td>
+        </tr>
+        <tr>
+          <td><code>--folders &lt;yes|no&gt;</code></td>
+          <td>Include folders from sources (default: <span class="quote">no</span>).</td>
+        </tr>
+        <tr>
+          <td><code>-r</code>, <code>--recursive</code></td>
+          <td>Expand directory sources recursively into subdirectories.</td>
+        </tr>
+        <tr>
+          <td><code>--continue-on-rename-error</code></td>
+          <td>
+            Continue committing after per-item rename errors instead of stopping at the first
+            failure.
+          </td>
+        </tr>
+        <tr>
+          <td><code>-c</code>, <code>--confirm</code></td>
+          <td>Prompt for confirmation before applying each rename.</td>
+        </tr>
+        <tr>
+          <td><code>--dry-run</code></td>
+          <td>Preview and report commit outcomes without changing files on disk.</td>
+        </tr>
+        <tr>
+          <td><code>-l</code>, <code>--log-level &lt;LEVEL&gt;</code></td>
+          <td>
+            Minimum log level: <span class="quote">debug</span>, <span class="quote">info</span>,
+            <span class="quote">warn</span>, or <span class="quote">error</span>.
+          </td>
+        </tr>
+        <tr>
+          <td><code>--config &lt;PATH&gt;</code></td>
+          <td>
+            Path to <span class="quote">config.json</span> (default: AppData). The file must exist
+            when this option is set.
+          </td>
+        </tr>
+        <tr>
+          <td><code>--set &lt;KEY=VALUE&gt;</code></td>
+          <td>
+            Override a config field (repeatable). Key is
+            <span class="quote">section.leaf</span>; the value is everything after the first
+            <span class="quote">=</span> (example:
+            <span class="quote">log.maxSessionFiles=200</span>).
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      At least one of <span class="quote">--files</span> or <span class="quote">--folders</span>
+      must be <span class="quote">yes</span>.
+    </p>
+
+    <h3>Exit codes</h3>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>0</td>
+          <td>Success (including when help/version output was requested).</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>
+            User or configuration error (invalid arguments, missing preset, no matching sources,
+            Preview errors, commit failure when fail-fast applies, and similar).
+          </td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Unexpected application fault.</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2>Examples</h2>
     <div class="examples">
@@ -76,7 +215,7 @@
     </div>
 
     <p class="note">
-      See also: <a href="cml.html">Command Line Parameters</a>,
+      See also: <a href="cml.html">Command Line Parameters</a> (desktop UI),
       <a href="../ui/presetmanager.html">Preset Manager</a>, <a href="../ui/log.html">Rename Log</a>,
       <a href="faqs.html#cli">FAQs — scripting</a>.
     </p>

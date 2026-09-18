@@ -16,26 +16,65 @@ namespace Mfr.App.Ui
         /// <param name="mainWindow">Main window view model (panes already constructed).</param>
         /// <param name="args">Raw desktop argv tokens (may be empty).</param>
         /// <remarks>
-        /// <para>
-        /// Soft-handles parse and apply failures: logs, sets status, and returns without throwing so the
-        /// UI still opens (including unexpected exceptions from the fire-and-forget App schedule). Orphan
-        /// add modifiers (no sources and no browse folder) are ignored. When sources add at least one
-        /// item and <c>--initial-folder</c> was omitted, locates the first added path in the File List.
-        /// </para>
+        /// Soft-handles parse and apply failures so the UI still opens. Prefer
+        /// <see cref="ApplyAsync(MainWindowViewModel, UiStartupArgs, bool)"/> when argv was already parsed
+        /// (e.g. App used <c>--initial-folder</c> for the File List ctor path).
         /// </remarks>
-        public static async Task ApplyAsync(MainWindowViewModel mainWindow, string[] args)
+        public static Task ApplyAsync(MainWindowViewModel mainWindow, string[] args)
         {
             ArgumentNullException.ThrowIfNull(mainWindow);
             ArgumentNullException.ThrowIfNull(args);
 
             if (args.Length == 0)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             try
             {
-                await _ApplyParsedAsync(mainWindow, args).ConfigureAwait(true);
+                return ApplyAsync(mainWindow, UiStartupArgsParser.Parse(args), initialFolderAlreadyApplied: false);
+            }
+            catch (UserException ex)
+            {
+                Log.Warning(ex, "Desktop startup arguments could not be parsed.");
+                mainWindow.StatusHint = StatusBarText.Warning(ex.Message);
+                return Task.CompletedTask;
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Desktop startup arguments apply failed unexpectedly.");
+                mainWindow.StatusHint = StatusBarText.Error(ex.Message);
+                return Task.CompletedTask;
+            }
+        }
+
+        /// <summary>
+        /// Seeds the Rename List / navigates the File List from already-parsed startup intents.
+        /// </summary>
+        /// <param name="mainWindow">Main window view model (panes already constructed).</param>
+        /// <param name="startupArgs">Parsed desktop intents.</param>
+        /// <param name="initialFolderAlreadyApplied">
+        /// When <see langword="true"/>, skips <c>--initial-folder</c> navigate because the File List was
+        /// already opened at that path (App ctor). Sources seeding and first-item locate still run.
+        /// </param>
+        /// <remarks>
+        /// Soft-handles apply failures: logs, sets status, and returns without throwing so the UI still
+        /// opens (including unexpected exceptions from the fire-and-forget App schedule). Orphan add
+        /// modifiers (no sources and no browse folder) are ignored. When sources add at least one item
+        /// and <c>--initial-folder</c> was omitted, locates the first added path in the File List.
+        /// </remarks>
+        public static async Task ApplyAsync(
+            MainWindowViewModel mainWindow,
+            UiStartupArgs startupArgs,
+            bool initialFolderAlreadyApplied = false
+        )
+        {
+            ArgumentNullException.ThrowIfNull(mainWindow);
+            ArgumentNullException.ThrowIfNull(startupArgs);
+
+            try
+            {
+                await _ApplyParsedAsync(mainWindow, startupArgs, initialFolderAlreadyApplied).ConfigureAwait(true);
             }
             catch (Exception ex)
             {
@@ -46,24 +85,17 @@ namespace Mfr.App.Ui
         }
 
         /// <summary>
-        /// Parses argv and applies Rename List / File List intents (soft-fail per step).
+        /// Applies Rename List / File List intents (soft-fail per step).
         /// </summary>
         /// <param name="mainWindow">Main window view model (panes already constructed).</param>
-        /// <param name="args">Non-empty desktop argv tokens.</param>
-        private static async Task _ApplyParsedAsync(MainWindowViewModel mainWindow, string[] args)
+        /// <param name="startupArgs">Parsed desktop intents.</param>
+        /// <param name="initialFolderAlreadyApplied">Skip browse navigate when the ctor already opened it.</param>
+        private static async Task _ApplyParsedAsync(
+            MainWindowViewModel mainWindow,
+            UiStartupArgs startupArgs,
+            bool initialFolderAlreadyApplied
+        )
         {
-            UiStartupArgs startupArgs;
-            try
-            {
-                startupArgs = UiStartupArgsParser.Parse(args);
-            }
-            catch (UserException ex)
-            {
-                Log.Warning(ex, "Desktop startup arguments could not be parsed.");
-                mainWindow.StatusHint = StatusBarText.Warning(ex.Message);
-                return;
-            }
-
             // Orphan add modifiers (no sources and no browse folder) are ignored after parse.
             if (startupArgs.Sources.Count == 0 && startupArgs.InitialFolder is null)
             {
@@ -94,8 +126,12 @@ namespace Mfr.App.Ui
 
             if (startupArgs.InitialFolder is not null)
             {
-                // NavigateTo soft-fails into File List status; it does not throw.
-                mainWindow.FileListViewModel.NavigateTo(startupArgs.InitialFolder);
+                if (!initialFolderAlreadyApplied)
+                {
+                    // NavigateTo soft-fails into File List status; it does not throw.
+                    mainWindow.FileListViewModel.NavigateTo(startupArgs.InitialFolder);
+                }
+
                 return;
             }
 
