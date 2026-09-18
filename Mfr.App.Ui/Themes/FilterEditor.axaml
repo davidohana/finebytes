@@ -343,14 +343,11 @@
     <Setter Property="Background" Value="Transparent" />
   </Style>
 
-  <!-- Insert-picker / field-shuttle search should keep its hint; option fields hide watermarks until focus. -->
+  <!-- Catalog search (token picker / field shuttle) keeps its hint; option fields hide watermarks until focus. -->
   <Style
-    Selector="TextBox.format-token-search /template/ TextBlock#PART_Watermark,
-              TextBox.format-token-search:pointerover /template/ TextBlock#PART_Watermark,
-              TextBox.format-token-search:focus /template/ TextBlock#PART_Watermark,
-              TextBox.field-shuttle-search /template/ TextBlock#PART_Watermark,
-              TextBox.field-shuttle-search:pointerover /template/ TextBlock#PART_Watermark,
-              TextBox.field-shuttle-search:focus /template/ TextBlock#PART_Watermark"
+    Selector="TextBox.catalog-search /template/ TextBlock#PART_Watermark,
+              TextBox.catalog-search:pointerover /template/ TextBlock#PART_Watermark,
+              TextBox.catalog-search:focus /template/ TextBlock#PART_Watermark"
   >
     <Setter Property="Foreground" Value="{DynamicResource FilterEditorWatermarkBrush}" />
   </Style>
@@ -369,6 +366,7 @@
     <Setter Property="HorizontalContentAlignment" Value="Center" />
     <Setter Property="VerticalContentAlignment" Value="Center" />
     <Setter Property="Cursor" Value="Hand" />
+    <Setter Property="Focusable" Value="False" />
   </Style>
   <Style Selector="Button.catalog-search-clear:pointerover /template/ ContentPresenter#PART_ContentPresenter">
     <Setter Property="Background" Value="{DynamicResource AppChromeHoverBrush}" />

@@ -120,7 +120,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 if (IsFieldSearchActive)
                 {
-                    // ListBox may push null when the bound value clears for search; keep browse group.
                     return;
                 }
 
@@ -958,6 +957,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             return [.. RenameListFieldCatalog.All.Where(field => _FieldMatchesSearch(field, query))];
         }
 
+        /// <summary>
+        /// Fields for the browse-selected group (kept while search clears the Groups highlight).
+        /// </summary>
         private IReadOnlyList<RenameListField> _FieldsInSelectedGroup()
         {
             var groupId = _browseSelectedGroup?.GroupId;
