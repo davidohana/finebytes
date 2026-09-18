@@ -10,7 +10,7 @@ todos:
     status: done
   - id: p3-docx
     content: "P3: OpenXml OfficeDocumentInfo for DOCX PackageProperties"
-    status: pending
+    status: done
   - id: p4-office-rest
     content: "P4: Extend Office reader to XLSX + PPTX"
     status: pending
@@ -113,11 +113,12 @@ Key PDF template files:
 - **Tests:** Minimal EPUB fixture + reader/token/catalog/loader tests mirroring PDF.
 - **Shipped:** EPUB reader/bucket, tokens/columns, docs/help ([`docs/epub-metadata-model.md`](docs/epub-metadata-model.md)).
 
-### P3 — Office DOCX PackageProperties (read-only)
+### P3 — Office DOCX PackageProperties (read-only) ✅
 
 - **Scope / files:** Add `DocumentFormat.OpenXml`. Shared `OfficeDocumentInfo` + `OfficeFileReader` (DOCX only in this phase). New metadata requirement bit (or shared `Office` bucket). Tokens `office-*` (or `docx-*` — **lock `office-*`** so P4 reuses names). Fields: Title, Author/Creator, Subject, Keywords, Category, Description, LastModifiedBy, Created, Modified (PackageProperties mapping).
 - **Exit criteria:** DOCX Info tokens/columns work; wrong type PreviewError; docs `office-metadata-model.md` + help; no write path.
 - **Tests:** Tiny DOCX fixture with core props + empty-props case.
+- **Shipped:** Child plan [`docs/plans/office-document-info-tokens.plan.md`](docs/plans/office-document-info-tokens.plan.md) P1–P3 (reader/bucket, tokens/columns, docs/help).
 
 ### P4 — Office XLSX + PPTX
 

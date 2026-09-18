@@ -30,5 +30,10 @@ namespace Mfr.Models.RenameList
         /// Field reads VersOne.Epub Dublin Core document Info from disk.
         /// </summary>
         Epub = 8,
+
+        /// <summary>
+        /// Field reads OpenXml Office PackageProperties document Info from disk.
+        /// </summary>
+        Office = 16,
     }
 }

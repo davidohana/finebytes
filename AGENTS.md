@@ -78,6 +78,7 @@ Cloud Agents run on Linux (Ubuntu 24.04), but Magic File Renamer is a Windows-ta
 - `docs/image-metadata-model.md` (lazy MetadataExtractor image properties + EXIF cache)
 - `docs/pdf-metadata-model.md` (lazy PdfPig PDF Info + page count cache)
 - `docs/epub-metadata-model.md` (lazy VersOne.Epub Dublin Core Info cache)
+- `docs/office-metadata-model.md` (lazy OpenXml Office PackageProperties cache)
 - `docs/debts.md` (deferred / later-work list)
 - `docs/plans/` (implementation / feature plans)
 - `.editorconfig`

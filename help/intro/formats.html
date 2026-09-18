@@ -180,6 +180,16 @@
       <a href="../reference/fields.html#epub">EPUB Document fields</a>.
     </p>
 
+    <h2 id="office">Office document Info (read-only)</h2>
+    <p>
+      Office PackageProperties (title, author from Creator, subject, keywords, category, description,
+      last modified by, created, modified) come from DocumentFormat.OpenXml for readable
+      <span class="quote">.docx</span> files. Missing Info fields expand empty after a successful
+      open; non-DOCX or corrupt packages fail preview. There is no write path. See
+      <a href="../tokens/officefp.html">Office Document tokens</a> and
+      <a href="../reference/fields.html#office">Office Document fields</a>.
+    </p>
+
     <h2 id="media">Media stream properties (read-only)</h2>
     <p>
       MIME type, duration, audio stream facts, and video frame size come from TagLib for containers

@@ -254,6 +254,18 @@ namespace Mfr.Models.Rename
         public EpubDocumentInfo? Epub { get; set; }
 
         /// <summary>
+        /// Gets or sets the lazy OpenXml Office PackageProperties document Info read cache.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>office-*</c> formatter load.
+        /// Successful opens with missing PackageProperties fields store an empty/partial snapshot, not
+        /// <see langword="null"/>.
+        /// </para>
+        /// </remarks>
+        public OfficeDocumentInfo? Office { get; set; }
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -280,6 +292,7 @@ namespace Mfr.Models.Rename
                 Exif = Exif,
                 Pdf = Pdf,
                 Epub = Epub,
+                Office = Office,
             };
         }
     }

@@ -11,6 +11,7 @@ using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mp3;
+using Mfr.Models.RenameList.Fields.Office;
 using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Models.Tags;
@@ -41,7 +42,8 @@ namespace Mfr.Tests.Models
                     + ImageRenameListFields.All.Count
                     + JpegRenameListFields.All.Count
                     + PdfRenameListFields.All.Count
-                    + EpubRenameListFields.All.Count,
+                    + EpubRenameListFields.All.Count
+                    + OfficeRenameListFields.All.Count,
                 RenameListFieldCatalog.All.Count
             );
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(BasicRenameListField.Group).Count);
@@ -66,6 +68,7 @@ namespace Mfr.Tests.Models
             Assert.Equal(17, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(PdfRenameListFields.Group).Count);
             Assert.Equal(8, RenameListFieldCatalog.GetFieldsForGroup(EpubRenameListFields.Group).Count);
+            Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(OfficeRenameListFields.Group).Count);
         }
 
         /// <summary>
@@ -111,6 +114,18 @@ namespace Mfr.Tests.Models
                 EpubRenameListFields.All,
                 f => f.PropertyKey == EpubRenameListFields.Key.Description
             );
+            var officeAuthor = Assert.Single(
+                OfficeRenameListFields.All,
+                f => f.PropertyKey == OfficeRenameListFields.Key.Author
+            );
+            var officeCategory = Assert.Single(
+                OfficeRenameListFields.All,
+                f => f.PropertyKey == OfficeRenameListFields.Key.Category
+            );
+            var officeLastModifiedBy = Assert.Single(
+                OfficeRenameListFields.All,
+                f => f.PropertyKey == OfficeRenameListFields.Key.LastModifiedBy
+            );
 
             Assert.Equal(
                 $"{SemanticAudioFieldTips.Artist} ({AudioTagRenameListFields.SemanticTipQualifier})",
@@ -140,6 +155,9 @@ namespace Mfr.Tests.Models
             Assert.Equal(EpubRenameListFieldTips.Creator, epubCreator.Tip);
             Assert.Equal(EpubRenameListFieldTips.Identifier, epubIdentifier.Tip);
             Assert.Equal(EpubRenameListFieldTips.Description, epubDescription.Tip);
+            Assert.Equal(OfficeRenameListFieldTips.Author, officeAuthor.Tip);
+            Assert.Equal(OfficeRenameListFieldTips.Category, officeCategory.Tip);
+            Assert.Equal(OfficeRenameListFieldTips.LastModifiedBy, officeLastModifiedBy.Tip);
         }
 
         [Fact]
@@ -159,6 +177,7 @@ namespace Mfr.Tests.Models
                     JpegRenameListFields.GroupLabel,
                     PdfRenameListFields.GroupLabel,
                     EpubRenameListFields.GroupLabel,
+                    OfficeRenameListFields.GroupLabel,
                 ],
                 RenameListFieldCatalog.All.Select(field => field.GroupDisplayName).Distinct()
             );
@@ -577,6 +596,44 @@ namespace Mfr.Tests.Models
                 RenameListMetadataRequirement.Epub,
                 RenameListFieldCatalog.GetMetadataRequirement(
                     RenameListFieldKey.Original(EpubRenameListFields.Group, EpubRenameListFields.Key.Title)
+                )
+            );
+        }
+
+        [Fact]
+        public void Office_fields_resolve_cached_metadata_and_require_office_bucket()
+        {
+            var created = new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.Zero);
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "docx",
+                configureOriginal: meta =>
+                    meta.Office = new OfficeDocumentInfo
+                    {
+                        Title = "Report",
+                        Author = "Author",
+                        Category = "Reports",
+                        Created = created,
+                    }
+            );
+
+            _AssertField(item, OfficeRenameListFields.Group, OfficeRenameListFields.Key.Title, "Report");
+            _AssertField(item, OfficeRenameListFields.Group, OfficeRenameListFields.Key.Author, "Author");
+            _AssertField(item, OfficeRenameListFields.Group, OfficeRenameListFields.Key.Category, "Reports");
+            _AssertField(
+                item,
+                OfficeRenameListFields.Group,
+                OfficeRenameListFields.Key.Created,
+                RenameListFieldDisplay.FormatFileDate(created.LocalDateTime)
+            );
+            Assert.False(
+                RenameListFieldCatalog
+                    .GetField(OfficeRenameListFields.Group, OfficeRenameListFields.Key.Title)
+                    .SupportsPreview
+            );
+            Assert.Equal(
+                RenameListMetadataRequirement.Office,
+                RenameListFieldCatalog.GetMetadataRequirement(
+                    RenameListFieldKey.Original(OfficeRenameListFields.Group, OfficeRenameListFields.Key.Title)
                 )
             );
         }
@@ -1400,6 +1457,47 @@ namespace Mfr.Tests.Models
             );
             var titleKey = RenameListFieldKey.Original(EpubRenameListFields.Group, EpubRenameListFields.Key.Title);
             Assert.True(RenameListFieldCatalog.CompareForSort(betaTitle, titleKey, alphaTitle) > 0);
+        }
+
+        [Fact]
+        public void CompareForSort_orders_office_title_string_and_created_date()
+        {
+            var betaTitle = FilterTestHelpers.CreateRenameItem(
+                fileName: "beta",
+                extension: "docx",
+                configureOriginal: meta => meta.Office = new OfficeDocumentInfo { Title = "Beta" }
+            );
+            var alphaTitle = FilterTestHelpers.CreateRenameItem(
+                fileName: "alpha",
+                extension: "docx",
+                configureOriginal: meta => meta.Office = new OfficeDocumentInfo { Title = "Alpha" }
+            );
+            var titleKey = RenameListFieldKey.Original(OfficeRenameListFields.Group, OfficeRenameListFields.Key.Title);
+            Assert.True(RenameListFieldCatalog.CompareForSort(betaTitle, titleKey, alphaTitle) > 0);
+
+            var later = FilterTestHelpers.CreateRenameItem(
+                fileName: "later",
+                extension: "docx",
+                configureOriginal: meta =>
+                    meta.Office = new OfficeDocumentInfo
+                    {
+                        Created = new DateTimeOffset(2024, 6, 1, 0, 0, 0, TimeSpan.Zero),
+                    }
+            );
+            var earlier = FilterTestHelpers.CreateRenameItem(
+                fileName: "earlier",
+                extension: "docx",
+                configureOriginal: meta =>
+                    meta.Office = new OfficeDocumentInfo
+                    {
+                        Created = new DateTimeOffset(2024, 1, 1, 0, 0, 0, TimeSpan.Zero),
+                    }
+            );
+            var createdKey = RenameListFieldKey.Original(
+                OfficeRenameListFields.Group,
+                OfficeRenameListFields.Key.Created
+            );
+            Assert.True(RenameListFieldCatalog.CompareForSort(earlier, createdKey, later) < 0);
         }
 
         [Fact]
