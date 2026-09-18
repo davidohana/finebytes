@@ -1,4 +1,3 @@
-using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.ViewModels.MainWindow;
 
 namespace Mfr.Tests.Ui.MainWindow
@@ -67,25 +66,15 @@ namespace Mfr.Tests.Ui.MainWindow
             Action<MainWindowViewModel, RecordingFileShellOpener, string> assert
         )
         {
-            var helpDir = Path.Combine(Path.GetTempPath(), $"mfr-help-mw-{Guid.NewGuid():N}");
-            Directory.CreateDirectory(helpDir);
-            try
-            {
-                var helpFile = Path.Combine(helpDir, helpFileName);
-                if (writeFile)
+            var files = writeFile ? new[] { helpFileName } : [];
+            TempHelpRoot.Run(
+                (helpDir, opener, host) =>
                 {
-                    File.WriteAllText(helpFile, "<html></html>");
-                }
-
-                var opener = new RecordingFileShellOpener();
-                var host = new HelpHost(opener, [helpDir]);
-                var viewModel = new MainWindowViewModel(helpHost: host);
-                assert(viewModel, opener, helpFile);
-            }
-            finally
-            {
-                Directory.Delete(helpDir, recursive: true);
-            }
+                    var viewModel = new MainWindowViewModel(helpHost: host);
+                    assert(viewModel, opener, Path.Combine(helpDir, helpFileName));
+                },
+                files
+            );
         }
 
         /// <summary>
