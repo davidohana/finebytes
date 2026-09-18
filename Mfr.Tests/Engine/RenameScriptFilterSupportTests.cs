@@ -8,6 +8,7 @@ using Mfr.Models.Filters;
 using Mfr.Models.Media;
 using Mfr.Models.Rename;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v1;
 
 namespace Mfr.Tests.Engine
 {
@@ -42,13 +43,16 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies timestamp and audio targets are not supported.
+        /// Verifies timestamp and tag targets are not supported.
         /// </summary>
         [Fact]
         public void IsSupported_target_false_for_dates_and_tags()
         {
             Assert.False(RenameScriptFilterSupport.IsSupported(new FileTimestampTarget(TimestampField.LastWrite)));
             Assert.False(RenameScriptFilterSupport.IsSupported(new SemanticAudioFieldTarget(SemanticAudioField.Title)));
+            Assert.False(RenameScriptFilterSupport.IsSupported(new Id3v1FieldTarget(Id3v1Field.Title)));
+            Assert.False(RenameScriptFilterSupport.IsSupported(new Id3v2FrameTarget("TIT2")));
+            Assert.False(RenameScriptFilterSupport.IsSupported(new XiphFieldTarget("TITLE")));
         }
 
         /// <summary>
@@ -78,6 +82,7 @@ namespace Mfr.Tests.Engine
             Assert.False(RenameScriptFilterSupport.IsSupported(new TimeShifterFilter()));
             Assert.False(RenameScriptFilterSupport.IsSupported(new AudioTagSetterFilter()));
             Assert.False(RenameScriptFilterSupport.IsSupported(new TagRemoverFilter()));
+            Assert.False(RenameScriptFilterSupport.IsSupported(new Id3v2FieldSetterFilter()));
         }
 
         /// <summary>

@@ -376,10 +376,10 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// extension. Outcomes land on <see cref="RenameListViewModel.LastStatusMessage"/>.
         /// </para>
         /// </remarks>
-        [RelayCommand(CanExecute = nameof(_CanGenerateRenameScript))]
+        [RelayCommand(CanExecute = nameof(_CanGo))]
         public async Task GenerateRenameScriptAsync()
         {
-            if (!_CanGenerateRenameScript())
+            if (!_CanGo())
             {
                 return;
             }
@@ -679,12 +679,10 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             return FilterPaletteViewModel.SelectedFilter is not null;
         }
 
+        /// <summary>
+        /// Whether GO / Generate Rename Script may run (non-empty idle Rename List).
+        /// </summary>
         private bool _CanGo()
-        {
-            return RenameListViewModel.ItemCount >= 1 && !RenameListViewModel.IsBusy;
-        }
-
-        private bool _CanGenerateRenameScript()
         {
             return RenameListViewModel.ItemCount >= 1 && !RenameListViewModel.IsBusy;
         }

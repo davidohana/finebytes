@@ -14,7 +14,7 @@ namespace Mfr.Engine.RenameScript
         /// </summary>
         /// <param name="target">Filter Apply-To target.</param>
         /// <returns>
-        /// <see langword="true"/> for name/path/attribute targets; <see langword="false"/> for timestamps and audio tags.
+        /// <see langword="true"/> for name/path/attribute targets; <see langword="false"/> for timestamps and tags.
         /// </returns>
         public static bool IsSupported(FilterTarget target)
         {
@@ -39,8 +39,15 @@ namespace Mfr.Engine.RenameScript
         /// <param name="filter">Filter instance from the Filter Chain.</param>
         /// <returns>
         /// <see langword="true"/> when path/name/attrs only; <see langword="false"/> for date/tag writers
-        /// (and string filters aimed at those targets).
+        /// (and string filters aimed at those targets). Unknown non-fixed filters default to supported.
         /// </returns>
+        /// <remarks>
+        /// <para>
+        /// <see cref="AttributesSetterFilter"/> and <see cref="PathMoverFilter"/> implement
+        /// <see cref="IFixedApplyToFilter"/> but are still scriptable, so they are matched before the
+        /// fixed-domain catch-all.
+        /// </para>
+        /// </remarks>
         public static bool IsSupported(BaseFilter filter)
         {
             ArgumentNullException.ThrowIfNull(filter);
@@ -48,8 +55,7 @@ namespace Mfr.Engine.RenameScript
             return filter switch
             {
                 StringTargetFilter stringFilter => IsSupported(stringFilter.Target),
-                AttributesSetterFilter => true,
-                PathMoverFilter => true,
+                AttributesSetterFilter or PathMoverFilter => true,
                 IFixedApplyToFilter => false,
                 _ => true,
             };

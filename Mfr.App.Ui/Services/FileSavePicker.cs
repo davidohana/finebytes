@@ -32,38 +32,6 @@ namespace Mfr.App.Ui.Services
         }
 
         /// <summary>
-        /// Opens a save-file picker owned by <paramref name="visual"/>'s top-level window.
-        /// </summary>
-        /// <param name="visual">Control used to resolve <see cref="TopLevel.StorageProvider"/>.</param>
-        /// <param name="title">Dialog title.</param>
-        /// <param name="defaultExtension">Extension without dot (e.g. <c>txt</c>).</param>
-        /// <param name="suggestedFileName">Optional suggested file name.</param>
-        /// <param name="fileTypeName">Primary filter label (e.g. <c>Text files</c> or <c>CSV files</c>).</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
-        public static Task<string?> PickSaveFileAsync(
-            Visual visual,
-            string title = "Save as",
-            string defaultExtension = "txt",
-            string? suggestedFileName = null,
-            string fileTypeName = "Text files",
-            CancellationToken cancellationToken = default
-        )
-        {
-            return PickSaveFileAsync(
-                visual,
-                new SaveFilePickOptions
-                {
-                    Title = title,
-                    DefaultExtension = defaultExtension,
-                    SuggestedFileName = suggestedFileName,
-                    FileTypeName = fileTypeName,
-                },
-                cancellationToken
-            );
-        }
-
-        /// <summary>
         /// Opens a save-file picker on <paramref name="storage"/>.
         /// </summary>
         /// <param name="storage">Avalonia storage provider.</param>
@@ -101,38 +69,6 @@ namespace Mfr.App.Ui.Services
                 .ConfigureAwait(true);
 
             return file?.TryGetLocalPath();
-        }
-
-        /// <summary>
-        /// Opens a save-file picker on <paramref name="storage"/>.
-        /// </summary>
-        /// <param name="storage">Avalonia storage provider.</param>
-        /// <param name="title">Dialog title.</param>
-        /// <param name="defaultExtension">Extension without dot (e.g. <c>txt</c>).</param>
-        /// <param name="suggestedFileName">Optional suggested file name.</param>
-        /// <param name="fileTypeName">Primary filter label (e.g. <c>Text files</c> or <c>CSV files</c>).</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
-        public static Task<string?> PickSaveFileAsync(
-            IStorageProvider storage,
-            string title = "Save as",
-            string defaultExtension = "txt",
-            string? suggestedFileName = null,
-            string fileTypeName = "Text files",
-            CancellationToken cancellationToken = default
-        )
-        {
-            return PickSaveFileAsync(
-                storage,
-                new SaveFilePickOptions
-                {
-                    Title = title,
-                    DefaultExtension = defaultExtension,
-                    SuggestedFileName = suggestedFileName,
-                    FileTypeName = fileTypeName,
-                },
-                cancellationToken
-            );
         }
 
         /// <summary>
