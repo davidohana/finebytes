@@ -64,6 +64,11 @@ namespace Mfr.App.Cli
                 Log.Error("{Text}", ex.Message);
                 return CliExitCode.UserError;
             }
+            catch (BetaExpiredException ex)
+            {
+                Log.Error("{Text}", ex.Message);
+                return CliExitCode.UserError;
+            }
             catch (Exception ex)
             {
                 Log.Error("{Text}", ex.ToString());
@@ -77,6 +82,11 @@ namespace Mfr.App.Cli
 
         private static CliExitCode _Execute(CliOptions options)
         {
+            if (BetaExpiryGate.IsEnforcementEnabled)
+            {
+                BetaExpiryGate.TryRefreshNetworkUtc();
+            }
+
             var presetManager = new PresetManager(options.PresetsFilePath);
             presetManager.LoadPresets();
 

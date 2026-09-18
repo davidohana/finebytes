@@ -1,4 +1,8 @@
 using System.Reflection;
+#if BETA
+using System.Globalization;
+using Mfr.Engine.Beta;
+#endif
 
 namespace Mfr.App.Ui.Services
 {
@@ -38,19 +42,24 @@ namespace Mfr.App.Ui.Services
         /// <param name="assembly">
         /// Assembly to read. When null, uses the UI assembly that defines this type.
         /// </param>
-        /// <returns>Display version, or <c>unknown</c> when unavailable.</returns>
+        /// <returns>
+        /// Display version, or <c>unknown</c> when unavailable. Beta builds append channel and expiry.
+        /// </returns>
         public static string GetDisplayVersion(Assembly? assembly = null)
         {
             var source = assembly ?? typeof(AppProductInfo).Assembly;
             var informational = source
                 .GetCustomAttribute<AssemblyInformationalVersionAttribute>()
                 ?.InformationalVersion;
-            if (!string.IsNullOrWhiteSpace(informational))
-            {
-                return informational;
-            }
-
-            return source.GetName().Version?.ToString(3) ?? "unknown";
+            var version = !string.IsNullOrWhiteSpace(informational)
+                ? informational
+                : source.GetName().Version?.ToString(3) ?? "unknown";
+#if BETA
+            var expiry = BetaExpiryGate.ExpiresUtc.ToString("d MMM yyyy", CultureInfo.InvariantCulture);
+            return $"{version} (beta; expires {expiry} UTC)";
+#else
+            return version;
+#endif
         }
 
         /// <summary>

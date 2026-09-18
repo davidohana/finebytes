@@ -72,6 +72,20 @@ dotnet format analyzers ./finebytes.slnx --verify-no-changes
 
 CSharpier formats `.cs`, `.csproj`, `.axaml`, and `.slnx` (see `.csharpierignore`). Code style and diagnostic severities live in `.editorconfig`.
 
+## Beta builds
+
+Official release builds omit the beta expiry gate. To cut a beta that enforces the hardcoded expiry (1 Jan 2027 UTC) and shows the beta label in the UI:
+
+```powershell
+dotnet build .\finebytes.slnx -c Release -p:BETA=true
+```
+
+```bash
+dotnet build ./finebytes.slnx -c Release -p:BETA=true
+```
+
+`-p:BETA=true` defines the `BETA` compile symbol via `Directory.Build.props`. Without it, commit enforcement stays off.
+
 ## Markdown formatting and linting
 
 One-time (dev machine):

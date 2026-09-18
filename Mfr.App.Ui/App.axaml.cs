@@ -7,6 +7,7 @@ using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views.GridColumnSizing;
 using Mfr.App.Ui.Views.MainWindow;
+using Mfr.Engine.Beta;
 using Mfr.Engine.Config;
 using Mfr.Engine.Presets;
 using Mfr.Models;
@@ -47,12 +48,31 @@ namespace Mfr.App.Ui
 
                 desktop.MainWindow = mainWindow;
                 _ScheduleStartupArgsApply(mainWindowViewModel, startupArgs, parseWarning);
+                _StartBetaExpiryProbe(mainWindowViewModel);
 #if DEBUG
                 this.AttachDeveloperTools();
 #endif
             }
 
             base.OnFrameworkInitializationCompleted();
+        }
+
+        /// <summary>
+        /// Fire-and-forget HTTPS Date probe so GO CanExecute usually has a cached clock without blocking the UI thread.
+        /// </summary>
+        /// <param name="mainWindowViewModel">Root view model that refreshes GO after the probe.</param>
+        private static void _StartBetaExpiryProbe(MainWindowViewModel mainWindowViewModel)
+        {
+            if (!BetaExpiryGate.IsEnforcementEnabled)
+            {
+                return;
+            }
+
+            _ = Task.Run(() =>
+            {
+                BetaExpiryGate.TryRefreshNetworkUtc();
+                Dispatcher.UIThread.Post(mainWindowViewModel.NotifyBetaExpiryProbeCompleted);
+            });
         }
 
         /// <summary>
