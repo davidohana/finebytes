@@ -1,4 +1,5 @@
 using Mfr.Filters.Formatting;
+using Mfr.Filters.Formatting.FormatString;
 using Mfr.Filters.Formatting.Tokens.Media;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.Tags;
@@ -10,6 +11,19 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Media
     /// </summary>
     public sealed class MediaPropertyTokenTests
     {
+        /// <summary>
+        /// Verifies media tokens nest under <c>Media Properties</c> in the Format Editor picker.
+        /// </summary>
+        [Fact]
+        public void Catalog_MediaTokens_UseMediaPropertiesGroupPath()
+        {
+            var mediaEntries = FormatTokenCatalog
+                .Entries.Where(e => e.CanonicalName.StartsWith("media-", StringComparison.Ordinal))
+                .ToList();
+            Assert.Equal(Enum.GetValues<MediaPropertyField>().Length, mediaEntries.Count);
+            Assert.All(mediaEntries, e => Assert.Equal("Media Properties", e.GroupPath));
+        }
+
         /// <summary>
         /// Token enum member names that drift from catalog keys must map explicitly.
         /// </summary>

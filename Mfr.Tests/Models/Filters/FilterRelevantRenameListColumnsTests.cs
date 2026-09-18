@@ -7,7 +7,7 @@ using Mfr.Filters.Formatting.Tokens;
 using Mfr.Filters.Formatting.Tokens.Exif;
 using Mfr.Filters.Formatting.Tokens.Image;
 using Mfr.Filters.Formatting.Tokens.Media;
-using Mfr.Filters.Formatting.Tokens.Mpeg;
+using Mfr.Filters.Formatting.Tokens.Mp3;
 using Mfr.Filters.Formatting.Tokens.Pdf;
 using Mfr.Filters.Misc;
 using Mfr.Filters.Space;
@@ -19,7 +19,7 @@ using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
-using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Mp3;
 using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Models.Tags.Id3v1;
@@ -526,8 +526,8 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="expectedPropertyKey">Catalog property key for the first mapped token field.</param>
         [Theory]
         [InlineData("<media-duration>", MediaRenameListFields.Group, MediaRenameListFields.Key.Duration)]
-        [InlineData("<mp3-bitrate>", MpegRenameListFields.Group, MpegRenameListFields.Key.Bitrate)]
-        [InlineData("<mp3-encoding>", MpegRenameListFields.Group, MpegRenameListFields.Key.VBR)]
+        [InlineData("<mp3-bitrate>", Mp3RenameListFields.Group, Mp3RenameListFields.Key.Bitrate)]
+        [InlineData("<mp3-encoding>", Mp3RenameListFields.Group, Mp3RenameListFields.Key.VBR)]
         [InlineData("<image-width>", ImageRenameListFields.Group, ImageRenameListFields.Key.Width)]
         [InlineData("<exif-make>", JpegRenameListFields.Group, JpegRenameListFields.Key.Make)]
         [InlineData("<exif-date:yyyy-MM-dd>", JpegRenameListFields.Group, JpegRenameListFields.Key.DateTaken)]
@@ -567,7 +567,7 @@ namespace Mfr.Tests.Models.Filters
                 .Where(static token =>
                     token
                         is MediaPropertyTokenBase
-                            or MpegAudioPropertyTokenBase
+                            or Mp3AudioPropertyTokenBase
                             or ImagePropertyTokenBase
                             or ExifPropertyTokenBase
                             or ExifDateToken

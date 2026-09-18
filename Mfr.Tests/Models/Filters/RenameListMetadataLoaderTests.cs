@@ -2,7 +2,7 @@ using Mfr.Filters;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
-using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Mp3;
 using Mfr.Models.RenameList.Fields.Pdf;
 
 namespace Mfr.Tests.Models.Filters
@@ -140,7 +140,7 @@ namespace Mfr.Tests.Models.Filters
                     overwrite: true
                 );
                 var item = _UnmarkedItem(path);
-                var layerKey = RenameListFieldKey.Original(MpegRenameListFields.Group, "Layer");
+                var layerKey = RenameListFieldKey.Original(Mp3RenameListFields.Group, "Layer");
 
                 Assert.False(item.TagLibLoadAttempted);
                 RenameListMetadataLoader.TryEnsureLoaded(item, layerKey);

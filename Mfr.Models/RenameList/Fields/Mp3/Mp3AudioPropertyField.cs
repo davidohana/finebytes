@@ -1,16 +1,16 @@
-namespace Mfr.Models.RenameList.Fields.Mpeg
+namespace Mfr.Models.RenameList.Fields.Mp3
 {
     /// <summary>
     /// MPEG audio-header properties shared by formatter tokens and Rename List columns.
     /// <para>
     /// Member names match <c>mp3-*</c> token vocabulary (including
-    /// <see cref="Encoding"/>, <see cref="MpegVer"/>, <see cref="DurationSec"/>). Catalog
+    /// <see cref="Encoding"/>, <see cref="Ver"/>, <see cref="DurationSec"/>). Catalog
     /// keys that differ are mapped in
-    /// <see cref="MpegPropertyRenameListField.CatalogPropertyKey"/>; DTO accessors live in
-    /// <see cref="MpegAudioPropertiesFormatting"/>.
+    /// <see cref="Mp3PropertyRenameListField.CatalogPropertyKey"/>; DTO accessors live in
+    /// <see cref="Mp3AudioPropertiesFormatting"/>.
     /// </para>
     /// </summary>
-    internal enum MpegAudioPropertyField
+    internal enum Mp3AudioPropertyField
     {
         /// <summary>Audio bitrate in kbps (VBR-prefixed when applicable).</summary>
         Bitrate,
@@ -33,8 +33,8 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
         /// <summary>MPEG audio layer.</summary>
         Layer,
 
-        /// <summary>MPEG version.</summary>
-        MpegVer,
+        /// <summary>MPEG version (<c>mp3-ver</c>).</summary>
+        Ver,
 
         /// <summary>Channel mode.</summary>
         Mode,

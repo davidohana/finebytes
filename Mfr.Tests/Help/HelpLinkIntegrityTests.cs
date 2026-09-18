@@ -9,7 +9,7 @@ using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
-using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Mp3;
 using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 
@@ -43,7 +43,7 @@ namespace Mfr.Tests.Help
             Id3v2RenameListFields.Group,
             XiphRenameListFields.Group,
             MediaRenameListFields.Group,
-            MpegRenameListFields.Group,
+            Mp3RenameListFields.Group,
             ImageRenameListFields.Group,
             JpegRenameListFields.Group,
             PdfRenameListFields.Group,

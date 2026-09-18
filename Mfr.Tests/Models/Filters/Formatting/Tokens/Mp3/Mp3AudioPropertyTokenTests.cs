@@ -1,15 +1,15 @@
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.FormatString;
-using Mfr.Filters.Formatting.Tokens.Mpeg;
-using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Filters.Formatting.Tokens.Mp3;
+using Mfr.Models.RenameList.Fields.Mp3;
 using Mfr.Models.Tags;
 
-namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
+namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mp3
 {
     /// <summary>
     /// Tests for <c>mp3-*</c> formatter tokens.
     /// </summary>
-    public sealed class MpegAudioPropertyTokenTests
+    public sealed class Mp3AudioPropertyTokenTests
     {
         /// <summary>
         /// Verifies catalog rows use the <c>mp3-*</c> prefix under <c>Audio\MP3</c> with no <c>mpeg-*</c> alias.
@@ -17,10 +17,12 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         [Fact]
         public void Catalog_Mp3Prefix_NoMpegAlias()
         {
+            Assert.Equal("MP3", Mp3RenameListFields.Group);
+
             var mp3Entries = FormatTokenCatalog
                 .Entries.Where(e => e.CanonicalName.StartsWith("mp3-", StringComparison.Ordinal))
                 .ToList();
-            Assert.Equal(Enum.GetValues<MpegAudioPropertyField>().Length, mp3Entries.Count);
+            Assert.Equal(Enum.GetValues<Mp3AudioPropertyField>().Length, mp3Entries.Count);
             Assert.All(mp3Entries, e => Assert.Equal("Audio\\MP3", e.GroupPath));
 
             Assert.DoesNotContain(
@@ -39,46 +41,46 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         public void CatalogPropertyKey_NameDriftArms_MapExplicitly()
         {
             Assert.Equal(
-                MpegRenameListFields.Key.VBR,
-                MpegPropertyRenameListField.CatalogPropertyKey(MpegAudioPropertyField.Encoding)
+                Mp3RenameListFields.Key.VBR,
+                Mp3PropertyRenameListField.CatalogPropertyKey(Mp3AudioPropertyField.Encoding)
             );
             Assert.Equal(
-                MpegRenameListFields.Key.Level,
-                MpegPropertyRenameListField.CatalogPropertyKey(MpegAudioPropertyField.MpegVer)
+                Mp3RenameListFields.Key.Level,
+                Mp3PropertyRenameListField.CatalogPropertyKey(Mp3AudioPropertyField.Ver)
             );
             Assert.Equal(
-                MpegRenameListFields.Key.DurationSecs,
-                MpegPropertyRenameListField.CatalogPropertyKey(MpegAudioPropertyField.DurationSec)
+                Mp3RenameListFields.Key.DurationSecs,
+                Mp3PropertyRenameListField.CatalogPropertyKey(Mp3AudioPropertyField.DurationSec)
             );
         }
 
         [Fact]
         public void TryGetFixedField_NameDriftTokens_MapCatalogKeys()
         {
-            var encoding = new MpegEncodingToken();
+            var encoding = new Mp3EncodingToken();
             Assert.True(encoding.TryGetFixedField(out var encodingGroup, out var encodingKey));
-            Assert.Equal(MpegRenameListFields.Group, encodingGroup);
-            Assert.Equal(MpegRenameListFields.Key.VBR, encodingKey);
+            Assert.Equal(Mp3RenameListFields.Group, encodingGroup);
+            Assert.Equal(Mp3RenameListFields.Key.VBR, encodingKey);
 
-            var mpegVer = new MpegVerToken();
-            Assert.True(mpegVer.TryGetFixedField(out var verGroup, out var verKey));
-            Assert.Equal(MpegRenameListFields.Group, verGroup);
-            Assert.Equal(MpegRenameListFields.Key.Level, verKey);
+            var mp3Ver = new Mp3VerToken();
+            Assert.True(mp3Ver.TryGetFixedField(out var verGroup, out var verKey));
+            Assert.Equal(Mp3RenameListFields.Group, verGroup);
+            Assert.Equal(Mp3RenameListFields.Key.Level, verKey);
 
-            var durationSec = new MpegDurationSecToken();
+            var durationSec = new Mp3DurationSecToken();
             Assert.True(durationSec.TryGetFixedField(out var durationGroup, out var durationKey));
-            Assert.Equal(MpegRenameListFields.Group, durationGroup);
-            Assert.Equal(MpegRenameListFields.Key.DurationSecs, durationKey);
+            Assert.Equal(Mp3RenameListFields.Group, durationGroup);
+            Assert.Equal(Mp3RenameListFields.Key.DurationSecs, durationKey);
         }
 
-        private static MediaProperties _MediaWithMpeg(MpegAudioProperties mpeg)
+        private static MediaProperties _MediaWithMp3(Mp3AudioProperties mp3)
         {
-            return new MediaProperties { Mpeg = mpeg };
+            return new MediaProperties { Mp3 = mp3 };
         }
 
-        private static MpegAudioProperties _SampleMpeg(bool isVbr = false)
+        private static Mp3AudioProperties _SampleMp3(bool isVbr = false)
         {
-            return new MpegAudioProperties
+            return new Mp3AudioProperties
             {
                 Bitrate = 128,
                 IsCopyrighted = true,
@@ -97,55 +99,55 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         public void Resolve_SeededFields_FormatPerRules()
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
-                m.Media = _MediaWithMpeg(_SampleMpeg())
+                m.Media = _MediaWithMp3(_SampleMp3())
             );
 
-            Assert.Equal("128", new MpegBitrateToken().Compile(string.Empty)(item));
-            Assert.Equal("Yes", new MpegCopyrightToken().Compile(string.Empty)(item));
-            Assert.Equal("0:03:45", new MpegDurationToken().Compile(string.Empty)(item));
-            Assert.Equal("225", new MpegDurationSecToken().Compile(string.Empty)(item));
-            Assert.Equal("CBR", new MpegEncodingToken().Compile(string.Empty)(item));
-            Assert.Equal("44100", new MpegFrequencyToken().Compile(string.Empty)(item));
-            Assert.Equal("III", new MpegLayerToken().Compile(string.Empty)(item));
-            Assert.Equal("1", new MpegVerToken().Compile(string.Empty)(item));
-            Assert.Equal("JointStereo", new MpegModeToken().Compile(string.Empty)(item));
-            Assert.Equal("No", new MpegOriginalToken().Compile(string.Empty)(item));
-            Assert.Equal("Yes", new MpegProtectionToken().Compile(string.Empty)(item));
+            Assert.Equal("128", new Mp3BitrateToken().Compile(string.Empty)(item));
+            Assert.Equal("Yes", new Mp3CopyrightToken().Compile(string.Empty)(item));
+            Assert.Equal("0:03:45", new Mp3DurationToken().Compile(string.Empty)(item));
+            Assert.Equal("225", new Mp3DurationSecToken().Compile(string.Empty)(item));
+            Assert.Equal("CBR", new Mp3EncodingToken().Compile(string.Empty)(item));
+            Assert.Equal("44100", new Mp3FrequencyToken().Compile(string.Empty)(item));
+            Assert.Equal("III", new Mp3LayerToken().Compile(string.Empty)(item));
+            Assert.Equal("1", new Mp3VerToken().Compile(string.Empty)(item));
+            Assert.Equal("JointStereo", new Mp3ModeToken().Compile(string.Empty)(item));
+            Assert.Equal("No", new Mp3OriginalToken().Compile(string.Empty)(item));
+            Assert.Equal("Yes", new Mp3ProtectionToken().Compile(string.Empty)(item));
         }
 
         [Fact]
         public void Resolve_VbrBitrate_PrefixesVbr()
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
-                m.Media = _MediaWithMpeg(_SampleMpeg(isVbr: true))
+                m.Media = _MediaWithMp3(_SampleMp3(isVbr: true))
             );
 
-            Assert.Equal("VBR128", new MpegBitrateToken().Compile(string.Empty)(item));
-            Assert.Equal("VBR", new MpegEncodingToken().Compile(string.Empty)(item));
+            Assert.Equal("VBR128", new Mp3BitrateToken().Compile(string.Empty)(item));
+            Assert.Equal("VBR", new Mp3EncodingToken().Compile(string.Empty)(item));
         }
 
         [Fact]
-        public void Resolve_NullMpeg_YieldsEmpty()
+        public void Resolve_NullMp3_YieldsEmpty()
         {
             var item = FilterTestHelpers.CreateRenameItem();
-            Assert.Null(item.Original.Media?.Mpeg);
+            Assert.Null(item.Original.Media?.Mp3);
 
-            Assert.Equal(string.Empty, new MpegBitrateToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegCopyrightToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegDurationToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegEncodingToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegLayerToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegVerToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegOriginalToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegProtectionToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3BitrateToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3CopyrightToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3DurationToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3EncodingToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3LayerToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3VerToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3OriginalToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3ProtectionToken().Compile(string.Empty)(item));
         }
 
         [Fact]
         public void Resolve_ZeroBitrateAndDuration_YieldEmpty()
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
-                m.Media = _MediaWithMpeg(
-                    new MpegAudioProperties
+                m.Media = _MediaWithMp3(
+                    new Mp3AudioProperties
                     {
                         IsCopyrighted = false,
                         IsOriginal = true,
@@ -154,21 +156,21 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
                 )
             );
 
-            Assert.Equal(string.Empty, new MpegBitrateToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegDurationToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegDurationSecToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegFrequencyToken().Compile(string.Empty)(item));
-            Assert.Equal(string.Empty, new MpegLayerToken().Compile(string.Empty)(item));
-            Assert.Equal("No", new MpegCopyrightToken().Compile(string.Empty)(item));
-            Assert.Equal("Yes", new MpegOriginalToken().Compile(string.Empty)(item));
-            Assert.Equal("No", new MpegProtectionToken().Compile(string.Empty)(item));
-            Assert.Equal("CBR", new MpegEncodingToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3BitrateToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3DurationToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3DurationSecToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3FrequencyToken().Compile(string.Empty)(item));
+            Assert.Equal(string.Empty, new Mp3LayerToken().Compile(string.Empty)(item));
+            Assert.Equal("No", new Mp3CopyrightToken().Compile(string.Empty)(item));
+            Assert.Equal("Yes", new Mp3OriginalToken().Compile(string.Empty)(item));
+            Assert.Equal("No", new Mp3ProtectionToken().Compile(string.Empty)(item));
+            Assert.Equal("CBR", new Mp3EncodingToken().Compile(string.Empty)(item));
         }
 
         [Fact]
         public void Compile_WithAnyArgument_Throws()
         {
-            var token = new MpegBitrateToken();
+            var token = new Mp3BitrateToken();
             var item = FilterTestHelpers.CreateRenameItem();
 
             foreach (var bad in new[] { "0", "1", "x" })
@@ -179,11 +181,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
         }
 
         [Fact]
-        public void FormatterFilter_UsesSeededMpeg()
+        public void FormatterFilter_UsesSeededMp3()
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
-                m.Media = _MediaWithMpeg(
-                    new MpegAudioProperties
+                m.Media = _MediaWithMp3(
+                    new Mp3AudioProperties
                     {
                         Bitrate = 320,
                         IsVbr = true,
@@ -228,23 +230,23 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
             Assert.False(item.TagLibLoadAttempted);
             Assert.Null(item.Original.Media);
 
-            var text = new MpegLayerToken().Compile(string.Empty)(item);
+            var text = new Mp3LayerToken().Compile(string.Empty)(item);
 
             Assert.True(item.TagLibLoadAttempted);
             Assert.NotNull(item.Original.Media);
-            Assert.NotNull(item.Original.Media.Mpeg);
+            Assert.NotNull(item.Original.Media.Mp3);
             Assert.Equal("III", text);
-            Assert.Equal("CBR", new MpegEncodingToken().Compile(string.Empty)(item));
+            Assert.Equal("CBR", new Mp3EncodingToken().Compile(string.Empty)(item));
         }
 
         [Fact]
-        public void ClearMediaPropertiesCache_ClearsNestedMpeg()
+        public void ClearMediaPropertiesCache_ClearsNestedMp3()
         {
             var item = FilterTestHelpers.CreateRenameItem(configureOriginal: m =>
-                m.Media = new MediaProperties { AudioBitrate = 128, Mpeg = _SampleMpeg() }
+                m.Media = new MediaProperties { AudioBitrate = 128, Mp3 = _SampleMp3() }
             );
 
-            Assert.NotNull(item.Original.Media?.Mpeg);
+            Assert.NotNull(item.Original.Media?.Mp3);
             item.ClearMediaPropertiesCache();
 
             Assert.False(item.TagLibLoadAttempted);

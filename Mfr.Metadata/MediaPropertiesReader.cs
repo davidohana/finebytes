@@ -64,11 +64,11 @@ namespace Mfr.Metadata
                 AudioChannels = properties.AudioChannels,
                 VideoWidth = properties.VideoWidth,
                 VideoHeight = properties.VideoHeight,
-                Mpeg = _TryMapMpeg(properties),
+                Mp3 = _TryMapMp3(properties),
             };
         }
 
-        private static MpegAudioProperties? _TryMapMpeg(Properties properties)
+        private static Mp3AudioProperties? _TryMapMp3(Properties properties)
         {
             if (properties.Codecs is null)
             {
@@ -83,7 +83,7 @@ namespace Mfr.Metadata
                 }
 
                 var isVbr = header.XingHeader.Present || header.VBRIHeader.Present;
-                return new MpegAudioProperties
+                return new Mp3AudioProperties
                 {
                     Bitrate = header.AudioBitrate,
                     IsCopyrighted = header.IsCopyrighted,

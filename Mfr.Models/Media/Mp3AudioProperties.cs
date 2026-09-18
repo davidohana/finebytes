@@ -9,7 +9,7 @@ namespace Mfr.Models.Media
     /// Integer fields use <c>0</c> for absent (TagLib convention).
     /// </para>
     /// </remarks>
-    public sealed record MpegAudioProperties
+    public sealed record Mp3AudioProperties
     {
         /// <summary>
         /// Gets audio bitrate in kbps; <c>0</c> when absent.

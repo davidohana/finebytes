@@ -1,14 +1,14 @@
-namespace Mfr.Models.RenameList.Fields.Mpeg
+namespace Mfr.Models.RenameList.Fields.Mp3
 {
     /// <summary>
     /// All MFR7 MP3 Properties Rename List fields (read-only originals).
     /// </summary>
-    public static class MpegRenameListFields
+    public static class Mp3RenameListFields
     {
         /// <summary>
         /// MFR7 MP3 property group id.
         /// </summary>
-        public const string Group = "MPEG";
+        public const string Group = "MP3";
 
         /// <summary>
         /// User-visible group label in the field shuttle groups list.
@@ -59,61 +59,61 @@ namespace Mfr.Models.RenameList.Fields.Mpeg
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
-            new MpegPropertyRenameListField(Key.Bitrate, "Bitrate", MpegAudioPropertyField.Bitrate, defaultWidth: 40),
-            new MpegPropertyRenameListField(Key.VBR, "VBR", MpegAudioPropertyField.Encoding, defaultWidth: 40),
-            new MpegPropertyRenameListField(
+            new Mp3PropertyRenameListField(Key.Bitrate, "Bitrate", Mp3AudioPropertyField.Bitrate, defaultWidth: 40),
+            new Mp3PropertyRenameListField(Key.VBR, "VBR", Mp3AudioPropertyField.Encoding, defaultWidth: 40),
+            new Mp3PropertyRenameListField(
                 Key.Frequency,
                 "Frequency",
-                MpegAudioPropertyField.Frequency,
-                tip: MpegRenameListFieldTips.Frequency
+                Mp3AudioPropertyField.Frequency,
+                tip: Mp3RenameListFieldTips.Frequency
             ),
-            new MpegPropertyRenameListField(
+            new Mp3PropertyRenameListField(
                 Key.Duration,
                 "Duration",
-                MpegAudioPropertyField.Duration,
-                tip: MpegRenameListFieldTips.Duration
+                Mp3AudioPropertyField.Duration,
+                tip: Mp3RenameListFieldTips.Duration
             ),
-            new MpegPropertyRenameListField(
+            new Mp3PropertyRenameListField(
                 Key.DurationSecs,
                 "Duration (Seconds)",
-                MpegAudioPropertyField.DurationSec,
-                tip: MpegRenameListFieldTips.DurationSecs
+                Mp3AudioPropertyField.DurationSec,
+                tip: Mp3RenameListFieldTips.DurationSecs
             ),
-            new MpegPropertyRenameListField(
+            new Mp3PropertyRenameListField(
                 Key.Layer,
                 "Layer",
-                MpegAudioPropertyField.Layer,
+                Mp3AudioPropertyField.Layer,
                 defaultWidth: 40,
-                tip: MpegRenameListFieldTips.Layer
+                tip: Mp3RenameListFieldTips.Layer
             ),
-            new MpegPropertyRenameListField(
+            new Mp3PropertyRenameListField(
                 Key.Level,
                 "Level",
-                MpegAudioPropertyField.MpegVer,
+                Mp3AudioPropertyField.Ver,
                 defaultWidth: 40,
-                tip: MpegRenameListFieldTips.Level
+                tip: Mp3RenameListFieldTips.Level
             ),
-            new MpegPropertyRenameListField(Key.Mode, "Mode", MpegAudioPropertyField.Mode),
-            new MpegPropertyRenameListField(
+            new Mp3PropertyRenameListField(Key.Mode, "Mode", Mp3AudioPropertyField.Mode),
+            new Mp3PropertyRenameListField(
                 Key.Copyright,
                 "Copyright",
-                MpegAudioPropertyField.Copyright,
+                Mp3AudioPropertyField.Copyright,
                 defaultWidth: 40,
-                tip: MpegRenameListFieldTips.Copyright
+                tip: Mp3RenameListFieldTips.Copyright
             ),
-            new MpegPropertyRenameListField(
+            new Mp3PropertyRenameListField(
                 Key.Original,
                 "Original",
-                MpegAudioPropertyField.Original,
+                Mp3AudioPropertyField.Original,
                 defaultWidth: 40,
-                tip: MpegRenameListFieldTips.Original
+                tip: Mp3RenameListFieldTips.Original
             ),
-            new MpegPropertyRenameListField(
+            new Mp3PropertyRenameListField(
                 Key.Protection,
                 "Protection",
-                MpegAudioPropertyField.Protection,
+                Mp3AudioPropertyField.Protection,
                 defaultWidth: 40,
-                tip: MpegRenameListFieldTips.Protection
+                tip: Mp3RenameListFieldTips.Protection
             ),
         ];
     }

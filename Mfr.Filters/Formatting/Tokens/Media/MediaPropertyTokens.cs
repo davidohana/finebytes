@@ -39,7 +39,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Mime Type", "Media", "MIME type from TagLib media properties", "media-mime")]
+    [FormatTokenInfo("Mime Type", "Media Properties", "MIME type from TagLib media properties", "media-mime")]
     internal sealed class MediaMimeToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-mime&gt;</c>.</summary>
@@ -48,7 +48,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Possibly Corrupt", "Media", MediaRenameListFieldTips.PossiblyCorrupt, "media-corrupt")]
+    [FormatTokenInfo("Possibly Corrupt", "Media Properties", MediaRenameListFieldTips.PossiblyCorrupt, "media-corrupt")]
     internal sealed class MediaCorruptToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-corrupt&gt;</c>.</summary>
@@ -57,7 +57,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Duration", "Media", MediaRenameListFieldTips.Duration, "media-duration")]
+    [FormatTokenInfo("Duration", "Media Properties", MediaRenameListFieldTips.Duration, "media-duration")]
     internal sealed class MediaDurationToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-duration&gt;</c>.</summary>
@@ -66,7 +66,12 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Duration Seconds", "Media", MediaRenameListFieldTips.DurationSeconds, "media-duration-sec")]
+    [FormatTokenInfo(
+        "Duration Seconds",
+        "Media Properties",
+        MediaRenameListFieldTips.DurationSeconds,
+        "media-duration-sec"
+    )]
     internal sealed class MediaDurationSecToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-duration-sec&gt;</c>.</summary>
@@ -75,7 +80,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Media Types", "Media", "TagLib media-type flags text", "media-types")]
+    [FormatTokenInfo("Media Types", "Media Properties", "TagLib media-type flags text", "media-types")]
     internal sealed class MediaTypesToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-types&gt;</c>.</summary>
@@ -84,7 +89,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Description", "Media", "Codec description", "media-description")]
+    [FormatTokenInfo("Description", "Media Properties", "Codec description", "media-description")]
     internal sealed class MediaDescriptionToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-description&gt;</c>.</summary>
@@ -93,7 +98,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Audio Bitrate", "Media", "Audio bitrate in kbps", "media-audio-bitrate")]
+    [FormatTokenInfo("Audio Bitrate", "Media Properties", "Audio bitrate in kbps", "media-audio-bitrate")]
     internal sealed class MediaAudioBitrateToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-audio-bitrate&gt;</c>.</summary>
@@ -102,7 +107,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Sample Rate", "Media", "Audio sample rate in Hz", "media-samplerate")]
+    [FormatTokenInfo("Sample Rate", "Media Properties", "Audio sample rate in Hz", "media-samplerate")]
     internal sealed class MediaSampleRateToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-samplerate&gt;</c>.</summary>
@@ -111,7 +116,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Bits Per Sample", "Media", "Bits per sample", "media-bits-per-sample")]
+    [FormatTokenInfo("Bits Per Sample", "Media Properties", "Bits per sample", "media-bits-per-sample")]
     internal sealed class MediaBitsPerSampleToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-bits-per-sample&gt;</c>.</summary>
@@ -120,7 +125,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Audio Channels", "Media", "Channel count", "media-channels")]
+    [FormatTokenInfo("Audio Channels", "Media Properties", "Channel count", "media-channels")]
     internal sealed class MediaChannelsToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-channels&gt;</c>.</summary>
@@ -129,7 +134,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Video Width", "Media", MediaRenameListFieldTips.VideoWidth, "media-video-width")]
+    [FormatTokenInfo("Video Width", "Media Properties", MediaRenameListFieldTips.VideoWidth, "media-video-width")]
     internal sealed class MediaVideoWidthToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-video-width&gt;</c>.</summary>
@@ -138,7 +143,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Video Height", "Media", MediaRenameListFieldTips.VideoHeight, "media-video-height")]
+    [FormatTokenInfo("Video Height", "Media Properties", MediaRenameListFieldTips.VideoHeight, "media-video-height")]
     internal sealed class MediaVideoHeightToken : MediaPropertyTokenBase
     {
         /// <summary>Registers <c>&lt;media-video-height&gt;</c>.</summary>

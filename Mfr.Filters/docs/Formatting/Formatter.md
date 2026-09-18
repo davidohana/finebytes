@@ -86,9 +86,9 @@ Stream properties (duration, bitrate, channels, …) are under **Media propertie
 
 #### Media properties
 
-Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`TagLibFileAccess.Read`**) **on first `media-*` or `mp3-*` token use** (or first `audio-*` / tag-filter load, which shares that open) for that **file** row inside a **`Preview`** run (one TagLib open; MPEG header nested on **`Media.Mpeg`** when present). The same open also fills embedded-tag overlays when they are not already marked loaded. **`RenameList.Commit`** clears the cache afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
+Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`TagLibFileAccess.Read`**) **on first `media-*` or `mp3-*` token use** (or first `audio-*` / tag-filter load, which shares that open) for that **file** row inside a **`Preview`** run (one TagLib open; MPEG header nested on **`Media.Mp3`** when present). The same open also fills embedded-tag overlays when they are not already marked loaded. **`RenameList.Commit`** clears the cache afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
 
-Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties as already loaded so seeded **`FileMeta.Media`** (including nested **`Media.Mpeg`**) is used without disk I/O.
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties as already loaded so seeded **`FileMeta.Media`** (including nested **`Media.Mp3`**) is used without disk I/O.
 
 | Token                     | Output                                                                                                                                                                             |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -109,7 +109,7 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties a
 
 #### MP3 Properties
 
-Reads from **`Original.Media.Mpeg`** (nested read-only TagLib `Mpeg.AudioHeader` on the media cache). Loaded by the same **`TagLibFileAccess.Read`** path as media properties (and as audio tags when that family loads first). Files without an MPEG audio header (e.g. WAV/FLAC/AAC) leave **`Media.Mpeg`** null and expand tokens to **empty** (not PreviewError). Token names match MFR7’s **`mp3-*`** prefix (prefix-only; finebytes keeps `mp3-encoding` / `mp3-ver` / `mp3-copyright` rather than unused MFR7 synonyms).
+Reads from **`Original.Media.Mp3`** (nested read-only TagLib `Mpeg.AudioHeader` on the media cache). Loaded by the same **`TagLibFileAccess.Read`** path as media properties (and as audio tags when that family loads first). Files without an MPEG audio header (e.g. WAV/FLAC/AAC) leave **`Media.Mp3`** null and expand tokens to **empty** (not PreviewError). Token names match MFR7’s **`mp3-*`** prefix (prefix-only; finebytes keeps `mp3-encoding` / `mp3-ver` / `mp3-copyright` rather than unused MFR7 synonyms).
 
 | Token                | Output                                                                                 |
 | -------------------- | -------------------------------------------------------------------------------------- |

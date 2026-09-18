@@ -68,6 +68,6 @@ namespace Mfr.Models.Media
         /// <summary>
         /// Gets MPEG audio-header properties when a codec is <c>TagLib.Mpeg.AudioHeader</c>; otherwise <see langword="null"/>.
         /// </summary>
-        public MpegAudioProperties? Mpeg { get; init; }
+        public Mp3AudioProperties? Mp3 { get; init; }
     }
 }

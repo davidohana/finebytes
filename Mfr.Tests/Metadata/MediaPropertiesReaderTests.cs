@@ -23,19 +23,19 @@ namespace Mfr.Tests.Metadata
         }
 
         [Fact]
-        public void Read_Mp3Fixture_PopulatesNestedMpeg()
+        public void Read_Mp3Fixture_PopulatesNestedMp3()
         {
             var path = _RequireFixture("l3-compl-cut.mp3");
 
             var media = MediaPropertiesReader.Read(path);
 
-            Assert.NotNull(media.Mpeg);
-            Assert.Equal(3, media.Mpeg.Layer);
-            Assert.False(media.Mpeg.IsVbr);
-            Assert.Equal("1", media.Mpeg.MpegVersion);
-            Assert.True(media.Mpeg.Bitrate > 0);
-            Assert.True(media.Mpeg.SampleRate > 0);
-            Assert.False(string.IsNullOrEmpty(media.Mpeg.ChannelMode));
+            Assert.NotNull(media.Mp3);
+            Assert.Equal(3, media.Mp3.Layer);
+            Assert.False(media.Mp3.IsVbr);
+            Assert.Equal("1", media.Mp3.MpegVersion);
+            Assert.True(media.Mp3.Bitrate > 0);
+            Assert.True(media.Mp3.SampleRate > 0);
+            Assert.False(string.IsNullOrEmpty(media.Mp3.ChannelMode));
         }
 
         [Fact]
@@ -53,13 +53,13 @@ namespace Mfr.Tests.Metadata
         }
 
         [Fact]
-        public void Read_WavFixture_MpegIsNull()
+        public void Read_WavFixture_Mp3IsNull()
         {
             var path = _RequireFixture("minimal-silent.wav");
 
             var media = MediaPropertiesReader.Read(path);
 
-            Assert.Null(media.Mpeg);
+            Assert.Null(media.Mp3);
             Assert.Equal(1, media.AudioChannels);
         }
 
