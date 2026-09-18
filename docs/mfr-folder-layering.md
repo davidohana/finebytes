@@ -41,12 +41,12 @@ Illustrative spine (typical flow, not exhaustive):
 
 ### Models friend assemblies
 
-`Mfr.Models` uses `InternalsVisibleTo` for **Engine**, **Filters**, and **Tests** so row mutation helpers (`RenameItem` load flags / overlay setters), field-catalog internals, and `BaseFilter.Setup`/`Apply` stay non-public to UI. Do **not** publicize those for App.Ui. Metadata uses only public Models DTOs (no Models friend access).
+`Mfr.Models` uses `InternalsVisibleTo` for **Engine**, **Filters**, and **Tests** so row mutation helpers (`RenameItem` load flags / overlay setters), field-catalog internals, and `BaseFilter.Setup`/`Apply` stay non-public to UI. Do **not** publicize those for App.Ui. Metadata uses only public Models DTOs (no Models friend access). Guarded by `ModelsFriendAssemblyArchitectureTests`.
 
 ## Enforcement
 
 - Enforced by `.csproj` project references.
-- Keep architecture tests in `Mfr.Tests` for guardrails (`ProjectReferenceArchitectureTests`, `PackageOwnershipArchitectureTests`, `ConfigStoreOwnershipArchitectureTests`, UI layer tests).
+- Keep architecture tests in `Mfr.Tests` for guardrails (`ProjectReferenceArchitectureTests`, `PackageOwnershipArchitectureTests`, `ConfigStoreOwnershipArchitectureTests`, `ModelsFriendAssemblyArchitectureTests`, UI layer tests).
 
 ## UI project internal layering
 
