@@ -42,7 +42,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`TagLibFileAccess.Read`**) **on first `audio-*` / `id3v2` / `id3v2-version` token use** (or first `media-*` / `mp3-*` token, which shares that open) for that **file** row inside a **`Preview`** run; the same open also fills the media cache when it is not already marked loaded. **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
-**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mp3-*`, `image-*`, `exif-*`, `pdf-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
+**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mp3-*`, `image-*`, `exif-*`, `pdf-*`, `epub-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
 
 Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateRenameItem`**, which marks TagLib load as already attempted (`TagLibLoadAttempted`) so **`EnsureTagLibLoaded`** does not touch pre-seeded **`AudioTagOverlay`**; integration-style tests use real tagged temp files when exercising disk read.
 
@@ -182,6 +182,38 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark PDF load as already
 | `<pdf-page-count>` | Page count; empty when `0`.                                                                     |
 
 **Arguments:** No argument (`<pdf-title>` only). A stray **`<pdf-title:…>`** fails at compile.
+
+#### EPUB Document
+
+Reads from **`Original.Epub`** (read-only VersOne.Epub Dublin Core Info cache). Properties load from
+disk (**`EpubFileReader.Read`** via `EpubReader.OpenBook`) **on first `epub-*` token use** for that
+**file** row inside a **`Preview`** run; **`RenameList.Commit`** clears the cache afterward so later
+previews reload from disk.
+
+Display strings come from Models **`EpubDocumentInfoFormatting`** (`PropertyDisplayContext.Token`),
+shared with Rename List EPUB columns (`Grid`). All fields are optional text (literal `Date` string;
+no PDF-style date fork) — see [epub-metadata-model.md](../../../docs/epub-metadata-model.md).
+
+**Directory rows**, non-EPUB files, and corrupt/unreadable packages surface
+**`RenameStatus.PreviewError`** (exception as **`Cause`**). A successful open with a missing DC field
+expands **empty**, not an error. Multi-value DC lists use the first non-blank entry only. There is no
+OPF write/Apply path.
+
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark EPUB load as already attempted so seeded
+**`FileMeta.Epub`** is used without disk I/O.
+
+| Token                | Output                                                                                                   |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| `<epub-title>`       | Dublin Core title; empty when unset.                                                                     |
+| `<epub-creator>`     | Dublin Core creator / author (person or organization); empty when unset.                                 |
+| `<epub-publisher>`   | Dublin Core publisher; empty when unset.                                                                 |
+| `<epub-language>`    | Dublin Core language; empty when unset.                                                                  |
+| `<epub-date>`        | Literal Dublin Core date string; empty when unset.                                                       |
+| `<epub-identifier>`  | Identifier whose id matches `Package.UniqueIdentifier` when set, else first non-blank; empty when unset. |
+| `<epub-subject>`     | Dublin Core subject; empty when unset.                                                                   |
+| `<epub-description>` | Dublin Core description; empty when unset.                                                               |
+
+**Arguments:** No argument (`<epub-title>` only). A stray **`<epub-title:…>`** fails at compile.
 
 #### EXIF
 

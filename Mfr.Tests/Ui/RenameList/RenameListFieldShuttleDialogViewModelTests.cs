@@ -1,6 +1,7 @@
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Epub;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.RenameList.Fields.Id3v1;
 using Mfr.Models.RenameList.Fields.Id3v2;
@@ -451,6 +452,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(
                 [
                     AudioTagRenameListFields.GroupLabel,
+                    EpubRenameListFields.GroupLabel,
                     BasicRenameListField.GroupLabel,
                     ExtendedRenameListFields.GroupLabel,
                     ImageRenameListFields.GroupLabel,
@@ -482,14 +484,7 @@ namespace Mfr.Tests.Ui.RenameList
             dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == ExtendedRenameListFields.Group);
 
             Assert.Equal(
-                [
-                    "Attributes",
-                    "Creation Date",
-                    "Folder File Count",
-                    "Last Access Date",
-                    "Last Write Date",
-                    "Size",
-                ],
+                ["Attributes", "Creation Date", "Folder File Count", "Last Access Date", "Last Write Date", "Size"],
                 dialogVm.AvailableOriginalFields.Select(field => field.DisplayName)
             );
             Assert.Equal(

@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Mfr.Models.Rename;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Epub;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.RenameList.Fields.Id3v1;
 using Mfr.Models.RenameList.Fields.Id3v2;
@@ -36,6 +37,7 @@ namespace Mfr.Models.RenameList
                 .. ImageRenameListFields.All,
                 .. JpegRenameListFields.All,
                 .. PdfRenameListFields.All,
+                .. EpubRenameListFields.All,
             ]);
 
         private static readonly Dictionary<(string GroupId, string PropertyKey), RenameListField> _fieldByKey =

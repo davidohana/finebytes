@@ -35,7 +35,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Title", "Pdf", "PDF document title from Info", "pdf-title")]
+    [FormatTokenInfo("Title", "Document\\Pdf", "PDF document title from Info", "pdf-title")]
     internal sealed class PdfTitleToken : PdfDocumentTokenBase
     {
         /// <summary>Registers <c>&lt;pdf-title&gt;</c>.</summary>
@@ -44,7 +44,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Author", "Pdf", "PDF document author from Info", "pdf-author")]
+    [FormatTokenInfo("Author", "Document\\Pdf", "PDF document author from Info", "pdf-author")]
     internal sealed class PdfAuthorToken : PdfDocumentTokenBase
     {
         /// <summary>Registers <c>&lt;pdf-author&gt;</c>.</summary>
@@ -53,7 +53,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Subject", "Pdf", "PDF document subject from Info", "pdf-subject")]
+    [FormatTokenInfo("Subject", "Document\\Pdf", "PDF document subject from Info", "pdf-subject")]
     internal sealed class PdfSubjectToken : PdfDocumentTokenBase
     {
         /// <summary>Registers <c>&lt;pdf-subject&gt;</c>.</summary>
@@ -62,7 +62,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Keywords", "Pdf", "PDF document keywords from Info", "pdf-keywords")]
+    [FormatTokenInfo("Keywords", "Document\\Pdf", "PDF document keywords from Info", "pdf-keywords")]
     internal sealed class PdfKeywordsToken : PdfDocumentTokenBase
     {
         /// <summary>Registers <c>&lt;pdf-keywords&gt;</c>.</summary>
@@ -73,7 +73,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
     /// <inheritdoc />
     [FormatTokenInfo(
         "Creator",
-        "Pdf",
+        "Document\\Pdf",
         "Application that created the original document before PDF conversion",
         "pdf-creator"
     )]
@@ -85,7 +85,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Producer", "Pdf", "Application that produced this PDF file", "pdf-producer")]
+    [FormatTokenInfo("Producer", "Document\\Pdf", "Application that produced this PDF file", "pdf-producer")]
     internal sealed class PdfProducerToken : PdfDocumentTokenBase
     {
         /// <summary>Registers <c>&lt;pdf-producer&gt;</c>.</summary>
@@ -94,7 +94,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Created", "Pdf", "PDF Info creation date (general format)", "pdf-created")]
+    [FormatTokenInfo("Created", "Document\\Pdf", "PDF Info creation date (general format)", "pdf-created")]
     internal sealed class PdfCreatedToken : PdfDocumentTokenBase
     {
         /// <summary>Registers <c>&lt;pdf-created&gt;</c>.</summary>
@@ -103,7 +103,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Modified", "Pdf", "PDF Info modification date (general format)", "pdf-modified")]
+    [FormatTokenInfo("Modified", "Document\\Pdf", "PDF Info modification date (general format)", "pdf-modified")]
     internal sealed class PdfModifiedToken : PdfDocumentTokenBase
     {
         /// <summary>Registers <c>&lt;pdf-modified&gt;</c>.</summary>
@@ -112,7 +112,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
     }
 
     /// <inheritdoc />
-    [FormatTokenInfo("Page Count", "Pdf", "Number of pages in the PDF", "pdf-page-count")]
+    [FormatTokenInfo("Page Count", "Document\\Pdf", "Number of pages in the PDF", "pdf-page-count")]
     internal sealed class PdfPageCountToken : PdfDocumentTokenBase
     {
         /// <summary>Registers <c>&lt;pdf-page-count&gt;</c>.</summary>

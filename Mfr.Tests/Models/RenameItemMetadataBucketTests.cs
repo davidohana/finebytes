@@ -12,6 +12,7 @@ namespace Mfr.Tests.Models
         [InlineData(RenameListMetadataRequirement.TagLib)]
         [InlineData(RenameListMetadataRequirement.ImageProperties)]
         [InlineData(RenameListMetadataRequirement.Pdf)]
+        [InlineData(RenameListMetadataRequirement.Epub)]
         public void Metadata_bucket_state_round_trips(RenameListMetadataRequirement bucket)
         {
             var item = new RenameItem(new FileMeta(0, 0, @"C:\tmp", "row", "bin", fileSize: 1));
@@ -37,7 +38,7 @@ namespace Mfr.Tests.Models
         [Theory]
         [InlineData(RenameListMetadataRequirement.None)]
         [InlineData(RenameListMetadataRequirement.TagLib | RenameListMetadataRequirement.Pdf)]
-        [InlineData((RenameListMetadataRequirement)8)]
+        [InlineData((RenameListMetadataRequirement)16)]
         public void RequireSingle_rejects_non_bucket_flags(RenameListMetadataRequirement bucket)
         {
             Assert.Throws<ArgumentOutOfRangeException>(() => RenameListMetadataBuckets.RequireSingle(bucket));
@@ -47,13 +48,14 @@ namespace Mfr.Tests.Models
         /// Verifies <see cref="RenameListMetadataBuckets.All"/> lists each single disk bucket once.
         /// </summary>
         [Fact]
-        public void All_lists_taglib_image_and_pdf()
+        public void All_lists_taglib_image_pdf_and_epub()
         {
             Assert.Equal(
                 [
                     RenameListMetadataRequirement.TagLib,
                     RenameListMetadataRequirement.ImageProperties,
                     RenameListMetadataRequirement.Pdf,
+                    RenameListMetadataRequirement.Epub,
                 ],
                 RenameListMetadataBuckets.All
             );

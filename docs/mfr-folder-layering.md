@@ -31,7 +31,7 @@ Illustrative spine (typical flow, not exhaustive):
 
 `Mfr.App.Ui -> Mfr.Engine -> ...` (same lower layers as CLI; UI also references `Mfr.Filters` directly for editors)
 
-`Mfr.Metadata` bridges TagLib Sharp, MetadataExtractor, and PdfPig to canonical records in `Mfr.Models` (overlay types, semantic projection/merge, and field get/set live in L1; TagLib / MetadataExtractor / PdfPig read/write/detect stay in L2). `Mfr.Engine` references Metadata for commit Apply; filters use Models for overlay edits and Metadata only for lazy load.
+`Mfr.Metadata` bridges TagLib Sharp, MetadataExtractor, PdfPig, and VersOne.Epub to canonical records in `Mfr.Models` (overlay types, semantic projection/merge, and field get/set live in L1; TagLib / MetadataExtractor / PdfPig / VersOne.Epub read/write/detect stay in L2). `Mfr.Engine` references Metadata for commit Apply; filters use Models for overlay edits and Metadata only for lazy load.
 
 ### Prefs ownership (Engine store, Models shape)
 

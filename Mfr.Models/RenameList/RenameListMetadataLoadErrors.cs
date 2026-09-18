@@ -152,6 +152,11 @@ namespace Mfr.Models.RenameList
                 return "This file could not be read as PDF document Info.";
             }
 
+            if (requirement.HasFlag(RenameListMetadataRequirement.Epub))
+            {
+                return "This file could not be read as EPUB document Info.";
+            }
+
             return "This field could not be loaded from disk.";
         }
     }
