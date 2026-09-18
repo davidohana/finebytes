@@ -745,7 +745,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
+            // Remap runs synchronously from ProjectedColumns; then bump so live-key cells re-read.
             OnPropertyChanged(nameof(ProjectedColumns));
+            if (IsAbModeEnabled)
+            {
+                _RefreshFieldDisplay();
+            }
         }
 
         /// <summary>

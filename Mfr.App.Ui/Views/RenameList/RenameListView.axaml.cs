@@ -870,7 +870,10 @@ namespace Mfr.App.Ui.Views.RenameList
 
             if (e.PropertyName is nameof(RenameListViewModel.ProjectedColumns))
             {
-                _RebuildColumns();
+                if (!_TryRemapAbSideProjectedKeys())
+                {
+                    _RebuildColumns();
+                }
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.UseFixedWidthFont))

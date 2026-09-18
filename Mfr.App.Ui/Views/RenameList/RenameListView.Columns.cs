@@ -90,6 +90,64 @@ namespace Mfr.App.Ui.Views.RenameList
         }
 
         /// <summary>
+        /// When Before/After Mode is on and the projected set is the same originals in display order,
+        /// remaps field keys and headers in place instead of clearing the grid.
+        /// </summary>
+        /// <returns>
+        /// <see langword="true"/> when columns were remapped; <see langword="false"/> when the caller
+        /// should <see cref="_RebuildColumns"/>.
+        /// </returns>
+        private bool _TryRemapAbSideProjectedKeys()
+        {
+            if (_viewModel is null || !_viewModel.IsAbModeEnabled)
+            {
+                return false;
+            }
+
+            var projected = _viewModel.ProjectedColumns;
+            var fieldColumns = RenameGrid
+                .Columns.Where(static column => !RenameListGridColumns.IsRowStatusColumn(column))
+                .OrderBy(static column => column.DisplayIndex)
+                .ToList();
+            if (fieldColumns.Count != projected.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < fieldColumns.Count; i++)
+            {
+                var existingKey = RenameListGridColumns.GetFieldKey(fieldColumns[i]);
+                if (existingKey is null || existingKey.Value.AsOriginal() != projected[i].Key.AsOriginal())
+                {
+                    return false;
+                }
+            }
+
+            _isRebuildingColumns = true;
+            try
+            {
+                for (var i = 0; i < fieldColumns.Count; i++)
+                {
+                    var column = fieldColumns[i];
+                    var key = projected[i].Key;
+                    RenameListGridColumns.SetFieldKey(column, key);
+                    if (column is DataGridTemplateColumn templateColumn)
+                    {
+                        _BindColumnHeader(templateColumn, _viewModel, key);
+                    }
+                }
+            }
+            finally
+            {
+                _isRebuildingColumns = false;
+            }
+
+            _RefreshColumnMinimumWidths();
+            _viewModel.RefreshFieldDisplayAfterColumnRemap();
+            return true;
+        }
+
+        /// <summary>
         /// Builds the leading status column whose cells listen for list-level field display refreshes.
         /// </summary>
         private DataGridTemplateColumn _CreateRowStatusColumn(RenameListViewModel listViewModel)
@@ -143,41 +201,51 @@ namespace Mfr.App.Ui.Views.RenameList
         )
         {
             var key = visibleColumn.Key;
-            var field = RenameListFieldCatalog.GetField(key);
-            var headerText = field.DisplayName;
-            var canUserSort = RenameListFieldCatalog.IsSortableKey(key);
-
             var minHeaderWidth = RenameListGridColumnWidths.GetMinimumHeaderWidth(key, listViewModel.UseFixedWidthFont);
             var pixelWidth = _ResolveEffectivePixelWidth(visibleColumn, minHeaderWidth);
 
             var column = new DataGridTemplateColumn
             {
-                CanUserSort = canUserSort,
                 Width = new DataGridLength(pixelWidth, DataGridLengthUnitType.Pixel),
                 MinWidth = minHeaderWidth,
-                CellTemplate = new FuncDataTemplate<RenameListEntry>(
-                    (entry, _) => _CreateFieldCell(entry, key, listViewModel)
-                ),
             };
 
             RenameListGridColumns.SetFieldKey(column, key);
-
-            column.HeaderTemplate = canUserSort
-                ? new FuncDataTemplate<object>(
-                    (_, _) => _BuildSortableHeader(listViewModel, headerText, key, field.Tip)
-                )
-                : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key, field.Tip));
+            column.CellTemplate = new FuncDataTemplate<RenameListEntry>(
+                (entry, _) => _CreateFieldCell(entry, column, listViewModel)
+            );
+            _BindColumnHeader(column, listViewModel, key);
 
             column.PropertyChanged += (_, args) => _OnGridColumnPropertyChanged(column, args);
             return column;
         }
 
         /// <summary>
-        /// Builds one field cell and re-applies text when the row recycles or field values change.
+        /// Applies sortability and header template for the current projected field key.
+        /// </summary>
+        private static void _BindColumnHeader(
+            DataGridTemplateColumn column,
+            RenameListViewModel listViewModel,
+            RenameListFieldKey key
+        )
+        {
+            var field = RenameListFieldCatalog.GetField(key);
+            var headerText = field.DisplayName;
+            var canUserSort = RenameListFieldCatalog.IsSortableKey(key);
+            column.CanUserSort = canUserSort;
+            column.HeaderTemplate = canUserSort
+                ? new FuncDataTemplate<object>(
+                    (_, _) => _BuildSortableHeader(listViewModel, headerText, key, field.Tip)
+                )
+                : new FuncDataTemplate<object>((_, _) => _CreateHeaderContent(headerText, key, field.Tip));
+        }
+
+        /// <summary>
+        /// Builds one field cell and re-applies text when the row recycles, field values change, or A/B side remaps.
         /// </summary>
         private TextBlock _CreateFieldCell(
             RenameListEntry? entry,
-            RenameListFieldKey key,
+            DataGridColumn column,
             RenameListViewModel listViewModel
         )
         {
@@ -185,7 +253,14 @@ namespace Mfr.App.Ui.Views.RenameList
 
             void ApplyCurrent()
             {
-                _ApplyFieldCell(textBlock, textBlock.DataContext as RenameListEntry ?? entry, key);
+                var key = RenameListGridColumns.GetFieldKey(column);
+                if (key is null)
+                {
+                    textBlock.Text = string.Empty;
+                    return;
+                }
+
+                _ApplyFieldCell(textBlock, textBlock.DataContext as RenameListEntry ?? entry, key.Value);
             }
 
             textBlock.DataContextChanged += (_, _) => ApplyCurrent();
@@ -348,7 +423,8 @@ namespace Mfr.App.Ui.Views.RenameList
             RenameListFieldKey fieldKey
         )
         {
-            var state = viewModel.ColumnSortStates[fieldKey];
+            // Auto-Sort states are keyed by originals; After-side headers stamp preview keys.
+            var state = viewModel.ColumnSortStates[fieldKey.AsOriginal()];
             glyph.IsVisible = state.IsActive;
             priority.Text = state.Priority?.ToString() ?? string.Empty;
             direction.Text = state.IsActive ? state.DirectionGlyph : string.Empty;

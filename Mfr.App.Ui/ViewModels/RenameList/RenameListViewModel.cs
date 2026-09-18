@@ -327,6 +327,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _NotifyRowErrorCommandsChanged();
         }
 
+        /// <summary>
+        /// Rebinds field cells after an in-place Before/After column key remap (no grid rebuild).
+        /// </summary>
+        internal void RefreshFieldDisplayAfterColumnRemap()
+        {
+            _RefreshFieldDisplay();
+        }
+
         private bool _CanRemoveSelected()
         {
             return !IsBusy && _selectedEntries.Count > 0;

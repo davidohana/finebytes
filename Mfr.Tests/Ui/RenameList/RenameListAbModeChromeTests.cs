@@ -11,7 +11,7 @@ using Mfr.Models.RenameList.Fields.Basic;
 namespace Mfr.Tests.Ui.RenameList
 {
     /// <summary>
-    /// Headless tests for A/B Mode grid chrome (toolbar side, projection rebuild, header menus).
+    /// Headless tests for A/B Mode grid chrome (toolbar side, projection remap, header menus).
     /// </summary>
     public sealed class RenameListAbModeChromeTests : IDisposable
     {
@@ -62,10 +62,10 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
-        /// Verifies the Before/After toolbar toggle rebuilds the grid from ProjectedColumns.
+        /// Verifies the Before/After toolbar toggle remaps projected field keys without dropping columns.
         /// </summary>
         [AvaloniaFact]
-        public async Task Ab_side_toolbar_click_rebuilds_projected_grid_columns()
+        public async Task Ab_side_toolbar_click_remaps_projected_grid_column_keys()
         {
             var (renameListViewModel, window, view) = await _ShowAsync();
             var grid = view.FindControl<DataGrid>("RenameGrid");
@@ -86,6 +86,7 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(sideToggle.IsVisible);
             Assert.True(sideToggle.IsChecked);
             Assert.Equal(2, grid.Columns.Count);
+            var fieldColumn = Assert.Single(grid.Columns, static c => !RenameListGridColumns.IsRowStatusColumn(c));
             Assert.Equal(
                 [RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)],
                 RenameListGridColumns.GetDisplayedFieldKeys(grid)
@@ -102,6 +103,10 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(RenameListPrefs.AbSideOriginal, renameListViewModel.AbSide);
             Assert.False(sideToggle.IsChecked);
             Assert.Equal(2, grid.Columns.Count);
+            Assert.Same(
+                fieldColumn,
+                Assert.Single(grid.Columns, static c => !RenameListGridColumns.IsRowStatusColumn(c))
+            );
             Assert.Equal([fullNameKey], RenameListGridColumns.GetDisplayedFieldKeys(grid));
 
             sideToggle.Command.Execute(null);
@@ -111,10 +116,51 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal(RenameListPrefs.AbSidePreview, renameListViewModel.AbSide);
             Assert.True(sideToggle.IsChecked);
             Assert.Equal(2, grid.Columns.Count);
+            Assert.Same(
+                fieldColumn,
+                Assert.Single(grid.Columns, static c => !RenameListGridColumns.IsRowStatusColumn(c))
+            );
             Assert.Equal(
                 [RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.FullName)],
                 RenameListGridColumns.GetDisplayedFieldKeys(grid)
             );
+
+            window.Close();
+        }
+
+        /// <summary>
+        /// Verifies After-side cells show preview values after an in-place A/B side remap (not a baked original key).
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Ab_side_flip_updates_cell_text_to_projected_values()
+        {
+            var (renameListViewModel, window, view) = await _ShowAsync();
+            var grid = view.FindControl<DataGrid>("RenameGrid");
+            Assert.NotNull(grid);
+
+            var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            var namePreview = RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
+            renameListViewModel.SetVisibleColumns([new RenameListVisibleColumn(nameKey)]);
+            renameListViewModel.IsAbModeEnabled = true;
+            renameListViewModel.AbSide = RenameListPrefs.AbSideOriginal;
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var entry = Assert.Single(renameListViewModel.Entries);
+            entry.EngineItem.SetOverride(nameKey, "before-name");
+            entry.EngineItem.SetOverride(namePreview, "after-name");
+            renameListViewModel.RefreshFieldDisplayAfterColumnRemap();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains(grid.GetVisualDescendants().OfType<TextBlock>(), text => text.Text == "before-name");
+
+            renameListViewModel.SetAbSide(RenameListPrefs.AbSidePreview);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Contains(grid.GetVisualDescendants().OfType<TextBlock>(), text => text.Text == "after-name");
+            Assert.DoesNotContain(grid.GetVisualDescendants().OfType<TextBlock>(), text => text.Text == "before-name");
 
             window.Close();
         }
