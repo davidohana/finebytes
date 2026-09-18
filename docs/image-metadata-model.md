@@ -88,7 +88,8 @@ Format-native directories first. EXIF IFD is not used for width/height except TI
 first `HeicImagePropertiesDirectory` — MetadataExtractor emits primary-item properties before thumbnail
 ones (`pitm` then `thmb`). DPI may use JFIF, then EXIF IFD0, then PNG pHYs, then BMP pixels/metre,
 converted to dots per inch. Bit depth is total bits per pixel where possible (typical JPEG `8×3 = 24`;
-HEIF sums `TagPixelDepths` when present), not JPEG sample precision alone.
+HEIF sums `TagPixelDepths` when present, else `TagBitDepthLuma` +
+`2×TagBitDepthChroma` for color / luma-only for monochrome), not JPEG sample precision alone.
 
 Frame count: GIF/ICO count per-image directories; TIFF counts dimension-bearing IFD0s (not thumbnails);
 JPEG/PNG/BMP/WebP/HEIF are `1` when width or height is known.
