@@ -161,7 +161,7 @@ namespace Mfr.Tests.Ui.FilterEditors
                     formatter.Template = "<counter:initial=1,step=1>.<file-name>";
                     break;
                 case InserterFilterEditorViewModel inserter:
-                    inserter.InsertText = " - <file-ext>";
+                    inserter.InsertText = " - <ext>";
                     break;
                 default:
                     break;
