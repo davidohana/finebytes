@@ -13,9 +13,9 @@ figure — their help pages say the filter has no options.
 
 ### Capture tips (filters)
 
-1. Regenerate with
+1. Regenerate with `just capture-help-filters` (or
    `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpScreenshotCaptureTests`
-   (uses Skia headless via `TestAppBuilder`).
+   then `just sync-help-img-dims`).
 1. Or run the UI (`just run-ui`), add the filter, select it, and crop the options body.
 1. Prefer PNG; keep widths roughly 400–640px when practical. Help CSS uses
    `max-width: 640px` with `height: auto` so HTML width/height attrs do not stretch.
@@ -90,20 +90,22 @@ Save under `help/images/ui/`. Pages under `help/ui/` reference `../images/ui/…
 
 ### Capture tips (UI)
 
-1. Regenerate with
-   `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpUiScreenshotCaptureTests`
-   (P0 shell + P1 dialogs/tools + P2 guide).
-1. Seed a sample folder + Rename List rows + a short Filter Chain so panes look live.
-1. After updating `images/ui/main-window.png`, regenerate the labeled parts diagram with
-   `python .tmp/annotate-help-hotspots.py` (Pillow) → `images/ui/hotspots.png`, and refresh
-   imagemap coords in `help/ui/parts.html` if chrome layout changed.
+1. Regenerate with `just capture-help-ui` (P0 shell + P1 dialogs/tools + P2 guide, then
+   hotspots annotate + HTML width/height sync). Or run both filter + UI captures with
+   `just capture-help`.
+1. Seed a sample folder + Rename List rows + a short Filter Chain so panes look live
+   (the capture tests do this automatically).
+1. Hotspots: `just annotate-help-hotspots` redraws `images/ui/hotspots.png` from
+   `main-window.png` and refreshes imagemap coords in `help/ui/parts.html`. Needs Pillow
+   once: `.venv/bin/pip install -r help/tools/requirements.txt`.
+1. `just sync-help-img-dims` rewrites `<img width/height>` from on-disk PNG sizes (stdlib).
 
 ### UI checklist (P0)
 
 - [x] `images/ui/main-window.png` — Main window (`ui.html`, `parts.html` base shot)
 
 - [x] `images/ui/hotspots.png` — Labeled main-window regions + imagemap (`parts.html`;
-  regenerate with `.tmp/annotate-help-hotspots.py` after recapturing `main-window.png`)
+  regenerate with `just annotate-help-hotspots` after recapturing `main-window.png`)
 
 - [x] `images/ui/file-list.png` — File List (`fileexp.html`)
 
