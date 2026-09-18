@@ -328,6 +328,39 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Verifies the explicit clear button appears while filtering and restores grouped browse.
+        /// </summary>
+        [AvaloniaFact]
+        public void InsertSearchBox_ClearButton_ClearsSearchAndRestoresGroupedItems()
+        {
+            var (editor, window) = _ShowWithInsertFlyout();
+
+            var catalogSearch = _RequireInsertCatalogSearch(editor);
+            var clearButton = catalogSearch.Clear;
+            Assert.False(clearButton.IsVisible);
+            Assert.True(editor.TokenPickerViewModel.IsGrouped);
+
+            editor.TokenPickerViewModel.SearchText = "file-name";
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.False(editor.TokenPickerViewModel.IsGrouped);
+            Assert.True(clearButton.IsVisible);
+
+            Assert.NotNull(clearButton.Command);
+            Assert.True(clearButton.Command.CanExecute(null));
+            clearButton.Command.Execute(null);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.Equal(string.Empty, editor.TokenPickerViewModel.SearchText);
+            Assert.True(editor.TokenPickerViewModel.IsGrouped);
+            Assert.False(clearButton.IsVisible);
+
+            window.Close();
+        }
+
+        /// <summary>
         /// Verifies the insert picker uses compact app list chrome (white panel, not tooltip flyout chrome).
         /// </summary>
         [AvaloniaFact]
@@ -1441,13 +1474,21 @@ namespace Mfr.Tests.Ui.FormatEditor
         }
 
         /// <summary>
+        /// Resolves the insert catalog search control inside the shared picker.
+        /// </summary>
+        private static CatalogSearchBox _RequireInsertCatalogSearch(
+            App.Ui.Views.FormatEditor.FormatEditor editor
+        )
+        {
+            var catalogSearch = editor.TokenPickerControl.FindControl<CatalogSearchBox>("TokenSearchBox");
+            Assert.NotNull(catalogSearch);
+            return catalogSearch;
+        }
+
+        /// <summary>
         /// Resolves the insert search box inside the shared picker.
         /// </summary>
-        private static TextBox _RequireInsertSearchBox(App.Ui.Views.FormatEditor.FormatEditor editor)
-        {
-            var search = editor.TokenPickerControl.FindControl<TextBox>("TokenSearchBox");
-            Assert.NotNull(search);
-            return search;
-        }
+        private static TextBox _RequireInsertSearchBox(App.Ui.Views.FormatEditor.FormatEditor editor) =>
+            _RequireInsertCatalogSearch(editor).Input;
     }
 }

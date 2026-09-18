@@ -1,0 +1,25 @@
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
+  x:Class="Mfr.App.Ui.Views.Controls.CatalogSearchBox"
+>
+  <TextBox
+    x:Name="SearchInput"
+    Classes="filter-editor-field catalog-search"
+    VerticalAlignment="{Binding VerticalAlignment, RelativeSource={RelativeSource AncestorType=controls:CatalogSearchBox}}"
+    PlaceholderText="{Binding PlaceholderText, RelativeSource={RelativeSource AncestorType=controls:CatalogSearchBox}}"
+    Text="{Binding Text, RelativeSource={RelativeSource AncestorType=controls:CatalogSearchBox}, Mode=TwoWay}"
+  >
+    <TextBox.InnerRightContent>
+      <Button
+        x:Name="ClearButton"
+        Classes="catalog-search-clear"
+        ToolTip.Tip="Clear search"
+        Content="✕"
+        Command="{Binding ClearCommand, RelativeSource={RelativeSource AncestorType=controls:CatalogSearchBox}}"
+        IsVisible="{Binding IsClearVisible, RelativeSource={RelativeSource AncestorType=controls:CatalogSearchBox}}"
+      />
+    </TextBox.InnerRightContent>
+  </TextBox>
+</UserControl>

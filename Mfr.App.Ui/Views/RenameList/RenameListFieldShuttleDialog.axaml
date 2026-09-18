@@ -286,27 +286,18 @@
                 SelectionMode="Multiple"
                 DoubleTapped="_OnAddPreviewDoubleTapped"
               />
-              <TextBox
+              <controls:CatalogSearchBox
                 x:Name="ColumnFieldSearchBox"
                 Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Margin="0,6,0,0"
-                Classes="filter-editor-field field-shuttle-search"
                 PlaceholderText="Search fields…"
                 VerticalAlignment="Center"
                 Text="{Binding SearchText}"
-              >
-                <TextBox.InnerRightContent>
-                  <Button
-                    Classes="catalog-search-clear"
-                    ToolTip.Tip="Clear search"
-                    Command="{Binding ClearSearchCommand}"
-                    IsVisible="{Binding IsFieldSearchActive}"
-                    Content="✕"
-                  />
-                </TextBox.InnerRightContent>
-              </TextBox>
+                ClearCommand="{Binding ClearSearchCommand}"
+                IsClearVisible="{Binding IsFieldSearchActive}"
+              />
               <StackPanel
                 Grid.Row="1"
                 Grid.Column="2"
@@ -451,27 +442,18 @@
                 SelectionMode="Multiple"
                 DoubleTapped="_OnAddSortDoubleTapped"
               />
-              <TextBox
+              <controls:CatalogSearchBox
                 x:Name="SortFieldSearchBox"
                 Grid.Row="2"
                 Grid.Column="0"
                 Grid.ColumnSpan="2"
                 Margin="0,6,0,0"
-                Classes="filter-editor-field field-shuttle-search"
                 PlaceholderText="Search fields…"
                 VerticalAlignment="Center"
                 Text="{Binding SearchText}"
-              >
-                <TextBox.InnerRightContent>
-                  <Button
-                    Classes="catalog-search-clear"
-                    ToolTip.Tip="Clear search"
-                    Command="{Binding ClearSearchCommand}"
-                    IsVisible="{Binding IsFieldSearchActive}"
-                    Content="✕"
-                  />
-                </TextBox.InnerRightContent>
-              </TextBox>
+                ClearCommand="{Binding ClearSearchCommand}"
+                IsClearVisible="{Binding IsFieldSearchActive}"
+              />
               <StackPanel
                 Grid.Row="1"
                 Grid.Column="2"

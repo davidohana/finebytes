@@ -56,7 +56,7 @@ namespace Mfr.App.Ui.ViewModels.FormatEditor
 
         private bool _CanClearSearch()
         {
-            return SearchText.Trim().Length > 0;
+            return !IsGrouped;
         }
 
         /// <summary>

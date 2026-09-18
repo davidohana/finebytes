@@ -4,6 +4,7 @@
   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
   xmlns:vm="using:Mfr.App.Ui.ViewModels.FormatEditor"
+  xmlns:controls="using:Mfr.App.Ui.Views.Controls"
   mc:Ignorable="d"
   d:DesignWidth="280"
   d:DesignHeight="320"
@@ -11,24 +12,15 @@
   x:DataType="vm:FormatTokenPickerViewModel"
 >
   <DockPanel>
-    <TextBox
+    <controls:CatalogSearchBox
       x:Name="TokenSearchBox"
       DockPanel.Dock="Top"
-      Classes="filter-editor-field format-token-search"
-      PlaceholderText="Search tokens…"
       Margin="0,0,0,4"
+      PlaceholderText="Search tokens…"
       Text="{Binding SearchText}"
-    >
-      <TextBox.InnerRightContent>
-        <Button
-          Classes="catalog-search-clear"
-          ToolTip.Tip="Clear search"
-          Command="{Binding ClearSearchCommand}"
-          IsVisible="{Binding !IsGrouped}"
-          Content="✕"
-        />
-      </TextBox.InnerRightContent>
-    </TextBox>
+      ClearCommand="{Binding ClearSearchCommand}"
+      IsClearVisible="{Binding !IsGrouped}"
+    />
     <TreeView x:Name="TokenList" Classes="format-token-picker" ItemsSource="{Binding VisibleItems}">
       <TreeView.ItemTemplate>
         <TreeDataTemplate ItemsSource="{Binding Children}" x:DataType="vm:FormatTokenPickerNode">
