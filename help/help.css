@@ -192,17 +192,20 @@ p:has(+ .examples):has(.ex-opt)::before {
 }
 
 .ex-name {
-  color: #b00b0b;
+  color: #5a6d7e;
   font-weight: 600;
+  padding-right: 0.15rem;
 }
 
 .ex-name::after {
-  content: ":";
+  content: "";
 }
 
 .ex-val {
   color: #111;
   min-width: 0;
+  padding-left: 0.65rem;
+  border-left: 1px solid #c5d0dc;
   font-family: Consolas, "Courier New", monospace;
   font-size: 0.95em;
 }
