@@ -6,8 +6,8 @@
   x:DataType="vm:AboutDialogViewModel"
   Title="About"
   Icon="/Assets/mfr.ico"
-  Width="420"
-  MinWidth="360"
+  Width="540"
+  MinWidth="480"
   SizeToContent="Height"
   WindowStartupLocation="CenterOwner"
   ShowInTaskbar="False"
@@ -29,7 +29,14 @@
     </StackPanel>
 
     <StackPanel Orientation="Horizontal" Spacing="16">
-      <Image Width="96" Height="96" Stretch="Uniform" Source="/Assets/mfr.png" VerticalAlignment="Top" />
+      <Image
+        x:Name="SplashImage"
+        Width="250"
+        Height="238"
+        Stretch="Uniform"
+        Source="/Assets/mfr.png"
+        VerticalAlignment="Top"
+      />
       <StackPanel Spacing="8" VerticalAlignment="Center">
         <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold" FontSize="16" />
         <TextBlock Text="{Binding DisplayVersion, StringFormat=Version {0}}" />
