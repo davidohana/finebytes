@@ -101,12 +101,26 @@ Effective username in every cache key. Sync lookup on preview path (~10s HttpCli
 GeoNames free tier (~1 000 credits/hour, ~10 000/day per username; `findNearby` = 4 credits). When the service rejects or throttles (HTTP 4xx/5xx, status payload like “the hourly limit…”, empty/error XML):
 
 1. **Do not** write L3 (failures never persisted).
-2. **Do not** retry in a tight loop on the same preview pass (one attempt per cache miss).
+2. **Do not** retry in a tight loop on the same cache miss.
 3. Surface **PreviewError** (geo token) / Rename List metadata error for that row — message should be understandable (e.g. “GeoNames rate limit exceeded” / include truncated service text when safe).
 4. Lat/Lon and other tokens unaffected.
 5. Later previews may succeed after the window resets; L1/L2 for *other* coords still work; user can switch Options override to their own username to leave the shared `fbmfr` pool.
 
-No client-side global QPS throttle in v1 beyond “one HTTP per L3 miss” (L1/L2/L3 already cut repeat calls). Optional later: polite delay between bursts — YAGNI unless we see bans.
+#### Batch of many files (e.g. 1 000)
+
+- **Same place (rounded lat/lon):** L1/L2/L3 → **one** HTTP for the whole set; others reuse cache. No mass failure.
+- **Many distinct places:** each L3 miss would otherwise call `findNearby` until credits run out.
+
+**Circuit breaker (locked):** on the first **rate-limit / quota** failure in a process (or preview pass):
+
+1. Mark GeoNames lookups **tripped** for that effective username (in-memory flag + optional short cooldown, e.g. until process exit or 1 hour).
+2. All further L3 misses in that window → **PreviewError** immediately with the same rate-limit message — **no more HTTP**.
+3. Cache hits (L1/L2/L3) still return success (already-paid coords).
+4. Clear trip when Options username override changes, or on app restart (and optionally after cooldown).
+
+So we do **not** “try all 1 000 and fail each against the network”; we fail fast after the first throttle. Distinct uncached coords before the trip still consume credits (up to the service limit) — help should warn that huge GPS-diverse lists can exhaust the free tier; use own username or expect errors after the breaker trips.
+
+No client-side global QPS pacing in v1 beyond breaker + caches.
 
 ## MFR7 reference brief
 
