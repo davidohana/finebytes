@@ -16,7 +16,17 @@ namespace Mfr.Tests.Ui
         /// <returns>The configured application builder.</returns>
         public static AppBuilder BuildAvaloniaApp()
         {
-            return AppBuilder.Configure<App.Ui.App>().UseHeadless(new AvaloniaHeadlessPlatformOptions());
+            var builder = AppBuilder.Configure<App.Ui.App>();
+
+            // Real Skia pixels for help screenshot capture; default headless drawing for tests.
+            if (Environment.GetEnvironmentVariable("MFR_CAPTURE_HELP_SCREENSHOTS") == "1")
+            {
+                return builder
+                    .UseSkia()
+                    .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false });
+            }
+
+            return builder.UseHeadless(new AvaloniaHeadlessPlatformOptions());
         }
     }
 }
