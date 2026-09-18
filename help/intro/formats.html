@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Supported Formats</title>
+    <link rel="stylesheet" href="../help.css" />
+    <script src="../help.js" defer></script>
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt; <a href="../index.html#introduction">Introduction</a>
+      &gt; <strong>Supported Formats</strong>
+    </nav>
+    <hr />
+    <h1>Supported Formats</h1>
+    <p>
+      Magic File Renamer can rename any file or folder Windows can see. This page lists the formats
+      where MFR also reads or writes <strong>embedded metadata</strong> — audio tags, image and EXIF
+      facts, PDF Info, and media stream properties — for the Rename List, Formatter tokens, and
+      related filters.
+    </p>
+    <p class="note">
+      Unsupported or unreadable metadata on a row surfaces as a preview error for that item; other
+      items in the list continue as usual.
+    </p>
+
+    <h2 id="audio">Audio tags (read and write)</h2>
+    <p>
+      Embedded audio tags load and save through TagLibSharp. Generic fields (title, artist, album,
+      and so on) work across these containers; format-specific targets (for example an ID3v2 frame
+      on a FLAC file) fail preview when the container cannot hold that tag type. See
+      <a href="../filters/audio/AudioTagSetter.html">Audio Tag Setter</a>,
+      <a href="../tokens/audiofp.html">Audio Tag tokens</a>, and
+      <a href="../reference/fields.html#audiotag">Audio Tag fields</a>.
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Container</th>
+          <th>Typical extensions</th>
+          <th>Tag blocks</th>
+          <th>Default when empty</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MP3 (MPEG)</td>
+          <td><span class="quote">.mp3</span></td>
+          <td>ID3v1, ID3v2</td>
+          <td>ID3v2 (v2.3)</td>
+        </tr>
+        <tr>
+          <td>FLAC</td>
+          <td><span class="quote">.flac</span></td>
+          <td>Xiph comment, APEv2</td>
+          <td>Xiph</td>
+        </tr>
+        <tr>
+          <td>Ogg</td>
+          <td><span class="quote">.ogg</span>, <span class="quote">.opus</span>, Ogg FLAC</td>
+          <td>Xiph comment</td>
+          <td>Xiph</td>
+        </tr>
+        <tr>
+          <td>MP4 / M4A</td>
+          <td><span class="quote">.m4a</span>, <span class="quote">.mp4</span>, <span class="quote">.m4b</span></td>
+          <td>Apple / iTunes</td>
+          <td>Apple</td>
+        </tr>
+        <tr>
+          <td>WMA / ASF</td>
+          <td><span class="quote">.wma</span>, <span class="quote">.asf</span></td>
+          <td>ASF</td>
+          <td>ASF</td>
+        </tr>
+        <tr>
+          <td>WAV (RIFF)</td>
+          <td><span class="quote">.wav</span></td>
+          <td>RIFF INFO</td>
+          <td>RIFF INFO</td>
+        </tr>
+        <tr>
+          <td>Monkey’s Audio</td>
+          <td><span class="quote">.ape</span></td>
+          <td>APEv2</td>
+          <td>APEv2</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      MPEG audio-header details (bitrate, layer, VBR, and related values) are available as read-only
+      <a href="../tokens/mp3fp.html">MP3 Properties</a> on files that expose an MPEG audio header.
+    </p>
+
+    <h2 id="image">Image properties and EXIF (read-only)</h2>
+    <p>
+      Raster size, bit depth, DPI, frame count, format name, and EXIF camera fields come from
+      MetadataExtractor. There is no write path for these values in the current build. See
+      <a href="../tokens/basicimagefp.html">Image Properties tokens</a>,
+      <a href="../tokens/eximagefp.html">EXIF tokens</a>, and
+      <a href="../reference/fields.html#image">Image</a> /
+      <a href="../reference/fields.html#jpeg">EXIF</a> Rename List fields.
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Format</th>
+          <th>Typical extensions</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>JPEG</td>
+          <td><span class="quote">.jpg</span>, <span class="quote">.jpeg</span></td>
+          <td>Dimensions and EXIF when present</td>
+        </tr>
+        <tr>
+          <td>PNG</td>
+          <td><span class="quote">.png</span></td>
+          <td>Dimensions; EXIF when embedded</td>
+        </tr>
+        <tr>
+          <td>GIF</td>
+          <td><span class="quote">.gif</span></td>
+          <td>Dimensions and frame count</td>
+        </tr>
+        <tr>
+          <td>BMP</td>
+          <td><span class="quote">.bmp</span></td>
+          <td>Dimensions</td>
+        </tr>
+        <tr>
+          <td>TIFF</td>
+          <td><span class="quote">.tif</span>, <span class="quote">.tiff</span></td>
+          <td>Dimensions; EXIF when present</td>
+        </tr>
+        <tr>
+          <td>ICO</td>
+          <td><span class="quote">.ico</span></td>
+          <td>Dimensions and frame count</td>
+        </tr>
+        <tr>
+          <td>WebP</td>
+          <td><span class="quote">.webp</span></td>
+          <td>Dimensions; EXIF when embedded</td>
+        </tr>
+        <tr>
+          <td>HEIF</td>
+          <td><span class="quote">.heic</span>, <span class="quote">.heif</span></td>
+          <td>Still images; not camera RAW</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note">
+      Other types MetadataExtractor can open (for example MP3 or MP4) are <strong>not</strong>
+      treated as images here — image and EXIF tokens still fail preview on those files.
+    </p>
+
+    <h2 id="pdf">PDF document Info (read-only)</h2>
+    <p>
+      PDF Info dictionary fields and page count come from PdfPig for readable
+      <span class="quote">.pdf</span> files. Missing Info fields expand empty after a successful
+      open; non-PDF or corrupt files fail preview. There is no write path. See
+      <a href="../tokens/pdffp.html">PDF Document tokens</a> and
+      <a href="../reference/fields.html#pdf">PDF Document fields</a>.
+    </p>
+
+    <h2 id="media">Media stream properties (read-only)</h2>
+    <p>
+      MIME type, duration, audio stream facts, and video frame size come from TagLib for containers
+      it can open — including the audio formats above and common video containers such as MP4 / M4V
+      and ASF / WMV when TagLib recognizes the file. Raster photo size uses the
+      <a href="#image">Image</a> path instead. See
+      <a href="../tokens/mediafp.html">Media tokens</a> and
+      <a href="../reference/fields.html#mediaproperties">Media Properties fields</a>.
+    </p>
+
+    <h2 id="names">Names, dates, and attributes</h2>
+    <p>
+      Changing names, extensions, folder location (Path Mover), file attributes, and timestamps is
+      not limited to the formats in this page. Any path Windows can rename or update is eligible;
+      metadata columns and tokens simply stay empty or error when a format is outside the lists
+      above.
+    </p>
+  </body>
+</html>
