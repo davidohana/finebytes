@@ -7,10 +7,9 @@ namespace Mfr.Tests.Metadata
     /// </summary>
     /// <remarks>
     /// <para>
-    /// HEIF fixtures: <c>tiny.heic</c> / <c>tiny.heif</c> are Crest Convert
-    /// <c>pampas-grass-small.heic</c> (CC0 1.0, SHA-256
-    /// <c>bb24331d3d5b7c54a4e98faf40fe465be524f83f841076c63b699c6a74fe67bf</c>).
-    /// <c>tiny-exif.heic</c> is <c>samplefilehub.heif</c> from
+    /// HEIF fixture <c>tiny.heic</c> is Crest Convert <c>pampas-grass-small.heic</c> (CC0 1.0, SHA-256
+    /// <c>bb24331d3d5b7c54a4e98faf40fe465be524f83f841076c63b699c6a74fe67bf</c>); <c>.heif</c> coverage
+    /// uses a temp copy of the same bytes. <c>tiny-exif.heic</c> is <c>samplefilehub.heif</c> from
     /// <c>ianare/exif-samples</c> (<c>heic/samplefilehub.heif</c>; CC BY-SA 4.0, SHA-256
     /// <c>f86ec0d3a6c82e31657bb1886e1ec95579329fa98d8be511ac1e8497c778e07f</c>).
     /// </para>
@@ -20,7 +19,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_JpegFixture_MapsRasterFields()
         {
-            var path = _RequireFixture("tiny.jpeg");
+            var path = FixturePaths.Require("tiny.jpeg");
 
             var image = ImagePropertiesReader.Read(path);
 
@@ -36,7 +35,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_PngFixture_MapsIhdrAndPhys()
         {
-            var path = _RequireFixture("tiny.png");
+            var path = FixturePaths.Require("tiny.png");
 
             var image = ImagePropertiesReader.Read(path);
 
@@ -52,7 +51,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_AnimatedGifFixture_FrameCountGreaterThanOne()
         {
-            var path = _RequireFixture("tiny-animated.gif");
+            var path = FixturePaths.Require("tiny-animated.gif");
 
             var image = ImagePropertiesReader.Read(path);
 
@@ -63,11 +62,12 @@ namespace Mfr.Tests.Metadata
         }
 
         [Theory]
-        [InlineData("tiny.heic")]
-        [InlineData("tiny.heif")]
-        public void Read_HeifFixture_MapsDimensionsAndFormat(string fileName)
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Read_HeifFixture_MapsDimensionsAndFormat(bool useHeifExtension)
         {
-            var path = _RequireFixture(fileName);
+            using var tempHeif = useHeifExtension ? HeifFixtures.CopyTinyAsHeif() : null;
+            var path = tempHeif?.FullPath ?? HeifFixtures.TinyHeicPath;
 
             var image = ImagePropertiesReader.Read(path);
 
@@ -81,14 +81,14 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_HeifExifFixture_MapsPrimaryDimensions()
         {
-            var path = _RequireFixture("tiny-exif.heic");
+            var path = FixturePaths.Require("tiny-exif.heic");
 
             var image = ImagePropertiesReader.Read(path);
 
             Assert.Equal("HEIF", image.Format);
             Assert.Equal(640, image.Width);
             Assert.Equal(426, image.Height);
-            Assert.Equal(0, image.BitDepth);
+            Assert.Equal(24, image.BitDepth);
             Assert.Equal(72, image.HorizontalResolutionDpi);
             Assert.Equal(72, image.VerticalResolutionDpi);
             Assert.Equal(1, image.FrameCount);
@@ -182,7 +182,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_WavFixture_ThrowsInvalidOperationException()
         {
-            var path = _RequireFixture("minimal-silent.wav");
+            var path = FixturePaths.Require("minimal-silent.wav");
 
             var ex = Assert.Throws<InvalidOperationException>(() => ImagePropertiesReader.Read(path));
             Assert.Contains("WAV", ex.Message, StringComparison.OrdinalIgnoreCase);
@@ -191,7 +191,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_Mp3Fixture_ThrowsInvalidOperationException()
         {
-            var path = _RequireFixture("l3-compl-cut.mp3");
+            var path = FixturePaths.Require("l3-compl-cut.mp3");
 
             var ex = Assert.Throws<InvalidOperationException>(() => ImagePropertiesReader.Read(path));
             Assert.Contains("MP3", ex.Message, StringComparison.OrdinalIgnoreCase);
@@ -229,19 +229,6 @@ namespace Mfr.Tests.Metadata
             }
 
             return bytes;
-        }
-
-        private static string _RequireFixture(string fileName)
-        {
-            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
-            if (!File.Exists(fixturePath))
-            {
-                throw new InvalidOperationException(
-                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output."
-                );
-            }
-
-            return Path.GetFullPath(fixturePath);
         }
     }
 }

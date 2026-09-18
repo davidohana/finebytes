@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void TagLib_failure_on_audio_key_satisfies_media_requirement()
         {
-            var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
+            var item = RenameItemFixtures.UnmarkedFromPath(@"C:\DoesNotExist\Never\missing.mp3");
             var audioKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
             RenameListMetadataLoader.TryEnsureLoaded(item, audioKey);
@@ -49,7 +49,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Missing_file_does_not_throw_and_marks_load_attempted()
         {
-            var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
+            var item = RenameItemFixtures.UnmarkedFromPath(@"C:\DoesNotExist\Never\missing.mp3");
             var audioKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
             var imageKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
             var mediaKey = RenameListFieldKey.Original(MediaRenameListFields.Group, "MimeType");
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Models.Filters
             {
                 var path = Path.Combine(tempDir, "tagged.wav");
                 TaggedMinimalWav.WriteTagged(path, title: "DiskTitle", album: "SnapshotAlbum");
-                var item = _UnmarkedItem(path);
+                var item = RenameItemFixtures.UnmarkedFromPath(path);
                 var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
                 Assert.False(item.TagLibLoadAttempted);
@@ -103,7 +103,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Loads_image_properties_from_exif_fixture()
         {
-            var item = _UnmarkedFixtureItem("tiny-exif.jpeg");
+            var item = RenameItemFixtures.Unmarked("tiny-exif.jpeg");
             var makeKey = RenameListFieldKey.Original(JpegRenameListFields.Group, "ExifDirectory*271");
 
             Assert.False(item.ImagePropertiesLoadAttempted);
@@ -116,7 +116,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Loads_pdf_info_from_fixture()
         {
-            var item = _UnmarkedFixtureItem("tiny-info.pdf");
+            var item = RenameItemFixtures.Unmarked("tiny-info.pdf");
             var titleKey = RenameListFieldKey.Original(PdfRenameListFields.Group, PdfRenameListFields.Key.Title);
 
             Assert.False(item.PdfLoadAttempted);
@@ -134,12 +134,8 @@ namespace Mfr.Tests.Models.Filters
             try
             {
                 var path = Path.Combine(tempDir, "sample.mp3");
-                File.Copy(
-                    Path.Combine(AppContext.BaseDirectory, "Fixtures", "l3-compl-cut.mp3"),
-                    path,
-                    overwrite: true
-                );
-                var item = _UnmarkedItem(path);
+                File.Copy(FixturePaths.Require("l3-compl-cut.mp3"), path, overwrite: true);
+                var item = RenameItemFixtures.UnmarkedFromPath(path);
                 var layerKey = RenameListFieldKey.Original(Mp3RenameListFields.Group, "Layer");
 
                 Assert.False(item.TagLibLoadAttempted);
@@ -157,7 +153,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Jpeg_file_with_audio_column_does_not_throw_and_shows_empty_tags()
         {
-            var item = _UnmarkedFixtureItem("tiny.jpeg");
+            var item = RenameItemFixtures.Unmarked("tiny.jpeg");
             var titleKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
             RenameListMetadataLoader.TryEnsureLoaded(item, titleKey);
@@ -170,7 +166,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Clear_metadata_cache_clears_load_errors()
         {
-            var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
+            var item = RenameItemFixtures.UnmarkedFromPath(@"C:\DoesNotExist\Never\missing.mp3");
             var audioKey = RenameListFieldKey.Original(AudioTagRenameListFields.Group, "Title");
 
             RenameListMetadataLoader.TryEnsureLoaded(item, audioKey);
@@ -184,7 +180,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void IsRequirementSatisfied_false_until_load_attempted()
         {
-            var item = _UnmarkedItem(@"C:\DoesNotExist\Never\missing.mp3");
+            var item = RenameItemFixtures.UnmarkedFromPath(@"C:\DoesNotExist\Never\missing.mp3");
             var requirement = RenameListMetadataRequirement.TagLib;
 
             Assert.False(RenameListMetadataLoader.IsRequirementSatisfied(item, requirement));
@@ -207,7 +203,7 @@ namespace Mfr.Tests.Models.Filters
         [Fact]
         public void Combined_requirement_loads_each_flagged_bucket()
         {
-            var item = _UnmarkedFixtureItem("tiny-exif.jpeg");
+            var item = RenameItemFixtures.Unmarked("tiny-exif.jpeg");
             var requirement =
                 RenameListMetadataRequirement.TagLib
                 | RenameListMetadataRequirement.ImageProperties
@@ -220,28 +216,6 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.True(item.PdfLoadAttempted);
             Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
-        }
-
-        private static RenameItem _UnmarkedFixtureItem(string fileName)
-        {
-            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
-            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
-            return _UnmarkedItem(Path.GetFullPath(fixturePath));
-        }
-
-        private static RenameItem _UnmarkedItem(string fullPath)
-        {
-            var directory = Path.GetDirectoryName(fullPath)!;
-            var meta = new FileMeta(
-                renameListIndex: 0,
-                inFolderIndex: 0,
-                directoryPath: directory,
-                fileName: Path.GetFileNameWithoutExtension(fullPath),
-                extension: FileMeta.ExtensionWithoutDot(fullPath),
-                fileSize: File.Exists(fullPath) ? new FileInfo(fullPath).Length : 0
-            );
-
-            return new RenameItem(meta);
         }
     }
 }

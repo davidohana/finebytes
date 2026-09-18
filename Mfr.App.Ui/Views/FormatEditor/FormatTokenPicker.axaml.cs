@@ -28,7 +28,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
             TokenList.AddHandler(TappedEvent, _OnTokenItemTapped, RoutingStrategies.Bubble);
             TokenList.AddHandler(TreeViewItem.ExpandedEvent, _OnTokenGroupExpanded);
             TokenList.AddHandler(KeyDownEvent, _OnTokenPickerKeyDown, RoutingStrategies.Tunnel);
-            TokenSearchBox.AddHandler(KeyDownEvent, _OnTokenPickerKeyDown, RoutingStrategies.Tunnel);
+            TokenSearchBox.Input.AddHandler(KeyDownEvent, _OnTokenPickerKeyDown, RoutingStrategies.Tunnel);
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace Mfr.App.Ui.Views.FormatEditor
         /// </summary>
         public void FocusSearch()
         {
-            TokenSearchBox.Focus();
+            TokenSearchBox.FocusInput();
         }
 
         /// <summary>

@@ -50,7 +50,7 @@ namespace Mfr.App.Ui.Views.RenameList
                 _ViewModel.SelectedTabIndex == (int)RenameListFieldShuttleTab.Sort
                     ? SortFieldSearchBox
                     : ColumnFieldSearchBox;
-            searchBox?.Focus();
+            searchBox?.FocusInput();
         }
 
         private RenameListFieldShuttleDialogViewModel? _ViewModel =>

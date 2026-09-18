@@ -148,7 +148,7 @@ namespace Mfr.Tests.Ui.RenameList
 
         /// <summary>
         /// Verifies setting search text refreshes the available-fields ListBox, disables Groups,
-        /// and shows group-name subtitles on hits.
+        /// clears the Groups highlight, shows the clear button, and shows group-name subtitles on hits.
         /// </summary>
         [AvaloniaFact]
         public void Setting_SearchText_refreshes_available_list()
@@ -156,13 +156,19 @@ namespace Mfr.Tests.Ui.RenameList
             var (dialog, dialogVm, _) = _ShowColumnsList();
             var availableList = dialog.FindControl<ListBox>("AvailableOriginalFieldsList");
             var groupsList = dialog.FindControl<ListBox>("ColumnGroupsList");
-            var searchBox = dialog.FindControl<TextBox>("ColumnFieldSearchBox");
+            var catalogSearch = dialog.FindControl<CatalogSearchBox>("ColumnFieldSearchBox");
             Assert.NotNull(availableList);
             Assert.NotNull(groupsList);
-            Assert.NotNull(searchBox);
+            Assert.NotNull(catalogSearch);
+            var searchBox = catalogSearch.Input;
             Assert.Equal("Search fields…", searchBox.PlaceholderText);
             Assert.False(dialogVm.IsFieldSearchActive);
             Assert.True(groupsList.IsEnabled);
+            Assert.Equal(BasicRenameListField.Group, dialogVm.SelectedGroup?.GroupId);
+            Assert.True(groupsList.SelectedIndex >= 0);
+
+            var clearButton = catalogSearch.Clear;
+            Assert.False(clearButton.IsVisible);
 
             var groupScopedCount = availableList.ItemCount;
             dialogVm.SearchText = "Title";
@@ -170,7 +176,10 @@ namespace Mfr.Tests.Ui.RenameList
             Dispatcher.UIThread.RunJobs();
 
             Assert.True(dialogVm.IsFieldSearchActive);
+            Assert.Null(dialogVm.SelectedGroup);
             Assert.False(groupsList.IsEnabled);
+            Assert.Equal(-1, groupsList.SelectedIndex);
+            Assert.True(clearButton.IsVisible);
             Assert.Equal("Title", searchBox.Text);
             Assert.Equal(dialogVm.AvailableOriginalFields.Count, availableList.ItemCount);
             Assert.NotEqual(groupScopedCount, availableList.ItemCount);
@@ -186,12 +195,18 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.NotNull(groupSubtitle);
             Assert.True(groupSubtitle.IsVisible);
 
-            dialogVm.SearchText = "";
+            Assert.NotNull(clearButton.Command);
+            Assert.True(clearButton.Command.CanExecute(null));
+            clearButton.Command.Execute(null);
             dialog.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 
             Assert.False(dialogVm.IsFieldSearchActive);
+            Assert.Equal(string.Empty, dialogVm.SearchText);
+            Assert.Equal(BasicRenameListField.Group, dialogVm.SelectedGroup?.GroupId);
             Assert.True(groupsList.IsEnabled);
+            Assert.True(groupsList.SelectedIndex >= 0);
+            Assert.False(clearButton.IsVisible);
             Assert.Equal(groupScopedCount, availableList.ItemCount);
 
             dialog.Close();

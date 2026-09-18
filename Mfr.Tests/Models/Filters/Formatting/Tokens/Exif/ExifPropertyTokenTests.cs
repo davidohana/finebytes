@@ -130,7 +130,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
         [Fact]
         public void EnsureImagePropertiesLoaded_ReadsExifFromDiskWhenNotMarked()
         {
-            var item = _UnmarkedFixtureItem("tiny-exif.jpeg");
+            var item = RenameItemFixtures.Unmarked("tiny-exif.jpeg");
             Assert.False(item.ImagePropertiesLoadAttempted);
             Assert.Null(item.Original.Exif);
 
@@ -146,7 +146,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
         [Fact]
         public void EnsureImagePropertiesLoaded_TinyJpegExifTokens_YieldEmptyNotError()
         {
-            var item = _UnmarkedFixtureItem("tiny.jpeg");
+            var item = RenameItemFixtures.Unmarked("tiny.jpeg");
 
             Assert.Equal(string.Empty, new ExifMakeToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new ExifDateToken().Compile("yyyy")(item));
@@ -157,7 +157,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
         [Fact]
         public void EnsureImagePropertiesLoaded_HeifExifFixture_ReadsExifField()
         {
-            var item = _UnmarkedFixtureItem("tiny-exif.heic");
+            var item = RenameItemFixtures.Unmarked("tiny-exif.heic");
 
             Assert.False(string.IsNullOrWhiteSpace(new ExifToken().Compile("Exif,Orientation")(item)));
             Assert.Equal(string.Empty, new ExifMakeToken().Compile(string.Empty)(item));
@@ -177,7 +177,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
         [Fact]
         public void AfterImageWidthLoad_ExifMakeUsesSameCache()
         {
-            var item = _UnmarkedFixtureItem("tiny-exif.jpeg");
+            var item = RenameItemFixtures.Unmarked("tiny-exif.jpeg");
             Assert.False(item.ImagePropertiesLoadAttempted);
 
             var width = new ImageWidthToken().Compile(string.Empty)(item);
@@ -205,28 +205,6 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
             Assert.Null(item.Preview.Image);
             Assert.Null(item.Original.Exif);
             Assert.Null(item.Preview.Exif);
-        }
-
-        private static RenameItem _UnmarkedFixtureItem(string fileName)
-        {
-            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
-            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
-
-            var fullPath = Path.GetFullPath(fixturePath);
-            var directory = Path.GetDirectoryName(fullPath)!;
-            var prefix = Path.GetFileNameWithoutExtension(fullPath);
-            var extension = FileMeta.ExtensionWithoutDot(fullPath);
-
-            var meta = new FileMeta(
-                renameListIndex: 0,
-                inFolderIndex: 0,
-                directoryPath: directory,
-                fileName: prefix,
-                extension: extension,
-                fileSize: new FileInfo(fullPath).Length
-            );
-
-            return new RenameItem(meta);
         }
     }
 }

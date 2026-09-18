@@ -16,7 +16,7 @@ namespace Mfr.Tests.Ui.Services.FileList
         [AvaloniaFact]
         public void TryLoad_Decodes_Png_To_Requested_Width()
         {
-            var path = _RequireFixture("tiny.png");
+            var path = FixturePaths.Require("tiny.png");
             var length = new FileInfo(path).Length;
 
             var image = ImageThumbnailLoader.TryLoad(path, length, ThumbnailSizes.Huge);
@@ -32,7 +32,7 @@ namespace Mfr.Tests.Ui.Services.FileList
         [AvaloniaFact]
         public void TryLoad_Decodes_Jpeg_Fixture()
         {
-            var path = _RequireFixture("tiny.jpeg");
+            var path = FixturePaths.Require("tiny.jpeg");
             var length = new FileInfo(path).Length;
 
             var image = ImageThumbnailLoader.TryLoad(path, length, ThumbnailSizes.Huge);
@@ -47,7 +47,7 @@ namespace Mfr.Tests.Ui.Services.FileList
         [AvaloniaFact]
         public void TryLoad_Exif_Jpeg_Does_Not_Throw()
         {
-            var path = _RequireFixture("tiny-exif.jpeg");
+            var path = FixturePaths.Require("tiny-exif.jpeg");
             var length = new FileInfo(path).Length;
 
             var image = ImageThumbnailLoader.TryLoad(path, length, ThumbnailSizes.Huge);
@@ -61,7 +61,7 @@ namespace Mfr.Tests.Ui.Services.FileList
         [AvaloniaFact]
         public void TryLoad_Does_Not_Upscale_Small_Exif_Thumbnail()
         {
-            var thumbnailJpeg = File.ReadAllBytes(_RequireFixture("tiny.jpeg"));
+            var thumbnailJpeg = File.ReadAllBytes(FixturePaths.Require("tiny.jpeg"));
             var path = Path.Combine(Path.GetTempPath(), $"mfr-exif-thumb-{Guid.NewGuid():N}.jpg");
             File.WriteAllBytes(path, _CreateJpegWithExifThumbnail(thumbnailJpeg));
             try
@@ -87,7 +87,7 @@ namespace Mfr.Tests.Ui.Services.FileList
         [Fact]
         public void TryExtract_Returns_Embedded_Thumbnail_Bytes()
         {
-            var thumbnailJpeg = File.ReadAllBytes(_RequireFixture("tiny.jpeg"));
+            var thumbnailJpeg = File.ReadAllBytes(FixturePaths.Require("tiny.jpeg"));
             using var stream = new MemoryStream(_CreateJpegWithExifThumbnail(thumbnailJpeg));
 
             var extracted = JpegExifThumbnailReader.TryExtract(stream);
@@ -101,7 +101,7 @@ namespace Mfr.Tests.Ui.Services.FileList
         [Fact]
         public void TryExtract_Returns_Null_When_No_Exif_Thumbnail()
         {
-            using var stream = File.OpenRead(_RequireFixture("tiny.jpeg"));
+            using var stream = File.OpenRead(FixturePaths.Require("tiny.jpeg"));
 
             Assert.Null(JpegExifThumbnailReader.TryExtract(stream));
         }
@@ -145,7 +145,7 @@ namespace Mfr.Tests.Ui.Services.FileList
         [Fact]
         public void TryLoad_Skips_When_Length_Unknown()
         {
-            var path = _RequireFixture("tiny.jpeg");
+            var path = FixturePaths.Require("tiny.jpeg");
 
             Assert.False(ImageThumbnailLoader.CanLoad(path, length: null));
             Assert.Null(ImageThumbnailLoader.TryLoad(path, length: null));
@@ -191,7 +191,7 @@ namespace Mfr.Tests.Ui.Services.FileList
             jpeg.WriteByte(0);
             jpeg.Write(tiffBytes);
 
-            var primary = File.ReadAllBytes(_RequireFixture("tiny.jpeg"));
+            var primary = File.ReadAllBytes(FixturePaths.Require("tiny.jpeg"));
             jpeg.Write(primary, 2, primary.Length - 2);
             return jpeg.ToArray();
         }
@@ -224,16 +224,6 @@ namespace Mfr.Tests.Ui.Services.FileList
             stream.WriteByte((byte)(value >> 8));
             stream.WriteByte((byte)(value >> 16));
             stream.WriteByte((byte)(value >> 24));
-        }
-
-        private static string _RequireFixture(string fileName)
-        {
-            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
-            Assert.True(
-                File.Exists(fixturePath),
-                $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output."
-            );
-            return fixturePath;
         }
     }
 }
