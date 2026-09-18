@@ -1,11 +1,11 @@
-// Package ownership: docs/mfr-folder-layering.md (TagLib / MetadataExtractor / PdfPig stay in L2)
+// Package ownership: docs/mfr-folder-layering.md (TagLib / MetadataExtractor / PdfPig / VersOne.Epub stay in L2)
 
 using System.Xml.Linq;
 
 namespace Mfr.Tests.Architecture
 {
     /// <summary>
-    /// Verifies TagLib Sharp, MetadataExtractor, and PdfPig packages stay in allowed projects.
+    /// Verifies TagLib Sharp, MetadataExtractor, PdfPig, and VersOne.Epub packages stay in allowed projects.
     /// </summary>
     public sealed class PackageOwnershipArchitectureTests
     {
@@ -17,6 +17,7 @@ namespace Mfr.Tests.Architecture
             "MetadataExtractor",
             "PdfPig",
             "UglyToad.PdfPig",
+            "VersOne.Epub",
         };
 
         /// <summary>
@@ -29,10 +30,10 @@ namespace Mfr.Tests.Architecture
         };
 
         /// <summary>
-        /// No layered project outside Metadata (and Tests fixtures) may take a TagLib/ME/PdfPig PackageReference.
+        /// No layered project outside Metadata (and Tests fixtures) may take a TagLib/ME/PdfPig/VersOne PackageReference.
         /// </summary>
         [Fact]
-        public void TagLib_MetadataExtractor_And_PdfPig_Only_In_Allowed_Projects()
+        public void Media_Packages_Only_In_Allowed_Projects()
         {
             var repoRoot = ArchitectureRepoPaths.FindRepoRoot();
             var violations = Directory
@@ -58,7 +59,7 @@ namespace Mfr.Tests.Architecture
 
             Assert.True(
                 violations.Count == 0,
-                "TagLibSharp / MetadataExtractor / PdfPig must stay in Mfr.Metadata (and Mfr.Tests fixtures). Violations:"
+                "TagLibSharp / MetadataExtractor / PdfPig / VersOne.Epub must stay in Mfr.Metadata (and Mfr.Tests fixtures). Violations:"
                     + Environment.NewLine
                     + string.Join(Environment.NewLine, violations)
             );

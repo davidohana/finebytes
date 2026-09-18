@@ -27,10 +27,12 @@ namespace Mfr.Tests.Models.Filters
                 item,
                 RenameListFieldKey.Original(PdfRenameListFields.Group, PdfRenameListFields.Key.Title)
             );
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Epub);
 
             Assert.False(item.TagLibLoadAttempted);
             Assert.False(item.ImagePropertiesLoadAttempted);
             Assert.False(item.PdfLoadAttempted);
+            Assert.False(item.EpubLoadAttempted);
         }
 
         [Fact]
@@ -59,13 +61,16 @@ namespace Mfr.Tests.Models.Filters
             RenameListMetadataLoader.TryEnsureLoaded(item, imageKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, mediaKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, pdfKey);
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Epub);
 
             Assert.True(item.TagLibLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.True(item.PdfLoadAttempted);
+            Assert.True(item.EpubLoadAttempted);
             Assert.NotNull(item.TagLibMetadataLoadError);
             Assert.NotNull(item.ImagePropertiesLoadError);
             Assert.NotNull(item.PdfLoadError);
+            Assert.NotNull(item.EpubLoadError);
             Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, audioKey));
             Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, imageKey));
             Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, mediaKey));
@@ -124,6 +129,48 @@ namespace Mfr.Tests.Models.Filters
 
             Assert.True(item.PdfLoadAttempted);
             Assert.Equal("Sample Title", RenameListFieldCatalog.Resolve(item, titleKey));
+        }
+
+        [Fact]
+        public void Loads_epub_info_from_fixture()
+        {
+            var item = RenameItemFixtures.Unmarked("tiny-info.epub");
+
+            Assert.False(item.EpubLoadAttempted);
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Epub);
+
+            Assert.True(item.EpubLoadAttempted);
+            Assert.Null(item.EpubLoadError);
+            Assert.NotNull(item.Original.Epub);
+            Assert.Same(item.Original.Epub, item.Preview.Epub);
+            Assert.Equal("Sample EPUB Title", item.Original.Epub.Title);
+        }
+
+        [Fact]
+        public void Non_epub_soft_fails_epub_bucket()
+        {
+            var item = RenameItemFixtures.Unmarked("tiny.jpeg");
+
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Epub);
+
+            Assert.True(item.EpubLoadAttempted);
+            Assert.NotNull(item.EpubLoadError);
+            Assert.Null(item.Original.Epub);
+        }
+
+        [Fact]
+        public void Clear_epub_cache_resets_flag_and_dto()
+        {
+            var item = RenameItemFixtures.Unmarked("tiny-info.epub");
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Epub);
+            Assert.NotNull(item.Original.Epub);
+
+            item.ClearEpubCache();
+
+            Assert.False(item.EpubLoadAttempted);
+            Assert.Null(item.EpubLoadError);
+            Assert.Null(item.Original.Epub);
+            Assert.Null(item.Preview.Epub);
         }
 
         [Fact]
@@ -207,7 +254,8 @@ namespace Mfr.Tests.Models.Filters
             var requirement =
                 RenameListMetadataRequirement.TagLib
                 | RenameListMetadataRequirement.ImageProperties
-                | RenameListMetadataRequirement.Pdf;
+                | RenameListMetadataRequirement.Pdf
+                | RenameListMetadataRequirement.Epub;
 
             Assert.True(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
             RenameListMetadataLoader.TryEnsureLoaded(item, requirement);
@@ -215,6 +263,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(item.TagLibLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.True(item.PdfLoadAttempted);
+            Assert.True(item.EpubLoadAttempted);
             Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
         }
     }

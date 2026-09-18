@@ -153,6 +153,11 @@ namespace Mfr.Models.Rename
         internal bool PdfLoadAttempted { get; private set; }
 
         /// <summary>
+        /// Gets whether VersOne.Epub document Info was loaded for this preview cycle.
+        /// </summary>
+        internal bool EpubLoadAttempted { get; private set; }
+
+        /// <summary>
         /// Gets the last TagLib read failure for audio-tag and media columns on this row, when present.
         /// </summary>
         internal Exception? TagLibMetadataLoadError { get; private set; }
@@ -166,6 +171,11 @@ namespace Mfr.Models.Rename
         /// Gets the last PDF-metadata read failure for this row, when present.
         /// </summary>
         internal Exception? PdfLoadError { get; private set; }
+
+        /// <summary>
+        /// Gets the last EPUB-metadata read failure for this row, when present.
+        /// </summary>
+        internal Exception? EpubLoadError { get; private set; }
 
         /// <summary>
         /// Records a TagLib read failure for audio-tag and media columns on this row.
@@ -195,6 +205,15 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Records an EPUB-metadata read failure for this row.
+        /// </summary>
+        /// <param name="ex">Failure from VersOne.Epub while reading the row path.</param>
+        internal void SetEpubLoadError(Exception ex)
+        {
+            SetMetadataLoadError(RenameListMetadataRequirement.Epub, ex);
+        }
+
+        /// <summary>
         /// Marks TagLib metadata load as attempted for this preview cycle.
         /// </summary>
         internal void MarkTagLibLoadAttempted()
@@ -216,6 +235,14 @@ namespace Mfr.Models.Rename
         internal void MarkPdfLoadAttempted()
         {
             MarkMetadataLoadAttempted(RenameListMetadataRequirement.Pdf);
+        }
+
+        /// <summary>
+        /// Marks EPUB document Info load as attempted for this preview cycle.
+        /// </summary>
+        internal void MarkEpubLoadAttempted()
+        {
+            MarkMetadataLoadAttempted(RenameListMetadataRequirement.Epub);
         }
 
         /// <summary>
@@ -285,6 +312,18 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Stores an EPUB document Info snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
+        /// </summary>
+        /// <param name="epub">Read-only Dublin Core Info from VersOne.Epub.</param>
+        internal void SetEpubDocumentInfo(EpubDocumentInfo epub)
+        {
+            ArgumentNullException.ThrowIfNull(epub);
+
+            Original.Epub = epub;
+            Preview.Epub = epub;
+        }
+
+        /// <summary>
         /// Clears lazy metadata caches after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearMetadataCaches()
@@ -293,6 +332,7 @@ namespace Mfr.Models.Rename
             ClearMediaPropertiesCache();
             ClearImagePropertiesCache();
             ClearPdfCache();
+            ClearEpubCache();
         }
 
         /// <summary>
@@ -336,6 +376,16 @@ namespace Mfr.Models.Rename
             ClearMetadataLoadState(RenameListMetadataRequirement.Pdf);
             Original.Pdf = null;
             Preview.Pdf = null;
+        }
+
+        /// <summary>
+        /// Clears the EPUB document Info cache after commit so subsequent previews reload from disk.
+        /// </summary>
+        internal void ClearEpubCache()
+        {
+            ClearMetadataLoadState(RenameListMetadataRequirement.Epub);
+            Original.Epub = null;
+            Preview.Epub = null;
         }
 
         /// <summary>

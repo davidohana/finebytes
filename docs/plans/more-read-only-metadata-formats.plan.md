@@ -7,7 +7,7 @@ todos:
     status: done
   - id: p2-epub
     content: "P2: VersOne.Epub PDF-shaped EpubDocumentInfo bucket, tokens, columns"
-    status: pending
+    status: done
   - id: p3-docx
     content: "P3: OpenXml OfficeDocumentInfo for DOCX PackageProperties"
     status: pending
@@ -107,12 +107,13 @@ Key PDF template files:
 - **Tests:** Fixture + `ImagePropertiesReader` / image+exif token tests (success + missing EXIF empty).
 - **Shipped:** MetadataExtractor **2.9.3** kept (spike OK). Allowlist `HEIF`; fixtures `tiny.heic` / `tiny-exif.heic` (`.heif` extension covered via temp copy of `tiny.heic`).
 
-### P2 — EPUB document Info (read-only)
+### P2 — EPUB document Info (read-only) ✅
 
 - **Scope / files:** Add `VersOne.Epub` to [`Mfr.Metadata.csproj`](Mfr.Metadata/Mfr.Metadata.csproj). New `EpubDocumentInfo` + `EpubFileReader`; `FileMeta.Epub`; new `RenameListMetadataRequirement` bit; Ensure/clear/loader; `EpubDocumentField` + formatting + Rename List fields; `epub-*` tokens; `docs/epub-metadata-model.md`; help `epubfp.html` + fields/fp/whatsnew.
 - **Fields (v1):** Title, Creator, Publisher, Language, Date, Identifier, Subject, Description (first/primary string where lists exist).
 - **Exit criteria:** Valid EPUB expands tokens/columns; missing DC fields empty; non-EPUB/corrupt → PreviewError; format + targeted tests green.
 - **Tests:** Minimal EPUB fixture + reader/token/catalog/loader tests mirroring PDF.
+- **Shipped:** Child plan [`docs/plans/epub-document-info-tokens.plan.md`](docs/plans/epub-document-info-tokens.plan.md) P1–P3 (reader/bucket, tokens/columns, docs/help).
 
 ### P3 — Office DOCX PackageProperties (read-only)
 
