@@ -15,12 +15,13 @@ namespace Mfr.Models.RenameList.Fields.Id3v1
             Id3v1RenameListFields.Group,
             Id3v1RenameListFields.GroupLabel,
             field.ToString(),
-            field.ToString(),
+            $"{field} (ID3v1)",
             defaultWidth,
             isSortable: true,
             supportsPreview: true,
             RenameListMetadataRequirement.TagLib,
-            writeTarget: new Id3v1FieldTarget(field)
+            writeTarget: new Id3v1FieldTarget(field),
+            tip: $"{Id3v1RenameListFields.GroupLabel}: {field}."
         )
     {
         /// <summary>

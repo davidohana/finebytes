@@ -9,9 +9,11 @@ namespace Mfr.Models.RenameList.Fields.Xiph
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Property keys match known Xiph comment keys (same as Filter Options Apply-To). Display names
-    /// and tips use <see cref="XiphKeyLabels"/>. Writable fields use <see cref="XiphFieldTarget"/>.
-    /// Resolve reads the overlay Xiph block via <see cref="AudioOverlayBlockFieldIo"/>.
+    /// Property keys match known Xiph comment keys (same as Filter Options Apply-To). Column
+    /// display names use <see cref="XiphKeyLabels"/> plus a <c>(Xiph)</c> qualifier so they stay
+    /// distinct from Audio Tag / ID3v1; tips always name the Xiph block (and keep Apply-To tips
+    /// when set). Writable fields use <see cref="XiphFieldTarget"/>. Resolve reads the overlay
+    /// Xiph block via <see cref="AudioOverlayBlockFieldIo"/>.
     /// </para>
     /// </remarks>
     public static class XiphRenameListFields

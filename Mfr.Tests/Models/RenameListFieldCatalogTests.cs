@@ -734,7 +734,8 @@ namespace Mfr.Tests.Models
             {
                 Assert.True(field.SupportsPreview, field.PropertyKey);
                 Assert.True(field.SupportsWrite, field.PropertyKey);
-                Assert.Equal(expected.ToString(), field.DisplayName);
+                Assert.Equal($"{expected} (ID3v1)", field.DisplayName);
+                Assert.Equal($"{Id3v1RenameListFields.GroupLabel}: {expected}.", field.Tip);
                 var target = Assert.IsType<Id3v1FieldTarget>(field.WriteTarget);
                 Assert.Equal(expected, target.Field);
             }
@@ -836,8 +837,12 @@ namespace Mfr.Tests.Models
             {
                 Assert.True(field.SupportsPreview, field.PropertyKey);
                 Assert.True(field.SupportsWrite, field.PropertyKey);
-                Assert.Equal(XiphKeyLabels.For(expectedKey), field.DisplayName);
-                Assert.Equal(XiphKeyLabels.Tip(expectedKey), field.Tip);
+                Assert.Equal($"{XiphKeyLabels.For(expectedKey)} (Xiph)", field.DisplayName);
+                var detail = XiphKeyLabels.Tip(expectedKey);
+                var expectedTip = detail is null
+                    ? $"{XiphRenameListFields.GroupLabel}: {expectedKey}."
+                    : $"{detail} ({XiphRenameListFields.GroupLabel})";
+                Assert.Equal(expectedTip, field.Tip);
                 var target = Assert.IsType<XiphFieldTarget>(field.WriteTarget);
                 Assert.Equal(expectedKey, target.Key);
             }
@@ -935,7 +940,8 @@ namespace Mfr.Tests.Models
             Assert.False(fields[0].SupportsPreview);
             Assert.False(fields[0].SupportsWrite);
             Assert.Null(fields[0].WriteTarget);
-            Assert.Equal("Version", fields[0].DisplayName);
+            Assert.Equal("Version (ID3v2)", fields[0].DisplayName);
+            Assert.Equal($"{Id3v2RenameListFields.GroupLabel}: tag version (e.g. 2.3 / 2.4).", fields[0].Tip);
 
             var frameFields = fields.Skip(1).ToList();
             Assert.Equal(Id3v2ModeledFrame.AllModeledFrameIds.Count, frameFields.Count);
@@ -946,6 +952,7 @@ namespace Mfr.Tests.Models
                 Assert.True(field.SupportsPreview, field.PropertyKey);
                 Assert.True(field.SupportsWrite, field.PropertyKey);
                 Assert.Equal(Id3v2FrameLabels.For(field.PropertyKey), field.DisplayName);
+                Assert.Equal($"{Id3v2RenameListFields.GroupLabel}: {field.PropertyKey}.", field.Tip);
                 var target = Assert.IsType<Id3v2FrameTarget>(field.WriteTarget);
                 Assert.Equal(field.PropertyKey, target.FrameId);
                 Assert.Null(target.Language);
@@ -1268,24 +1275,20 @@ namespace Mfr.Tests.Models
         [Fact]
         public void CompareForSort_orders_id3v1_year_and_track_numeric()
         {
-            var yearTen = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: meta =>
-                    meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Year = 10 } }
+            var yearTen = FilterTestHelpers.CreateRenameItem(configureOriginal: meta =>
+                meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Year = 10 } }
             );
-            var yearTwo = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: meta =>
-                    meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Year = 2 } }
+            var yearTwo = FilterTestHelpers.CreateRenameItem(configureOriginal: meta =>
+                meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Year = 2 } }
             );
             var yearKey = RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Year");
             Assert.True(RenameListFieldCatalog.CompareForSort(yearTwo, yearKey, yearTen) < 0);
 
-            var trackTen = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: meta =>
-                    meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Track = 10 } }
+            var trackTen = FilterTestHelpers.CreateRenameItem(configureOriginal: meta =>
+                meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Track = 10 } }
             );
-            var trackTwo = FilterTestHelpers.CreateRenameItem(
-                configureOriginal: meta =>
-                    meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Track = 2 } }
+            var trackTwo = FilterTestHelpers.CreateRenameItem(configureOriginal: meta =>
+                meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Track = 2 } }
             );
             var trackKey = RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Track");
             Assert.True(RenameListFieldCatalog.CompareForSort(trackTwo, trackKey, trackTen) < 0);

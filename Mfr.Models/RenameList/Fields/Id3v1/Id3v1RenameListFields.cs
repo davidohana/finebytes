@@ -9,9 +9,11 @@ namespace Mfr.Models.RenameList.Fields.Id3v1
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Property keys and display names match <see cref="Id3v1Field"/> names (same as Filter Options
-    /// Apply-To). Writable fields use <see cref="Id3v1FieldTarget"/>. Resolve reads the
-    /// overlay ID3v1 block via <see cref="AudioOverlayBlockFieldIo"/>.
+    /// Property keys match <see cref="Id3v1Field"/> names (same as Filter Options Apply-To).
+    /// Column display names are qualified as <c>Title (ID3v1)</c> so they stay distinct from
+    /// Audio Tag / Xiph when shown together; tips name the MP3 ID3v1 block. Writable fields use
+    /// <see cref="Id3v1FieldTarget"/>. Resolve reads the overlay ID3v1 block via
+    /// <see cref="AudioOverlayBlockFieldIo"/>.
     /// </para>
     /// </remarks>
     public static class Id3v1RenameListFields
