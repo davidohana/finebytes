@@ -16,7 +16,7 @@ Single slice (no phases). Architecture locked from Cursor plan `createplan_405ae
 - **Empty vs error:** missing fields empty after successful open; non-PDF / corrupt → PreviewError
 - **Out of scope:** XMP fallback, text extraction, write path, generic documents
 
-## Tokens (`Pdf\Document`)
+## Tokens (`Pdf`)
 
 | Token              | Field                  |
 | ------------------ | ---------------------- |
