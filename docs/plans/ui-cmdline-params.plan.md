@@ -130,7 +130,7 @@ flowchart LR
 - Wire from `App` / desktop args; soft-handle apply failures so the UI still opens.
 - Tests: sources-only; `--initial-folder` only; both; modifier overrides vs prefs; invalid paths.
 - Exit: startup apply + tests green.
-- Status: pending
+- Status: done
 
 ### P3 — Help docs
 
