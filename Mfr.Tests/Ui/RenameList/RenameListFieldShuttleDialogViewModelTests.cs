@@ -7,7 +7,7 @@ using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
-using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Mp3;
 using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 
@@ -457,7 +457,7 @@ namespace Mfr.Tests.Ui.RenameList
                     Id3v2RenameListFields.GroupLabel,
                     XiphRenameListFields.GroupLabel,
                     MediaRenameListFields.GroupLabel,
-                    MpegRenameListFields.GroupLabel,
+                    Mp3RenameListFields.GroupLabel,
                     ImageRenameListFields.GroupLabel,
                     JpegRenameListFields.GroupLabel,
                     PdfRenameListFields.GroupLabel,

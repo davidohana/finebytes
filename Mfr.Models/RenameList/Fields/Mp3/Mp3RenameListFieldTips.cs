@@ -1,9 +1,9 @@
-namespace Mfr.Models.RenameList.Fields.Mpeg
+namespace Mfr.Models.RenameList.Fields.Mp3
 {
     /// <summary>
     /// Clarifying tooltips for MP3 Properties Rename List columns and format tokens.
     /// </summary>
-    public static class MpegRenameListFieldTips
+    public static class Mp3RenameListFieldTips
     {
         /// <summary>Formatted duration column.</summary>
         public const string Duration = "MPEG header duration as h:mm:ss.";

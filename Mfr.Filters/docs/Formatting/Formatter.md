@@ -40,9 +40,9 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 #### Audio tags (canonical overlay)
 
-Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`TagLibFileAccess.Read`**) **on first `audio-*` / `id3v2` / `id3v2-version` token use** (or first `media-*` / `mpeg-*` token, which shares that open) for that **file** row inside a **`Preview`** run; the same open also fills the media cache when it is not already marked loaded. **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
+Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`TagLibFileAccess.Read`**) **on first `audio-*` / `id3v2` / `id3v2-version` token use** (or first `media-*` / `mp3-*` token, which shares that open) for that **file** row inside a **`Preview`** run; the same open also fills the media cache when it is not already marked loaded. **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
-**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mpeg-*`, `image-*`, `exif-*`, `pdf-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
+**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mp3-*`, `image-*`, `exif-*`, `pdf-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
 
 Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateRenameItem`**, which marks TagLib load as already attempted (`TagLibLoadAttempted`) so **`EnsureTagLibLoaded`** does not touch pre-seeded **`AudioTagOverlay`**; integration-style tests use real tagged temp files when exercising disk read.
 
@@ -82,13 +82,13 @@ Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateR
 
 **Unit tests:** **`FilterTestHelpers.CreateRenameItem`** marks TagLib load as already attempted, so **`EnsureTagLibLoaded`** is skipped and the overlay stays at its initial state (usually the default empty overlay), meaning **`<audio-*>`** tokens expand to **empty** strings without touching disk.
 
-Stream properties (duration, bitrate, channels, …) are under **Media properties** (`<media-*>`) and **MPEG audio properties** (`<mpeg-*>`), not `<audio-*>`.
+Stream properties (duration, bitrate, channels, …) are under **Media properties** (`<media-*>`) and **MP3 Properties** (`<mp3-*>`), not `<audio-*>`.
 
 #### Media properties
 
-Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`TagLibFileAccess.Read`**) **on first `media-*` or `mpeg-*` token use** (or first `audio-*` / tag-filter load, which shares that open) for that **file** row inside a **`Preview`** run (one TagLib open; MPEG header nested on **`Media.Mpeg`** when present). The same open also fills embedded-tag overlays when they are not already marked loaded. **`RenameList.Commit`** clears the cache afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
+Reads from **`Original.Media`** (read-only TagLib cache). Properties load from disk (**`TagLibFileAccess.Read`**) **on first `media-*` or `mp3-*` token use** (or first `audio-*` / tag-filter load, which shares that open) for that **file** row inside a **`Preview`** run (one TagLib open; MPEG header nested on **`Media.Mp3`** when present). The same open also fills embedded-tag overlays when they are not already marked loaded. **`RenameList.Commit`** clears the cache afterward so later previews reload from disk. **Directory rows** or files TagLib cannot open surface **`RenameStatus.PreviewError`** (exception as **`Cause`**), same policy as audio tags. Wrong stream kind (e.g. video width on a pure MP3) expands to **empty**, not an error.
 
-Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties as already loaded so seeded **`FileMeta.Media`** (including nested **`Media.Mpeg`**) is used without disk I/O.
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties as already loaded so seeded **`FileMeta.Media`** (including nested **`Media.Mp3`**) is used without disk I/O.
 
 | Token                     | Output                                                                                                                                                                             |
 | ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -104,31 +104,28 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties a
 | `<media-channels>`        | Channel count; empty when `0`.                                                                                                                                                     |
 | `<media-video-width>`     | Video width (px); empty when `0`.                                                                                                                                                  |
 | `<media-video-height>`    | Video height (px); empty when `0`.                                                                                                                                                 |
-| `<media-photo-width>`     | Photo width (px); empty when `0`.                                                                                                                                                  |
-| `<media-photo-height>`    | Photo height (px); empty when `0`.                                                                                                                                                 |
-| `<media-photo-quality>`   | Photo quality; empty when `0`.                                                                                                                                                     |
 
 **Arguments:** No argument (`<media-mime>` only). A stray **`<media-mime:…>`** fails at compile.
 
-#### MPEG audio properties
+#### MP3 Properties
 
-Reads from **`Original.Media.Mpeg`** (nested read-only TagLib `Mpeg.AudioHeader` on the media cache). Loaded by the same **`TagLibFileAccess.Read`** path as media properties (and as audio tags when that family loads first). Files without an MPEG audio header (e.g. WAV/FLAC/AAC) leave **`Media.Mpeg`** null and expand tokens to **empty** (not PreviewError). Replaces MFR7’s legacy **`mp3-*`** names.
+Reads from **`Original.Media.Mp3`** (nested read-only TagLib `Mpeg.AudioHeader` on the media cache). Loaded by the same **`TagLibFileAccess.Read`** path as media properties (and as audio tags when that family loads first). Files without an MPEG audio header (e.g. WAV/FLAC/AAC) leave **`Media.Mp3`** null and expand tokens to **empty** (not PreviewError). Token names match MFR7’s **`mp3-*`** prefix (prefix-only; finebytes keeps `mp3-encoding` / `mp3-ver` / `mp3-copyright` rather than unused MFR7 synonyms).
 
-| Token                 | Output                                                                                 |
-| --------------------- | -------------------------------------------------------------------------------------- |
-| `<mpeg-bitrate>`      | Bitrate (kbps); prefixed `VBR` when Xing/VBRI present (e.g. `VBR128`); empty when `0`. |
-| `<mpeg-copyright>`    | `Yes` or `No`.                                                                         |
-| `<mpeg-duration>`     | Header duration as `h:mm:ss`; empty when zero.                                         |
-| `<mpeg-duration-sec>` | Whole seconds (floor); empty when zero.                                                |
-| `<mpeg-encoding>`     | `CBR` or `VBR`; empty when no MPEG header.                                             |
-| `<mpeg-frequency>`    | Sample rate (Hz); empty when `0`.                                                      |
-| `<mpeg-layer>`        | `I`, `II`, or `III`; empty when unset.                                                 |
-| `<mpeg-ver>`          | MPEG version (`1`, `2`, or `2.5`); empty when unknown.                                 |
-| `<mpeg-mode>`         | Channel mode (`Stereo`, `JointStereo`, `DualChannel`, `SingleChannel`).                |
-| `<mpeg-original>`     | `Yes` or `No`.                                                                         |
-| `<mpeg-protection>`   | `Yes` or `No` (CRC protection bit).                                                    |
+| Token                | Output                                                                                 |
+| -------------------- | -------------------------------------------------------------------------------------- |
+| `<mp3-bitrate>`      | Bitrate (kbps); prefixed `VBR` when Xing/VBRI present (e.g. `VBR128`); empty when `0`. |
+| `<mp3-copyright>`    | `Yes` or `No`.                                                                         |
+| `<mp3-duration>`     | Header duration as `h:mm:ss`; empty when zero.                                         |
+| `<mp3-duration-sec>` | Whole seconds (floor); empty when zero.                                                |
+| `<mp3-encoding>`     | `CBR` or `VBR`; empty when no MPEG header.                                             |
+| `<mp3-frequency>`    | Sample rate (Hz); empty when `0`.                                                      |
+| `<mp3-layer>`        | `I`, `II`, or `III`; empty when unset.                                                 |
+| `<mp3-ver>`          | MPEG version (`1`, `2`, or `2.5`); empty when unknown.                                 |
+| `<mp3-mode>`         | Channel mode (`Stereo`, `JointStereo`, `DualChannel`, `SingleChannel`).                |
+| `<mp3-original>`     | `Yes` or `No`.                                                                         |
+| `<mp3-protection>`   | `Yes` or `No` (CRC protection bit).                                                    |
 
-**Arguments:** No argument (`<mpeg-bitrate>` only). A stray **`<mpeg-bitrate:…>`** fails at compile.
+**Arguments:** No argument (`<mp3-bitrate>` only). A stray **`<mp3-bitrate:…>`** fails at compile.
 
 #### Image properties
 
@@ -138,7 +135,7 @@ Display strings come from Models **`ImagePropertiesFormatting`** (`PropertyDispl
 
 **Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** (exception as **`Cause`**). Mapped rasters are JPEG, PNG, GIF, BMP, TIFF, ICO, and WebP. MetadataExtractor **does** open MP3/WAV (and other audio/video), but **`image-*` still errors** on those types. A missing field on a mapped raster (no DPI, WebP bit depth, `0` dimensions) expands **empty**, not an error.
 
-Keep **`<media-photo-width>`** / **`<media-photo-height>`** for TagLib photo dims; values may differ from **`<image-width>`** / **`<image-height>`**.
+Raster size uses **`<image-width>`** / **`<image-height>`** (MetadataExtractor). TagLib **`<media-video-width>`** / **`<media-video-height>`** are video frame size only.
 
 Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image properties as already loaded so seeded **`FileMeta.Image`** is used without disk I/O.
 

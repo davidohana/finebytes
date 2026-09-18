@@ -8,7 +8,7 @@ using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
-using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Mp3;
 using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Utils;
@@ -32,7 +32,7 @@ namespace Mfr.Models.RenameList
                 .. Id3v2RenameListFields.All,
                 .. XiphRenameListFields.All,
                 .. MediaRenameListFields.All,
-                .. MpegRenameListFields.All,
+                .. Mp3RenameListFields.All,
                 .. ImageRenameListFields.All,
                 .. JpegRenameListFields.All,
                 .. PdfRenameListFields.All,

@@ -79,9 +79,6 @@ namespace Mfr.Models.RenameList.Fields.Media
                 MediaPropertyField.Channels => MediaRenameListFields.Key.AudioChannels,
                 MediaPropertyField.VideoWidth => MediaRenameListFields.Key.VideoWidth,
                 MediaPropertyField.VideoHeight => MediaRenameListFields.Key.VideoHeight,
-                MediaPropertyField.PhotoWidth => MediaRenameListFields.Key.PhotoWidth,
-                MediaPropertyField.PhotoHeight => MediaRenameListFields.Key.PhotoHeight,
-                MediaPropertyField.PhotoQuality => MediaRenameListFields.Key.PhotoQuality,
                 _ => throw new UnreachableException(),
             };
         }
@@ -126,18 +123,6 @@ namespace Mfr.Models.RenameList.Fields.Media
                 MediaPropertyField.VideoHeight => RenameListFieldSortCompare.Int32(
                     leftMedia?.VideoHeight ?? 0,
                     rightMedia?.VideoHeight ?? 0
-                ),
-                MediaPropertyField.PhotoWidth => RenameListFieldSortCompare.Int32(
-                    leftMedia?.PhotoWidth ?? 0,
-                    rightMedia?.PhotoWidth ?? 0
-                ),
-                MediaPropertyField.PhotoHeight => RenameListFieldSortCompare.Int32(
-                    leftMedia?.PhotoHeight ?? 0,
-                    rightMedia?.PhotoHeight ?? 0
-                ),
-                MediaPropertyField.PhotoQuality => RenameListFieldSortCompare.Int32(
-                    leftMedia?.PhotoQuality ?? 0,
-                    rightMedia?.PhotoQuality ?? 0
                 ),
                 MediaPropertyField.MimeType
                 or MediaPropertyField.Corrupt

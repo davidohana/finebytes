@@ -19,11 +19,5 @@ namespace Mfr.Models.RenameList.Fields.Media
 
         /// <summary>Video frame height.</summary>
         public const string VideoHeight = "Video stream height in pixels (not still-image / cover art).";
-
-        /// <summary>Photo / still width.</summary>
-        public const string PhotoWidth = "Still-image or embedded photo width (not video frame size).";
-
-        /// <summary>Photo / still height.</summary>
-        public const string PhotoHeight = "Still-image or embedded photo height (not video frame size).";
     }
 }

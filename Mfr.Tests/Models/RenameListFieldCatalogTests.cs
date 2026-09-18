@@ -9,7 +9,7 @@ using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
-using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Mp3;
 using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Models.Tags;
@@ -36,7 +36,7 @@ namespace Mfr.Tests.Models
                     + Id3v2RenameListFields.All.Count
                     + XiphRenameListFields.All.Count
                     + MediaRenameListFields.All.Count
-                    + MpegRenameListFields.All.Count
+                    + Mp3RenameListFields.All.Count
                     + ImageRenameListFields.All.Count
                     + JpegRenameListFields.All.Count
                     + PdfRenameListFields.All.Count,
@@ -58,8 +58,8 @@ namespace Mfr.Tests.Models
                 XiphKnownKeys.All.Count,
                 RenameListFieldCatalog.GetFieldsForGroup(XiphRenameListFields.Group).Count
             );
-            Assert.Equal(15, RenameListFieldCatalog.GetFieldsForGroup(MediaRenameListFields.Group).Count);
-            Assert.Equal(11, RenameListFieldCatalog.GetFieldsForGroup(MpegRenameListFields.Group).Count);
+            Assert.Equal(12, RenameListFieldCatalog.GetFieldsForGroup(MediaRenameListFields.Group).Count);
+            Assert.Equal(11, RenameListFieldCatalog.GetFieldsForGroup(Mp3RenameListFields.Group).Count);
             Assert.Equal(7, RenameListFieldCatalog.GetFieldsForGroup(ImageRenameListFields.Group).Count);
             Assert.Equal(17, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(PdfRenameListFields.Group).Count);
@@ -81,7 +81,7 @@ namespace Mfr.Tests.Models
                 BasicRenameListFields.All,
                 f => f.PropertyKey == BasicRenameListFields.Key.Folder
             );
-            var mpegCopyright = Assert.Single(MpegRenameListFields.All, f => f.PropertyKey == "Copyright");
+            var mpegCopyright = Assert.Single(Mp3RenameListFields.All, f => f.PropertyKey == "Copyright");
             var jpegAuthor = Assert.Single(JpegRenameListFields.All, f => f.PropertyKey == "ExifDirectory*40093");
             var jpegArtist = Assert.Single(JpegRenameListFields.All, f => f.PropertyKey == "ExifDirectory*315");
             var pdfAuthor = Assert.Single(
@@ -116,7 +116,7 @@ namespace Mfr.Tests.Models
                 title.Tip
             );
             Assert.Equal(PathFieldTips.ParentDirectory, parentDirectory.Tip);
-            Assert.Equal(MpegRenameListFieldTips.Copyright, mpegCopyright.Tip);
+            Assert.Equal(Mp3RenameListFieldTips.Copyright, mpegCopyright.Tip);
             Assert.Equal(JpegRenameListFieldTips.Author, jpegAuthor.Tip);
             Assert.Equal(JpegRenameListFieldTips.Artist, jpegArtist.Tip);
             Assert.Equal(PdfRenameListFieldTips.Author, pdfAuthor.Tip);
@@ -136,7 +136,7 @@ namespace Mfr.Tests.Models
                     Id3v2RenameListFields.GroupLabel,
                     XiphRenameListFields.GroupLabel,
                     MediaRenameListFields.GroupLabel,
-                    MpegRenameListFields.GroupLabel,
+                    Mp3RenameListFields.GroupLabel,
                     ImageRenameListFields.GroupLabel,
                     JpegRenameListFields.GroupLabel,
                     PdfRenameListFields.GroupLabel,
@@ -531,7 +531,7 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
-        public void Media_mpeg_and_jpeg_camera_fields_resolve_cached_metadata()
+        public void Media_mp3_and_jpeg_camera_fields_resolve_cached_metadata()
         {
             var item = FilterTestHelpers.CreateRenameItem(
                 extension: "mp3",
@@ -548,10 +548,9 @@ namespace Mfr.Tests.Models
                         AudioSampleRate = 44100,
                         BitsPerSample = 16,
                         AudioChannels = 2,
-                        PhotoWidth = 1920,
-                        PhotoHeight = 1080,
-                        PhotoQuality = 85,
-                        Mpeg = new MpegAudioProperties
+                        VideoWidth = 1920,
+                        VideoHeight = 1080,
+                        Mp3 = new Mp3AudioProperties
                         {
                             Bitrate = 128,
                             IsCopyrighted = true,
@@ -582,13 +581,14 @@ namespace Mfr.Tests.Models
             _AssertField(item, MediaRenameListFields.Group, "DurationSeconds", "225");
             _AssertField(item, MediaRenameListFields.Group, "MediaTypes", "Audio");
             _AssertField(item, MediaRenameListFields.Group, "AudioBitrate", "128");
-            _AssertField(item, MediaRenameListFields.Group, "PhotoWidth", "1920");
-            _AssertField(item, MpegRenameListFields.Group, "Bitrate", "128");
-            _AssertField(item, MpegRenameListFields.Group, "Copyright", "Yes");
-            _AssertField(item, MpegRenameListFields.Group, "Duration", "0:03:45");
-            _AssertField(item, MpegRenameListFields.Group, "VBR", "CBR");
-            _AssertField(item, MpegRenameListFields.Group, "Layer", "III");
-            _AssertField(item, MpegRenameListFields.Group, "Mode", "JointStereo");
+            _AssertField(item, MediaRenameListFields.Group, "VideoWidth", "1920");
+            _AssertField(item, MediaRenameListFields.Group, "VideoHeight", "1080");
+            _AssertField(item, Mp3RenameListFields.Group, "Bitrate", "128");
+            _AssertField(item, Mp3RenameListFields.Group, "Copyright", "Yes");
+            _AssertField(item, Mp3RenameListFields.Group, "Duration", "0:03:45");
+            _AssertField(item, Mp3RenameListFields.Group, "VBR", "CBR");
+            _AssertField(item, Mp3RenameListFields.Group, "Layer", "III");
+            _AssertField(item, Mp3RenameListFields.Group, "Mode", "JointStereo");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*33434", "1/250 sec");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*33437", "f/5.6");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*34855", "400");
@@ -604,7 +604,7 @@ namespace Mfr.Tests.Models
             Assert.Equal(
                 RenameListMetadataRequirement.TagLib,
                 RenameListFieldCatalog.GetMetadataRequirement(
-                    RenameListFieldKey.Original(MpegRenameListFields.Group, "Bitrate")
+                    RenameListFieldKey.Original(Mp3RenameListFields.Group, "Bitrate")
                 )
             );
         }
@@ -631,7 +631,7 @@ namespace Mfr.Tests.Models
             string[] originalOnlyGroups =
             [
                 MediaRenameListFields.Group,
-                MpegRenameListFields.Group,
+                Mp3RenameListFields.Group,
                 ImageRenameListFields.Group,
                 JpegRenameListFields.Group,
             ];
@@ -1085,7 +1085,7 @@ namespace Mfr.Tests.Models
             string[] originalOnlyGroups =
             [
                 MediaRenameListFields.Group,
-                MpegRenameListFields.Group,
+                Mp3RenameListFields.Group,
                 ImageRenameListFields.Group,
                 JpegRenameListFields.Group,
             ];
@@ -1231,7 +1231,7 @@ namespace Mfr.Tests.Models
             _AssertField(item, AudioTagRenameListFields.Group, "TagTypes", "");
             _AssertField(item, MediaRenameListFields.Group, "MimeType", "");
             _AssertField(item, MediaRenameListFields.Group, "Duration", "");
-            _AssertField(item, MpegRenameListFields.Group, "Bitrate", "");
+            _AssertField(item, Mp3RenameListFields.Group, "Bitrate", "");
             _AssertField(item, ImageRenameListFields.Group, "Width", "");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*271", "");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*33434", "");

@@ -37,7 +37,7 @@ finebytes implements tokens under `Mfr.Filters/Formatting/Tokens/` as `IFormatTo
 | `Id3FieldFormattingParameter`    | `id3fp.html`       | `SemanticAudioFieldTokens`                                 |
 | `Id3V2FieldFormattingParameter`  | `id3v2fp.html`     | `Id3v2Token`                                               |
 
-Also check `FullPathToken`, `FullPathLengthToken`, `FileNameLengthToken`, `FileOrFolderToken`, `FileNameNumericValueToken`, `NowToken`, `ExifToken`, `ExifDateToken`, `ExifPropertyTokens`, `ImagePropertyTokens`, `MediaPropertyTokens`, `MpegAudioPropertyTokens` — added or reorganized in the rewrite; grep finebytes for the angle-bracket token name if no MFR7 class name match.
+Also check `FullPathToken`, `FullPathLengthToken`, `FileNameLengthToken`, `FileOrFolderToken`, `FileNameNumericValueToken`, `NowToken`, `ExifToken`, `ExifDateToken`, `ExifPropertyTokens`, `ImagePropertyTokens`, `MediaPropertyTokens`, `Mp3AudioPropertyTokens` — added or reorganized in the rewrite; grep finebytes for the angle-bracket token name if no MFR7 class name match.
 
 ## How to read a token spec
 

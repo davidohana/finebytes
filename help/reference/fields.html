@@ -178,7 +178,11 @@
     </p>
 
     <h2 id="mediaproperties">Media Properties</h2>
-    <p>Read-only TagLib media properties for image, audio, and video files.</p>
+    <p>
+      Read-only TagLib stream properties for audio and video (MIME, duration, audio stream, video frame
+      size). Raster size is under
+      <a href="#image">Image</a>.
+    </p>
     <table class="ref-table">
       <thead>
         <tr>
@@ -215,18 +219,14 @@
           <td>Video Width / Height</td>
           <td>Video frame size in pixels.</td>
         </tr>
-        <tr>
-          <td>Photo Width / Height / Quality</td>
-          <td>Still-image size and format-specific quality (0 if none).</td>
-        </tr>
       </tbody>
     </table>
     <p>See also <a href="../tokens/mediafp.html">Media formatting tokens</a>.</p>
 
-    <h2 id="mpeg">MP3 Properties</h2>
+    <h2 id="mp3">MP3 Properties</h2>
     <p>Read-only MPEG audio properties for MP3 files (bitrate, encoding, frequency, layer, version,
       mode, duration, copyright/original/protection flags, and related values). See
-      <a href="../tokens/mpegfp.html">Audio MP3 formatting tokens</a>.
+      <a href="../tokens/mp3fp.html">MP3 Properties formatting tokens</a>.
     </p>
 
     <h2 id="image">Image</h2>

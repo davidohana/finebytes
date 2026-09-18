@@ -47,14 +47,5 @@ namespace Mfr.Models.RenameList.Fields.Media
 
         /// <summary>Video frame height in pixels.</summary>
         VideoHeight,
-
-        /// <summary>Photo width in pixels.</summary>
-        PhotoWidth,
-
-        /// <summary>Photo height in pixels.</summary>
-        PhotoHeight,
-
-        /// <summary>Format-specific photo quality.</summary>
-        PhotoQuality,
     }
 }

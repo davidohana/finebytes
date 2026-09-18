@@ -42,9 +42,6 @@ namespace Mfr.Models.RenameList.Fields.Media
                 MediaPropertyField.Channels => RenameListFieldDisplay.FormatPositiveInt(media.AudioChannels),
                 MediaPropertyField.VideoWidth => RenameListFieldDisplay.FormatPositiveInt(media.VideoWidth),
                 MediaPropertyField.VideoHeight => RenameListFieldDisplay.FormatPositiveInt(media.VideoHeight),
-                MediaPropertyField.PhotoWidth => RenameListFieldDisplay.FormatPositiveInt(media.PhotoWidth),
-                MediaPropertyField.PhotoHeight => RenameListFieldDisplay.FormatPositiveInt(media.PhotoHeight),
-                MediaPropertyField.PhotoQuality => RenameListFieldDisplay.FormatPositiveInt(media.PhotoQuality),
                 _ => throw new UnreachableException(),
             };
         }
