@@ -81,15 +81,18 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Attributes
         [RelayCommand]
         public void SetCurrent()
         {
-            if (SetDate)
+            ApplyDiscreteFill(() =>
             {
-                DateText = DateTime.Today.ToString(DateFormat, CultureInfo.InvariantCulture);
-            }
+                if (SetDate)
+                {
+                    DateText = DateTime.Today.ToString(DateFormat, CultureInfo.InvariantCulture);
+                }
 
-            if (SetTime)
-            {
-                TimeText = DateTime.Now.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture);
-            }
+                if (SetTime)
+                {
+                    TimeText = DateTime.Now.ToString(TimeFormatWithSeconds, CultureInfo.InvariantCulture);
+                }
+            });
         }
 
         /// <summary>

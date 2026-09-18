@@ -68,6 +68,7 @@ Copy the closest shipped editor (see list below). Required shape:
 1. Enum radios: bind `IsChecked` through `EnumToBooleanConverter.Instance` + `x:Static` (do not add per-value `IsXxx` properties)
 1. **Do not** call `Setup()`; **no** Apply button — live replace only
 1. Preview is already wired via `SetFilter` → chain change → Auto-Preview; do not re-wire `MainWindowViewModel`
+1. Discrete fill buttons (Load defaults, Current, …): wrap field updates in `ApplyDiscreteFill` so pending list-text debounce commits on click (see DateTime Setter / Casing List)
 
 ## View pattern
 

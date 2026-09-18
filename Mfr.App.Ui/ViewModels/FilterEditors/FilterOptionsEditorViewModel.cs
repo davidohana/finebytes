@@ -209,6 +209,22 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors
             pending?.Invoke();
         }
 
+        /// <summary>
+        /// Runs <paramref name="fill"/> as a discrete editor action (Load defaults, Current, …).
+        /// <para>
+        /// Flushes any pending list-text apply before and after so property setters commit on the
+        /// button click instead of waiting on the live-text debounce.
+        /// </para>
+        /// </summary>
+        /// <param name="fill">Updates bound editor fields (which may schedule or apply options).</param>
+        protected void ApplyDiscreteFill(Action fill)
+        {
+            ArgumentNullException.ThrowIfNull(fill);
+            FlushPendingLiveListTextApply();
+            fill();
+            FlushPendingLiveListTextApply();
+        }
+
         private void _CancelLiveListTextApplyTimer()
         {
             if (_liveListTextApplyCts is null)

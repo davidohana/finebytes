@@ -5,7 +5,7 @@ Changes letter casing on the target segment. **Capitalize** and **sentence case*
 ## Options
 
 - **`mode`** (enum, required) — One of the **Modes** below.
-- **`capitalizeSkipWords`** (array of string, default `[]` in JSON; add-to-list uses
+- **`capitalizeSkipWords`** (array of string, default `[]` in JSON; add-to-list / title-bar Reset use
   `DefaultCapitalizeSkipWords`: articles, short conjunctions, common prepositions, and short `be`
   forms — `a`, `an`, `the`, `and`, `but`, `or`, `nor`, `so`, `yet`, `am`, `are`, `be`, `been`,
   `being`, `is`, `was`, `were`, `as`, `at`, `by`, `for`, `from`, `in`, `into`, `of`, `off`, `on`,

@@ -4,10 +4,11 @@ Sets the **word separator** character for the rest of the rename pass and option
 
 ## Options
 
-- **`spaceCharacter`** (string or char)
+- **`spaceCharacter`** (string or char; add-to-list / title-bar Reset use ordinary space)
   - **Single** character that becomes the word separator (first character used if a longer string is sent).
   - Empty / undefined Other (NUL) fails setup with **Space character not defined** (MFR7 parity).
-- **`replacements`** (array of strings)
+- **`replacements`** (array of strings; add-to-list / title-bar Reset use `DefaultReplacements`:
+  `"%20"`, `" "` (U+0020 SPACE), `"_"`)
   - Each listed substring is replaced with `spaceCharacter`, in array order.
   - Built-in choices map to `"%20"`, `" "` (U+0020 SPACE), and `"_"`.
   - Any other string is a custom replacement (for example `"++"`).

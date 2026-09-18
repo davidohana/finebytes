@@ -50,6 +50,10 @@ Add `Mfr.Tests/Models/Filters/<Group>/YourFilterTests.cs`. Use `FilterTestHelper
 
 Add `Mfr.Filters/docs/<Group>/YourFilterType.md` (examples table per `Mfr.Filters/docs/README.md`) and link it from `Mfr.Filters/docs/README.md` in the right group section.
 
+When an option’s **JSON / options-record default** differs from the **parameterless ctor** (palette add /
+title-bar Reset), document both on the same bullet — see **Option defaults (JSON vs add-to-list)** in
+`Mfr.Filters/docs/README.md`. Do not call a Load-defaults / Current editor button an add-to-list default.
+
 ## User Help HTML
 
 When adding a filter, also ship Help next to the exe (refresh the same page if options/labels

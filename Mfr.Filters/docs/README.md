@@ -90,6 +90,18 @@ Each filter in a preset has:
 
 Property names use **camelCase**; enum values usually match the C# names (e.g. `Capitalize`, `Literal`).
 
+### Option defaults (JSON vs add-to-list)
+
+Document each option’s **JSON / options-record default** (what you get when the key is omitted or the
+record parameter default applies). When the **parameterless filter ctor** (palette add and title-bar
+Reset) uses a different value, say so on the same bullet:
+
+- Same value: `default \`X\`` (or `default \`X\` on the options record / omitted JSON key`).
+- Different: `default \`X\` in JSON; add-to-list / title-bar Reset use \`Y\``.
+
+Do **not** call a Load-defaults / Current-style editor button an “add-to-list default” — that is a
+separate inject path (document it under the option or Editor section when present).
+
 Each filter page uses an **Examples** section: prefer a four-column table (**Options**, **Before**, **After**, **Comment**) when every padded row fits in **120** characters; otherwise use a bullet list with the same fields. Use **Comment** only when the example is non-obvious (edge case, chain order, or why the result differs from a first guess). In table **Options** cells, put each option property on its **own line** (HTML `<br>` in the markdown source).
 
 **Order matters.** Some filters only affect _later_ filters (for example `SpaceCharacter` sets the word separator; `SentenceEndCharacters` sets sentence-ending punctuation). Put those _before_ the filters that should use the new settings.
