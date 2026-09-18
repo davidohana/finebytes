@@ -1,4 +1,4 @@
-// Prefs store ownership: docs/plans/layering-ownership-cleanup.plan.md (P1); layering doc in P2
+// Prefs store ownership: docs/mfr-folder-layering.md
 
 namespace Mfr.Tests.Architecture
 {

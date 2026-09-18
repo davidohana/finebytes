@@ -29,24 +29,36 @@ Illustrative spine (typical flow, not exhaustive):
 
 `Mfr.App.Cli -> Mfr.Engine -> Mfr.Filters -> Mfr.Models -> Mfr.Utils`
 
-`Mfr.App.Ui -> Mfr.Engine -> ...` (same lower layers as CLI)
+`Mfr.App.Ui -> Mfr.Engine -> ...` (same lower layers as CLI; UI also references `Mfr.Filters` directly for editors)
 
 `Mfr.Metadata` bridges TagLib Sharp and MetadataExtractor to canonical records in `Mfr.Models` (overlay types, semantic projection/merge, and field get/set live in L1; TagLib and MetadataExtractor read/write/detect stay in L2). `Mfr.Engine` references Metadata for commit Apply; filters use Models for overlay edits and Metadata only for lazy load.
+
+### Prefs ownership (Engine store, Models shape)
+
+- **L4 Engine** owns process-wide prefs I/O: [`ConfigStore`](../Mfr.Engine/Config/ConfigStore.cs) and [`ConfirmationPolicy`](../Mfr.Engine/Config/ConfirmationPolicy.cs) under `Mfr.Engine.Config` (load/save/delete, soft-load dialect, CLI `--set`). Guarded by `ConfigStoreOwnershipArchitectureTests`.
+- **L1 Models** owns prefs **shape** only: `OptionsConfig`, `LogConfig`, `RenameLogConfig`, session DTOs (`FileListPrefs`, …), `ConfirmationKind` under `Mfr.Models.Config`.
+- Reset Configuration stays [`PersistedConfigurationReset`](../Mfr.Engine/Config/PersistedConfigurationReset.cs) (calls `ConfigStore.DeleteDefaultFile`).
+
+### Models friend assemblies
+
+`Mfr.Models` uses `InternalsVisibleTo` for **Engine**, **Filters**, and **Tests** so row mutation helpers (`RenameItem` load flags / overlay setters), field-catalog internals, and `BaseFilter.Setup`/`Apply` stay non-public to UI. Do **not** publicize those for App.Ui. Metadata uses only public Models DTOs (no Models friend access).
 
 ## Enforcement
 
 - Enforced by `.csproj` project references.
-- Keep architecture tests in `Mfr.Tests` for guardrails.
+- Keep architecture tests in `Mfr.Tests` for guardrails (`ProjectReferenceArchitectureTests`, `PackageOwnershipArchitectureTests`, `ConfigStoreOwnershipArchitectureTests`, UI layer tests).
 
 ## UI project internal layering
 
 Inside [`Mfr.App.Ui/`](../Mfr.App.Ui), keep dependencies one-way:
 
-`Views → ViewModels → Services → Engine / Models / Utils`
+`Views → ViewModels → Services`
 
-Do not import `ViewModels` (or Views) from `Services`. Session restore/save passes Models session DTOs (`FileListPrefs`, `RenameListPrefs`) across that boundary; apply/capture lives on the pane view models. Guarded by `UiServicesLayerArchitectureTests`.
+- **ViewModels** use Engine + Filters + Models (+ Utils as needed) for orchestration (Rename List, Filter Chain, Options, presets).
+- **Services** may use Engine.Config / Models (session DTOs, File List options) and must **not** import Filters or Metadata. Services must not import ViewModels or Views (guarded by `UiServicesLayerArchitectureTests`).
+- **Views** must not import ViewModels types for ownership (ViewModels↛Views guarded by `UiViewModelsLayerArchitectureTests`). Supporting folders (`Diagnostics`, `Input`, `Converters`, `Threading`) are not separate layers.
 
-ViewModels must not import Views. Guarded by `UiViewModelsLayerArchitectureTests`.
+Do not import `ViewModels` (or Views) from `Services`. Session restore/save passes Models session DTOs (`FileListPrefs`, `RenameListPrefs`) across that boundary; apply/capture lives on the pane view models.
 
 ### Views → Services (intentional glue)
 

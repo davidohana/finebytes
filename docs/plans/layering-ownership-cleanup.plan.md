@@ -1,7 +1,7 @@
 ---
 title: Layering ownership cleanup
 description: Move ConfigStore I/O to Engine; update layering docs; no new projects.
-status: in-progress
+status: complete
 ---
 
 # Layering ownership cleanup plan
@@ -90,7 +90,7 @@ flowchart TB
   - Models `InternalsVisibleTo` Engine/Filters is intentional (`RenameItem` mutation, field catalog types, `BaseFilter.Setup`/`Apply`). Do not make those public for UI.
   - Drop unused `InternalsVisibleTo` **Metadata** from [`Mfr.Models.csproj`](../../Mfr.Models/Mfr.Models.csproj) after confirm Metadata does not touch Models internals (current readers only use public tag/media DTOs).
 - **Exit:** doc matches code; Models still builds Metadata without friend access; `just lint`.
-- **Status:** pending
+- **Status:** done
 
 ### P3 — Optional later (not default)
 
