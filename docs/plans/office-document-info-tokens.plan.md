@@ -10,7 +10,7 @@ todos:
     status: done
   - id: p3-docs
     content: "P3: office-metadata-model.md + help/credits + parent P3 mark"
-    status: pending
+    status: done
 ---
 
 # Office DOCX PackageProperties (read-only)
@@ -21,7 +21,7 @@ Parent: [`docs/plans/more-read-only-metadata-formats.plan.md`](docs/plans/more-r
 
 - [x] P1 — Reader + FileMeta bucket
 - [x] P2 — Tokens + Rename List columns
-- [ ] P3 — Docs + help
+- [x] P3 — Docs + help
 
 ## Decisions (locked)
 

@@ -42,7 +42,7 @@ Along with path and file-name targets ([preset shape](../README.md#preset-shape)
 
 Reads from **`Preview.AudioTagOverlay`**. Tag-backed fields load from disk (**`TagLibFileAccess.Read`**) **on first `audio-*` / `id3v2` / `id3v2-version` token use** (or first `media-*` / `mp3-*` token, which shares that open) for that **file** row inside a **`Preview`** run; the same open also fills the media cache when it is not already marked loaded. **`RenameList.Commit`** clears cached overlays afterward so later previews reload from disk. **Directory rows** or **unsupported / unreadable** embedded metadata cause **`RenameStatus.PreviewError`** on that row; when TagLib or the reader throws, the surfaced **`RenameItem`** **`PreviewError`** entry keeps that exception as **`Cause`**.
 
-**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mp3-*`, `image-*`, `exif-*`, `pdf-*`, `epub-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
+**Contrast:** file-name and audio tokens both use **`Preview`** so later filters in the chain see mutated names/tags before a formatter runs. Disk-backed read-only facts (`media-*`, `mp3-*`, `image-*`, `exif-*`, `pdf-*`, `epub-*`, `office-*`, `file-size`, dates, drive/label/count) still read **`Original`**.
 
 Unit tests typically construct **`RenameItem`** via **`FilterTestHelpers.CreateRenameItem`**, which marks TagLib load as already attempted (`TagLibLoadAttempted`) so **`EnsureTagLibLoaded`** does not touch pre-seeded **`AudioTagOverlay`**; integration-style tests use real tagged temp files when exercising disk read.
 
@@ -214,6 +214,41 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark EPUB load as alread
 | `<epub-description>` | Dublin Core description; empty when unset.                                                               |
 
 **Arguments:** No argument (`<epub-title>` only). A stray **`<epub-title:…>`** fails at compile.
+
+#### Office Document
+
+Reads from **`Original.Office`** (read-only OpenXml PackageProperties cache). Properties load from
+disk (**`OfficeFileReader.Read`** via `WordprocessingDocument.Open`) **on first `office-*` token use**
+for that **file** row inside a **`Preview`** run; **`RenameList.Commit`** clears the cache afterward
+so later previews reload from disk. v1 opens **`.docx` only**.
+
+Display strings come from Models **`OfficeDocumentInfoFormatting`** (`PropertyDisplayContext.Token`),
+shared with Rename List Office columns (`Grid`). Created/Modified keep the Token Invariant
+`DateTimeOffset` `"G"` vs Grid `FormatFileDate(LocalDateTime)` split; package dates normalize to UTC
+offset 0 (OpenXml often surfaces Zulu core props as Local) — see
+[office-metadata-model.md](../../../docs/office-metadata-model.md).
+
+**Directory rows**, non-DOCX files, and corrupt/unreadable packages surface
+**`RenameStatus.PreviewError`** (exception as **`Cause`**). A successful open with a missing
+PackageProperties field expands **empty**, not an error. Author maps from OPC **Creator**. There is
+no core.xml write/Apply path.
+
+Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark Office load as already attempted so
+seeded **`FileMeta.Office`** is used without disk I/O.
+
+| Token                       | Output                                                                                 |
+| --------------------------- | -------------------------------------------------------------------------------------- |
+| `<office-title>`            | PackageProperties Title; empty when unset.                                             |
+| `<office-author>`           | PackageProperties Creator (exposed as Author); empty when unset.                       |
+| `<office-subject>`          | PackageProperties Subject; empty when unset.                                           |
+| `<office-keywords>`         | PackageProperties Keywords; empty when unset.                                          |
+| `<office-category>`         | PackageProperties Category; empty when unset.                                          |
+| `<office-description>`      | PackageProperties Description; empty when unset.                                       |
+| `<office-last-modified-by>` | PackageProperties LastModifiedBy; empty when unset.                                    |
+| `<office-created>`          | Created as general date/time (`G`, InvariantCulture, UTC offset 0); empty when unset.  |
+| `<office-modified>`         | Modified as general date/time (`G`, InvariantCulture, UTC offset 0); empty when unset. |
+
+**Arguments:** No argument (`<office-title>` only). A stray **`<office-title:…>`** fails at compile.
 
 #### EXIF
 
