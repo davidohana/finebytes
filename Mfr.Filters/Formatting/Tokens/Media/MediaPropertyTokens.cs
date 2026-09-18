@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Media;
 
 namespace Mfr.Filters.Formatting.Tokens.Media
@@ -22,25 +22,7 @@ namespace Mfr.Filters.Formatting.Tokens.Media
         public bool TryGetFixedField(out string groupId, out string propertyKey)
         {
             groupId = MediaRenameListFields.Group;
-            propertyKey = propertyField switch
-            {
-                MediaPropertyField.MimeType => MediaRenameListFields.Key.MimeType,
-                MediaPropertyField.Corrupt => MediaRenameListFields.Key.PossiblyCorrupt,
-                MediaPropertyField.Duration => MediaRenameListFields.Key.Duration,
-                MediaPropertyField.DurationSec => MediaRenameListFields.Key.DurationSeconds,
-                MediaPropertyField.MediaTypes => MediaRenameListFields.Key.MediaTypes,
-                MediaPropertyField.Description => MediaRenameListFields.Key.Description,
-                MediaPropertyField.AudioBitrate => MediaRenameListFields.Key.AudioBitrate,
-                MediaPropertyField.SampleRate => MediaRenameListFields.Key.AudioSampleRate,
-                MediaPropertyField.BitsPerSample => MediaRenameListFields.Key.BitsPerSample,
-                MediaPropertyField.Channels => MediaRenameListFields.Key.AudioChannels,
-                MediaPropertyField.VideoWidth => MediaRenameListFields.Key.VideoWidth,
-                MediaPropertyField.VideoHeight => MediaRenameListFields.Key.VideoHeight,
-                MediaPropertyField.PhotoWidth => MediaRenameListFields.Key.PhotoWidth,
-                MediaPropertyField.PhotoHeight => MediaRenameListFields.Key.PhotoHeight,
-                MediaPropertyField.PhotoQuality => MediaRenameListFields.Key.PhotoQuality,
-                _ => throw new UnreachableException(),
-            };
+            propertyKey = MediaPropertyRenameListField.CatalogPropertyKey(propertyField);
             return true;
         }
 
@@ -52,7 +34,11 @@ namespace Mfr.Filters.Formatting.Tokens.Media
             return item =>
             {
                 item.EnsureTagLibLoaded();
-                return MediaPropertiesFormatting.Format(item.Original.Media, propertyField);
+                return MediaPropertiesFormatting.Format(
+                    item.Original.Media,
+                    propertyField,
+                    PropertyDisplayContext.Token
+                );
             };
         }
     }

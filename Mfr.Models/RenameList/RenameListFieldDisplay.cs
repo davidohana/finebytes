@@ -140,10 +140,10 @@ namespace Mfr.Models.RenameList
         }
 
         /// <summary>
-        /// Formats optional text from image or EXIF snapshots.
+        /// Formats optional text from property snapshots (Image, EXIF, Media, PDF, …).
         /// </summary>
         /// <param name="value">Stored text, or <see langword="null"/> when absent.</param>
-        /// <returns>Trimmed text, or empty.</returns>
+        /// <returns>The value when non-blank; otherwise empty.</returns>
         internal static string FormatOptionalText(string? value)
         {
             return value.IsBlank() ? string.Empty : value;

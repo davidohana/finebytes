@@ -1,5 +1,6 @@
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.Tokens.Mpeg;
+using Mfr.Models.RenameList.Fields.Mpeg;
 using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
@@ -9,6 +10,45 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Mpeg
     /// </summary>
     public sealed class MpegAudioPropertyTokenTests
     {
+        /// <summary>
+        /// Token enum member names that drift from catalog keys must map explicitly.
+        /// </summary>
+        [Fact]
+        public void CatalogPropertyKey_NameDriftArms_MapExplicitly()
+        {
+            Assert.Equal(
+                MpegRenameListFields.Key.VBR,
+                MpegPropertyRenameListField.CatalogPropertyKey(MpegAudioPropertyField.Encoding)
+            );
+            Assert.Equal(
+                MpegRenameListFields.Key.Level,
+                MpegPropertyRenameListField.CatalogPropertyKey(MpegAudioPropertyField.MpegVer)
+            );
+            Assert.Equal(
+                MpegRenameListFields.Key.DurationSecs,
+                MpegPropertyRenameListField.CatalogPropertyKey(MpegAudioPropertyField.DurationSec)
+            );
+        }
+
+        [Fact]
+        public void TryGetFixedField_NameDriftTokens_MapCatalogKeys()
+        {
+            var encoding = new MpegEncodingToken();
+            Assert.True(encoding.TryGetFixedField(out var encodingGroup, out var encodingKey));
+            Assert.Equal(MpegRenameListFields.Group, encodingGroup);
+            Assert.Equal(MpegRenameListFields.Key.VBR, encodingKey);
+
+            var mpegVer = new MpegVerToken();
+            Assert.True(mpegVer.TryGetFixedField(out var verGroup, out var verKey));
+            Assert.Equal(MpegRenameListFields.Group, verGroup);
+            Assert.Equal(MpegRenameListFields.Key.Level, verKey);
+
+            var durationSec = new MpegDurationSecToken();
+            Assert.True(durationSec.TryGetFixedField(out var durationGroup, out var durationKey));
+            Assert.Equal(MpegRenameListFields.Group, durationGroup);
+            Assert.Equal(MpegRenameListFields.Key.DurationSecs, durationKey);
+        }
+
         private static MediaProperties _MediaWithMpeg(MpegAudioProperties mpeg)
         {
             return new MediaProperties { Mpeg = mpeg };
