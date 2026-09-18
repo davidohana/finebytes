@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Migrating from MFR 7</title>
+    <link rel="stylesheet" href="../help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt; <a href="../index.html#introduction">Introduction</a>
+      &gt; <strong>Migrating from MFR 7</strong>
+    </nav>
+    <hr />
+    <h1>Migrating from MFR 7</h1>
+    <p>
+      Magic File Renamer 8 keeps the same batch-renaming ideas as MFR 7, but names, storage, and a
+      few filters changed in the rewrite. Use the tables below to find the MFR 8 counterpart for a
+      familiar MFR 7 feature. There is no automatic import of MFR 7 presets or settings.
+    </p>
+    <p class="note">
+      Also see <a href="whatsnew.html">What's New</a>,
+      <a href="sysreqs.html#vercompt">Version compatibility</a>, and
+      <a href="../guide/faqs.html#mfr7presets">FAQs — MFR 7 presets</a>.
+    </p>
+
+    <h2 id="ui">UI and workflow</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>MFR 7</th>
+          <th>MFR 8</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Applied Filters</td>
+          <td><a href="../ui/appliedfilterlist.html">Filter Chain</a></td>
+          <td>Same ordered list of filters to apply; renamed everywhere in the UI and Help.</td>
+        </tr>
+        <tr>
+          <td>Generate Batch Renaming File</td>
+          <td>Tools → Generate Rename Script</td>
+          <td>
+            Exports pending path and attribute changes as <span class="quote">.bat</span> or
+            PowerShell <span class="quote">.ps1</span>.
+          </td>
+        </tr>
+        <tr>
+          <td>Undo Last (writes immediately)</td>
+          <td><a href="../guide/undolast.html">Undo Last</a> (preview session)</td>
+          <td>
+            Loads reverse values and clears the Filter Chain; nothing is written until you press
+            <a href="../guide/applychanges.html">GO</a> again.
+          </td>
+        </tr>
+        <tr>
+          <td>Console / <span class="quote">MFRC</span></td>
+          <td><a href="../guide/console.html">Console</a> (<span class="quote">mfr</span>)</td>
+          <td>
+            See <a href="../guide/cml.html">Command Line Parameters</a>. New flags include
+            <span class="quote">--dry-run</span>, <span class="quote">-o</span> /
+            <span class="quote">--output-file</span>, and <span class="quote">--set</span>.
+          </td>
+        </tr>
+        <tr>
+          <td>Explorer “Rename with MFR…”</td>
+          <td>—</td>
+          <td>
+            Not in this build. Use the <a href="../ui/fileexp.html">File List</a>, drag and drop,
+            or the console. See <a href="sysreqs.html#contextmenu">System Requirements</a>.
+          </td>
+        </tr>
+        <tr>
+          <td>Show Hidden (Rename List menu / Explorer)</td>
+          <td>
+            <a href="../ui/optionswin.html">Options</a> — include hidden / system when adding
+          </td>
+          <td>One preference drives File List visibility and Rename List add include.</td>
+        </tr>
+        <tr>
+          <td>Open UI with paths on the command line</td>
+          <td>—</td>
+          <td>
+            Not in this build for the desktop UI. Seed the Rename List from the File List, drag and
+            drop, or use the <span class="quote">mfr</span> console.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="storage">Settings and presets</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>MFR 7</th>
+          <th>MFR 8</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>XML presets (<span class="quote">.mps</span>)</td>
+          <td>JSON presets</td>
+          <td>
+            Not imported automatically. Rebuild the Filter Chain and
+            <a href="../guide/savepreset.html">save a new preset</a>.
+          </td>
+        </tr>
+        <tr>
+          <td>Legacy shared config / session files</td>
+          <td>
+            <span class="quote">config.json</span> under
+            <span class="quote">%AppData%\finebytes\mfr\</span>
+          </td>
+          <td>
+            Soft-loads with defaults when missing or corrupt. See
+            <a href="../ui/optionswin.html">Options</a> and
+            <a href="../guide/resetconfig.html">Reset configuration</a>.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="groups">Filter groups</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>MFR 7 group</th>
+          <th>MFR 8 group</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Case</td>
+          <td>Case</td>
+        </tr>
+        <tr>
+          <td>Space</td>
+          <td>Space</td>
+        </tr>
+        <tr>
+          <td>Trimmer</td>
+          <td>Trimming</td>
+        </tr>
+        <tr>
+          <td>Replace</td>
+          <td>Replace</td>
+        </tr>
+        <tr>
+          <td>Format</td>
+          <td>Formatting</td>
+        </tr>
+        <tr>
+          <td>ID3</td>
+          <td>Audio</td>
+        </tr>
+        <tr>
+          <td>Attrs</td>
+          <td>Attributes</td>
+        </tr>
+        <tr>
+          <td>Misc</td>
+          <td>Misc</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="filters">Filters renamed or combined</h2>
+    <p>
+      Most filters keep the same display name. These are the ones that changed. Full catalog:
+      <a href="../filters/filters.html">Filters</a>.
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>MFR 7</th>
+          <th>MFR 8</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Remove Duplicate Characters</td>
+          <td>
+            <a href="../filters/trimming/ShrinkDuplicateCharacters.html">Shrink Duplicate Characters</a>
+          </td>
+          <td>Same behavior; renamed in the rewrite.</td>
+        </tr>
+        <tr>
+          <td>Trim Spaces Left</td>
+          <td><a href="../filters/space/StripSpacesLeft.html">Strip Spaces Left</a></td>
+          <td>Same behavior; renamed in the rewrite.</td>
+        </tr>
+        <tr>
+          <td>Trim Spaces Right</td>
+          <td><a href="../filters/space/StripSpacesRight.html">Strip Spaces Right</a></td>
+          <td>Same behavior; renamed in the rewrite.</td>
+        </tr>
+        <tr>
+          <td>Date Setter + Time Setter</td>
+          <td><a href="../filters/attributes/DateTimeSetter.html">Date/Time Setter</a></td>
+          <td>
+            One filter with optional <span class="quote">Set date</span> /
+            <span class="quote">Set time</span>.
+          </td>
+        </tr>
+        <tr>
+          <td>Set from FreeDB</td>
+          <td>—</td>
+          <td>Not shipped yet. May return in a later release.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="tokens">Formatting tokens and Rename List fields</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>MFR 7</th>
+          <th>MFR 8</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Image Tag columns / <span class="quote">&lt;imagetag-*&gt;</span></td>
+          <td>
+            Jpeg / EXIF columns;
+            <span class="quote">&lt;exif-*&gt;</span> /
+            <span class="quote">&lt;image-*&gt;</span>
+          </td>
+          <td>
+            TagLib Image Tag fields (Rating, Orientation, Creator, …) are not ported. Prefer EXIF
+            and image property tokens where they cover the same data. See
+            <a href="../tokens/fp.html">Formatting Tokens</a> and
+            <a href="../reference/fields.html">Rename List Fields</a>.
+          </td>
+        </tr>
+        <tr>
+          <td>Clipboard text token</td>
+          <td>—</td>
+          <td>Not shipped yet.</td>
+        </tr>
+        <tr>
+          <td>GeoNames / <span class="quote">&lt;geo-*&gt;</span> tokens</td>
+          <td>—</td>
+          <td>Not shipped yet.</td>
+        </tr>
+        <tr>
+          <td>WMF / EMF image property tokens</td>
+          <td>—</td>
+          <td>
+            Image property tokens no longer cover WMF or EMF. WebP (and EXIF on PNG / TIFF / WebP)
+            are supported instead where MetadataExtractor can read them.
+          </td>
+        </tr>
+        <tr>
+          <td>Name List formatter parameter</td>
+          <td><a href="../filters/formatting/NameList.html">Name List</a> filter</td>
+          <td>
+            Per-line names live on the filter; there is no separate Name List formatting token.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="note">
+      Filters whose display names match MFR 7 (for example Capitalize After, Replacer, Formatter,
+      Audio Tag Setter) are listed under <a href="../filters/filters.html">Filters</a> — they are
+      not repeated here.
+    </p>
+  </body>
+</html>
