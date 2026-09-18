@@ -21,7 +21,7 @@ namespace Mfr.Tests.Ui.About
             Assert.Equal(AppProductInfo.GetDisplayVersion(), viewModel.DisplayVersion);
             Assert.Equal(AppProductInfo.GetCopyright(), viewModel.Copyright);
             Assert.False(string.IsNullOrWhiteSpace(viewModel.DisplayVersion));
-            Assert.Contains("Beta", viewModel.DisplayVersion, StringComparison.Ordinal);
+            Assert.Contains("8.0.0-beta", viewModel.DisplayVersion, StringComparison.Ordinal);
             Assert.False(string.IsNullOrWhiteSpace(viewModel.Copyright));
             Assert.Contains("1999", viewModel.Copyright, StringComparison.Ordinal);
             Assert.Contains("FineBytes", viewModel.Copyright, StringComparison.Ordinal);

@@ -22,7 +22,7 @@ Parent: deferred **5c** in [`docs/image-metadata-model.md`](../image-metadata-mo
 - **Display format** — invariant culture, up to 6 decimal places, trim trailing zeros (`0.######`). Same for tokens and Rename List columns.
 - **Tokens** — `<exif-gps-lat>` / `<exif-gps-lon>`; GeoNames `<geo-place>` / `<geo-region>` / `<geo-country>` (not MFR7 `image-nearby-*`).
 - **Empty rules** — missing GPS → empty; blank GeoNames username → empty; successful lookup with blank field → empty. Network/API/XML failure when a `geo-*` token or geo column is used → **PreviewError**.
-- **GeoNames auth** — `OptionsConfig.GeoNamesUsername` (default blank). HTTPS `https://api.geonames.org/findNearby` with `style=FULL`. No vendored 3rdParty GeoNames lib — thin `HttpClient` + XML parse in `Mfr.Metadata`.
+- **GeoNames auth** — see **Online auth without end-user username** below. Default lock remains user-supplied `OptionsConfig.GeoNamesUsername` until changed.
 - **Username plumbing** — Filters must not reference `ConfigStore`. Persist on `OptionsConfig`; Engine syncs a small Models accessor / `Func<string?>` when prefs load and when Options OK. Client takes username as a parameter.
 - **Caching** — process-wide dictionary keyed by lat/lon rounded to 4 decimals → place/region/country; clear when username changes. Per-row `GeoNamesInfo` on `FileMeta`; commit `ClearMetadataCaches` clears the row snapshot.
 - **Rename List** — Latitude/Longitude under Jpeg group (`ImageProperties`). Nearby Country/Region/Place use new `RenameListMetadataRequirement.GeoNames` so the grid only hits the network when those columns are visible.
@@ -80,7 +80,22 @@ Uncompressed text is larger (often ~2–3× zip). In-memory KD-tree is larger st
 
 Libraries that do B/C (not locked): NuGet **ReverseGeocoder** / **GeoSharp**-style loaders, or **NGeoNames**, all feeding official [GeoNames dump](https://download.geonames.org/export/dump/) text — still CC-BY attribution in help/About. None remove the need to ship or download data.
 
-**Still locked: A** until the user picks otherwise. Typed GPS (P1) is offline either way; only P2 place names need A/B/C.
+**Still locked: A** (online GeoNames) until the user picks otherwise. Typed GPS (P1) is offline either way; only P2 place names need A/B/C. Auth flavor for A is under **Online auth without end-user username**.
+
+### Online auth without end-user username
+
+GeoNames **free web services always require a `username=`** — anonymous/`demo` is dead. Options that hide that from the end user:
+
+| Flavor | End-user setup | How it works | Risk |
+| --- | --- | --- | --- |
+| **A1. User username (current UX lock)** | Options TextBox | Each user registers at geonames.org | Best ToS fit; friction |
+| **A2. App-bundled FineBytes username** | None | Ship one registered username in the client | Shared **~10k credits/day** across *all* installs; one abusive user can burn the quota; commercial/scale may need premium |
+| **A3. OSM Nominatim public** | None (User-Agent only) | `nominatim.openstreetmap.org/reverse` | **No API key**, but ≤1 req/s *per app globally*, identifying User-Agent, attribution, must be able to switch host without an update. Batch Rename List / preview of many GPS files is a poor fit — easy to violate policy |
+| **B/C offline dump** | None | Local nearest-city | No online auth at all (see sizes above) |
+
+**Recommendation if “no username field” is required:** prefer **B (`cities15000` ~3.2 MB)** over A2/A3. A2 is OK for early/private builds only. A3 is not recommended for MFR’s batch preview model.
+
+**Still locked: A1** until the user picks A2, A3, or B.
 
 ## UX
 
