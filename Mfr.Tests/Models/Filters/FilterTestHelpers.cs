@@ -87,13 +87,19 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
-        /// Ensures purely synthetic MP3-ish rows carry at least one ID3v2 block so semantic merges used by preview filters persist.
+        /// Ensures purely synthetic MP3-ish rows carry at least one tag block so semantic merges used by preview filters persist.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Skips when any format block is already present (including ID3v1-only). Otherwise injects a minimal ID3v2 overlay.
+        /// </para>
+        /// </remarks>
         internal static void EnsureSyntheticAudioOverlayWhenTagless(FileMeta meta)
         {
             var o = meta.AudioTagOverlay;
             if (
-                o.Id3v2 is not null
+                o.Id3v1 is not null
+                || o.Id3v2 is not null
                 || o.Xiph is not null
                 || o.Ape is not null
                 || o.Apple is not null

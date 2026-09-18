@@ -1,13 +1,21 @@
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Audio;
+using Mfr.Filters.Formatting;
+using Mfr.Models.Filters;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Id3v1;
+using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Xiph;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v1;
+using Mfr.Models.Tags.Id3v2;
+using Mfr.Models.Tags.Xiph;
 using Mfr.Tests.Models.Filters;
 
 namespace Mfr.Tests.Models
@@ -20,13 +28,34 @@ namespace Mfr.Tests.Models
         [Fact]
         public void Catalog_registers_all_phase7a_original_field_groups()
         {
-            Assert.Equal(97, RenameListFieldCatalog.All.Count);
+            Assert.Equal(
+                BasicRenameListFields.All.Count
+                    + ExtendedRenameListFields.All.Count
+                    + AudioTagRenameListFields.All.Count
+                    + Id3v1RenameListFields.All.Count
+                    + Id3v2RenameListFields.All.Count
+                    + XiphRenameListFields.All.Count
+                    + MediaRenameListFields.All.Count
+                    + MpegRenameListFields.All.Count
+                    + ImageRenameListFields.All.Count
+                    + JpegRenameListFields.All.Count,
+                RenameListFieldCatalog.All.Count
+            );
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(BasicRenameListField.Group).Count);
             Assert.Equal(6, RenameListFieldCatalog.GetFieldsForGroup(ExtendedRenameListFields.Group).Count);
             Assert.Equal(32, RenameListFieldCatalog.GetFieldsForGroup(AudioTagRenameListFields.Group).Count);
             Assert.Equal(
                 AudioTagRenameListFields.All.OrderBy(f => f.DisplayName, StringComparer.OrdinalIgnoreCase).ToList(),
                 [.. AudioTagRenameListFields.All]
+            );
+            Assert.Equal(7, RenameListFieldCatalog.GetFieldsForGroup(Id3v1RenameListFields.Group).Count);
+            Assert.Equal(
+                1 + Id3v2ModeledFrame.AllModeledFrameIds.Count,
+                RenameListFieldCatalog.GetFieldsForGroup(Id3v2RenameListFields.Group).Count
+            );
+            Assert.Equal(
+                XiphKnownKeys.All.Count,
+                RenameListFieldCatalog.GetFieldsForGroup(XiphRenameListFields.Group).Count
             );
             Assert.Equal(15, RenameListFieldCatalog.GetFieldsForGroup(MediaRenameListFields.Group).Count);
             Assert.Equal(11, RenameListFieldCatalog.GetFieldsForGroup(MpegRenameListFields.Group).Count);
@@ -74,6 +103,9 @@ namespace Mfr.Tests.Models
                     BasicRenameListField.GroupLabel,
                     ExtendedRenameListFields.GroupLabel,
                     AudioTagRenameListFields.GroupLabel,
+                    Id3v1RenameListFields.GroupLabel,
+                    Id3v2RenameListFields.GroupLabel,
+                    XiphRenameListFields.GroupLabel,
                     MediaRenameListFields.GroupLabel,
                     MpegRenameListFields.GroupLabel,
                     ImageRenameListFields.GroupLabel,
@@ -687,6 +719,328 @@ namespace Mfr.Tests.Models
                 Assert.False(field.SupportsWrite, field.PropertyKey);
                 Assert.Null(field.WriteTarget);
             }
+        }
+
+        [Fact]
+        public void Id3v1_fields_cover_scalars_with_field_targets()
+        {
+            var fields = RenameListFieldCatalog.GetFieldsForGroup(Id3v1RenameListFields.Group);
+            var expectedFields = Enum.GetValues<Id3v1Field>().ToArray();
+
+            Assert.Equal(expectedFields.Length, fields.Count);
+            Assert.Equal(expectedFields.Select(static field => field.ToString()), fields.Select(f => f.PropertyKey));
+
+            foreach (var (field, expected) in fields.Zip(expectedFields))
+            {
+                Assert.True(field.SupportsPreview, field.PropertyKey);
+                Assert.True(field.SupportsWrite, field.PropertyKey);
+                Assert.Equal(expected.ToString(), field.DisplayName);
+                var target = Assert.IsType<Id3v1FieldTarget>(field.WriteTarget);
+                Assert.Equal(expected, target.Field);
+            }
+        }
+
+        [Fact]
+        public void Id3v1_title_resolves_from_overlay_block()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "mp3",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        ContainerFormat = AudioContainerFormat.Mpeg,
+                        Id3v1 = new Id3v1TagData
+                        {
+                            Title = "Trailer Title",
+                            Year = 1999,
+                            Track = 3,
+                            Genre = Id3v1Genres.AudioToIndex("Rock"),
+                        },
+                    }
+            );
+
+            Assert.Equal(
+                "Trailer Title",
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Title"))
+            );
+            Assert.Equal(
+                "1999",
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Year"))
+            );
+            Assert.Equal(
+                "3",
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Track"))
+            );
+            Assert.Equal(
+                "Rock",
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Genre"))
+            );
+        }
+
+        [Fact]
+        public void Id3v1_fields_empty_without_id3v1_block()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "flac",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        ContainerFormat = AudioContainerFormat.Flac,
+                        // Non-null Xiph keeps EnsureSyntheticAudioOverlayWhenTagless from injecting ID3.
+                        Xiph = new XiphTagData(),
+                    }
+            );
+
+            Assert.Equal(
+                string.Empty,
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Title"))
+            );
+        }
+
+        [Fact]
+        public void Id3v1_title_preview_differs_after_formatter_on_field_target()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "mp3",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        ContainerFormat = AudioContainerFormat.Mpeg,
+                        Id3v1 = new Id3v1TagData { Title = "Old" },
+                    }
+            );
+            var titleOriginal = RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Title");
+            var titlePreview = RenameListFieldKey.Preview(Id3v1RenameListFields.Group, "Title");
+
+            Assert.Equal("Old", RenameListFieldCatalog.Resolve(item, titleOriginal));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, titlePreview));
+
+            var filter = new FormatterFilter(new Id3v1FieldTarget(Id3v1Field.Title), new FormatterOptions("New"));
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("Old", RenameListFieldCatalog.Resolve(item, titleOriginal));
+            Assert.Equal("New", RenameListFieldCatalog.Resolve(item, titlePreview));
+            Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, titlePreview));
+        }
+
+        [Fact]
+        public void Xiph_fields_cover_known_keys_with_field_targets()
+        {
+            var fields = RenameListFieldCatalog.GetFieldsForGroup(XiphRenameListFields.Group);
+
+            Assert.Equal(XiphKnownKeys.All.Count, fields.Count);
+            Assert.Equal(XiphKnownKeys.All, fields.Select(f => f.PropertyKey));
+
+            foreach (var (field, expectedKey) in fields.Zip(XiphKnownKeys.All))
+            {
+                Assert.True(field.SupportsPreview, field.PropertyKey);
+                Assert.True(field.SupportsWrite, field.PropertyKey);
+                Assert.Equal(XiphKeyLabels.For(expectedKey), field.DisplayName);
+                Assert.Equal(XiphKeyLabels.Tip(expectedKey), field.Tip);
+                var target = Assert.IsType<XiphFieldTarget>(field.WriteTarget);
+                Assert.Equal(expectedKey, target.Key);
+            }
+        }
+
+        [Fact]
+        public void Xiph_title_resolves_from_overlay_block()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "flac",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        ContainerFormat = AudioContainerFormat.Flac,
+                        Xiph = new XiphTagData
+                        {
+                            Fields =
+                            [
+                                new TextFieldRow("TITLE", ["Vorbis Title"]),
+                                new TextFieldRow("ARTIST", ["Band"]),
+                                new TextFieldRow("TRACKNUMBER", ["3"]),
+                            ],
+                        },
+                    }
+            );
+
+            Assert.Equal(
+                "Vorbis Title",
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(XiphRenameListFields.Group, "TITLE"))
+            );
+            Assert.Equal(
+                "Band",
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(XiphRenameListFields.Group, "ARTIST"))
+            );
+            Assert.Equal(
+                "3",
+                RenameListFieldCatalog.Resolve(
+                    item,
+                    RenameListFieldKey.Original(XiphRenameListFields.Group, "TRACKNUMBER")
+                )
+            );
+        }
+
+        [Fact]
+        public void Xiph_fields_empty_without_xiph_block()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "mp3",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        ContainerFormat = AudioContainerFormat.Mpeg,
+                        Id3v1 = new Id3v1TagData { Title = "V1 only" },
+                    }
+            );
+
+            Assert.Equal(
+                string.Empty,
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(XiphRenameListFields.Group, "TITLE"))
+            );
+        }
+
+        [Fact]
+        public void Xiph_title_preview_differs_after_formatter_on_field_target()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "flac",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        ContainerFormat = AudioContainerFormat.Flac,
+                        Xiph = new XiphTagData { Fields = [new TextFieldRow("TITLE", ["Old"])] },
+                    }
+            );
+            var titleOriginal = RenameListFieldKey.Original(XiphRenameListFields.Group, "TITLE");
+            var titlePreview = RenameListFieldKey.Preview(XiphRenameListFields.Group, "TITLE");
+
+            Assert.Equal("Old", RenameListFieldCatalog.Resolve(item, titleOriginal));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, titlePreview));
+
+            var filter = new FormatterFilter(new XiphFieldTarget("TITLE"), new FormatterOptions("New"));
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("Old", RenameListFieldCatalog.Resolve(item, titleOriginal));
+            Assert.Equal("New", RenameListFieldCatalog.Resolve(item, titlePreview));
+            Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, titlePreview));
+        }
+
+        [Fact]
+        public void Id3v2_fields_cover_modeled_frames_with_frame_targets()
+        {
+            var fields = RenameListFieldCatalog.GetFieldsForGroup(Id3v2RenameListFields.Group);
+            Assert.Equal(Id3v2RenameListFields.Key.Version, fields[0].PropertyKey);
+            Assert.False(fields[0].SupportsPreview);
+            Assert.False(fields[0].SupportsWrite);
+            Assert.Null(fields[0].WriteTarget);
+            Assert.Equal("Version", fields[0].DisplayName);
+
+            var frameFields = fields.Skip(1).ToList();
+            Assert.Equal(Id3v2ModeledFrame.AllModeledFrameIds.Count, frameFields.Count);
+            Assert.Equal(Id3v2ModeledFrame.AllModeledFrameIds, frameFields.Select(f => f.PropertyKey));
+
+            foreach (var field in frameFields)
+            {
+                Assert.True(field.SupportsPreview, field.PropertyKey);
+                Assert.True(field.SupportsWrite, field.PropertyKey);
+                Assert.Equal(Id3v2FrameLabels.For(field.PropertyKey), field.DisplayName);
+                var target = Assert.IsType<Id3v2FrameTarget>(field.WriteTarget);
+                Assert.Equal(field.PropertyKey, target.FrameId);
+                Assert.Null(target.Language);
+                Assert.Null(target.Description);
+            }
+
+            Assert.DoesNotContain(fields, f => f.PropertyKey is "APIC" or "UFID" or "WXXX");
+        }
+
+        [Fact]
+        public void Id3v2_tit2_and_version_resolve_from_overlay_block()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "mp3",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        ContainerFormat = AudioContainerFormat.Mpeg,
+                        Id3v2 = new Id3v2TagData
+                        {
+                            Version = 4,
+                            Frames = [new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Frame Title"] }],
+                        },
+                    }
+            );
+
+            Assert.Equal(
+                "Frame Title",
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2"))
+            );
+            Assert.Equal(
+                "2.4",
+                RenameListFieldCatalog.Resolve(
+                    item,
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, Id3v2RenameListFields.Key.Version)
+                )
+            );
+        }
+
+        [Fact]
+        public void Id3v2_version_and_frames_empty_without_id3v2_block()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "flac",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        ContainerFormat = AudioContainerFormat.Flac,
+                        // Non-null Xiph keeps EnsureSyntheticAudioOverlayWhenTagless from injecting ID3v2.
+                        Xiph = new XiphTagData(),
+                    }
+            );
+
+            Assert.Equal(
+                string.Empty,
+                RenameListFieldCatalog.Resolve(
+                    item,
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, Id3v2RenameListFields.Key.Version)
+                )
+            );
+            Assert.Equal(
+                string.Empty,
+                RenameListFieldCatalog.Resolve(item, RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2"))
+            );
+        }
+
+        [Fact]
+        public void Id3v2_tit2_preview_differs_after_formatter_on_frame_target()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                extension: "mp3",
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay
+                    {
+                        ContainerFormat = AudioContainerFormat.Mpeg,
+                        Id3v2 = new Id3v2TagData
+                        {
+                            Version = 3,
+                            Frames = [new Id3v2ModeledFrame { FrameId = "TIT2", TextValues = ["Old"] }],
+                        },
+                    }
+            );
+            var tit2Original = RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2");
+            var tit2Preview = RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2");
+
+            Assert.Equal("Old", RenameListFieldCatalog.Resolve(item, tit2Original));
+            Assert.False(RenameListFieldCatalog.IsPreviewChanged(item, tit2Preview));
+
+            var filter = new FormatterFilter(new Id3v2FrameTarget("TIT2"), new FormatterOptions("New"));
+            filter.Setup();
+            filter.Apply(item);
+
+            Assert.Equal("Old", RenameListFieldCatalog.Resolve(item, tit2Original));
+            Assert.Equal("New", RenameListFieldCatalog.Resolve(item, tit2Preview));
+            Assert.True(RenameListFieldCatalog.IsPreviewChanged(item, tit2Preview));
         }
 
         [Fact]

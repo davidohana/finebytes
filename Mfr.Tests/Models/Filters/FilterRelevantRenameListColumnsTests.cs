@@ -13,10 +13,14 @@ using Mfr.Filters.Space;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Id3v1;
+using Mfr.Models.RenameList.Fields.Id3v2;
 using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Xiph;
+using Mfr.Models.Tags.Id3v1;
 
 namespace Mfr.Tests.Models.Filters
 {
@@ -52,14 +56,199 @@ namespace Mfr.Tests.Models.Filters
         }
 
         /// <summary>
-        /// Verifies unmapped Apply-To targets (e.g. Id3v2) are skipped silently.
+        /// Verifies ID3v1 Apply-To maps to the MP3 ID3v1 catalog field (Original + Preview), not MediaTag.
         /// </summary>
         [Fact]
-        public void Collect_StringTarget_UnmappedId3v2_SkipsWrites()
+        public void Collect_StringTarget_Id3v1Title_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([
+                new RemoveSpacesFilter(new Id3v1FieldTarget(Id3v1Field.Title)),
+            ]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Title"),
+                    RenameListFieldKey.Preview(Id3v1RenameListFields.Group, "Title"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies Formatter on ID3v1 maps to ID3v1 Original + Preview only (not MediaTag).
+        /// </summary>
+        [Fact]
+        public void Collect_Formatter_Id3v1Artist_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([
+                new FormatterFilter(new Id3v1FieldTarget(Id3v1Field.Artist), new FormatterOptions("x")),
+            ]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Artist"),
+                    RenameListFieldKey.Preview(Id3v1RenameListFields.Group, "Artist"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies Xiph Apply-To maps to the Xiph catalog field (Original + Preview), not MediaTag.
+        /// </summary>
+        [Fact]
+        public void Collect_StringTarget_XiphTitle_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([new RemoveSpacesFilter(new XiphFieldTarget("TITLE"))]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(XiphRenameListFields.Group, "TITLE"),
+                    RenameListFieldKey.Preview(XiphRenameListFields.Group, "TITLE"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies Formatter on Xiph maps to Xiph Original + Preview only (not MediaTag).
+        /// </summary>
+        [Fact]
+        public void Collect_Formatter_XiphArtist_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([
+                new FormatterFilter(new XiphFieldTarget("ARTIST"), new FormatterOptions("x")),
+            ]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(XiphRenameListFields.Group, "ARTIST"),
+                    RenameListFieldKey.Preview(XiphRenameListFields.Group, "ARTIST"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies mixed-case Xiph keys still map to the uppercase catalog column.
+        /// </summary>
+        [Fact]
+        public void Collect_StringTarget_XiphTitle_MixedCase_AddsOriginalAndPreview()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([new RemoveSpacesFilter(new XiphFieldTarget("title"))]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(XiphRenameListFields.Group, "TITLE"),
+                    RenameListFieldKey.Preview(XiphRenameListFields.Group, "TITLE"),
+                ],
+                keys
+            );
+        }
+
+        /// <summary>
+        /// Verifies ID3v2 frame Apply-To maps to the MP3 ID3v2 catalog field (Original + Preview).
+        /// </summary>
+        [Fact]
+        public void Collect_StringTarget_Id3v2Tit2_AddsOriginalAndPreview()
         {
             var keys = FilterRelevantRenameListColumns.Collect([new RemoveSpacesFilter(new Id3v2FrameTarget("TIT2"))]);
 
-            Assert.Empty(keys);
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies multi-instance COMM with language/description maps to the primary COMM column only.
+        /// </summary>
+        [Fact]
+        public void Collect_StringTarget_Id3v2CommWithLanguageDescription_MapsPrimaryCommColumn()
+        {
+            var keys = FilterRelevantRenameListColumns.Collect([
+                new RemoveSpacesFilter(new Id3v2FrameTarget("comm", "eng", "Album")),
+            ]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "COMM"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "COMM"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies ID3v2 Field Setter maps FrameId to ID3v2 Original + Preview (not MediaTag).
+        /// </summary>
+        [Fact]
+        public void Collect_Id3v2FieldSetter_AddsId3v2Columns()
+        {
+            var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(FrameId: "tit2", Text: "New"));
+
+            var keys = FilterRelevantRenameListColumns.Collect([filter]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies ID3v2 Field Setter COMM with language/description still maps the primary COMM column.
+        /// </summary>
+        [Fact]
+        public void Collect_Id3v2FieldSetter_CommWithLanguageDescription_MapsPrimaryCommColumn()
+        {
+            var filter = new Id3v2FieldSetterFilter(
+                new Id3v2FieldSetterOptions(FrameId: "COMM", Text: "Note", Language: "eng", Description: "Album")
+            );
+
+            var keys = FilterRelevantRenameListColumns.Collect([filter]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "COMM"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "COMM"),
+                ],
+                keys
+            );
+            Assert.DoesNotContain(keys, static key => key.GroupId == AudioTagRenameListFields.Group);
+        }
+
+        /// <summary>
+        /// Verifies ID3v2 Field Setter write keys precede format tokens from Text.
+        /// </summary>
+        [Fact]
+        public void Collect_Id3v2FieldSetter_FieldTextTokens_AppendAfterWrites()
+        {
+            var filter = new Id3v2FieldSetterFilter(new Id3v2FieldSetterOptions(FrameId: "TIT2", Text: "<file-name>"));
+
+            var keys = FilterRelevantRenameListColumns.Collect([filter]);
+
+            Assert.Equal(
+                [
+                    RenameListFieldKey.Original(Id3v2RenameListFields.Group, "TIT2"),
+                    RenameListFieldKey.Preview(Id3v2RenameListFields.Group, "TIT2"),
+                    RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                    RenameListFieldKey.Preview(BasicRenameListField.Group, BasicRenameListFields.Key.Name),
+                ],
+                keys
+            );
         }
 
         /// <summary>
