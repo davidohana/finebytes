@@ -55,6 +55,28 @@ namespace Mfr.Tests.Ui.MainWindow
         }
 
         /// <summary>
+        /// Verifies missing Tips raises <see cref="MainWindowViewModel.HelpMissing"/>.
+        /// </summary>
+        [Fact]
+        public void ShowTips_raises_missing_when_tips_absent()
+        {
+            _WithTempHelpRoot(
+                "tips.html",
+                writeFile: false,
+                (viewModel, opener, _) =>
+                {
+                    string? missing = null;
+                    viewModel.HelpMissing += (_, fileName) => missing = fileName;
+
+                    viewModel.ShowTipsCommand.Execute(null);
+
+                    Assert.Equal("tips.html", missing);
+                    Assert.Empty(opener.OpenedWithDefaultApp);
+                }
+            );
+        }
+
+        /// <summary>
         /// Runs <paramref name="assert"/> with a MainWindow wired to a temp help root.
         /// </summary>
         /// <param name="helpFileName">Basename under the temp root.</param>

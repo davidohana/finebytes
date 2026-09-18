@@ -1,18 +1,67 @@
 using System.Text.RegularExpressions;
+using Mfr.Filters;
 using Mfr.Filters.Formatting.FormatString;
+using Mfr.Models.RenameList;
+using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;
+using Mfr.Models.RenameList.Fields.Id3v1;
+using Mfr.Models.RenameList.Fields.Id3v2;
+using Mfr.Models.RenameList.Fields.Image;
+using Mfr.Models.RenameList.Fields.Jpeg;
+using Mfr.Models.RenameList.Fields.Media;
+using Mfr.Models.RenameList.Fields.Mpeg;
+using Mfr.Models.RenameList.Fields.Xiph;
 
 namespace Mfr.Tests.Help
 {
     /// <summary>
     /// Ensures Help under repo-root <c>help/</c> stays linked and catalog-aligned: every
     /// <c>href</c> targets an existing file (and fragment id when present), public format tokens
-    /// appear from <c>fp.html</c>, and <c>fields.html</c> Write/Preview markers match
-    /// <see cref="RenameListFieldCatalog"/> for documented groups.
+    /// appear from <c>fp.html</c>, the filters hub matches <see cref="FilterCatalog"/>,
+    /// every HTML page is reachable from Index, and <c>fields.html</c> Write/Preview markers
+    /// match <see cref="RenameListFieldCatalog"/> for documented groups.
     /// </summary>
     public sealed partial class HelpLinkIntegrityTests
     {
+        /// <summary>
+        /// Relative paths under <c>help/</c> that may exist without a link path from
+        /// <c>index.html</c> (intentional orphans only).
+        /// </summary>
+        private static readonly HashSet<string> _IndexReachabilityOrphanAllowlist = new(
+            StringComparer.OrdinalIgnoreCase
+        );
+
+        /// <summary>
+        /// Catalog group ids that intentionally have no Write/Preview table in
+        /// <c>fields.html</c> (prose or Field/Description only).
+        /// </summary>
+        private static readonly HashSet<string> _GroupsWithoutWritePreviewTable = new(
+            StringComparer.Ordinal
+        )
+        {
+            AudioTagRenameListFields.Group,
+            Id3v1RenameListFields.Group,
+            Id3v2RenameListFields.Group,
+            XiphRenameListFields.Group,
+            MediaRenameListFields.Group,
+            MpegRenameListFields.Group,
+            ImageRenameListFields.Group,
+            JpegRenameListFields.Group,
+        };
+
+        /// <summary>
+        /// Help <c>h2</c> section id → catalog group id for Write/Preview tables in
+        /// <c>fields.html</c>.
+        /// </summary>
+        private static readonly Dictionary<string, string> _FieldsWritePreviewSectionToGroup = new(
+            StringComparer.OrdinalIgnoreCase
+        )
+        {
+            ["basic"] = BasicRenameListField.Group,
+            ["extended"] = ExtendedRenameListFields.Group,
+        };
+
         [GeneratedRegex(
             """href\s*=\s*(?:["'](?<url>[^"']+)["']|(?<url>[^\s>]+))""",
             RegexOptions.IgnoreCase | RegexOptions.CultureInvariant
@@ -34,6 +83,11 @@ namespace Mfr.Tests.Help
         )]
         private static partial Regex _WritePreviewRowRegex();
 
+        [GeneratedRegex(
+            """<a\s+href\s*=\s*["'](?<href>[^"']+)["'][^>]*>(?<text>.*?)</a>""",
+            RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline
+        )]
+        private static partial Regex _AnchorRegex();
         /// <summary>
         /// Verifies relative Help <c>href</c> values resolve to files under <c>help/</c>.
         /// </summary>
@@ -180,11 +234,175 @@ namespace Mfr.Tests.Help
         }
 
         /// <summary>
-        /// Verifies <c>fields.html</c> Write/Preview markers for File Name and File Properties match
-        /// <see cref="RenameListFieldCatalog"/> (<c>+</c> vs empty cell).
+        /// Verifies <c>filters/filters.html</c> lists every <see cref="FilterCatalog"/> entry under
+        /// the matching group section (and has no stale filter links).
         /// </summary>
         [Fact]
-        public void Fields_Html_Write_Preview_Markers_Match_RenameListFieldCatalog_Basic_And_Extended()
+        public void Filters_Hub_Links_Match_FilterCatalog_By_Group_And_Type()
+        {
+            var helpRoot = _ResolveRepoHelpRoot();
+            var hubPath = Path.Combine(helpRoot, "filters", "filters.html");
+            Assert.True(File.Exists(hubPath), "Expected help/filters/filters.html");
+
+            var sectionIdToLinks = _ParseFilterHubSections(File.ReadAllText(hubPath));
+            var issues = new List<string>();
+
+            var knownGroupIds = Enum.GetValues<FilterGroup>()
+                .Select(group => group.ToString().ToLowerInvariant())
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (var sectionId in sectionIdToLinks.Keys.OrderBy(id => id, StringComparer.OrdinalIgnoreCase))
+            {
+                if (!knownGroupIds.Contains(sectionId))
+                {
+                    issues.Add($"unknown hub section #{sectionId} (not a FilterGroup)");
+                }
+            }
+
+            foreach (var entry in FilterCatalog.Entries.OrderBy(e => e.Type, StringComparer.Ordinal))
+            {
+                var sectionId = entry.Group.ToString().ToLowerInvariant();
+                var expectedHref = $"{sectionId}/{entry.HelpFileName}";
+                if (!sectionIdToLinks.TryGetValue(sectionId, out var links))
+                {
+                    issues.Add($"{entry.Type}: missing hub section #{sectionId}");
+                    continue;
+                }
+
+                var match = links.Find(link =>
+                    string.Equals(link.Href, expectedHref, StringComparison.OrdinalIgnoreCase)
+                );
+                if (match.Href is null)
+                {
+                    issues.Add($"{entry.Type}: missing hub link '{expectedHref}'");
+                    continue;
+                }
+
+                if (!string.Equals(match.Text, entry.DisplayName, StringComparison.Ordinal))
+                {
+                    issues.Add(
+                        $"{entry.Type}: hub label '{match.Text}' != catalog DisplayName '{entry.DisplayName}'"
+                    );
+                }
+            }
+
+            var catalogTypeToEntry = FilterCatalog.Entries.ToDictionary(
+                entry => entry.Type,
+                StringComparer.Ordinal
+            );
+            foreach (var (sectionId, links) in sectionIdToLinks)
+            {
+                foreach (var link in links)
+                {
+                    var typeName = Path.GetFileNameWithoutExtension(link.Href.Replace('\\', '/'));
+                    if (typeName.Length == 0)
+                    {
+                        issues.Add($"#{sectionId}: empty filter href '{link.Href}'");
+                        continue;
+                    }
+
+                    if (!catalogTypeToEntry.TryGetValue(typeName, out var entry))
+                    {
+                        issues.Add($"#{sectionId}: stale hub link '{link.Href}' (not in FilterCatalog)");
+                        continue;
+                    }
+
+                    var expectedSection = entry.Group.ToString().ToLowerInvariant();
+                    if (!string.Equals(sectionId, expectedSection, StringComparison.OrdinalIgnoreCase))
+                    {
+                        issues.Add(
+                            $"{entry.Type}: hub section #{sectionId} != catalog group '{entry.Group}'"
+                        );
+                    }
+
+                    var expectedHref = $"{expectedSection}/{entry.HelpFileName}";
+                    if (!string.Equals(link.Href, expectedHref, StringComparison.OrdinalIgnoreCase))
+                    {
+                        issues.Add($"{entry.Type}: hub href '{link.Href}' != '{expectedHref}'");
+                    }
+                }
+            }
+
+            Assert.True(
+                issues.Count == 0,
+                "filters.html hub vs FilterCatalog:"
+                    + Environment.NewLine
+                    + string.Join(Environment.NewLine, issues)
+            );
+        }
+
+        /// <summary>
+        /// Verifies every shipped Help HTML page is reachable by following relative links from
+        /// <c>index.html</c> (or is listed in the intentional orphan allowlist).
+        /// </summary>
+        [Fact]
+        public void Every_Html_Page_Is_Reachable_From_Index()
+        {
+            var helpRoot = _ResolveRepoHelpRoot();
+            var indexPath = Path.GetFullPath(Path.Combine(helpRoot, "index.html"));
+            Assert.True(File.Exists(indexPath), "Expected help/index.html");
+
+            var allHtmlPaths = Directory
+                .EnumerateFiles(helpRoot, "*.html", SearchOption.AllDirectories)
+                .Select(Path.GetFullPath)
+                .ToList();
+            Assert.NotEmpty(allHtmlPaths);
+
+            var reachable = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { indexPath };
+            var queue = new Queue<string>();
+            queue.Enqueue(indexPath);
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                foreach (Match match in _HrefRegex().Matches(File.ReadAllText(current)))
+                {
+                    var href = match.Groups["url"].Value.Trim();
+                    if (href.Length == 0 || _IsAllowedAbsoluteUrl(href))
+                    {
+                        continue;
+                    }
+
+                    if (!_TryResolveLocalTarget(helpRoot, current, href, out var targetPath) || !File.Exists(targetPath))
+                    {
+                        continue;
+                    }
+
+                    if (!targetPath.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var fullTarget = Path.GetFullPath(targetPath);
+                    if (!reachable.Add(fullTarget))
+                    {
+                        continue;
+                    }
+
+                    queue.Enqueue(fullTarget);
+                }
+            }
+
+            var orphans = allHtmlPaths
+                .Where(path => !reachable.Contains(path))
+                .Select(path => _RelPath(helpRoot, path))
+                .Where(rel => !_IndexReachabilityOrphanAllowlist.Contains(rel))
+                .OrderBy(rel => rel, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+
+            Assert.True(
+                orphans.Count == 0,
+                "Help HTML not reachable from index.html:"
+                    + Environment.NewLine
+                    + string.Join(Environment.NewLine, orphans)
+            );
+        }
+
+        /// <summary>
+        /// Verifies <c>fields.html</c> Write/Preview markers match
+        /// <see cref="RenameListFieldCatalog"/> for documented groups, and that every other
+        /// catalog group is explicitly allowlisted as lacking a Write/Preview table.
+        /// </summary>
+        [Fact]
+        public void Fields_Html_Write_Preview_Markers_Match_Documented_Catalog_Groups()
         {
             var helpRoot = _ResolveRepoHelpRoot();
             var fieldsPath = Path.Combine(helpRoot, "reference", "fields.html");
@@ -192,22 +410,54 @@ namespace Mfr.Tests.Help
 
             var html = File.ReadAllText(fieldsPath);
             var sectionIdToRows = _ParseWritePreviewSections(html);
-            Assert.True(sectionIdToRows.ContainsKey("basic"), "Expected fields.html#basic Write/Preview table");
-            Assert.True(sectionIdToRows.ContainsKey("extended"), "Expected fields.html#extended Write/Preview table");
-
             var mismatches = new List<string>();
-            _AssertGroupMatchesHelp(
-                mismatches,
-                groupId: BasicRenameListField.Group,
-                sectionId: "basic",
-                sectionIdToRows
-            );
-            _AssertGroupMatchesHelp(
-                mismatches,
-                groupId: ExtendedRenameListFields.Group,
-                sectionId: "extended",
-                sectionIdToRows
-            );
+
+            var catalogGroupIds = RenameListFieldCatalog
+                .All.Select(field => field.GroupId)
+                .Distinct(StringComparer.Ordinal)
+                .OrderBy(id => id, StringComparer.Ordinal)
+                .ToList();
+            var documentedGroupIds = _FieldsWritePreviewSectionToGroup
+                .Values.ToHashSet(StringComparer.Ordinal);
+
+            foreach (var groupId in catalogGroupIds)
+            {
+                var isDocumented = documentedGroupIds.Contains(groupId);
+                var isAllowlisted = _GroupsWithoutWritePreviewTable.Contains(groupId);
+                if (isDocumented && isAllowlisted)
+                {
+                    mismatches.Add($"group '{groupId}' is both Write/Preview-documented and allowlisted");
+                    continue;
+                }
+
+                if (!isDocumented && !isAllowlisted)
+                {
+                    mismatches.Add(
+                        $"catalog group '{groupId}' has no fields.html Write/Preview mapping and is not allowlisted"
+                    );
+                }
+            }
+
+            foreach (var sectionId in sectionIdToRows.Keys.OrderBy(id => id, StringComparer.OrdinalIgnoreCase))
+            {
+                if (!_FieldsWritePreviewSectionToGroup.ContainsKey(sectionId))
+                {
+                    mismatches.Add(
+                        $"fields.html#{sectionId} has Write/Preview rows but is not in the documented map"
+                    );
+                }
+            }
+
+            foreach (var (sectionId, groupId) in _FieldsWritePreviewSectionToGroup)
+            {
+                if (!sectionIdToRows.ContainsKey(sectionId))
+                {
+                    mismatches.Add($"Expected fields.html#{sectionId} Write/Preview table for '{groupId}'");
+                    continue;
+                }
+
+                _AssertGroupMatchesHelp(mismatches, groupId, sectionId, sectionIdToRows);
+            }
 
             Assert.True(
                 mismatches.Count == 0,
@@ -215,6 +465,44 @@ namespace Mfr.Tests.Help
                     + Environment.NewLine
                     + string.Join(Environment.NewLine, mismatches)
             );
+        }
+
+        private static Dictionary<string, List<(string Href, string Text)>> _ParseFilterHubSections(string html)
+        {
+            var sectionIdToLinks = new Dictionary<string, List<(string Href, string Text)>>(
+                StringComparer.OrdinalIgnoreCase
+            );
+            foreach (Match section in _FieldsSectionRegex().Matches(html))
+            {
+                var sectionId = section.Groups["id"].Value;
+                var links = new List<(string Href, string Text)>();
+                foreach (Match anchor in _AnchorRegex().Matches(section.Groups["body"].Value))
+                {
+                    var href = anchor.Groups["href"].Value.Trim();
+                    if (href.Length == 0 || _IsAllowedAbsoluteUrl(href) || href.StartsWith('#'))
+                    {
+                        continue;
+                    }
+
+                    var hashIndex = href.IndexOf('#');
+                    if (hashIndex >= 0)
+                    {
+                        href = href[..hashIndex];
+                    }
+
+                    if (href.Length == 0 || !href.EndsWith(".html", StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    var text = _StripHtml(anchor.Groups["text"].Value).Trim();
+                    links.Add((href.Replace('\\', '/'), text));
+                }
+
+                sectionIdToLinks[sectionId] = links;
+            }
+
+            return sectionIdToLinks;
         }
 
         private static void _AssertGroupMatchesHelp(
@@ -327,7 +615,20 @@ namespace Mfr.Tests.Help
                 result = result.Remove(start, end - start + 1);
             }
 
-            return result;
+            return _DecodeBasicHtmlEntities(result);
+        }
+
+        private static string _DecodeBasicHtmlEntities(string value)
+        {
+            return value
+                .Replace("&amp;", "&", StringComparison.Ordinal)
+                .Replace("&lt;", "<", StringComparison.Ordinal)
+                .Replace("&gt;", ">", StringComparison.Ordinal)
+                .Replace("&quot;", "\"", StringComparison.Ordinal)
+                .Replace("&#39;", "'", StringComparison.Ordinal)
+                .Replace("&#x27;", "'", StringComparison.OrdinalIgnoreCase)
+                .Replace("&apos;", "'", StringComparison.OrdinalIgnoreCase)
+                .Replace("&nbsp;", " ", StringComparison.OrdinalIgnoreCase);
         }
 
         private static bool _TryGetHtmlIds(
