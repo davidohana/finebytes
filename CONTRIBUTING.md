@@ -15,12 +15,13 @@ If you have `just` installed, you can use shortcuts for the most common workflow
 - `just lint-md`
 - `just run-help`
 - `just run-ui`
+- `just capture-help` / `just capture-help-filters` / `just capture-help-ui` (regenerate help PNGs; see `help/SCREENSHOTS.md`)
 
 ## Prerequisites
 
 - [.NET SDK](https://dotnet.microsoft.com/download) (see global.json if present)
 - [just](https://github.com/casey/just#installation) (optional task runner)
-- [Python 3.12+](https://www.python.org/downloads/) (dev-only, for markdown format/lint)
+- [Python 3.12+](https://www.python.org/downloads/) (dev-only, for markdown format/lint and optional help screenshot tooling)
 
 ## C# formatting and linting
 

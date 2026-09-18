@@ -102,9 +102,9 @@ Extend [`help/SCREENSHOTS.md`](../../help/SCREENSHOTS.md) with a **UI / dialogs*
 
 ## Capture approach
 
-1. Regenerate with
-   `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpUiScreenshotCaptureTests`
-   (`HelpUiScreenshotCaptureTests` — P0 shell panes + P1 dialogs/tools + P2 guide).
+1. Regenerate with `just capture-help` / `just capture-help-ui` (or
+   `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test … HelpUiScreenshotCaptureTests`, then
+   `just annotate-help-hotspots` and `just sync-help-img-dims`).
 1. Or `just run-ui` on Xvfb / Windows; crop to subject; save under `help/images/ui/` or `help/images/guide/`.
 
 ## Exit criteria
