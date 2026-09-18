@@ -31,8 +31,26 @@ namespace Mfr.App.Ui.Views.RenameList
             DataContext = viewModel;
             viewModel.PropertyChanged += _OnViewModelPropertyChanged;
             Closed += (_, _) => viewModel.PropertyChanged -= _OnViewModelPropertyChanged;
+            Opened += (_, _) => _FocusSearchBox();
             _WireSelectionHandlers();
             _WireDragDropHandlers();
+        }
+
+        /// <summary>
+        /// Focuses the search box for the active Columns or Sort tab when the dialog opens.
+        /// </summary>
+        private void _FocusSearchBox()
+        {
+            if (_ViewModel is null)
+            {
+                return;
+            }
+
+            var searchBox =
+                _ViewModel.SelectedTabIndex == (int)RenameListFieldShuttleTab.Sort
+                    ? SortFieldSearchBox
+                    : ColumnFieldSearchBox;
+            searchBox?.Focus();
         }
 
         private RenameListFieldShuttleDialogViewModel? _ViewModel =>
