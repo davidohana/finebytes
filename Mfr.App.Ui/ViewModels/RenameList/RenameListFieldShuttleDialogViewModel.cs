@@ -126,6 +126,37 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Gets or sets the shared field search filter for Columns and Sort available lists.
+        /// <para>
+        /// Empty or whitespace keeps group browse. Non-empty filters
+        /// <see cref="RenameListFieldCatalog.All"/> (already-selected / preview / sortable gates still apply).
+        /// Search text is kept after Add so the shuttle stays multi-add friendly.
+        /// </para>
+        /// </summary>
+        public string SearchText
+        {
+            get;
+            set
+            {
+                value ??= string.Empty;
+                if (field == value)
+                {
+                    return;
+                }
+
+                field = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsFieldSearchActive));
+                _RefreshLists();
+            }
+        } = string.Empty;
+
+        /// <summary>
+        /// Gets whether available fields are filtered across groups (non-empty trimmed <see cref="SearchText"/>).
+        /// </summary>
+        public bool IsFieldSearchActive => SearchText.Trim().Length > 0;
+
+        /// <summary>
         /// Gets or sets the top-level tab index (0 = Columns, 1 = Sort).
         /// </summary>
         public int SelectedTabIndex
@@ -785,15 +816,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private void _RefreshLists()
         {
-            var fieldsInGroup = _FieldsInSelectedGroup();
-            AvailableOriginalFields = [.. fieldsInGroup.Where(field => !_columns.Contains(field.OriginalKey))];
+            var candidateFields = _CandidateAvailableFields();
+            AvailableOriginalFields = [.. candidateFields.Where(field => !_columns.Contains(field.OriginalKey))];
             AvailablePreviewFields =
             [
-                .. fieldsInGroup.Where(field => field.SupportsPreview && !_columns.Contains(field.PreviewKey)),
+                .. candidateFields.Where(field => field.SupportsPreview && !_columns.Contains(field.PreviewKey)),
             ];
             AvailableSortFields =
             [
-                .. fieldsInGroup.Where(field => field.IsSortable && !_sortKeys.Contains(field.OriginalKey)),
+                .. candidateFields.Where(field => field.IsSortable && !_sortKeys.Contains(field.OriginalKey)),
             ];
             SelectedColumnRows =
             [
@@ -871,6 +902,20 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             ToggleSelectedSortDirectionCommand.NotifyCanExecuteChanged();
         }
 
+        /// <summary>
+        /// Candidate fields for available lists: selected group when search is idle; catalog matches when active.
+        /// </summary>
+        private IReadOnlyList<RenameListField> _CandidateAvailableFields()
+        {
+            var query = SearchText.Trim();
+            if (query.Length == 0)
+            {
+                return _FieldsInSelectedGroup();
+            }
+
+            return [.. RenameListFieldCatalog.All.Where(field => _FieldMatchesSearch(field, query))];
+        }
+
         private IReadOnlyList<RenameListField> _FieldsInSelectedGroup()
         {
             var groupId = SelectedGroup?.GroupId;
@@ -880,6 +925,18 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             return RenameListFieldCatalog.GetFieldsForGroup(groupId);
+        }
+
+        /// <summary>
+        /// OR match on display name, property key, group label, group id, and tip (null-safe).
+        /// </summary>
+        private static bool _FieldMatchesSearch(RenameListField field, string query)
+        {
+            return field.DisplayName.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || field.PropertyKey.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || field.GroupDisplayName.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || field.GroupId.Contains(query, StringComparison.OrdinalIgnoreCase)
+                || (field.Tip is { } tip && tip.Contains(query, StringComparison.OrdinalIgnoreCase));
         }
 
         private static IReadOnlyList<RenameListFieldGroupOption> _BuildGroups()
