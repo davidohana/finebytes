@@ -253,6 +253,28 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
+        /// Percent signs in bat paths are doubled so cmd does not expand <c>%VAR%</c>; PowerShell keeps them.
+        /// </summary>
+        [Fact]
+        public void Format_escapes_percent_in_bat_paths()
+        {
+            var item = FilterTestHelpers.CreateRenameItem(
+                fileName: "100%TEMP%done",
+                extension: "txt",
+                directory: @"D:\100%OFF"
+            );
+            item.Preview.FileName = "safe";
+
+            _AssertFormats(
+                [item],
+                expectedBat: _HeaderBat + "ren \"D:\\100%%OFF\\100%%TEMP%%done.txt\" \"safe.txt\"\n" + "\n",
+                expectedPs1: _HeaderPs1
+                    + "Rename-Item -LiteralPath 'D:\\100%OFF\\100%TEMP%done.txt' -NewName 'safe.txt'\n"
+                    + "\n"
+            );
+        }
+
+        /// <summary>
         /// PreviewError rows are omitted from the script.
         /// </summary>
         [Fact]

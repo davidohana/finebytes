@@ -178,11 +178,19 @@ namespace Mfr.Engine.RenameScript
         }
 
         /// <summary>
-        /// Quotes a cmd.exe path/name, doubling embedded double quotes.
+        /// Quotes a cmd.exe path/name, doubling embedded double quotes and percent signs.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// <c>%%</c> keeps literal <c>%</c> so cmd does not expand <c>%VAR%</c> inside quoted paths.
+        /// </para>
+        /// </remarks>
         private static string _BatQuote(string value)
         {
-            return $"\"{value.Replace("\"", "\"\"", StringComparison.Ordinal)}\"";
+            var escaped = value
+                .Replace("\"", "\"\"", StringComparison.Ordinal)
+                .Replace("%", "%%", StringComparison.Ordinal);
+            return $"\"{escaped}\"";
         }
 
         /// <summary>
