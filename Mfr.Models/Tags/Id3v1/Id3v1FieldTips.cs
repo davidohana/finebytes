@@ -15,11 +15,15 @@ namespace Mfr.Models.Tags.Id3v1
         {
             return field switch
             {
-                Id3v1Field.Title => "Track title in the ID3v1 tag (max ~30 characters on disk).",
-                Id3v1Field.Artist => "Artist name in the ID3v1 tag (max ~30 characters on disk).",
-                Id3v1Field.Album => "Album title in the ID3v1 tag (max ~30 characters on disk).",
+                Id3v1Field.Title =>
+                    "Track title in the ID3v1 tag (preview shows only what fits on disk, about 30 characters).",
+                Id3v1Field.Artist =>
+                    "Artist name in the ID3v1 tag (preview shows only what fits on disk, about 30 characters).",
+                Id3v1Field.Album =>
+                    "Album title in the ID3v1 tag (preview shows only what fits on disk, about 30 characters).",
                 Id3v1Field.Year => "Four-digit year in the ID3v1 tag.",
-                Id3v1Field.Comment => "Comment in the ID3v1 tag (slightly shorter when a track number is also stored).",
+                Id3v1Field.Comment =>
+                    "Comment in the ID3v1 tag (preview shows only what fits on disk, about 28 characters).",
                 Id3v1Field.Track => "Track number in the ID3v1 tag (ID3v1.1).",
                 Id3v1Field.Genre => "Genre name from the ID3v1 genre list (empty when unset).",
                 _ => throw new ArgumentOutOfRangeException(nameof(field), field, "Missing ID3v1 field tip."),

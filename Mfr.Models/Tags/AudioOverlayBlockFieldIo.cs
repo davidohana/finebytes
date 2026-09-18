@@ -36,10 +36,10 @@ namespace Mfr.Models.Tags
 
             return field switch
             {
-                Id3v1Field.Title => block.Title ?? string.Empty,
-                Id3v1Field.Artist => block.Artist ?? string.Empty,
-                Id3v1Field.Album => block.Album ?? string.Empty,
-                Id3v1Field.Comment => block.Comment ?? string.Empty,
+                Id3v1Field.Title => Id3v1OnDiskText.Truncate(block.Title, Id3v1OnDiskText.TitleArtistAlbumMaxBytes),
+                Id3v1Field.Artist => Id3v1OnDiskText.Truncate(block.Artist, Id3v1OnDiskText.TitleArtistAlbumMaxBytes),
+                Id3v1Field.Album => Id3v1OnDiskText.Truncate(block.Album, Id3v1OnDiskText.TitleArtistAlbumMaxBytes),
+                Id3v1Field.Comment => Id3v1OnDiskText.Truncate(block.Comment, Id3v1OnDiskText.CommentMaxBytes),
                 Id3v1Field.Year => _DecimalDigitsOrEmpty(block.Year),
                 Id3v1Field.Track => block.Track is null
                     ? string.Empty
@@ -68,10 +68,10 @@ namespace Mfr.Models.Tags
 
             var updated = field switch
             {
-                Id3v1Field.Title => existing with { Title = trimmed.TrimmedOrNull() },
-                Id3v1Field.Artist => existing with { Artist = trimmed.TrimmedOrNull() },
-                Id3v1Field.Album => existing with { Album = trimmed.TrimmedOrNull() },
-                Id3v1Field.Comment => existing with { Comment = trimmed.TrimmedOrNull() },
+                Id3v1Field.Title => existing with { Title = Id3v1OnDiskText.TruncateTitleArtistAlbumOrNull(trimmed) },
+                Id3v1Field.Artist => existing with { Artist = Id3v1OnDiskText.TruncateTitleArtistAlbumOrNull(trimmed) },
+                Id3v1Field.Album => existing with { Album = Id3v1OnDiskText.TruncateTitleArtistAlbumOrNull(trimmed) },
+                Id3v1Field.Comment => existing with { Comment = Id3v1OnDiskText.TruncateCommentOrNull(trimmed) },
                 Id3v1Field.Year => existing with { Year = _ParseNullableUInt(trimmed, max: 9999, nameof(fieldString)) },
                 Id3v1Field.Track => existing with { Track = _ParseNullableByte(trimmed, nameof(fieldString)) },
                 Id3v1Field.Genre => existing with { Genre = _ParseGenreByte(trimmed) },
