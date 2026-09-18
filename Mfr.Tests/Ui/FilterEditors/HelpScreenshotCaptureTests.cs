@@ -53,6 +53,8 @@ namespace Mfr.Tests.Ui.FilterEditors
             "TokenMover",
         };
 
+        private const double CaptureMaxWidth = 720.0;
+
         /// <summary>
         /// Renders every option-bearing filter editor to <c>help/images/{Type}.png</c>.
         /// </summary>
@@ -71,7 +73,6 @@ namespace Mfr.Tests.Ui.FilterEditors
             var captured = new List<string>();
             foreach (var entry in FilterCatalog.Entries.Where(e => !OptionlessTypes.Contains(e.Type)))
             {
-                var width = WideTypes.Contains(entry.Type) ? 640.0 : 480.0;
                 var filter = FilterCatalog.CreateDefault(entry);
                 var step = new FilterChainStepViewModel(entry.DisplayName, filter);
                 var editor = FilterOptionsEditorFactory.Create(step);
@@ -83,17 +84,19 @@ namespace Mfr.Tests.Ui.FilterEditors
                 var view = locator.Build(editor);
                 Assert.NotNull(view);
 
+                // Measure at a generous max width, then size the bitmap to DesiredSize (no forced stretch).
+                var measureWidth = WideTypes.Contains(entry.Type) ? CaptureMaxWidth : 520.0;
                 var host = new Border
                 {
                     Background = Brushes.White,
                     Padding = new Thickness(8),
                     Child = view,
-                    Width = width,
+                    HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Left,
                 };
 
                 var window = new Window
                 {
-                    Width = width + 24,
+                    Width = CaptureMaxWidth + 48,
                     Height = 900,
                     Background = Brushes.White,
                     Content = host,
@@ -102,17 +105,22 @@ namespace Mfr.Tests.Ui.FilterEditors
                 try
                 {
                     window.Show();
-                    host.Measure(new Size(width, double.PositiveInfinity));
+                    host.Measure(new Size(measureWidth, double.PositiveInfinity));
                     var desired = host.DesiredSize;
-                    var pixelWidth = Math.Max(1, (int)Math.Ceiling(Math.Max(desired.Width, width)));
+                    var pixelWidth = Math.Max(1, (int)Math.Ceiling(Math.Min(desired.Width, CaptureMaxWidth)));
                     var pixelHeight = Math.Max(1, (int)Math.Ceiling(desired.Height));
+                    if (pixelWidth < 120 || pixelHeight < 16)
+                    {
+                        throw new InvalidOperationException(
+                            $"{entry.Type} rendered unexpectedly small ({pixelWidth}x{pixelHeight})."
+                        );
+                    }
+
                     host.Width = pixelWidth;
                     host.Height = pixelHeight;
                     host.Arrange(new Rect(0, 0, pixelWidth, pixelHeight));
                     window.UpdateLayout();
                     Dispatcher.UIThread.RunJobs();
-
-                    Assert.True(pixelHeight > 16, $"{entry.Type} rendered with empty height");
 
                     var path = Path.Combine(outputDir, $"{entry.Type}.png");
                     using var bitmap = new RenderTargetBitmap(
