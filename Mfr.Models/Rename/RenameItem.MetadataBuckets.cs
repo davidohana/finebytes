@@ -22,6 +22,7 @@ namespace Mfr.Models.Rename
                 RenameListMetadataRequirement.ImageProperties => ImagePropertiesLoadAttempted,
                 RenameListMetadataRequirement.Pdf => PdfLoadAttempted,
                 RenameListMetadataRequirement.Epub => EpubLoadAttempted,
+                RenameListMetadataRequirement.Office => OfficeLoadAttempted,
                 RenameListMetadataRequirement.None => throw new UnreachableException(),
                 _ => throw new UnreachableException(),
             };
@@ -48,6 +49,9 @@ namespace Mfr.Models.Rename
                 case RenameListMetadataRequirement.Epub:
                     EpubLoadAttempted = true;
                     break;
+                case RenameListMetadataRequirement.Office:
+                    OfficeLoadAttempted = true;
+                    break;
                 case RenameListMetadataRequirement.None:
                 default:
                     throw new UnreachableException();
@@ -68,6 +72,7 @@ namespace Mfr.Models.Rename
                 RenameListMetadataRequirement.ImageProperties => ImagePropertiesLoadError,
                 RenameListMetadataRequirement.Pdf => PdfLoadError,
                 RenameListMetadataRequirement.Epub => EpubLoadError,
+                RenameListMetadataRequirement.Office => OfficeLoadError,
                 RenameListMetadataRequirement.None => throw new UnreachableException(),
                 _ => throw new UnreachableException(),
             };
@@ -95,6 +100,9 @@ namespace Mfr.Models.Rename
                     break;
                 case RenameListMetadataRequirement.Epub:
                     EpubLoadError = ex;
+                    break;
+                case RenameListMetadataRequirement.Office:
+                    OfficeLoadError = ex;
                     break;
                 case RenameListMetadataRequirement.None:
                 default:
@@ -126,6 +134,10 @@ namespace Mfr.Models.Rename
                 case RenameListMetadataRequirement.Epub:
                     EpubLoadAttempted = false;
                     EpubLoadError = null;
+                    break;
+                case RenameListMetadataRequirement.Office:
+                    OfficeLoadAttempted = false;
+                    OfficeLoadError = null;
                     break;
                 case RenameListMetadataRequirement.None:
                 default:

@@ -6,7 +6,7 @@ namespace Mfr.Models.RenameList
     internal static class RenameListMetadataBuckets
     {
         /// <summary>
-        /// Disk metadata buckets in reader order (TagLib, Image/EXIF, PDF, EPUB).
+        /// Disk metadata buckets in reader order (TagLib, Image/EXIF, PDF, EPUB, Office).
         /// </summary>
         public static IReadOnlyList<RenameListMetadataRequirement> All { get; } =
         [
@@ -14,6 +14,7 @@ namespace Mfr.Models.RenameList
             RenameListMetadataRequirement.ImageProperties,
             RenameListMetadataRequirement.Pdf,
             RenameListMetadataRequirement.Epub,
+            RenameListMetadataRequirement.Office,
         ];
 
         /// <summary>

@@ -157,6 +157,11 @@ namespace Mfr.Models.RenameList
                 return "This file could not be read as EPUB document Info.";
             }
 
+            if (requirement.HasFlag(RenameListMetadataRequirement.Office))
+            {
+                return "This file could not be read as Office document Info.";
+            }
+
             return "This field could not be loaded from disk.";
         }
     }

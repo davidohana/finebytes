@@ -28,11 +28,13 @@ namespace Mfr.Tests.Models.Filters
                 RenameListFieldKey.Original(PdfRenameListFields.Group, PdfRenameListFields.Key.Title)
             );
             RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Epub);
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Office);
 
             Assert.False(item.TagLibLoadAttempted);
             Assert.False(item.ImagePropertiesLoadAttempted);
             Assert.False(item.PdfLoadAttempted);
             Assert.False(item.EpubLoadAttempted);
+            Assert.False(item.OfficeLoadAttempted);
         }
 
         [Fact]
@@ -62,15 +64,18 @@ namespace Mfr.Tests.Models.Filters
             RenameListMetadataLoader.TryEnsureLoaded(item, mediaKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, pdfKey);
             RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Epub);
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Office);
 
             Assert.True(item.TagLibLoadAttempted);
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.True(item.PdfLoadAttempted);
             Assert.True(item.EpubLoadAttempted);
+            Assert.True(item.OfficeLoadAttempted);
             Assert.NotNull(item.TagLibMetadataLoadError);
             Assert.NotNull(item.ImagePropertiesLoadError);
             Assert.NotNull(item.PdfLoadError);
             Assert.NotNull(item.EpubLoadError);
+            Assert.NotNull(item.OfficeLoadError);
             Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, audioKey));
             Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, imageKey));
             Assert.Equal(RenameListFieldCatalog.LoadErrorText, RenameListFieldCatalog.Resolve(item, mediaKey));
@@ -147,6 +152,21 @@ namespace Mfr.Tests.Models.Filters
         }
 
         [Fact]
+        public void Loads_office_info_from_fixture()
+        {
+            var item = RenameItemFixtures.Unmarked("tiny-info.docx");
+
+            Assert.False(item.OfficeLoadAttempted);
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Office);
+
+            Assert.True(item.OfficeLoadAttempted);
+            Assert.Null(item.OfficeLoadError);
+            Assert.NotNull(item.Original.Office);
+            Assert.Same(item.Original.Office, item.Preview.Office);
+            Assert.Equal("Sample Office Title", item.Original.Office.Title);
+        }
+
+        [Fact]
         public void Non_epub_soft_fails_epub_bucket()
         {
             var item = RenameItemFixtures.Unmarked("tiny.jpeg");
@@ -156,6 +176,18 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(item.EpubLoadAttempted);
             Assert.NotNull(item.EpubLoadError);
             Assert.Null(item.Original.Epub);
+        }
+
+        [Fact]
+        public void Non_docx_soft_fails_office_bucket()
+        {
+            var item = RenameItemFixtures.Unmarked("tiny.jpeg");
+
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Office);
+
+            Assert.True(item.OfficeLoadAttempted);
+            Assert.NotNull(item.OfficeLoadError);
+            Assert.Null(item.Original.Office);
         }
 
         [Fact]
@@ -171,6 +203,21 @@ namespace Mfr.Tests.Models.Filters
             Assert.Null(item.EpubLoadError);
             Assert.Null(item.Original.Epub);
             Assert.Null(item.Preview.Epub);
+        }
+
+        [Fact]
+        public void Clear_office_cache_resets_flag_and_dto()
+        {
+            var item = RenameItemFixtures.Unmarked("tiny-info.docx");
+            RenameListMetadataLoader.TryEnsureLoaded(item, RenameListMetadataRequirement.Office);
+            Assert.NotNull(item.Original.Office);
+
+            item.ClearOfficeCache();
+
+            Assert.False(item.OfficeLoadAttempted);
+            Assert.Null(item.OfficeLoadError);
+            Assert.Null(item.Original.Office);
+            Assert.Null(item.Preview.Office);
         }
 
         [Fact]
@@ -255,7 +302,8 @@ namespace Mfr.Tests.Models.Filters
                 RenameListMetadataRequirement.TagLib
                 | RenameListMetadataRequirement.ImageProperties
                 | RenameListMetadataRequirement.Pdf
-                | RenameListMetadataRequirement.Epub;
+                | RenameListMetadataRequirement.Epub
+                | RenameListMetadataRequirement.Office;
 
             Assert.True(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
             RenameListMetadataLoader.TryEnsureLoaded(item, requirement);
@@ -264,6 +312,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(item.ImagePropertiesLoadAttempted);
             Assert.True(item.PdfLoadAttempted);
             Assert.True(item.EpubLoadAttempted);
+            Assert.True(item.OfficeLoadAttempted);
             Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
         }
     }

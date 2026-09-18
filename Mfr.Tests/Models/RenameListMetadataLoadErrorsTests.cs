@@ -88,20 +88,38 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies listing returns TagLib, image, PDF, and EPUB failures for one row.
+        /// Verifies Office load failures use the Office-bucket explanation.
         /// </summary>
         [Fact]
-        public void ListLoadErrors_returns_taglib_image_pdf_and_epub_failures()
+        public void DescribeLoadError_uses_office_bucket_message()
+        {
+            var item = _UnmarkedItem(@"D:\Docs\notes.txt");
+            item.SetOfficeLoadError(new InvalidOperationException("Cannot read Office Info"));
+
+            var explanation = RenameListMetadataLoadErrors.DescribeUserMessage(
+                item.OfficeLoadError!,
+                RenameListMetadataRequirement.Office
+            );
+
+            Assert.Equal("This file could not be read as Office document Info.", explanation);
+        }
+
+        /// <summary>
+        /// Verifies listing returns TagLib, image, PDF, EPUB, and Office failures for one row.
+        /// </summary>
+        [Fact]
+        public void ListLoadErrors_returns_taglib_image_pdf_epub_and_office_failures()
         {
             var item = _UnmarkedItem(@"D:\Music\PLAYLIST.M3U");
             item.SetTagLibMetadataLoadError(new InvalidOperationException(@"D:\Music\PLAYLIST.M3U (taglib/m3u)"));
             item.SetImagePropertiesLoadError(new InvalidOperationException("Cannot read image properties"));
             item.SetPdfLoadError(new InvalidOperationException("Cannot read PDF Info"));
             item.SetEpubLoadError(new InvalidOperationException("Cannot read EPUB Info"));
+            item.SetOfficeLoadError(new InvalidOperationException("Cannot read Office Info"));
 
             Assert.True(RenameListFieldCatalog.HasAnyLoadError(item));
             var errors = RenameListFieldCatalog.ListLoadErrors(item);
-            Assert.Equal(4, errors.Count);
+            Assert.Equal(5, errors.Count);
             Assert.Equal("This file could not be read as audio or media metadata.", errors[0].UserExplanation);
             Assert.Contains("taglib/m3u", errors[0].TechnicalDetails, StringComparison.Ordinal);
             Assert.Equal("This file could not be read as image or EXIF metadata.", errors[1].UserExplanation);
@@ -110,6 +128,8 @@ namespace Mfr.Tests.Models
             Assert.Equal("Cannot read PDF Info", errors[2].TechnicalDetails);
             Assert.Equal("This file could not be read as EPUB document Info.", errors[3].UserExplanation);
             Assert.Equal("Cannot read EPUB Info", errors[3].TechnicalDetails);
+            Assert.Equal("This file could not be read as Office document Info.", errors[4].UserExplanation);
+            Assert.Equal("Cannot read Office Info", errors[4].TechnicalDetails);
         }
 
         /// <summary>

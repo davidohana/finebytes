@@ -19,6 +19,7 @@ namespace Mfr.Filters
             (RenameListMetadataRequirement.ImageProperties, static item => item.EnsureImagePropertiesLoaded()),
             (RenameListMetadataRequirement.Pdf, static item => item.EnsurePdfLoaded()),
             (RenameListMetadataRequirement.Epub, static item => item.EnsureEpubLoaded()),
+            (RenameListMetadataRequirement.Office, static item => item.EnsureOfficeLoaded()),
         ];
 
         /// <summary>
@@ -128,7 +129,7 @@ namespace Mfr.Filters
                 return true;
             }
 
-            // TagLib / MetadataExtractor / PdfPig / VersOne.Epub without a Filters package reference.
+            // TagLib / MetadataExtractor / PdfPig / VersOne.Epub / OpenXml without a Filters package reference.
             // Walk bases so VersOne concretes (EpubPackageException, …) match EpubReaderException.
             for (var type = ex.GetType(); type is not null && type != typeof(object); type = type.BaseType)
             {
@@ -140,6 +141,8 @@ namespace Mfr.Filters
                         or "PdfDocumentFormatException"
                         or "PdfDocumentEncryptedException"
                         or "EpubReaderException"
+                        or "OpenXmlPackageException"
+                        or "FileFormatException"
                 )
                 {
                     return true;

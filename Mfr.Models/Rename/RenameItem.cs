@@ -158,6 +158,11 @@ namespace Mfr.Models.Rename
         internal bool EpubLoadAttempted { get; private set; }
 
         /// <summary>
+        /// Gets whether OpenXml Office document Info was loaded for this preview cycle.
+        /// </summary>
+        internal bool OfficeLoadAttempted { get; private set; }
+
+        /// <summary>
         /// Gets the last TagLib read failure for audio-tag and media columns on this row, when present.
         /// </summary>
         internal Exception? TagLibMetadataLoadError { get; private set; }
@@ -176,6 +181,11 @@ namespace Mfr.Models.Rename
         /// Gets the last EPUB-metadata read failure for this row, when present.
         /// </summary>
         internal Exception? EpubLoadError { get; private set; }
+
+        /// <summary>
+        /// Gets the last Office-metadata read failure for this row, when present.
+        /// </summary>
+        internal Exception? OfficeLoadError { get; private set; }
 
         /// <summary>
         /// Records a TagLib read failure for audio-tag and media columns on this row.
@@ -214,6 +224,15 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Records an Office-metadata read failure for this row.
+        /// </summary>
+        /// <param name="ex">Failure from OpenXml while reading the row path.</param>
+        internal void SetOfficeLoadError(Exception ex)
+        {
+            SetMetadataLoadError(RenameListMetadataRequirement.Office, ex);
+        }
+
+        /// <summary>
         /// Marks TagLib metadata load as attempted for this preview cycle.
         /// </summary>
         internal void MarkTagLibLoadAttempted()
@@ -243,6 +262,14 @@ namespace Mfr.Models.Rename
         internal void MarkEpubLoadAttempted()
         {
             MarkMetadataLoadAttempted(RenameListMetadataRequirement.Epub);
+        }
+
+        /// <summary>
+        /// Marks Office document Info load as attempted for this preview cycle.
+        /// </summary>
+        internal void MarkOfficeLoadAttempted()
+        {
+            MarkMetadataLoadAttempted(RenameListMetadataRequirement.Office);
         }
 
         /// <summary>
@@ -324,6 +351,18 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Stores an Office document Info snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
+        /// </summary>
+        /// <param name="office">Read-only PackageProperties from OpenXml.</param>
+        internal void SetOfficeDocumentInfo(OfficeDocumentInfo office)
+        {
+            ArgumentNullException.ThrowIfNull(office);
+
+            Original.Office = office;
+            Preview.Office = office;
+        }
+
+        /// <summary>
         /// Clears lazy metadata caches after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearMetadataCaches()
@@ -333,6 +372,7 @@ namespace Mfr.Models.Rename
             ClearImagePropertiesCache();
             ClearPdfCache();
             ClearEpubCache();
+            ClearOfficeCache();
         }
 
         /// <summary>
@@ -386,6 +426,16 @@ namespace Mfr.Models.Rename
             ClearMetadataLoadState(RenameListMetadataRequirement.Epub);
             Original.Epub = null;
             Preview.Epub = null;
+        }
+
+        /// <summary>
+        /// Clears the Office document Info cache after commit so subsequent previews reload from disk.
+        /// </summary>
+        internal void ClearOfficeCache()
+        {
+            ClearMetadataLoadState(RenameListMetadataRequirement.Office);
+            Original.Office = null;
+            Preview.Office = null;
         }
 
         /// <summary>
