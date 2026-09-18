@@ -39,9 +39,10 @@ flowchart LR
    Extended EXIF is flattened into `ExifData.TagToDescription` (string dictionary) at map time.
 1. **Original snapshot.** Tokens read `item.Original.Image` and `item.Original.Exif` (disk-backed facts), not Preview.
 1. **Mapped rasters only.** Empty tokens apply only after a successful allowlist map when a field is
-   missing (`0` / null). Anything that is not JPEG, PNG, GIF, BMP, TIFF, ICO, or WebP is PreviewError —
-   including types MetadataExtractor will open (MP3, WAV, MP4, HEIF, RAW, …). Missing EXIF on a mapped
-   raster is an **empty** snapshot, not PreviewError. PNG/TIFF/WebP with EXIF are supported (not JPEG-only).
+   missing (`0` / null). Anything that is not JPEG, PNG, GIF, BMP, TIFF, ICO, WebP, or HEIF is PreviewError —
+   including types MetadataExtractor will open (MP3, WAV, MP4, RAW, …). Missing EXIF on a mapped
+   raster is an **empty** snapshot, not PreviewError. PNG/TIFF/WebP/HEIF with EXIF are supported (not JPEG-only).
+   HEIF covers MetadataExtractor’s `HEIF` type name for `.heic` / `.heif` (not camera RAW).
 1. **Separate from TagLib.** Raster size and EXIF live on the MetadataExtractor `FileMeta.Image` /
    `FileMeta.Exif` caches. TagLib `FileMeta.Media` holds stream facts (including video frame size);
    `<image-*>` / `<exif-*>` values may differ from TagLib/GDI+.
@@ -83,12 +84,14 @@ tests never hit disk. Integration-style tests construct an unmarked `RenameItem`
 
 ## Mapped image fields (5a)
 
-Format-native directories first. EXIF IFD is not used for width/height except TIFF (IFD0). DPI may use
-JFIF, then EXIF IFD0, then PNG pHYs, then BMP pixels/metre, converted to dots per inch. Bit depth is
-total bits per pixel where possible (typical JPEG `8×3 = 24`), not JPEG sample precision alone.
+Format-native directories first. EXIF IFD is not used for width/height except TIFF (IFD0). HEIF uses the
+first `HeicImagePropertiesDirectory` — MetadataExtractor emits primary-item properties before thumbnail
+ones (`pitm` then `thmb`). DPI may use JFIF, then EXIF IFD0, then PNG pHYs, then BMP pixels/metre,
+converted to dots per inch. Bit depth is total bits per pixel where possible (typical JPEG `8×3 = 24`;
+HEIF sums `TagPixelDepths` when present), not JPEG sample precision alone.
 
 Frame count: GIF/ICO count per-image directories; TIFF counts dimension-bearing IFD0s (not thumbnails);
-JPEG/PNG/BMP/WebP are `1` when width or height is known.
+JPEG/PNG/BMP/WebP/HEIF are `1` when width or height is known.
 
 ## Mapped EXIF fields (5b)
 

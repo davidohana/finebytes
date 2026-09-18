@@ -99,24 +99,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
         [Fact]
         public void EnsureImagePropertiesLoaded_ReadsFromDiskWhenNotMarked()
         {
-            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", "tiny.jpeg");
-            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
-
-            var fullPath = Path.GetFullPath(fixturePath);
-            var directory = Path.GetDirectoryName(fullPath)!;
-            var prefix = Path.GetFileNameWithoutExtension(fullPath);
-            var extension = FileMeta.ExtensionWithoutDot(fullPath);
-
-            var meta = new FileMeta(
-                renameListIndex: 0,
-                inFolderIndex: 0,
-                directoryPath: directory,
-                fileName: prefix,
-                extension: extension,
-                fileSize: new FileInfo(fullPath).Length
-            );
-
-            var item = new RenameItem(meta);
+            var item = _UnmarkedFixtureItem("tiny.jpeg");
             Assert.False(item.ImagePropertiesLoadAttempted);
             Assert.Null(item.Original.Image);
 
@@ -126,6 +109,17 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
             Assert.NotNull(item.Original.Image);
             Assert.Equal("8", text);
             Assert.Equal("JPEG", new ImageFormatToken().Compile(string.Empty)(item));
+        }
+
+        [Theory]
+        [InlineData("tiny.heic")]
+        [InlineData("tiny.heif")]
+        public void EnsureImagePropertiesLoaded_Heif_ReadsWidthFromDisk(string fileName)
+        {
+            var item = _UnmarkedFixtureItem(fileName);
+
+            Assert.Equal("600", new ImageWidthToken().Compile(string.Empty)(item));
+            Assert.Equal("HEIF", new ImageFormatToken().Compile(string.Empty)(item));
         }
 
         [Fact]
@@ -150,6 +144,28 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Image
             Assert.Null(item.Preview.Image);
             Assert.Null(item.Original.Exif);
             Assert.Null(item.Preview.Exif);
+        }
+
+        private static RenameItem _UnmarkedFixtureItem(string fileName)
+        {
+            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
+            Assert.True(File.Exists(fixturePath), $"Missing fixture '{fixturePath}'.");
+
+            var fullPath = Path.GetFullPath(fixturePath);
+            var directory = Path.GetDirectoryName(fullPath)!;
+            var prefix = Path.GetFileNameWithoutExtension(fullPath);
+            var extension = FileMeta.ExtensionWithoutDot(fullPath);
+
+            var meta = new FileMeta(
+                renameListIndex: 0,
+                inFolderIndex: 0,
+                directoryPath: directory,
+                fileName: prefix,
+                extension: extension,
+                fileSize: new FileInfo(fullPath).Length
+            );
+
+            return new RenameItem(meta);
         }
     }
 }

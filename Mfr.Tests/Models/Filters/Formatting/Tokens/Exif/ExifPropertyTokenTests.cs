@@ -155,6 +155,17 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
         }
 
         [Fact]
+        public void EnsureImagePropertiesLoaded_HeifExifFixture_ReadsExifField()
+        {
+            var item = _UnmarkedFixtureItem("tiny-exif.heic");
+
+            Assert.False(string.IsNullOrWhiteSpace(new ExifToken().Compile("Exif,Orientation")(item)));
+            Assert.Equal(string.Empty, new ExifMakeToken().Compile(string.Empty)(item));
+            Assert.NotNull(item.Original.Image);
+            Assert.Equal("HEIF", item.Original.Image.Format);
+        }
+
+        [Fact]
         public void EnsureImagePropertiesLoaded_Directory_Throws()
         {
             var item = FilterTestHelpers.CreateRenameItem(attributes: FileAttributes.Directory);
