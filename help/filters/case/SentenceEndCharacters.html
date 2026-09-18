@@ -21,16 +21,24 @@
       <img src="../../images/SentenceEndCharacters.png" alt="Sentence End Characters options" width="501" height="69" />
       <figcaption>Filter options.</figcaption>
     </figure>
-        <p>Does not change names by itself. It sets which characters count as sentence ends for later Letters Case (Sentence case) and Casing List (uppercase sentence initials).</p>
-        <p>Until this filter runs, Magic File Renamer uses . ! ? as the default set.</p>
+    <p>Does not change names by itself.</p>
+    <ul>
+      <li>
+        Sets which characters count as sentence ends for later Letters Case (Sentence case) and
+        Casing List (uppercase sentence initials).
+      </li>
+      <li>Until this filter runs, the default set is <code>. ! ?</code>.</li>
+    </ul>
     <h2>Options</h2>
         <ul class="options">
           <li><span class="quote">Characters</span> — Characters treated as sentence ends (for example .!? or :;).</li>
         </ul>
     <h2>Examples</h2>
+    <p>
+      Characters: <code>-:;</code>, then Letters Case → Sentence case
+    </p>
     <div class="examples">
-          <code>track 1 - intro: verse two; chorus. bridge >>> Track 1 - Intro: Verse two; Chorus. bridge</code>
+      <code>track 1 - intro: verse two; chorus. bridge >>> Track 1 - Intro: Verse two; Chorus. bridge</code>
     </div>
-        <p class="note">Example assumes Sentence End Characters is set to -:; then Letters Case → Sentence case.</p>
   </body>
 </html>

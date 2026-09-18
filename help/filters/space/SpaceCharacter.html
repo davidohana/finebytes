@@ -21,8 +21,15 @@
       <img src="../../images/SpaceCharacter.png" alt="Space Character options" width="417" height="227" />
       <figcaption>Filter options.</figcaption>
     </figure>
-        <p>Defines which character is used as the word separator for filters that follow it, and optionally replaces common stand-ins with that character.</p>
-        <p>Later filters such as Shrink Spaces, Remove Spaces, Separate Capitalized Text, strip-space filters, and Capitalize use this separator. Until this filter runs, the default is ordinary space.</p>
+    <p>Defines the word separator for filters that follow it.</p>
+    <ul>
+      <li>Optionally rewrites common stand-ins (spaces, underscores, <code>%20</code>, custom text) to that character.</li>
+      <li>
+        Later filters such as Shrink Spaces, Remove Spaces, Separate Capitalized Text, strip-space
+        filters, and Capitalize use this separator.
+      </li>
+      <li>Until this filter runs, the default is ordinary space.</li>
+    </ul>
     <h2>Options</h2>
         <ul class="options">
           <li><span class="quote">Use the following character to separate between words</span> — Space, Underscore ( _ ), or Other (any single character).</li>

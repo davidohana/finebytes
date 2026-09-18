@@ -21,12 +21,17 @@
       <img src="../../images/Formatter.png" alt="Formatter options" width="372" height="216" />
       <figcaption>Filter options.</figcaption>
     </figure>
-    <p>
-      Replaces the entire selected field with the result of a format string. Mix literals and tokens
-      such as <code class="sig">&lt;file-name&gt;</code> or
-      <code class="sig">&lt;counter:…&gt;</code>. An empty format string clears the field. Edit the
-      pattern with the <a href="../../ui/formateditor.html">Format Editor</a>.
-    </p>
+    <p>Replaces the entire selected field with the result of a format string.</p>
+    <ul>
+      <li>
+        Mix literals and tokens such as <code class="sig">&lt;file-name&gt;</code> or
+        <code class="sig">&lt;counter:…&gt;</code>.
+      </li>
+      <li>An empty format string clears the field.</li>
+      <li>
+        Edit the pattern with the <a href="../../ui/formateditor.html">Format Editor</a>.
+      </li>
+    </ul>
     <h2>Options</h2>
     <ul class="options">
       <li>
@@ -35,14 +40,21 @@
       </li>
     </ul>
     <h2>Examples</h2>
+    <p>
+      Format string
+      <code class="sig">&lt;counter&gt;.&lt;image-width&gt;x&lt;image-height&gt;</code>
+    </p>
     <div class="examples">
       <code>DSC00019 >>> 01.1920x1080</code>
+    </div>
+    <p>
+      Format string <code class="sig">&lt;file-name&gt;_backup</code>
+    </p>
+    <div class="examples">
       <code>MeetingNotes >>> MeetingNotes_backup</code>
     </div>
     <p class="note">
-      First example uses a format string like
-      <code class="sig">&lt;counter&gt;.&lt;image-width&gt;x&lt;image-height&gt;</code>. Full token
-      list: <a href="../../tokens/fp.html">Formatting Tokens</a>.
+      Full token list: <a href="../../tokens/fp.html">Formatting Tokens</a>.
     </p>
   </body>
 </html>
