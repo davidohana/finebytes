@@ -22,7 +22,7 @@ shared policy in two layers, twin APIs, and test fixtures. **Always apply** high
 local wins in-pass (do not wait for the user to say simplify / auto-correct);
 **always call out** stronger cross-file or structural dedups clearly in the report, ranked by
 **cost-to-value** (the user welcomes deeper refactors — do not bury or skip them because they
-are not auto-applied).
+are not auto-applied). Dedup threshold: **rule of three** in `AGENTS.md` (do not restate).
 
 ## Resolve scope
 
@@ -68,9 +68,9 @@ the user explicitly asks for findings-only / no changes (e.g. “review only”,
 - Cross-file fixture unifications that are a dedicated pass
 - Caching or perf work with no measured cost
 
-For each proposed dedup/refactor: name the **duplicated sites**, the **target shape**
-(what to extract, merge, or delete), **value**, **cost**, and a **cost-to-value rank**.
-Do not treat “deeper refactor” as optional silence — if duplication exists, say so.
+For each proposed dedup/refactor: name the **duplicated sites** (count them; apply `AGENTS.md`
+rule of three), the **target shape**, **value**, **cost**, and a **cost-to-value rank**.
+Do not treat “deeper refactor” as optional silence when sites ≥ 3.
 
 **Prioritize deeper refactors by cost-to-value** (best ratio first). Do not list by discovery
 order or by how ambitious they sound.
@@ -145,8 +145,8 @@ Hunt in this order:
 1. **Tests** — same scenario through VM + headless + integration; near-identical facts;
    fixtures that could be one builder.
 
-When two sites implement the same policy or shape, prefer **one owner** — even if merging
-them is a follow-up pass. Flag “same logic, two homes” explicitly.
+When two or more sites implement the same policy or shape, apply the **rule of three**
+(`AGENTS.md`). Flag “same logic, N homes” with a site count.
 
 ### KISS / YAGNI / cleanup
 
@@ -236,13 +236,14 @@ merges).
 
 ```markdown
 N. **Short title**
-   Sites: …
+   Sites: … (count)
    Target: …
    Value: … (delete X; close drift; one owner; …)
    Cost: … (risk; net/temp LOC; churn: files/tests; blast radius)
    Rank: high | medium | low cost-to-value — do first / later / skip
 ```
 
+Rank with cost-to-value **and** the rule of three (`AGENTS.md`).
 If several items relate, the number order **is** the suggested order (do not add a second
 ordering scheme). Put “do not merge / do not simplify” under **What to keep**, not as fake
 refactors. If nothing is worth doing, say that and stop.

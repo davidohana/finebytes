@@ -46,6 +46,7 @@
 - This project is new; when refactoring, do not preserve legacy behavior solely for backward compatibility.
 - Prefer clean, current designs over compatibility shims, adapter layers, or deprecated-path fallbacks.
 - If a breaking change is needed during refactor, implement the simpler forward path and update tests/docs accordingly.
+- **Rule of three (dedup):** count independent sites with the same policy/shape — **1** leave; **2** note the twin (refactor only if high drift risk or a third is imminent); **3+** prefer one owner unless cost-to-value is clearly negative. “Sites” = real parallel implementations (not every similar `if`).
 
 ### Persistence and session (no legacy migrations)
 

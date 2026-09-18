@@ -76,7 +76,7 @@ After the last slice (or when stopping):
 
 When listing deferred deeper refactors, do **not** use one-line titles alone. For each item, elaborate enough that a later agent (or you) can act without re-discovering context:
 
-- **What** — concrete smell / duplication / layering issue (files, types, or call sites)
+- **What** — concrete smell / duplication / layering issue (files, types, or call sites); count sites (`AGENTS.md` rule of three)
 - **Why it hurts** — maintenance, correctness risk, or friction if left as-is
 - **Proposed direction** — preferred approach in a few sentences (not a full design dump)
 - **Cost-to-value** — rough risk / LOC / churn vs payoff; rank higher-value items first
