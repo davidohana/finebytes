@@ -5,7 +5,7 @@ using Mfr.Tests.TestSupport;
 namespace Mfr.Tests.Ui.MainWindow
 {
     /// <summary>
-    /// Main-window Help Index / Tips open through <see cref="FilterHelpHost"/>.
+    /// Main-window Help Index / Tips open through <see cref="HelpHost"/>.
     /// </summary>
     public sealed class MainWindowHelpCommandTests
     {
@@ -79,7 +79,7 @@ namespace Mfr.Tests.Ui.MainWindow
                 }
 
                 var opener = new RecordingFileShellOpener();
-                var host = new FilterHelpHost(opener, [helpDir]);
+                var host = new HelpHost(opener, [helpDir]);
                 var viewModel = new MainWindowViewModel(helpHost: host);
                 assert(viewModel, opener, helpFile);
             }

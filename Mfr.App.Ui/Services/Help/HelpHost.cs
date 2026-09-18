@@ -18,7 +18,7 @@ namespace Mfr.App.Ui.Services.Help
     /// <param name="helpRoots">
     /// Directories to search for Help HTML. When null, uses <see cref="DefaultHelpRoots"/>.
     /// </param>
-    public sealed class FilterHelpHost(IFileShellOpener? shellOpener = null, IEnumerable<string>? helpRoots = null)
+    public sealed class HelpHost(IFileShellOpener? shellOpener = null, IEnumerable<string>? helpRoots = null)
     {
         /// <summary>
         /// Default Help root directories. First existing <c>helpFileName</c> under these roots wins.

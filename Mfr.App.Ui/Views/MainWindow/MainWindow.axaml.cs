@@ -258,10 +258,7 @@ namespace Mfr.App.Ui.Views.MainWindow
 
         private async Task _ShowHelpMissingAsync(string helpFileName)
         {
-            var dialog = new OkMessageDialog(
-                title: "Help",
-                message: FilterHelpHost.FormatMissingHelpMessage(helpFileName)
-            );
+            var dialog = new OkMessageDialog(title: "Help", message: HelpHost.FormatMissingHelpMessage(helpFileName));
             await dialog.ShowDialog(this);
         }
 

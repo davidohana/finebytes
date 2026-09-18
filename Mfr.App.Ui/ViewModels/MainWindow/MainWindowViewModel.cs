@@ -23,7 +23,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
     /// </summary>
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private readonly FilterHelpHost _helpHost;
+        private readonly HelpHost _helpHost;
         private bool _previewDirty;
         private bool _previewRunning;
         private Task _previewDrainTask = Task.CompletedTask;
@@ -48,18 +48,18 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// (production passes <see cref="PresetManager.OpenDefault"/>).
         /// </param>
         /// <param name="helpHost">
-        /// Opens Index / Tips Help HTML. When null, uses a default <see cref="FilterHelpHost"/>.
+        /// Opens Index / Tips Help HTML. When null, uses a default <see cref="HelpHost"/>.
         /// </param>
         public MainWindowViewModel(
             string? initialFileListPath = null,
             bool persistSession = false,
             FilterDefaultsStore? filterDefaults = null,
             PresetManager? presetManager = null,
-            FilterHelpHost? helpHost = null
+            HelpHost? helpHost = null
         )
         {
             PersistSession = persistSession;
-            _helpHost = helpHost ?? new FilterHelpHost();
+            _helpHost = helpHost ?? new HelpHost();
             FilterChainViewModel = new FilterChainViewModel(
                 filterDefaults ?? FilterDefaultsStore.CreateEmpty(),
                 presetManager ?? PresetManager.CreateEmpty()

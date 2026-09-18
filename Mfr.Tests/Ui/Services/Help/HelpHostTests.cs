@@ -7,9 +7,9 @@ using Mfr.Tests.Ui.FilterChainPane;
 namespace Mfr.Tests.Ui.Services.Help
 {
     /// <summary>
-    /// Unit tests for <see cref="FilterHelpHost"/> path resolution and open.
+    /// Unit tests for <see cref="HelpHost"/> path resolution and open.
     /// </summary>
-    public sealed class FilterHelpHostTests
+    public sealed class HelpHostTests
     {
         /// <summary>
         /// Verifies the host finds a help file under a configured root and opens it.
@@ -24,7 +24,7 @@ namespace Mfr.Tests.Ui.Services.Help
                 var helpFile = Path.Combine(helpDir, "SpaceCharacter.html");
                 File.WriteAllText(helpFile, "<html></html>");
                 var opener = new RecordingFileShellOpener();
-                var host = new FilterHelpHost(opener, [helpDir]);
+                var host = new HelpHost(opener, [helpDir]);
 
                 Assert.True(host.TryOpen("SpaceCharacter.html", out var fullPath));
                 Assert.Equal(helpFile, fullPath);
@@ -47,7 +47,7 @@ namespace Mfr.Tests.Ui.Services.Help
             try
             {
                 var opener = new RecordingFileShellOpener();
-                var host = new FilterHelpHost(opener, [helpDir]);
+                var host = new HelpHost(opener, [helpDir]);
 
                 Assert.False(host.TryOpen("SpaceCharacter.html", out var fullPath));
                 Assert.Null(fullPath);
@@ -65,7 +65,7 @@ namespace Mfr.Tests.Ui.Services.Help
         [Fact]
         public void TryResolve_rejects_path_segments()
         {
-            var host = new FilterHelpHost(NullFileShellOpener.Instance, [@"C:\nowhere"]);
+            var host = new HelpHost(NullFileShellOpener.Instance, [@"C:\nowhere"]);
             Assert.False(host.TryResolve(@"..\SpaceCharacter.html", out _));
             Assert.False(host.TryResolve(@"sub\SpaceCharacter.html", out _));
         }
@@ -76,10 +76,10 @@ namespace Mfr.Tests.Ui.Services.Help
         [Fact]
         public void FormatMissingHelpMessage_lists_default_roots()
         {
-            var message = FilterHelpHost.FormatMissingHelpMessage("SpaceCharacter.html");
+            var message = HelpHost.FormatMissingHelpMessage("SpaceCharacter.html");
             Assert.Contains("SpaceCharacter.html", message, StringComparison.Ordinal);
             Assert.Contains("application folder", message, StringComparison.OrdinalIgnoreCase);
-            foreach (var root in FilterHelpHost.DefaultHelpRoots)
+            foreach (var root in HelpHost.DefaultHelpRoots)
             {
                 Assert.Contains(root, message, StringComparison.OrdinalIgnoreCase);
             }
@@ -91,7 +91,7 @@ namespace Mfr.Tests.Ui.Services.Help
         [Fact]
         public void DefaultHelpRoots_is_app_base_help_only()
         {
-            Assert.Equal([Path.Combine(AppContext.BaseDirectory, "help")], FilterHelpHost.DefaultHelpRoots);
+            Assert.Equal([Path.Combine(AppContext.BaseDirectory, "help")], HelpHost.DefaultHelpRoots);
         }
     }
 
@@ -113,7 +113,7 @@ namespace Mfr.Tests.Ui.Services.Help
                 var helpFile = Path.Combine(helpDir, "LettersCase.html");
                 File.WriteAllText(helpFile, "<html></html>");
                 var opener = new RecordingFileShellOpener();
-                var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
+                var viewModel = new FilterChainViewModel(helpHost: new HelpHost(opener, [helpDir]));
                 viewModel.AddCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
 
                 Assert.True(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));
@@ -142,7 +142,7 @@ namespace Mfr.Tests.Ui.Services.Help
             try
             {
                 var opener = new RecordingFileShellOpener();
-                var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(opener, [helpDir]));
+                var viewModel = new FilterChainViewModel(helpHost: new HelpHost(opener, [helpDir]));
                 viewModel.AddCommand.Execute(FilterChainTestUi.Entry("SpaceCharacter"));
                 string? missing = null;
                 viewModel.FilterHelpMissing += (_, fileName) => missing = fileName;
@@ -164,7 +164,7 @@ namespace Mfr.Tests.Ui.Services.Help
         [Fact]
         public void OpenSelectedFilterHelp_disabled_for_multi_select()
         {
-            var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(NullFileShellOpener.Instance, []));
+            var viewModel = new FilterChainViewModel(helpHost: new HelpHost(NullFileShellOpener.Instance, []));
             viewModel.AddCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
             viewModel.SetSelectedSteps([]);
             viewModel.AddCommand.Execute(FilterChainTestUi.Entry("ShrinkSpaces"));
@@ -179,7 +179,7 @@ namespace Mfr.Tests.Ui.Services.Help
         [Fact]
         public void OpenSelectedFilterHelp_disabled_when_empty()
         {
-            var viewModel = new FilterChainViewModel(filterHelp: new FilterHelpHost(NullFileShellOpener.Instance, []));
+            var viewModel = new FilterChainViewModel(helpHost: new HelpHost(NullFileShellOpener.Instance, []));
             Assert.False(viewModel.OpenSelectedFilterHelpCommand.CanExecute(null));
         }
     }

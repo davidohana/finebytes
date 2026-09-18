@@ -19,7 +19,7 @@ todos:
     status: completed
   - id: p6-polish-nav
     content: "P6: filter breadcrumbs to Index, figcaption cleanup, skills/layering sync"
-    status: pending
+    status: completed
 isProject: false
 ---
 
@@ -32,7 +32,7 @@ Save as [`docs/plans/in-app-help-about.plan.md`](docs/plans/in-app-help-about.pl
 ## Existing stubs (finebytes)
 
 - Per-filter Help live: repo-root [`help/`](help/) (`{Type}.html` + [`filters.html`](help/filters.html) + [`help.css`](help/help.css)); copied to output by [`Mfr.App.Ui.csproj`](Mfr.App.Ui/Mfr.App.Ui.csproj).
-- Open path: [`FilterHelpHost`](Mfr.App.Ui/Services/Help/FilterHelpHost.cs) → `IFileShellOpener.OpenWithDefaultApp` (OS browser). Filter Configuration `?` already uses this.
+- Open path: [`HelpHost`](Mfr.App.Ui/Services/Help/HelpHost.cs) → `IFileShellOpener.OpenWithDefaultApp` (OS browser). Filter Configuration `?` already uses this.
 - **No** `index.html`, shell/UI/intro/reference hubs, Tips menu, F1, or About dialog.
 - Help menu stub only: disabled About in [`MainWindow.axaml`](Mfr.App.Ui/Views/MainWindow/MainWindow.axaml).
 - Version string already in window title via `_GetDisplayVersion()` in [`MainWindowViewModel`](Mfr.App.Ui/ViewModels/MainWindow/MainWindowViewModel.cs); logo at [`Assets/mfr.png`](Mfr.App.Ui/Assets/mfr.png).
@@ -47,7 +47,7 @@ Save as [`docs/plans/in-app-help-about.plan.md`](docs/plans/in-app-help-about.pl
 - **Naming:** finebytes basenames stay (`SpaceCharacter.html`, not MFR7 `spacecharfilter.html`). New shell pages use MFR7-like short names (`index.html`, `ui.html`, `fileexp.html`, …) so the Index tree stays familiar.
 - **Help menu:** **Index** (F1), **Tips**, separator, **About**. No Search, no Register.
 - **About:** Modal dialog (CenterOwner, not in taskbar) with logo (`mfr.png`), product name, display version, assembly copyright, OK. Links: Web Site + Support e-mail opened via shell (`https://www.finebytes.com/mfr`, `mailto:support@finebytes.com`) — same idea as MFR7 Splash.
-- **Host API:** Generalize [`FilterHelpHost`](Mfr.App.Ui/Services/Help/FilterHelpHost.cs) to open any relative help file (`index.html`, `tips.html`, filter pages) from `DefaultHelpRoots`; keep filter `?` on the same path.
+- **Host API:** Generalize [`HelpHost`](Mfr.App.Ui/Services/Help/HelpHost.cs) to open any relative help file (`index.html`, `tips.html`, filter pages) from `DefaultHelpRoots`; keep filter `?` on the same path.
 - **Accuracy:** Shell/operation pages describe **shipped** MFR8 panes/commands; omit or mark “not in this build” only when a MFR7 topic has no counterpart (prefer rewriting around what exists). Formatter-token help covers tokens that exist under `Mfr.Filters/Formatting/Tokens/` (see [`formatter-tokens.md`](.agents/skills/mfr7-reference/formatter-tokens.md)); unported tokens get no orphan pages.
 - **License text:** Ship a current EULA/`license.txt` suitable for MFR8/finebytes (adapt from MFR7 Help license; do not claim 1999–2013 FineBytes shareware terms unchanged).
 
@@ -113,7 +113,7 @@ flowchart LR
 
 ### P1 — Help menu, F1, About, host open for Index/Tips
 
-- **Scope / files:** Rename/generalize `FilterHelpHost` → shared help open (`TryOpen("index.html")` etc.); `AppShortcuts.ShowHelp` = F1; MainWindow KeyBinding + Help menu Index / Tips / About; `AboutDialog` (+ VM) wired like Options (`ShowDialog`); extract shared display version/copyright helper used by title + About; update [`docs/keyboard-shortcuts.md`](docs/keyboard-shortcuts.md); remove “not implemented” F1 row.
+- **Scope / files:** Rename/generalize `HelpHost` → shared help open (`TryOpen("index.html")` etc.); `AppShortcuts.ShowHelp` = F1; MainWindow KeyBinding + Help menu Index / Tips / About; `AboutDialog` (+ VM) wired like Options (`ShowDialog`); extract shared display version/copyright helper used by title + About; update [`docs/keyboard-shortcuts.md`](docs/keyboard-shortcuts.md); remove “not implemented” F1 row.
 - **Exit criteria:** F1 and Help → Index open `help/index.html` when present (missing → same style dialog as filter help); Tips opens `tips.html`; About shows logo/version/copyright/links and closes on OK.
 - **Tests:** Host resolve/open unit tests; `AppShortcuts` F1; About VM version/copyright; optional headless menu enablement if cheap ([`mfr-ui-headless-tests`](.agents/skills/mfr-ui-headless-tests/SKILL.md)).
 - **Note:** Until P2, Index/Tips may be minimal stubs so wiring is testable — replace with full pages in content phases.
