@@ -10,7 +10,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_Mp3Fixture_PopulatesAudioFields()
         {
-            var path = _RequireFixture("l3-compl-cut.mp3");
+            var path = FixturePaths.Require("l3-compl-cut.mp3");
 
             var media = MediaPropertiesReader.Read(path);
 
@@ -25,7 +25,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_Mp3Fixture_PopulatesNestedMp3()
         {
-            var path = _RequireFixture("l3-compl-cut.mp3");
+            var path = FixturePaths.Require("l3-compl-cut.mp3");
 
             var media = MediaPropertiesReader.Read(path);
 
@@ -41,7 +41,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_WavFixture_PopulatesAudioFields()
         {
-            var path = _RequireFixture("minimal-silent.wav");
+            var path = FixturePaths.Require("minimal-silent.wav");
 
             var media = MediaPropertiesReader.Read(path);
 
@@ -55,7 +55,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_WavFixture_Mp3IsNull()
         {
-            var path = _RequireFixture("minimal-silent.wav");
+            var path = FixturePaths.Require("minimal-silent.wav");
 
             var media = MediaPropertiesReader.Read(path);
 
@@ -122,19 +122,6 @@ namespace Mfr.Tests.Metadata
             {
                 File.Delete(path);
             }
-        }
-
-        private static string _RequireFixture(string fileName)
-        {
-            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
-            if (!File.Exists(fixturePath))
-            {
-                throw new InvalidOperationException(
-                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output."
-                );
-            }
-
-            return Path.GetFullPath(fixturePath);
         }
     }
 }

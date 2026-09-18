@@ -105,7 +105,7 @@ Key PDF template files:
 - **Scope / files:** Spike ME on a `.heic` fixture: confirm `TagDetectedFileTypeName` (`HEIF`), dimension + EXIF directories. Then update [`ImagePropertiesReader`](Mfr.Metadata/ImagePropertiesReader.cs) allowlist + `_ReadDimensions` / bit-depth / frame-count arms; EXIF path via existing [`ExifDataReader`](Mfr.Metadata/ExifDataReader.cs) if directories present. Docs: [`image-metadata-model.md`](docs/image-metadata-model.md), Formatter.md image section, `whatsnew` / image help. Bump `MetadataExtractor` only if spike proves 2.9.3 insufficient.
 - **Exit criteria:** `.heic`/`.heif` succeed for `<image-width>` and at least one EXIF field when present; non-HEIF audio still PreviewError; docs/help updated.
 - **Tests:** Fixture + `ImagePropertiesReader` / image+exif token tests (success + missing EXIF empty).
-- **Shipped:** MetadataExtractor **2.9.3** kept (spike OK). Allowlist `HEIF`; fixtures `tiny.heic` / `tiny.heif` / `tiny-exif.heic`.
+- **Shipped:** MetadataExtractor **2.9.3** kept (spike OK). Allowlist `HEIF`; fixtures `tiny.heic` / `tiny-exif.heic` (`.heif` extension covered via temp copy of `tiny.heic`).
 
 ### P2 — EPUB document Info (read-only)
 

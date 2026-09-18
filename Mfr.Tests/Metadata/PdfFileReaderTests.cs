@@ -10,7 +10,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_InfoFixture_FillsFieldsAndPageCount()
         {
-            var path = _RequireFixture("tiny-info.pdf");
+            var path = FixturePaths.Require("tiny-info.pdf");
 
             var pdf = PdfFileReader.Read(path);
 
@@ -34,7 +34,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_EmptyInfoFixture_LeavesFieldsEmpty()
         {
-            var path = _RequireFixture("tiny-empty-info.pdf");
+            var path = FixturePaths.Require("tiny-empty-info.pdf");
 
             var pdf = PdfFileReader.Read(path);
 
@@ -52,7 +52,7 @@ namespace Mfr.Tests.Metadata
         [Fact]
         public void Read_NonPdf_Throws()
         {
-            var path = _RequireFixture("tiny.jpeg");
+            var path = FixturePaths.Require("tiny.jpeg");
 
             var ex = Assert.ThrowsAny<Exception>(() => PdfFileReader.Read(path));
             Assert.Equal("PdfDocumentFormatException", ex.GetType().Name);
@@ -64,19 +64,6 @@ namespace Mfr.Tests.Metadata
             var missing = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName(), "missing.pdf");
             var ex = Assert.Throws<ArgumentException>(() => PdfFileReader.Read(missing));
             Assert.Contains("exist", ex.Message, StringComparison.OrdinalIgnoreCase);
-        }
-
-        private static string _RequireFixture(string fileName)
-        {
-            var fixturePath = Path.Combine(AppContext.BaseDirectory, "Fixtures", fileName);
-            if (!File.Exists(fixturePath))
-            {
-                throw new InvalidOperationException(
-                    $"Missing fixture '{fixturePath}'. Run build so Fixtures copy to output."
-                );
-            }
-
-            return Path.GetFullPath(fixturePath);
         }
     }
 }

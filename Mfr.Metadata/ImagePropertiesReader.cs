@@ -258,12 +258,45 @@ namespace Mfr.Metadata
         }
 
         /// <summary>
-        /// Sums per-channel pixel depths from the primary HEIC item when <c>TagPixelDepths</c> is present.
+        /// Total bits per pixel for the primary HEIC item: sum <c>TagPixelDepths</c>, else luma/chroma fallback.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// When <c>TagPixelDepths</c> is missing, uses <c>TagBitDepthLuma</c> / <c>TagBitDepthChroma</c>.
+        /// Monochrome (<c>TagChromaFormat == 0</c>) or missing chroma depth yields luma only; otherwise
+        /// <c>luma + 2×chroma</c> (Y+Cb+Cr channel-depth sum, matching a typical <c>8 8 8</c> depths array).
+        /// </para>
+        /// </remarks>
         private static int _ReadHeifBitDepth(IReadOnlyList<MeDirectory> directories)
         {
             var heic = _PrimaryHeicProperties(directories);
-            return heic is null ? 0 : _SumNumericTag(heic, HeicImagePropertiesDirectory.TagPixelDepths);
+            if (heic is null)
+            {
+                return 0;
+            }
+
+            var fromPixelDepths = _SumNumericTag(heic, HeicImagePropertiesDirectory.TagPixelDepths);
+            if (fromPixelDepths > 0)
+            {
+                return fromPixelDepths;
+            }
+
+            var luma = _TryGetInt(heic, HeicImagePropertiesDirectory.TagBitDepthLuma);
+            var chroma = _TryGetInt(heic, HeicImagePropertiesDirectory.TagBitDepthChroma);
+            if (luma == 0 && chroma == 0)
+            {
+                return 0;
+            }
+
+            var isMonochrome =
+                heic.ContainsTag(HeicImagePropertiesDirectory.TagChromaFormat)
+                && _TryGetInt(heic, HeicImagePropertiesDirectory.TagChromaFormat) == 0;
+            if (isMonochrome || chroma == 0)
+            {
+                return luma;
+            }
+
+            return luma + (2 * chroma);
         }
 
         /// <summary>
