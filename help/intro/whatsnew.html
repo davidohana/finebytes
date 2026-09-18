@@ -145,26 +145,12 @@
         <strong>Format / imaging regressions</strong>
         <ul>
           <li>
-            Image property tokens no longer cover WMF or EMF (MFR 7 did)
+            Image property tokens no longer cover WMF or EMF
           </li>
           <li>
             Read-only Image Tag columns and <span class="quote">&lt;imagetag-*&gt;</span> tokens
-            (Keywords, Rating, Creator, …) are not ported yet — MFR 7 had them read-only; writing
-            image tags was never supported there either
-          </li>
-          <li>
-            JPEG 2000 and PDF image-tag / XMP reading from MFR 7 is not in the current image
-            allowlist
-          </li>
-        </ul>
-      </li>
-      <li>
-        <strong>Other gaps</strong>
-        <ul>
-          <li>Drag selected Rename List rows out to Explorer (inbound drop still works)</li>
-          <li>
-            Rename List “Show Last Rename Errors” list-wide view (per-row rename error details still
-            work)
+            (Keywords, Rating, Creator, …) are not ported yet — MFR 7 had them read-only for JPEG /
+            TIFF / PNG / GIF (and similar); writing image tags was never supported there either
           </li>
         </ul>
       </li>
