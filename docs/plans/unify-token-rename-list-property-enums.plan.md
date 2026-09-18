@@ -140,6 +140,5 @@ No new MFR7 crawl required.
 
 ## Open (tidy)
 
-None at write time. After P2, Media is the natural third twin — open a small follow-up
-plan then if Media/Mpeg still duplicate token vs Rename List enums; do not expand this
-plan’s phases to absorb Media (Media needs key-name mapping, not a pure enum merge).
+Handed off — follow-up plan (prio: Media high → MPEG medium → helper collapse low):
+[`unify-media-mpeg-property-enums.plan.md`](unify-media-mpeg-property-enums.plan.md).
