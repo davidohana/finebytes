@@ -37,7 +37,7 @@ Illustrative spine (typical flow, not exhaustive):
 
 - **L4 Engine** owns process-wide prefs I/O: [`ConfigStore`](../Mfr.Engine/Config/ConfigStore.cs) and [`ConfirmationPolicy`](../Mfr.Engine/Config/ConfirmationPolicy.cs) under `Mfr.Engine.Config` (load/save/delete, soft-load dialect, CLI `--set`). Guarded by `ConfigStoreOwnershipArchitectureTests`.
 - **L1 Models** owns prefs **shape** only: `OptionsConfig`, `LogConfig`, `RenameLogConfig`, session DTOs (`FileListPrefs`, …), `ConfirmationKind` under `Mfr.Models.Config`.
-- Reset Configuration stays [`PersistedConfigurationReset`](../Mfr.Engine/Config/PersistedConfigurationReset.cs) (calls `ConfigStore.DeleteDefaultFile`).
+- Reset Configuration deletes prefs via [`ConfigStore.DeleteDefaultFile`](../Mfr.Engine/Config/ConfigStore.cs) (does not touch `presets.json` or local logs).
 
 ### Models friend assemblies
 

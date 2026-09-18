@@ -367,7 +367,7 @@ namespace Mfr.App.Ui.Views.MainWindow
                     }
                     else
                     {
-                        PersistedConfigurationReset.Reset();
+                        ConfigStore.DeleteDefaultFile();
                     }
                 }
                 catch (Exception)

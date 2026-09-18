@@ -227,7 +227,12 @@ namespace Mfr.Engine.Config
 
         /// <summary>
         /// Deletes the config JSON file when it exists (Reset Configuration).
-        /// <para>Missing files are a no-op. Does not change in-memory prefs (UI exits after delete).</para>
+        /// <para>
+        /// Removes <c>config.json</c> only (log/options/renameLog + UI session sections + filterDefaults).
+        /// Does not touch <c>presets.json</c> or local logs. Missing files are a no-op. Does not change
+        /// in-memory prefs — the UI exits after delete (with session save suppressed) so the next process
+        /// soft-loads defaults.
+        /// </para>
         /// </summary>
         /// <param name="configFilePath">
         /// Path to JSON. When <c>null</c> or whitespace, <see cref="_ResolvePath"/> is used.

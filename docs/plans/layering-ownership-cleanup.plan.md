@@ -10,7 +10,7 @@ status: complete
 
 - **No new projects.** Keep L0–L5. Do not add `App.Core`, split Engine, or extract Persistence.
 - **P1:** Move [`ConfigStore`](../../Mfr.Engine/Config/ConfigStore.cs) and [`ConfirmationPolicy`](../../Mfr.Engine/Config/ConfirmationPolicy.cs) to [`Mfr.Engine/Config/`](../../Mfr.Engine/Config) (`namespace Mfr.Engine.Config`). Prefs **DTOs** stay in Models (`OptionsConfig`, `LogConfig`, `RenameLogConfig`, session records, `ConfirmationKind`).
-- **Keep** [`PersistedConfigurationReset`](../../Mfr.Engine/Config/PersistedConfigurationReset.cs) as the named Reset Configuration API (still calls `ConfigStore.DeleteDefaultFile`).
+- Reset Configuration uses [`ConfigStore.DeleteDefaultFile`](../../Mfr.Engine/Config/ConfigStore.cs) directly (former `PersistedConfigurationReset` wrapper removed).
 - **UI Services may import `Mfr.Engine.Config`.** Session/File List already read the static store; that matches the documented Services→Engine edge. Do not inject `OptionsConfig` through every catalog call.
 - **Do not move** `RenameListMetadataLoader` / `EnsureTagLibLoaded` out of Filters. Filters know *when* to load; Metadata knows *how*.
 - **Do not publicize** `RenameItem` internals. Models `InternalsVisibleTo` Engine/Filters is a friend API, not a leak.
@@ -24,7 +24,7 @@ status: complete
 
 ## MFR7 reference brief
 
-Not an MFR7 feature. Reset Configuration already exists (`PersistedConfigurationReset`). This is ownership only: same `config.json` soft-load, same CLI `--set` hard-fail, same UI session DTOs. No Help/GIF crawl.
+Not an MFR7 feature. Reset Configuration already exists (`ConfigStore.DeleteDefaultFile`). This is ownership only: same `config.json` soft-load, same CLI `--set` hard-fail, same UI session DTOs. No Help/GIF crawl.
 
 ## Non-goals
 
