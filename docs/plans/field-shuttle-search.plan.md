@@ -41,10 +41,10 @@ Hook in `_RefreshLists` in `RenameListFieldShuttleDialogViewModel`: resolve cand
 
 ### P2 — AXAML + help + light headless
 
-- [ ] Search boxes on Columns + Sort; disable Groups while searching; group subtitles on available rows.
-- [ ] Optional: focus search when dialog opens only if cheap in existing dialog open path.
-- [ ] Update `help/ui/fieldselector.html` (+ whatsnew if that page tracks UI tweaks).
-- [ ] One headless assert in `RenameListFieldShuttleDialogTests.cs` that setting search refreshes the available list.
+- [x] Search boxes on Columns + Sort; disable Groups while searching; group subtitles on available rows.
+- [x] Optional: focus search when dialog opens only if cheap in existing dialog open path.
+- [x] Update `help/ui/fieldselector.html` (+ whatsnew if that page tracks UI tweaks).
+- [x] One headless assert in `RenameListFieldShuttleDialogTests.cs` that setting search refreshes the available list.
 
 **Exit:** User can type in the shuttle and find fields across groups; help mentions search.
 

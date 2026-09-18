@@ -147,6 +147,38 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies setting search text refreshes the available-fields ListBox and disables Groups.
+        /// </summary>
+        [AvaloniaFact]
+        public void Setting_SearchText_refreshes_available_list()
+        {
+            var (dialog, dialogVm, _) = _ShowColumnsList();
+            var availableList = dialog.FindControl<ListBox>("AvailableOriginalFieldsList");
+            var groupsList = dialog.FindControl<ListBox>("ColumnGroupsList");
+            var searchBox = dialog.FindControl<TextBox>("ColumnFieldSearchBox");
+            Assert.NotNull(availableList);
+            Assert.NotNull(groupsList);
+            Assert.NotNull(searchBox);
+            Assert.Equal("Search fields…", searchBox.PlaceholderText);
+            Assert.False(dialogVm.IsFieldSearchActive);
+            Assert.True(groupsList.IsEnabled);
+
+            var groupScopedCount = availableList.ItemCount;
+            dialogVm.SearchText = "Title";
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            Assert.True(dialogVm.IsFieldSearchActive);
+            Assert.False(groupsList.IsEnabled);
+            Assert.Equal("Title", searchBox.Text);
+            Assert.Equal(dialogVm.AvailableOriginalFields.Count, availableList.ItemCount);
+            Assert.NotEqual(groupScopedCount, availableList.ItemCount);
+            Assert.True(availableList.ItemCount > 0);
+
+            dialog.Close();
+        }
+
+        /// <summary>
         /// Verifies clicking a property group updates the available-fields list.
         /// </summary>
         [AvaloniaFact]

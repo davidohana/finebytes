@@ -343,11 +343,14 @@
     <Setter Property="Background" Value="Transparent" />
   </Style>
 
-  <!-- Insert-picker search should keep its hint; option fields hide watermarks until focus. -->
+  <!-- Insert-picker / field-shuttle search should keep its hint; option fields hide watermarks until focus. -->
   <Style
     Selector="TextBox.format-token-search /template/ TextBlock#PART_Watermark,
               TextBox.format-token-search:pointerover /template/ TextBlock#PART_Watermark,
-              TextBox.format-token-search:focus /template/ TextBlock#PART_Watermark"
+              TextBox.format-token-search:focus /template/ TextBlock#PART_Watermark,
+              TextBox.field-shuttle-search /template/ TextBlock#PART_Watermark,
+              TextBox.field-shuttle-search:pointerover /template/ TextBlock#PART_Watermark,
+              TextBox.field-shuttle-search:focus /template/ TextBlock#PART_Watermark"
   >
     <Setter Property="Foreground" Value="{DynamicResource FilterEditorWatermarkBrush}" />
   </Style>
