@@ -1266,6 +1266,32 @@ namespace Mfr.Tests.Models
         }
 
         [Fact]
+        public void CompareForSort_orders_id3v1_year_and_track_numeric()
+        {
+            var yearTen = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Year = 10 } }
+            );
+            var yearTwo = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Year = 2 } }
+            );
+            var yearKey = RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Year");
+            Assert.True(RenameListFieldCatalog.CompareForSort(yearTwo, yearKey, yearTen) < 0);
+
+            var trackTen = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Track = 10 } }
+            );
+            var trackTwo = FilterTestHelpers.CreateRenameItem(
+                configureOriginal: meta =>
+                    meta.AudioTagOverlay = new AudioTagOverlay { Id3v1 = new Id3v1TagData { Track = 2 } }
+            );
+            var trackKey = RenameListFieldKey.Original(Id3v1RenameListFields.Group, "Track");
+            Assert.True(RenameListFieldCatalog.CompareForSort(trackTwo, trackKey, trackTen) < 0);
+        }
+
+        [Fact]
         public void CompareForSort_orders_media_duration_and_file_name_numeric()
         {
             var tenHours = FilterTestHelpers.CreateRenameItem(

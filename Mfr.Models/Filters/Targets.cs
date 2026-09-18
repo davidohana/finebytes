@@ -129,7 +129,21 @@ namespace Mfr.Models.Filters
     /// <param name="Description">Content descriptor for <c>COMM</c>/<c>USLT</c>/<c>TXXX</c>, or <see langword="null"/> for primary.</param>
     public sealed record Id3v2FrameTarget(string FrameId, string? Language = null, string? Description = null)
         : FilterTarget,
-            IAudioOverlayFilterTarget;
+            IAudioOverlayFilterTarget
+    {
+        /// <summary>
+        /// Gets the four-character frame id (always trimmed uppercase; blank → empty).
+        /// </summary>
+        public string FrameId { get; init; } = _NormalizeId3v2FrameId(FrameId);
+
+        /// <summary>
+        /// Trims and uppercases a frame id for storage / equality.
+        /// </summary>
+        private static string _NormalizeId3v2FrameId(string frameId)
+        {
+            return string.IsNullOrWhiteSpace(frameId) ? string.Empty : frameId.Trim().ToUpperInvariant();
+        }
+    }
 
     /// <summary>
     /// Targets one known Xiph / Vorbis comment key on <see cref="Rename.FileMeta.AudioTagOverlay"/>.<see cref="AudioTagOverlay.Xiph"/>.
@@ -140,5 +154,19 @@ namespace Mfr.Models.Filters
     /// </para>
     /// </remarks>
     /// <param name="Key">Comment field key (for example <c>TITLE</c>, <c>ARTIST</c>).</param>
-    public sealed record XiphFieldTarget(string Key) : FilterTarget, IAudioOverlayFilterTarget;
+    public sealed record XiphFieldTarget(string Key) : FilterTarget, IAudioOverlayFilterTarget
+    {
+        /// <summary>
+        /// Gets the comment field key (always trimmed uppercase; blank → empty).
+        /// </summary>
+        public string Key { get; init; } = _NormalizeXiphKey(Key);
+
+        /// <summary>
+        /// Trims and uppercases a Xiph key for storage / equality.
+        /// </summary>
+        private static string _NormalizeXiphKey(string key)
+        {
+            return string.IsNullOrWhiteSpace(key) ? string.Empty : key.Trim().ToUpperInvariant();
+        }
+    }
 }

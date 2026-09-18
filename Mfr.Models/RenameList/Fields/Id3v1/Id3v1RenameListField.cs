@@ -33,5 +33,16 @@ namespace Mfr.Models.RenameList.Fields.Id3v1
         {
             return AudioOverlayBlockFieldIo.GetId3v1FieldString(meta.AudioTagOverlay, Field);
         }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            if (Field is Id3v1Field.Year or Id3v1Field.Track)
+            {
+                return RenameListFieldSortCompare.ParsedInt64(Resolve(left), Resolve(right));
+            }
+
+            return base.CompareForSort(left, right);
+        }
     }
 }
