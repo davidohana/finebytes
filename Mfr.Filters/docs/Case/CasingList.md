@@ -7,14 +7,18 @@ Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceE
 ## Options
 
 - **`words`** (`string[]`) — Words to apply by exact spelling. Duplicates: **last wins**.
-- **`uppercaseSentenceInitial`** (bool, default `false`)
+  - Add-to-list and title-bar Reset still start with an **empty** list. The Filter Configuration
+    **Load defaults** button replaces the Words box with the curated factory list (`DefaultWords`:
+    title-case exceptions, multilingual particles, and common rename/media acronyms). That same
+    list is used by the Beautify Names sample preset; it is **not** merged with existing text.
+- **`uppercaseSentenceInitial`** (bool, default `false` in JSON; add-to-list / title-bar Reset use `true`)
   - If `true`, after list application, uppercases sentence starts with the same boundary rules as
     [LettersCase](LettersCase.md) **SentenceCase** (first letter, scanning past leading non-letters; after
     sentence-end characters when followed by the word separator). Does **not** lowercase the rest of the text.
 
 ## Editor text format
 
-The Filter Configuration pane edits `words` as **space-separated** text (e.g. `and or with RMX`). Each word is limited to the configured maximum (default 2000 characters; same cap as name-list lines and replace-list search/replacement).
+The Filter Configuration pane edits `words` as **space-separated** text (e.g. `and or with RMX`). Each word is limited to the configured maximum (default 2000 characters; same cap as name-list lines and replace-list search/replacement). Use **Load defaults** to fill the box from the factory list described above.
 
 ## Examples
 

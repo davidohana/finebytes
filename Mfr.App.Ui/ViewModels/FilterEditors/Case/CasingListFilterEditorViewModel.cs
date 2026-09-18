@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.Filters.Case;
 
@@ -30,6 +31,21 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         /// </summary>
         [ObservableProperty]
         private bool _uppercaseSentenceInitial = true;
+
+        /// <summary>
+        /// Replaces the Words box with the curated factory casing list.
+        /// </summary>
+        /// <remarks>
+        /// Flushes pending list-text apply before and after the replace so the factory list is
+        /// committed immediately (button click), not after the live-text debounce.
+        /// </remarks>
+        [RelayCommand]
+        public void LoadDefaults()
+        {
+            FlushPendingLiveListTextApply();
+            WordsText = CasingListParser.FormatEditorText(CasingListOptions.DefaultWords);
+            FlushPendingLiveListTextApply();
+        }
 
         partial void OnWordsTextChanged(string value)
         {

@@ -55,6 +55,15 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
             Assert.Equal(["and", "or", "RMX"], filter.Options.Words);
             Assert.False(filter.Options.UppercaseSentenceInitial);
 
+            var loadDefaults = editor.FindControl<Button>("LoadDefaultsButton");
+            Assert.NotNull(loadDefaults);
+            loadDefaults.Command!.Execute(null);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            filter = (CasingListFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(CasingListOptions.DefaultWords, filter.Options.Words);
+
             window.Close();
         }
     }

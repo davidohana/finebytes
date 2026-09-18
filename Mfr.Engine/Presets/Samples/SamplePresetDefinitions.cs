@@ -100,10 +100,7 @@ namespace Mfr.Engine.Presets.Samples
                     _On(
                         new CasingListFilter(
                             FileName,
-                            new CasingListOptions(
-                                Words: LettersCaseOptions.DefaultCapitalizeSkipWords,
-                                UppercaseSentenceInitial: true
-                            )
+                            new CasingListOptions(Words: CasingListOptions.DefaultWords, UppercaseSentenceInitial: true)
                         )
                     )
                 ),

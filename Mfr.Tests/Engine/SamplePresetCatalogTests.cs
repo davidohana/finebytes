@@ -168,10 +168,10 @@ namespace Mfr.Tests.Engine
         }
 
         /// <summary>
-        /// Verifies the Beautify Names sample keeps its ordered cleanup and casing workflow.
+        /// Verifies the Beautify Names sample keeps its ordered cleanup and curated casing list.
         /// </summary>
         [Fact]
-        public void Beautify_Names_has_locked_chain_and_common_words()
+        public void Beautify_Names_has_locked_chain_and_default_casing_words()
         {
             var preset = _Preset("General: Beautify Names");
             string[] expectedTypes =
@@ -190,7 +190,7 @@ namespace Mfr.Tests.Engine
 
             Assert.Equal(expectedTypes, preset.Chain.Steps.Select(step => step.Filter.Type));
             var casingList = Assert.IsType<CasingListFilter>(preset.Chain.Steps[^1].Filter);
-            Assert.Equal(LettersCaseOptions.DefaultCapitalizeSkipWords, casingList.Options.Words);
+            Assert.Equal(CasingListOptions.DefaultWords, casingList.Options.Words);
             Assert.True(casingList.Options.UppercaseSentenceInitial);
         }
 
