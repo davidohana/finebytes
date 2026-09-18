@@ -1,3 +1,4 @@
+using Mfr.Filters;
 using Mfr.Filters.Case;
 using Mfr.Filters.Space;
 
@@ -11,6 +12,35 @@ namespace Mfr.Tests.Models.Filters.Case
         private static readonly FileNameTarget _target = new();
 
         private static readonly string[] _sampleWords = ["and", "or", "with", "RMX"];
+
+        /// <summary>
+        /// Verifies add-to-list defaults keep an empty word list (factory Load defaults is separate).
+        /// </summary>
+        [Fact]
+        public void ParameterlessCtor_UsesEmptyWords()
+        {
+            var filter = new CasingListFilter();
+
+            Assert.Empty(filter.Options.Words);
+            Assert.True(filter.Options.UppercaseSentenceInitial);
+        }
+
+        /// <summary>
+        /// Verifies curated DefaultWords build a valid casing map within list limits.
+        /// </summary>
+        [Fact]
+        public void DefaultWords_BuildsMapWithinListEntryLimits()
+        {
+            var words = CasingListOptions.DefaultWords;
+
+            Assert.NotEmpty(words);
+            Assert.True(words.Count <= ListEntryLength.DefaultMaxEntryCount);
+            Assert.All(words, word => Assert.True(word.Length <= ListEntryLength.DefaultMaxLength));
+            Assert.Equal(words.Count, words.Distinct(StringComparer.OrdinalIgnoreCase).Count());
+
+            var map = CasingListParser.BuildMap(words);
+            Assert.Equal(words.Count, map.Count);
+        }
 
         /// <summary>
         /// Verifies casing-list words are applied and unknown words remain unchanged.

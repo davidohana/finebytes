@@ -23,6 +23,18 @@ namespace Mfr.Tests.Models.Filters.Case
         }
 
         /// <summary>
+        /// Verifies capitalize skip-words are the shared title-case exception array (not a drifted copy).
+        /// </summary>
+        [Fact]
+        public void DefaultCapitalizeSkipWords_IsSharedTitleCaseExceptionArray()
+        {
+            var skipWords = LettersCaseOptions.DefaultCapitalizeSkipWords;
+            Assert.Same(CommonCasingWords.TitleCaseExceptions, skipWords);
+            Assert.Same(CommonCasingWords.DefaultWords, CasingListOptions.DefaultWords);
+            Assert.Equal(skipWords, CasingListOptions.DefaultWords.Take(skipWords.Count));
+        }
+
+        /// <summary>
         /// Verifies upper-case mode.
         /// </summary>
         [Fact]

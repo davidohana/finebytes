@@ -41,7 +41,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
             var uppercase = editor.FindControl<CompactCheckBox>("UppercaseSentenceInitialCheckBox");
             Assert.NotNull(words);
             Assert.NotNull(uppercase);
-            Assert.Equal(TextWrapping.NoWrap, words.TextWrapping);
+            Assert.Equal(TextWrapping.Wrap, words.TextWrapping);
             Assert.Equal(ListEntryLength.DefaultEditorTextMaxLength, words.MaxLength);
             Assert.Equal(string.Empty, words.Text);
             Assert.True(uppercase.IsChecked);
@@ -54,6 +54,15 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
             var filter = (CasingListFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
             Assert.Equal(["and", "or", "RMX"], filter.Options.Words);
             Assert.False(filter.Options.UppercaseSentenceInitial);
+
+            var loadDefaults = editor.FindControl<Button>("LoadDefaultsButton");
+            Assert.NotNull(loadDefaults);
+            loadDefaults.Command!.Execute(null);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            filter = (CasingListFilter)mainViewModel.FilterChainViewModel.ToChain().Steps[0].Filter;
+            Assert.Equal(CasingListOptions.DefaultWords, filter.Options.Words);
 
             window.Close();
         }

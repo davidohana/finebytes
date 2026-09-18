@@ -43,7 +43,9 @@ figure.screenshot {
 }
 
 figure.screenshot img {
-  max-width: min(100%, 520px);
+  /* Keep intrinsic aspect when max-width shrinks (HTML width/height alone stretch). */
+  max-width: min(100%, 640px);
+  height: auto;
   border: 1px solid #888;
   background:
     linear-gradient(45deg, #eee 25%, transparent 25%),

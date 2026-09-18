@@ -15,7 +15,8 @@ figure — their help pages say the filter has no options.
    `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpScreenshotCaptureTests`
    (uses Skia headless via `TestAppBuilder`).
 1. Or run the UI (`just run-ui`), add the filter, select it, and crop the options body.
-1. Prefer PNG; keep widths roughly 480–640px when practical.
+1. Prefer PNG; keep widths roughly 400–640px when practical. Help CSS uses
+   `max-width: 640px` with `height: auto` so HTML width/height attrs do not stretch.
 1. Missing images still load: `help.css` shows a checkerboard placeholder behind broken `img`.
 1. This file is **not** copied to the app output directory.
 

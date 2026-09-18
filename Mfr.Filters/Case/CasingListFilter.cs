@@ -14,7 +14,17 @@ namespace Mfr.Filters.Case
     /// (first letter, and after <see cref="RenameItem.SentenceEndChars"/> when followed by the word separator;
     /// default ends <c>".!?"</c>). Does not lowercase the rest of the text.
     /// </param>
-    public sealed record CasingListOptions(IReadOnlyList<string> Words, bool UppercaseSentenceInitial = false);
+    public sealed record CasingListOptions(IReadOnlyList<string> Words, bool UppercaseSentenceInitial = false)
+    {
+        /// <summary>
+        /// Curated factory casing list shared by the editor Load defaults action and the Pretty Names sample.
+        /// </summary>
+        /// <remarks>
+        /// English title-case exceptions, multilingual particles, and common rename/media acronyms.
+        /// New filter instances still start with an empty <see cref="Words"/> list.
+        /// </remarks>
+        public static IReadOnlyList<string> DefaultWords { get; } = CommonCasingWords.DefaultWords;
+    }
 
     /// <summary>
     /// Changes each word's casing to match how it appears in the configured word list.

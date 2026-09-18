@@ -28,7 +28,7 @@ namespace Mfr.Engine.Presets.Samples
         {
             return
             [
-                _BeautifyNames(),
+                _PrettyNames(),
                 _CounterPrefix(),
                 _TagsFromFilename(),
                 _ArtistTrackTitle(),
@@ -47,12 +47,12 @@ namespace Mfr.Engine.Presets.Samples
             ];
         }
 
-        private static FilterPreset _BeautifyNames()
+        private static FilterPreset _PrettyNames()
         {
             return _Preset(
                 id: "10000000-0000-4000-8000-000000000001",
-                name: "General: Beautify Names",
-                description: "Beautify file names by fixing casing and spaces",
+                name: "General: Pretty Names",
+                description: "Clean up file names by fixing casing and spaces",
                 chain: _Chain(
                     _On(
                         new SpaceCharacterFilter(
@@ -84,10 +84,7 @@ namespace Mfr.Engine.Presets.Samples
                     _On(
                         new LettersCaseFilter(
                             FileName,
-                            new LettersCaseOptions(
-                                LettersCaseMode.Capitalize,
-                                LettersCaseOptions.DefaultCapitalizeSkipWords
-                            )
+                            new LettersCaseOptions(LettersCaseMode.Capitalize, CapitalizeSkipWords: [])
                         )
                     ),
                     _On(
@@ -100,10 +97,7 @@ namespace Mfr.Engine.Presets.Samples
                     _On(
                         new CasingListFilter(
                             FileName,
-                            new CasingListOptions(
-                                Words: LettersCaseOptions.DefaultCapitalizeSkipWords,
-                                UppercaseSentenceInitial: true
-                            )
+                            new CasingListOptions(Words: CasingListOptions.DefaultWords, UppercaseSentenceInitial: true)
                         )
                     )
                 ),
