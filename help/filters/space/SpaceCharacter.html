@@ -28,9 +28,16 @@
           <li><span class="quote">Replace … Spaces / Underscores / %20&#x27;s / Custom text</span> — Rewrite checked forms to the defined space character.</li>
         </ul>
     <h2>Examples</h2>
+    <p>Space character <code>_</code>; replace <code>%20</code></p>
     <div class="examples">
           <code>Gone%20With%20The%20Wind >>> Gone_With_The_Wind</code>
+    </div>
+    <p>Space character space; replace <code>%20</code>, spaces, and underscores</p>
+    <div class="examples">
           <code>a_b c%20d >>> a b c d</code>
+    </div>
+    <p>Space character <code>-</code>; replace custom text <code>++</code></p>
+    <div class="examples">
           <code>a++b >>> a-b</code>
     </div>
         <p class="note">Put Space Character before any filter that should use a non-space word boundary.</p>

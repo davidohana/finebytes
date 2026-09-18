@@ -27,9 +27,18 @@
           <li><span class="quote">Mode / match flags</span> — Same matching rules as Replacer (literal, wildcards, or regular expression).</li>
         </ul>
     <h2>Examples</h2>
+    <p>Entries (literal):</p>
     <div class="examples">
+          <code>a =&gt; b
+. =&gt; _</code>
           <code>a.a >>> b_b</code>
-          <code>01.-.Blue.Train >>> 10_-_Blue_Train</code>
+    </div>
+    <p>Entries (regular expression; second item in the Rename List):</p>
+    <div class="examples">
+          <code>a =&gt; b
+\. =&gt; _
+[0-9]+ =&gt; &lt;counter:initial=10,step=1,padding=none,length=2,resetScope=global&gt;</code>
+          <code>01.-.Blue.Train >>> 10_-_Blue_Trbin</code>
     </div>
 
   </body>

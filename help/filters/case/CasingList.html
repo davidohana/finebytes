@@ -24,12 +24,16 @@
         <p>Words not in the list stay unchanged. You can also uppercase sentence initials using Sentence End Characters.</p>
     <h2>Options</h2>
         <ul class="options">
-          <li><span class="quote">Words</span> — One word per line (or comma-separated). Matching is case-insensitive; replacement keeps the list spelling.</li>
-          <li><span class="quote">Uppercase sentence initials</span> — When checked, capitalizes the first letter of each sentence.</li>
+          <li><span class="quote">Words</span> — Space-separated words. Matching is case-insensitive; replacement keeps the list spelling.</li>
+          <li><span class="quote">Always uppercase first letter in sentence</span> — When checked, capitalizes the first letter of each sentence.</li>
         </ul>
     <h2>Examples</h2>
+    <p>Words: <code>and or with RMX</code></p>
     <div class="examples">
           <code>03 - WiTH Or Without You Rmx >>> 03 - with or Without You RMX</code>
+    </div>
+    <p>Words: <code>and us them</code> (word separator <code>_</code>; uppercase sentence initials on)</p>
+    <div class="examples">
           <code>US_AND_THEM >>> Us_and_them</code>
     </div>
         <p class="note">Place Sentence End Characters before this filter when sentence-initial uppercasing should use a custom end set.</p>

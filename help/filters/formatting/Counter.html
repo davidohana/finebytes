@@ -29,9 +29,16 @@
           <li><span class="quote">Placement</span> — Prepend, append, or replace the target field.</li>
         </ul>
     <h2>Examples</h2>
+    <p>Start 1, step 1, pad to 3 digits, replace (5th item → 005)</p>
     <div class="examples">
           <code>old >>> 005</code>
+    </div>
+    <p>Start 0, step 1, prepend with separator <code>_</code> (3rd item → 2)</p>
+    <div class="examples">
           <code>name >>> 2_name</code>
+    </div>
+    <p>Start 0, step 1, append with separator <code>-</code> (2nd item → 1)</p>
+    <div class="examples">
           <code>name >>> name-1</code>
     </div>
 
