@@ -28,13 +28,20 @@
           <li><span class="quote">Mode / match flags</span> — Same matching rules as Replacer (literal, wildcards, or regular expression).</li>
         </ul>
     <h2>Examples</h2>
-    <p>Entries (literal):</p>
+    <p>
+      <span class="ex-opt"><span class="ex-name">Mode</span><span class="ex-val">literal</span></span>
+      <span class="ex-opt"><span class="ex-name">Entries</span><span class="ex-val">(list below)</span></span>
+    </p>
     <div class="examples">
           <code>feat. =&gt; ft.
 . =&gt; _</code>
           <code>01.Blue.Train.feat.Coltrane >>> 01_Blue_Train_ft_Coltrane</code>
     </div>
-    <p>Entries (regular expression; 2nd Rename List item → counter 11):</p>
+    <p>
+      <span class="ex-opt"><span class="ex-name">Mode</span><span class="ex-val">regular expression</span></span>
+      <span class="ex-opt"><span class="ex-name">Rename List item</span><span class="ex-val">2nd (counter → 11)</span></span>
+      <span class="ex-opt"><span class="ex-name">Entries</span><span class="ex-val">(list below)</span></span>
+    </p>
     <div class="examples">
           <code>\. =&gt; _
 [0-9]+ =&gt; &lt;counter:initial=10,step=1,padding=none,length=2,resetScope=global&gt;</code>
