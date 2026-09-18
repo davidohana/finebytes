@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Rename List Fields</title>
+    <link rel="stylesheet" href="../help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt;
+      <a href="../index.html#reference">Reference</a>
+      &gt;
+      <strong>Rename List Fields</strong>
+    </nav>
+    <hr />
+    <h1>Rename List Fields</h1>
+    <p>
+      These fields can be shown as columns in the <a href="../ui/renamelist.html">Rename List</a>. Use
+      <a href="../ui/fieldselector.html">Select fields…</a> to choose visible columns. Many fields also
+      appear as formatting tokens — see <a href="../tokens/fp.html">Formatting Tokens</a>.
+    </p>
+    <p>Each field may support:</p>
+    <ul>
+      <li>
+        <strong>Write</strong> — editable via Manual Override / Edit as Name List, and available as a
+        filter Apply target when the Filter Options pane offers that field.
+      </li>
+      <li>
+        <strong>Preview</strong> — a Before/After (or preview) column variant can be shown; values may
+        also change when related writable fields change (for example File Name Length after renaming).
+      </li>
+    </ul>
+
+    <h2 id="basic">File Name</h2>
+    <p>Basic path and name information.</p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>File Name</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Name without extension.</td>
+        </tr>
+        <tr>
+          <td>File Extension</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Extension without a leading dot.</td>
+        </tr>
+        <tr>
+          <td>Full File Name</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Name including extension.</td>
+        </tr>
+        <tr>
+          <td>Full Path</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Absolute path including full name.</td>
+        </tr>
+        <tr>
+          <td>Parent Directory</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>
+            Absolute path of the containing folder. Changing it moves the item; missing folders are
+            created on Apply.
+          </td>
+        </tr>
+        <tr>
+          <td>File/Folder</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td><code>File</code> or <code>Folder</code>.</td>
+        </tr>
+        <tr>
+          <td>File Name Numeric Value</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>First number found in the full name, or 0. Useful for sorting.</td>
+        </tr>
+        <tr>
+          <td>File Name Length</td>
+          <td class="center"></td>
+          <td class="center">+</td>
+          <td>Character length of Full File Name.</td>
+        </tr>
+        <tr>
+          <td>Full Path Length</td>
+          <td class="center"></td>
+          <td class="center">+</td>
+          <td>Character length of Full Path.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="extended">File Properties</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Creation Date</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Filesystem creation time.</td>
+        </tr>
+        <tr>
+          <td>Last Write Date</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Filesystem last-write time.</td>
+        </tr>
+        <tr>
+          <td>Last Access Date</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Filesystem last-access time.</td>
+        </tr>
+        <tr>
+          <td>Size</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>File size in bytes (0 for folders).</td>
+        </tr>
+        <tr>
+          <td>Attributes</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>
+            Attribute flags in the form <code>RHAS</code> (Read-only, Hidden, Archive, System);
+            <code>-</code> means unset.
+          </td>
+        </tr>
+        <tr>
+          <td>Folder File Count</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>
+            Count of files in the item’s folder (parent folder for file rows; the folder itself for
+            folder rows). Does not include subfolders.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="audiotag">Audio Tag</h2>
+    <p>
+      Semantic tag fields for common audio formats (MP3/ID3, Ogg, FLAC, Apple, ASF, and others via
+      TagLib). Writable fields can be edited in the grid and targeted by audio tag filters. Multi-value
+      fields (Artist, Album Artist, Composer, Genre) also have a matching
+      <span class="quote">(first)</span> column. <span class="quote">Tag Types</span> is read-only and
+      lists present tag blocks.
+    </p>
+    <p>
+      Core columns include Title, Artist, Album Artist, Album, Year, Genre, Track, Track Count, Disc,
+      Disc Count, Comment, Composer, Lyrics, Copyright, Grouping, BPM, Conductor, plus MusicBrainz /
+      MusicIP / Amazon identifiers. Matching tokens are listed under
+      <a href="../tokens/audiofp.html">Audio Tag formatting tokens</a>.
+    </p>
+
+    <h2 id="mediaproperties">Media Properties</h2>
+    <p>Read-only TagLib media properties for image, audio, and video files.</p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MIME Type</td>
+          <td>Internet media type.</td>
+        </tr>
+        <tr>
+          <td>Possibly Corrupt</td>
+          <td>Whether TagLib flagged the file as possibly corrupt.</td>
+        </tr>
+        <tr>
+          <td>Duration / Duration (Seconds)</td>
+          <td>Media duration as formatted time or whole seconds.</td>
+        </tr>
+        <tr>
+          <td>Media Types</td>
+          <td>TagLib media-type flags text.</td>
+        </tr>
+        <tr>
+          <td>Description</td>
+          <td>Codec / media description.</td>
+        </tr>
+        <tr>
+          <td>Audio Bitrate / Sample Rate / Bits Per Sample / Channels</td>
+          <td>Audio stream properties when present.</td>
+        </tr>
+        <tr>
+          <td>Video Width / Height</td>
+          <td>Video frame size in pixels.</td>
+        </tr>
+        <tr>
+          <td>Photo Width / Height / Quality</td>
+          <td>Still-image size and format-specific quality (0 if none).</td>
+        </tr>
+      </tbody>
+    </table>
+    <p>See also <a href="../tokens/mediafp.html">Media formatting tokens</a>.</p>
+
+    <h2 id="mpeg">MP3 Properties</h2>
+    <p>Read-only MPEG audio properties for MP3 files (bitrate, encoding, frequency, layer, version,
+      mode, duration, copyright/original/protection flags, and related values). See
+      <a href="../tokens/mpegfp.html">Audio MP3 formatting tokens</a>.
+    </p>
+
+    <h2 id="image">Image</h2>
+    <p>
+      Read-only basic image properties (format, width, height, bit depth, horizontal/vertical DPI,
+      frame count). See <a href="../tokens/basicimagefp.html">Image Properties tokens</a>.
+    </p>
+
+    <h2 id="jpeg">Jpeg Tag</h2>
+    <p>
+      Read-only EXIF-derived columns commonly shown in the Rename List (Title, Subject, Author,
+      Keywords, Comments, Date/Time taken, Make, Model, Description, Artist, Image Number, User
+      Comment, Exposure, F-Number, ISO, Focal Length, Focal Length 35mm). For arbitrary EXIF tags use
+      the <a href="../tokens/eximagefp.html">EXIF formatting tokens</a>.
+    </p>
+  </body>
+</html>

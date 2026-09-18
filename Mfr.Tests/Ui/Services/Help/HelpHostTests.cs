@@ -28,6 +28,42 @@ namespace Mfr.Tests.Ui.Services.Help
         }
 
         /// <summary>
+        /// Verifies basename open finds a nested Help file under topic folders.
+        /// </summary>
+        [Fact]
+        public void TryOpen_resolves_nested_basename()
+        {
+            TempHelpRoot.Run(
+                (helpDir, opener, host) =>
+                {
+                    var helpFile = Path.Combine(helpDir, "filters", "space", "SpaceCharacter.html");
+                    Assert.True(host.TryOpen("SpaceCharacter.html", out var fullPath));
+                    Assert.Equal(helpFile, fullPath);
+                    Assert.Equal([helpFile], opener.OpenedWithDefaultApp);
+                },
+                Path.Combine("filters", "space", "SpaceCharacter.html")
+            );
+        }
+
+        /// <summary>
+        /// Verifies duplicate basenames under one root fail closed (not found).
+        /// </summary>
+        [Fact]
+        public void TryResolve_returns_false_when_basename_is_ambiguous()
+        {
+            TempHelpRoot.Run(
+                (_, opener, host) =>
+                {
+                    Assert.False(host.TryResolve("SpaceCharacter.html", out var fullPath));
+                    Assert.Null(fullPath);
+                    Assert.Empty(opener.OpenedWithDefaultApp);
+                },
+                Path.Combine("filters", "space", "SpaceCharacter.html"),
+                Path.Combine("other", "SpaceCharacter.html")
+            );
+        }
+
+        /// <summary>
         /// Verifies missing help files do not open and return false.
         /// </summary>
         [Fact]

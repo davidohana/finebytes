@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tips</title>
+    <link rel="stylesheet" href="../help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt; <a href="../index.html#operation">Operation</a>
+      &gt; <strong>Tips</strong>
+    </nav>
+    <hr />
+    <h1>Tips</h1>
+    <p>Short reminders for everyday Magic File Renamer 8 workflows.</p>
+
+    <div class="tip-list">
+      <div class="tip">
+        Press <span class="quote">F1</span> or choose <span class="quote">Help → Index</span> to open
+        this Help in your default browser. <span class="quote">Help → Tips</span> opens this page.
+      </div>
+      <div class="tip">
+        Drag files or folders from Windows Explorer onto the Rename List to add them. You can also
+        use <span class="quote">Ctrl+Shift+S</span> to add the File List selection, or
+        <span class="quote">Ctrl+Shift+A</span> to add all listed items.
+      </div>
+      <div class="tip">
+        Press <span class="quote">Del</span> on a selected Rename List row to remove it from the list
+        (it does not delete the file on disk). <span class="quote">Ctrl+Shift+C</span> clears the
+        whole Rename List.
+      </div>
+      <div class="tip">
+        Press <span class="quote">F2</span> on a Rename List cell to set a manual override. A preview
+        cell override wins over filter output; an original-side edit is then processed by the Filter
+        Chain.
+      </div>
+      <div class="tip">
+        Press <span class="quote">F4</span> on a Rename List row to locate that item in the File List.
+        <span class="quote">Alt+Enter</span> opens the Windows properties sheet for the focused item.
+      </div>
+      <div class="tip">
+        Press <span class="quote">F5</span> to refresh: File List when that pane (or the main window)
+        has focus; Rename List when its grid is focused (re-reads originals and re-runs preview when
+        Auto-Preview is on).
+      </div>
+      <div class="tip">
+        Use <span class="quote">Ctrl+↑</span> / <span class="quote">Ctrl+↓</span> to reorder selected
+        Rename List rows. Manual reordering turns off Auto-Sort for the list.
+      </div>
+      <div class="tip">
+        Shift+click a Rename List column header to add, flip, or remove a sort level. A plain header
+        click sorts by that column alone.
+      </div>
+      <div class="tip">
+        Open <span class="quote">Select fields…</span> from the Rename List toolbar or menu to choose
+        visible columns and Auto-Sort. Turn on Before/after mode there, then flip with
+        <span class="quote">Ctrl+[</span> / <span class="quote">Ctrl+]</span>.
+      </div>
+      <div class="tip">
+        If Auto-Preview feels slow on a large list, turn preview off from the Rename List toolbar,
+        adjust filters, then turn preview back on.
+      </div>
+      <div class="tip">
+        Press <span class="quote">Ctrl+G</span> (GO) to apply valid renames. Preview errors are warned
+        before commit; unchanged or error rows are skipped as shown in the preview.
+      </div>
+      <div class="tip">
+        <span class="quote">Ctrl+Z</span> (Undo Last) loads a reverse preview from the last GO and
+        clears the Filter Chain. Disk files change only when you press GO again.
+      </div>
+      <div class="tip">
+        Double-click a filter in Available Filters (or use Filters → Add selected filter) to append
+        it to the Filter Chain. Select a chain step to edit its options in Filter Configuration.
+      </div>
+      <div class="tip">
+        Click <strong>?</strong> on the Filter Configuration title bar to open that filter’s Help
+        topic. The full catalog is under <a href="../filters/filters.html">Filters</a>.
+      </div>
+      <div class="tip">
+        Put <a href="../filters/space/SpaceCharacter.html">Space Character</a> early in the Filter Chain before space
+        or casing filters that should honor a non-space word separator (for example underscore).
+      </div>
+      <div class="tip">
+        Most filters can target fields other than the file name — open Filter Options on the selected
+        Filter Chain step and choose the apply target.
+      </div>
+      <div class="tip">
+        Use Formatter tokens for audio tags, image size, EXIF, and file properties when building
+        pattern names. Open the Format Editor insert menu / token editor, or browse the full
+        reference under <a href="../tokens/fp.html">Formatting Tokens</a>.
+      </div>
+      <div class="tip">
+        Path Mover can create folder trees from patterns while renaming. Combine it with Formatter
+        tokens when you want artist/album-style layouts.
+      </div>
+      <div class="tip">
+        Save a working Filter Chain as a preset so you can reload the same sequence later. Presets
+        use the MFR 8 JSON format (MFR 7 XML presets are not imported automatically).
+      </div>
+      <div class="tip">
+        File List view modes are on the File List menu and <span class="quote">Ctrl+1</span> …
+        <span class="quote">Ctrl+6</span> (Large Icons through Thumbnails).
+      </div>
+    </div>
+  </body>
+</html>

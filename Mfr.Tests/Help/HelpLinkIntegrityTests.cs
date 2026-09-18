@@ -42,7 +42,7 @@ namespace Mfr.Tests.Help
         {
             var helpRoot = _ResolveRepoHelpRoot();
             var htmlFiles = Directory
-                .EnumerateFiles(helpRoot, "*.html", SearchOption.TopDirectoryOnly)
+                .EnumerateFiles(helpRoot, "*.html", SearchOption.AllDirectories)
                 .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
@@ -62,13 +62,13 @@ namespace Mfr.Tests.Help
 
                     if (!_TryResolveLocalTarget(helpRoot, htmlPath, href, out var targetPath))
                     {
-                        broken.Add($"{Path.GetFileName(htmlPath)} → {href}");
+                        broken.Add($"{_RelPath(helpRoot, htmlPath)} → {href}");
                         continue;
                     }
 
                     if (!File.Exists(targetPath))
                     {
-                        broken.Add($"{Path.GetFileName(htmlPath)} → {href} (missing '{targetPath}')");
+                        broken.Add($"{_RelPath(helpRoot, htmlPath)} → {href} (missing '{targetPath}')");
                     }
                 }
             }
@@ -87,7 +87,7 @@ namespace Mfr.Tests.Help
         {
             var helpRoot = _ResolveRepoHelpRoot();
             var htmlFiles = Directory
-                .EnumerateFiles(helpRoot, "*.html", SearchOption.TopDirectoryOnly)
+                .EnumerateFiles(helpRoot, "*.html", SearchOption.AllDirectories)
                 .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
                 .ToList();
 
@@ -129,13 +129,13 @@ namespace Mfr.Tests.Help
 
                     if (!_TryGetHtmlIds(pathToIds, targetPath, out var ids))
                     {
-                        broken.Add($"{Path.GetFileName(htmlPath)} → {href} (unreadable '{targetPath}')");
+                        broken.Add($"{_RelPath(helpRoot, htmlPath)} → {href} (unreadable '{targetPath}')");
                         continue;
                     }
 
                     if (!ids.Contains(fragment))
                     {
-                        broken.Add($"{Path.GetFileName(htmlPath)} → {href} (missing id '{fragment}')");
+                        broken.Add($"{_RelPath(helpRoot, htmlPath)} → {href} (missing id '{fragment}')");
                     }
                 }
             }
@@ -154,8 +154,8 @@ namespace Mfr.Tests.Help
         public void Every_Public_Format_Token_Is_Documented_From_Fp_Help_Tree()
         {
             var helpRoot = _ResolveRepoHelpRoot();
-            var fpPath = Path.Combine(helpRoot, "fp.html");
-            Assert.True(File.Exists(fpPath), "Expected help/fp.html");
+            var fpPath = Path.Combine(helpRoot, "tokens", "fp.html");
+            Assert.True(File.Exists(fpPath), "Expected help/tokens/fp.html");
 
             var pageToIsIncluded = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase) { [fpPath] = true };
             _CollectLinkedHelpPages(helpRoot, fpPath, pageToIsIncluded);
@@ -187,8 +187,8 @@ namespace Mfr.Tests.Help
         public void Fields_Html_Write_Preview_Markers_Match_RenameListFieldCatalog_Basic_And_Extended()
         {
             var helpRoot = _ResolveRepoHelpRoot();
-            var fieldsPath = Path.Combine(helpRoot, "fields.html");
-            Assert.True(File.Exists(fieldsPath), "Expected help/fields.html");
+            var fieldsPath = Path.Combine(helpRoot, "reference", "fields.html");
+            Assert.True(File.Exists(fieldsPath), "Expected help/reference/fields.html");
 
             var html = File.ReadAllText(fieldsPath);
             var sectionIdToRows = _ParseWritePreviewSections(html);
@@ -460,13 +460,29 @@ namespace Mfr.Tests.Help
             return true;
         }
 
+        private static string _RelPath(string helpRoot, string fullPath)
+        {
+            var rootFull = Path.GetFullPath(helpRoot)
+                .TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            var pathFull = Path.GetFullPath(fullPath);
+            if (
+                pathFull.StartsWith(rootFull + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                || pathFull.StartsWith(rootFull + Path.AltDirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+            )
+            {
+                return pathFull[(rootFull.Length + 1)..].Replace('\\', '/');
+            }
+
+            return Path.GetFileName(fullPath);
+        }
+
         private static string _ResolveRepoHelpRoot()
         {
             var dir = new DirectoryInfo(AppContext.BaseDirectory);
             while (dir is not null)
             {
                 var candidate = Path.Combine(dir.FullName, "help");
-                if (Directory.Exists(candidate) && File.Exists(Path.Combine(candidate, "filters.html")))
+                if (Directory.Exists(candidate) && File.Exists(Path.Combine(candidate, "index.html")))
                 {
                     return candidate;
                 }
@@ -475,7 +491,7 @@ namespace Mfr.Tests.Help
             }
 
             throw new InvalidOperationException(
-                "Could not locate repo-root help/ (expected filters.html) by walking up from BaseDirectory."
+                "Could not locate repo-root help/ (expected index.html) by walking up from BaseDirectory."
             );
         }
     }

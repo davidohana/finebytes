@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>What's New?</title>
+    <link rel="stylesheet" href="../help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt; <a href="../index.html#introduction">Introduction</a>
+      &gt; <strong>What's New?</strong>
+    </nav>
+    <hr />
+    <h1>What's New in this Version?</h1>
+    <p>
+      Magic File Renamer 8 is a ground-up rewrite of the classic MFR 7 desktop experience. The goals
+      are the same — fast multi-file renaming, rich filters, live preview, presets, and tag-aware
+      workflows — on a modern UI toolkit and .NET stack.
+    </p>
+
+    <h2>Highlights in Magic File Renamer 8</h2>
+    <ul>
+      <li>
+        <strong>Avalonia desktop shell.</strong> The main window keeps the familiar MFR layout: File
+        List on the left, Rename List, Available Filters, Filter Chain, and Filter Configuration —
+        rebuilt for current Windows desktop APIs.
+      </li>
+      <li>
+        <strong>.NET 10.</strong> Engine, filters, UI, and CLI target .NET 10 instead of the .NET
+        Framework 4.x stack used by MFR 7.
+      </li>
+      <li>
+        <strong>Filter Chain.</strong> The ordered list of filters to apply (formerly “Applied
+        Filters” in MFR 7) is named Filter Chain throughout the UI and Help.
+      </li>
+      <li>
+        <strong>JSON configuration and presets.</strong> Preferences live in
+        <span class="quote">config.json</span> under AppData; presets use the current JSON schema.
+        MFR 7 XML presets are not migrated automatically.
+      </li>
+      <li>
+        <strong>Audio tags via TagLib.</strong> Read/write overlays for common tag families, with
+        field-patch Apply on GO and dedicated Audio filters (Setter, ID3v2 Field Setter, Remover).
+      </li>
+      <li>
+        <strong>Image and EXIF for formatting.</strong> Formatter tokens can read image properties
+        and EXIF metadata for renaming patterns (read-only; writing image tags is a separate future
+        slice).
+      </li>
+      <li>
+        <strong>Rename List upgrades.</strong> Field shuttle, multi-column Auto-Sort, Before/After
+        mode, CSV export of visible columns, and filter-driven column suggestions.
+      </li>
+      <li>
+        <strong>Undo Last as a preview session.</strong> Ctrl+Z (or Undo Last) loads reverse values
+        from the last GO into the Rename List and clears the Filter Chain; nothing is written until
+        you press GO again.
+      </li>
+      <li>
+        <strong>Local Help in your browser.</strong> F1 / Help → Index and Tips open HTML topics
+        with the default OS app. Filter <strong>?</strong> uses the same Help host.
+      </li>
+      <li>
+        <strong>CLI.</strong> A console entry point supports automated / preset-driven renaming
+        — see <a href="../guide/console.html">Console (Automatic) Mode</a> and
+        <a href="../guide/cml.html">Command Line Parameters</a>.
+      </li>
+    </ul>
+
+    <h2>Intentional differences from MFR 7</h2>
+    <ul>
+      <li>No FreeDB / freedb.org album lookup filter.</li>
+      <li>No shareware Register flow or Pro/Standard edition split in the UI.</li>
+      <li>No Google site-search box on the Help Index.</li>
+      <li>Explorer shell context-menu integration is not shipped yet (see debts / later releases).</li>
+      <li>
+        Help content is rewritten for the Avalonia UI; older MFR 7 CHM-style pages and screenshots
+        are not reused as-is.
+      </li>
+    </ul>
+
+    <p class="note">
+      For the full capability list as of this build, see <a href="features.html">Feature List</a>.
+      Filter reference starts at <a href="../filters/filters.html">Filters</a>.
+    </p>
+  </body>
+</html>

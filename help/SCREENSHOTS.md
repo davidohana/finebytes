@@ -2,6 +2,8 @@
 
 Capture each filter’s Filter Configuration options panel and save as
 `help/images/{Type}.png` (catalog type name, e.g. `SpaceCharacter.png`).
+HTML pages live under `help/filters/{group}/{Type}.html` and reference
+`../../images/{Type}.png`.
 
 ## Capture tips
 

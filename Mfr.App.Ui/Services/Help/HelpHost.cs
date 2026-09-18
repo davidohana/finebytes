@@ -6,9 +6,10 @@ namespace Mfr.App.Ui.Services.Help
     /// <summary>
     /// Resolves and opens Help HTML shipped beside the application (Index, Tips, filter pages).
     /// <para>
-    /// Looks under <c>help/</c> next to the exe (<see cref="AppContext.BaseDirectory"/>).
-    /// Opens the file with the OS default app (typically the browser). Used by F1 / Help → Index,
-    /// Help → Tips, and Filter Configuration <c>?</c>.
+    /// Looks under <c>help/</c> next to the exe (<see cref="AppContext.BaseDirectory"/>),
+    /// matching a unique basename recursively (topic folders allowed). Opens the file with the
+    /// OS default app (typically the browser). Used by F1 / Help → Index, Help → Tips, and Filter
+    /// Configuration <c>?</c>.
     /// </para>
     /// </summary>
     /// <param name="shellOpener">
@@ -21,7 +22,7 @@ namespace Mfr.App.Ui.Services.Help
     public sealed class HelpHost(IFileShellOpener? shellOpener = null, IEnumerable<string>? helpRoots = null)
     {
         /// <summary>
-        /// Default Help root directories. First existing <c>helpFileName</c> under these roots wins.
+        /// Default Help root directories. First root with exactly one recursive basename match wins.
         /// </summary>
         public static IReadOnlyList<string> DefaultHelpRoots { get; } =
         [Path.Combine(AppContext.BaseDirectory, "help")];
@@ -47,7 +48,11 @@ namespace Mfr.App.Ui.Services.Help
         }
 
         /// <summary>
-        /// Finds an existing Help HTML file under the configured roots.
+        /// Finds an existing Help HTML file under the configured roots by unique basename.
+        /// <para>
+        /// Searches each root recursively. Path segments in <paramref name="helpFileName"/> are
+        /// rejected. Duplicate basenames under the same root fail closed (not found).
+        /// </para>
         /// </summary>
         /// <param name="helpFileName">File name only (e.g. <c>index.html</c> or <c>SpaceCharacter.html</c>).</param>
         /// <param name="fullPath">Absolute path when found.</param>
@@ -65,17 +70,31 @@ namespace Mfr.App.Ui.Services.Help
 
             foreach (var root in _helpRoots)
             {
-                if (string.IsNullOrWhiteSpace(root))
+                if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root))
                 {
                     continue;
                 }
 
-                var candidate = Path.Combine(root, safeName);
-                if (File.Exists(candidate))
+                string? match = null;
+                var ambiguous = false;
+                foreach (var candidate in Directory.EnumerateFiles(root, safeName, SearchOption.AllDirectories))
                 {
-                    fullPath = candidate;
-                    return true;
+                    if (match is not null)
+                    {
+                        ambiguous = true;
+                        break;
+                    }
+
+                    match = candidate;
                 }
+
+                if (ambiguous || match is null)
+                {
+                    continue;
+                }
+
+                fullPath = match;
+                return true;
             }
 
             fullPath = null;

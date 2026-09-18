@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>File Properties Tokens</title>
+    <link rel="stylesheet" href="../help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt;
+      <a href="../index.html#reference">Reference</a>
+      &gt;
+      <a href="fp.html">Formatting Tokens</a>
+      &gt;
+      <strong>File Properties</strong>
+    </nav>
+    <hr />
+    <h1>File Properties Tokens</h1>
+    <p>Tokens from filesystem properties of the current item.</p>
+
+    <div class="token-block" id="file-date">
+      <h2>Date/Time</h2>
+      <p>Formats a filesystem timestamp with a .NET date/time pattern.</p>
+      <p>
+        Signature:
+        <code class="sig">&lt;file-date:format-string,date-kind&gt;</code>
+      </p>
+      <ul>
+        <li>
+          <code>format-string</code> — see <a href="../reference/dateformat.html">Date and Time Format Strings</a>.
+          May contain commas; the last comma separates <code>date-kind</code>.
+        </li>
+        <li>
+          <code>date-kind</code> — <code>creation</code>, <code>lastWrite</code>, or
+          <code>lastAccess</code> (case-insensitive).
+        </li>
+      </ul>
+      <p>
+        Example: <code class="sig">&lt;file-date:yyyy-MM-dd,creation&gt;</code>
+      </p>
+      <p class="note">
+        For EXIF “date picture taken”, use
+        <a href="eximagefp.html#exif-date"><code class="sig">&lt;exif-date&gt;</code></a> instead.
+      </p>
+    </div>
+
+    <div class="token-block" id="label">
+      <h2>Disk Label</h2>
+      <p>Volume label of the drive that contains the item.</p>
+      <p>Signature: <code class="sig">&lt;label&gt;</code></p>
+    </div>
+
+    <div class="token-block" id="drive-letter">
+      <h2>Drive Letter</h2>
+      <p>Drive letter for the item’s path. Network/share paths may return <code>$</code>.</p>
+      <p>Signature: <code class="sig">&lt;drive-letter&gt;</code></p>
+    </div>
+
+    <div class="token-block" id="file-count">
+      <h2>Folder File Count</h2>
+      <p>
+        Count of files in the item’s folder (parent folder for file rows; the folder itself for
+        folder rows). Does not include subfolders.
+      </p>
+      <p>Signature: <code class="sig">&lt;file-count&gt;</code></p>
+    </div>
+
+    <div class="token-block" id="file-size">
+      <h2>Size</h2>
+      <p>File size on disk, optionally scaled.</p>
+      <p>
+        Signature: <code class="sig">&lt;file-size&gt;</code>,
+        <code class="sig">&lt;file-size:unit&gt;</code>, or
+        <code class="sig">&lt;file-size:unit,decimals&gt;</code>
+      </p>
+      <ul>
+        <li>
+          <code>unit</code> — omit or <code>auto</code> (default), <code>b</code>/<code>bytes</code>,
+          <code>kb</code>, <code>mb</code>, <code>gb</code> (case-insensitive). Auto appends a unit
+          suffix.
+        </li>
+        <li><code>decimals</code> — digits after the decimal point (default 0).</li>
+      </ul>
+    </div>
+  </body>
+</html>

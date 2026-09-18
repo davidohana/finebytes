@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Command Line Parameters</title>
+    <link rel="stylesheet" href="../help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt; <a href="../index.html#operation">Operation</a>
+      &gt; <strong>Command Line Parameters</strong>
+    </nav>
+    <hr />
+    <h1>Command Line Parameters</h1>
+    <p>
+      This page documents the Magic File Renamer 8 console entry point
+      (<span class="quote">mfr</span> / <span class="quote">Mfr.App.Cli</span>). For an overview of
+      automatic renaming, see <a href="console.html">Console (Automatic) Mode</a>.
+    </p>
+    <p>
+      The desktop UI does not use these flags to add items at startup; use the File List, drag and
+      drop, or pass paths to <span class="quote">mfr</span> instead.
+    </p>
+
+    <h2>Usage</h2>
+    <p>
+      <code>mfr &lt;SOURCES&gt;… -p|--preset &lt;NAME&gt; [options]</code>
+    </p>
+    <p>
+      <span class="quote">SOURCES</span> are one or more files, directories, or filemasks
+      (space-separated). Quote paths that contain spaces. Run
+      <span class="quote">mfr --help</span> for the built-in summary.
+    </p>
+
+    <h2>Required</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Argument / option</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>&lt;SOURCES&gt;</code></td>
+          <td>One or more files, directories, or wildcards to process.</td>
+        </tr>
+        <tr>
+          <td><code>-p</code>, <code>--preset &lt;NAME&gt;</code></td>
+          <td>
+            Preset name from the presets file (required). Save presets in the UI first. See
+            <a href="savepreset.html">Save Preset</a>.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Options</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>--presets-file &lt;PATH&gt;</code></td>
+          <td>Override the presets JSON file path (default: AppData finebytes MFR presets).</td>
+        </tr>
+        <tr>
+          <td><code>-o</code>, <code>--output-file &lt;PATH&gt;</code></td>
+          <td>Write rename results as JSON to this path.</td>
+        </tr>
+        <tr>
+          <td><code>--include-hidden</code></td>
+          <td>Include hidden and system files when expanding sources.</td>
+        </tr>
+        <tr>
+          <td><code>--files &lt;yes|no&gt;</code></td>
+          <td>Include files from sources (default: <span class="quote">yes</span>).</td>
+        </tr>
+        <tr>
+          <td><code>--folders &lt;yes|no&gt;</code></td>
+          <td>Include folders from sources (default: <span class="quote">no</span>).</td>
+        </tr>
+        <tr>
+          <td><code>-r</code>, <code>--recursive</code></td>
+          <td>Expand directory sources recursively into subdirectories.</td>
+        </tr>
+        <tr>
+          <td><code>--continue-on-rename-error</code></td>
+          <td>
+            Continue committing after per-item rename errors instead of stopping at the first
+            failure.
+          </td>
+        </tr>
+        <tr>
+          <td><code>-c</code>, <code>--confirm</code></td>
+          <td>Prompt for confirmation before applying each rename.</td>
+        </tr>
+        <tr>
+          <td><code>--dry-run</code></td>
+          <td>Preview and report commit outcomes without changing files on disk.</td>
+        </tr>
+        <tr>
+          <td><code>-l</code>, <code>--log-level &lt;LEVEL&gt;</code></td>
+          <td>
+            Minimum log level: <span class="quote">debug</span>, <span class="quote">info</span>,
+            <span class="quote">warn</span>, or <span class="quote">error</span>.
+          </td>
+        </tr>
+        <tr>
+          <td><code>--config &lt;PATH&gt;</code></td>
+          <td>
+            Path to <span class="quote">config.json</span> (default: AppData). The file must exist
+            when this option is set.
+          </td>
+        </tr>
+        <tr>
+          <td><code>--set &lt;KEY=VALUE&gt;</code></td>
+          <td>
+            Override a config field (repeatable). Key is
+            <span class="quote">section.leaf</span>; the value is everything after the first
+            <span class="quote">=</span> (example:
+            <span class="quote">log.maxSessionFiles=200</span>).
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      At least one of <span class="quote">--files</span> or <span class="quote">--folders</span>
+      must be <span class="quote">yes</span>.
+    </p>
+
+    <h2>Exit codes</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Meaning</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>0</td>
+          <td>Success (including when help/version output was requested).</td>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>
+            User or configuration error (invalid arguments, missing preset, no matching sources,
+            Preview errors, commit failure when fail-fast applies, and similar).
+          </td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>Unexpected application fault.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Examples</h2>
+    <div class="examples">
+      <code>mfr C:\Music\*.mp3 -p clean --dry-run</code>
+      <code>mfr C:\Music\*.flac -r -p lowercase-extension --log-level debug</code>
+      <code>mfr C:\Music -p name_from_id3 -r</code>
+      <code
+        >mfr C:\Music C:\Podcasts -p my_preset --files yes --folders yes --output-file
+        C:\Temp\mfr-results.json</code
+      >
+      <code
+        >mfr C:\Music -p clean --config C:\Temp\config.json --set
+        log.maxSessionFiles=50</code
+      >
+    </div>
+
+    <p class="note">
+      See also: <a href="console.html">Console (Automatic) Mode</a>,
+      <a href="../ui/optionswin.html">Options</a>, <a href="faqs.html#cli">FAQs — scripting</a>.
+    </p>
+  </body>
+</html>

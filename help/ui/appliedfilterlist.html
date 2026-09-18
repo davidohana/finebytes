@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Filter Chain</title>
+    <link rel="stylesheet" href="../help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt;
+      <a href="../index.html#operation">Operation</a>
+      &gt;
+      <a href="ui.html">User Interface</a>
+      &gt;
+      <strong>Filter Chain</strong>
+    </nav>
+    <hr />
+    <h1>Filter Chain</h1>
+    <p>
+      The Filter Chain (called Applied Filters in MFR 7) is the ordered list of filters that run on
+      the <a href="renamelist.html">Rename List</a>.
+    </p>
+    <ul>
+      <li>
+        Add filters from <a href="availfilterlist.html">Available Filters</a> (double-click, Enter, or
+        Filters menu). Remove with Del or <span class="quote">Filters → Remove selected filter</span>.
+      </li>
+      <li>
+        Filters run top to bottom. Reorder with drag-and-drop,
+        <span class="quote">Ctrl+↑</span> / <span class="quote">Ctrl+↓</span>, toolbar arrows, or the
+        Filters menu.
+      </li>
+      <li>
+        Each row shows the filter name and Apply To target. Open
+        <a href="filteropts.html">Filter Options</a> to change name, target, and whole / substring /
+        token scope.
+      </li>
+      <li>
+        Uncheck a step to disable it temporarily without removing it. Right-click for Check / Uncheck /
+        Invert all.
+      </li>
+      <li>
+        Selecting a step shows its editor in
+        <a href="filterconfigpanel.html">Filter Configuration</a>. Changes update the
+        <a href="renamelist.html#preview">preview</a> when Auto-Preview is on.
+      </li>
+      <li>
+        <a href="../guide/savepreset.html">Save Preset</a> stores the current chain.
+        Load presets from the Presets drop-down or <a href="presetmanager.html">Preset Manager</a>.
+      </li>
+      <li>
+        The <a href="statusbar.html">status bar</a> shows the filter count.
+      </li>
+    </ul>
+
+  </body>
+</html>

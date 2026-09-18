@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>EXIF Tokens</title>
+    <link rel="stylesheet" href="../help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt;
+      <a href="../index.html#reference">Reference</a>
+      &gt;
+      <a href="fp.html">Formatting Tokens</a>
+      &gt;
+      <strong>EXIF</strong>
+    </nav>
+    <hr />
+    <h1>EXIF Tokens</h1>
+    <p>
+      EXIF and related metadata from image files. Common fields also appear under
+      <a href="../reference/fields.html#jpeg">Jpeg Tag</a> columns.
+    </p>
+
+    <div class="token-block" id="exif-date">
+      <h2>Date Picture Taken</h2>
+      <p>
+        Formats EXIF Date Taken with a .NET date/time pattern. Missing Date Taken expands empty.
+      </p>
+      <p>Signature: <code class="sig">&lt;exif-date:format-string&gt;</code></p>
+      <p>
+        Example: <code class="sig">&lt;exif-date:yyyy-MM-dd&gt;</code> — see
+        <a href="../reference/dateformat.html">Date and Time Format Strings</a>.
+      </p>
+    </div>
+
+    <h2>Common EXIF fields</h2>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Signature</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Make</td>
+          <td><code class="sig">&lt;exif-make&gt;</code></td>
+        </tr>
+        <tr>
+          <td>Model</td>
+          <td><code class="sig">&lt;exif-model&gt;</code></td>
+        </tr>
+        <tr>
+          <td>Exposure</td>
+          <td><code class="sig">&lt;exif-exposure&gt;</code></td>
+        </tr>
+        <tr>
+          <td>F-Number</td>
+          <td><code class="sig">&lt;exif-fnumber&gt;</code></td>
+        </tr>
+        <tr>
+          <td>ISO</td>
+          <td><code class="sig">&lt;exif-iso&gt;</code></td>
+        </tr>
+        <tr>
+          <td>Focal Length</td>
+          <td><code class="sig">&lt;exif-focal&gt;</code></td>
+        </tr>
+        <tr>
+          <td>Focal Length 35mm</td>
+          <td><code class="sig">&lt;exif-focal-35&gt;</code></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="token-block" id="exif">
+      <h2>Metadata Field</h2>
+      <p>
+        Escape hatch for any MetadataExtractor tag by directory alias and tag name or decimal id.
+        Missing tags expand empty.
+      </p>
+      <p>Signature: <code class="sig">&lt;exif:source,name&gt;</code></p>
+      <ul>
+        <li>
+          <code>source</code> — one of:
+          <code>Exif</code>, <code>ExifSub</code>, <code>GPS</code>, <code>IPTC</code>,
+          <code>Canon</code>, <code>Casio</code>, <code>FujiFilm</code>, <code>Nikon</code>,
+          <code>Olympus</code>, <code>Interop</code>, <code>Thumb</code> (case-insensitive).
+        </li>
+        <li>
+          <code>name</code> — tag display name (for example <code>Make</code>) or decimal tag id (for
+          example <code>271</code> or <code>36867</code>).
+        </li>
+      </ul>
+      <p>
+        Examples:
+        <code class="sig">&lt;exif:Exif,Make&gt;</code>,
+        <code class="sig">&lt;exif:ExifSub,36867&gt;</code>
+      </p>
+    </div>
+  </body>
+</html>

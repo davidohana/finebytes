@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Counter Token</title>
+    <link rel="stylesheet" href="../help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt;
+      <a href="../index.html#reference">Reference</a>
+      &gt;
+      <a href="fp.html">Formatting Tokens</a>
+      &gt;
+      <a href="generalfp.html">General</a>
+      &gt;
+      <strong>Counter</strong>
+    </nav>
+    <hr />
+    <h1>Counter</h1>
+    <p>
+      Serial number from the item’s position in the <a href="../ui/renamelist.html">Rename List</a>. Sort
+      order affects numbering. The <a href="../filters/formatting/Counter.html">Counter</a> filter is an alternative when you
+      only need to prepend/append/replace with a number.
+    </p>
+    <p>
+      Signature: <code class="sig">&lt;counter&gt;</code> or named options, for example
+      <code class="sig"
+        >&lt;counter:initial=1,step=1,padding=none,length=2,resetScope=global&gt;</code
+      >
+    </p>
+    <p>Bare <code class="sig">&lt;counter&gt;</code> uses those defaults.</p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>initial</code></td>
+          <td>Start value for the first item (default 1).</td>
+        </tr>
+        <tr>
+          <td><code>step</code></td>
+          <td>Increment per index; may be negative (default 1).</td>
+        </tr>
+        <tr>
+          <td><code>padding</code></td>
+          <td>
+            <code>none</code> (default), <code>auto</code> (width from list/folder scope), or
+            <code>fixed</code> (pad to <code>length</code>).
+          </td>
+        </tr>
+        <tr>
+          <td><code>length</code></td>
+          <td>Digit width when <code>padding=fixed</code> (default 2; ignored when padding is none).</td>
+        </tr>
+        <tr>
+          <td><code>resetScope</code></td>
+          <td>
+            <code>global</code> (Rename List index) or <code>perFolder</code> (reset within each parent
+            folder).
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

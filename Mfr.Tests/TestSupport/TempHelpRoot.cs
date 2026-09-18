@@ -12,18 +12,30 @@ namespace Mfr.Tests.TestSupport
         /// Runs <paramref name="body"/> against a fresh temp help directory.
         /// </summary>
         /// <param name="body">Test body receiving the help directory, opener, and host.</param>
-        /// <param name="htmlBasenames">
-        /// Optional basenames to write as minimal <c>&lt;html&gt;&lt;/html&gt;</c> files under the root.
+        /// <param name="htmlRelativePaths">
+        /// Optional relative paths under the root to write as minimal
+        /// <c>&lt;html&gt;&lt;/html&gt;</c> files (e.g. <c>SpaceCharacter.html</c> or
+        /// <c>filters/space/SpaceCharacter.html</c>).
         /// </param>
-        public static void Run(Action<string, RecordingFileShellOpener, HelpHost> body, params string[] htmlBasenames)
+        public static void Run(
+            Action<string, RecordingFileShellOpener, HelpHost> body,
+            params string[] htmlRelativePaths
+        )
         {
             var helpDir = Path.Combine(Path.GetTempPath(), $"mfr-help-{Guid.NewGuid():N}");
             Directory.CreateDirectory(helpDir);
             try
             {
-                foreach (var basename in htmlBasenames)
+                foreach (var relativePath in htmlRelativePaths)
                 {
-                    File.WriteAllText(Path.Combine(helpDir, basename), "<html></html>");
+                    var fullPath = Path.Combine(helpDir, relativePath);
+                    var parent = Path.GetDirectoryName(fullPath);
+                    if (!string.IsNullOrEmpty(parent))
+                    {
+                        Directory.CreateDirectory(parent);
+                    }
+
+                    File.WriteAllText(fullPath, "<html></html>");
                 }
 
                 var opener = new RecordingFileShellOpener();

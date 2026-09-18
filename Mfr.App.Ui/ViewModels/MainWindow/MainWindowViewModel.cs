@@ -335,7 +335,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Opens Tips (<c>help/tips.html</c>) in the default browser.
+        /// Opens Tips (<c>help/guide/tips.html</c>) in the default browser.
         /// </summary>
         [RelayCommand]
         public void ShowTips()
