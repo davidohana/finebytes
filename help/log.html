@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Rename Log</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="index.html">Index</a>
+      &gt;
+      <a href="index.html#operation">Operation</a>
+      &gt;
+      <a href="ui.html">User Interface</a>
+      &gt;
+      <strong>Rename Log</strong>
+    </nav>
+    <hr />
+    <h1>Rename Log</h1>
+    <p>
+      <span class="quote">MFR → Rename Log</span> (<span class="quote">Ctrl+Shift+L</span>) lists past
+      renaming operations so you can inspect details and undo from history.
+    </p>
+    <ul>
+      <li>
+        Operations appear newest first. Selecting one shows which items and fields changed, and any
+        commit errors.
+      </li>
+      <li>
+        The last operation in this session is always available for
+        <a href="undolast.html">Undo Last</a>, even when disk logging is limited or disabled in
+        <a href="optionswin.html#log">Options</a>.
+      </li>
+      <li>
+        Undo from the log prepares the same reverse preview session as Undo Last: Rename List is
+        filled with reverse values, the Filter Chain is cleared, and disk files change only when you
+        press <a href="applychanges.html">GO</a> again. Items must still be at the paths recorded in
+        the log.
+      </li>
+    </ul>
+
+  </body>
+</html>

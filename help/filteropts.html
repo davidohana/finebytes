@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Filter Options</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="index.html">Index</a>
+      &gt;
+      <a href="index.html#operation">Operation</a>
+      &gt;
+      <a href="ui.html">User Interface</a>
+      &gt;
+      <strong>Filter Options</strong>
+    </nav>
+    <hr />
+    <h1>Filter Options</h1>
+    <p>
+      Filter Options configures general settings for the selected
+      <a href="appliedfilterlist.html">Filter Chain</a> step: display name, Apply To target, and
+      (for text targets) where the filter runs.
+    </p>
+    <ul>
+      <li>
+        Open from the Filter Chain toolbar / context menu, or
+        <span class="quote">Filters → Filter options</span>, when exactly one step is selected.
+      </li>
+      <li>
+        Most filters can target writable text fields (file name, path parts, audio tags, and more).
+        Some filters (for example <a href="AudioTagSetter.html">Audio Tag Setter</a>) use a fixed
+        target.
+      </li>
+      <li>
+        Apply To uses a field group combo and a field combo. Only changeable text fields are listed.
+      </li>
+      <li>
+        Scope:
+        <ul>
+          <li><strong>Whole</strong> — entire field text.</li>
+          <li><strong>Substring</strong> — a start/end character range.</li>
+          <li>
+            <strong>Token</strong> — one part after splitting on a separator (for example
+            <span class="quote">-</span> in <span class="quote">Artist-Song</span>).
+          </li>
+        </ul>
+      </li>
+    </ul>
+
+  </body>
+</html>

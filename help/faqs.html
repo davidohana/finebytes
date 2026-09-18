@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Frequently Asked Questions</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="index.html">Index</a>
+      &gt; <a href="index.html#operation">Operation</a>
+      &gt; <strong>Frequently Asked Questions</strong>
+    </nav>
+    <hr />
+    <h1>Frequently Asked Questions</h1>
+    <p>Common questions about Magic File Renamer 8. Also see <a href="tips.html">Tips</a>.</p>
+
+    <h2 id="extensions">Can MFR change file extensions?</h2>
+    <p>
+      Yes. Select a Filter Chain step, open its Filter Options, and set
+      <span class="quote">Apply To</span> to the extension target (or include the extension in a
+      multi-target apply). See <a href="filteropts.html">Filter Options</a>.
+    </p>
+
+    <h2 id="preview">Preview looks wrong — will GO still change my files?</h2>
+    <p>
+      GO commits what Preview shows. If Auto-Preview is on, the Rename List New columns update as
+      you edit the Filter Chain. Fix Preview first (or use
+      <a href="console.html">console</a> <span class="quote">--dry-run</span> for a no-write run).
+      See <a href="applychanges.html">Apply Changes</a> and
+      <a href="renamelist.html#preview">Rename List Preview</a>.
+    </p>
+
+    <h2 id="undo">Can I undo a rename?</h2>
+    <p>
+      <span class="quote">Undo Last</span> prepares a reverse preview of the last GO; disk is
+      unchanged until you press GO again. Older operations may still be listed in the
+      <a href="log.html">Rename Log</a>. See <a href="undolast.html">Undo Last</a>.
+    </p>
+
+    <h2 id="presets">Where are my presets stored?</h2>
+    <p>
+      Presets are JSON under your AppData finebytes MFR folder (not MFR 7
+      <span class="quote">.mps</span> files). Manage them from the Preset Manager. See
+      <a href="presetmanager.html">Preset Manager</a> and
+      <a href="savepreset.html">Save Preset</a>.
+    </p>
+
+    <h2 id="mfr7presets">Can I load MFR 7 presets in MFR 8?</h2>
+    <p>
+      Not automatically. MFR 8 uses a different preset format. Rebuild Filter Chains in MFR 8 (or
+      recreate them from the filter list) and save new presets.
+    </p>
+
+    <h2 id="config">Where is configuration stored? How do I reset it?</h2>
+    <p>
+      Preferences live in <span class="quote">config.json</span> under
+      <span class="quote">%AppData%\finebytes\mfr\</span>. See
+      <a href="optionswin.html">Options</a> and <a href="resetconfig.html">Reset configuration</a>.
+    </p>
+
+    <h2 id="cli">How do I rename from a script or Task Scheduler?</h2>
+    <p>
+      Use the console entry point with a saved preset. See
+      <a href="console.html">Console (Automatic) Mode</a> and
+      <a href="cml.html">Command Line Parameters</a>. Prefer
+      <span class="quote">--dry-run</span> until the preview looks right.
+    </p>
+
+    <h2 id="contextmenu">Is there a Windows Explorer “Rename with MFR” menu?</h2>
+    <p>
+      Not in this build. Add items via the File List, drag-and-drop onto the Rename List, or pass
+      paths to the console app. See <a href="sysreqs.html#contextmenu">System Requirements</a>.
+    </p>
+
+    <h2 id="help">How do I open Help?</h2>
+    <p>
+      Press <span class="quote">F1</span> or choose <span class="quote">Help → Index</span>.
+      <span class="quote">Help → Tips</span> opens tips.
+      Filter Configuration <strong>?</strong> opens that filter’s topic. Pages open in your default
+      browser.
+    </p>
+
+    <p class="note">
+      Still stuck? See
+      <a href="contact.html">Technical Support, Feedback &amp; Contact Information</a>.
+    </p>
+  </body>
+</html>

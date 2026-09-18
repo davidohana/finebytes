@@ -4,10 +4,11 @@ using Mfr.App.Ui.Services.Shell;
 namespace Mfr.App.Ui.Services.Help
 {
     /// <summary>
-    /// Resolves and opens per-filter Help HTML shipped beside the application.
+    /// Resolves and opens Help HTML shipped beside the application (Index, Tips, filter pages).
     /// <para>
     /// Looks under <c>help/</c> next to the exe (<see cref="AppContext.BaseDirectory"/>).
-    /// Opens the file with the OS default app (typically the browser).
+    /// Opens the file with the OS default app (typically the browser). Used by F1 / Help → Index,
+    /// Help → Tips, and Filter Configuration <c>?</c>.
     /// </para>
     /// </summary>
     /// <param name="shellOpener">
@@ -17,7 +18,7 @@ namespace Mfr.App.Ui.Services.Help
     /// <param name="helpRoots">
     /// Directories to search for Help HTML. When null, uses <see cref="DefaultHelpRoots"/>.
     /// </param>
-    public sealed class FilterHelpHost(IFileShellOpener? shellOpener = null, IEnumerable<string>? helpRoots = null)
+    public sealed class HelpHost(IFileShellOpener? shellOpener = null, IEnumerable<string>? helpRoots = null)
     {
         /// <summary>
         /// Default Help root directories. First existing <c>helpFileName</c> under these roots wins.
@@ -31,7 +32,7 @@ namespace Mfr.App.Ui.Services.Help
         /// <summary>
         /// Builds the missing-help dialog text for a file expected under the app <c>help/</c> folder.
         /// </summary>
-        /// <param name="helpFileName">Expected Help HTML basename (e.g. <c>SpaceCharacter.html</c>).</param>
+        /// <param name="helpFileName">Expected Help HTML basename (e.g. <c>index.html</c> or <c>SpaceCharacter.html</c>).</param>
         /// <returns>User-facing message.</returns>
         public static string FormatMissingHelpMessage(string helpFileName)
         {
@@ -48,7 +49,7 @@ namespace Mfr.App.Ui.Services.Help
         /// <summary>
         /// Finds an existing Help HTML file under the configured roots.
         /// </summary>
-        /// <param name="helpFileName">File name only (e.g. <c>SpaceCharacter.html</c>).</param>
+        /// <param name="helpFileName">File name only (e.g. <c>index.html</c> or <c>SpaceCharacter.html</c>).</param>
         /// <param name="fullPath">Absolute path when found.</param>
         /// <returns><see langword="true"/> when a readable file exists.</returns>
         public bool TryResolve(string helpFileName, [NotNullWhen(true)] out string? fullPath)
@@ -84,7 +85,7 @@ namespace Mfr.App.Ui.Services.Help
         /// <summary>
         /// Resolves <paramref name="helpFileName"/> and opens it with the default application.
         /// </summary>
-        /// <param name="helpFileName">File name only (e.g. <c>SpaceCharacter.html</c>).</param>
+        /// <param name="helpFileName">File name only (e.g. <c>tips.html</c> or <c>SpaceCharacter.html</c>).</param>
         /// <param name="fullPath">Absolute path when opened.</param>
         /// <returns><see langword="true"/> when the file was found and open was requested.</returns>
         public bool TryOpen(string helpFileName, [NotNullWhen(true)] out string? fullPath)

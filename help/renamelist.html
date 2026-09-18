@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Rename List</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="index.html">Index</a>
+      &gt;
+      <a href="index.html#operation">Operation</a>
+      &gt;
+      <a href="ui.html">User Interface</a>
+      &gt;
+      <strong>Rename List</strong>
+    </nav>
+    <hr />
+    <h1>Rename List</h1>
+    <p>
+      The Rename List holds the files and folders you intend to process. It shows live preview of
+      Filter Chain results, supports multi-column sort, export, and manual overrides.
+    </p>
+
+    <h2 id="add">Adding items</h2>
+    <ul>
+      <li>
+        From the <a href="fileexp.html">File List</a>: Add selected (<span class="quote">Ctrl+Shift+S</span>),
+        Add all (<span class="quote">Ctrl+Shift+A</span>), drag-and-drop, or double-click when Options
+        is set to Add to Rename List.
+      </li>
+      <li>
+        Drag from Windows Explorer or other apps onto the Rename List.
+      </li>
+      <li>
+        <a href="optionswin.html#additems">Options</a> control files vs folders, folder contents
+        recursion, and hidden/system inclusion. File List Mask and Exclude still apply.
+      </li>
+      <li>
+        Each path appears at most once. Item count is in the <a href="statusbar.html">status bar</a>.
+      </li>
+    </ul>
+
+    <h2 id="remove">Removing items</h2>
+    <ul>
+      <li>
+        Remove selected: toolbar / menu (<span class="quote">Ctrl+Shift+R</span>) or
+        <span class="quote">Del</span> when the grid is focused (does not delete files on disk).
+      </li>
+      <li>
+        Remove all but selected (<span class="quote">Ctrl+Shift+B</span>), Clear
+        (<span class="quote">Ctrl+Shift+C</span>).
+      </li>
+    </ul>
+
+    <h2 id="selectfields">Selecting fields</h2>
+    <ul>
+      <li>
+        <a href="fieldselector.html">Select fields…</a> chooses visible columns and optional
+        Before/after mode. Hide a column from the header menu.
+      </li>
+      <li>
+        Column layout and widths can persist across sessions (see Options → Remember column widths).
+        Presets can store columns when you <a href="savepreset.html">save a preset</a>.
+      </li>
+    </ul>
+
+    <h2 id="preview">Preview</h2>
+    <ul>
+      <li>
+        Auto-Preview recalculates results when the Filter Chain or list membership changes. Toggle
+        Auto-Preview from the Rename List toolbar or menu.
+      </li>
+      <li>
+        Changed cells are highlighted. Preview failures mark the row and increment
+        <span class="quote">Preview errors</span> on the status bar; those rows are skipped on GO.
+      </li>
+      <li>
+        Use Before/after mode or preview columns to compare originals and results.
+      </li>
+    </ul>
+
+    <h2 id="sort">Sort</h2>
+    <ul>
+      <li>
+        Auto-Sort: header click / Shift+click, or the Sort tab in
+        <a href="fieldselector.html">Select fields…</a> / <a href="sorteditor.html">Auto-Sort</a>.
+      </li>
+      <li>
+        Manual order: <span class="quote">Ctrl+↑</span> / <span class="quote">Ctrl+↓</span> or drag
+        rows (turns Auto-Sort off).
+      </li>
+    </ul>
+
+    <h2 id="manualrename">Manual field override (F2)</h2>
+    <ul>
+      <li>
+        Focus a writable cell and press <span class="quote">F2</span> (or use the context menu) to set
+        a manual value. Preview-side overrides win over filter output; original-side edits are then
+        processed by the Filter Chain.
+      </li>
+      <li>
+        Cancel overrides from the context menu, or refresh (<span class="quote">F5</span>) to clear
+        overrides and re-read from disk.
+      </li>
+    </ul>
+
+    <h2 id="highlighting">Highlighting</h2>
+    <ul>
+      <li>Changed preview values are highlighted.</li>
+      <li>Manual overrides use a distinct text style.</li>
+      <li>Missing paths and field/preview/commit errors use gray / error styling; use row/cell menus for details.</li>
+    </ul>
+
+    <h2 id="removeunchanged">Remove unchanged items</h2>
+    <ul>
+      <li>
+        From a preview-capable column header menu, choose Remove unchanged items to drop rows where
+        that field is not predicted to change.
+      </li>
+    </ul>
+
+    <h2 id="export">Export</h2>
+    <ul>
+      <li>
+        <span class="quote">Export this column (txt)</span> from a header menu writes one value per
+        line.
+      </li>
+      <li>
+        <span class="quote">Export Rename List (csv)…</span> / Export visible columns writes the
+        on-screen columns (preview values when the After side is showing).
+      </li>
+    </ul>
+
+    <h2 id="freeedit">Edit as Name List</h2>
+    <ul>
+      <li>
+        From a writable column header, <span class="quote">Edit as Name List</span> creates a temporary
+        list and adds a <a href="NameList.html">Name List</a> filter so you can edit values in an
+        external editor.
+      </li>
+    </ul>
+
+    <h2 id="refresh">Refresh</h2>
+    <ul>
+      <li>
+        <span class="quote">F5</span> on the Rename List re-reads originals from disk (clears manual
+        overrides) and re-runs preview when Auto-Preview is on.
+      </li>
+    </ul>
+
+    <h2>More</h2>
+    <ul>
+      <li><span class="quote">F4</span> — locate the focused item in the File List.</li>
+      <li><span class="quote">Alt+Enter</span> — Windows properties for the focused item.</li>
+      <li>Drag items to Explorer or into filter editors that accept drops.</li>
+    </ul>
+    <p class="note">
+      See also: <a href="fileexp.html">File List</a>,
+      <a href="appliedfilterlist.html">Filter Chain</a>,
+      <a href="applychanges.html">Apply Changes</a>.
+    </p>
+
+  </body>
+</html>

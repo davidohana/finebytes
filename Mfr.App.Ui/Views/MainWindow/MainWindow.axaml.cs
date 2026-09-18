@@ -5,9 +5,11 @@ using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Session;
+using Mfr.App.Ui.ViewModels.About;
 using Mfr.App.Ui.ViewModels.LogDialog;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.Options;
+using Mfr.App.Ui.Views.About;
 using Mfr.App.Ui.Views.LogDialog;
 using Mfr.App.Ui.Views.Options;
 using Mfr.Engine.Config;
@@ -25,6 +27,7 @@ namespace Mfr.App.Ui.Views.MainWindow
         private bool _resetConfigurationInProgress;
         private bool _optionsDialogInProgress;
         private bool _logDialogInProgress;
+        private bool _aboutDialogInProgress;
 
         /// <summary>
         /// Initializes the main window.
@@ -71,8 +74,10 @@ namespace Mfr.App.Ui.Views.MainWindow
             if (_boundViewModel is not null)
             {
                 _boundViewModel.FilterChainViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
-                _boundViewModel.FilterChainViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
+                _boundViewModel.FilterChainViewModel.FilterHelpMissing -= _OnHelpMissing;
+                _boundViewModel.HelpMissing -= _OnHelpMissing;
                 _boundViewModel.OptionsRequested -= _OnOptionsRequested;
+                _boundViewModel.AboutRequested -= _OnAboutRequested;
                 _boundViewModel.LogRequested -= _OnLogRequested;
                 _boundViewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
                 _boundViewModel.ConfirmRenameScriptUnsupportedFiltersAsync = null;
@@ -87,8 +92,10 @@ namespace Mfr.App.Ui.Views.MainWindow
 
             _boundViewModel = viewModel;
             viewModel.FilterChainViewModel.FilterDefaultSaved += _OnFilterDefaultSaved;
-            viewModel.FilterChainViewModel.FilterHelpMissing += _OnFilterHelpMissing;
+            viewModel.FilterChainViewModel.FilterHelpMissing += _OnHelpMissing;
+            viewModel.HelpMissing += _OnHelpMissing;
             viewModel.OptionsRequested += _OnOptionsRequested;
+            viewModel.AboutRequested += _OnAboutRequested;
             viewModel.LogRequested += _OnLogRequested;
             viewModel.ResetConfigurationRequested += _OnResetConfigurationRequested;
             viewModel.ConfirmRenameScriptUnsupportedFiltersAsync = _ConfirmRenameScriptUnsupportedFiltersAsync;
@@ -135,14 +142,19 @@ namespace Mfr.App.Ui.Views.MainWindow
             Dispatcher.UIThread.Post(() => _ = _ShowFilterDefaultSavedAsync(catalogDisplayName));
         }
 
-        private void _OnFilterHelpMissing(object? sender, string helpFileName)
+        private void _OnHelpMissing(object? sender, string helpFileName)
         {
-            Dispatcher.UIThread.Post(() => _ = _ShowFilterHelpMissingAsync(helpFileName));
+            Dispatcher.UIThread.Post(() => _ = _ShowHelpMissingAsync(helpFileName));
         }
 
         private void _OnOptionsRequested(object? sender, EventArgs e)
         {
             Dispatcher.UIThread.Post(() => _ = _ShowOptionsAsync());
+        }
+
+        private void _OnAboutRequested(object? sender, EventArgs e)
+        {
+            Dispatcher.UIThread.Post(() => _ = _ShowAboutAsync());
         }
 
         private void _OnLogRequested(object? sender, EventArgs e)
@@ -284,13 +296,29 @@ namespace Mfr.App.Ui.Views.MainWindow
             await dialog.ShowDialog(this);
         }
 
-        private async Task _ShowFilterHelpMissingAsync(string helpFileName)
+        private async Task _ShowHelpMissingAsync(string helpFileName)
         {
-            var dialog = new OkMessageDialog(
-                title: "Help",
-                message: FilterHelpHost.FormatMissingHelpMessage(helpFileName)
-            );
+            var dialog = new OkMessageDialog(title: "Help", message: HelpHost.FormatMissingHelpMessage(helpFileName));
             await dialog.ShowDialog(this);
+        }
+
+        private async Task _ShowAboutAsync()
+        {
+            if (_aboutDialogInProgress)
+            {
+                return;
+            }
+
+            _aboutDialogInProgress = true;
+            try
+            {
+                var dialog = new AboutDialog(new AboutDialogViewModel());
+                await dialog.ShowDialog(this);
+            }
+            finally
+            {
+                _aboutDialogInProgress = false;
+            }
         }
 
         /// <summary>
@@ -438,8 +466,10 @@ namespace Mfr.App.Ui.Views.MainWindow
             }
 
             viewModel.FilterChainViewModel.FilterDefaultSaved -= _OnFilterDefaultSaved;
-            viewModel.FilterChainViewModel.FilterHelpMissing -= _OnFilterHelpMissing;
+            viewModel.FilterChainViewModel.FilterHelpMissing -= _OnHelpMissing;
+            viewModel.HelpMissing -= _OnHelpMissing;
             viewModel.OptionsRequested -= _OnOptionsRequested;
+            viewModel.AboutRequested -= _OnAboutRequested;
             viewModel.LogRequested -= _OnLogRequested;
             viewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
             viewModel.ConfirmRenameScriptUnsupportedFiltersAsync = null;

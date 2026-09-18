@@ -27,6 +27,9 @@ namespace Mfr.App.Ui.Input
         /// <summary>Opens Options.</summary>
         public static KeyGesture ShowOptions { get; } = new(Key.OemComma, KeyModifiers.Control);
 
+        /// <summary>Opens Help Index in the default browser.</summary>
+        public static KeyGesture ShowHelp { get; } = new(Key.F1);
+
         /// <summary>Exits the application. Bound by the OS on Windows, not as a window key binding.</summary>
         public static KeyGesture Exit { get; } = new(Key.F4, KeyModifiers.Alt);
 

@@ -55,10 +55,11 @@ Add `Mfr.Filters/docs/<Group>/YourFilterType.md` (examples table per `Mfr.Filter
 When adding a filter, also ship Help next to the exe:
 
 1. Add `help/{Type}.html` (flat under repo-root `help/`; display name = `FilterPalette` label; options use Filter Configuration UI labels). Help basename is convention: `{Type}.html` (no map).
-1. Link the page from `help/filters.html` under the right group.
+1. Breadcrumb: `Index` → `Filters` → group → display name (`index.html` / `filters.html` / `filters.html#{group}`). Figcaption is user-facing (`Filter options.`); keep screenshot capture notes in `help/SCREENSHOTS.md` only — not in shipped HTML.
+1. Link the page from `help/filters.html` under the right group (that hub breadcrumbs to Index).
 1. Add a checklist row in `help/SCREENSHOTS.md` for `images/{Type}.png` (screenshot optional).
 
-`Mfr.App.Ui.csproj` already copies `..\help\**\*` (except `SCREENSHOTS.md`) to output.
+`Mfr.App.Ui.csproj` already copies `..\help\**\*` (except `SCREENSHOTS.md`) to output. Open path is `HelpHost` (`Mfr.App.Ui/Services/Help/`).
 
 ## Deeper context
 

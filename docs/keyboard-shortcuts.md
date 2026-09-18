@@ -14,11 +14,12 @@ Gestures bound in the UI live in `Mfr.App.Ui/Input/AppShortcuts.cs`. Menu items 
 | Undo last            | Ctrl+Z          |
 | Rename Log           | Ctrl+Shift+L    |
 | Options              | Ctrl+,          |
+| Help Index           | F1              |
 | Exit                 | Alt+F4          |
 | Refresh focused pane | F5              |
 | Go to folder         | Ctrl+L or Alt+D |
 
-Undo last (Ctrl+Z) prepares an undo session from the last GO when a rename log exists: it replaces the Rename List with reverse OldValues, clears Filter Chain, and leaves disk unchanged until you press GO. Rename Log (Ctrl+Shift+L) opens the dialog (disk history + last operation); Undo there uses the same prepare path. Options (Ctrl+,) is live. GO previews the current list, warns before ignoring preview errors, applies valid renames, and clears manual field overrides on rows that were applied or hit a commit error (preview-error and skipped rows keep theirs).
+Undo last (Ctrl+Z) prepares an undo session from the last GO when a rename log exists: it replaces the Rename List with reverse OldValues, clears Filter Chain, and leaves disk unchanged until you press GO. Rename Log (Ctrl+Shift+L) opens the dialog (disk history + last operation); Undo there uses the same prepare path. Options (Ctrl+,) is live. Help Index (F1) and **Help → Index** / **Tips** open local Help HTML in the default browser; **Help → About** shows version and support links. GO previews the current list, warns before ignoring preview errors, applies valid renames, and clears manual field overrides on rows that were applied or hit a commit error (preview-error and skipped rows keep theirs).
 
 Ctrl+L is the address bar (Explorer / Chrome). Rename Log is Ctrl+Shift+L so the two do not clash. Alt+F4 is shown on **MFR → Exit** and is handled by the window manager on Windows, not as an extra app binding.
 
@@ -101,13 +102,5 @@ Click the **Select fields** toolbar button on the Rename List, or choose **Selec
 | ---------- | -------- | -------------------- |
 | First item | Home     | Focused shuttle list |
 | Last item  | End      | Focused shuttle list |
-
-## Shown in menus, not implemented yet
-
-These shortcuts match MFR 7.4 and are already labeled on disabled menu items.
-
-| Action | Shortcut | Notes                        |
-| ------ | -------- | ---------------------------- |
-| Help   | F1       | Help UI is not in this build |
 
 F5 reloads the File List from the main window and address bar, or the Rename List when its grid has focus (MFR 7.4 shared the same key in both panes). Rename List refresh re-reads original fields from disk (and clears manual field overrides), then re-runs preview when Auto-Preview is on.
