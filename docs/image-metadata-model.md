@@ -52,9 +52,10 @@ flowchart LR
 - **Lazy load (formatter preview)** — `Mfr.Filters` — `RenameItemImagePropertiesExtensions.EnsureImagePropertiesLoaded`
 - **Rename List grid** — eager-loads image buckets for visible columns and Auto-Sort keys via `RenameList.EnsureMetadataLoaded`
 - **Shared field enum + display** — `Mfr.Models` — `ImagePropertyField` and
-  `ImagePropertiesFormatting.Format(..., PropertyDisplayContext)` under
-  `RenameList/Fields/Image/` (tokens use `Token`; Rename List columns use `Grid`;
-  Image arms are culture-identical today)
+  `ImagePropertiesFormatting` under `RenameList/Fields/Image/`;
+  `Format(..., PropertyDisplayContext)` with tokens using `Token` and Rename List
+  columns using `Grid` (`PropertyDisplayContext` at `RenameList/`; Image arms are
+  culture-identical today)
 - **Tokens**
   - `Mfr.Filters` — `ImagePropertyTokenBase` (`image-*`); `ExifPropertyTokenBase`, `ExifDateToken`, `ExifToken`
 - **Commit cache clear** — `Mfr.Engine` — `RenameList.Commit` calls `ClearMetadataCaches`

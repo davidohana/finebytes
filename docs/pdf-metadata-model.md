@@ -45,8 +45,9 @@ flowchart LR
   (`RenameListMetadataRequirement.Pdf`); attempt/error state shares the
   `RenameItem` / `RenameListMetadataBuckets` single-flag API with TagLib and Image
 - **Shared field enum + display** — `Mfr.Models` — `PdfDocumentField` and
-  `PdfDocumentInfoFormatting.Format(..., PropertyDisplayContext)` under
-  `RenameList/Fields/Pdf/` (tokens use `Token`; Rename List columns use `Grid`).
+  `PdfDocumentInfoFormatting` under `RenameList/Fields/Pdf/`;
+  `Format(..., PropertyDisplayContext)` with tokens using `Token` and Rename List
+  columns using `Grid` (`PropertyDisplayContext` at `RenameList/`).
   Created/Modified fork: Token = Invariant `DateTimeOffset` `"G"`; Grid =
   `RenameListFieldDisplay.FormatFileDate(LocalDateTime)`
 - **Tokens** — `Mfr.Filters` — `PdfDocumentTokenBase` (`pdf-*`)
