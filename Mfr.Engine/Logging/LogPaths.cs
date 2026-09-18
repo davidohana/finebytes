@@ -1,4 +1,3 @@
-using Mfr.Models.Config;
 using Mfr.Utils;
 using Serilog;
 

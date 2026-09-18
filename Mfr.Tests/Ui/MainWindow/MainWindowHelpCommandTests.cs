@@ -1,6 +1,5 @@
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.ViewModels.MainWindow;
-using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Ui.MainWindow
 {

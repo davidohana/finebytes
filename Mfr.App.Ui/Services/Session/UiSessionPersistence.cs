@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Mfr.App.Ui.Services.FileList;
+using Mfr.Engine.Config;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.Services.Session

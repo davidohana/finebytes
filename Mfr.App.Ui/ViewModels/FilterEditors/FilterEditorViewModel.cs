@@ -2,7 +2,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
-using Mfr.Models.Config;
+using Mfr.Engine.Config;
 using Mfr.Models.Rename;
 
 namespace Mfr.App.Ui.ViewModels.FilterEditors

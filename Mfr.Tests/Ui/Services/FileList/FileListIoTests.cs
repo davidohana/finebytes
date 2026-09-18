@@ -1,6 +1,6 @@
 using Mfr.App.Ui.Services.FileList;
 
-namespace Mfr.Tests.Ui.FileList
+namespace Mfr.Tests.Ui.Services.FileList
 {
     /// <summary>
     /// Tests shared File List IO probes used by catalog listing and Go Up climb.

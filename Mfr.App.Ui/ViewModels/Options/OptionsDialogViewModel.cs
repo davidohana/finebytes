@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mfr.Engine.Config;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.ViewModels.Options

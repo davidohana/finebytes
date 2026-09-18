@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Mfr.Tests.Models
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Tests for <see cref="ConfigStore.Save"/>.

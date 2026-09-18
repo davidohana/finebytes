@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 using Mfr.Utils;
 using Mfr.Utils.Config;
 
-namespace Mfr.Models.Config
+namespace Mfr.Engine.Config
 {
     /// <summary>
     /// Loads and saves process-wide preferences as a single <c>config.json</c>:

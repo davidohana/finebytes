@@ -1,9 +1,7 @@
 using System.Text;
-using Mfr.Engine.RenameList;
 using Mfr.Engine.RenameScript;
 using Mfr.Models.Tags;
 using Mfr.Tests.Models.Filters;
-using Mfr.Utils;
 
 namespace Mfr.Tests.Engine
 {

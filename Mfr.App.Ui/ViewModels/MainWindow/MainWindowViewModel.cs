@@ -11,6 +11,7 @@ using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Engine.Config;
 using Mfr.Engine.Presets;
 using Mfr.Engine.RenameLog;
 using Mfr.Engine.RenameScript;

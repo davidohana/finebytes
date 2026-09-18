@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Platform;
+using Mfr.Engine.Config;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.Services.Session

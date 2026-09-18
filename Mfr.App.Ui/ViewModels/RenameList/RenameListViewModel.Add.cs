@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
+using Mfr.Engine.Config;
 using Mfr.Engine.RenameList;
 using Mfr.Models.Config;
 using Serilog;

@@ -11,7 +11,7 @@ namespace Mfr.Engine.Presets
     /// Hard-fail dialect: invalid <c>presets.json</c> → <see cref="LoadPresets"/> throws
     /// (<see cref="UserException"/> / wrapped IO) and aborts load. Missing AppData file is created
     /// empty by <see cref="OpenDefault"/> then loaded. Opposite of soft-load prefs
-    /// (<see cref="Models.Config.ConfigStore"/>) and per-entry skip in <see cref="FilterDefaultsStore"/>.
+    /// (<see cref="ConfigStore"/>) and per-entry skip in <see cref="FilterDefaultsStore"/>.
     /// Do not unify these modes — the split is intentional product dialect.
     /// <para>
     /// Display and save order is the <see cref="Presets"/> list (JSON array order). Use the mutation

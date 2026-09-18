@@ -1,7 +1,7 @@
 using Avalonia;
 using Mfr.App.Ui.Diagnostics;
+using Mfr.Engine.Config;
 using Mfr.Engine.Logging;
-using Mfr.Models.Config;
 using Serilog.Events;
 
 namespace Mfr.App.Ui

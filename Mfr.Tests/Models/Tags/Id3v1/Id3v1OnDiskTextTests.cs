@@ -109,7 +109,7 @@ namespace Mfr.Tests.Models.Tags.Id3v1
                 )
             );
 
-            Assert.Equal(new string('T', 30), overlay.Id3v1!.Title);
+            Assert.Equal(new string('T', 30), overlay.Id3v1.Title);
             Assert.Equal(new string('A', 30), overlay.Id3v1.Album);
             Assert.Equal(new string('P', 30), overlay.Id3v1.Artist);
             Assert.Equal(new string('C', 28), overlay.Id3v1.Comment);

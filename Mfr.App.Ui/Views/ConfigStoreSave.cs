@@ -1,4 +1,4 @@
-using Mfr.Models.Config;
+using Mfr.Engine.Config;
 
 namespace Mfr.App.Ui.Views
 {

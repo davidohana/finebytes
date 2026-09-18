@@ -1,5 +1,6 @@
 using Avalonia.Media;
 using Mfr.Engine.Commit;
+using Mfr.Engine.Config;
 using Mfr.Models.Config;
 using Mfr.Models.Filters;
 using Mfr.Models.Rename;

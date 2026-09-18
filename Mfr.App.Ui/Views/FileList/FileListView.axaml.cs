@@ -13,7 +13,7 @@ using Mfr.App.Ui.Input;
 using Mfr.App.Ui.Services.RenameList;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.Views.GridColumnSizing;
-using Mfr.Models.Config;
+using Mfr.Engine.Config;
 using Mfr.Utils;
 
 namespace Mfr.App.Ui.Views.FileList

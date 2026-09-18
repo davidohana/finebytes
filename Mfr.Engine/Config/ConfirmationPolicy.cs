@@ -1,4 +1,4 @@
-namespace Mfr.Models.Config
+namespace Mfr.Engine.Config
 {
     /// <summary>
     /// Reads and mutates <see cref="OptionsConfig.SuppressedConfirmations"/> on <see cref="ConfigStore.Options"/> to decide

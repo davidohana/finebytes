@@ -1,7 +1,6 @@
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Audio;
 using Mfr.Filters.Formatting;
-using Mfr.Models.Filters;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.RenameList.Fields.Extended;

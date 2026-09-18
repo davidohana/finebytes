@@ -1,12 +1,8 @@
 using Mfr.Engine.RenameScript;
-using Mfr.Filters;
 using Mfr.Filters.Attributes;
 using Mfr.Filters.Audio;
 using Mfr.Filters.Case;
 using Mfr.Filters.Misc;
-using Mfr.Models.Filters;
-using Mfr.Models.Media;
-using Mfr.Models.Rename;
 using Mfr.Models.Tags;
 using Mfr.Models.Tags.Id3v1;
 

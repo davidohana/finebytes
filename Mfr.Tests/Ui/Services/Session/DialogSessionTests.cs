@@ -156,7 +156,7 @@ namespace Mfr.Tests.Ui.Services.Session
             window.WindowState = WindowState.Maximized;
             window.Close();
 
-            var saved = Assert.Contains(DialogIds.RenameLog, ConfigStore.Dialogs!);
+            var saved = Assert.Contains(DialogIds.RenameLog, ConfigStore.Dialogs);
             Assert.Equal(40, saved.X);
             Assert.Equal(60, saved.Y);
             Assert.Equal(820, saved.Width);

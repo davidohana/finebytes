@@ -1,5 +1,3 @@
-using Mfr.Models.Config;
-
 namespace Mfr.Engine.Config
 {
     /// <summary>

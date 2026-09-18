@@ -1,7 +1,6 @@
 using Mfr.App.Ui.Services;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.About;
-using Mfr.Tests.TestSupport;
 
 namespace Mfr.Tests.Ui.About
 {

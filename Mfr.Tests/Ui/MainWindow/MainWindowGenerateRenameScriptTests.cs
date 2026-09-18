@@ -5,7 +5,6 @@ using Mfr.App.Ui.ViewModels;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.Filters.Attributes;
-using Mfr.Models.Config;
 
 namespace Mfr.Tests.Ui.MainWindow
 {

@@ -2,7 +2,6 @@ using System.Reflection;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Mfr.Models.Config;
 using Mfr.Utils;
 using Serilog;
 using RenameLogModel = Mfr.Models.Rename.RenameLog;

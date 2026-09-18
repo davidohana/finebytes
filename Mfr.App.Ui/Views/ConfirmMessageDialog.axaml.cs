@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Mfr.Engine.Config;
 using Mfr.Models.Config;
 
 namespace Mfr.App.Ui.Views

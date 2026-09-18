@@ -5,8 +5,8 @@ using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.Views.GridColumnSizing;
 using Mfr.App.Ui.Views.MainWindow;
+using Mfr.Engine.Config;
 using Mfr.Engine.Presets;
-using Mfr.Models.Config;
 
 namespace Mfr.App.Ui
 {

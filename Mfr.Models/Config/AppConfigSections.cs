@@ -6,7 +6,7 @@ namespace Mfr.Models.Config
     /// Options-dialog prefs from the <c>options</c> section of the config file (app config leaf section).
     /// <para>
     /// Bound via <see cref="ConfigJsonApplier"/> string leaves. <see cref="SuppressedConfirmations"/> gates
-    /// optional confirms via <see cref="ConfirmationPolicy"/>. Obsolete <c>options.confirmationPrompts</c> /
+    /// optional confirms via Engine <c>ConfirmationPolicy</c>. Obsolete <c>options.confirmationPrompts</c> /
     /// root <c>ui</c> / Options fields formerly under <c>fileList</c> / <c>renameList</c> are ignored on soft-load
     /// (no migration).
     /// </para>

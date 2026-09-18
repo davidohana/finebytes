@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.ViewModels.Presets;
+using Mfr.Engine.Config;
 using Mfr.Engine.Presets;
 using Mfr.Filters;
 using Mfr.Models.Config;

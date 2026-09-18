@@ -1,4 +1,4 @@
-namespace Mfr.Tests.Models
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Tests for <see cref="ConfigStore.DeleteDefaultFile"/>.

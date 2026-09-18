@@ -3,7 +3,7 @@ using Mfr.Filters.Case;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Tests.Ui.RenameList;
 
-namespace Mfr.Tests.Models
+namespace Mfr.Tests.Engine
 {
     /// <summary>
     /// Tests for <see cref="ConfigStore"/> session sections / filterDefaults and soft-load dialect.
