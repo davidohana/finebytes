@@ -25,5 +25,10 @@ namespace Mfr.Models.RenameList
         /// Field reads PdfPig PDF Info and/or page count from disk.
         /// </summary>
         Pdf = 4,
+
+        /// <summary>
+        /// Field reads VersOne.Epub Dublin Core document Info from disk.
+        /// </summary>
+        Epub = 8,
     }
 }

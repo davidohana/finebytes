@@ -29,7 +29,8 @@ namespace Mfr.Tests.Models.Filters
         /// <param name="configureOriginal">
         /// Optional callback invoked on <see cref="FileMeta"/> after construction but before constructing
         /// <see cref="RenameItem"/>—for stamping <see cref="FileMeta.AudioTagOverlay"/>, <see cref="FileMeta.Media"/>,
-        /// <see cref="FileMeta.Image"/>, <see cref="FileMeta.Exif"/>, <see cref="FileMeta.Pdf"/>, and other overrides.
+        /// <see cref="FileMeta.Image"/>, <see cref="FileMeta.Exif"/>, <see cref="FileMeta.Pdf"/>,
+        /// <see cref="FileMeta.Epub"/>, and other overrides.
         /// </param>
         /// <returns>A rename item with original and preview snapshots initialized.</returns>
         public static RenameItem CreateRenameItem(
@@ -82,6 +83,7 @@ namespace Mfr.Tests.Models.Filters
                 item.MarkTagLibLoadAttempted();
                 item.MarkImagePropertiesLoadAttempted();
                 item.MarkPdfLoadAttempted();
+                item.MarkEpubLoadAttempted();
             }
 
             return item;

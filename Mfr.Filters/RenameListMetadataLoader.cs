@@ -18,6 +18,7 @@ namespace Mfr.Filters
             (RenameListMetadataRequirement.TagLib, static item => item.EnsureTagLibLoaded()),
             (RenameListMetadataRequirement.ImageProperties, static item => item.EnsureImagePropertiesLoaded()),
             (RenameListMetadataRequirement.Pdf, static item => item.EnsurePdfLoaded()),
+            (RenameListMetadataRequirement.Epub, static item => item.EnsureEpubLoaded()),
         ];
 
         /// <summary>
@@ -115,19 +116,37 @@ namespace Mfr.Filters
 
         private static bool _IsMetadataReadFailure(Exception ex)
         {
-            if (ex is InvalidOperationException or IOException or ArgumentException or UnauthorizedAccessException)
+            if (
+                ex
+                is InvalidOperationException
+                    or IOException
+                    or InvalidDataException
+                    or ArgumentException
+                    or UnauthorizedAccessException
+            )
             {
                 return true;
             }
 
-            // TagLib / MetadataExtractor / PdfPig exceptions without taking a Filters package reference on those libraries.
-            var typeName = ex.GetType().Name;
-            return typeName
-                is "UnsupportedFormatException"
-                    or "CorruptFileException"
-                    or "ImageProcessingException"
-                    or "PdfDocumentFormatException"
-                    or "PdfDocumentEncryptedException";
+            // TagLib / MetadataExtractor / PdfPig / VersOne.Epub without a Filters package reference.
+            // Walk bases so VersOne concretes (EpubPackageException, …) match EpubReaderException.
+            for (var type = ex.GetType(); type is not null && type != typeof(object); type = type.BaseType)
+            {
+                if (
+                    type.Name
+                    is "UnsupportedFormatException"
+                        or "CorruptFileException"
+                        or "ImageProcessingException"
+                        or "PdfDocumentFormatException"
+                        or "PdfDocumentEncryptedException"
+                        or "EpubReaderException"
+                )
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

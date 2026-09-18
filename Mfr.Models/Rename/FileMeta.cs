@@ -243,6 +243,17 @@ namespace Mfr.Models.Rename
         public PdfDocumentInfo? Pdf { get; set; }
 
         /// <summary>
+        /// Gets or sets the lazy VersOne.Epub Dublin Core document Info read cache.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>epub-*</c> formatter load.
+        /// Successful opens with missing DC fields store an empty/partial snapshot, not <see langword="null"/>.
+        /// </para>
+        /// </remarks>
+        public EpubDocumentInfo? Epub { get; set; }
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -268,6 +279,7 @@ namespace Mfr.Models.Rename
                 Image = Image,
                 Exif = Exif,
                 Pdf = Pdf,
+                Epub = Epub,
             };
         }
     }

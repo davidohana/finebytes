@@ -71,25 +71,45 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies listing returns TagLib, image, and PDF failures for one row.
+        /// Verifies EPUB load failures use the EPUB-bucket explanation.
         /// </summary>
         [Fact]
-        public void ListLoadErrors_returns_taglib_image_and_pdf_failures()
+        public void DescribeLoadError_uses_epub_bucket_message()
+        {
+            var item = _UnmarkedItem(@"D:\Docs\notes.txt");
+            item.SetEpubLoadError(new InvalidOperationException("Cannot read EPUB Info"));
+
+            var explanation = RenameListMetadataLoadErrors.DescribeUserMessage(
+                item.EpubLoadError!,
+                RenameListMetadataRequirement.Epub
+            );
+
+            Assert.Equal("This file could not be read as EPUB document Info.", explanation);
+        }
+
+        /// <summary>
+        /// Verifies listing returns TagLib, image, PDF, and EPUB failures for one row.
+        /// </summary>
+        [Fact]
+        public void ListLoadErrors_returns_taglib_image_pdf_and_epub_failures()
         {
             var item = _UnmarkedItem(@"D:\Music\PLAYLIST.M3U");
             item.SetTagLibMetadataLoadError(new InvalidOperationException(@"D:\Music\PLAYLIST.M3U (taglib/m3u)"));
             item.SetImagePropertiesLoadError(new InvalidOperationException("Cannot read image properties"));
             item.SetPdfLoadError(new InvalidOperationException("Cannot read PDF Info"));
+            item.SetEpubLoadError(new InvalidOperationException("Cannot read EPUB Info"));
 
             Assert.True(RenameListFieldCatalog.HasAnyLoadError(item));
             var errors = RenameListFieldCatalog.ListLoadErrors(item);
-            Assert.Equal(3, errors.Count);
+            Assert.Equal(4, errors.Count);
             Assert.Equal("This file could not be read as audio or media metadata.", errors[0].UserExplanation);
             Assert.Contains("taglib/m3u", errors[0].TechnicalDetails, StringComparison.Ordinal);
             Assert.Equal("This file could not be read as image or EXIF metadata.", errors[1].UserExplanation);
             Assert.Equal("Cannot read image properties", errors[1].TechnicalDetails);
             Assert.Equal("This file could not be read as PDF document Info.", errors[2].UserExplanation);
             Assert.Equal("Cannot read PDF Info", errors[2].TechnicalDetails);
+            Assert.Equal("This file could not be read as EPUB document Info.", errors[3].UserExplanation);
+            Assert.Equal("Cannot read EPUB Info", errors[3].TechnicalDetails);
         }
 
         /// <summary>
