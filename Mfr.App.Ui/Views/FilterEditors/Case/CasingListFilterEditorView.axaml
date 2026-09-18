@@ -31,8 +31,6 @@
               x:Name="WordsBox"
               Classes="filter-editor-field-wrap"
               MinWidth="240"
-              TextWrapping="NoWrap"
-              ScrollViewer.HorizontalScrollBarVisibility="Auto"
               MaxLength="{x:Static filters:ListEntryLength.DefaultEditorTextMaxLength}"
               PlaceholderText="and or with RMX"
               Text="{Binding WordsText}"
