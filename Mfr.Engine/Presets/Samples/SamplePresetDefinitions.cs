@@ -84,10 +84,7 @@ namespace Mfr.Engine.Presets.Samples
                     _On(
                         new LettersCaseFilter(
                             FileName,
-                            new LettersCaseOptions(
-                                LettersCaseMode.Capitalize,
-                                LettersCaseOptions.DefaultCapitalizeSkipWords
-                            )
+                            new LettersCaseOptions(LettersCaseMode.Capitalize, CapitalizeSkipWords: [])
                         )
                     ),
                     _On(

@@ -189,6 +189,9 @@ namespace Mfr.Tests.Engine
             ];
 
             Assert.Equal(expectedTypes, preset.Chain.Steps.Select(step => step.Filter.Type));
+            var lettersCase = Assert.IsType<LettersCaseFilter>(preset.Chain.Steps[6].Filter);
+            Assert.Equal(LettersCaseMode.Capitalize, lettersCase.Options.Mode);
+            Assert.Empty(lettersCase.Options.CapitalizeSkipWords);
             var casingList = Assert.IsType<CasingListFilter>(preset.Chain.Steps[^1].Filter);
             Assert.Equal(CasingListOptions.DefaultWords, casingList.Options.Words);
             Assert.True(casingList.Options.UppercaseSentenceInitial);

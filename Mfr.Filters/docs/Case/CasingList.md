@@ -11,6 +11,8 @@ Optional **sentence-initial** uppercasing uses [SentenceEndCharacters](SentenceE
     **Load defaults** button replaces the Words box with the curated factory list (`DefaultWords`:
     title-case exceptions, multilingual particles, and common rename/media acronyms). That same
     list is used by the Beautify Names sample preset; it is **not** merged with existing text.
+    That sample uses Letters Case Capitalize with an **empty** skip list so this filter owns the
+    curated exceptions/acronyms.
 - **`uppercaseSentenceInitial`** (bool, default `false` in JSON; add-to-list / title-bar Reset use `true`)
   - If `true`, after list application, uppercases sentence starts with the same boundary rules as
     [LettersCase](LettersCase.md) **SentenceCase** (first letter, scanning past leading non-letters; after
