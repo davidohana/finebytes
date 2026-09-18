@@ -37,6 +37,7 @@
     <KeyBinding Gesture="{x:Static input:AppShortcuts.UndoLast}" Command="{Binding UndoLastCommand}" />
     <KeyBinding Gesture="{x:Static input:AppShortcuts.ShowLog}" Command="{Binding ShowLogCommand}" />
     <KeyBinding Gesture="{x:Static input:AppShortcuts.ShowOptions}" Command="{Binding ShowOptionsCommand}" />
+    <KeyBinding Gesture="{x:Static input:AppShortcuts.ShowHelp}" Command="{Binding ShowHelpCommand}" />
     <KeyBinding Gesture="{x:Static input:AppShortcuts.Refresh}" Command="{Binding RefreshFocusedPaneCommand}" />
     <KeyBinding
       Gesture="{x:Static input:AppShortcuts.GoToAddress}"
@@ -538,7 +539,14 @@
         />
       </MenuItem>
       <MenuItem Header="_Help">
-        <MenuItem Header="About" IsEnabled="False" />
+        <MenuItem
+          Header="_Index"
+          Command="{Binding ShowHelpCommand}"
+          InputGesture="{x:Static input:AppShortcuts.ShowHelp}"
+        />
+        <MenuItem Header="_Tips" Command="{Binding ShowTipsCommand}" />
+        <Separator />
+        <MenuItem Header="_About" Command="{Binding ShowAboutCommand}" />
       </MenuItem>
     </Menu>
 

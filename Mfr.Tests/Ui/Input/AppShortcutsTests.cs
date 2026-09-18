@@ -18,6 +18,7 @@ namespace Mfr.Tests.Ui.Input
             Assert.Equal(new KeyGesture(Key.Z, KeyModifiers.Control), AppShortcuts.UndoLast);
             Assert.Equal(new KeyGesture(Key.L, KeyModifiers.Control | KeyModifiers.Shift), AppShortcuts.ShowLog);
             Assert.Equal(new KeyGesture(Key.OemComma, KeyModifiers.Control), AppShortcuts.ShowOptions);
+            Assert.Equal(new KeyGesture(Key.F1), AppShortcuts.ShowHelp);
             Assert.Equal(new KeyGesture(Key.F4, KeyModifiers.Alt), AppShortcuts.Exit);
             Assert.Equal(new KeyGesture(Key.F5), AppShortcuts.Refresh);
             Assert.Equal(new KeyGesture(Key.L, KeyModifiers.Control), AppShortcuts.GoToAddress);

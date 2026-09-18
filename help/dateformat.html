@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Date and Time Format Strings</title>
+    <link rel="stylesheet" href="help.css" />
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="index.html">Index</a>
+      &gt;
+      <a href="index.html#reference">Reference</a>
+      &gt;
+      <strong>Date and Time Format Strings</strong>
+    </nav>
+    <hr />
+    <h1>Date and Time Format Strings</h1>
+    <p>
+      Date/time format strings convert a date value to text. They are used by tokens such as
+      <a href="filepropsfp.html#file-date"><code class="sig">&lt;file-date&gt;</code></a>,
+      <a href="eximagefp.html#exif-date"><code class="sig">&lt;exif-date&gt;</code></a>, and
+      <a href="generalfp.html#now"><code class="sig">&lt;now&gt;</code></a>. Magic File Renamer uses
+      .NET date/time format patterns (Invariant culture for formatter tokens).
+    </p>
+    <p class="note">
+      Prefer filename-safe custom patterns (for example
+      <code>yyyy-MM-dd_HH-mm-ss</code>). Characters such as <code>:</code> and <code>/</code> are not
+      valid in Windows file names.
+    </p>
+
+    <h2>Standard format specifiers</h2>
+    <p>A single letter selects a culture-defined pattern:</p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Specifier</th>
+          <th>Name</th>
+          <th>Example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>d</code></td>
+          <td>Short date</td>
+          <td>11/29/2004</td>
+        </tr>
+        <tr>
+          <td><code>D</code></td>
+          <td>Long date</td>
+          <td>Monday, November 29, 2004</td>
+        </tr>
+        <tr>
+          <td><code>t</code></td>
+          <td>Short time</td>
+          <td>10:36 AM</td>
+        </tr>
+        <tr>
+          <td><code>T</code></td>
+          <td>Long time</td>
+          <td>10:36:22 AM</td>
+        </tr>
+        <tr>
+          <td><code>f</code></td>
+          <td>Full (short time)</td>
+          <td>Monday, November 29, 2004 10:36 AM</td>
+        </tr>
+        <tr>
+          <td><code>F</code></td>
+          <td>Full (long time)</td>
+          <td>Wednesday, November 24, 2004 2:21:34 PM</td>
+        </tr>
+        <tr>
+          <td><code>g</code></td>
+          <td>General (short time)</td>
+          <td>11/24/2004 2:21 PM</td>
+        </tr>
+        <tr>
+          <td><code>G</code></td>
+          <td>General (long time)</td>
+          <td>11/24/2004 2:21:33 PM</td>
+        </tr>
+        <tr>
+          <td><code>M</code> or <code>m</code></td>
+          <td>Month day</td>
+          <td>November 29</td>
+        </tr>
+        <tr>
+          <td><code>s</code></td>
+          <td>Sortable (ISO 8601)</td>
+          <td>2004-11-24T14:21:34</td>
+        </tr>
+        <tr>
+          <td><code>u</code></td>
+          <td>Universal sortable</td>
+          <td>2004-11-24 14:21:33Z</td>
+        </tr>
+        <tr>
+          <td><code>Y</code> or <code>y</code></td>
+          <td>Year month</td>
+          <td>November, 2004</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Custom format specifiers</h2>
+    <p>Examples below use 8 Nov 2004, 4:22:18 PM:</p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Specifier</th>
+          <th>Description</th>
+          <th>Example</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>d</code> / <code>dd</code></td>
+          <td>Day of month (1–31); <code>dd</code> zero-pads</td>
+          <td>8 / 08</td>
+        </tr>
+        <tr>
+          <td><code>ddd</code> / <code>dddd</code></td>
+          <td>Abbreviated / full weekday name</td>
+          <td>Mon / Monday</td>
+        </tr>
+        <tr>
+          <td><code>M</code> / <code>MM</code></td>
+          <td>Month number; <code>MM</code> zero-pads</td>
+          <td>11 / 11</td>
+        </tr>
+        <tr>
+          <td><code>MMM</code> / <code>MMMM</code></td>
+          <td>Abbreviated / full month name</td>
+          <td>Nov / November</td>
+        </tr>
+        <tr>
+          <td><code>y</code> / <code>yy</code> / <code>yyyy</code></td>
+          <td>Year (1–2 digits, padded 2, or 4)</td>
+          <td>4 / 04 / 2004</td>
+        </tr>
+        <tr>
+          <td><code>h</code> / <code>hh</code></td>
+          <td>Hour 1–12</td>
+          <td>4 / 04</td>
+        </tr>
+        <tr>
+          <td><code>H</code> / <code>HH</code></td>
+          <td>Hour 0–23</td>
+          <td>16 / 16</td>
+        </tr>
+        <tr>
+          <td><code>m</code> / <code>mm</code></td>
+          <td>Minute 0–59</td>
+          <td>22 / 22</td>
+        </tr>
+        <tr>
+          <td><code>s</code> / <code>ss</code></td>
+          <td>Second 0–59</td>
+          <td>18 / 18</td>
+        </tr>
+        <tr>
+          <td><code>t</code> / <code>tt</code></td>
+          <td>A.M./P.M. designator (first char / full)</td>
+          <td>P / PM</td>
+        </tr>
+        <tr>
+          <td><code>f</code>…<code>fffffff</code></td>
+          <td>Fractional seconds (1–7 digits)</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>z</code> / <code>zz</code> / <code>zzz</code></td>
+          <td>Time-zone offset</td>
+          <td>+2 / +02 / +02:00</td>
+        </tr>
+        <tr>
+          <td><code>:</code> / <code>/</code></td>
+          <td>Time / date separators (often unsafe in file names)</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>'…'</code> or <code>"…"</code></td>
+          <td>Quoted literal text</td>
+          <td>—</td>
+        </tr>
+        <tr>
+          <td><code>\c</code></td>
+          <td>Escape next character as literal</td>
+          <td>—</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>

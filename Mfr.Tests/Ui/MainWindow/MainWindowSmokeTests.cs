@@ -67,6 +67,7 @@ namespace Mfr.Tests.Ui.MainWindow
             Assert.Contains(AppShortcuts.UndoLast, gestures);
             Assert.Contains(AppShortcuts.ShowLog, gestures);
             Assert.Contains(AppShortcuts.ShowOptions, gestures);
+            Assert.Contains(AppShortcuts.ShowHelp, gestures);
             Assert.Contains(AppShortcuts.Refresh, gestures);
             Assert.Contains(AppShortcuts.GoToAddress, gestures);
             Assert.Contains(AppShortcuts.GoToAddressAlt, gestures);

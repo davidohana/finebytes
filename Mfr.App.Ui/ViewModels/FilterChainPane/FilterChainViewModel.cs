@@ -20,7 +20,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChainPane
     public sealed partial class FilterChainViewModel : ViewModelBase
     {
         private readonly FilterDefaultsStore _filterDefaults;
-        private readonly FilterHelpHost _filterHelp;
+        private readonly HelpHost _helpHost;
         private readonly List<FilterChainStepViewModel> _selectedSteps = [];
         private Func<IReadOnlyList<RenameListVisibleColumnSpec>>? _captureRenameListColumns;
         private Action<IReadOnlyList<RenameListVisibleColumnSpec>>? _applyRenameListColumns;
@@ -43,18 +43,19 @@ namespace Mfr.App.Ui.ViewModels.FilterChainPane
         /// Named presets store. When null, uses an empty manager that does not read AppData
         /// (production passes <see cref="PresetManager.OpenDefault"/>).
         /// </param>
-        /// <param name="filterHelp">
-        /// Opens per-filter Help HTML. When null, uses a host with default app <c>help/</c> roots.
+        /// <param name="helpHost">
+        /// Opens Help HTML (filter pages via Configuration <c>?</c>). When null, uses a host with
+        /// default app <c>help/</c> roots.
         /// </param>
         public FilterChainViewModel(
             FilterDefaultsStore? filterDefaults = null,
             PresetManager? presetManager = null,
-            FilterHelpHost? filterHelp = null
+            HelpHost? helpHost = null
         )
         {
             _filterDefaults = filterDefaults ?? FilterDefaultsStore.CreateEmpty();
             PresetManager = presetManager ?? PresetManager.CreateEmpty();
-            _filterHelp = filterHelp ?? new FilterHelpHost();
+            _helpHost = helpHost ?? new HelpHost();
             Steps = [];
             Steps.CollectionChanged += _OnStepsCollectionChanged;
         }
@@ -710,7 +711,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChainPane
         /// Opens Help HTML for the sole selected filter type (MFR7 Filter Configuration <c>?</c>).
         /// <para>
         /// Requires exactly one selected step (Help file is <c>{Type}.html</c> by convention).
-        /// Opens via <see cref="FilterHelpHost"/> when the file exists; otherwise raises
+        /// Opens via <see cref="HelpHost"/> when the file exists; otherwise raises
         /// <see cref="FilterHelpMissing"/>.
         /// </para>
         /// </summary>
@@ -722,7 +723,7 @@ namespace Mfr.App.Ui.ViewModels.FilterChainPane
                 return;
             }
 
-            if (_filterHelp.TryOpen(helpFileName, out _))
+            if (_helpHost.TryOpen(helpFileName, out _))
             {
                 return;
             }
