@@ -27,10 +27,10 @@ Parent: [`docs/plans/more-read-only-metadata-formats.plan.md`](docs/plans/more-r
 
 - **Read-only only** — tokens + Rename List columns; no OpenXml write / Apply (deferred per parent).
 - **Library:** `DocumentFormat.OpenXml` on [`Mfr.Metadata/Mfr.Metadata.csproj`](Mfr.Metadata/Mfr.Metadata.csproj) only (forbidden elsewhere via `PackageOwnershipArchitectureTests`, same as PdfPig / VersOne).
-- **Open path (P3):** extension must be `.docx` (case-insensitive); then `WordprocessingDocument.Open(path, isEditable: false)` → map `PackageProperties` → dispose. Do **not** load body parts beyond what Open needs for core props.
+- **Open path:** extension must be `.docx` (case-insensitive); then `WordprocessingDocument.Open(path, isEditable: false)` → map `PackageProperties` → dispose. Do **not** load body parts beyond what Open needs for core props.
 - **DTO:** nullable `FileMeta.Office` / `OfficeDocumentInfo` in `Mfr.Models.Media` (shared name for parent P4).
 - **Author mapping:** DTO + token use **Author**; source is OpenXml `PackageProperties.Creator` (OPC core prop). No separate “creating app” field on PackageProperties.
-- **Dates:** `Created` / `Modified` as `DateTimeOffset?` (from package `DateTime?`, unspecified kind → UTC offset 0 or treat as UTC consistently with PDF map). Formatting = PDF fork: Token = Invariant `DateTimeOffset` `"G"`; Grid = `RenameListFieldDisplay.FormatFileDate(LocalDateTime)`; sort via `RenameListFieldSortCompare.DateTime`.
+- **Dates:** `Created` / `Modified` as `DateTimeOffset?` (from package `DateTime?`). Unspecified kind → UTC offset 0; Local/Utc keep the same instant then normalize to offset 0 (OpenXml often surfaces Zulu core props as Local). Formatting = PDF fork: Token = Invariant `DateTimeOffset` `"G"`; Grid = `RenameListFieldDisplay.FormatFileDate(LocalDateTime)`; sort via `RenameListFieldSortCompare.DateTime`.
 - **Text fields:** `_NormalizeText` copy from PDF/EPUB (`IsBlank` → null; collapse `\r`/`\n` to space; trim).
 - **Bucket flag:** `RenameListMetadataRequirement.Office = 16`; wire `RenameListMetadataBuckets.All`, `RenameItem.MetadataBuckets`, `RenameListMetadataLoader._BucketEnsures`, `ClearMetadataCaches` / `FileMeta.Clone`.
 - **Empty vs error:** successful open + missing field → empty; non-`.docx` / corrupt / OpenXml open failure → PreviewError (tokens) / soft grid message; directory → `InvalidOperationException`.

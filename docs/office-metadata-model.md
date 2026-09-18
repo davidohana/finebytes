@@ -37,8 +37,8 @@ flowchart LR
 1. **Original snapshot.** Tokens read `item.Original.Office` (disk-backed facts), not Preview.
 1. **Readable DOCX only.** Empty tokens apply only after a successful open when a field is missing
    (`null`). Non-`.docx`, corrupt, or OpenXml open failure → PreviewError
-   (`OpenXmlPackageException` / `FileFormatException` family, or IO). Missing PackageProperties on a
-   successful open is an **empty** field, not PreviewError.
+   (`InvalidDataException` for non-`.docx`; `OpenXmlPackageException` / `FileFormatException` family;
+   or IO). Missing PackageProperties on a successful open is an **empty** field, not PreviewError.
 1. **Author from Creator.** DTO + token use **Author**; the OPC source is `PackageProperties.Creator`.
    There is no separate “creating app” field on PackageProperties.
 1. **UTC date normalize.** `Created` / `Modified` are `DateTimeOffset?`. OpenXml often surfaces Zulu
