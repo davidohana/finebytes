@@ -8,7 +8,7 @@
   xmlns:filters="using:Mfr.Filters"
   mc:Ignorable="d"
   d:DesignWidth="420"
-  d:DesignHeight="120"
+  d:DesignHeight="160"
   x:Class="Mfr.App.Ui.Views.FilterEditors.Case.CasingListFilterEditorView"
   x:DataType="vm:CasingListFilterEditorViewModel"
 >
@@ -16,26 +16,28 @@
     <controls:FieldsetGroup Header="Options">
       <StackPanel Spacing="6">
         <StackPanel Spacing="4">
-          <ToolTip.Tip>
-            <controls:RichToolTip>
-              <TextBlock Classes="rich-tip-title" Text="Space-separated words." />
-              <TextBlock
-                Classes="rich-tip-body"
-                Text="Matched words take the exact casing from the list; unknown words are left unchanged."
-              />
-            </controls:RichToolTip>
-          </ToolTip.Tip>
-          <TextBlock Classes="filter-editor-label" Text="Words:" />
-          <TextBox
-            x:Name="WordsBox"
-            Classes="filter-editor-field-wrap"
-            MinWidth="240"
-            TextWrapping="NoWrap"
-            ScrollViewer.HorizontalScrollBarVisibility="Auto"
-            MaxLength="{x:Static filters:ListEntryLength.DefaultEditorTextMaxLength}"
-            PlaceholderText="and or with RMX"
-            Text="{Binding WordsText}"
-          />
+          <StackPanel Spacing="4">
+            <ToolTip.Tip>
+              <controls:RichToolTip>
+                <TextBlock Classes="rich-tip-title" Text="Space-separated words." />
+                <TextBlock
+                  Classes="rich-tip-body"
+                  Text="Matched words take the exact casing from the list; unknown words are left unchanged."
+                />
+              </controls:RichToolTip>
+            </ToolTip.Tip>
+            <TextBlock Classes="filter-editor-label" Text="Words:" />
+            <TextBox
+              x:Name="WordsBox"
+              Classes="filter-editor-field-wrap"
+              MinWidth="240"
+              TextWrapping="NoWrap"
+              ScrollViewer.HorizontalScrollBarVisibility="Auto"
+              MaxLength="{x:Static filters:ListEntryLength.DefaultEditorTextMaxLength}"
+              PlaceholderText="and or with RMX"
+              Text="{Binding WordsText}"
+            />
+          </StackPanel>
           <Button
             x:Name="LoadDefaultsButton"
             Classes="tool-chrome filter-editor-button"

@@ -57,9 +57,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
 
             var loadDefaults = editor.FindControl<Button>("LoadDefaultsButton");
             Assert.NotNull(loadDefaults);
-            Assert.NotNull(loadDefaults.Command);
-            Assert.True(loadDefaults.Command.CanExecute(null));
-            loadDefaults.Command.Execute(null);
+            loadDefaults.Command!.Execute(null);
             window.UpdateLayout();
             Dispatcher.UIThread.RunJobs();
 

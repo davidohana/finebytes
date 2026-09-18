@@ -50,5 +50,32 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
             Assert.Equal(CasingListParser.FormatEditorText(CasingListOptions.DefaultWords), editor.WordsText);
             Assert.Equal(CasingListOptions.DefaultWords, ((CasingListFilter)step.Filter).Options.Words);
         }
+
+        /// <summary>
+        /// Verifies Load defaults commits the factory list without waiting for list-text debounce.
+        /// </summary>
+        [Fact]
+        public void LoadDefaults_AppliesImmediatelyWithLiveDebounceEnabled()
+        {
+            var priorDebounce = FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds;
+            try
+            {
+                FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds = 150;
+
+                var step = new FilterChainStepViewModel("Casing List", new CasingListFilter());
+                var editor = new CasingListFilterEditorViewModel(step);
+                editor.WordsText = "custom";
+                editor.FlushPendingLiveListTextApply();
+                Assert.Equal(["custom"], ((CasingListFilter)step.Filter).Options.Words);
+
+                editor.LoadDefaultsCommand.Execute(null);
+
+                Assert.Equal(CasingListOptions.DefaultWords, ((CasingListFilter)step.Filter).Options.Words);
+            }
+            finally
+            {
+                FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds = priorDebounce;
+            }
+        }
     }
 }

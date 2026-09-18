@@ -35,11 +35,16 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         /// <summary>
         /// Replaces the Words box with the curated factory casing list.
         /// </summary>
+        /// <remarks>
+        /// Flushes pending list-text apply before and after the replace so the factory list is
+        /// committed immediately (button click), not after the live-text debounce.
+        /// </remarks>
         [RelayCommand]
         public void LoadDefaults()
         {
             FlushPendingLiveListTextApply();
             WordsText = CasingListParser.FormatEditorText(CasingListOptions.DefaultWords);
+            FlushPendingLiveListTextApply();
         }
 
         partial void OnWordsTextChanged(string value)
