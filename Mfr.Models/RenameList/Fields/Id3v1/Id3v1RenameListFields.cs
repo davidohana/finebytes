@@ -32,10 +32,7 @@ namespace Mfr.Models.RenameList.Fields.Id3v1
         /// ID3v1 group fields in Apply-To / enum order.
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
-        [
-            .. Enum.GetValues<Id3v1Field>()
-                .Select(static field => new Id3v1RenameListField(field, _DefaultWidth(field))),
-        ];
+        [.. Enum.GetValues<Id3v1Field>().Select(static field => new Id3v1RenameListField(field, _DefaultWidth(field)))];
 
         /// <summary>
         /// Wider default for title / free-text; others stay at 160.

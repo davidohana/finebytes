@@ -145,15 +145,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
                     e => string.Equals(e.CanonicalName, canonicalName, StringComparison.Ordinal)
                 );
                 Assert.Equal(SemanticAudioFieldLabels.For(field), entry.DisplayName);
-                var tip = SemanticAudioFieldTips.For(field);
-                if (tip is not null)
-                {
-                    Assert.Equal(tip, entry.ShortDescription);
-                }
-                else
-                {
-                    Assert.False(string.IsNullOrWhiteSpace(entry.ShortDescription));
-                }
+                Assert.Equal(SemanticAudioFieldTips.For(field), entry.ShortDescription);
             }
         }
 

@@ -83,12 +83,24 @@ namespace Mfr.Tests.Models
             var jpegAuthor = Assert.Single(JpegRenameListFields.All, f => f.PropertyKey == "ExifDirectory*40093");
             var jpegArtist = Assert.Single(JpegRenameListFields.All, f => f.PropertyKey == "ExifDirectory*315");
 
-            Assert.Equal(SemanticAudioFieldTips.Artist, artist.Tip);
-            Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
-            Assert.Equal(SemanticAudioFieldTips.FirstSegment(SemanticAudioField.Performers), firstArtist.Tip);
-            Assert.Equal(SemanticAudioFieldTips.Asin, asin.Tip);
-            Assert.Equal(SemanticAudioFieldTips.Bpm, bpm.Tip);
-            Assert.Null(title.Tip);
+            Assert.Equal(
+                $"{SemanticAudioFieldTips.Artist} ({AudioTagRenameListFields.SemanticTipQualifier})",
+                artist.Tip
+            );
+            Assert.Equal(
+                $"{SemanticAudioFieldTips.AlbumArtist} ({AudioTagRenameListFields.SemanticTipQualifier})",
+                albumArtist.Tip
+            );
+            Assert.Equal(
+                $"{SemanticAudioFieldTips.FirstSegment(SemanticAudioField.Performers)} ({AudioTagRenameListFields.SemanticTipQualifier})",
+                firstArtist.Tip
+            );
+            Assert.Equal($"{SemanticAudioFieldTips.Asin} ({AudioTagRenameListFields.SemanticTipQualifier})", asin.Tip);
+            Assert.Equal($"{SemanticAudioFieldTips.Bpm} ({AudioTagRenameListFields.SemanticTipQualifier})", bpm.Tip);
+            Assert.Equal(
+                $"{SemanticAudioFieldTips.Title} ({AudioTagRenameListFields.SemanticTipQualifier})",
+                title.Tip
+            );
             Assert.Equal(PathFieldTips.ParentDirectory, parentDirectory.Tip);
             Assert.Equal(MpegRenameListFieldTips.Copyright, mpegCopyright.Tip);
             Assert.Equal(JpegRenameListFieldTips.Author, jpegAuthor.Tip);
@@ -735,7 +747,7 @@ namespace Mfr.Tests.Models
                 Assert.True(field.SupportsPreview, field.PropertyKey);
                 Assert.True(field.SupportsWrite, field.PropertyKey);
                 Assert.Equal($"{expected} (ID3v1)", field.DisplayName);
-                Assert.Equal($"{Id3v1RenameListFields.GroupLabel}: {expected}.", field.Tip);
+                Assert.Equal($"{Id3v1FieldTips.For(expected)} ({Id3v1RenameListFields.GroupLabel})", field.Tip);
                 var target = Assert.IsType<Id3v1FieldTarget>(field.WriteTarget);
                 Assert.Equal(expected, target.Field);
             }
@@ -838,11 +850,7 @@ namespace Mfr.Tests.Models
                 Assert.True(field.SupportsPreview, field.PropertyKey);
                 Assert.True(field.SupportsWrite, field.PropertyKey);
                 Assert.Equal($"{XiphKeyLabels.For(expectedKey)} (Xiph)", field.DisplayName);
-                var detail = XiphKeyLabels.Tip(expectedKey);
-                var expectedTip = detail is null
-                    ? $"{XiphRenameListFields.GroupLabel}: {expectedKey}."
-                    : $"{detail} ({XiphRenameListFields.GroupLabel})";
-                Assert.Equal(expectedTip, field.Tip);
+                Assert.Equal($"{XiphKeyLabels.Tip(expectedKey)} ({XiphRenameListFields.GroupLabel})", field.Tip);
                 var target = Assert.IsType<XiphFieldTarget>(field.WriteTarget);
                 Assert.Equal(expectedKey, target.Key);
             }
@@ -941,7 +949,7 @@ namespace Mfr.Tests.Models
             Assert.False(fields[0].SupportsWrite);
             Assert.Null(fields[0].WriteTarget);
             Assert.Equal("Version (ID3v2)", fields[0].DisplayName);
-            Assert.Equal($"{Id3v2RenameListFields.GroupLabel}: tag version (e.g. 2.3 / 2.4).", fields[0].Tip);
+            Assert.Equal($"{Id3v2FrameTips.Version} ({Id3v2RenameListFields.GroupLabel})", fields[0].Tip);
 
             var frameFields = fields.Skip(1).ToList();
             Assert.Equal(Id3v2ModeledFrame.AllModeledFrameIds.Count, frameFields.Count);
@@ -952,7 +960,10 @@ namespace Mfr.Tests.Models
                 Assert.True(field.SupportsPreview, field.PropertyKey);
                 Assert.True(field.SupportsWrite, field.PropertyKey);
                 Assert.Equal(Id3v2FrameLabels.For(field.PropertyKey), field.DisplayName);
-                Assert.Equal($"{Id3v2RenameListFields.GroupLabel}: {field.PropertyKey}.", field.Tip);
+                Assert.Equal(
+                    $"{Id3v2FrameTips.For(field.PropertyKey)} ({Id3v2RenameListFields.GroupLabel})",
+                    field.Tip
+                );
                 var target = Assert.IsType<Id3v2FrameTarget>(field.WriteTarget);
                 Assert.Equal(field.PropertyKey, target.FrameId);
                 Assert.Null(target.Language);

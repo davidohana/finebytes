@@ -51,7 +51,7 @@ namespace Mfr.Models.RenameList.Fields.Id3v2
             defaultWidth,
             supportsPreview: true,
             writeTarget: new Id3v2FrameTarget(frameId),
-            tip: $"{Id3v2RenameListFields.GroupLabel}: {frameId}."
+            tip: $"{Id3v2FrameTips.For(frameId)} ({Id3v2RenameListFields.GroupLabel})"
         )
     {
         /// <summary>
@@ -74,7 +74,7 @@ namespace Mfr.Models.RenameList.Fields.Id3v2
             Id3v2RenameListFields.Key.Version,
             "Version (ID3v2)",
             defaultWidth: 80,
-            tip: $"{Id3v2RenameListFields.GroupLabel}: tag version (e.g. 2.3 / 2.4)."
+            tip: $"{Id3v2FrameTips.Version} ({Id3v2RenameListFields.GroupLabel})"
         )
     {
         /// <inheritdoc />

@@ -36,16 +36,11 @@ namespace Mfr.Models.RenameList.Fields.Xiph
         }
 
         /// <summary>
-        /// Builds a column tooltip that always names the Xiph block (and keeps Apply-To tips when set).
+        /// Builds a column tooltip that always names the Xiph block after the field-specific tip.
         /// </summary>
         private static string _Tip(string key)
         {
-            var detail = XiphKeyLabels.Tip(key);
-            if (detail is null)
-            {
-                return $"{XiphRenameListFields.GroupLabel}: {key}.";
-            }
-
+            var detail = XiphKeyLabels.Tip(key) ?? $"Xiph comment key {key}.";
             return $"{detail} ({XiphRenameListFields.GroupLabel})";
         }
     }

@@ -21,7 +21,7 @@ namespace Mfr.Models.RenameList.Fields.Id3v1
             supportsPreview: true,
             RenameListMetadataRequirement.TagLib,
             writeTarget: new Id3v1FieldTarget(field),
-            tip: $"{Id3v1RenameListFields.GroupLabel}: {field}."
+            tip: $"{Id3v1FieldTips.For(field)} ({Id3v1RenameListFields.GroupLabel})"
         )
     {
         /// <summary>

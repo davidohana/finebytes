@@ -8,24 +8,19 @@ namespace Mfr.Tests.Models.Tags
     public sealed class SemanticAudioFieldTipsTests
     {
         /// <summary>
-        /// Verifies only ambiguous labels (multi-value, role, or abbreviation) return tips.
+        /// Verifies every semantic field has a non-empty tip.
         /// </summary>
         [Fact]
-        public void For_returns_tips_only_for_non_trivial_fields()
+        public void For_returns_a_tip_for_every_semantic_field()
         {
-            Assert.Equal(SemanticAudioFieldTips.Artist, SemanticAudioFieldTips.For(SemanticAudioField.Performers));
-            Assert.Equal(
-                SemanticAudioFieldTips.AlbumArtist,
-                SemanticAudioFieldTips.For(SemanticAudioField.AlbumArtists)
-            );
-            Assert.Equal(SemanticAudioFieldTips.Composer, SemanticAudioFieldTips.For(SemanticAudioField.Composers));
-            Assert.Equal(SemanticAudioFieldTips.Genre, SemanticAudioFieldTips.For(SemanticAudioField.Genre));
-            Assert.Equal(SemanticAudioFieldTips.Asin, SemanticAudioFieldTips.For(SemanticAudioField.AmazonId));
-            Assert.Equal(SemanticAudioFieldTips.Bpm, SemanticAudioFieldTips.For(SemanticAudioField.BeatsPerMinute));
+            foreach (var field in Enum.GetValues<SemanticAudioField>())
+            {
+                Assert.False(string.IsNullOrWhiteSpace(SemanticAudioFieldTips.For(field)), field.ToString());
+            }
 
-            Assert.Null(SemanticAudioFieldTips.For(SemanticAudioField.Title));
-            Assert.Null(SemanticAudioFieldTips.For(SemanticAudioField.Year));
-            Assert.Null(SemanticAudioFieldTips.For(SemanticAudioField.MusicBrainzArtistId));
+            Assert.Equal(SemanticAudioFieldTips.Title, SemanticAudioFieldTips.For(SemanticAudioField.Title));
+            Assert.Equal(SemanticAudioFieldTips.Artist, SemanticAudioFieldTips.For(SemanticAudioField.Performers));
+            Assert.Equal(SemanticAudioFieldTips.Asin, SemanticAudioFieldTips.For(SemanticAudioField.AmazonId));
         }
 
         /// <summary>
