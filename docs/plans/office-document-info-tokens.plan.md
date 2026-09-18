@@ -7,7 +7,7 @@ todos:
     status: done
   - id: p2-tokens
     content: "P2: office-* tokens + Rename List Office fields/catalog"
-    status: pending
+    status: done
   - id: p3-docs
     content: "P3: office-metadata-model.md + help/credits + parent P3 mark"
     status: pending
@@ -20,7 +20,7 @@ Parent: [`docs/plans/more-read-only-metadata-formats.plan.md`](docs/plans/more-r
 ## Status
 
 - [x] P1 — Reader + FileMeta bucket
-- [ ] P2 — Tokens + Rename List columns
+- [x] P2 — Tokens + Rename List columns
 - [ ] P3 — Docs + help
 
 ## Decisions (locked)

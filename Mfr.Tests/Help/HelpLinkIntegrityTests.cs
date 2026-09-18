@@ -3,6 +3,7 @@ using Mfr.Filters;
 using Mfr.Filters.Formatting.FormatString;
 using Mfr.Models.RenameList.Fields.AudioTag;
 using Mfr.Models.RenameList.Fields.Basic;
+using Mfr.Models.RenameList.Fields.Epub;
 using Mfr.Models.RenameList.Fields.Extended;
 using Mfr.Models.RenameList.Fields.Id3v1;
 using Mfr.Models.RenameList.Fields.Id3v2;
@@ -10,6 +11,7 @@ using Mfr.Models.RenameList.Fields.Image;
 using Mfr.Models.RenameList.Fields.Jpeg;
 using Mfr.Models.RenameList.Fields.Media;
 using Mfr.Models.RenameList.Fields.Mp3;
+using Mfr.Models.RenameList.Fields.Office;
 using Mfr.Models.RenameList.Fields.Pdf;
 using Mfr.Models.RenameList.Fields.Xiph;
 
@@ -47,6 +49,8 @@ namespace Mfr.Tests.Help
             ImageRenameListFields.Group,
             JpegRenameListFields.Group,
             PdfRenameListFields.Group,
+            EpubRenameListFields.Group,
+            OfficeRenameListFields.Group,
         };
 
         /// <summary>
