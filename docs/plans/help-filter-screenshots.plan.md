@@ -15,14 +15,14 @@ todos:
     content: "Capture list/formatter/audio editors with light illustrative defaults"
     status: completed
   - id: ship-assets
-    content: "Write PNGs under help/images/, fix img width/height, tick SCREENSHOTS.md"
+    content: "Write PNGs under help/images/, fix img width/height"
     status: completed
 isProject: false
 ---
 
 # Help filter screenshots — capture plan
 
-Parent: optional assets called out in [`help/SCREENSHOTS.md`](../../help/SCREENSHOTS.md) and [`docs/plans/in-app-help-about.plan.md`](in-app-help-about.plan.md). HTML already ships `<img>` tags; `help/images/` has only `.gitkeep`.
+Parent: optional assets called out in [`CONTRIBUTING.md`](../../CONTRIBUTING.md) (Help screenshots) and [`docs/plans/in-app-help-about.plan.md`](in-app-help-about.plan.md). HTML already ships `<img>` tags; `help/images/` has only `.gitkeep`.
 
 ## Decisions (locked)
 
@@ -41,7 +41,7 @@ Only filter option shots are requested today. UI/guide pages do not reference im
 
 ## What each shot is
 
-Per [`SCREENSHOTS.md`](../../help/SCREENSHOTS.md):
+Per [`CONTRIBUTING.md`](../../CONTRIBUTING.md) (Help screenshots):
 
 1. Run UI → add filter → select it so **Filter Configuration** shows its type-specific editor.
 1. Capture the **options body** (preferred) or the full Filter Configuration pane.
@@ -187,7 +187,7 @@ These help pages say “This filter has no options” but still reference a PNG.
 1. Screenshot → crop to framing choice → save `help/images/{Type}.png`.
 1. Spot-check HTML in a browser (or open help file) that the figure no longer shows checkerboard.
 1. Adjust each page’s `width` / `height` attributes to the real pixel size (or drop fixed height and rely on CSS `max-width`).
-1. Check off rows in [`help/SCREENSHOTS.md`](../../help/SCREENSHOTS.md); remove optionless rows if we drop figures.
+1. Drop optionless figures if that policy is chosen; recapture notes live in [`CONTRIBUTING.md`](../../CONTRIBUTING.md).
 
 No automation harness yet (no headless “export editor to PNG” API). Manual/computer-use capture is the planned method; a later optional follow-up could script Avalonia Headless render of each editor view alone if we want regression-friendly assets.
 
@@ -202,5 +202,5 @@ No automation harness yet (no headless “export editor to PNG” API). Manual/c
 
 - Every remaining `<img>` under `help/filters/` resolves to a real PNG (no checkerboard).
 - Optionless policy applied consistently (no empty meaningless images unless you chose option 2).
-- `SCREENSHOTS.md` checklist matches shipped files.
+- Filter help `<img>` paths match shipped PNGs under `help/images/`.
 - `just lint` / help link tests still green (no HTML path breaks).

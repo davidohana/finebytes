@@ -12,14 +12,14 @@ todos:
     content: "P2: tutorial/howto step shots (optional)"
     status: completed
   - id: wire-html
-    content: "Add <figure> refs + expand help/SCREENSHOTS.md (or split ui checklist)"
+    content: "Add <figure> refs + document UI capture in CONTRIBUTING.md"
     status: completed
 isProject: false
 ---
 
 # Help non-filter screenshots — inventory
 
-Filter option bodies are done (`help/images/{Type}.png`, [`help/SCREENSHOTS.md`](../../help/SCREENSHOTS.md)).
+Filter option bodies are done (`help/images/{Type}.png`; capture notes in [`CONTRIBUTING.md`](../../CONTRIBUTING.md)).
 No other help pages currently reference images. This list is what still **should** get shots for MFR7-parity shell help.
 
 ## Naming
@@ -98,7 +98,7 @@ For each P0/P1 page, add one `<figure class="screenshot">` under the H1 (same pa
 </figure>
 ```
 
-Extend [`help/SCREENSHOTS.md`](../../help/SCREENSHOTS.md) with a **UI / dialogs** checklist section (or split `help/SCREENSHOTS-UI.md` if the filter list should stay filter-only).
+Document UI / dialog capture under [`CONTRIBUTING.md`](../../CONTRIBUTING.md) (Help screenshots).
 
 ## Capture approach
 

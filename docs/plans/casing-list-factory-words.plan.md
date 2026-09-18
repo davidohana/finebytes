@@ -50,7 +50,7 @@ Do **not** change Filter Configuration title-bar ↺ / 📌 behavior.
 
 - [`Mfr.Filters/docs/Case/CasingList.md`](../../Mfr.Filters/docs/Case/CasingList.md) — note Load defaults + that the curated list is shared with the sample preset.
 - [`help/filters/case/CasingList.html`](../../help/filters/case/CasingList.html) — document the button under Options; keep short examples as-is.
-- Recapture [`help/images/CasingList.png`](../../help/images/CasingList.png) if layout height changes (see `help/SCREENSHOTS.md` / existing capture test hook).
+- Recapture [`help/images/CasingList.png`](../../help/images/CasingList.png) if layout height changes (`just capture-help-filters`; see [`CONTRIBUTING.md`](../../CONTRIBUTING.md)).
 
 ## Tests
 

@@ -2,7 +2,7 @@
 
 ## What to know
 
-- Use `just` for common tasks: `restore`, `build`, `test`, `format`, `lint`, `run-ui`, `capture-help` (help PNGs; see `help/SCREENSHOTS.md`).
+- Use `just` for common tasks: `restore`, `build`, `test`, `format`, `lint`, `run-ui`, `capture-help` (help PNGs; see `CONTRIBUTING.md`).
 - Before committing, run `just format` then `just lint` (or `just build` after format if you only need compile/analyzer checks).
 - Markdown tools need a local `.venv` once: `python -m venv .venv` and `pip install -r requirements-md.txt` (see `CONTRIBUTING.md`).
 - Formatting: CSharpier for `.cs` / `.csproj` / `.axaml` / `.slnx` layout; `dotnet format style` / `analyzers` for non-whitespace rules; mdformat (+ gfm, frontmatter) for `.md` (via `just format-md`, also part of `just format`).

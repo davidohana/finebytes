@@ -15,7 +15,7 @@ If you have `just` installed, you can use shortcuts for the most common workflow
 - `just lint-md`
 - `just run-help`
 - `just run-ui`
-- `just capture-help` / `just capture-help-filters` / `just capture-help-ui` (regenerate help PNGs; see `help/SCREENSHOTS.md`)
+- `just capture-help` / `just capture-help-filters` / `just capture-help-ui` (regenerate help PNGs; see [Help screenshots](#help-screenshots))
 
 ## Prerequisites
 
@@ -97,3 +97,13 @@ just lint
 - Lint: [pymarkdownlnt](https://github.com/jackdewinter/pymarkdown) (`pymarkdown.toml`); `mdformat --check` (includes table alignment)
 - File set: tracked + untracked `.md` via `git ls-files` in the `justfile`; skips `.cursor/**` and gitignored paths
 - Shortcuts: `just format-md` / `just lint-md` (also run from `just format` / `just lint`)
+
+## Help screenshots
+
+Regenerate PNGs with `just capture-help` (or `capture-help-filters` / `capture-help-ui`). The capture tests seed sample files and a short Filter Chain so panes look live.
+
+- Filter option bodies (no title bar) → `help/images/{Type}.png` (catalog type name, e.g. `SpaceCharacter.png`). Optionless filters (`RemoveSpaces`, `ShrinkSpaces`, `SeparateCapitalizedText`, `StripSpacesLeft`, `StripSpacesRight`, `UppercaseInitials`) have **no** figure.
+- UI / dialogs → `help/images/ui/`; guide → `help/images/guide/`.
+- `just capture-help-ui` also runs `just annotate-help-hotspots` (redraws `images/ui/hotspots.png` and percentage boxes in `help/ui/parts.html`) and `just sync-help-img-dims` (`<img width/height>` from on-disk PNG sizes). Pillow once: `.venv/bin/pip install -r help/tools/requirements.txt` (or `.venv\Scripts\pip` on Windows).
+- Prefer PNG; help CSS uses `max-width: 640px` with `height: auto` (`screenshot-wide` for full-window). Missing images show a checkerboard placeholder.
+- Keep capture notes out of shipped HTML. `Mfr.App.Ui.csproj` copies `help/` beside the exe but skips `help/tools/`.

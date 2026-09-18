@@ -26,7 +26,7 @@ Filter editor:
 - [ ] 5. Add matching View under Views/FilterEditors/<Group>/
 - [ ] 6. Register in FilterOptionsEditorFactory
 - [ ] 7. Dedicated VM + headless tests under Ui/FilterEditors/<Group>/ (each filter type in the group)
-- [ ] 8. If options/labels changed, refresh that filter’s `help/filters/…` page (conventions: `mfr-implement-filter` User Help HTML — do not restate)
+- [ ] 8. If options/labels changed, refresh that filter’s `help/filters/…` page (conventions: `mfr-implement-filter` User Help HTML — do not restate) and recapture with `just capture-help-filters` when the options body layout changed
 - [ ] 9. Format/lint touched files
 ```
 
