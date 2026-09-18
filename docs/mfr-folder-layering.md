@@ -54,9 +54,9 @@ Inside [`Mfr.App.Ui/`](../Mfr.App.Ui), keep dependencies one-way:
 
 `Views → ViewModels → Services`
 
-- **ViewModels** use Engine + Filters + Models (+ Utils as needed) for orchestration (Rename List, Filter Chain, Options, presets).
+- **ViewModels** use Engine + Filters + Models (+ Utils as needed) for orchestration (Rename List, Filter Chain, Options, presets). ViewModels must not import Views (guarded by `UiViewModelsLayerArchitectureTests`).
 - **Services** may use Engine.Config / Models (session DTOs, File List options) and must **not** import Filters or Metadata. Services must not import ViewModels or Views (guarded by `UiServicesLayerArchitectureTests`).
-- **Views** must not import ViewModels types for ownership (ViewModels↛Views guarded by `UiViewModelsLayerArchitectureTests`). Supporting folders (`Diagnostics`, `Input`, `Converters`, `Threading`) are not separate layers.
+- **Views** bind ViewModels and may call Services for thin platform / session glue (see table below). Supporting folders (`Diagnostics`, `Input`, `Converters`, `Threading`) are not separate layers.
 
 Do not import `ViewModels` (or Views) from `Services`. Session restore/save passes Models session DTOs (`FileListPrefs`, `RenameListPrefs`) across that boundary; apply/capture lives on the pane view models.
 
@@ -70,7 +70,9 @@ Current code-behind / AXAML consumers (verify with `using Mfr.App.Ui.Services` u
 | ------------------------------------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------- |
 | `Views/MainWindow/MainWindow`              | `Services.Session` (`MainWindowPaneGrids`)            | Session splitter restore/capture needs named pane grids from the window           |
 | `Views/MainWindow/MainWindow`              | `Services.Help` (`HelpHost`)                          | Missing-help dialog text lists the app-local `help/` folder                       |
+| Resizable dialogs under `Views/`           | `Services.Session` (`DialogSession.Attach`)           | Remembered dialog geometry needs the window as visual root                        |
 | `PathMoverFilterEditorView`                | `Services.FolderPicker`                               | Folder picker needs a visual root; VM gets an injected async delegate             |
+| `RenameListView`                           | `Services.FileSavePicker`                             | Export save dialog needs a visual root; VM gets an injected async delegate        |
 | `FileListView`                             | `Services.RenameList` (`RenameListAddSourceResolver`) | DnD / Add-Selected path validation shared with Rename List add                    |
 | `FileListAddressBarView` (+ AXAML `xmlns`) | `Services.FileList` (`PathBreadcrumbSegment`)         | Breadcrumb overflow UI binds the same segment type as the File List service model |
 
