@@ -47,14 +47,14 @@ Mfr.App.Ui.exe D:\batch\a.jpg D:\batch\b.jpg --initial-folder D:\batch
 
 **Yes — thin GUI startup API**, separate from console rename automation. Useful for drag-to-icon, shortcuts, and future Explorer “Rename with MFR…” ([docs/debts.md](../debts.md)).
 
-Current docs mark this as “not in this build”: [help/guide/console.html](../../help/guide/console.html), [help/intro/migrations.html](../../help/intro/migrations.html), [help/intro/whatsnew.html](../../help/intro/whatsnew.html). UI entry today passes argv through Avalonia with no product parsing ([Mfr.App.Ui/Program.cs](../../Mfr.App.Ui/Program.cs)).
+Shipped: thin UI argv parse ([`UiStartupArgsParser`](../../Mfr.App.Ui/UiStartupArgsParser.cs)) + apply after main window ([`UiStartupArgsApplier`](../../Mfr.App.Ui/UiStartupArgsApplier.cs)); help covers desktop vs console ([help/guide/cml.html](../../help/guide/cml.html)).
 
 ```mermaid
 flowchart LR
   subgraph gui [Desktop UI]
     Sources["positional SOURCES"]
     InitFolder["--initial-folder"]
-    Add[Rename List AddPaths]
+    Add[Rename List AddSources]
     Browse[File List Navigate]
     Sources --> Add
     InitFolder --> Browse
@@ -73,7 +73,7 @@ flowchart LR
 
 - Help: `C:\Program Files\FineBytes\MFR7\Help\cml.html` (GUI CML; console is separate)
 - Code: `D:\Devl\mfr7\Core\MFRGui\Forms\Main\Main.cs` (`ProcessCML`), `D:\Devl\mfr7\Core\MFR\Program.cs`
-- finebytes status: not implemented; help documents gap
+- finebytes status: implemented (P1–P3); desktop uses console-style long options + `--initial-folder`
 
 ### Behavior
 
@@ -110,6 +110,30 @@ flowchart LR
 
 - Parse in UI startup (not CLI project): thin argv reader next to [Mfr.App.Ui/Program.cs](../../Mfr.App.Ui/Program.cs) / app init after main window + VMs exist
 - Prefer sharing option name/semantics with [Mfr.App.Cli/CliArgParser.cs](../../Mfr.App.Cli/CliArgParser.cs) (`--files`, `--folders`, `-r`, `--include-hidden`); do not require Spectre on the UI
-- Feed sources into Rename List add (`RenameListViewModel` / `RenameListAddSourceResolver`); call `FileListViewModel.NavigateTo` for `--initial-folder` (or first-added locate when browse unset)
+- Feed sources into Rename List add (`RenameListViewModel` / raw engine sources for wildcards like console); call `FileListViewModel.NavigateTo` / `TryLocatePath` for `--initial-folder` (or first-added locate when browse unset)
 - Tests: sources-only add; `--initial-folder` only; both combined; modifier overrides vs prefs; invalid paths
 - Help: update `cml.html` / `console.html` / migrations / whatsnew for desktop vs console
+
+## Phases
+
+### P1 — UiStartupArgs parser
+
+- Add a thin argv parser under `Mfr.App.Ui` (no Spectre): positional sources, `--initial-folder`, `--files` / `--folders` yes|no, `-r`/`--recursive`, `--include-hidden`.
+- Omitted add modifiers stay unset so apply can fall back to Options prefs; reject unknown flags / bad yes|no.
+- Unit tests for parse shapes (sources-only, folder-only, modifiers, errors).
+- Exit: parser + tests green; no App/VM wiring yet.
+- Status: done
+
+### P2 — Apply after main window
+
+- After `MainWindow` + VMs exist, apply parsed intents: seed Rename List from sources (engine `AddSources` path, including wildcards; optional policy overrides), navigate/locate File List for `--initial-folder` or first-added item when browse unset.
+- Wire from `App` / desktop args; soft-handle apply failures so the UI still opens.
+- Tests: sources-only; `--initial-folder` only; both; modifier overrides vs prefs; invalid paths.
+- Exit: startup apply + tests green.
+- Status: done
+
+### P3 — Help docs
+
+- Update `help/guide/cml.html`, `help/guide/console.html`, `help/intro/migrations.html`, `help/intro/whatsnew.html` for desktop seed/browse vs console rename.
+- Exit: help no longer says desktop CML is “not in this build”; documents `--initial-folder` and add modifiers.
+- Status: done

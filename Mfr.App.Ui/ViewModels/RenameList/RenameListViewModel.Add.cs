@@ -69,20 +69,89 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
+        /// Adds raw engine sources (paths or wildcards) for desktop startup seeding.
+        /// </summary>
+        /// <param name="sources">Positional source paths or wildcards (same shape as console <c>SOURCES</c>).</param>
+        /// <param name="includeFiles">
+        /// Add-files override; <see langword="null"/> uses Options <see cref="ConfigStore.Options"/> AddMode.
+        /// </param>
+        /// <param name="includeFolders">
+        /// Add-folders override; <see langword="null"/> uses Options AddMode.
+        /// </param>
+        /// <param name="includeSubdirs">
+        /// Recursive add override; <see langword="null"/> uses Options AddFolderContents.
+        /// </param>
+        /// <param name="includeHidden">
+        /// Include-hidden override; <see langword="null"/> uses Options IncludeHidden.
+        /// </param>
+        /// <returns>Full path of the first added item, or <see langword="null"/> when nothing was added.</returns>
+        /// <remarks>
+        /// <para>
+        /// Does not apply File List exclude masks (console-shaped argv seeding). Interactive Add Selected /
+        /// Add Paths still honor exclude masks when enabled.
+        /// </para>
+        /// </remarks>
+        internal async Task<string?> AddStartupSourcesAsync(
+            IReadOnlyList<string> sources,
+            bool? includeFiles = null,
+            bool? includeFolders = null,
+            bool? includeSubdirs = null,
+            bool? includeHidden = null
+        )
+        {
+            ArgumentNullException.ThrowIfNull(sources);
+
+            return await _AddSourcesAsync(
+                    sources,
+                    includeFilesOverride: includeFiles,
+                    includeFoldersOverride: includeFolders,
+                    includeSubdirsOverride: includeSubdirs,
+                    includeHiddenOverride: includeHidden,
+                    applyFileListExcludeMasks: false
+                )
+                .ConfigureAwait(true);
+        }
+
+        /// <summary>
         /// Resolves sources into the engine, then mirrors a successful insert into <see cref="Entries"/>.
         /// </summary>
-        private async Task _AddSourcesAsync(IReadOnlyList<string> sources)
+        /// <param name="sources">Engine add sources (paths, folder+mask, or wildcards).</param>
+        /// <param name="includeFilesOverride">
+        /// Optional files include; <see langword="null"/> uses Options AddMode.
+        /// </param>
+        /// <param name="includeFoldersOverride">
+        /// Optional folders include; <see langword="null"/> uses Options AddMode.
+        /// </param>
+        /// <param name="includeSubdirsOverride">
+        /// Optional recursive flag; <see langword="null"/> uses Options AddFolderContents.
+        /// </param>
+        /// <param name="includeHiddenOverride">
+        /// Optional hidden include; <see langword="null"/> uses Options IncludeHidden.
+        /// </param>
+        /// <param name="applyFileListExcludeMasks">
+        /// When <see langword="true"/>, uses File List exclude masks if enabled; when
+        /// <see langword="false"/>, never excludes (startup / console-shaped seeding).
+        /// </param>
+        /// <returns>Full path of the first added item, or <see langword="null"/> when nothing was added.</returns>
+        private async Task<string?> _AddSourcesAsync(
+            IReadOnlyList<string> sources,
+            bool? includeFilesOverride = null,
+            bool? includeFoldersOverride = null,
+            bool? includeSubdirsOverride = null,
+            bool? includeHiddenOverride = null,
+            bool applyFileListExcludeMasks = true
+        )
         {
             if (IsBusy)
             {
                 LastStatusMessage = StatusBarText.Warning("Rename List is busy.");
-                return;
+                return null;
             }
 
             if (sources.Count == 0)
             {
                 LastStatusMessage = StatusBarText.Warning("No items were added.");
-                return;
+                return null;
             }
 
             var autoSort = IsAutoSort;
@@ -93,9 +162,14 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             var oldCount = _renameList.RenameItems.Count;
 
             var addMode = _AddMode();
-            var addFolderContents = _AddFolderContents();
-            var includeHidden = _IncludeHidden();
-            var excludeMasks = _fileListViewModel.ExcludeMasksEnabled ? _fileListViewModel.ExcludeMasks : null;
+            var includeFiles = includeFilesOverride ?? addMode.IncludesFiles();
+            var includeFolders = includeFoldersOverride ?? addMode.IncludesFolders();
+            var includeSubdirs = includeSubdirsOverride ?? _AddFolderContents();
+            var includeHidden = includeHiddenOverride ?? _IncludeHidden();
+            var excludeMasks =
+                applyFileListExcludeMasks && _fileListViewModel.ExcludeMasksEnabled
+                    ? _fileListViewModel.ExcludeMasks
+                    : null;
             var metadataRequirement = _CurrentMetadataRequirement();
             var addSummary = new RenameListAddSummary(0);
             void OnAddCanceled()
@@ -112,9 +186,9 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                         (token, progress) =>
                             addSummary = _renameList.AddSources(
                                 sources: sources,
-                                includeFiles: addMode.IncludesFiles(),
-                                includeFolders: addMode.IncludesFolders(),
-                                includeSubdirs: addFolderContents,
+                                includeFiles: includeFiles,
+                                includeFolders: includeFolders,
+                                includeSubdirs: includeSubdirs,
                                 includeHidden: includeHidden,
                                 excludeMasks: excludeMasks,
                                 cancellationToken: token,
@@ -131,22 +205,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 LastStatusMessage = StatusBarText.Error(ex.Message);
                 Log.Error(ex, "Unexpected failure while adding rename sources.");
                 OnAddCanceled();
-                return;
+                return null;
             }
 
             if (!completed)
             {
-                return;
+                return null;
             }
 
             _SyncEntriesAfterAdd(insertAt, oldCount);
+            var addedCount = _renameList.RenameItems.Count - oldCount;
+            string? firstAddedPath = null;
+            if (addedCount > 0)
+            {
+                firstAddedPath = Entries[insertAt].FullPath;
+            }
+
             if (autoSort)
             {
                 _renameList.Sort(_sortKeys);
                 _SyncEntriesToEngineOrder();
             }
 
-            var addedCount = _renameList.RenameItems.Count - oldCount;
             if (selectFirstAdded && addedCount > 0)
             {
                 SetSelectedEntries([Entries[insertAt]]);
@@ -162,6 +242,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 sourceCount: sources.Count
             );
             _NotifyListChangedAfterAdd(oldCount);
+
+            return firstAddedPath;
         }
 
         /// <summary>
