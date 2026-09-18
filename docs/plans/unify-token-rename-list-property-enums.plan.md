@@ -119,6 +119,7 @@ No new MFR7 crawl required.
 
 ### P2 — PDF: same pattern
 
+- **Status:** done (reviewed)
 - **Scope / files:** Same as P1 for `PdfDocumentField` /
   `PdfDocumentInfoFormatting`; delete `PdfRenameListProperty` and Filters-local
   duplicate; keep Author/Creator/Producer tips and sort rules; context branches

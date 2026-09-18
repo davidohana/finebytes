@@ -1,6 +1,7 @@
 using System.Globalization;
 using Mfr.Filters.Formatting;
 using Mfr.Filters.Formatting.Tokens.Pdf;
+using Mfr.Models.RenameList.Fields.Pdf;
 
 namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Pdf
 {
@@ -46,6 +47,27 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Pdf
                 sample.Modified!.Value.ToString("G", CultureInfo.InvariantCulture),
                 new PdfModifiedToken().Compile(string.Empty)(item)
             );
+        }
+
+        [Fact]
+        public void Format_Created_TokenUsesInvariantDateTimeOffset_GridUsesFormatFileDateLocal()
+        {
+            var sample = _SamplePdf();
+            var created = sample.Created!.Value;
+
+            var tokenText = PdfDocumentInfoFormatting.Format(
+                sample,
+                PdfDocumentField.Created,
+                PropertyDisplayContext.Token
+            );
+            var gridText = PdfDocumentInfoFormatting.Format(
+                sample,
+                PdfDocumentField.Created,
+                PropertyDisplayContext.Grid
+            );
+
+            Assert.Equal(created.ToString("G", CultureInfo.InvariantCulture), tokenText);
+            Assert.Equal(RenameListFieldDisplay.FormatFileDate(created.LocalDateTime), gridText);
         }
 
         [Fact]

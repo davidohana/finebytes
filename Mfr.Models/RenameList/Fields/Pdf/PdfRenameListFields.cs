@@ -53,33 +53,33 @@ namespace Mfr.Models.RenameList.Fields.Pdf
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
-            new PdfPropertyRenameListField(Key.Title, "Title", PdfRenameListProperty.Title, defaultWidth: 160),
+            new PdfPropertyRenameListField(Key.Title, "Title", PdfDocumentField.Title, defaultWidth: 160),
             new PdfPropertyRenameListField(
                 Key.Author,
                 "Author",
-                PdfRenameListProperty.Author,
+                PdfDocumentField.Author,
                 defaultWidth: 120,
                 tip: PdfRenameListFieldTips.Author
             ),
-            new PdfPropertyRenameListField(Key.Subject, "Subject", PdfRenameListProperty.Subject, defaultWidth: 160),
-            new PdfPropertyRenameListField(Key.Keywords, "Keywords", PdfRenameListProperty.Keywords, defaultWidth: 160),
+            new PdfPropertyRenameListField(Key.Subject, "Subject", PdfDocumentField.Subject, defaultWidth: 160),
+            new PdfPropertyRenameListField(Key.Keywords, "Keywords", PdfDocumentField.Keywords, defaultWidth: 160),
             new PdfPropertyRenameListField(
                 Key.Creator,
                 "Creator",
-                PdfRenameListProperty.Creator,
+                PdfDocumentField.Creator,
                 defaultWidth: 120,
                 tip: PdfRenameListFieldTips.Creator
             ),
             new PdfPropertyRenameListField(
                 Key.Producer,
                 "Producer",
-                PdfRenameListProperty.Producer,
+                PdfDocumentField.Producer,
                 defaultWidth: 120,
                 tip: PdfRenameListFieldTips.Producer
             ),
-            new PdfPropertyRenameListField(Key.Created, "Created", PdfRenameListProperty.Created, defaultWidth: 140),
-            new PdfPropertyRenameListField(Key.Modified, "Modified", PdfRenameListProperty.Modified, defaultWidth: 140),
-            new PdfPropertyRenameListField(Key.PageCount, "Page Count", PdfRenameListProperty.PageCount),
+            new PdfPropertyRenameListField(Key.Created, "Created", PdfDocumentField.Created, defaultWidth: 140),
+            new PdfPropertyRenameListField(Key.Modified, "Modified", PdfDocumentField.Modified, defaultWidth: 140),
+            new PdfPropertyRenameListField(Key.PageCount, "Page Count", PdfDocumentField.PageCount),
         ];
     }
 }

@@ -1,4 +1,4 @@
-using System.Diagnostics;
+using Mfr.Models.RenameList;
 using Mfr.Models.RenameList.Fields.Pdf;
 
 namespace Mfr.Filters.Formatting.Tokens.Pdf
@@ -22,19 +22,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
         public bool TryGetFixedField(out string groupId, out string propertyKey)
         {
             groupId = PdfRenameListFields.Group;
-            propertyKey = propertyField switch
-            {
-                PdfDocumentField.Title => PdfRenameListFields.Key.Title,
-                PdfDocumentField.Author => PdfRenameListFields.Key.Author,
-                PdfDocumentField.Subject => PdfRenameListFields.Key.Subject,
-                PdfDocumentField.Keywords => PdfRenameListFields.Key.Keywords,
-                PdfDocumentField.Creator => PdfRenameListFields.Key.Creator,
-                PdfDocumentField.Producer => PdfRenameListFields.Key.Producer,
-                PdfDocumentField.Created => PdfRenameListFields.Key.Created,
-                PdfDocumentField.Modified => PdfRenameListFields.Key.Modified,
-                PdfDocumentField.PageCount => PdfRenameListFields.Key.PageCount,
-                _ => throw new UnreachableException(),
-            };
+            propertyKey = PdfPropertyRenameListField.CatalogPropertyKey(propertyField);
             return true;
         }
 
@@ -46,7 +34,7 @@ namespace Mfr.Filters.Formatting.Tokens.Pdf
             return item =>
             {
                 item.EnsurePdfLoaded();
-                return PdfDocumentInfoFormatting.Format(item.Original.Pdf, propertyField);
+                return PdfDocumentInfoFormatting.Format(item.Original.Pdf, propertyField, PropertyDisplayContext.Token);
             };
         }
     }
