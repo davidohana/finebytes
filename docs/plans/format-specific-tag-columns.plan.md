@@ -25,13 +25,13 @@ Filter Options **Apply To** already offers block-specific targets (see Finebytes
 
 MFR7 had ID3v1/ID3v2 column groups; finebytes also ships **Xiph** Apply-To (`XiphFieldTarget` + known keys), so Xiph belongs in this plan even though MFR7 had no Xiph property group.
 
-| Apply-To group (today) | FilterTarget | Rename List group | Phase |
-| --- | --- | --- | --- |
-| Audio Tag | `SemanticAudioField` | `MediaTag` (done) | — |
-| **ID3v2** | `Id3v2Frame` (+ Field Setter) | `ID3v2` / MP3 ID3v2 | **P1** |
-| **ID3v1** | `Id3v1Field` | `ID3v1` / MP3 ID3v1 | **P2** |
-| **Xiph** | `XiphField` | `Xiph` | **P3** |
-| (none yet) | Apple / ASF / APE / RIFF | — | Backlog until Apply-To exists |
+| Apply-To group (today) | FilterTarget                  | Rename List group   | Phase                         |
+| ---------------------- | ----------------------------- | ------------------- | ----------------------------- |
+| Audio Tag              | `SemanticAudioField`          | `MediaTag` (done)   | —                             |
+| **ID3v2**              | `Id3v2Frame` (+ Field Setter) | `ID3v2` / MP3 ID3v2 | **P1**                        |
+| **ID3v1**              | `Id3v1Field`                  | `ID3v1` / MP3 ID3v1 | **P2**                        |
+| **Xiph**               | `XiphField`                   | `Xiph`              | **P3**                        |
+| (none yet)             | Apple / ASF / APE / RIFF      | —                   | Backlog until Apply-To exists |
 
 **Rule of thumb:** if users can Apply To a block in Filter Options, that block gets a Rename List group and relevant-column wiring.
 
@@ -40,41 +40,41 @@ MFR7 had ID3v1/ID3v2 column groups; finebytes also ships **Xiph** Apply-To (`Xip
 ### Product defaults (former open calls)
 
 1. **Shuttle duplication** — Accept MFR7-style overlap (Audio Tag + ID3v2 + Xiph can all show Title-like fields). No “common frames only” subset in v1.
-2. **Relevant columns = block only** — Do **not** also add MediaTag when a format field is inferred.
-3. **Xiph field set** — Full [`XiphKnownKeys.All`](Mfr.Models/Tags/Xiph/XiphKnownKeys.cs) (parity with Apply-To), including aliases (`DESCRIPTION`/`COMMENT`, `DATE`/`YEAR`, track/disc totals, …).
-4. **Group naming** — MFR7 labels **MP3 ID3v1** / **MP3 ID3v2**; Xiph label **Xiph** (matches Apply-To).
-5. **Ship** — Implement P1→P2→P3 in one feature track; do not market “done” until all three land (phased commits OK).
-6. **Apple / ASF** — Leave asymmetric for now; docs note format columns track Apply-To groups.
+1. **Relevant columns = block only** — Do **not** also add MediaTag when a format field is inferred.
+1. **Xiph field set** — Full [`XiphKnownKeys.All`](Mfr.Models/Tags/Xiph/XiphKnownKeys.cs) (parity with Apply-To), including aliases (`DESCRIPTION`/`COMMENT`, `DATE`/`YEAR`, track/disc totals, …).
+1. **Group naming** — MFR7 labels **MP3 ID3v1** / **MP3 ID3v2**; Xiph label **Xiph** (matches Apply-To).
+1. **Ship** — Implement P1→P2→P3 in one feature track; do not market “done” until all three land (phased commits OK).
+1. **Apple / ASF** — Leave asymmetric for now; docs note format columns track Apply-To groups.
 
 ### Shared
 
 1. Format-specific columns show **that block only** (not semantic broadcast).
-2. Relevant columns emit the **format-specific** catalog key — **not** also MediaTag Title.
-3. `supportsPreview: true` + `WriteTarget` matching the Apply-To target type.
-4. Resolve / F2 override via existing [`AudioOverlayBlockFieldIo`](Mfr.Models/Tags/AudioOverlayBlockFieldIo.cs) / block getters.
+1. Relevant columns emit the **format-specific** catalog key — **not** also MediaTag Title.
+1. `supportsPreview: true` + `WriteTarget` matching the Apply-To target type.
+1. Resolve / F2 override via existing [`AudioOverlayBlockFieldIo`](Mfr.Models/Tags/AudioOverlayBlockFieldIo.cs) / block getters.
 
 ### P1 — ID3v2
 
 1. Group `ID3v2`, label **MP3 ID3v2**; property keys = modeled frame ids ([`Id3v2ModeledFrame`](Mfr.Models/Tags/Id3v2/Id3v2ModeledFrame.cs)).
-2. No MFR7 legacy `Title [ID3v2]` aliases — frame-id keys only.
-3. Display names from [`Id3v2FrameLabels`](Mfr.Models/Tags/Id3v2/).
-4. `WriteTarget = new Id3v2FrameTarget(frameId)` (primary `COMM` / `USLT` / `TXXX`).
-5. RO **Version** column from overlay version.
-6. Skip unmodeled web/UFID/APIC.
-7. Explicit `_CollectWriteKeys` for **`Id3v2FieldSetterFilter`** (not a string target); string `Id3v2FrameTarget` falls out of catalog reverse-map.
+1. No MFR7 legacy `Title [ID3v2]` aliases — frame-id keys only.
+1. Display names from [`Id3v2FrameLabels`](Mfr.Models/Tags/Id3v2/).
+1. `WriteTarget = new Id3v2FrameTarget(frameId)` (primary `COMM` / `USLT` / `TXXX`).
+1. RO **Version** column from overlay version.
+1. Skip unmodeled web/UFID/APIC.
+1. Explicit `_CollectWriteKeys` for **`Id3v2FieldSetterFilter`** (not a string target); string `Id3v2FrameTarget` falls out of catalog reverse-map.
 
 ### P2 — ID3v1
 
 1. Group `ID3v1`, label **MP3 ID3v1**: Title, Artist, Album, Year, Comment, Track, Genre.
-2. `WriteTarget = Id3v1FieldTarget`; relevant columns for that target.
+1. `WriteTarget = Id3v1FieldTarget`; relevant columns for that target.
 
 ### P3 — Xiph
 
 1. Group `Xiph`, label **Xiph**.
-2. Property keys = full `XiphKnownKeys.All` (modeled keys only; unknown on-disk keys stay omitted).
-3. Display names / tips from [`XiphKeyLabels`](Mfr.Models/Tags/Xiph/XiphKeyLabels.cs).
-4. `WriteTarget = new XiphFieldTarget(key)`.
-5. No dedicated Field Setter — string filters with `XiphField` target suffice for relevant columns via WriteTarget map.
+1. Property keys = full `XiphKnownKeys.All` (modeled keys only; unknown on-disk keys stay omitted).
+1. Display names / tips from [`XiphKeyLabels`](Mfr.Models/Tags/Xiph/XiphKeyLabels.cs).
+1. `WriteTarget = new XiphFieldTarget(key)`.
+1. No dedicated Field Setter — string filters with `XiphField` target suffice for relevant columns via WriteTarget map.
 
 ## Root cause
 

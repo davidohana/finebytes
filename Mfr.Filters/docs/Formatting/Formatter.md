@@ -90,23 +90,23 @@ Reads from **`Original.Media`** (read-only TagLib cache). Properties load from d
 
 Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark stream properties as already loaded so seeded **`FileMeta.Media`** (including nested **`Media.Mpeg`**) is used without disk I/O.
 
-| Token                     | Output                                                         |
-| ------------------------- | -------------------------------------------------------------- |
-| `<media-mime>`            | MIME type; empty when unset.                                   |
-| `<media-corrupt>`         | `Yes` or `No`.                                                 |
+| Token                     | Output                                                                                                                                                                             |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<media-mime>`            | MIME type; empty when unset.                                                                                                                                                       |
+| `<media-corrupt>`         | `Yes` or `No`.                                                                                                                                                                     |
 | `<media-duration>`        | Duration as `h:mm:ss` (total hours unpadded); empty when zero. Colons are illegal in Windows file names — the **Video: Resolution Duration Suffix** sample replaces them with `.`. |
-| `<media-duration-sec>`    | Whole seconds (floor); empty when zero.                        |
-| `<media-types>`           | TagLib media-type flags text (e.g. `Audio`); empty when none.  |
-| `<media-description>`     | Codec description; empty when unset.                           |
-| `<media-audio-bitrate>`   | Audio bitrate (kbps); empty when `0`.                          |
-| `<media-samplerate>`      | Sample rate (Hz); empty when `0`.                              |
-| `<media-bits-per-sample>` | Bits per sample; empty when `0`.                               |
-| `<media-channels>`        | Channel count; empty when `0`.                                 |
-| `<media-video-width>`     | Video width (px); empty when `0`.                              |
-| `<media-video-height>`    | Video height (px); empty when `0`.                             |
-| `<media-photo-width>`     | Photo width (px); empty when `0`.                              |
-| `<media-photo-height>`    | Photo height (px); empty when `0`.                             |
-| `<media-photo-quality>`   | Photo quality; empty when `0`.                                 |
+| `<media-duration-sec>`    | Whole seconds (floor); empty when zero.                                                                                                                                            |
+| `<media-types>`           | TagLib media-type flags text (e.g. `Audio`); empty when none.                                                                                                                      |
+| `<media-description>`     | Codec description; empty when unset.                                                                                                                                               |
+| `<media-audio-bitrate>`   | Audio bitrate (kbps); empty when `0`.                                                                                                                                              |
+| `<media-samplerate>`      | Sample rate (Hz); empty when `0`.                                                                                                                                                  |
+| `<media-bits-per-sample>` | Bits per sample; empty when `0`.                                                                                                                                                   |
+| `<media-channels>`        | Channel count; empty when `0`.                                                                                                                                                     |
+| `<media-video-width>`     | Video width (px); empty when `0`.                                                                                                                                                  |
+| `<media-video-height>`    | Video height (px); empty when `0`.                                                                                                                                                 |
+| `<media-photo-width>`     | Photo width (px); empty when `0`.                                                                                                                                                  |
+| `<media-photo-height>`    | Photo height (px); empty when `0`.                                                                                                                                                 |
+| `<media-photo-quality>`   | Photo quality; empty when `0`.                                                                                                                                                     |
 
 **Arguments:** No argument (`<media-mime>` only). A stray **`<media-mime:…>`** fails at compile.
 

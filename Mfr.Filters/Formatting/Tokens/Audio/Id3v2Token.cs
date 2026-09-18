@@ -134,7 +134,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// <remarks>
     /// <para>
     /// Returns MFR7-style text such as <c>2.3</c> or <c>2.4</c> from
-    /// <see cref="Models.Tags.Id3v2.Id3v2TagData.Version"/>. Empty when no ID3v2 block is present.
+    /// <see cref="Id3v2TagData.Version"/>. Empty when no ID3v2 block is present.
     /// </para>
     /// </remarks>
     [FormatTokenInfo("ID3v2 Version", "Audio\\ID3", Id3v2FrameTips.Version, "id3v2-version")]

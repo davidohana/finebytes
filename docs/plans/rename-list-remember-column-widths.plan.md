@@ -53,9 +53,9 @@ Reuse [`RenameListVisibleColumnSpec`](Mfr.Models/RenameList/RenameListVisibleCol
 ## Write path
 
 1. VM holds an in-memory `Dictionary<RenameListFieldKey, int>` (or list) loaded in `ApplySessionSection` from `renameList.columnWidths`.
-2. `UpdateVisibleColumnWidth`: when `ConfigStore.Options.RememberColumnWidths` is true, upsert the stored key’s width into that map (same `_StoredColumnKey` as today for A/B).
-3. `CaptureSession`: include `ColumnWidths` from the map (and when remembering is on, upsert all current visible absolute widths so session columns seed the map without another resize).
-4. `SaveOnClose`: unchanged pattern — whole `CaptureSession()` object assigned to `ConfigStore.RenameList`, so the map must be on the captured prefs.
+1. `UpdateVisibleColumnWidth`: when `ConfigStore.Options.RememberColumnWidths` is true, upsert the stored key’s width into that map (same `_StoredColumnKey` as today for A/B).
+1. `CaptureSession`: include `ColumnWidths` from the map (and when remembering is on, upsert all current visible absolute widths so session columns seed the map without another resize).
+1. `SaveOnClose`: unchanged pattern — whole `CaptureSession()` object assigned to `ConfigStore.RenameList`, so the map must be on the captured prefs.
 
 ## Read / apply path
 

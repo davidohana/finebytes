@@ -1,7 +1,7 @@
 namespace Mfr.Engine.RenameScript
 {
     /// <summary>
-    /// Output script dialect for <see cref="Mfr.Engine.RenameList.RenameList.ExportRenameScript"/>.
+    /// Output script dialect for <see cref="RenameList.RenameList.ExportRenameScript"/>.
     /// </summary>
     public enum RenameScriptFormat
     {

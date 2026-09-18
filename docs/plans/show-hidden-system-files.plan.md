@@ -15,16 +15,19 @@
 ## MFR7 reference brief
 
 ### Sources
+
 - Help: `fileexp.html`, `renamelist.html`, `cml.html`, `console.html`
 - Code: `Main.cs` (`mniAddHiddenItems`), `RenameList.cs` (`AddHiddenItems`), `Adder.cs` (`IncHidden` / `IsHidden`)
 - finebytes: partial — CLI `--include-hidden`, `AddSources(includeHidden:)`, File List stub `IsEnabled=False`
 
 ### Behavior
+
 - Live UX: **Rename List → Add Hidden/System Files** checkable; default off; persisted `AddHiddenItems`.
 - Gates recursive add of Hidden|System children (`Hidden | System`); topmost explicit path not filtered the same way.
 - File List visibility followed Explorer “Show hidden files”; stale help/hints still mention a File List Show Hidden menu that is not live.
 
 ### Parity gaps / intentional diffs
+
 - finebytes: **one Options checkbox** drives both File List visibility and Rename List add include (MFR7 used Rename List menu + Explorer for show).
 
 ## Current stubs / APIs
@@ -57,12 +60,14 @@ flowchart LR
 ## Phases
 
 ### P1 — Engine: honor `includeHidden` during directory walks
+
 - [x] Thread `includeHidden` into `AddedSourceResolver.ResolveToPaths` / `_ResolveDirectory`; when true set `AttributesToSkip = 0` (or none); when false keep default Hidden|System skip (or set explicitly).
 - Keep `_ShouldIncludeResolvedPath` as the attribute gate for resolved paths.
 - **Tests:** extend [`RenameListTests`](Mfr.Tests/Engine/RenameListTests.cs) so recursive folder add with a hidden child is excluded by default and included when `includeHidden: true`. Add CLI parse smoke for `--include-hidden` in [`CliArgParserTests`](Mfr.Tests/Cli/CliArgParserTests.cs) if missing.
 - **Exit:** CLI/engine recursive include-hidden works for Hidden|System children.
 
 ### P2 — Pref + Options checkbox + listing/add wiring
+
 - [x] Add `OptionsConfig.IncludeHidden` (`JsonPropertyName("includeHidden")`, default false).
 - Wire [`OptionsDialogViewModel`](Mfr.App.Ui/ViewModels/Options/OptionsDialogViewModel.cs) load/save + checkbox in [`OptionsDialog.axaml`](Mfr.App.Ui/Views/Options/OptionsDialog.axaml) under the Add fieldset (after **Add folder contents**), with tip text (show in File List + include when adding).
 - [`FileListCatalog`](Mfr.App.Ui/Services/FileList/FileListCatalog.cs): listing options depend on `ConfigStore.Options.IncludeHidden` (or passed flag); refresh current folder when Options apply changes the value.
