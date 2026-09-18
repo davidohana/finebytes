@@ -92,7 +92,7 @@ Save under `help/images/ui/`. Pages under `help/ui/` reference `../images/ui/…
 
 1. Regenerate with
    `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpUiScreenshotCaptureTests`
-   (P0 shell + P1 dialogs/tools).
+   (P0 shell + P1 dialogs/tools + P2 guide).
 1. Seed a sample folder + Rename List rows + a short Filter Chain so panes look live.
 
 ### UI checklist (P0)
@@ -129,7 +129,15 @@ Save under `help/images/ui/`. Pages under `help/ui/` reference `../images/ui/…
 
 - [x] `images/ui/status-bar.png` — Status bar (`statusbar.html`)
 
-### Still optional (P2)
+### Guide checklist (P2)
 
-See [`docs/plans/help-non-filter-screenshots.plan.md`](../docs/plans/help-non-filter-screenshots.plan.md)
-for tutorial/howto guide shots.
+- [x] `images/guide/tutorial-overview.png` — Tutorial overview (reuses `ui/main-window.png` when present)
+  (`tutorial.html`)
+
+- [x] `images/guide/apply-go.png` — Toolbar GO (`applychanges.html`)
+
+- [x] `images/guide/undo-last.png` — Undo Last prepared session (`undolast.html`)
+
+- [x] `images/guide/save-preset.png` — Save preset dialog (`savepreset.html`)
+
+- [x] `images/guide/reset-config.png` — Reset Configuration confirm (`resetconfig.html`)

@@ -13,7 +13,9 @@ using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
 using Mfr.App.Ui.ViewModels.LogDialog;
 using Mfr.App.Ui.ViewModels.MainWindow;
 using Mfr.App.Ui.ViewModels.Options;
+using Mfr.App.Ui.ViewModels.Presets;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.App.Ui.Views;
 using Mfr.App.Ui.Views.FileList;
 using Mfr.App.Ui.Views.FilterChainPane;
 using Mfr.App.Ui.Views.FilterEditors;
@@ -22,11 +24,13 @@ using Mfr.App.Ui.Views.FilterPalette;
 using Mfr.App.Ui.Views.FormatEditor;
 using Mfr.App.Ui.Views.LogDialog;
 using Mfr.App.Ui.Views.Options;
+using Mfr.App.Ui.Views.Presets;
 using Mfr.App.Ui.Views.RenameList;
 using Mfr.Filters.Case;
 using Mfr.Tests.Ui.FilterChainPane;
 using Mfr.Tests.Ui.FilterEditors;
 using Mfr.Tests.Ui.Presets;
+using Mfr.Tests.Ui.RenameList;
 using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
 using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
@@ -207,6 +211,206 @@ namespace Mfr.Tests.Ui.Help
             {
                 Assert.True(File.Exists(Path.Combine(outputDir, name)), "Missing " + name);
             }
+        }
+
+        /// <summary>
+        /// Renders P2 howto / tutorial shots under <c>help/images/guide/</c>.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Capture_p2_guide_shots_to_help_images()
+        {
+            if (Environment.GetEnvironmentVariable("MFR_CAPTURE_HELP_SCREENSHOTS") != "1")
+            {
+                return;
+            }
+
+            var outputDir = Path.Combine(_ResolveHelpImagesDirectory(), "guide");
+            Directory.CreateDirectory(outputDir);
+
+            await _CaptureTutorialOverviewAsync(outputDir);
+            await _CaptureApplyGoAsync(outputDir);
+            await _CaptureUndoLastAsync(outputDir);
+            _CaptureSavePreset(outputDir);
+            _CaptureResetConfig(outputDir);
+
+            foreach (
+                var name in new[]
+                {
+                    "tutorial-overview.png",
+                    "apply-go.png",
+                    "undo-last.png",
+                    "save-preset.png",
+                    "reset-config.png",
+                }
+            )
+            {
+                Assert.True(File.Exists(Path.Combine(outputDir, name)), "Missing " + name);
+            }
+        }
+
+        private async Task _CaptureTutorialOverviewAsync(string outputDir)
+        {
+            // Prefer reuse of the P0 main-window shot when present.
+            var mainWindowPath = Path.Combine(_ResolveHelpImagesDirectory(), "ui", "main-window.png");
+            var dest = Path.Combine(outputDir, "tutorial-overview.png");
+            if (File.Exists(mainWindowPath))
+            {
+                File.Copy(mainWindowPath, dest, overwrite: true);
+                return;
+            }
+
+            var (window, _) = await _ShowSeededMainWindowAsync();
+            try
+            {
+                _CaptureControl(window, dest);
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+
+        private async Task _CaptureApplyGoAsync(string outputDir)
+        {
+            var (window, _) = await _ShowSeededMainWindowAsync();
+            try
+            {
+                var toolbar = window
+                    .GetVisualDescendants()
+                    .OfType<Border>()
+                    .First(border => border.Classes.Contains("pane-action-strip"));
+                toolbar.Background = Brushes.White;
+                _CaptureControl(toolbar, Path.Combine(outputDir, "apply-go.png"), minWidth: 80, minHeight: 20);
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+
+        private async Task _CaptureUndoLastAsync(string outputDir)
+        {
+            var (viewModel, _, _) = await UndoPrepareTestUi
+                .GoPrefixRenameAsync(_tempDirectoryFixture, disableAutoPreview: true)
+                .ConfigureAwait(true);
+
+            var window = new AppMainWindow
+            {
+                DataContext = viewModel,
+                Width = 1280,
+                Height = 860,
+                Background = Brushes.White,
+            };
+
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+                FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+
+                await viewModel.UndoLastCommand.ExecuteAsync(null).ConfigureAwait(true);
+                window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+                await Task.Delay(200);
+                Dispatcher.UIThread.RunJobs();
+
+                Assert.Contains("Prepared undo", viewModel.StatusHint.ToPlainText());
+                _CaptureControl(window, Path.Combine(outputDir, "undo-last.png"));
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+
+        private static void _CaptureSavePreset(string outputDir)
+        {
+            var viewModel = new SavePresetDialogViewModel
+            {
+                Name = "Music tags cleanup",
+                Description = "Normalize tags and file names for a music folder.",
+                SaveRenameListColumns = true,
+            };
+            var dialog = new SavePresetDialog(viewModel);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                _CaptureControl(dialog, Path.Combine(outputDir, "save-preset.png"));
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        private static void _CaptureResetConfig(string outputDir)
+        {
+            var dialog = new ConfirmMessageDialog(
+                title: "Confirmation",
+                message: "Reset configuration to default values? Magic File Renamer will close and restart."
+            );
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                _CaptureControl(dialog, Path.Combine(outputDir, "reset-config.png"));
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        private async Task<(AppMainWindow Window, MainWindowViewModel ViewModel)> _ShowSeededMainWindowAsync()
+        {
+            var sampleDir = _CreateSampleFolder();
+            var viewModel = new MainWindowViewModel(
+                initialFileListPath: sampleDir,
+                persistSession: false,
+                shellOpener: NullFileShellOpener.Instance
+            );
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+            Assert.False(viewModel.FileListViewModel.HasListingError, viewModel.FileListViewModel.ListingError);
+
+            var window = new AppMainWindow
+            {
+                DataContext = viewModel,
+                Width = 1280,
+                Height = 860,
+                Background = Brushes.White,
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+
+            var sources = Directory
+                .GetFiles(sampleDir)
+                .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+                .ToArray();
+            await UiStartupArgsApplier.ApplyAsync(viewModel, sources);
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+
+            viewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("SpaceCharacter"));
+            viewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
+            viewModel.FilterChainViewModel.SetSelectedSteps([viewModel.FilterChainViewModel.Steps[1]]);
+            viewModel.FilterEditorViewModel.FormatTokenPickerExpanded = false;
+            if (viewModel.FilterEditorViewModel.OptionsEditor is { } optionsEditor)
+            {
+                optionsEditor.FormatTokenPickerExpanded = false;
+            }
+
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            await Task.Delay(200);
+            Dispatcher.UIThread.RunJobs();
+            return (window, viewModel);
         }
 
         private static void _CaptureFilterOptions(string outputDir)
