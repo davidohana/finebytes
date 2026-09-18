@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p1-dialogs
     content: "P1: Options, Filter Options, Presets, Log, Format Editor, field shuttle, sort, Visual Trim"
-    status: pending
+    status: completed
   - id: p2-howto
     content: "P2: tutorial/howto step shots (optional)"
     status: pending
@@ -102,13 +102,13 @@ Extend [`help/SCREENSHOTS.md`](../../help/SCREENSHOTS.md) with a **UI / dialogs*
 
 ## Capture approach
 
-1. `just run-ui` on Xvfb (or Windows for product-look shots).
-1. Seed folder + Rename List rows + one filter chain.
-1. Open each dialog; crop to subject; save under `help/images/ui/`.
-1. Optional later: headless window/dialog render harness (harder than filter editors — full MainWindow).
+1. Regenerate with
+   `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpUiScreenshotCaptureTests`
+   (`HelpUiScreenshotCaptureTests` — P0 shell panes + P1 dialogs/tools).
+1. Or `just run-ui` on Xvfb / Windows; crop to subject; save under `help/images/ui/`.
 
 ## Exit criteria
 
 - Every P0 page has a real PNG (no checkerboard).
-- P1 complete or explicitly deferred in the checklist.
+- Every P1 page has a real PNG (no checkerboard).
 - Link/img paths resolve; `height: auto` CSS still in effect.
