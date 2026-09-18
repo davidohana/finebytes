@@ -169,6 +169,17 @@
       <a href="../reference/fields.html#pdf">PDF Document fields</a>.
     </p>
 
+    <h2 id="epub">EPUB document Info (read-only)</h2>
+    <p>
+      EPUB Dublin Core package fields (title, creator/author, publisher, language, literal date,
+      identifier, subject, description) come from VersOne.Epub for readable
+      <span class="quote">.epub</span> packages. Multi-value DC lists use the first non-blank entry
+      only. Missing Info fields expand empty after a successful open; non-EPUB or corrupt packages
+      fail preview. There is no write path. See
+      <a href="../tokens/epubfp.html">EPUB Document tokens</a> and
+      <a href="../reference/fields.html#epub">EPUB Document fields</a>.
+    </p>
+
     <h2 id="media">Media stream properties (read-only)</h2>
     <p>
       MIME type, duration, audio stream facts, and video frame size come from TagLib for containers

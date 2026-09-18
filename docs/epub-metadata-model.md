@@ -34,8 +34,9 @@ flowchart LR
 1. **DTO only.** Raw VersOne types are not stored on `FileMeta`. Mapping discards them after dispose.
 1. **Original snapshot.** Tokens read `item.Original.Epub` (disk-backed facts), not Preview.
 1. **Readable EPUBs only.** Empty tokens apply only after a successful open when a field is missing
-   (`null`). Non-EPUB, corrupt, or DRM open failure → PreviewError (`EpubReaderException` family or
-   IO). Missing DC on a successful open is an **empty** field, not PreviewError.
+   (`null`). Non-EPUB, corrupt, or DRM open failure → PreviewError (`EpubReaderException` family,
+   `InvalidDataException` for non-ZIP, or IO). Missing DC on a successful open is an **empty**
+   field, not PreviewError.
 1. **First primary string.** Multi-value DC lists take the **first** non-blank entry after normalize
    (blank → null; collapse `\r`/`\n` to space; trim). Never join creators/subjects in v1.
 1. **Literal Date.** `Date` is stored as `string?` (first `dc:date` text), not `DateTimeOffset?` —
@@ -75,21 +76,22 @@ file.
 
 - **Directory row** — `InvalidOperationException` from ensure → PreviewError
 - **Missing / relative path** — `ArgumentException` from the reader → PreviewError
-- **Non-EPUB / corrupt / DRM open failure** — Propagated VersOne exception → PreviewError
+- **Non-EPUB / corrupt / DRM open failure** — Propagated VersOne `EpubReaderException` (or
+  `InvalidDataException` when the file is not a ZIP/EPUB archive) → PreviewError
 - **Successful open, missing DC field** — That `epub-*` token expands **empty**, not an error
 
 ## Mapped fields
 
-| Field       | Source                                                               |
-| ----------- | -------------------------------------------------------------------- |
-| Title       | `Metadata.Titles[0].Title`                                           |
-| Creator     | `Metadata.Creators[0].Creator` (display name / author, not `FileAs`) |
-| Publisher   | `Metadata.Publishers[0].Publisher`                                   |
-| Language    | `Metadata.Languages[0].Language`                                     |
-| Date        | `Metadata.Dates[0].Date` (literal string)                            |
-| Identifier  | unique-id resolve, else first identifier                             |
-| Subject     | `Metadata.Subjects[0].Subject`                                       |
-| Description | `Metadata.Descriptions[0].Description`                               |
+| Field       | Source                                                                              |
+| ----------- | ----------------------------------------------------------------------------------- |
+| Title       | First non-blank `Metadata.Titles[].Title`                                           |
+| Creator     | First non-blank `Metadata.Creators[].Creator` (display name / author, not `FileAs`) |
+| Publisher   | First non-blank `Metadata.Publishers[].Publisher`                                   |
+| Language    | First non-blank `Metadata.Languages[].Language`                                     |
+| Date        | First non-blank `Metadata.Dates[].Date` (literal string)                            |
+| Identifier  | `UniqueIdentifier` id match when set, else first non-blank identifier               |
+| Subject     | First non-blank `Metadata.Subjects[].Subject`                                       |
+| Description | First non-blank `Metadata.Descriptions[].Description`                               |
 
 **Creator ≠ PDF Creator:** EPUB `Creator` is Dublin Core author (person/org). PDF Info Creator is the
 creating application. Display formatting is shared via Models `EpubDocumentInfoFormatting` (optional

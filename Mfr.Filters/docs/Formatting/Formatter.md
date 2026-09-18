@@ -202,16 +202,16 @@ OPF write/Apply path.
 Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark EPUB load as already attempted so seeded
 **`FileMeta.Epub`** is used without disk I/O.
 
-| Token                | Output                                                                       |
-| -------------------- | ---------------------------------------------------------------------------- |
-| `<epub-title>`       | Dublin Core title; empty when unset.                                         |
-| `<epub-creator>`     | Dublin Core creator / author (person or organization); empty when unset.     |
-| `<epub-publisher>`   | Dublin Core publisher; empty when unset.                                     |
-| `<epub-language>`    | Dublin Core language; empty when unset.                                      |
-| `<epub-date>`        | Literal Dublin Core date string; empty when unset.                           |
-| `<epub-identifier>`  | Package unique-identifier when set, else first identifier; empty when unset. |
-| `<epub-subject>`     | Dublin Core subject; empty when unset.                                       |
-| `<epub-description>` | Dublin Core description; empty when unset.                                   |
+| Token                | Output                                                                                                   |
+| -------------------- | -------------------------------------------------------------------------------------------------------- |
+| `<epub-title>`       | Dublin Core title; empty when unset.                                                                     |
+| `<epub-creator>`     | Dublin Core creator / author (person or organization); empty when unset.                                 |
+| `<epub-publisher>`   | Dublin Core publisher; empty when unset.                                                                 |
+| `<epub-language>`    | Dublin Core language; empty when unset.                                                                  |
+| `<epub-date>`        | Literal Dublin Core date string; empty when unset.                                                       |
+| `<epub-identifier>`  | Identifier whose id matches `Package.UniqueIdentifier` when set, else first non-blank; empty when unset. |
+| `<epub-subject>`     | Dublin Core subject; empty when unset.                                                                   |
+| `<epub-description>` | Dublin Core description; empty when unset.                                                               |
 
 **Arguments:** No argument (`<epub-title>` only). A stray **`<epub-title:…>`** fails at compile.
 
