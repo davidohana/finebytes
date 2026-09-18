@@ -136,4 +136,4 @@ flowchart LR
 
 - Update `help/guide/cml.html`, `help/guide/console.html`, `help/intro/migrations.html`, `help/intro/whatsnew.html` for desktop seed/browse vs console rename.
 - Exit: help no longer says desktop CML is “not in this build”; documents `--initial-folder` and add modifiers.
-- Status: pending
+- Status: done

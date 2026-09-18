@@ -16,16 +16,122 @@
     <hr />
     <h1>Command Line Parameters</h1>
     <p>
-      This page documents the Magic File Renamer 8 console program
-      (<span class="quote">mfr</span>). For an overview of automatic renaming, see
-      <a href="console.html">Console (Automatic) Mode</a>.
+      Magic File Renamer 8 has two command-line entry points:
     </p>
+    <ul>
+      <li>
+        The <strong>desktop UI</strong> — open the app and optionally seed the
+        <a href="../ui/renamelist.html">Rename List</a> or browse a folder in the
+        <a href="../ui/fileexp.html">File List</a> (interactive work; no automatic rename).
+      </li>
+      <li>
+        The <strong>console</strong> program (<span class="quote">mfr</span>) — automatic rename
+        with a saved preset. See <a href="console.html">Console (Automatic) Mode</a>.
+      </li>
+    </ul>
+
+    <h2 id="desktop">Desktop UI</h2>
     <p>
-      The desktop UI does not use these flags to add items at startup; use the File List, drag and
-      drop, or pass paths to <span class="quote">mfr</span> instead.
+      Launch the graphical app with optional paths and flags. Paths on the command line add items to
+      the Rename List so you can preview and press GO in the UI. The desktop app does
+      <strong>not</strong> accept preset, dry-run, confirm, or commit options — those belong to
+      <span class="quote">mfr</span>.
     </p>
 
-    <h2>Usage</h2>
+    <h3>Usage</h3>
+    <p>
+      <code>Mfr.App.Ui.exe [&lt;SOURCES&gt;…] [--initial-folder &lt;PATH&gt;] [add options]</code>
+    </p>
+    <p>
+      <span class="quote">SOURCES</span> are one or more files, directories, or filemasks
+      (space-separated). Quote paths that contain spaces.
+    </p>
+
+    <h3>Startup intents</h3>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Argument / option</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>&lt;SOURCES&gt;…</code></td>
+          <td>
+            Files, folders, or wildcards that seed the Rename List (same role as console sources,
+            without running a preset).
+          </td>
+        </tr>
+        <tr>
+          <td><code>--initial-folder &lt;PATH&gt;</code></td>
+          <td>
+            Open the File List at this directory only (no Rename List add). UI-only; the console has
+            no File List. When both sources and this option are set, sources still seed the Rename
+            List and this path wins for File List location.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      After a successful add, if <span class="quote">--initial-folder</span> was not set, the File
+      List navigates to the first added item.
+    </p>
+
+    <h3>Add modifiers</h3>
+    <p>
+      These options use the same names as the console. They apply only when seeding from
+      <span class="quote">SOURCES</span>. When omitted, the desktop UI uses the matching
+      <a href="../ui/optionswin.html">Options</a> preferences (Add files, Add folders, Add folder
+      contents, include hidden/system).
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Option</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>--files &lt;yes|no&gt;</code></td>
+          <td>Include files from sources (when omitted: Options — Add files).</td>
+        </tr>
+        <tr>
+          <td><code>--folders &lt;yes|no&gt;</code></td>
+          <td>Include folders from sources (when omitted: Options — Add folders).</td>
+        </tr>
+        <tr>
+          <td><code>-r</code>, <code>--recursive</code></td>
+          <td>
+            Expand directory sources recursively (when omitted: Options — Add folder contents).
+          </td>
+        </tr>
+        <tr>
+          <td><code>--include-hidden</code></td>
+          <td>
+            Include hidden and system items when expanding sources (when omitted: Options —
+            include hidden/system).
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Examples</h3>
+    <div class="examples">
+      <code>Mfr.App.Ui.exe D:\music\*.mp3</code>
+      <code>Mfr.App.Ui.exe D:\photos --files yes --folders no -r</code>
+      <code>Mfr.App.Ui.exe --initial-folder D:\photos</code>
+      <code>Mfr.App.Ui.exe D:\batch\a.jpg D:\batch\b.jpg --initial-folder D:\batch</code>
+    </div>
+
+    <h2 id="console">Console (<span class="quote">mfr</span>)</h2>
+    <p>
+      This section documents the console program (<span class="quote">mfr</span>). For an overview
+      of automatic renaming, see <a href="console.html">Console (Automatic) Mode</a>.
+    </p>
+
+    <h3>Usage</h3>
     <p>
       <code>mfr &lt;SOURCES&gt;… -p|--preset &lt;NAME&gt; [options]</code>
     </p>
@@ -35,7 +141,7 @@
       <span class="quote">mfr --help</span> for the built-in summary.
     </p>
 
-    <h2>Required</h2>
+    <h3>Required</h3>
     <table class="ref-table">
       <thead>
         <tr>
@@ -58,7 +164,7 @@
       </tbody>
     </table>
 
-    <h2>Options</h2>
+    <h3>Options</h3>
     <table class="ref-table">
       <thead>
         <tr>
@@ -136,7 +242,7 @@
       must be <span class="quote">yes</span>.
     </p>
 
-    <h2>Exit codes</h2>
+    <h3>Exit codes</h3>
     <table class="ref-table">
       <thead>
         <tr>
@@ -163,7 +269,7 @@
       </tbody>
     </table>
 
-    <h2>Examples</h2>
+    <h3>Examples</h3>
     <div class="examples">
       <code>mfr C:\Music\*.mp3 -p clean --dry-run</code>
       <code>mfr C:\Music\*.flac -r -p lowercase-extension --log-level debug</code>
