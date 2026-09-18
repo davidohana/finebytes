@@ -1,4 +1,5 @@
 using Mfr.Metadata;
+using Mfr.Models.RenameList;
 using Mfr.Models.Tags;
 using Mfr.Utils;
 
@@ -18,12 +19,12 @@ namespace Mfr.Filters
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (item.TagLibLoadAttempted)
+            if (item.WasMetadataLoadAttempted(RenameListMetadataRequirement.TagLib))
             {
                 return;
             }
 
-            item.MarkTagLibLoadAttempted();
+            item.MarkMetadataLoadAttempted(RenameListMetadataRequirement.TagLib);
 
             if (item.Original.Attributes.IsDirectory())
             {

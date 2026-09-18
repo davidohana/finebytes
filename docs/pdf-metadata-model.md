@@ -41,8 +41,9 @@ flowchart LR
 - **Snapshot record** — `Mfr.Models` — `PdfDocumentInfo` on `FileMeta.Pdf`
 - **Disk read / map** — `Mfr.Metadata` — `PdfFileReader`
 - **Lazy load (formatter preview)** — `Mfr.Filters` — `RenameItemPdfExtensions.EnsurePdfLoaded`
-- **Rename List grid** — eager-loads PDF buckets for visible columns and Auto-Sort keys via
-  `RenameList.EnsureMetadataLoaded` (`RenameListMetadataRequirement.Pdf`)
+- **Rename List grid** — eager-loads via `RenameList.EnsureMetadataLoaded`
+  (`RenameListMetadataRequirement.Pdf`); attempt/error state shares the
+  `RenameItem` / `RenameListMetadataBuckets` single-flag API with TagLib and Image
 - **Tokens** — `Mfr.Filters` — `PdfDocumentTokenBase` (`pdf-*`)
 - **Commit cache clear** — `Mfr.Engine` — `RenameList.Commit` calls `ClearMetadataCaches` →
   `ClearPdfCache`

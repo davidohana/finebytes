@@ -13,6 +13,13 @@ namespace Mfr.Filters
     /// </remarks>
     public static class RenameListMetadataLoader
     {
+        private static readonly (RenameListMetadataRequirement Bucket, Action<RenameItem> Ensure)[] _BucketEnsures =
+        [
+            (RenameListMetadataRequirement.TagLib, static item => item.EnsureTagLibLoaded()),
+            (RenameListMetadataRequirement.ImageProperties, static item => item.EnsureImagePropertiesLoaded()),
+            (RenameListMetadataRequirement.Pdf, static item => item.EnsurePdfLoaded()),
+        ];
+
         /// <summary>
         /// Ensures rename-row metadata is loaded for each requirement in <paramref name="metadataRequirement"/>.
         /// </summary>
@@ -22,19 +29,12 @@ namespace Mfr.Filters
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.TagLib))
+            foreach (var (bucket, ensure) in _BucketEnsures)
             {
-                _TryEnsureTagLibLoaded(item);
-            }
-
-            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.ImageProperties))
-            {
-                _TryEnsureImagePropertiesLoaded(item);
-            }
-
-            if (metadataRequirement.HasFlag(RenameListMetadataRequirement.Pdf))
-            {
-                _TryEnsurePdfLoaded(item);
+                if (metadataRequirement.HasFlag(bucket))
+                {
+                    _TryEnsureBucket(item, bucket, ensure);
+                }
             }
         }
 
@@ -59,21 +59,12 @@ namespace Mfr.Filters
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (requirement.HasFlag(RenameListMetadataRequirement.TagLib) && !item.TagLibLoadAttempted)
+            foreach (var bucket in RenameListMetadataBuckets.All)
             {
-                return false;
-            }
-
-            if (
-                requirement.HasFlag(RenameListMetadataRequirement.ImageProperties) && !item.ImagePropertiesLoadAttempted
-            )
-            {
-                return false;
-            }
-
-            if (requirement.HasFlag(RenameListMetadataRequirement.Pdf) && !item.PdfLoadAttempted)
-            {
-                return false;
+                if (requirement.HasFlag(bucket) && !item.WasMetadataLoadAttempted(bucket))
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -97,10 +88,14 @@ namespace Mfr.Filters
             return items.Any(item => !IsRequirementSatisfied(item, requirement));
         }
 
-        private static void _TryEnsureTagLibLoaded(RenameItem item)
+        private static void _TryEnsureBucket(
+            RenameItem item,
+            RenameListMetadataRequirement bucket,
+            Action<RenameItem> ensure
+        )
         {
             if (
-                item.TagLibLoadAttempted
+                item.WasMetadataLoadAttempted(bucket)
                 || item.Original.Attributes.IsDirectory()
                 || RenameListDiskPaths.IsMissingFromDisk(item)
             )
@@ -110,53 +105,11 @@ namespace Mfr.Filters
 
             try
             {
-                item.EnsureTagLibLoaded();
+                ensure(item);
             }
             catch (Exception ex) when (_IsMetadataReadFailure(ex))
             {
-                item.SetTagLibMetadataLoadError(ex);
-            }
-        }
-
-        private static void _TryEnsureImagePropertiesLoaded(RenameItem item)
-        {
-            if (
-                item.ImagePropertiesLoadAttempted
-                || item.Original.Attributes.IsDirectory()
-                || RenameListDiskPaths.IsMissingFromDisk(item)
-            )
-            {
-                return;
-            }
-
-            try
-            {
-                item.EnsureImagePropertiesLoaded();
-            }
-            catch (Exception ex) when (_IsMetadataReadFailure(ex))
-            {
-                item.SetImagePropertiesLoadError(ex);
-            }
-        }
-
-        private static void _TryEnsurePdfLoaded(RenameItem item)
-        {
-            if (
-                item.PdfLoadAttempted
-                || item.Original.Attributes.IsDirectory()
-                || RenameListDiskPaths.IsMissingFromDisk(item)
-            )
-            {
-                return;
-            }
-
-            try
-            {
-                item.EnsurePdfLoaded();
-            }
-            catch (Exception ex) when (_IsMetadataReadFailure(ex))
-            {
-                item.SetPdfLoadError(ex);
+                item.SetMetadataLoadError(bucket, ex);
             }
         }
 

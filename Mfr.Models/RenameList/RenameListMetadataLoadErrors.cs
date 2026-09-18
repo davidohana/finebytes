@@ -51,27 +51,14 @@ namespace Mfr.Models.RenameList
                 return false;
             }
 
-            if (requirement.HasFlag(RenameListMetadataRequirement.TagLib))
+            foreach (var bucket in RenameListMetadataBuckets.All)
             {
-                error = item.TagLibMetadataLoadError;
-                if (error is not null)
+                if (!requirement.HasFlag(bucket))
                 {
-                    return true;
+                    continue;
                 }
-            }
 
-            if (requirement.HasFlag(RenameListMetadataRequirement.ImageProperties))
-            {
-                error = item.ImagePropertiesLoadError;
-                if (error is not null)
-                {
-                    return true;
-                }
-            }
-
-            if (requirement.HasFlag(RenameListMetadataRequirement.Pdf))
-            {
-                error = item.PdfLoadError;
+                error = item.GetMetadataLoadError(bucket);
                 if (error is not null)
                 {
                     return true;
@@ -97,17 +84,23 @@ namespace Mfr.Models.RenameList
         /// Returns whether the row has any original metadata load failure.
         /// </summary>
         /// <param name="item">Rename row.</param>
-        /// <returns><see langword="true"/> when TagLib, image, or PDF metadata failed to load.</returns>
+        /// <returns><see langword="true"/> when any disk metadata bucket failed to load.</returns>
         internal static bool HasAny(RenameItem item)
         {
             ArgumentNullException.ThrowIfNull(item);
-            return item.TagLibMetadataLoadError is not null
-                || item.ImagePropertiesLoadError is not null
-                || item.PdfLoadError is not null;
+            foreach (var bucket in RenameListMetadataBuckets.All)
+            {
+                if (item.GetMetadataLoadError(bucket) is not null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
-        /// Lists distinct reader failures stored on the row (at most one TagLib, one image, and one PDF).
+        /// Lists distinct reader failures stored on the row (at most one per disk metadata bucket).
         /// </summary>
         /// <param name="item">Rename row.</param>
         /// <returns>User-facing entries for Show Load Errors, in reader order.</returns>
@@ -115,35 +108,15 @@ namespace Mfr.Models.RenameList
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            var errors = new List<RenameListLoadError>(3);
-            if (item.TagLibMetadataLoadError is { } tagLibError)
+            var errors = new List<RenameListLoadError>(RenameListMetadataBuckets.All.Count);
+            foreach (var bucket in RenameListMetadataBuckets.All)
             {
-                errors.Add(
-                    new RenameListLoadError(
-                        DescribeUserMessage(tagLibError, RenameListMetadataRequirement.TagLib),
-                        tagLibError.Message
-                    )
-                );
-            }
+                if (item.GetMetadataLoadError(bucket) is not { } bucketError)
+                {
+                    continue;
+                }
 
-            if (item.ImagePropertiesLoadError is { } imageError)
-            {
-                errors.Add(
-                    new RenameListLoadError(
-                        DescribeUserMessage(imageError, RenameListMetadataRequirement.ImageProperties),
-                        imageError.Message
-                    )
-                );
-            }
-
-            if (item.PdfLoadError is { } pdfError)
-            {
-                errors.Add(
-                    new RenameListLoadError(
-                        DescribeUserMessage(pdfError, RenameListMetadataRequirement.Pdf),
-                        pdfError.Message
-                    )
-                );
+                errors.Add(new RenameListLoadError(DescribeUserMessage(bucketError, bucket), bucketError.Message));
             }
 
             return errors;

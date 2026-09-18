@@ -1,4 +1,5 @@
 using Mfr.Metadata;
+using Mfr.Models.RenameList;
 using Mfr.Utils;
 
 namespace Mfr.Filters
@@ -17,12 +18,12 @@ namespace Mfr.Filters
         {
             ArgumentNullException.ThrowIfNull(item);
 
-            if (item.ImagePropertiesLoadAttempted)
+            if (item.WasMetadataLoadAttempted(RenameListMetadataRequirement.ImageProperties))
             {
                 return;
             }
 
-            item.MarkImagePropertiesLoadAttempted();
+            item.MarkMetadataLoadAttempted(RenameListMetadataRequirement.ImageProperties);
 
             if (item.Original.Attributes.IsDirectory())
             {

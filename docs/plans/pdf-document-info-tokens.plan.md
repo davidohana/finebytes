@@ -45,3 +45,8 @@ Help: `help/tokens/pdffp.html`, link from `fp.html`, PDF section in `fields.html
 1. Fixtures + tests (success, missing fields empty, non-PDF PreviewError)
 1. Help (`pdffp.html`, `fp.html`, `fields.html`, whatsnew) + `docs/pdf-metadata-model.md` + Formatter.md
 1. `just format` + targeted tests pass
+
+## Deferred (separate plans)
+
+- Unify token vs Rename List property enums for **Image + PDF** — see
+  [`unify-token-rename-list-property-enums.plan.md`](unify-token-rename-list-property-enums.plan.md)

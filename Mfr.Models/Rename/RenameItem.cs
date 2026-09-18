@@ -51,7 +51,7 @@ namespace Mfr.Models.Rename
     /// Represents one rename candidate with original and preview metadata.
     /// </summary>
     /// <param name="original">Original immutable file snapshot.</param>
-    public sealed class RenameItem(FileMeta original)
+    public sealed partial class RenameItem(FileMeta original)
     {
         private readonly Dictionary<(string GroupId, string PropertyKey), string> _originalOverrides = [];
 
@@ -173,8 +173,7 @@ namespace Mfr.Models.Rename
         /// <param name="ex">Failure from TagLib while reading the row path.</param>
         internal void SetTagLibMetadataLoadError(Exception ex)
         {
-            ArgumentNullException.ThrowIfNull(ex);
-            TagLibMetadataLoadError = ex;
+            SetMetadataLoadError(RenameListMetadataRequirement.TagLib, ex);
         }
 
         /// <summary>
@@ -183,8 +182,7 @@ namespace Mfr.Models.Rename
         /// <param name="ex">Failure from MetadataExtractor while reading the row path.</param>
         internal void SetImagePropertiesLoadError(Exception ex)
         {
-            ArgumentNullException.ThrowIfNull(ex);
-            ImagePropertiesLoadError = ex;
+            SetMetadataLoadError(RenameListMetadataRequirement.ImageProperties, ex);
         }
 
         /// <summary>
@@ -193,8 +191,7 @@ namespace Mfr.Models.Rename
         /// <param name="ex">Failure from PdfPig while reading the row path.</param>
         internal void SetPdfLoadError(Exception ex)
         {
-            ArgumentNullException.ThrowIfNull(ex);
-            PdfLoadError = ex;
+            SetMetadataLoadError(RenameListMetadataRequirement.Pdf, ex);
         }
 
         /// <summary>
@@ -202,7 +199,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void MarkTagLibLoadAttempted()
         {
-            TagLibLoadAttempted = true;
+            MarkMetadataLoadAttempted(RenameListMetadataRequirement.TagLib);
         }
 
         /// <summary>
@@ -210,7 +207,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void MarkImagePropertiesLoadAttempted()
         {
-            ImagePropertiesLoadAttempted = true;
+            MarkMetadataLoadAttempted(RenameListMetadataRequirement.ImageProperties);
         }
 
         /// <summary>
@@ -218,7 +215,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void MarkPdfLoadAttempted()
         {
-            PdfLoadAttempted = true;
+            MarkMetadataLoadAttempted(RenameListMetadataRequirement.Pdf);
         }
 
         /// <summary>
@@ -303,8 +300,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void ClearEmbeddedTagsCache()
         {
-            TagLibLoadAttempted = false;
-            TagLibMetadataLoadError = null;
+            ClearMetadataLoadState(RenameListMetadataRequirement.TagLib);
             Original.AudioTagOverlay = new AudioTagOverlay();
             Preview.AudioTagOverlay = new AudioTagOverlay();
             StripAllEmbeddedTagsOnCommit = false;
@@ -315,8 +311,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void ClearMediaPropertiesCache()
         {
-            TagLibLoadAttempted = false;
-            TagLibMetadataLoadError = null;
+            ClearMetadataLoadState(RenameListMetadataRequirement.TagLib);
             Original.Media = null;
             Preview.Media = null;
         }
@@ -326,8 +321,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void ClearImagePropertiesCache()
         {
-            ImagePropertiesLoadAttempted = false;
-            ImagePropertiesLoadError = null;
+            ClearMetadataLoadState(RenameListMetadataRequirement.ImageProperties);
             Original.Image = null;
             Preview.Image = null;
             Original.Exif = null;
@@ -339,8 +333,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void ClearPdfCache()
         {
-            PdfLoadAttempted = false;
-            PdfLoadError = null;
+            ClearMetadataLoadState(RenameListMetadataRequirement.Pdf);
             Original.Pdf = null;
             Preview.Pdf = null;
         }
