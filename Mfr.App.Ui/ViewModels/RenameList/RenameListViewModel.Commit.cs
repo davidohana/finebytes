@@ -1,4 +1,5 @@
 using Avalonia.Media;
+using Mfr.Engine.Beta;
 using Mfr.Engine.Commit;
 using Mfr.Engine.Config;
 using Mfr.Models.Config;
@@ -71,19 +72,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             IReadOnlyList<RenameResultItem>? results = null;
-            var commitCompleted = await _RunProgressAsync(
-                    RenameListProgressOperation.Commit,
-                    (token, progress) =>
-                    {
-                        results = _renameList.Commit(
-                            plan,
-                            failFast: false,
-                            cancellationToken: token,
-                            progress: progress
-                        );
-                    }
-                )
-                .ConfigureAwait(true);
+            bool commitCompleted;
+            try
+            {
+                commitCompleted = await _RunProgressAsync(
+                        RenameListProgressOperation.Commit,
+                        (token, progress) =>
+                        {
+                            results = _renameList.Commit(
+                                plan,
+                                failFast: false,
+                                cancellationToken: token,
+                                progress: progress
+                            );
+                        }
+                    )
+                    .ConfigureAwait(true);
+            }
+            catch (BetaExpiredException ex)
+            {
+                LastStatusMessage = StatusBarText.Error(ex.Message);
+                return false;
+            }
 
             _ClearPreviewCounts();
             _RefreshFieldDisplay();

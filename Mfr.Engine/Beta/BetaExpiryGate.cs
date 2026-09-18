@@ -55,7 +55,18 @@ namespace Mfr.Engine.Beta
         /// <summary>
         /// Gets whether the effective UTC clock is on or after <see cref="ExpiresUtc"/>.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Starts the one-shot network probe when it has not run yet (may block briefly). Prefer
+        /// <see cref="IsExpiredWithoutProbe"/> on UI CanExecute paths.
+        /// </para>
+        /// </remarks>
         public static bool IsExpired => GetEffectiveUtc() >= ExpiresUtc;
+
+        /// <summary>
+        /// Gets whether expiry holds using only cached network time or local UTC — never starts a probe.
+        /// </summary>
+        public static bool IsExpiredWithoutProbe => _GetEffectiveUtcWithoutProbe() >= ExpiresUtc;
 
         /// <summary>
         /// Returns the effective UTC used for expiry: cached network time advanced by local elapsed, or local UTC.
@@ -64,7 +75,14 @@ namespace Mfr.Engine.Beta
         public static DateTime GetEffectiveUtc()
         {
             _EnsureNetworkProbe();
+            return _GetEffectiveUtcWithoutProbe();
+        }
 
+        /// <summary>
+        /// Cached network UTC advanced by local elapsed, or local UTC, without starting a probe.
+        /// </summary>
+        private static DateTime _GetEffectiveUtcWithoutProbe()
+        {
             lock (Sync)
             {
                 if (_cachedNetworkUtc is { } networkUtc && _sinceNetworkProbe is not null)

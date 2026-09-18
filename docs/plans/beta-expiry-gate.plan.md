@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-hosts-build
     content: "P2: UI disable GO/status + About beta label; CLI catch; early network probe; BETA build flag docs"
-    status: pending
+    status: completed
 isProject: false
 ---
 

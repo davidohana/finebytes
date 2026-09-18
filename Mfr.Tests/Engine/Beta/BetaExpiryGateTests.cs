@@ -139,6 +139,32 @@ namespace Mfr.Tests.Engine.Beta
             BetaExpiryGate.ThrowIfCommitDisallowed(dryRun: true);
         }
 
+        [Fact]
+        public void IsExpiredWithoutProbe_uses_local_clock_without_fetch()
+        {
+            var fetchCalls = 0;
+            BetaExpiryGate.ConfigureForTests(
+                utcNow: () => BetaExpiryGate.ExpiresUtc,
+                tryFetchNetworkUtc: _ =>
+                {
+                    fetchCalls++;
+                    return null;
+                }
+            );
+
+            Assert.True(BetaExpiryGate.IsExpiredWithoutProbe);
+            Assert.Equal(0, fetchCalls);
+        }
+
+        [Fact]
+        public void FormatMessage_includes_expiry_day_and_download_guidance()
+        {
+            var message = BetaExpiredException.FormatMessage(BetaExpiryGate.ExpiresUtc);
+
+            Assert.Contains("2027-01-01", message, StringComparison.Ordinal);
+            Assert.Contains("Download a newer beta or the release.", message, StringComparison.Ordinal);
+        }
+
 #if !BETA
         [Fact]
         public void IsEnforcementEnabled_false_by_default_in_non_beta_builds()

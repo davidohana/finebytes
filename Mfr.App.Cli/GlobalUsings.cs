@@ -1,3 +1,4 @@
+global using Mfr.Engine.Beta;
 global using Mfr.Engine.Config;
 global using Mfr.Engine.Logging;
 global using Mfr.Engine.Presets;

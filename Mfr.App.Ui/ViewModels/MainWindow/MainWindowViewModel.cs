@@ -11,6 +11,7 @@ using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors;
 using Mfr.App.Ui.ViewModels.FilterPalette;
 using Mfr.App.Ui.ViewModels.RenameList;
+using Mfr.Engine.Beta;
 using Mfr.Engine.Config;
 using Mfr.Engine.Presets;
 using Mfr.Engine.RenameLog;
@@ -239,8 +240,14 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         public async Task GoAsync()
         {
             await WaitForPendingPreviewAsync().ConfigureAwait(true);
+            await _EnsureBetaProbeBeforeCommitGateAsync().ConfigureAwait(true);
             if (!_CanGo())
             {
+                if (_IsBetaCommitBlocked())
+                {
+                    _ShowBetaExpiredStatus();
+                }
+
                 return;
             }
 
@@ -423,8 +430,14 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         [RelayCommand(CanExecute = nameof(_CanGo))]
         public async Task GenerateRenameScriptAsync()
         {
+            await _EnsureBetaProbeBeforeCommitGateAsync().ConfigureAwait(true);
             if (!_CanGo())
             {
+                if (_IsBetaCommitBlocked())
+                {
+                    _ShowBetaExpiredStatus();
+                }
+
                 return;
             }
 
@@ -724,11 +737,65 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Whether GO / Generate Rename Script may run (non-empty idle Rename List).
+        /// Whether GO / Generate Rename Script may run (non-empty idle Rename List; beta not expired).
         /// </summary>
         private bool _CanGo()
         {
-            return RenameListViewModel.ItemCount >= 1 && !RenameListViewModel.IsBusy;
+            if (RenameListViewModel.ItemCount < 1 || RenameListViewModel.IsBusy)
+            {
+                return false;
+            }
+
+            if (_IsBetaCommitBlocked())
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Completes the one-shot network clock probe off the UI thread before re-checking commit gates.
+        /// </summary>
+        private async Task _EnsureBetaProbeBeforeCommitGateAsync()
+        {
+            if (!BetaExpiryGate.IsEnforcementEnabled)
+            {
+                return;
+            }
+
+            await Task.Run(BetaExpiryGate.TryRefreshNetworkUtc).ConfigureAwait(true);
+            GoCommand.NotifyCanExecuteChanged();
+            GenerateRenameScriptCommand.NotifyCanExecuteChanged();
+        }
+
+        /// <summary>
+        /// Refreshes GO CanExecute after the startup network clock probe and surfaces expiry status when blocked.
+        /// </summary>
+        internal void NotifyBetaExpiryProbeCompleted()
+        {
+            GoCommand.NotifyCanExecuteChanged();
+            GenerateRenameScriptCommand.NotifyCanExecuteChanged();
+            if (_IsBetaCommitBlocked())
+            {
+                _ShowBetaExpiredStatus();
+            }
+        }
+
+        /// <summary>
+        /// Whether enforcement is on and the available clock is past the beta expiry (does not start a probe).
+        /// </summary>
+        private static bool _IsBetaCommitBlocked()
+        {
+            return BetaExpiryGate.IsEnforcementEnabled && BetaExpiryGate.IsExpiredWithoutProbe;
+        }
+
+        /// <summary>
+        /// Publishes the shared beta-expired message on the status bar.
+        /// </summary>
+        private void _ShowBetaExpiredStatus()
+        {
+            StatusHint = StatusBarText.Error(BetaExpiredException.FormatMessage(BetaExpiryGate.ExpiresUtc));
         }
 
         private bool _CanUndoLast()
