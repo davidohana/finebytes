@@ -27,6 +27,10 @@ namespace Mfr.Tests.Ui.About
             Assert.NotNull(splash);
             Assert.NotNull(splash.Source);
 
+            var ok = dialog.FindControl<Button>("OkButton");
+            Assert.NotNull(ok);
+            Assert.Contains("message-dialog-footer", ok.Classes);
+
             dialog.Close();
         }
     }

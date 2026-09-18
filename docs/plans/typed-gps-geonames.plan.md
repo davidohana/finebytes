@@ -53,6 +53,35 @@ MFR7 vendors this under `3rdParty/GeoNames/` (not a maintained NuGet). Skip it b
 
 If GeoNames ever grows (feature-class filters, retries, etc.), still prefer a small `GeoNamesClient` in `Mfr.Metadata` over resurrecting the vendored tree.
 
+### Offline alternatives (considered)
+
+Yes — reverse geocoding does **not** require the live API. Realistic options:
+
+| Approach | Works offline? | Cost | Place quality |
+| --- | --- | --- | --- |
+| **A. HTTPS findNearby (current lock)** | No (needs net + username) | Tiny code; free GeoNames account; ~0 install data | Best match to MFR7; nearest feature from server |
+| **B. Bundle a GeoNames dump** (e.g. `cities15000` / `cities5000`) + local nearest-neighbor | Yes after install | Zip sizes below; uncompressed ~2–3×; plus RAM for KD-tree | Nearest *city in dump*, not full gazetteer; weak for remote photos |
+| **C. Download dump once to AppData** (same as B, not embedded) | Yes after first fetch | Same data sizes; update story + disk; still need a fetch path | Same as B |
+| **D. GPS tokens only** (`exif-gps-*`); defer `<geo-*>` | Yes | No geo UX | No place/region/country names |
+
+**GeoNames dump zip sizes** (from [download.geonames.org/export/dump](https://download.geonames.org/export/dump/), Sep 2026):
+
+| File | Zip | Rows (approx) | Notes |
+| --- | --- | --- | --- |
+| `cities15000.zip` | **3.2 MB** | ~25k | Cities pop > 15k + capitals — best bundle candidate |
+| `cities5000.zip` | **5.4 MB** | ~50k | pop > 5k |
+| `cities1000.zip` | **10 MB** | ~130k | pop > 1k |
+| `cities500.zip` | **13 MB** | ~185k | pop > 500 |
+| `allCountries.zip` | **402 MB** | everything | Not practical to ship |
+| `admin1CodesASCII.txt` | **148 KB** | — | Needed to resolve admin1 → region *name* if dump only has codes |
+| `countryInfo.txt` | **31 KB** | — | Country names from ISO codes |
+
+Uncompressed text is larger (often ~2–3× zip). In-memory KD-tree is larger still (tens of MB for cities15000 is plausible). Online API stays ~0 extra install size.
+
+Libraries that do B/C (not locked): NuGet **ReverseGeocoder** / **GeoSharp**-style loaders, or **NGeoNames**, all feeding official [GeoNames dump](https://download.geonames.org/export/dump/) text — still CC-BY attribution in help/About. None remove the need to ship or download data.
+
+**Still locked: A** until the user picks otherwise. Typed GPS (P1) is offline either way; only P2 place names need A/B/C.
+
 ## UX
 
 ### Options (P2)

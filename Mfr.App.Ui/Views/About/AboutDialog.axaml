@@ -6,7 +6,7 @@
   x:DataType="vm:AboutDialogViewModel"
   Title="About"
   Icon="/Assets/mfr.ico"
-  Width="540"
+  Width="520"
   MinWidth="480"
   SizeToContent="Height"
   WindowStartupLocation="CenterOwner"
@@ -15,9 +15,32 @@
   FontFamily="{StaticResource AppChromeFont}"
   FontSize="{StaticResource AppChromeFontSize}"
   Foreground="{DynamicResource AppChromeForegroundBrush}"
+  Background="{DynamicResource AppChromeSurfaceBrush}"
 >
-  <DockPanel Margin="16">
-    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+  <Window.Styles>
+    <Style Selector="HyperlinkButton.about-link">
+      <Setter Property="Padding" Value="0" />
+      <Setter Property="MinHeight" Value="0" />
+      <Setter Property="FontFamily" Value="{DynamicResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="{DynamicResource AppChromeFontSize}" />
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeForegroundBrush}" />
+      <Setter Property="Background" Value="Transparent" />
+      <Setter Property="BorderThickness" Value="0" />
+      <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="HyperlinkButton.about-link:pointerover">
+      <Setter Property="Foreground" Value="{DynamicResource AppChromeMutedForegroundBrush}" />
+    </Style>
+  </Window.Styles>
+
+  <DockPanel Margin="20">
+    <StackPanel
+      x:Name="Footer"
+      DockPanel.Dock="Bottom"
+      Orientation="Horizontal"
+      HorizontalAlignment="Right"
+      Margin="0,18,0,0"
+    >
       <Button
         x:Name="OkButton"
         Classes="message-dialog-footer"
@@ -28,24 +51,70 @@
       />
     </StackPanel>
 
-    <StackPanel Orientation="Horizontal" Spacing="16">
+    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="20">
       <Image
         x:Name="SplashImage"
-        Width="250"
-        Height="238"
+        Grid.Column="0"
+        Width="220"
+        Height="210"
         Stretch="Uniform"
-        Source="/Assets/mfr.png"
         VerticalAlignment="Top"
+        Source="/Assets/mfr.png"
       />
-      <StackPanel Spacing="8" VerticalAlignment="Center">
-        <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold" FontSize="16" />
-        <TextBlock Text="{Binding DisplayVersion, StringFormat=Version {0}}" />
-        <TextBlock Text="{Binding Copyright}" TextWrapping="Wrap" />
-        <StackPanel Orientation="Horizontal" Spacing="16" Margin="0,4,0,0">
-          <HyperlinkButton Content="Web Site" Command="{Binding OpenWebSiteCommand}" />
-          <HyperlinkButton Content="Support e-mail" Command="{Binding OpenSupportEmailCommand}" />
-        </StackPanel>
-      </StackPanel>
-    </StackPanel>
+
+      <Border
+        Grid.Column="1"
+        Background="{DynamicResource AppChromeAltSurfaceBrush}"
+        BorderBrush="{DynamicResource AppChromeBorderBrush}"
+        BorderThickness="1"
+        CornerRadius="4"
+        Padding="16,14"
+        MinHeight="210"
+      >
+        <DockPanel>
+          <StackPanel
+            DockPanel.Dock="Bottom"
+            Orientation="Horizontal"
+            Spacing="14"
+            Margin="0,16,0,0"
+          >
+            <HyperlinkButton
+              Classes="about-link"
+              Content="Web Site"
+              Command="{Binding OpenWebSiteCommand}"
+            />
+            <TextBlock
+              Text="·"
+              VerticalAlignment="Center"
+              Foreground="{DynamicResource AppChromeMutedForegroundBrush}"
+            />
+            <HyperlinkButton
+              Classes="about-link"
+              Content="Support e-mail"
+              Command="{Binding OpenSupportEmailCommand}"
+            />
+          </StackPanel>
+
+          <StackPanel Spacing="6" VerticalAlignment="Top">
+            <TextBlock
+              Text="{Binding ProductName}"
+              FontWeight="SemiBold"
+              FontSize="18"
+              TextWrapping="Wrap"
+            />
+            <TextBlock
+              Text="{Binding DisplayVersion, StringFormat=Version {0}}"
+              Foreground="{DynamicResource AppChromeMutedForegroundBrush}"
+            />
+            <TextBlock
+              Text="{Binding Copyright}"
+              TextWrapping="Wrap"
+              Margin="0,4,0,0"
+              Foreground="{DynamicResource AppChromeMutedForegroundBrush}"
+            />
+          </StackPanel>
+        </DockPanel>
+      </Border>
+    </Grid>
   </DockPanel>
 </Window>
