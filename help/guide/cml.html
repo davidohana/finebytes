@@ -66,16 +66,16 @@
         <tr>
           <td><code>--initial-folder &lt;PATH&gt;</code></td>
           <td>
-            Open the File List at this directory only (no Rename List add). UI-only; the console has
-            no File List. When both sources and this option are set, sources still seed the Rename
-            List and this path wins for File List location.
+            Open the File List at this directory. Does not add paths by itself (UI-only; the console
+            has no File List). When both sources and this option are set, sources still seed the
+            Rename List and this path wins for File List location.
           </td>
         </tr>
       </tbody>
     </table>
     <p>
       After a successful add, if <span class="quote">--initial-folder</span> was not set, the File
-      List navigates to the first added item.
+      List opens the folder that contains the first added item and selects that item.
     </p>
 
     <h3>Add modifiers</h3>
@@ -83,7 +83,7 @@
       These options use the same names as the console. They apply only when seeding from
       <span class="quote">SOURCES</span>. When omitted, the desktop UI uses the matching
       <a href="../ui/optionswin.html">Options</a> preferences (Add files, Add folders, Add folder
-      contents, include hidden/system).
+      contents, Include hidden/system files).
     </p>
     <table class="ref-table">
       <thead>
@@ -111,7 +111,7 @@
           <td><code>--include-hidden</code></td>
           <td>
             Include hidden and system items when expanding sources (when omitted: Options —
-            include hidden/system).
+            Include hidden/system files).
           </td>
         </tr>
       </tbody>
