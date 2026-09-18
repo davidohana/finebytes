@@ -61,24 +61,23 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Office
         }
 
         [Fact]
-        public void Format_Created_TokenUsesInvariantDateTimeOffset_GridUsesFormatFileDateLocal()
+        public void Format_DateFields_TokenUsesInvariantDateTimeOffset_GridUsesFormatFileDateLocal()
         {
             var sample = _SampleOffice();
-            var created = sample.Created!.Value;
+            foreach (
+                var (field, value) in new (OfficeDocumentField Field, DateTimeOffset Value)[]
+                {
+                    (OfficeDocumentField.Created, sample.Created!.Value),
+                    (OfficeDocumentField.Modified, sample.Modified!.Value),
+                }
+            )
+            {
+                var tokenText = OfficeDocumentInfoFormatting.Format(sample, field, PropertyDisplayContext.Token);
+                var gridText = OfficeDocumentInfoFormatting.Format(sample, field, PropertyDisplayContext.Grid);
 
-            var tokenText = OfficeDocumentInfoFormatting.Format(
-                sample,
-                OfficeDocumentField.Created,
-                PropertyDisplayContext.Token
-            );
-            var gridText = OfficeDocumentInfoFormatting.Format(
-                sample,
-                OfficeDocumentField.Created,
-                PropertyDisplayContext.Grid
-            );
-
-            Assert.Equal(created.ToString("G", CultureInfo.InvariantCulture), tokenText);
-            Assert.Equal(RenameListFieldDisplay.FormatFileDate(created.LocalDateTime), gridText);
+                Assert.Equal(value.ToString("G", CultureInfo.InvariantCulture), tokenText);
+                Assert.Equal(RenameListFieldDisplay.FormatFileDate(value.LocalDateTime), gridText);
+            }
         }
 
         [Fact]
@@ -181,7 +180,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Office
             );
 
             var item = new RenameItem(meta);
-            Assert.ThrowsAny<Exception>(() => new OfficeTitleToken().Compile(string.Empty)(item));
+            var ex = Assert.Throws<InvalidDataException>(() => new OfficeTitleToken().Compile(string.Empty)(item));
+            Assert.Contains("DOCX", ex.Message, StringComparison.OrdinalIgnoreCase);
         }
 
         [Fact]
