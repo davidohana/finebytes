@@ -20,42 +20,72 @@
     </nav>
     <hr />
     <h1>User Interface Elements</h1>
-    <figure class="screenshot">
-      <img
-        src="../images/ui/hotspots.png"
-        alt="Main window with labeled regions"
-        width="1280"
-        height="860"
-        usemap="#ui-parts-map"
-      />
-      <map name="ui-parts-map">
-        <area shape="rect" coords="2,70,508,528" href="fileexp.html" alt="File List" title="File List" />
-        <area
-          shape="rect"
-          coords="518,70,832,203"
+    <figure class="screenshot screenshot-wide">
+      <!-- Hotspot % boxes match labeled borders on hotspots.png (1280×860). -->
+      <div class="screenshot-hotspots">
+        <img
+          src="../images/ui/hotspots.png"
+          alt="Main window with labeled regions"
+          width="1280"
+          height="860"
+        />
+        <a
+          class="screenshot-hotspot"
+          style="left: 0.16%; top: 8.14%; width: 39.53%; height: 53.26%"
+          href="fileexp.html"
+          title="File List"
+          aria-label="File List"
+        ></a>
+        <a
+          class="screenshot-hotspot"
+          style="left: 40.47%; top: 8.14%; width: 24.53%; height: 15.47%"
           href="availfilterlist.html"
-          alt="Available Filters"
           title="Available Filters"
-        />
-        <area
-          shape="rect"
-          coords="842,70,1276,203"
+          aria-label="Available Filters"
+        ></a>
+        <a
+          class="screenshot-hotspot"
+          style="left: 65.78%; top: 8.14%; width: 33.91%; height: 15.47%"
           href="appliedfilterlist.html"
-          alt="Filter Chain"
           title="Filter Chain"
-        />
-        <area
-          shape="rect"
-          coords="518,213,1276,528"
+          aria-label="Filter Chain"
+        ></a>
+        <a
+          class="screenshot-hotspot"
+          style="left: 40.47%; top: 24.77%; width: 59.22%; height: 36.63%"
           href="filterconfigpanel.html"
-          alt="Filter Configuration"
           title="Filter Configuration"
-        />
-        <area shape="rect" coords="2,538,1276,829" href="renamelist.html" alt="Rename List" title="Rename List" />
-        <area shape="rect" coords="2,832,1276,857" href="statusbar.html" alt="Status Bar" title="Status Bar" />
-        <area shape="circle" coords="96,46,20" href="log.html" alt="Rename Log" title="Rename Log" />
-        <area shape="circle" coords="132,46,20" href="optionswin.html" alt="Options" title="Options" />
-      </map>
+          aria-label="Filter Configuration"
+        ></a>
+        <a
+          class="screenshot-hotspot"
+          style="left: 0.16%; top: 62.56%; width: 99.53%; height: 33.84%"
+          href="renamelist.html"
+          title="Rename List"
+          aria-label="Rename List"
+        ></a>
+        <a
+          class="screenshot-hotspot"
+          style="left: 0.16%; top: 96.74%; width: 99.53%; height: 2.91%"
+          href="statusbar.html"
+          title="Status Bar"
+          aria-label="Status Bar"
+        ></a>
+        <a
+          class="screenshot-hotspot is-circle"
+          style="left: 5.78%; top: 2.79%; width: 3.13%; height: 4.65%"
+          href="log.html"
+          title="Rename Log"
+          aria-label="Rename Log"
+        ></a>
+        <a
+          class="screenshot-hotspot is-circle"
+          style="left: 8.91%; top: 3.49%; width: 3.13%; height: 4.65%"
+          href="optionswin.html"
+          title="Options"
+          aria-label="Options"
+        ></a>
+      </div>
       <figcaption>Click a labeled region for details.</figcaption>
     </figure>
     <p>Main-window regions. Click a colored area (or a name below) for details.</p>

@@ -96,13 +96,13 @@ Save under `help/images/ui/`. Pages under `help/ui/` reference `../images/ui/…
 1. Seed a sample folder + Rename List rows + a short Filter Chain so panes look live.
 1. After updating `images/ui/main-window.png`, regenerate the labeled parts diagram with
    `python .tmp/annotate-help-hotspots.py` (Pillow) → `images/ui/hotspots.png`, and refresh
-   imagemap coords in `help/ui/parts.html` if chrome layout changed.
+   percentage hotspot boxes in `help/ui/parts.html` if chrome layout changed.
 
 ### UI checklist (P0)
 
 - [x] `images/ui/main-window.png` — Main window (`ui.html`, `parts.html` base shot)
 
-- [x] `images/ui/hotspots.png` — Labeled main-window regions + imagemap (`parts.html`;
+- [x] `images/ui/hotspots.png` — Labeled main-window regions + percentage hotspots (`parts.html`;
   regenerate with `.tmp/annotate-help-hotspots.py` after recapturing `main-window.png`)
 
 - [x] `images/ui/file-list.png` — File List (`fileexp.html`)

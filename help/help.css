@@ -58,6 +58,37 @@ figure.screenshot img {
   cursor: zoom-in;
 }
 
+/* Full-window diagrams (e.g. UI parts hotspots) — up to intrinsic width. */
+figure.screenshot.screenshot-wide img,
+figure.screenshot.screenshot-wide .screenshot-hotspots {
+  max-width: min(100%, 1280px);
+}
+
+/* Percentage overlays stay aligned when the screenshot is CSS-scaled. */
+.screenshot-hotspots {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+}
+
+.screenshot-hotspots > img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  cursor: default;
+}
+
+.screenshot-hotspot {
+  position: absolute;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+
+.screenshot-hotspot.is-circle {
+  border-radius: 50%;
+}
+
 figure.screenshot figcaption {
   color: #666;
   font-size: 0.85em;

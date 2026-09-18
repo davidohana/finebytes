@@ -71,18 +71,32 @@
     }
   }
 
+  /**
+   * @param {HTMLImageElement} img
+   * @returns {boolean}
+   */
+  function isHotspotDiagram(img) {
+    return img.hasAttribute("usemap") || !!img.closest(".screenshot-hotspots");
+  }
+
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll("figure.screenshot img").forEach(function (img) {
-      if (!img.getAttribute("title")) {
-        img.setAttribute("title", "Click to enlarge");
+      if (isHotspotDiagram(img) || img.getAttribute("title")) {
+        return;
       }
+
+      img.setAttribute("title", "Click to enlarge");
     });
   });
 
   document.addEventListener("click", function (event) {
     var target = /** @type {HTMLElement} */ (event.target);
+    if (target.closest(".screenshot-hotspot")) {
+      return;
+    }
+
     var img = target.closest("figure.screenshot img");
-    if (!img || img.closest(".screenshot-lightbox")) {
+    if (!img || img.closest(".screenshot-lightbox") || isHotspotDiagram(img)) {
       return;
     }
 
