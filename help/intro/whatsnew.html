@@ -18,8 +18,8 @@
     <p>
       Magic File Renamer 8 is a ground-up rewrite of the classic MFR 7 desktop app on a modern UI
       toolkit. It keeps the batch-renaming workflow — filters, live preview, presets, and tag-aware
-      renaming — and adds several capabilities around the Rename List, formatting tokens, undo, and
-      Help.
+      renaming — and adds the capabilities below around the Rename List, formats, undo, scripting,
+      and console automation.
     </p>
 
     <h2>New features</h2>
@@ -27,18 +27,27 @@
       <li>
         <strong>Rename List upgrades</strong>
         <ul>
-          <li>Field shuttle to choose visible columns</li>
-          <li>Multi-column Auto-Sort</li>
-          <li>Before/After mode for the same fields</li>
-          <li>CSV export of visible columns</li>
-          <li>Column suggestions from the current Filter Chain</li>
+          <li>Before/After mode — flip the same columns between original and preview values</li>
+          <li>CSV export of the visible columns</li>
+          <li>
+            Add / Set columns from the current Filter Chain (write targets and format tokens)
+          </li>
+          <li>
+            <span class="quote">Xiph</span> Rename List columns (and Apply To targets) for Vorbis /
+            FLAC / Opus-style tags
+          </li>
         </ul>
       </li>
       <li>
-        <strong>Image and EXIF in Formatter patterns</strong>
+        <strong>Broader image and audio format support</strong>
         <ul>
-          <li>Tokens can read image properties and EXIF metadata</li>
-          <li>Read-only in this version</li>
+          <li>
+            Formatter tokens can read <span class="quote">WebP</span> image properties (read-only)
+          </li>
+          <li>
+            EXIF tokens work on JPEG and also on PNG, TIFF, and WebP (still read-only)
+          </li>
+          <li>Opus files use the same Xiph comment path as Ogg Vorbis / FLAC</li>
         </ul>
       </li>
       <li>
@@ -50,17 +59,26 @@
         </ul>
       </li>
       <li>
-        <strong>Local Help in your browser</strong>
+        <strong>Generate Rename Script</strong>
         <ul>
-          <li>F1 / Help → Index and Tips open HTML topics in your default browser</li>
-          <li>Filter Configuration <strong>?</strong> opens that filter’s topic</li>
+          <li>
+            Tools → Generate Rename Script exports pending path and attribute changes as
+            <span class="quote">.bat</span> or PowerShell <span class="quote">.ps1</span>
+          </li>
         </ul>
       </li>
       <li>
-        <strong>Console mode</strong>
+        <strong>Console automation upgrades</strong>
         <ul>
           <li>
-            <span class="quote">mfr</span> runs automated, preset-driven renaming
+            <span class="quote">--dry-run</span> previews commit outcomes without changing disk
+          </li>
+          <li>
+            <span class="quote">-o</span> / <span class="quote">--output-file</span> writes JSON
+            results
+          </li>
+          <li>
+            <span class="quote">--set</span> overrides config keys for a run
           </li>
           <li>
             See <a href="../guide/console.html">Console (Automatic) Mode</a> and
@@ -100,5 +118,56 @@
         </ul>
       </li>
     </ul>
+
+    <h2>Not in this build yet / regressions vs MFR 7</h2>
+    <p>
+      The rewrite does not yet match every MFR 7 capability. These items are omitted on purpose for
+      now and may return later.
+    </p>
+    <ul>
+      <li>
+        <strong>Not shipped yet</strong>
+        <ul>
+          <li>FreeDB album lookup (Set from FreeDB filter)</li>
+          <li>Windows Explorer shell context-menu integration</li>
+          <li>Clipboard text formatter token</li>
+          <li>
+            Editable image tags and <span class="quote">&lt;imagetag-*&gt;</span> tokens (EXIF /
+            image properties stay read-only)
+          </li>
+          <li>
+            GeoNames reverse geocoding and typed GPS / <span class="quote">&lt;geo-*&gt;</span>
+            tokens
+          </li>
+          <li>
+            Opening the desktop UI with command-line paths to seed the Rename List (use the File
+            List, drag and drop, or the <span class="quote">mfr</span> console instead)
+          </li>
+        </ul>
+      </li>
+      <li>
+        <strong>Format / imaging regressions</strong>
+        <ul>
+          <li>
+            Image property tokens no longer cover WMF or EMF (MFR 7 did)
+          </li>
+          <li>
+            JPEG 2000 and PDF image-tag / XMP reading from MFR 7 is not in the current image
+            allowlist
+          </li>
+        </ul>
+      </li>
+      <li>
+        <strong>Other gaps</strong>
+        <ul>
+          <li>Drag selected Rename List rows out to Explorer (inbound drop still works)</li>
+          <li>
+            Rename List “Show Last Rename Errors” list-wide view (per-row rename error details still
+            work)
+          </li>
+        </ul>
+      </li>
+    </ul>
   </body>
 </html>
+
