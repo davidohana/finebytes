@@ -84,7 +84,7 @@ figure — their help pages say the filter has no options.
 
 - [x] `images/StripParentheses.png` — Strip Parentheses
 
-## UI / shell (P0)
+## UI / shell
 
 Save under `help/images/ui/`. Pages under `help/ui/` reference `../images/ui/…`.
 
@@ -92,9 +92,10 @@ Save under `help/images/ui/`. Pages under `help/ui/` reference `../images/ui/…
 
 1. Regenerate with
    `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpUiScreenshotCaptureTests`
+   (P0 shell + P1 dialogs/tools).
 1. Seed a sample folder + Rename List rows + a short Filter Chain so panes look live.
 
-### UI checklist
+### UI checklist (P0)
 
 - [x] `images/ui/main-window.png` — Main window (`ui.html`, `parts.html`)
 
@@ -108,24 +109,27 @@ Save under `help/images/ui/`. Pages under `help/ui/` reference `../images/ui/…
 
 - [x] `images/ui/filter-configuration.png` — Filter Configuration pane (`filterconfigpanel.html`)
 
-### UI still to capture (P1+)
+### UI checklist (P1)
 
-See [`docs/plans/help-non-filter-screenshots.plan.md`](../docs/plans/help-non-filter-screenshots.plan.md).
+- [x] `images/ui/filter-options.png` — Filter Options dialog (`filteropts.html`)
 
-- [ ] `images/ui/filter-options.png` — Filter Options dialog
+- [x] `images/ui/options.png` — Options dialog (`optionswin.html`)
 
-- [ ] `images/ui/options.png` — Options dialog
+- [x] `images/ui/preset-manager.png` — Preset Manager (`presetmanager.html`)
 
-- [ ] `images/ui/preset-manager.png` — Preset Manager
+- [x] `images/ui/rename-log.png` — Rename Log (`log.html`)
 
-- [ ] `images/ui/rename-log.png` — Rename Log
+- [x] `images/ui/format-editor.png` — Format Editor (`formateditor.html`)
 
-- [ ] `images/ui/format-editor.png` — Format Editor
+- [x] `images/ui/field-shuttle.png` — Select Fields (`fieldselector.html`)
 
-- [ ] `images/ui/field-shuttle.png` — Select Fields
+- [x] `images/ui/auto-sort.png` — Auto-Sort (`sorteditor.html`)
 
-- [ ] `images/ui/auto-sort.png` — Auto-Sort
+- [x] `images/ui/visual-trim.png` — Visual Trim Helper (`visualtrimmer.html`)
 
-- [ ] `images/ui/visual-trim.png` — Visual Trim Helper
+- [x] `images/ui/status-bar.png` — Status bar (`statusbar.html`)
 
-- [ ] `images/ui/status-bar.png` — Status bar
+### Still optional (P2)
+
+See [`docs/plans/help-non-filter-screenshots.plan.md`](../docs/plans/help-non-filter-screenshots.plan.md)
+for tutorial/howto guide shots.

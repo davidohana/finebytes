@@ -8,19 +8,32 @@ using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Mfr.App.Ui;
 using Mfr.App.Ui.Services.Shell;
+using Mfr.App.Ui.ViewModels.FilterChainPane;
+using Mfr.App.Ui.ViewModels.FilterEditors.Trimming;
+using Mfr.App.Ui.ViewModels.LogDialog;
 using Mfr.App.Ui.ViewModels.MainWindow;
+using Mfr.App.Ui.ViewModels.Options;
+using Mfr.App.Ui.ViewModels.RenameList;
 using Mfr.App.Ui.Views.FileList;
 using Mfr.App.Ui.Views.FilterChainPane;
 using Mfr.App.Ui.Views.FilterEditors;
+using Mfr.App.Ui.Views.FilterEditors.Trimming;
 using Mfr.App.Ui.Views.FilterPalette;
+using Mfr.App.Ui.Views.FormatEditor;
+using Mfr.App.Ui.Views.LogDialog;
+using Mfr.App.Ui.Views.Options;
 using Mfr.App.Ui.Views.RenameList;
+using Mfr.Filters.Case;
 using Mfr.Tests.Ui.FilterChainPane;
+using Mfr.Tests.Ui.FilterEditors;
+using Mfr.Tests.Ui.Presets;
 using AppMainWindow = Mfr.App.Ui.Views.MainWindow.MainWindow;
+using FormatEditorControl = Mfr.App.Ui.Views.FormatEditor.FormatEditor;
 
 namespace Mfr.Tests.Ui.Help
 {
     /// <summary>
-    /// One-shot capture of main-window / pane screenshots for non-filter help pages.
+    /// One-shot capture of main-window / pane / dialog screenshots for non-filter help pages.
     /// <para>
     /// Run with <c>MFR_CAPTURE_HELP_SCREENSHOTS=1</c>. No-ops otherwise.
     /// </para>
@@ -36,11 +49,15 @@ namespace Mfr.Tests.Ui.Help
         public HelpUiScreenshotCaptureTests()
         {
             ConfigStoreTestReset.LoadEmpty();
+            RenameLogStore.ClearLastOperation();
+            ConfigStore.RenameLog.Limit = 0;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
+            RenameLogStore.ClearLastOperation();
+            ConfigStoreTestReset.LoadEmpty();
             _tempDirectoryFixture.Dispose();
         }
 
@@ -149,7 +166,331 @@ namespace Mfr.Tests.Ui.Help
             }
         }
 
-        private static void _CaptureControl(Control control, string path)
+        /// <summary>
+        /// Renders P1 dialog / tool shots under <c>help/images/ui/</c>.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Capture_p1_dialogs_and_tools_to_help_images()
+        {
+            if (Environment.GetEnvironmentVariable("MFR_CAPTURE_HELP_SCREENSHOTS") != "1")
+            {
+                return;
+            }
+
+            var outputDir = Path.Combine(_ResolveHelpImagesDirectory(), "ui");
+            Directory.CreateDirectory(outputDir);
+
+            _CaptureFilterOptions(outputDir);
+            _CaptureOptions(outputDir);
+            _CapturePresetManager(outputDir);
+            _CaptureRenameLog(outputDir);
+            _CaptureFormatEditor(outputDir);
+            _CaptureFieldShuttle(outputDir);
+            _CaptureAutoSort(outputDir);
+            _CaptureVisualTrim(outputDir);
+            await _CaptureStatusBarAsync(outputDir);
+
+            foreach (
+                var name in new[]
+                {
+                    "filter-options.png",
+                    "options.png",
+                    "preset-manager.png",
+                    "rename-log.png",
+                    "format-editor.png",
+                    "field-shuttle.png",
+                    "auto-sort.png",
+                    "visual-trim.png",
+                    "status-bar.png",
+                }
+            )
+            {
+                Assert.True(File.Exists(Path.Combine(outputDir, name)), "Missing " + name);
+            }
+        }
+
+        private static void _CaptureFilterOptions(string outputDir)
+        {
+            var step = new FilterChainStepViewModel("Letters Case", new LettersCaseFilter());
+            var dialogVm = new FilterOptionsDialogViewModel(step);
+            var dialog = new FilterOptionsDialog(dialogVm);
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                _CaptureControl(dialog, Path.Combine(outputDir, "filter-options.png"));
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        private static void _CaptureOptions(string outputDir)
+        {
+            var dialog = new OptionsDialog(new OptionsDialogViewModel());
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                _CaptureControl(dialog, Path.Combine(outputDir, "options.png"));
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        private static void _CapturePresetManager(string outputDir)
+        {
+            var (dialog, _, _) = PresetManagerDialogTestUi.ShowWithPresets(
+                "Music tags cleanup",
+                "Photo batch",
+                "Strip drafts"
+            );
+
+            try
+            {
+                _CaptureControl(dialog, Path.Combine(outputDir, "preset-manager.png"));
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        private void _CaptureRenameLog(string outputDir)
+        {
+            var logDir = _tempDirectoryFixture.CreateTempDir();
+            RenameLogStore.CaptureFromCommit(
+                [
+                    new RenameResultItem(
+                        OriginalPath: TestPaths.Absolute("Blue Train.mp3"),
+                        Status: RenameStatus.CommitOk,
+                        Error: null,
+                        Changes: [new RenamePropertyChange("FileName", "Blue Train", "Blue_Train")],
+                        DestinationPath: TestPaths.Absolute("Blue_Train.mp3"),
+                        IsFolder: false
+                    ),
+                    new RenameResultItem(
+                        OriginalPath: TestPaths.Absolute("report_draft.txt"),
+                        Status: RenameStatus.CommitOk,
+                        Error: null,
+                        Changes: [new RenamePropertyChange("FileName", "report_draft", "report")],
+                        DestinationPath: TestPaths.Absolute("report.txt"),
+                        IsFolder: false
+                    ),
+                ],
+                directoryPath: logDir,
+                limit: 10
+            );
+            RenameLogStore.CaptureFromCommit(
+                [
+                    new RenameResultItem(
+                        OriginalPath: TestPaths.Absolute("IMG_0001.jpg"),
+                        Status: RenameStatus.CommitOk,
+                        Error: null,
+                        Changes: [new RenamePropertyChange("FileName", "IMG_0001", "photo-0001")],
+                        DestinationPath: TestPaths.Absolute("photo-0001.jpg"),
+                        IsFolder: false
+                    ),
+                ],
+                directoryPath: logDir,
+                limit: 10
+            );
+
+            var dialog = new RenameLogDialog(new RenameLogDialogViewModel(logDir));
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                _CaptureControl(dialog, Path.Combine(outputDir, "rename-log.png"));
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        private static void _CaptureFormatEditor(string outputDir)
+        {
+            var editor = new FormatEditorControl
+            {
+                Text = "Track <counter:initial=1,step=1> - <file-name>",
+                ShowRightClickHint = true,
+            };
+            var pane = new FormatTokenPickerPane { Content = editor, IsExpanded = true };
+            var window = new Window
+            {
+                Title = "Format Editor",
+                Width = 720,
+                Height = 320,
+                Background = Brushes.White,
+                Content = new Border
+                {
+                    Padding = new Thickness(12),
+                    Background = Brushes.White,
+                    Child = pane,
+                },
+            };
+            window.Show();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                _CaptureControl(pane, Path.Combine(outputDir, "format-editor.png"));
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+
+        private static void _CaptureFieldShuttle(string outputDir)
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                RenameListVisibleColumn.CreateDefaults(),
+                RenameListSortKey.DefaultKeys
+            );
+            var dialog = new RenameListFieldShuttleDialog(dialogVm) { Width = 900, Height = 700 };
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                _CaptureControl(dialog, Path.Combine(outputDir, "field-shuttle.png"));
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        private static void _CaptureAutoSort(string outputDir)
+        {
+            var dialogVm = new RenameListFieldShuttleDialogViewModel(
+                RenameListVisibleColumn.CreateDefaults(),
+                RenameListSortKey.DefaultKeys,
+                RenameListFieldShuttleTab.Sort
+            );
+            var dialog = new RenameListFieldShuttleDialog(dialogVm) { Width = 900, Height = 700 };
+            dialog.Show();
+            dialog.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                _CaptureControl(dialog, Path.Combine(outputDir, "auto-sort.png"));
+            }
+            finally
+            {
+                dialog.Close();
+            }
+        }
+
+        private static void _CaptureVisualTrim(string outputDir)
+        {
+            var (window, mainViewModel, editorView) = FilterEditorTestUi.ShowFilterEditorPanes();
+            mainViewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("TrimLeft"));
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var optionsEditor = Assert.IsType<CountFilterEditorViewModel>(
+                mainViewModel.FilterEditorViewModel.OptionsEditor
+            );
+            optionsEditor.TrimHelper.SetSampleText("Blue Train.mp3");
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            var helperView = editorView.GetVisualDescendants().OfType<VisualTrimHelperView>().Single();
+            var textBox = helperView.FindControl<TextBox>("TrimHelperText");
+            Assert.NotNull(textBox);
+            textBox.SelectionStart = 0;
+            textBox.SelectionEnd = 5;
+            FilterEditorTestUi.RaisePointerReleased(textBox);
+            window.UpdateLayout();
+            Dispatcher.UIThread.RunJobs();
+
+            try
+            {
+                // RenderTargetBitmap treats unset Background as transparent → black; force a light plate.
+                helperView.Background = Brushes.White;
+                _CaptureControl(helperView, Path.Combine(outputDir, "visual-trim.png"));
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+
+        private async Task _CaptureStatusBarAsync(string outputDir)
+        {
+            var sampleDir = _CreateSampleFolder();
+            var viewModel = new MainWindowViewModel(
+                initialFileListPath: sampleDir,
+                persistSession: false,
+                shellOpener: NullFileShellOpener.Instance
+            );
+            FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+
+            var window = new AppMainWindow
+            {
+                DataContext = viewModel,
+                Width = 1280,
+                Height = 860,
+                Background = Brushes.White,
+            };
+
+            try
+            {
+                window.Show();
+                window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+                FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+
+                var sources = Directory
+                    .GetFiles(sampleDir)
+                    .OrderBy(path => path, StringComparer.OrdinalIgnoreCase)
+                    .ToArray();
+                await UiStartupArgsApplier.ApplyAsync(viewModel, sources);
+                FileListListingWait.WaitUntilIdle(viewModel.FileListViewModel);
+
+                viewModel.FilterChainViewModel.AppendCommand.Execute(FilterChainTestUi.Entry("LettersCase"));
+                window.UpdateLayout();
+                Dispatcher.UIThread.RunJobs();
+                await Task.Delay(200);
+                Dispatcher.UIThread.RunJobs();
+
+                var itemsLabel = window
+                    .GetVisualDescendants()
+                    .OfType<TextBlock>()
+                    .First(block =>
+                        block.Text is not null && block.Text.StartsWith("Items:", StringComparison.Ordinal)
+                    );
+                var statusBar = itemsLabel.GetVisualAncestors().OfType<Border>().First();
+                // Status bar Border has no Background; alone it renders transparent → black.
+                statusBar.Background = Brushes.White;
+                _CaptureControl(statusBar, Path.Combine(outputDir, "status-bar.png"), minWidth: 200, minHeight: 16);
+            }
+            finally
+            {
+                window.Close();
+            }
+        }
+
+        private static void _CaptureControl(Control control, string path, int minWidth = 40, int minHeight = 40)
         {
             ArgumentNullException.ThrowIfNull(control);
 
@@ -159,7 +500,10 @@ namespace Mfr.Tests.Ui.Help
             var bounds = control.Bounds;
             var pixelWidth = Math.Max(1, (int)Math.Ceiling(bounds.Width));
             var pixelHeight = Math.Max(1, (int)Math.Ceiling(bounds.Height));
-            Assert.True(pixelWidth > 40 && pixelHeight > 40, $"{path} too small: {pixelWidth}x{pixelHeight}");
+            Assert.True(
+                pixelWidth > minWidth && pixelHeight > minHeight,
+                $"{path} too small: {pixelWidth}x{pixelHeight}"
+            );
 
             using var bitmap = new RenderTargetBitmap(new PixelSize(pixelWidth, pixelHeight), new Vector(96, 96));
             bitmap.Render(control);
