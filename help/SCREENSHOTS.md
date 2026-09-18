@@ -1,4 +1,6 @@
-# Filter help screenshots
+# Help screenshots
+
+## Filter options
 
 Capture each filter’s Filter Configuration **options body** (no title bar) and
 save as `help/images/{Type}.png` (catalog type name, e.g. `SpaceCharacter.png`).
@@ -9,7 +11,7 @@ Optionless filters (`RemoveSpaces`, `ShrinkSpaces`, `SeparateCapitalizedText`,
 `StripSpacesLeft`, `StripSpacesRight`, `UppercaseInitials`) have **no** screenshot
 figure — their help pages say the filter has no options.
 
-## Capture tips
+### Capture tips (filters)
 
 1. Regenerate with
    `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpScreenshotCaptureTests`
@@ -20,7 +22,7 @@ figure — their help pages say the filter has no options.
 1. Missing images still load: `help.css` shows a checkerboard placeholder behind broken `img`.
 1. This file is **not** copied to the app output directory.
 
-## Checklist
+### Filter checklist
 
 - [x] `images/CapitalizeAfter.png` — Capitalize After
 
@@ -81,3 +83,49 @@ figure — their help pages say the filter has no options.
 - [x] `images/PathMover.png` — Path Mover
 
 - [x] `images/StripParentheses.png` — Strip Parentheses
+
+## UI / shell (P0)
+
+Save under `help/images/ui/`. Pages under `help/ui/` reference `../images/ui/…`.
+
+### Capture tips (UI)
+
+1. Regenerate with
+   `MFR_CAPTURE_HELP_SCREENSHOTS=1 dotnet test ./Mfr.Tests/Mfr.Tests.csproj --filter FullyQualifiedName~HelpUiScreenshotCaptureTests`
+1. Seed a sample folder + Rename List rows + a short Filter Chain so panes look live.
+
+### UI checklist
+
+- [x] `images/ui/main-window.png` — Main window (`ui.html`, `parts.html`)
+
+- [x] `images/ui/file-list.png` — File List (`fileexp.html`)
+
+- [x] `images/ui/rename-list.png` — Rename List (`renamelist.html`)
+
+- [x] `images/ui/available-filters.png` — Available Filters (`availfilterlist.html`)
+
+- [x] `images/ui/filter-chain.png` — Filter Chain (`appliedfilterlist.html`)
+
+- [x] `images/ui/filter-configuration.png` — Filter Configuration pane (`filterconfigpanel.html`)
+
+### UI still to capture (P1+)
+
+See [`docs/plans/help-non-filter-screenshots.plan.md`](../docs/plans/help-non-filter-screenshots.plan.md).
+
+- [ ] `images/ui/filter-options.png` — Filter Options dialog
+
+- [ ] `images/ui/options.png` — Options dialog
+
+- [ ] `images/ui/preset-manager.png` — Preset Manager
+
+- [ ] `images/ui/rename-log.png` — Rename Log
+
+- [ ] `images/ui/format-editor.png` — Format Editor
+
+- [ ] `images/ui/field-shuttle.png` — Select Fields
+
+- [ ] `images/ui/auto-sort.png` — Auto-Sort
+
+- [ ] `images/ui/visual-trim.png` — Visual Trim Helper
+
+- [ ] `images/ui/status-bar.png` — Status bar
