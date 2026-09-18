@@ -56,6 +56,33 @@ namespace Mfr.Tests.Metadata
         }
 
         [Fact]
+        public void Read_HeifFixtureWithoutExif_EmptySnapshot()
+        {
+            var path = _RequireFixture("tiny.heic");
+
+            var exif = ExifDataReader.Read(path);
+
+            Assert.Null(exif.Make);
+            Assert.Null(exif.Model);
+            Assert.Null(exif.DateTaken);
+            Assert.Null(exif.Exposure);
+            Assert.Empty(exif.TagToDescription);
+        }
+
+        [Fact]
+        public void Read_HeifExifFixture_MapsExifTagToDescription()
+        {
+            var path = _RequireFixture("tiny-exif.heic");
+
+            var exif = ExifDataReader.Read(path);
+
+            Assert.Null(exif.Make);
+            Assert.Null(exif.DateTaken);
+            Assert.True(exif.TagToDescription.ContainsKey("Exif/Orientation"));
+            Assert.False(string.IsNullOrWhiteSpace(exif.TagToDescription["Exif/Orientation"]));
+        }
+
+        [Fact]
         public void Read_WavFixture_ThrowsInvalidOperationException()
         {
             var path = _RequireFixture("minimal-silent.wav");

@@ -109,6 +109,24 @@ namespace Mfr.Tests.Ui.FormatEditor
             Assert.True(vm.IsGrouped);
         }
 
+        /// <summary>
+        /// Verifies ClearSearch restores grouped browse.
+        /// </summary>
+        [Fact]
+        public void ClearSearchCommand_ClearsTextAndRestoresGroupedItems()
+        {
+            var vm = _CreateVm();
+            vm.SearchText = "counter";
+            Assert.False(vm.IsGrouped);
+            Assert.True(vm.ClearSearchCommand.CanExecute(null));
+
+            vm.ClearSearchCommand.Execute(null);
+
+            Assert.Equal(string.Empty, vm.SearchText);
+            Assert.True(vm.IsGrouped);
+            Assert.False(vm.ClearSearchCommand.CanExecute(null));
+        }
+
         private static FormatTokenPickerViewModel _CreateVm()
         {
             return new(static _ => { });

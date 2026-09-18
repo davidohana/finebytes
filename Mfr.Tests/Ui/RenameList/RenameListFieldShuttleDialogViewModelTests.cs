@@ -794,10 +794,12 @@ namespace Mfr.Tests.Ui.RenameList
             var groupCount = dialogVm.AvailableOriginalFields.Count;
             dialogVm.SearchText = "Title";
             Assert.True(dialogVm.IsFieldSearchActive);
+            Assert.Null(dialogVm.SelectedGroup);
 
             dialogVm.SearchText = blankSearch;
 
             Assert.False(dialogVm.IsFieldSearchActive);
+            Assert.Equal(ImageRenameListFields.Group, dialogVm.SelectedGroup?.GroupId);
             Assert.Equal(groupCount, dialogVm.AvailableOriginalFields.Count);
             Assert.All(
                 dialogVm.AvailableOriginalFields,
@@ -814,11 +816,27 @@ namespace Mfr.Tests.Ui.RenameList
             dialogVm.SearchText = "Title";
 
             Assert.True(dialogVm.IsFieldSearchActive);
+            Assert.Null(dialogVm.SelectedGroup);
             Assert.Contains(
                 dialogVm.AvailableOriginalFields,
                 field => field.GroupId == AudioTagRenameListFields.Group && field.PropertyKey == "Title"
             );
             Assert.Contains(dialogVm.AvailableOriginalFields, field => field.GroupId != BasicRenameListField.Group);
+        }
+
+        [Fact]
+        public void SearchText_ignores_SelectedGroup_writes_while_active()
+        {
+            var dialogVm = _CreateDefaultDialog();
+            dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == ImageRenameListFields.Group);
+            dialogVm.SearchText = "Title";
+            Assert.Null(dialogVm.SelectedGroup);
+
+            dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == BasicRenameListField.Group);
+
+            Assert.Null(dialogVm.SelectedGroup);
+            dialogVm.SearchText = "";
+            Assert.Equal(ImageRenameListFields.Group, dialogVm.SelectedGroup?.GroupId);
         }
 
         [Fact]
@@ -941,6 +959,22 @@ namespace Mfr.Tests.Ui.RenameList
                 dialogVm.SelectedColumnRows,
                 row => row.Column.Key.PropertyKey == BasicRenameListFields.Key.Name
             );
+        }
+
+        [Fact]
+        public void ClearSearchCommand_clears_text_and_restores_group()
+        {
+            var dialogVm = _CreateDefaultDialog();
+            dialogVm.SelectedGroup = dialogVm.Groups.Single(group => group.GroupId == ImageRenameListFields.Group);
+            dialogVm.SearchText = "Title";
+            Assert.True(dialogVm.ClearSearchCommand.CanExecute(null));
+
+            dialogVm.ClearSearchCommand.Execute(null);
+
+            Assert.Equal(string.Empty, dialogVm.SearchText);
+            Assert.False(dialogVm.IsFieldSearchActive);
+            Assert.Equal(ImageRenameListFields.Group, dialogVm.SelectedGroup?.GroupId);
+            Assert.False(dialogVm.ClearSearchCommand.CanExecute(null));
         }
 
         private static RenameListFieldShuttleDialogViewModel _CreateDefaultDialog()

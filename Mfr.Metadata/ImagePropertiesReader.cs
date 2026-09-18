@@ -3,6 +3,7 @@ using MetadataExtractor.Formats.Bmp;
 using MetadataExtractor.Formats.Exif;
 using MetadataExtractor.Formats.FileType;
 using MetadataExtractor.Formats.Gif;
+using MetadataExtractor.Formats.Heif;
 using MetadataExtractor.Formats.Ico;
 using MetadataExtractor.Formats.Jfif;
 using MetadataExtractor.Formats.Jpeg;
@@ -27,6 +28,7 @@ namespace Mfr.Metadata
             "TIFF",
             "ICO",
             "WebP",
+            "HEIF",
         };
 
         /// <summary>
@@ -99,6 +101,7 @@ namespace Mfr.Metadata
                 "TIFF" => _ReadTiffDimensions(directories),
                 "WebP" => _ReadWebPDimensions(directories),
                 "ICO" => _ReadIcoDimensions(directories),
+                "HEIF" => _ReadHeifDimensions(directories),
                 _ => (0, 0),
             };
         }
@@ -161,6 +164,18 @@ namespace Mfr.Metadata
             );
         }
 
+        /// <summary>
+        /// Reads width/height from the primary HEIC item properties directory.
+        /// </summary>
+        private static (int Width, int Height) _ReadHeifDimensions(IReadOnlyList<MeDirectory> directories)
+        {
+            var heic = _PrimaryHeicProperties(directories);
+            return (
+                _TryGetInt(heic, HeicImagePropertiesDirectory.TagImageWidth),
+                _TryGetInt(heic, HeicImagePropertiesDirectory.TagImageHeight)
+            );
+        }
+
         private static int _ReadIcoDimension(IcoDirectory? directory, int tag)
         {
             if (directory is null || !directory.ContainsTag(tag))
@@ -188,6 +203,7 @@ namespace Mfr.Metadata
                 ),
                 "ICO" => _TryGetInt(directories.OfType<IcoDirectory>().FirstOrDefault(), IcoDirectory.TagBitsPerPixel),
                 "TIFF" => _ReadTiffBitDepth(directories),
+                "HEIF" => _ReadHeifBitDepth(directories),
                 _ => 0,
             };
         }
@@ -239,6 +255,29 @@ namespace Mfr.Metadata
             }
 
             return _SumNumericTag(ifd0, ExifDirectoryBase.TagBitsPerSample);
+        }
+
+        /// <summary>
+        /// Sums per-channel pixel depths from the primary HEIC item when <c>TagPixelDepths</c> is present.
+        /// </summary>
+        private static int _ReadHeifBitDepth(IReadOnlyList<MeDirectory> directories)
+        {
+            var heic = _PrimaryHeicProperties(directories);
+            return heic is null ? 0 : _SumNumericTag(heic, HeicImagePropertiesDirectory.TagPixelDepths);
+        }
+
+        /// <summary>
+        /// Returns the HEIC primary-item properties directory.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// MetadataExtractor adds <c>HEIC Primary Item Properties</c> before thumbnail property
+        /// directories (<c>pitm</c> then <c>thmb</c>), so the first match is the primary item.
+        /// </para>
+        /// </remarks>
+        private static HeicImagePropertiesDirectory? _PrimaryHeicProperties(IReadOnlyList<MeDirectory> directories)
+        {
+            return directories.OfType<HeicImagePropertiesDirectory>().FirstOrDefault();
         }
 
         private static (double Horizontal, double Vertical) _ReadDpiPair(IReadOnlyList<MeDirectory> directories)
@@ -379,7 +418,7 @@ namespace Mfr.Metadata
                 }
             }
 
-            var isStillFormat = format is "JPEG" or "PNG" or "BMP" or "WebP" or "TIFF";
+            var isStillFormat = format is "JPEG" or "PNG" or "BMP" or "WebP" or "TIFF" or "HEIF";
             if (isStillFormat && (width > 0 || height > 0))
             {
                 return 1;

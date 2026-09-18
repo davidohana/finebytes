@@ -5,6 +5,16 @@ namespace Mfr.Tests.Metadata
     /// <summary>
     /// Tests for <see cref="ImagePropertiesReader"/>.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// HEIF fixtures: <c>tiny.heic</c> / <c>tiny.heif</c> are Crest Convert
+    /// <c>pampas-grass-small.heic</c> (CC0 1.0, SHA-256
+    /// <c>bb24331d3d5b7c54a4e98faf40fe465be524f83f841076c63b699c6a74fe67bf</c>).
+    /// <c>tiny-exif.heic</c> is <c>samplefilehub.heif</c> from
+    /// <c>ianare/exif-samples</c> (<c>heic/samplefilehub.heif</c>; CC BY-SA 4.0, SHA-256
+    /// <c>f86ec0d3a6c82e31657bb1886e1ec95579329fa98d8be511ac1e8497c778e07f</c>).
+    /// </para>
+    /// </remarks>
     public sealed class ImagePropertiesReaderTests
     {
         [Fact]
@@ -50,6 +60,38 @@ namespace Mfr.Tests.Metadata
             Assert.Equal(1, image.Width);
             Assert.Equal(1, image.Height);
             Assert.True(image.FrameCount > 1);
+        }
+
+        [Theory]
+        [InlineData("tiny.heic")]
+        [InlineData("tiny.heif")]
+        public void Read_HeifFixture_MapsDimensionsAndFormat(string fileName)
+        {
+            var path = _RequireFixture(fileName);
+
+            var image = ImagePropertiesReader.Read(path);
+
+            Assert.Equal("HEIF", image.Format);
+            Assert.Equal(600, image.Width);
+            Assert.Equal(800, image.Height);
+            Assert.Equal(24, image.BitDepth);
+            Assert.Equal(1, image.FrameCount);
+        }
+
+        [Fact]
+        public void Read_HeifExifFixture_MapsPrimaryDimensions()
+        {
+            var path = _RequireFixture("tiny-exif.heic");
+
+            var image = ImagePropertiesReader.Read(path);
+
+            Assert.Equal("HEIF", image.Format);
+            Assert.Equal(640, image.Width);
+            Assert.Equal(426, image.Height);
+            Assert.Equal(0, image.BitDepth);
+            Assert.Equal(72, image.HorizontalResolutionDpi);
+            Assert.Equal(72, image.VerticalResolutionDpi);
+            Assert.Equal(1, image.FrameCount);
         }
 
         [Fact]

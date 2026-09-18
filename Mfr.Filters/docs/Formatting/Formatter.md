@@ -133,21 +133,21 @@ Reads from **`Original.Image`** (read-only MetadataExtractor raster cache). Prop
 
 Display strings come from Models **`ImagePropertiesFormatting`** (`PropertyDisplayContext.Token`), shared with Rename List Image columns (`Grid`). See [image-metadata-model.md](../../../docs/image-metadata-model.md).
 
-**Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** (exception as **`Cause`**). Mapped rasters are JPEG, PNG, GIF, BMP, TIFF, ICO, and WebP. MetadataExtractor **does** open MP3/WAV (and other audio/video), but **`image-*` still errors** on those types. A missing field on a mapped raster (no DPI, WebP bit depth, `0` dimensions) expands **empty**, not an error.
+**Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** (exception as **`Cause`**). Mapped rasters are JPEG, PNG, GIF, BMP, TIFF, ICO, WebP, and HEIF (`.heic` / `.heif`). MetadataExtractor **does** open MP3/WAV (and other audio/video), but **`image-*` still errors** on those types. A missing field on a mapped raster (no DPI, WebP bit depth, `0` dimensions) expands **empty**, not an error.
 
 Raster size uses **`<image-width>`** / **`<image-height>`** (MetadataExtractor). TagLib **`<media-video-width>`** / **`<media-video-height>`** are video frame size only.
 
 Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image properties as already loaded so seeded **`FileMeta.Image`** is used without disk I/O.
 
-| Token                 | Output                                                                                                    |
-| --------------------- | --------------------------------------------------------------------------------------------------------- |
-| `<image-width>`       | Width (px); empty when `0`.                                                                               |
-| `<image-height>`      | Height (px); empty when `0`.                                                                              |
-| `<image-bit-depth>`   | Total bits per pixel; empty when `0`.                                                                     |
-| `<image-format>`      | MetadataExtractor short type name (`JPEG`, `PNG`, `GIF`, `TIFF`, `BMP`, `ICO`, `WebP`); empty when unset. |
-| `<image-horz-res>`    | Horizontal DPI; whole numbers without a decimal (`96`); otherwise general (`72.009`); empty when `≤ 0`.   |
-| `<image-vert-res>`    | Vertical DPI; same formatting as horz-res; empty when `≤ 0`.                                              |
-| `<image-frame-count>` | Frame count; empty when `0`. Stills with known dims are `1`.                                              |
+| Token                 | Output                                                                                                            |
+| --------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `<image-width>`       | Width (px); empty when `0`.                                                                                       |
+| `<image-height>`      | Height (px); empty when `0`.                                                                                      |
+| `<image-bit-depth>`   | Total bits per pixel; empty when `0`.                                                                             |
+| `<image-format>`      | MetadataExtractor short type name (`JPEG`, `PNG`, `GIF`, `TIFF`, `BMP`, `ICO`, `WebP`, `HEIF`); empty when unset. |
+| `<image-horz-res>`    | Horizontal DPI; whole numbers without a decimal (`96`); otherwise general (`72.009`); empty when `≤ 0`.           |
+| `<image-vert-res>`    | Vertical DPI; same formatting as horz-res; empty when `≤ 0`.                                                      |
+| `<image-frame-count>` | Frame count; empty when `0`. Stills with known dims are `1`.                                                      |
 
 **Arguments:** No argument (`<image-width>` only). A stray **`<image-width:…>`** fails at compile.
 
@@ -187,7 +187,7 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark PDF load as already
 
 Reads from **`Original.Exif`** (read-only MetadataExtractor EXIF cache). The same **`EnsureImagePropertiesLoaded`** path as **`image-*`** fills both caches on first **`image-*`** or **`exif-*`** token use; **`RenameList.Commit`** clears them. Text/camera fields are MetadataExtractor **`GetDescription`** strings (then `\n` → space, trim). **`DateTaken`** is SubIFD DateTimeOriginal via **`TryGetDateTime`** only (no DateTimeDigitized / IFD0 DateTime fallback).
 
-**Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** — including MP3/WAV. A mapped raster with no EXIF (or a missing field) expands **empty**, not an error. PNG/TIFF/WebP with EXIF work; the allowlist is the same as **`image-*`**.
+**Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** — including MP3/WAV. A mapped raster with no EXIF (or a missing field) expands **empty**, not an error. PNG/TIFF/WebP/HEIF with EXIF work; the allowlist is the same as **`image-*`**.
 
 Keep later **`<imagetag-*>`** (TagLib Image Tag) separate; values may differ from **`<exif-*>`**. Typed GPS lat/lon and **`<geo-*>`** are not in this slice.
 
