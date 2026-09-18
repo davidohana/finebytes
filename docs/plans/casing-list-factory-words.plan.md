@@ -7,7 +7,7 @@
 | curate-default-words | Done |
 | editor-load-button | Done |
 | sample-reuse | Done |
-| docs-tests | Open |
+| docs-tests | Done |
 
 ## Decisions (locked)
 
