@@ -52,7 +52,8 @@ Add `Mfr.Filters/docs/<Group>/YourFilterType.md` (examples table per `Mfr.Filter
 
 ## User Help HTML
 
-When adding a filter, also ship Help next to the exe:
+When adding a filter, also ship Help next to the exe (refresh the same page if options/labels
+change later — editors follow this section via `mfr-implement-filter-editor`):
 
 1. Add `help/filters/{group}/{Type}.html` where `{group}` is the lowercase `FilterGroup` name (e.g. `space`, `trimming`); display name = `FilterPalette` label; options use Filter Configuration UI labels. Help basename is convention: `{Type}.html` (no map; `HelpHost` resolves by unique basename under `help/`).
 1. Breadcrumb: `Index` → `Filters` → group → display name (`../../index.html` / `../filters.html` / `../filters.html#{group}`). Figcaption is user-facing (`Filter options.`); keep screenshot capture notes in `help/SCREENSHOTS.md` only — not in shipped HTML. Use `../../help.css` and `../../images/{Type}.png`.

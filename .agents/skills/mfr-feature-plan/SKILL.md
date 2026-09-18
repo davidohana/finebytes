@@ -63,6 +63,11 @@ plan for non-blocking tweaks — amend that section and affected phases only.
 …
 ```
 
+When a phase ships **user-visible** product behavior, put Help in that phase’s exit criteria
+(touch only what drifts: usually `help/intro/whatsnew.html` and/or `features.html`, plus the
+matching `help/ui/` or `help/guide/` page). Filter HTML stays with `mfr-implement-filter` —
+do not restate its conventions here.
+
 Link the parent plan section when this is a child (e.g. rename-list 14d).
 
 ## Explore budget

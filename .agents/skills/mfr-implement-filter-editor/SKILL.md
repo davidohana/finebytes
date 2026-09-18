@@ -26,7 +26,8 @@ Filter editor:
 - [ ] 5. Add matching View under Views/FilterEditors/<Group>/
 - [ ] 6. Register in FilterOptionsEditorFactory
 - [ ] 7. Dedicated VM + headless tests under Ui/FilterEditors/<Group>/ (each filter type in the group)
-- [ ] 8. Format/lint touched files
+- [ ] 8. If options/labels changed, refresh that filter’s `help/filters/…` page (conventions: `mfr-implement-filter` User Help HTML — do not restate)
+- [ ] 9. Format/lint touched files
 ```
 
 ## Grouping
@@ -108,12 +109,12 @@ Follow `mfr-ui-headless-tests` for gesture/control rules. Put per-editor facts i
 
 - Preset load/save UI; persisting the working chain on session
 - Filter Options dialog XAML polish / Apply To / instance rename
-- Filter help `?` button
+- Filter help `?` button wiring (content updates: checklist step 8)
 - Creating the underlying `BaseFilter` / options record (separate pass + `mfr-implement-filter`)
 - Formatter rich token builder (own sub-project when that plan item is current)
 
 ## Related skills
 
 - `mfr7-reference` — MFR7 editor + help before coding
-- `mfr-implement-filter` — filter record / JSON / docs only
+- `mfr-implement-filter` — filter record / JSON / docs / Help HTML conventions
 - `mfr-ui-headless-tests` — Avalonia headless coverage rules

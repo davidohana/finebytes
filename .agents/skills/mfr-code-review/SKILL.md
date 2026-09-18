@@ -181,6 +181,9 @@ session, not process config.
 - Prefer one general API over a singular/plural or parse/try-parse twin that share a body.
   Prefer one field when two are always written together.
 - After a behavior change, hunt stale predicates, comments, and type names.
+- User-visible product change with no matching `help/` update → propose (or apply a small
+  obvious page fix). Filter page layout: `mfr-implement-filter`; product intro/UI: plan exit
+  criteria — do not invent a second Help style guide here.
 - Explicit registration when order/defaults/identity are the product; reflection when it is
   an open catalog. Namespaces match folders. Question every warning suppression.
 - Non-obvious private methods get XML `<summary>`. Load-bearing concepts belong there, not
