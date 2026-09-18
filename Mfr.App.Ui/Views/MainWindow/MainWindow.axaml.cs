@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
@@ -79,6 +80,8 @@ namespace Mfr.App.Ui.Views.MainWindow
                 _boundViewModel.AboutRequested -= _OnAboutRequested;
                 _boundViewModel.LogRequested -= _OnLogRequested;
                 _boundViewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
+                _boundViewModel.ConfirmRenameScriptUnsupportedFiltersAsync = null;
+                _boundViewModel.ShowRenameScriptEmptyAsync = null;
                 _boundViewModel = null;
             }
 
@@ -95,6 +98,43 @@ namespace Mfr.App.Ui.Views.MainWindow
             viewModel.AboutRequested += _OnAboutRequested;
             viewModel.LogRequested += _OnLogRequested;
             viewModel.ResetConfigurationRequested += _OnResetConfigurationRequested;
+            viewModel.ConfirmRenameScriptUnsupportedFiltersAsync = _ConfirmRenameScriptUnsupportedFiltersAsync;
+            viewModel.ShowRenameScriptEmptyAsync = _ShowRenameScriptEmptyAsync;
+        }
+
+        private Task<bool> _ConfirmRenameScriptUnsupportedFiltersAsync(IReadOnlyList<string> unsupportedNames)
+        {
+            var body = new StringBuilder();
+            body.Append("The Filter Chain includes filters whose changes cannot be written to a rename script ");
+            body.Append("(file dates and tags are not supported).");
+            body.AppendLine();
+            body.AppendLine();
+            foreach (var name in unsupportedNames)
+            {
+                body.Append("• ");
+                body.AppendLine(name);
+            }
+
+            body.AppendLine();
+            body.Append("The script will only include name, path, and attribute changes. Continue?");
+
+            return SuppressibleConfirm.ConfirmAsync(
+                this,
+                title: "Generate Rename Script",
+                message: body.ToString(),
+                kind: ConfirmationKind.GenerateRenameScriptUnsupportedFilters
+            );
+        }
+
+        private async Task _ShowRenameScriptEmptyAsync()
+        {
+            await new OkMessageDialog(
+                title: "Generate Rename Script",
+                message: "No name, path, or attribute changes to export.\n\n"
+                    + "Generated scripts do not include file dates or tag changes."
+            )
+                .ShowDialog(this)
+                .ConfigureAwait(true);
         }
 
         private void _OnFilterDefaultSaved(object? sender, string catalogDisplayName)
@@ -432,6 +472,8 @@ namespace Mfr.App.Ui.Views.MainWindow
             viewModel.AboutRequested -= _OnAboutRequested;
             viewModel.LogRequested -= _OnLogRequested;
             viewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
+            viewModel.ConfirmRenameScriptUnsupportedFiltersAsync = null;
+            viewModel.ShowRenameScriptEmptyAsync = null;
 
             if (viewModel.SuppressSessionSaveOnClose)
             {

@@ -1,4 +1,5 @@
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v2;
 using Mfr.Utils;
 
 namespace Mfr.Filters.Formatting.Tokens.Audio
@@ -136,7 +137,7 @@ namespace Mfr.Filters.Formatting.Tokens.Audio
     /// <see cref="Models.Tags.Id3v2.Id3v2TagData.Version"/>. Empty when no ID3v2 block is present.
     /// </para>
     /// </remarks>
-    [FormatTokenInfo("ID3v2 Version", "Audio\\ID3", "ID3v2 tag version (e.g. 2.3 / 2.4)", "id3v2-version")]
+    [FormatTokenInfo("ID3v2 Version", "Audio\\ID3", Id3v2FrameTips.Version, "id3v2-version")]
     internal sealed class Id3v2VersionToken : IFormatToken
     {
         /// <inheritdoc />

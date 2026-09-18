@@ -675,7 +675,7 @@ namespace Mfr.Tests.Ui.RenameList
             renameListViewModel.AbSide = RenameListPrefs.AbSidePreview;
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
+                PickSavePathAsync = _ => Task.FromResult<string?>(outPath),
             };
 
             await renameListViewModel.ExportVisibleColumnsAsync();

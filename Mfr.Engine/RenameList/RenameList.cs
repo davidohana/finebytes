@@ -379,6 +379,54 @@ namespace Mfr.Engine.RenameList
         }
 
         /// <summary>
+        /// Counts Rename List rows that would emit path or RAHS ops in a rename script.
+        /// </summary>
+        /// <returns>Number of scriptable rows (same grouping as <see cref="ExportRenameScript"/>).</returns>
+        public int CountRenameScriptItems()
+        {
+            return RenameScriptCollector.Collect(_renameItems).Count;
+        }
+
+        /// <summary>
+        /// Writes a UTF-8 rename script for path and RAHS attribute preview deltas.
+        /// </summary>
+        /// <param name="path">Destination file path (created or overwritten).</param>
+        /// <param name="format">Bat or PowerShell dialect; PowerShell files include a UTF-8 BOM.</param>
+        /// <returns>
+        /// Number of scriptable rows written. Returns <c>0</c> without creating or overwriting
+        /// <paramref name="path"/> when there is nothing to export.
+        /// </returns>
+        /// <exception cref="ArgumentException"><paramref name="path"/> is null or whitespace.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="format"/> is not a supported value.</exception>
+        /// <exception cref="IOException">The file could not be written.</exception>
+        /// <remarks>
+        /// <para>
+        /// Skips <see cref="RenameStatus.PreviewError"/> rows and rows with only tag/date changes.
+        /// Attribute commands target the preview full path after any rename/move for that row.
+        /// </para>
+        /// </remarks>
+        public int ExportRenameScript(string path, RenameScriptFormat format)
+        {
+            ArgumentException.ThrowIfNullOrWhiteSpace(path);
+            if (format is not (RenameScriptFormat.Bat or RenameScriptFormat.PowerShell))
+            {
+                throw new ArgumentOutOfRangeException(nameof(format), format, "Unsupported rename script format.");
+            }
+
+            var opGroups = RenameScriptCollector.Collect(_renameItems);
+            if (opGroups.Count == 0)
+            {
+                return 0;
+            }
+
+            var text = RenameScriptFormatter.Format(opGroups, format);
+            // Format validated above; encode Bat without BOM and PowerShell with BOM.
+            var encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier: format == RenameScriptFormat.PowerShell);
+            File.WriteAllText(path, text, encoding);
+            return opGroups.Count;
+        }
+
+        /// <summary>
         /// Moves the given items one position by <paramref name="offset"/>.
         /// </summary>
         /// <param name="items">Items to move; entries not in the list are ignored.</param>

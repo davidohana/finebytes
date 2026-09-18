@@ -528,6 +528,11 @@
           </MenuItem.Icon>
         </MenuItem>
         <MenuItem
+          Header="_Generate Rename Script…"
+          Command="{Binding GenerateRenameScriptCommand}"
+          ToolTip.Tip="{x:Static resources:AppTips.GenerateRenameScript}"
+        />
+        <MenuItem
           Header="Reset _configuration"
           Command="{Binding ResetConfigurationCommand}"
           ToolTip.Tip="{x:Static resources:AppTips.ResetConfiguration}"

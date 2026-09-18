@@ -162,6 +162,12 @@ String-target filters (Formatter, Replacer, …) can address one native field vi
 | `Id3v2Frame`         | One modeled frame (`frameId`, optional `language` / `description`) |
 | `XiphField`          | One Xiph key                                                       |
 
+Rename List format-specific column groups track Filter Options **Apply-To** groups that already
+exist: **MP3 ID3v1**, **MP3 ID3v2**, and **Xiph** (plus semantic **Audio Tag** / MediaTag).
+Apple / ASF / APE / RIFF INFO stay out of the shuttle until they have Apply-To groups. Set/Add
+columns from filters reverse-map catalog `WriteTarget`s, so a Formatter on `XiphField("TITLE")`
+adds Xiph Title Original+Preview — not MediaTag Title.
+
 Dedicated audio filters:
 
 - `AudioTagSetter` — multi-field semantic set (no target)

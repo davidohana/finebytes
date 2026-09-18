@@ -607,7 +607,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([alphaPath, betaPath]);
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
+                PickSavePathAsync = _ => Task.FromResult<string?>(outPath),
             };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -643,7 +643,7 @@ namespace Mfr.Tests.Ui.RenameList
             ]);
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
+                PickSavePathAsync = _ => Task.FromResult<string?>(outPath),
             };
 
             await renameListViewModel.ExportVisibleColumnsAsync();
@@ -671,7 +671,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]);
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(null),
+                PickSavePathAsync = _ => Task.FromResult<string?>(null),
             };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -697,7 +697,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]);
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
+                PickSavePathAsync = _ => Task.FromResult<string?>(outPath),
             };
 
             var nameKey = RenameListFieldKey.Original(BasicRenameListField.Group, BasicRenameListFields.Key.Name);
@@ -723,7 +723,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]);
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(outPath),
+                PickSavePathAsync = _ => Task.FromResult<string?>(outPath),
             };
 
             await renameListViewModel.ExportVisibleColumnsAsync();
@@ -750,7 +750,7 @@ namespace Mfr.Tests.Ui.RenameList
             await renameListViewModel.AddPathsAsync([path]);
             renameListViewModel.UiHooks = new RenameListUiHooks
             {
-                PickSavePathAsync = (_, _, _) => Task.FromResult<string?>(missingDir),
+                PickSavePathAsync = _ => Task.FromResult<string?>(missingDir),
                 ShowErrorAsync = (title, message) =>
                 {
                     errorTitle = title;

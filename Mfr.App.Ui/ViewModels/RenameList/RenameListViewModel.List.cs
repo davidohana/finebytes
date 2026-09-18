@@ -1,4 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.Services;
+using Mfr.Engine.RenameScript;
 using Mfr.Filters.Formatting;
 using Mfr.Models.Config;
 using Mfr.Models.RenameList;
@@ -156,7 +158,16 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            var path = await hooks.PickSavePathAsync(title, defaultExtension, fileTypeName).ConfigureAwait(true);
+            var path = await hooks
+                .PickSavePathAsync(
+                    new SaveFilePickOptions
+                    {
+                        Title = title,
+                        DefaultExtension = defaultExtension,
+                        FileTypeName = fileTypeName,
+                    }
+                )
+                .ConfigureAwait(true);
             if (string.IsNullOrWhiteSpace(path) || IsBusy)
             {
                 return;
@@ -179,6 +190,35 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             LastStatusMessage = StatusBarText.Neutral($"Exported {Entries.Count} row(s).");
+            _shellOpener.RevealInFileManager(path);
+        }
+
+        /// <summary>
+        /// Counts Rename List rows that would emit path or RAHS ops in a rename script.
+        /// </summary>
+        /// <returns>Number of scriptable rows.</returns>
+        internal int CountRenameScriptItems()
+        {
+            return _renameList.CountRenameScriptItems();
+        }
+
+        /// <summary>
+        /// Writes a rename script for path and RAHS preview deltas.
+        /// </summary>
+        /// <param name="path">Destination file path.</param>
+        /// <param name="format">Bat or PowerShell dialect.</param>
+        /// <returns>Scriptable row count written, or <c>0</c> when nothing was written.</returns>
+        internal int ExportRenameScript(string path, RenameScriptFormat format)
+        {
+            return _renameList.ExportRenameScript(path, format);
+        }
+
+        /// <summary>
+        /// Reveals <paramref name="path"/> in the OS file manager (after a successful export).
+        /// </summary>
+        /// <param name="path">Local file path to reveal.</param>
+        internal void RevealExportedPath(string path)
+        {
             _shellOpener.RevealInFileManager(path);
         }
 

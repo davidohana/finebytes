@@ -1,6 +1,7 @@
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors.Audio;
 using Mfr.Filters.Audio;
+using Mfr.Models.Tags;
 
 namespace Mfr.Tests.Ui.FilterEditors.Audio
 {
@@ -178,6 +179,30 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         }
 
         /// <summary>
+        /// Verifies setter tips reuse <see cref="SemanticAudioFieldTips"/> and append clamp notes where needed.
+        /// </summary>
+        [Fact]
+        public void Audio_tag_setter_tips_reuse_semantic_field_tips()
+        {
+            Assert.Equal(SemanticAudioFieldTips.Title, _Choice(AudioTagSetterFieldKind.Title).Tip);
+            Assert.Equal(SemanticAudioFieldTips.Artist, _Choice(AudioTagSetterFieldKind.Performers).Tip);
+            Assert.Equal(SemanticAudioFieldTips.AlbumArtist, _Choice(AudioTagSetterFieldKind.AlbumArtists).Tip);
+            Assert.Equal(SemanticAudioFieldTips.Lyrics, _Choice(AudioTagSetterFieldKind.Lyrics).Tip);
+
+            var year = _Choice(AudioTagSetterFieldKind.Year).Tip;
+            Assert.StartsWith(SemanticAudioFieldTips.Year, year);
+            Assert.Contains("1–9999", year, StringComparison.Ordinal);
+
+            var track = _Choice(AudioTagSetterFieldKind.Track).Tip;
+            Assert.StartsWith(SemanticAudioFieldTips.Track, track);
+            Assert.Contains("auto-increment", track, StringComparison.Ordinal);
+
+            var genre = _Choice(AudioTagSetterFieldKind.Genre).Tip;
+            Assert.StartsWith(SemanticAudioFieldTips.Genre, genre);
+            Assert.Contains("ID3v1", genre, StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// Verifies track auto-increment persists on options even when the track field is omitted.
         /// </summary>
         [Fact]
@@ -220,6 +245,11 @@ namespace Mfr.Tests.Ui.FilterEditors.Audio
         )
         {
             return editor.FieldRows.Single(row => row.Kind == kind);
+        }
+
+        private static AudioTagSetterFieldChoice _Choice(AudioTagSetterFieldKind kind)
+        {
+            return AudioTagSetterFieldChoice.All.Single(choice => choice.Kind == kind);
         }
     }
 }

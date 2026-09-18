@@ -175,13 +175,7 @@ namespace Mfr.App.Ui.Views.RenameList
         {
             viewModel.UiHooks = new RenameListUiHooks
             {
-                PickSavePathAsync = (title, defaultExtension, fileTypeName) =>
-                    FileSavePicker.PickSaveFileAsync(
-                        this,
-                        title: title,
-                        defaultExtension: defaultExtension,
-                        fileTypeName: fileTypeName
-                    ),
+                PickSavePathAsync = options => FileSavePicker.PickSaveFileAsync(this, options),
                 ShowErrorAsync = _ShowExportErrorAsync,
                 PromptAsync = _PromptOverrideAsync,
                 ConfirmPreviewErrorsAsync = _ConfirmPreviewErrorsAsync,

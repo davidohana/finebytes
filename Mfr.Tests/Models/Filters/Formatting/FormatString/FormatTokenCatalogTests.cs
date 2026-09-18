@@ -1,6 +1,7 @@
 using Mfr.Filters.Formatting.FormatString;
 using Mfr.Models.RenameList.Fields.Basic;
 using Mfr.Models.Tags;
+using Mfr.Models.Tags.Id3v2;
 
 namespace Mfr.Tests.Models.Filters.Formatting.FormatString
 {
@@ -145,15 +146,7 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
                     e => string.Equals(e.CanonicalName, canonicalName, StringComparison.Ordinal)
                 );
                 Assert.Equal(SemanticAudioFieldLabels.For(field), entry.DisplayName);
-                var tip = SemanticAudioFieldTips.For(field);
-                if (tip is not null)
-                {
-                    Assert.Equal(tip, entry.ShortDescription);
-                }
-                else
-                {
-                    Assert.False(string.IsNullOrWhiteSpace(entry.ShortDescription));
-                }
+                Assert.Equal(SemanticAudioFieldTips.For(field), entry.ShortDescription);
             }
         }
 
@@ -197,6 +190,19 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         {
             var field = Assert.Single(BasicRenameListFields.All, f => f.PropertyKey == propertyKey);
             Assert.Equal(label, field.DisplayName);
+        }
+
+        /// <summary>
+        /// Verifies the ID3v2 Version token tooltip is the shared <see cref="Id3v2FrameTips.Version"/> string.
+        /// </summary>
+        [Fact]
+        public void Id3v2_version_token_uses_frame_tips_version()
+        {
+            var entry = Assert.Single(
+                FormatTokenCatalog.Entries,
+                e => string.Equals(e.CanonicalName, "id3v2-version", StringComparison.Ordinal)
+            );
+            Assert.Equal(Id3v2FrameTips.Version, entry.ShortDescription);
         }
     }
 }

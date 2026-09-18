@@ -79,11 +79,11 @@ namespace Mfr.Models.Tags
 
             var merged = new Id3v1TagData
             {
-                Title = common.Title.TrimmedOrNull(),
-                Artist = artist.TrimmedOrNull(),
-                Album = common.Album.TrimmedOrNull(),
+                Title = Id3v1OnDiskText.TruncateTitleArtistAlbumOrNull(common.Title),
+                Artist = Id3v1OnDiskText.TruncateTitleArtistAlbumOrNull(artist),
+                Album = Id3v1OnDiskText.TruncateTitleArtistAlbumOrNull(common.Album),
                 Year = common.Year,
-                Comment = common.Comment.TrimmedOrNull(),
+                Comment = Id3v1OnDiskText.TruncateCommentOrNull(common.Comment),
                 Track = track,
                 Genre = genreByte,
             };

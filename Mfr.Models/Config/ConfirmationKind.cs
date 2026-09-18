@@ -43,5 +43,11 @@ namespace Mfr.Models.Config
         /// Confirm before deleting one or more presets.
         /// </summary>
         DeletePreset = 6,
+
+        /// <summary>
+        /// Confirm before Generate Rename Script when the Filter Chain has date/tag filters
+        /// (script emits name/path/attrs only).
+        /// </summary>
+        GenerateRenameScriptUnsupportedFilters = 7,
     }
 }
