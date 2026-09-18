@@ -13,18 +13,12 @@ namespace Mfr.App.Ui.Services
         /// Opens a save-file picker owned by <paramref name="visual"/>'s top-level window.
         /// </summary>
         /// <param name="visual">Control used to resolve <see cref="TopLevel.StorageProvider"/>.</param>
-        /// <param name="title">Dialog title.</param>
-        /// <param name="defaultExtension">Extension without dot (e.g. <c>txt</c>).</param>
-        /// <param name="suggestedFileName">Optional suggested file name.</param>
-        /// <param name="fileTypeName">Primary filter label (e.g. <c>Text files</c> or <c>CSV files</c>).</param>
+        /// <param name="options">Dialog title, extension, and type filters.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
         public static Task<string?> PickSaveFileAsync(
             Visual visual,
-            string title = "Save as",
-            string defaultExtension = "txt",
-            string? suggestedFileName = null,
-            string fileTypeName = "Text files",
+            SaveFilePickOptions options,
             CancellationToken cancellationToken = default
         )
         {
@@ -34,49 +28,47 @@ namespace Mfr.App.Ui.Services
                 return Task.FromResult<string?>(null);
             }
 
-            return PickSaveFileAsync(
-                storage,
-                title,
-                defaultExtension,
-                suggestedFileName,
-                fileTypeName,
-                cancellationToken
-            );
+            return PickSaveFileAsync(storage, options, cancellationToken);
         }
 
         /// <summary>
-        /// Opens a save-file picker owned by <paramref name="visual"/>'s top-level window with explicit type filters.
+        /// Opens a save-file picker on <paramref name="storage"/>.
         /// </summary>
-        /// <param name="visual">Control used to resolve <see cref="TopLevel.StorageProvider"/>.</param>
-        /// <param name="title">Dialog title.</param>
-        /// <param name="defaultExtension">Extension without dot (e.g. <c>bat</c>).</param>
-        /// <param name="fileTypeChoices">Save dialog type filters (e.g. bat, ps1, all).</param>
-        /// <param name="suggestedFileName">Optional suggested file name.</param>
+        /// <param name="storage">Avalonia storage provider.</param>
+        /// <param name="options">Dialog title, extension, and type filters.</param>
         /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
-        public static Task<string?> PickSaveFileAsync(
-            Visual visual,
-            string title,
-            string defaultExtension,
-            IReadOnlyList<FilePickerFileType> fileTypeChoices,
-            string? suggestedFileName = null,
+        public static async Task<string?> PickSaveFileAsync(
+            IStorageProvider storage,
+            SaveFilePickOptions options,
             CancellationToken cancellationToken = default
         )
         {
-            var storage = _TryGetStorageProvider(visual);
-            if (storage is null)
+            ArgumentNullException.ThrowIfNull(storage);
+            ArgumentNullException.ThrowIfNull(options);
+            ArgumentException.ThrowIfNullOrWhiteSpace(options.Title);
+            ArgumentException.ThrowIfNullOrWhiteSpace(options.DefaultExtension);
+
+            var fileTypeChoices = _BuildFileTypeChoices(options);
+
+            if (cancellationToken.IsCancellationRequested)
             {
-                return Task.FromResult<string?>(null);
+                return null;
             }
 
-            return PickSaveFileAsync(
-                storage,
-                title,
-                defaultExtension,
-                fileTypeChoices,
-                suggestedFileName,
-                cancellationToken
-            );
+            var file = await storage
+                .SaveFilePickerAsync(
+                    new FilePickerSaveOptions
+                    {
+                        Title = options.Title,
+                        DefaultExtension = options.DefaultExtension,
+                        SuggestedFileName = options.SuggestedFileName,
+                        FileTypeChoices = fileTypeChoices,
+                    }
+                )
+                .ConfigureAwait(true);
+
+            return file?.TryGetLocalPath();
         }
 
         /// <summary>
@@ -89,89 +81,37 @@ namespace Mfr.App.Ui.Services
         }
 
         /// <summary>
-        /// Opens a save-file picker on <paramref name="storage"/>.
+        /// Builds Avalonia type filters from <paramref name="options"/>.
         /// </summary>
-        /// <param name="storage">Avalonia storage provider.</param>
-        /// <param name="title">Dialog title.</param>
-        /// <param name="defaultExtension">Extension without dot (e.g. <c>txt</c>).</param>
-        /// <param name="suggestedFileName">Optional suggested file name.</param>
-        /// <param name="fileTypeName">Primary filter label (e.g. <c>Text files</c> or <c>CSV files</c>).</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
-        public static Task<string?> PickSaveFileAsync(
-            IStorageProvider storage,
-            string title = "Save as",
-            string defaultExtension = "txt",
-            string? suggestedFileName = null,
-            string fileTypeName = "Text files",
-            CancellationToken cancellationToken = default
-        )
+        private static FilePickerFileType[] _BuildFileTypeChoices(SaveFilePickOptions options)
         {
-            ArgumentNullException.ThrowIfNull(storage);
-            ArgumentException.ThrowIfNullOrWhiteSpace(title);
-            ArgumentException.ThrowIfNullOrWhiteSpace(defaultExtension);
-            ArgumentException.ThrowIfNullOrWhiteSpace(fileTypeName);
-
-            return PickSaveFileAsync(
-                storage,
-                title,
-                defaultExtension,
-                fileTypeChoices:
-                [
-                    new FilePickerFileType(fileTypeName) { Patterns = [$"*.{defaultExtension}"] },
-                    new FilePickerFileType("All files") { Patterns = ["*.*"] },
-                ],
-                suggestedFileName,
-                cancellationToken
-            );
-        }
-
-        /// <summary>
-        /// Opens a save-file picker on <paramref name="storage"/> with explicit type filters.
-        /// </summary>
-        /// <param name="storage">Avalonia storage provider.</param>
-        /// <param name="title">Dialog title.</param>
-        /// <param name="defaultExtension">Extension without dot (e.g. <c>bat</c>).</param>
-        /// <param name="fileTypeChoices">Save dialog type filters (e.g. bat, ps1, all).</param>
-        /// <param name="suggestedFileName">Optional suggested file name.</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Picked local path, or <see langword="null"/> when cancelled / unavailable.</returns>
-        public static async Task<string?> PickSaveFileAsync(
-            IStorageProvider storage,
-            string title,
-            string defaultExtension,
-            IReadOnlyList<FilePickerFileType> fileTypeChoices,
-            string? suggestedFileName = null,
-            CancellationToken cancellationToken = default
-        )
-        {
-            ArgumentNullException.ThrowIfNull(storage);
-            ArgumentException.ThrowIfNullOrWhiteSpace(title);
-            ArgumentException.ThrowIfNullOrWhiteSpace(defaultExtension);
-            ArgumentNullException.ThrowIfNull(fileTypeChoices);
-            if (fileTypeChoices.Count == 0)
+            if (options.FileTypes is { Count: > 0 } fileTypes)
             {
-                throw new ArgumentException("At least one file type choice is required.", nameof(fileTypeChoices));
-            }
-
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return null;
-            }
-
-            var file = await storage
-                .SaveFilePickerAsync(
-                    new FilePickerSaveOptions
+                var choices = new FilePickerFileType[fileTypes.Count];
+                for (var i = 0; i < fileTypes.Count; i++)
+                {
+                    var type = fileTypes[i];
+                    ArgumentException.ThrowIfNullOrWhiteSpace(type.Name);
+                    if (type.Patterns is null || type.Patterns.Count == 0)
                     {
-                        Title = title,
-                        DefaultExtension = defaultExtension,
-                        SuggestedFileName = suggestedFileName,
-                        FileTypeChoices = fileTypeChoices,
+                        throw new ArgumentException(
+                            $"Save file type '{type.Name}' requires at least one pattern.",
+                            nameof(options)
+                        );
                     }
-                )
-                .ConfigureAwait(true);
 
-            return file?.TryGetLocalPath();
+                    choices[i] = new FilePickerFileType(type.Name) { Patterns = type.Patterns };
+                }
+
+                return choices;
+            }
+
+            ArgumentException.ThrowIfNullOrWhiteSpace(options.FileTypeName);
+            return
+            [
+                new FilePickerFileType(options.FileTypeName) { Patterns = [$"*.{options.DefaultExtension}"] },
+                new FilePickerFileType("All files") { Patterns = ["*.*"] },
+            ];
         }
     }
 }

@@ -15,13 +15,13 @@ namespace Mfr.Models.RenameList.Fields.Xiph
             XiphRenameListFields.Group,
             XiphRenameListFields.GroupLabel,
             key,
-            XiphKeyLabels.For(key),
+            $"{XiphKeyLabels.For(key)} (Xiph)",
             defaultWidth,
             isSortable: true,
             supportsPreview: true,
             RenameListMetadataRequirement.TagLib,
             writeTarget: new XiphFieldTarget(key),
-            tip: XiphKeyLabels.Tip(key)
+            tip: _Tip(key)
         )
     {
         /// <summary>
@@ -33,6 +33,15 @@ namespace Mfr.Models.RenameList.Fields.Xiph
         public override string Resolve(FileMeta meta)
         {
             return AudioOverlayBlockFieldIo.GetXiphFieldString(meta.AudioTagOverlay, Key);
+        }
+
+        /// <summary>
+        /// Builds a column tooltip that always names the Xiph block after the field-specific tip.
+        /// </summary>
+        private static string _Tip(string key)
+        {
+            var detail = XiphKeyLabels.Tip(key) ?? $"Xiph comment key {key}.";
+            return $"{detail} ({XiphRenameListFields.GroupLabel})";
         }
     }
 }

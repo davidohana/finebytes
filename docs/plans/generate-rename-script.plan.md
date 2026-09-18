@@ -22,6 +22,10 @@ Parent: Cursor backlog MFR7 feature parity item **11** (P2).
 
 **Done** (P1–P3). Shipped modernized script export: Tools → Generate Rename Script… writes Windows `.bat` or PowerShell `.ps1` from Rename List path/RAHS deltas (IR + emitters + UI). Parity backlog item **11** points here.
 
+**Follow-up done:** multi-type save picking unified via `SaveFilePickOptions` + `RenameListUiHooks.PickSavePathAsync` (CSV/column export and Generate Rename Script share one hook; MainWindow no longer owns a separate picker).
+
+**Follow-up done:** warn (suppressible) when enabled Filter Chain steps write dates/tags that scripts cannot emit.
+
 ## MFR7 reference brief
 
 ### Sources

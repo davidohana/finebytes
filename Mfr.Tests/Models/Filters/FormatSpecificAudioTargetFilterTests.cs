@@ -12,6 +12,28 @@ namespace Mfr.Tests.Models.Filters
     public sealed class FormatSpecificAudioTargetFilterTests
     {
         /// <summary>
+        /// Verifies <see cref="Id3v2FrameTarget"/> stores frame ids uppercase.
+        /// </summary>
+        [Fact]
+        public void Id3v2FrameTarget_normalizes_frame_id_to_uppercase()
+        {
+            Assert.Equal("TIT2", new Id3v2FrameTarget("tit2").FrameId);
+            Assert.Equal("COMM", new Id3v2FrameTarget(" Comm ", "eng", "x").FrameId);
+            Assert.Equal(string.Empty, new Id3v2FrameTarget("  ").FrameId);
+        }
+
+        /// <summary>
+        /// Verifies <see cref="XiphFieldTarget"/> stores keys uppercase.
+        /// </summary>
+        [Fact]
+        public void XiphFieldTarget_normalizes_key_to_uppercase()
+        {
+            Assert.Equal("TITLE", new XiphFieldTarget("title").Key);
+            Assert.Equal("ARTIST", new XiphFieldTarget(" Artist ").Key);
+            Assert.Equal(string.Empty, new XiphFieldTarget("\t").Key);
+        }
+
+        /// <summary>
         /// Verifies a formatter can set ID3v2 <c>TIT2</c> on an MPEG row without touching ID3v1.
         /// </summary>
         [Fact]

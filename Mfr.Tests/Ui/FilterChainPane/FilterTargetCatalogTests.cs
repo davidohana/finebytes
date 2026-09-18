@@ -175,7 +175,7 @@ namespace Mfr.Tests.Ui.FilterChainPane
             Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
             Assert.Equal(SemanticAudioFieldTips.Asin, asin.Tip);
             Assert.Equal(SemanticAudioFieldTips.Bpm, bpm.Tip);
-            Assert.Null(title.Tip);
+            Assert.Equal(SemanticAudioFieldTips.Title, title.Tip);
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace Mfr.Tests.Ui.FilterChainPane
         }
 
         /// <summary>
-        /// Verifies Xiph Apply-To options reuse semantic clarifying tips for role and abbreviation keys.
+        /// Verifies Xiph Apply-To options carry field-specific tips for every known key.
         /// </summary>
         [Fact]
         public void Xiph_artist_options_include_semantic_field_tips()
@@ -209,7 +209,8 @@ namespace Mfr.Tests.Ui.FilterChainPane
             Assert.Equal(SemanticAudioFieldTips.AlbumArtist, albumArtist.Tip);
             Assert.Equal(SemanticAudioFieldTips.Asin, asin.Tip);
             Assert.Equal(SemanticAudioFieldTips.Bpm, bpm.Tip);
-            Assert.Null(title.Tip);
+            Assert.Equal(SemanticAudioFieldTips.Title, title.Tip);
+            Assert.All(xiphGroup.Targets, option => Assert.False(string.IsNullOrWhiteSpace(option.Tip)));
         }
 
         /// <summary>

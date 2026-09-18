@@ -186,7 +186,11 @@ namespace Mfr.App.Ui.ViewModels.FilterChainPane
             return
             [
                 .. Enum.GetValues<Id3v1Field>()
-                    .Select(field => new FilterTargetOption(field.ToString(), new Id3v1FieldTarget(field))),
+                    .Select(field => new FilterTargetOption(
+                        field.ToString(),
+                        new Id3v1FieldTarget(field),
+                        Id3v1FieldTips.For(field)
+                    )),
             ];
         }
 
@@ -196,7 +200,8 @@ namespace Mfr.App.Ui.ViewModels.FilterChainPane
             [
                 .. Id3v2ModeledFrame.AllModeledFrameIds.Select(frameId => new FilterTargetOption(
                     Id3v2FrameLabels.For(frameId),
-                    new Id3v2FrameTarget(frameId)
+                    new Id3v2FrameTarget(frameId),
+                    Id3v2FrameTips.For(frameId)
                 )),
             ];
         }

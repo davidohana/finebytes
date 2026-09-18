@@ -1,9 +1,8 @@
 using System.Diagnostics;
+using System.Text;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using Mfr.App.Ui.Services;
 using Mfr.App.Ui.Services.Help;
 using Mfr.App.Ui.Services.Session;
 using Mfr.App.Ui.ViewModels.LogDialog;
@@ -76,7 +75,8 @@ namespace Mfr.App.Ui.Views.MainWindow
                 _boundViewModel.OptionsRequested -= _OnOptionsRequested;
                 _boundViewModel.LogRequested -= _OnLogRequested;
                 _boundViewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
-                _boundViewModel.PickRenameScriptPathAsync = null;
+                _boundViewModel.ConfirmRenameScriptUnsupportedFiltersAsync = null;
+                _boundViewModel.ShowRenameScriptEmptyAsync = null;
                 _boundViewModel = null;
             }
 
@@ -91,23 +91,43 @@ namespace Mfr.App.Ui.Views.MainWindow
             viewModel.OptionsRequested += _OnOptionsRequested;
             viewModel.LogRequested += _OnLogRequested;
             viewModel.ResetConfigurationRequested += _OnResetConfigurationRequested;
-            viewModel.PickRenameScriptPathAsync = _PickRenameScriptPathAsync;
+            viewModel.ConfirmRenameScriptUnsupportedFiltersAsync = _ConfirmRenameScriptUnsupportedFiltersAsync;
+            viewModel.ShowRenameScriptEmptyAsync = _ShowRenameScriptEmptyAsync;
         }
 
-        private Task<string?> _PickRenameScriptPathAsync()
+        private Task<bool> _ConfirmRenameScriptUnsupportedFiltersAsync(IReadOnlyList<string> unsupportedNames)
         {
-            return FileSavePicker.PickSaveFileAsync(
+            var body = new StringBuilder();
+            body.Append("The Filter Chain includes filters whose changes cannot be written to a rename script ");
+            body.Append("(file dates and tags are not supported).");
+            body.AppendLine();
+            body.AppendLine();
+            foreach (var name in unsupportedNames)
+            {
+                body.Append("• ");
+                body.AppendLine(name);
+            }
+
+            body.AppendLine();
+            body.Append("The script will only include name, path, and attribute changes. Continue?");
+
+            return SuppressibleConfirm.ConfirmAsync(
                 this,
                 title: "Generate Rename Script",
-                defaultExtension: "bat",
-                fileTypeChoices:
-                [
-                    new FilePickerFileType("Batch files") { Patterns = ["*.bat"] },
-                    new FilePickerFileType("PowerShell scripts") { Patterns = ["*.ps1"] },
-                    new FilePickerFileType("All files") { Patterns = ["*.*"] },
-                ],
-                suggestedFileName: "rename"
+                message: body.ToString(),
+                kind: ConfirmationKind.GenerateRenameScriptUnsupportedFilters
             );
+        }
+
+        private async Task _ShowRenameScriptEmptyAsync()
+        {
+            await new OkMessageDialog(
+                title: "Generate Rename Script",
+                message: "No name, path, or attribute changes to export.\n\n"
+                    + "Generated scripts do not include file dates or tag changes."
+            )
+                .ShowDialog(this)
+                .ConfigureAwait(true);
         }
 
         private void _OnFilterDefaultSaved(object? sender, string catalogDisplayName)
@@ -422,7 +442,8 @@ namespace Mfr.App.Ui.Views.MainWindow
             viewModel.OptionsRequested -= _OnOptionsRequested;
             viewModel.LogRequested -= _OnLogRequested;
             viewModel.ResetConfigurationRequested -= _OnResetConfigurationRequested;
-            viewModel.PickRenameScriptPathAsync = null;
+            viewModel.ConfirmRenameScriptUnsupportedFiltersAsync = null;
+            viewModel.ShowRenameScriptEmptyAsync = null;
 
             if (viewModel.SuppressSessionSaveOnClose)
             {

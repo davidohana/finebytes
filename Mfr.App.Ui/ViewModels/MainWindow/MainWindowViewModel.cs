@@ -4,6 +4,8 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.Services;
+using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.FileList;
 using Mfr.App.Ui.ViewModels.FilterChainPane;
 using Mfr.App.Ui.ViewModels.FilterEditors;
@@ -46,11 +48,16 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         /// Named presets store. When null, uses an empty manager that does not read AppData
         /// (production passes <see cref="PresetManager.OpenDefault"/>).
         /// </param>
+        /// <param name="shellOpener">
+        /// Shared shell opener for File List and Rename List, or <see langword="null"/> for the OS default.
+        /// Tests pass <see cref="NullFileShellOpener"/> so export/reveal does not open Explorer.
+        /// </param>
         public MainWindowViewModel(
             string? initialFileListPath = null,
             bool persistSession = false,
             FilterDefaultsStore? filterDefaults = null,
-            PresetManager? presetManager = null
+            PresetManager? presetManager = null,
+            IFileShellOpener? shellOpener = null
         )
         {
             PersistSession = persistSession;
@@ -61,9 +68,14 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             FileListViewModel = new FileListViewModel(
                 iconProvider: null,
                 initialPath: initialFileListPath,
+                shellOpener: shellOpener,
                 deferInitialListing: persistSession
             );
-            RenameListViewModel = new RenameListViewModel(FileListViewModel, filterChain: FilterChainViewModel);
+            RenameListViewModel = new RenameListViewModel(
+                FileListViewModel,
+                shellOpener: shellOpener,
+                filterChain: FilterChainViewModel
+            );
             FilterChainViewModel.SetRenameListColumnSource(
                 RenameListViewModel.CaptureVisibleColumnSpecs,
                 RenameListViewModel.ApplyVisibleColumnSpecs
@@ -337,45 +349,77 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
         }
 
         /// <summary>
-        /// Save-path picker for Tools → Generate Rename Script (wired by the main window; set in tests).
+        /// Confirm when the Filter Chain has filters that cannot be fully emitted in a rename script
+        /// (wired by the main window; set in tests). Argument is unsupported step display names.
         /// </summary>
         /// <remarks>
-        /// <para>When null, Generate Rename Script is a no-op after the empty-list gate.</para>
+        /// <para>
+        /// When null while confirmation is required, Generate Rename Script aborts after the empty gate.
+        /// </para>
         /// </remarks>
-        internal Func<Task<string?>>? PickRenameScriptPathAsync { get; set; }
+        internal Func<IReadOnlyList<string>, Task<bool>>? ConfirmRenameScriptUnsupportedFiltersAsync { get; set; }
+
+        /// <summary>
+        /// Info dialog when there are no path/attribute changes to put in a rename script
+        /// (wired by the main window; set in tests).
+        /// </summary>
+        internal Func<Task>? ShowRenameScriptEmptyAsync { get; set; }
 
         /// <summary>
         /// Exports pending path and RAHS attribute changes as a <c>.bat</c> or <c>.ps1</c> script.
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Gates empty Collect before the save dialog. Format follows the chosen extension.
-        /// Outcomes land on <see cref="RenameListViewModel.LastStatusMessage"/> (success, cancel,
-        /// no scriptable changes, invalid extension, or IO error).
+        /// Gates empty Collect before the save dialog (OK dialog + status). Warns when enabled Filter Chain
+        /// steps write dates or tags (not emitted). Uses Rename List
+        /// <see cref="RenameListViewModel.UiHooks"/> <c>PickSavePathAsync</c>. Format follows the chosen
+        /// extension. Outcomes land on <see cref="RenameListViewModel.LastStatusMessage"/>.
         /// </para>
         /// </remarks>
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(_CanGo))]
         public async Task GenerateRenameScriptAsync()
         {
-            var renameList = RenameListViewModel;
-            if (renameList.IsBusy)
+            if (!_CanGo())
             {
                 return;
             }
 
+            var renameList = RenameListViewModel;
             if (renameList.CountRenameScriptItems() == 0)
             {
-                renameList.LastStatusMessage = StatusBarText.Warning("No scriptable changes to export.");
+                await _NotifyRenameScriptEmptyAsync(renameList).ConfigureAwait(true);
                 return;
             }
 
-            var pick = PickRenameScriptPathAsync;
+            var unsupportedNames = RenameScriptFilterSupport.GetUnsupportedEnabledStepNames(
+                FilterChainViewModel.Steps.Select(step => (step.Enabled, step.Filter, step.DisplayName))
+            );
+            if (
+                unsupportedNames.Count > 0
+                && ConfirmationPolicy.ShouldConfirm(ConfirmationKind.GenerateRenameScriptUnsupportedFilters)
+            )
+            {
+                var confirm = ConfirmRenameScriptUnsupportedFiltersAsync;
+                if (confirm is null)
+                {
+                    return;
+                }
+
+                var accepted = await confirm(unsupportedNames).ConfigureAwait(true);
+                if (!accepted)
+                {
+                    renameList.LastStatusMessage = StatusBarText.Neutral("Generate Rename Script cancelled.");
+                    return;
+                }
+            }
+
+            var pick = renameList.UiHooks?.PickSavePathAsync;
             if (pick is null)
             {
                 return;
             }
 
-            var path = await pick().ConfigureAwait(true);
+            var path = await pick(_RenameScriptSaveOptions).ConfigureAwait(true);
             if (string.IsNullOrWhiteSpace(path))
             {
                 renameList.LastStatusMessage = StatusBarText.Neutral("Generate Rename Script cancelled.");
@@ -398,7 +442,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 var count = renameList.ExportRenameScript(path, format);
                 if (count == 0)
                 {
-                    renameList.LastStatusMessage = StatusBarText.Warning("No scriptable changes to export.");
+                    await _NotifyRenameScriptEmptyAsync(renameList).ConfigureAwait(true);
                     return;
                 }
 
@@ -410,6 +454,31 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
                 renameList.LastStatusMessage = StatusBarText.Error($"Failed to generate rename script: {ex.Message}");
             }
         }
+
+        /// <summary>
+        /// Status + optional OK dialog when Collect finds no path/RAHS ops.
+        /// </summary>
+        private async Task _NotifyRenameScriptEmptyAsync(RenameListViewModel renameList)
+        {
+            renameList.LastStatusMessage = StatusBarText.Warning("No scriptable changes to export.");
+            if (ShowRenameScriptEmptyAsync is { } show)
+            {
+                await show().ConfigureAwait(true);
+            }
+        }
+
+        private static readonly SaveFilePickOptions _RenameScriptSaveOptions = new()
+        {
+            Title = "Generate Rename Script",
+            DefaultExtension = "bat",
+            SuggestedFileName = "rename",
+            FileTypes =
+            [
+                new SaveFilePickType("Batch files", ["*.bat"]),
+                new SaveFilePickType("PowerShell scripts", ["*.ps1"]),
+                new SaveFilePickType("All files", ["*.*"]),
+            ],
+        };
 
         /// <summary>
         /// Maps a save path extension to bat or PowerShell.
@@ -451,6 +520,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             {
                 ItemCount = RenameListViewModel.ItemCount;
                 GoCommand.NotifyCanExecuteChanged();
+                GenerateRenameScriptCommand.NotifyCanExecuteChanged();
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.ChangeCount))
@@ -477,6 +547,7 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             {
                 GoCommand.NotifyCanExecuteChanged();
                 UndoLastCommand.NotifyCanExecuteChanged();
+                GenerateRenameScriptCommand.NotifyCanExecuteChanged();
             }
 
             if (e.PropertyName is nameof(RenameListViewModel.LastStatusMessage))
@@ -608,6 +679,9 @@ namespace Mfr.App.Ui.ViewModels.MainWindow
             return FilterPaletteViewModel.SelectedFilter is not null;
         }
 
+        /// <summary>
+        /// Whether GO / Generate Rename Script may run (non-empty idle Rename List).
+        /// </summary>
         private bool _CanGo()
         {
             return RenameListViewModel.ItemCount >= 1 && !RenameListViewModel.IsBusy;

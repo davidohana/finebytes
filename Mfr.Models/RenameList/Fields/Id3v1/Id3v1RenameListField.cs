@@ -15,12 +15,13 @@ namespace Mfr.Models.RenameList.Fields.Id3v1
             Id3v1RenameListFields.Group,
             Id3v1RenameListFields.GroupLabel,
             field.ToString(),
-            field.ToString(),
+            $"{field} (ID3v1)",
             defaultWidth,
             isSortable: true,
             supportsPreview: true,
             RenameListMetadataRequirement.TagLib,
-            writeTarget: new Id3v1FieldTarget(field)
+            writeTarget: new Id3v1FieldTarget(field),
+            tip: $"{Id3v1FieldTips.For(field)} ({Id3v1RenameListFields.GroupLabel})"
         )
     {
         /// <summary>
@@ -32,6 +33,17 @@ namespace Mfr.Models.RenameList.Fields.Id3v1
         public override string Resolve(FileMeta meta)
         {
             return AudioOverlayBlockFieldIo.GetId3v1FieldString(meta.AudioTagOverlay, Field);
+        }
+
+        /// <inheritdoc />
+        public override int CompareForSort(FileMeta left, FileMeta right)
+        {
+            if (Field is Id3v1Field.Year or Id3v1Field.Track)
+            {
+                return RenameListFieldSortCompare.ParsedInt64(Resolve(left), Resolve(right));
+            }
+
+            return base.CompareForSort(left, right);
         }
     }
 }

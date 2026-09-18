@@ -302,6 +302,46 @@ namespace Mfr.Tests.Engine
         }
 
         [Fact]
+        public void Formatter_JSON_normalizes_lowercase_Id3v2_and_Xiph_keys()
+        {
+            var id3v2Json = /*lang=json,strict*/
+                """
+                {
+                  "type": "Formatter",
+                  "target": {
+                    "targetType": "Id3v2Frame",
+                    "frameId": "tit2"
+                  },
+                  "options": {
+                    "template": "hi"
+                  }
+                }
+                """;
+            var id3v2Filter = Assert.IsType<FormatterFilter>(
+                JsonSerializer.Deserialize<BaseFilter>(id3v2Json, PresetJsonOptions.Default)
+            );
+            Assert.Equal("TIT2", Assert.IsType<Id3v2FrameTarget>(id3v2Filter.Target).FrameId);
+
+            var xiphJson = /*lang=json,strict*/
+                """
+                {
+                  "type": "Formatter",
+                  "target": {
+                    "targetType": "XiphField",
+                    "key": "title"
+                  },
+                  "options": {
+                    "template": "x"
+                  }
+                }
+                """;
+            var xiphFilter = Assert.IsType<FormatterFilter>(
+                JsonSerializer.Deserialize<BaseFilter>(xiphJson, PresetJsonOptions.Default)
+            );
+            Assert.Equal("TITLE", Assert.IsType<XiphFieldTarget>(xiphFilter.Target).Key);
+        }
+
+        [Fact]
         public void Formatter_JSON_round_trips_XiphField_and_Id3v1Field_targets()
         {
             var xiphJson = /*lang=json,strict*/

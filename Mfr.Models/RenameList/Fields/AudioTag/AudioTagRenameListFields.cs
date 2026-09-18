@@ -26,6 +26,11 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         public const string GroupLabel = "Audio Tag";
 
         /// <summary>
+        /// Short tip suffix clarifying semantic (merged) vs format-specific columns.
+        /// </summary>
+        public const string SemanticTipQualifier = "Audio Tag · semantic";
+
+        /// <summary>
         /// Property keys within <see cref="Group"/>.
         /// </summary>
         public static class Key
@@ -179,7 +184,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
         }
 
         /// <summary>
-        /// Creates a semantic column with the shared display label and optional clarifying tooltip.
+        /// Creates a semantic column with the shared display label and semantic-block tooltip.
         /// </summary>
         private static AudioTagSemanticRenameListField _Semantic(
             string propertyKey,
@@ -192,7 +197,7 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
                 SemanticAudioFieldLabels.For(field),
                 field,
                 defaultWidth,
-                SemanticAudioFieldTips.For(field)
+                _SemanticTip(SemanticAudioFieldTips.For(field))
             );
         }
 
@@ -205,8 +210,16 @@ namespace Mfr.Models.RenameList.Fields.AudioTag
                 propertyKey,
                 SemanticAudioFieldLabels.FirstSegment(field),
                 field,
-                SemanticAudioFieldTips.FirstSegment(field)
+                _SemanticTip(SemanticAudioFieldTips.FirstSegment(field))
             );
+        }
+
+        /// <summary>
+        /// Always names the semantic Audio Tag block after the field-specific tip.
+        /// </summary>
+        private static string _SemanticTip(string detail)
+        {
+            return $"{detail} ({SemanticTipQualifier})";
         }
 
         private static Dictionary<SemanticAudioField, string> _BuildSemanticFieldToPropertyKey()
