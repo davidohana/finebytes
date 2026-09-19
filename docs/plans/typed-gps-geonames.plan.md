@@ -4,7 +4,7 @@ overview: "Typed GPS via MetadataExtractor; online GeoNames findNearby with bund
 todos:
   - id: p1-typed-gps
     content: "P1: ExifData lat/lon via TryGetGeoLocation, tokens, columns, docs/help, tests"
-    status: pending
+    status: completed
   - id: p2-online-geo
     content: "P2: findNearby client, Options override + help link, geo-* tokens/columns, L1/L2/L3 cache, docs"
     status: pending
@@ -34,12 +34,12 @@ Parent: deferred **5c** in [`docs/image-metadata-model.md`](../image-metadata-mo
 
 ## Libraries (locked)
 
-| Concern | Library | Why |
-| --- | --- | --- |
-| Typed GPS | **MetadataExtractor 2.9.3** | `TryGetGeoLocation` |
-| GeoNames HTTP | **BCL `HttpClient`** | HTTPS `findNearby` |
-| GeoNames XML | **BCL `XDocument`** | First `geoname` → `name`, `adminName1`, `countryName` |
-| UI | Avalonia Options / FormatEditor / Rename List | |
+| Concern       | Library                                       | Why                                                   |
+| ------------- | --------------------------------------------- | ----------------------------------------------------- |
+| Typed GPS     | **MetadataExtractor 2.9.3**                   | `TryGetGeoLocation`                                   |
+| GeoNames HTTP | **BCL `HttpClient`**                          | HTTPS `findNearby`                                    |
+| GeoNames XML  | **BCL `XDocument`**                           | First `geoname` → `name`, `adminName1`, `countryName` |
+| UI            | Avalonia Options / FormatEditor / Rename List |                                                       |
 
 **Not used:** BenjaminSchroeter.GeoNames, offline dump/KD-tree, zip download UI.
 
@@ -52,18 +52,18 @@ Bundled username constant e.g. `GeoNamesClient.DefaultUsername = "fbmfr"` in Met
 Fieldset in [`OptionsDialog.axaml`](../../Mfr.App.Ui/Views/Options/OptionsDialog.axaml):
 
 1. **GeoNames username** — TextBox bound to `GeoNamesUsername`. Placeholder / tip: leave blank to use the built-in MFR account; enter your own for a private quota.
-2. **Help link** — “How to get a GeoNames username” → opens in-app help (e.g. `help/guide/geonames.html` or under Options/help) with steps:
+1. **Help link** — “How to get a GeoNames username” → opens in-app help (e.g. `help/guide/geonames.html` or under Options/help) with steps:
    - Create account at geonames.org
    - Manage account → **Enable free web services**
    - Copy username into this field
    - Attribution / credit limits summary
-3. No password field. Changing override on OK clears L2 process cache (L3 keys include username).
+1. No password field. Changing override on OK clears L2 process cache (L3 keys include username).
 
 ### Format Editor / tokens
 
-| Token | Catalog | Name |
-| --- | --- | --- |
-| `<exif-gps-lat>` / `<exif-gps-lon>` | `Image\EXIF` | GPS Latitude / Longitude |
+| Token                                            | Catalog        | Name                            |
+| ------------------------------------------------ | -------------- | ------------------------------- |
+| `<exif-gps-lat>` / `<exif-gps-lon>`              | `Image\EXIF`   | GPS Latitude / Longitude        |
 | `<geo-country>` / `<geo-region>` / `<geo-place>` | `Image\Nearby` | Nearby Country / Region / Place |
 
 Help: `eximagefp.html` for GPS; `geofp.html` for geo + link to GeoNames username help. Example: `<geo-place> - <exif-date:yyyy-MM-dd>`.
@@ -74,12 +74,12 @@ Lat/Lon under Jpeg (`ImageProperties`). Nearby Country/Region/Place after Lon (`
 
 ### Empty vs error
 
-| Situation | Result |
-| --- | --- |
-| No GPS | empty |
-| GPS + cache/API hit | place / region / country |
-| Network / API / XML / rate limit | **PreviewError** |
-| Non-image | existing image/EXIF PreviewError |
+| Situation                        | Result                           |
+| -------------------------------- | -------------------------------- |
+| No GPS                           | empty                            |
+| GPS + cache/API hit              | place / region / country         |
+| Network / API / XML / rate limit | **PreviewError**                 |
+| Non-image                        | existing image/EXIF PreviewError |
 
 ## Caching (locked)
 
@@ -101,10 +101,10 @@ Effective username in every cache key. Sync lookup on preview path (~10s HttpCli
 GeoNames free tier (~1 000 credits/hour, ~10 000/day per username; `findNearby` = 4 credits). When the service rejects or throttles (HTTP 4xx/5xx, status payload like “the hourly limit…”, empty/error XML):
 
 1. **Do not** write L3 (failures never persisted).
-2. **Do not** retry in a tight loop on the same cache miss.
-3. Surface **PreviewError** (geo token) / Rename List metadata error for that row — message should be understandable (e.g. “GeoNames rate limit exceeded” / include truncated service text when safe).
-4. Lat/Lon and other tokens unaffected.
-5. Later previews may succeed after the window resets; L1/L2 for *other* coords still work; user can switch Options override to their own username to leave the shared `fbmfr` pool.
+1. **Do not** retry in a tight loop on the same cache miss.
+1. Surface **PreviewError** (geo token) / Rename List metadata error for that row — message should be understandable (e.g. “GeoNames rate limit exceeded” / include truncated service text when safe).
+1. Lat/Lon and other tokens unaffected.
+1. Later previews may succeed after the window resets; L1/L2 for *other* coords still work; user can switch Options override to their own username to leave the shared `fbmfr` pool.
 
 #### Batch of many files (e.g. 1 000)
 
@@ -114,9 +114,9 @@ GeoNames free tier (~1 000 credits/hour, ~10 000/day per username; `findNear
 **Circuit breaker (locked):** on the first **rate-limit / quota** failure in a process (or preview pass):
 
 1. Mark GeoNames lookups **tripped** for that effective username (in-memory flag + optional short cooldown, e.g. until process exit or 1 hour).
-2. All further L3 misses in that window → **PreviewError** immediately with the same rate-limit message — **no more HTTP**.
-3. Cache hits (L1/L2/L3) still return success (already-paid coords).
-4. Clear trip when Options username override changes, or on app restart (and optionally after cooldown).
+1. All further L3 misses in that window → **PreviewError** immediately with the same rate-limit message — **no more HTTP**.
+1. Cache hits (L1/L2/L3) still return success (already-paid coords).
+1. Clear trip when Options username override changes, or on app restart (and optionally after cooldown).
 
 So we do **not** “try all 1 000 and fail each against the network”; we fail fast after the first throttle. Distinct uncached coords before the trip still consume credits (up to the service limit) — help should warn that huge GPS-diverse lists can exhaust the free tier; use own username or expect errors after the breaker trips.
 
@@ -151,15 +151,15 @@ flowchart LR
 
 ### Code placement
 
-| Project | What |
-| --- | --- |
-| `Mfr.Models` | GPS fields; `GeoNamesInfo`; `OptionsConfig.GeoNamesUsername`; Nearby Rename List fields; formatting helper |
-| `Mfr.Metadata` | `ExifDataReader` GPS; **`GeoNamesClient`** (HttpClient + XML); L3 cache IO |
-| `Mfr.Filters` | Ensure geo; `exif-gps-*` / `geo-*` tokens; metadata loader arm |
-| `Mfr.Engine` | Clear row geo on commit; sync effective username accessor for Filters if needed |
-| `Mfr.App.Ui` | Options Location TextBox + help link; no Tools dump dialog |
-| `help/` | `geofp.html` + **GeoNames username instructions** page; whatsnew/migrations |
-| `Mfr.Tests` | GPS; client XML fixtures + stub handler; Options round-trip; cache keys |
+| Project        | What                                                                                                       |
+| -------------- | ---------------------------------------------------------------------------------------------------------- |
+| `Mfr.Models`   | GPS fields; `GeoNamesInfo`; `OptionsConfig.GeoNamesUsername`; Nearby Rename List fields; formatting helper |
+| `Mfr.Metadata` | `ExifDataReader` GPS; **`GeoNamesClient`** (HttpClient + XML); L3 cache IO                                 |
+| `Mfr.Filters`  | Ensure geo; `exif-gps-*` / `geo-*` tokens; metadata loader arm                                             |
+| `Mfr.Engine`   | Clear row geo on commit; sync effective username accessor for Filters if needed                            |
+| `Mfr.App.Ui`   | Options Location TextBox + help link; no Tools dump dialog                                                 |
+| `help/`        | `geofp.html` + **GeoNames username instructions** page; whatsnew/migrations                                |
+| `Mfr.Tests`    | GPS; client XML fixtures + stub handler; Options round-trip; cache keys                                    |
 
 Suggested: `Mfr.Metadata/GeoNames/GeoNamesClient.cs`, `GeoNamesResponseCache.cs`; `Mfr.Filters/Formatting/Tokens/Geo/GeoNearbyTokens.cs`; `help/guide/geonames-username.html` (name TBD).
 

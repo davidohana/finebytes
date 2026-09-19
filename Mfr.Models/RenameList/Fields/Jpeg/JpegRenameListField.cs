@@ -63,6 +63,22 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 return RenameListFieldSortCompare.DateTime(leftDate, rightDate);
             }
 
+            if (Field == JpegRenameListExifProperty.Latitude)
+            {
+                return RenameListFieldSortCompare.Double(
+                    left.Exif?.GpsLatitude ?? default,
+                    right.Exif?.GpsLatitude ?? default
+                );
+            }
+
+            if (Field == JpegRenameListExifProperty.Longitude)
+            {
+                return RenameListFieldSortCompare.Double(
+                    left.Exif?.GpsLongitude ?? default,
+                    right.Exif?.GpsLongitude ?? default
+                );
+            }
+
             if (Field == JpegRenameListExifProperty.ImageNumber)
             {
                 return RenameListFieldSortCompare.ParsedInt64(Resolve(left), Resolve(right));
@@ -127,6 +143,12 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
 
         /// <summary>Focal length in 35mm film.</summary>
         FocalLength35mm,
+
+        /// <summary>GPS latitude (decimal degrees).</summary>
+        Latitude,
+
+        /// <summary>GPS longitude (decimal degrees).</summary>
+        Longitude,
     }
 
     /// <summary>
@@ -172,6 +194,8 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 JpegRenameListExifProperty.FocalLength35mm => RenameListFieldDisplay.FormatOptionalText(
                     exif.FocalLength35mm
                 ),
+                JpegRenameListExifProperty.Latitude => ExifGpsFormatting.FormatCoordinate(exif.GpsLatitude),
+                JpegRenameListExifProperty.Longitude => ExifGpsFormatting.FormatCoordinate(exif.GpsLongitude),
                 _ => string.Empty,
             };
         }

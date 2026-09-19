@@ -70,6 +70,12 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
 
             /// <summary>35mm-equivalent focal length.</summary>
             public const string FocalLength35mm = "ExifDirectory*41989";
+
+            /// <summary>GPS latitude (decimal degrees).</summary>
+            public const string Latitude = "Latitude";
+
+            /// <summary>GPS longitude (decimal degrees).</summary>
+            public const string Longitude = "Longitude";
         }
 
         /// <summary>
@@ -150,6 +156,18 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 "Focal Length In 35mm Film",
                 JpegRenameListExifProperty.FocalLength35mm,
                 defaultWidth: 80
+            ),
+            new JpegExifRenameListField(
+                Key.Latitude,
+                "Latitude",
+                JpegRenameListExifProperty.Latitude,
+                defaultWidth: 100
+            ),
+            new JpegExifRenameListField(
+                Key.Longitude,
+                "Longitude",
+                JpegRenameListExifProperty.Longitude,
+                defaultWidth: 100
             ),
         ];
     }

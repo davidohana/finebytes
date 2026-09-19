@@ -256,7 +256,7 @@ Reads from **`Original.Exif`** (read-only MetadataExtractor EXIF cache). The sam
 
 **Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** — including MP3/WAV. A mapped raster with no EXIF (or a missing field) expands **empty**, not an error. PNG/TIFF/WebP/HEIF with EXIF work; the allowlist is the same as **`image-*`**.
 
-Keep later **`<imagetag-*>`** (TagLib Image Tag) separate; values may differ from **`<exif-*>`**. Typed GPS lat/lon and **`<geo-*>`** are not in this slice.
+Keep later **`<imagetag-*>`** (TagLib Image Tag) separate; values may differ from **`<exif-*>`**. **`<geo-*>`** (Nearby / GeoNames) is not in this slice.
 
 Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image/EXIF load as already attempted so seeded **`FileMeta.Exif`** is used without disk I/O.
 
@@ -269,6 +269,8 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image/EXIF load as 
 | `<exif-iso>`         | ISO speed description; empty when unset.                                                                         |
 | `<exif-focal>`       | Focal length description (e.g. `50 mm`); empty when unset.                                                       |
 | `<exif-focal-35>`    | 35mm-equivalent focal length; empty when unset.                                                                  |
+| `<exif-gps-lat>`     | GPS latitude in decimal degrees (InvariantCulture, up to 6 dp, trim trailing zeros); empty when unset.           |
+| `<exif-gps-lon>`     | GPS longitude in decimal degrees (same format as latitude); empty when unset. No network.                        |
 | `<exif-date:format>` | DateTaken with a .NET date format string (InvariantCulture); empty when unset.                                   |
 | `<exif:source,name>` | Extended tag by directory alias and tag name or decimal id; empty when missing. Example: `<exif:ExifSub,36867>`. |
 

@@ -110,6 +110,12 @@ becomes null. That keeps display strings such as `1/60 sec`, `f/8.0`, `50 mm`.
 - **Exposure / FNumber / Iso / FocalLength / FocalLength35mm / UserComment**
   - Directory: `ExifSubIfdDirectory`
   - Tag: Exposure Time / F-Number / ISO Speed Ratings / Focal Length / Focal Length 35 / User Comment
+- **GpsLatitude / GpsLongitude**
+  - Directory: `GpsDirectory` via `TryGetGeoLocation()` only (decimal degrees; south/west negative)
+  - Display: invariant culture, up to six decimal places, trim trailing zeros (`0.######`) via
+    `ExifGpsFormatting.FormatCoordinate`
+  - Tokens: `<exif-gps-lat>` / `<exif-gps-lon>`; Rename List Jpeg Tag columns Latitude / Longitude
+  - Missing GPS → empty (no network). Nearby GeoNames (`<geo-*>`) is a later slice.
 
 JPEG Tag extras (Title, Subject, Author, Keywords, Comments, Artist, UserComment, Description) are
 stored for later columns and reachable via `<exif:Exif,…>` / `<exif:ExifSub,User Comment>`. There are
@@ -121,20 +127,20 @@ Only directories that map to a source alias are flattened. For each tag with a n
 two keys are stored (existing keys are not overwritten): `{Alias}/{Tag.Name}` and `{Alias}/{Tag.Type}`
 (decimal id, e.g. `Exif/271`). Alias table (case-insensitive):
 
-| Alias      | Directory                                                      |
-| ---------- | -------------------------------------------------------------- |
-| `Exif`     | `ExifIfd0Directory`                                            |
-| `ExifSub`  | `ExifSubIfdDirectory`                                          |
-| `GPS`      | `GpsDirectory` (string descriptions only; typed lat/lon is 5c) |
-| `IPTC`     | `IptcDirectory`                                                |
-| `Canon`    | `CanonMakernoteDirectory`                                      |
-| `Casio`    | Casio Type1/Type2 (first tag wins)                             |
-| `FujiFilm` | `FujifilmMakernoteDirectory`                                   |
-| `Nikon`    | Nikon Type1/Type2 (first tag wins)                             |
-| `Olympus`  | `OlympusMakernoteDirectory`                                    |
-| `Interop`  | `ExifInteropDirectory`                                         |
-| `Thumb`    | `ExifThumbnailDirectory`                                       |
+| Alias      | Directory                                                                                  |
+| ---------- | ------------------------------------------------------------------------------------------ |
+| `Exif`     | `ExifIfd0Directory`                                                                        |
+| `ExifSub`  | `ExifSubIfdDirectory`                                                                      |
+| `GPS`      | `GpsDirectory` (string descriptions; typed lat/lon also on `GpsLatitude` / `GpsLongitude`) |
+| `IPTC`     | `IptcDirectory`                                                                            |
+| `Canon`    | `CanonMakernoteDirectory`                                                                  |
+| `Casio`    | Casio Type1/Type2 (first tag wins)                                                         |
+| `FujiFilm` | `FujifilmMakernoteDirectory`                                                               |
+| `Nikon`    | Nikon Type1/Type2 (first tag wins)                                                         |
+| `Olympus`  | `OlympusMakernoteDirectory`                                                                |
+| `Interop`  | `ExifInteropDirectory`                                                                     |
+| `Thumb`    | `ExifThumbnailDirectory`                                                                   |
 
 FileType, JPEG SOF, XMP, and anything else are skipped. Thumbnail DateTime is not copied into `DateTaken`.
 
-Typed GPS lat/lon tokens (`<exif-gps-lat>` / `<exif-gps-lon>`) and GeoNames (`<geo-*>`) stay deferred.
+GeoNames reverse geocoding (`<geo-*>` tokens and Nearby Rename List columns) stays deferred.

@@ -952,7 +952,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private IReadOnlyList<RenameListField> _CandidateAvailableFields()
         {
             var query = SearchText.Trim();
-            IEnumerable<RenameListField> fields =
+            var fields =
                 query.Length == 0
                     ? _FieldsInSelectedGroup()
                     : RenameListFieldCatalog.All.Where(field => _FieldMatchesSearch(field, query));

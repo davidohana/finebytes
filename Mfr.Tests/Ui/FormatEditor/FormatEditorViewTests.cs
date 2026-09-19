@@ -1476,9 +1476,7 @@ namespace Mfr.Tests.Ui.FormatEditor
         /// <summary>
         /// Resolves the insert catalog search control inside the shared picker.
         /// </summary>
-        private static CatalogSearchBox _RequireInsertCatalogSearch(
-            App.Ui.Views.FormatEditor.FormatEditor editor
-        )
+        private static CatalogSearchBox _RequireInsertCatalogSearch(App.Ui.Views.FormatEditor.FormatEditor editor)
         {
             var catalogSearch = editor.TokenPickerControl.FindControl<CatalogSearchBox>("TokenSearchBox");
             Assert.NotNull(catalogSearch);
@@ -1488,7 +1486,9 @@ namespace Mfr.Tests.Ui.FormatEditor
         /// <summary>
         /// Resolves the insert search box inside the shared picker.
         /// </summary>
-        private static TextBox _RequireInsertSearchBox(App.Ui.Views.FormatEditor.FormatEditor editor) =>
-            _RequireInsertCatalogSearch(editor).Input;
+        private static TextBox _RequireInsertSearchBox(App.Ui.Views.FormatEditor.FormatEditor editor)
+        {
+            return _RequireInsertCatalogSearch(editor).Input;
+        }
     }
 }

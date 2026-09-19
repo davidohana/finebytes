@@ -63,8 +63,7 @@ namespace Mfr.Tests.Ui.FilterEditors.Case
                 FilterOptionsEditorViewModel.LiveListTextApplyDebounceMilliseconds = 150;
 
                 var step = new FilterChainStepViewModel("Casing List", new CasingListFilter());
-                var editor = new CasingListFilterEditorViewModel(step);
-                editor.WordsText = "custom";
+                var editor = new CasingListFilterEditorViewModel(step) { WordsText = "custom" };
                 editor.FlushPendingLiveListTextApply();
                 Assert.Equal(["custom"], ((CasingListFilter)step.Filter).Options.Words);
 

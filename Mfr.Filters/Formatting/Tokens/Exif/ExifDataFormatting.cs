@@ -30,6 +30,8 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
                 ExifPropertyField.Iso => _FormatText(exif.Iso),
                 ExifPropertyField.FocalLength => _FormatText(exif.FocalLength),
                 ExifPropertyField.FocalLength35mm => _FormatText(exif.FocalLength35mm),
+                ExifPropertyField.GpsLatitude => ExifGpsFormatting.FormatCoordinate(exif.GpsLatitude),
+                ExifPropertyField.GpsLongitude => ExifGpsFormatting.FormatCoordinate(exif.GpsLongitude),
                 _ => string.Empty,
             };
         }
@@ -85,5 +87,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         Iso,
         FocalLength,
         FocalLength35mm,
+        GpsLatitude,
+        GpsLongitude,
     }
 }

@@ -65,7 +65,7 @@ namespace Mfr.Tests.Models
             Assert.Equal(12, RenameListFieldCatalog.GetFieldsForGroup(MediaRenameListFields.Group).Count);
             Assert.Equal(11, RenameListFieldCatalog.GetFieldsForGroup(Mp3RenameListFields.Group).Count);
             Assert.Equal(7, RenameListFieldCatalog.GetFieldsForGroup(ImageRenameListFields.Group).Count);
-            Assert.Equal(17, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
+            Assert.Equal(19, RenameListFieldCatalog.GetFieldsForGroup(JpegRenameListFields.Group).Count);
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(PdfRenameListFields.Group).Count);
             Assert.Equal(8, RenameListFieldCatalog.GetFieldsForGroup(EpubRenameListFields.Group).Count);
             Assert.Equal(9, RenameListFieldCatalog.GetFieldsForGroup(OfficeRenameListFields.Group).Count);
@@ -525,6 +525,8 @@ namespace Mfr.Tests.Models
                         Title = "Vacation",
                         Artist = "Pat",
                         DateTaken = new DateTime(2024, 7, 4, 9, 30, 0, DateTimeKind.Unspecified),
+                        GpsLatitude = 32.823057,
+                        GpsLongitude = 34.971542,
                         TagToDescription = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                         {
                             ["ExifSub/37393"] = "17",
@@ -537,6 +539,8 @@ namespace Mfr.Tests.Models
             _AssertField(item, ImageRenameListFields.Group, "Width", "1920");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*271", "Canon");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*40091", "Vacation");
+            _AssertField(item, JpegRenameListFields.Group, JpegRenameListFields.Key.Latitude, "32.823057");
+            _AssertField(item, JpegRenameListFields.Group, JpegRenameListFields.Key.Longitude, "34.971542");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*315", "Pat");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*37393", "17");
             _AssertField(
@@ -1343,6 +1347,8 @@ namespace Mfr.Tests.Models
             _AssertField(item, ImageRenameListFields.Group, "Width", "");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*271", "");
             _AssertField(item, JpegRenameListFields.Group, "ExifDirectory*33434", "");
+            _AssertField(item, JpegRenameListFields.Group, JpegRenameListFields.Key.Latitude, "");
+            _AssertField(item, JpegRenameListFields.Group, JpegRenameListFields.Key.Longitude, "");
         }
 
         [Fact]

@@ -18,15 +18,16 @@ namespace Mfr.Models.Media
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Lookup is case-insensitive. Typed GPS lat/lon is a later slice; the <c>GPS</c> alias
-        /// still stores string descriptions in <see cref="TagToDescription"/>.
+        /// Lookup is case-insensitive. Typed decimal degrees live on
+        /// <see cref="GpsLatitude"/> / <see cref="GpsLongitude"/>; the <c>GPS</c> alias still
+        /// stores string descriptions in <see cref="TagToDescription"/>.
         /// </para>
         /// </remarks>
         public static IReadOnlyList<string> SourceAliases { get; } =
         [
             "Exif", // IFD0: Make, Model, Artist, Description, Windows XP fields
             "ExifSub", // SubIFD: DateTimeOriginal, exposure, F-number, ISO, focal, User Comment
-            "GPS", // GPS IFD strings only; typed lat/lon is later
+            "GPS", // GPS IFD strings; typed lat/lon also on GpsLatitude / GpsLongitude
             "IPTC", // IPTC-IIM captions/keywords/byline
             "Canon", // Canon makernote
             "Casio", // Casio Type1/Type2 makernotes (first tag wins)
@@ -61,6 +62,28 @@ namespace Mfr.Models.Media
         /// </para>
         /// </remarks>
         public DateTime? DateTaken { get; init; }
+
+        /// <summary>
+        /// Gets GPS latitude in decimal degrees from <c>GpsDirectory.TryGetGeoLocation</c>, or
+        /// <see langword="null"/> when absent.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Negative values are south. Display via <see cref="ExifGpsFormatting.FormatCoordinate"/>.
+        /// </para>
+        /// </remarks>
+        public double? GpsLatitude { get; init; }
+
+        /// <summary>
+        /// Gets GPS longitude in decimal degrees from <c>GpsDirectory.TryGetGeoLocation</c>, or
+        /// <see langword="null"/> when absent.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Negative values are west. Display via <see cref="ExifGpsFormatting.FormatCoordinate"/>.
+        /// </para>
+        /// </remarks>
+        public double? GpsLongitude { get; init; }
 
         /// <summary>
         /// Gets the camera manufacturer (IFD0 Make), or <see langword="null"/> when absent.

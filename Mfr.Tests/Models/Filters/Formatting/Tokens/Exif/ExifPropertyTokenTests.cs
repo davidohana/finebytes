@@ -20,6 +20,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
                 Iso = "100",
                 FocalLength = "50 mm",
                 FocalLength35mm = "50 mm",
+                GpsLatitude = 32.823057,
+                GpsLongitude = 34.971542,
                 DateTaken = new DateTime(2020, 5, 15, 14, 30, 0, DateTimeKind.Unspecified),
                 TagToDescription = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
                 {
@@ -43,6 +45,8 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
             Assert.Equal("100", new ExifIsoToken().Compile(string.Empty)(item));
             Assert.Equal("50 mm", new ExifFocalToken().Compile(string.Empty)(item));
             Assert.Equal("50 mm", new ExifFocal35Token().Compile(string.Empty)(item));
+            Assert.Equal("32.823057", new ExifGpsLatitudeToken().Compile(string.Empty)(item));
+            Assert.Equal("34.971542", new ExifGpsLongitudeToken().Compile(string.Empty)(item));
             Assert.Equal("2020-05-15", new ExifDateToken().Compile("yyyy-MM-dd")(item));
             Assert.Equal("Canon", new ExifToken().Compile("Exif,Make")(item));
             Assert.Equal("Canon", new ExifToken().Compile("Exif,271")(item));
@@ -57,9 +61,13 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
             Assert.Null(nullItem.Original.Exif);
 
             Assert.Equal(string.Empty, new ExifMakeToken().Compile(string.Empty)(emptyItem));
+            Assert.Equal(string.Empty, new ExifGpsLatitudeToken().Compile(string.Empty)(emptyItem));
+            Assert.Equal(string.Empty, new ExifGpsLongitudeToken().Compile(string.Empty)(emptyItem));
             Assert.Equal(string.Empty, new ExifDateToken().Compile("yyyy")(emptyItem));
             Assert.Equal(string.Empty, new ExifToken().Compile("Exif,Make")(emptyItem));
             Assert.Equal(string.Empty, new ExifMakeToken().Compile(string.Empty)(nullItem));
+            Assert.Equal(string.Empty, new ExifGpsLatitudeToken().Compile(string.Empty)(nullItem));
+            Assert.Equal(string.Empty, new ExifGpsLongitudeToken().Compile(string.Empty)(nullItem));
             Assert.Equal(string.Empty, new ExifDateToken().Compile("yyyy-MM-dd")(nullItem));
             Assert.Equal(string.Empty, new ExifToken().Compile("Exif,Make")(nullItem));
         }
@@ -150,8 +158,21 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Exif
 
             Assert.Equal(string.Empty, new ExifMakeToken().Compile(string.Empty)(item));
             Assert.Equal(string.Empty, new ExifDateToken().Compile("yyyy")(item));
+            Assert.Equal(string.Empty, new ExifGpsLatitudeToken().Compile(string.Empty)(item));
             Assert.NotNull(item.Original.Image);
             Assert.NotNull(item.Original.Exif);
+        }
+
+        [Fact]
+        public void EnsureImagePropertiesLoaded_GpsJpeg_ReadsTypedLatLon()
+        {
+            var item = RenameItemFixtures.Unmarked("tiny-gps.jpeg");
+
+            Assert.Equal("32.823057", new ExifGpsLatitudeToken().Compile(string.Empty)(item));
+            Assert.Equal("34.971542", new ExifGpsLongitudeToken().Compile(string.Empty)(item));
+            Assert.NotNull(item.Original.Exif);
+            Assert.Equal(32.823057, item.Original.Exif.GpsLatitude!.Value, precision: 6);
+            Assert.Equal(34.971542, item.Original.Exif.GpsLongitude!.Value, precision: 6);
         }
 
         [Fact]
