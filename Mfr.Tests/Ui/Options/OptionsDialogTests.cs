@@ -37,11 +37,11 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies the Options dialog tabs host Session, Confirmations, File List, Rename List,
-        /// Location, and Undo &amp; Rename Log retention controls.
+        /// Verifies the Options dialog General and Undo tabs host Session, Confirmations, File List,
+        /// Rename List, Location, and Undo &amp; Rename Log retention controls.
         /// </summary>
         [AvaloniaFact]
-        public void OptionsDialog_shows_session_confirmations_file_list_rename_list_and_undo_log()
+        public void OptionsDialog_shows_general_and_undo_tabs()
         {
             var dialogVm = new OptionsDialogViewModel();
             var dialog = new OptionsDialog(dialogVm);
@@ -154,6 +154,7 @@ namespace Mfr.Tests.Ui.Options
                     .Select(group => group.Header?.ToString())
                     .ToList();
                 Assert.Contains("Undo & Rename Log", undoGroupHeaders);
+                Assert.DoesNotContain("Session", undoGroupHeaders);
 
                 var undoRadioLabels = dialog
                     .GetVisualDescendants()
