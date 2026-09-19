@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Mfr.Utils;
 using Serilog;
 
 namespace Mfr.Engine.Beta
@@ -20,6 +19,11 @@ namespace Mfr.Engine.Beta
         /// UTC instant at which the beta becomes expired (inclusive). Last valid moment is end of 2026-12-31 UTC.
         /// </summary>
         public static readonly DateTime ExpiresUtc = new(2027, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        /// <summary>
+        /// Stable HTTPS host used only for the response <c>Date</c> header (not the product site).
+        /// </summary>
+        private const string NetworkTimeUrl = "https://www.microsoft.com/";
 
         private static readonly TimeSpan ProbeTimeout = TimeSpan.FromSeconds(2);
         private static readonly Func<CancellationToken, DateTime?> OfflineNetworkStub = static _ => null;
@@ -182,7 +186,7 @@ namespace Mfr.Engine.Beta
                     _sinceNetworkProbe = Stopwatch.StartNew();
                     Log.Debug(
                         "Beta network time probe succeeded from {ProbeUrl}: {NetworkUtc:O} UTC.",
-                        ProductUrls.WebSite,
+                        NetworkTimeUrl,
                         _cachedNetworkUtc
                     );
                 }
@@ -190,7 +194,7 @@ namespace Mfr.Engine.Beta
                 {
                     Log.Debug(
                         "Beta network time probe unavailable from {ProbeUrl}; using local UTC {LocalUtc:O}.",
-                        ProductUrls.WebSite,
+                        NetworkTimeUrl,
                         _utcNow()
                     );
                 }
@@ -228,7 +232,7 @@ namespace Mfr.Engine.Beta
         private static DateTime? _FetchNetworkUtcViaHttp(CancellationToken cancellationToken)
         {
             using var client = new HttpClient { Timeout = ProbeTimeout };
-            using var request = new HttpRequestMessage(HttpMethod.Head, ProductUrls.WebSite);
+            using var request = new HttpRequestMessage(HttpMethod.Head, NetworkTimeUrl);
             using var response = client.Send(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
             if (response.Headers.Date is not { } date)
