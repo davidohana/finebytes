@@ -44,6 +44,20 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies a flag without a value soft-fails to Information (does not throw).
+        /// </summary>
+        [Theory]
+        [InlineData(new[] { "--log-level" }, "--log-level")]
+        [InlineData(new[] { "-l", "--initial-folder", "C:\\x" }, "-l")]
+        public void Resolve_Soft_Fails_Missing_Value(string[] args, string optionName)
+        {
+            var (level, softWarning) = UiLogLevelArgs.Resolve(args);
+            Assert.Equal(LogEventLevel.Information, level);
+            Assert.NotNull(softWarning);
+            Assert.Contains($"Missing value for {optionName}", softWarning, StringComparison.Ordinal);
+        }
+
+        /// <summary>
         /// Verifies <see cref="UiLogLevelArgs.TakeSoftWarning"/> is one-shot after remember.
         /// </summary>
         [Fact]

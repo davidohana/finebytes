@@ -71,7 +71,7 @@ namespace Mfr.App.Cli
                 ? PresetManager.DefaultPresetsFilePath()
                 : rawPresetsFilePath.Trim();
             var outputFilePath = _GetValueOrDefault(parsedSettings.OutputFilePath, defaultValue: string.Empty);
-            var logLevel = _GetValueOrDefault(parsedSettings.LogLevel, defaultValue: CliLogging.DefaultLogLevelName);
+            var logLevel = _GetValueOrDefault(parsedSettings.LogLevel, defaultValue: LogLevelParser.DefaultName);
             var configFilePath = _GetValueOrDefault(parsedSettings.ConfigFilePath, defaultValue: string.Empty);
             var configOverrides = parsedSettings
                 .ConfigOverrides.Where(o => !o.IsBlank())
@@ -88,7 +88,7 @@ namespace Mfr.App.Cli
                 ContinueOnRenameError: parsedSettings.ContinueOnRenameError,
                 ConfirmBeforeCommit: parsedSettings.ConfirmBeforeCommit,
                 DryRun: parsedSettings.DryRun,
-                LogLevel: CliLogging.ParseLogLevel(logLevel),
+                LogLevel: LogLevelParser.Parse(logLevel),
                 PresetsFilePath: presetsFilePath,
                 ConfigFilePath: configFilePath.IsBlank() ? null : configFilePath.Trim(),
                 ConfigOverrides: configOverrides

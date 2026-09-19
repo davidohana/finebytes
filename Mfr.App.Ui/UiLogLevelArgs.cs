@@ -23,7 +23,6 @@ namespace Mfr.App.Ui
         {
             string? optionName = null;
             string? rawValue = null;
-            var found = false;
             var missingValue = false;
 
             for (var i = 0; i < args.Length; i++)
@@ -34,7 +33,6 @@ namespace Mfr.App.Ui
                     continue;
                 }
 
-                found = true;
                 optionName = token;
                 var nextIndex = i + 1;
                 if (nextIndex >= args.Length || args[nextIndex].StartsWith('-'))
@@ -49,7 +47,7 @@ namespace Mfr.App.Ui
                 missingValue = false;
             }
 
-            if (!found)
+            if (optionName is null)
             {
                 return (LogEventLevel.Information, null);
             }

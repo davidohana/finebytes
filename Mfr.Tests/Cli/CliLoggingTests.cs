@@ -5,7 +5,7 @@ using Serilog.Events;
 namespace Mfr.Tests.Cli
 {
     /// <summary>
-    /// Tests CLI Serilog bootstrap and log-level parsing.
+    /// Tests CLI Serilog bootstrap (console sink on top of the shared file session).
     /// </summary>
     [Collection(SessionLogCollection.Name)]
     public class CliLoggingTests : IDisposable
@@ -59,32 +59,6 @@ namespace Mfr.Tests.Cli
             var content = File.ReadAllText(logFilePath);
 
             Assert.Contains("hello from test", content, StringComparison.Ordinal);
-        }
-
-        [Fact]
-        /// <summary>
-        /// Verifies blank input uses the default level name.
-        /// </summary>
-        public void ParseLogLevel_Defaults_To_Info()
-        {
-            Assert.Equal(LogEventLevel.Information, CliLogging.ParseLogLevel(null));
-
-            Assert.Equal(LogEventLevel.Information, CliLogging.ParseLogLevel(" "));
-        }
-
-        [Fact]
-        /// <summary>
-        /// Verifies supported level names map to Serilog levels.
-        /// </summary>
-        public void ParseLogLevel_Accepts_Supported_Names()
-        {
-            Assert.Equal(LogEventLevel.Debug, CliLogging.ParseLogLevel("debug"));
-
-            Assert.Equal(LogEventLevel.Information, CliLogging.ParseLogLevel("INFO"));
-
-            Assert.Equal(LogEventLevel.Warning, CliLogging.ParseLogLevel("warn"));
-
-            Assert.Equal(LogEventLevel.Error, CliLogging.ParseLogLevel("error"));
         }
     }
 }
