@@ -72,7 +72,8 @@ namespace Mfr.Tests.Ui.Crash
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
             LogSession.Start(
                 logLevel: LogEventLevel.Information,
-                logConfig: new LogConfig { DirectoryPath = logDirectoryPath }
+                logConfig: new LogConfig { DirectoryPath = logDirectoryPath },
+                blankDirectoryDefault: LogPaths.UiDefaultDirectoryPath
             );
             var sessionLogFilePath = LogSession.LogFilePath;
             var sessionLogDirectoryPath = LogSession.LogDirectoryPath;

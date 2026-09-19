@@ -12,7 +12,12 @@ namespace Mfr.App.Cli
         /// <param name="logLevel">Minimum level for both sinks.</param>
         internal static void Start(LogEventLevel logLevel)
         {
-            LogSession.Start(logLevel: logLevel, logConfig: ConfigStore.Log, configureAdditionalSinks: _AddConsoleSink);
+            LogSession.Start(
+                logLevel: logLevel,
+                logConfig: ConfigStore.Log,
+                blankDirectoryDefault: LogPaths.CliDefaultDirectoryPath,
+                configureAdditionalSinks: _AddConsoleSink
+            );
         }
 
         /// <summary>

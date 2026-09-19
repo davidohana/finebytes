@@ -7,7 +7,7 @@ namespace Mfr.Models
     /// <para>
     /// Roaming holds <c>config.json</c> (prefs: log/ui/renameLog/mainWindow/fileList/renameList/filterEditor/filterDefaults)
     /// and <c>presets.json</c>;
-    /// local holds diagnostic logs, rename-commit <c>.mfrlog</c> history, and GeoNames L3 cache.
+    /// local holds diagnostic logs (<c>logs/ui</c>, <c>logs/cli</c>, crash under <c>logs</c>), rename-commit <c>.mfrlog</c> history, and GeoNames L3 cache.
     /// </para>
     /// </summary>
     public static class AppDataPaths

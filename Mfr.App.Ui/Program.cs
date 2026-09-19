@@ -21,7 +21,11 @@ namespace Mfr.App.Ui
                 ConfigStore.Load();
                 ConfigStore.EnsureDefaultFile();
                 var logLevel = UiLogLevelArgs.ResolveAndRememberWarning(args);
-                LogSession.Start(logLevel: logLevel, logConfig: ConfigStore.Log);
+                LogSession.Start(
+                    logLevel: logLevel,
+                    logConfig: ConfigStore.Log,
+                    blankDirectoryDefault: LogPaths.UiDefaultDirectoryPath
+                );
                 return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
             }
             catch (Exception ex)

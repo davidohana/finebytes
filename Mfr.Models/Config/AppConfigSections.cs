@@ -88,7 +88,8 @@ namespace Mfr.Models.Config
         /// <summary>
         /// Directory for session log files.
         /// <para>
-        /// When blank, <see cref="AppDataPaths.LocalRoot"/> + <c>logs</c> is used.
+        /// When blank, the UI uses <c>logs/ui</c> and the console uses <c>logs/cli</c> under
+        /// <see cref="AppDataPaths.LocalRoot"/>. An explicit path is shared by both hosts as-is.
         /// </para>
         /// </summary>
         [ConfigStringMaxLength(4096)]

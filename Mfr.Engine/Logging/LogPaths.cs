@@ -6,9 +6,11 @@ namespace Mfr.Engine.Logging
     /// <summary>
     /// Path and on-disk helpers for diagnostic session and crash log files.
     /// <para>
-    /// CLI and UI session logs write under <see cref="DefaultDirectoryPath"/> unless
-    /// <see cref="LogConfig.DirectoryPath"/> is set. Crash files always use the default directory.
-    /// These helpers do not configure Serilog; hosts assign <c>Log.Logger</c> via <see cref="LogSession.Start"/>.
+    /// When <see cref="LogConfig.DirectoryPath"/> is blank, the UI writes under
+    /// <see cref="UiDefaultDirectoryPath"/> and the console under <see cref="CliDefaultDirectoryPath"/>.
+    /// An explicit directory override is shared as-is (no host subfolder). Crash files use
+    /// <see cref="DefaultDirectoryPath"/>. These helpers do not configure Serilog; hosts assign
+    /// <c>Log.Logger</c> via <see cref="LogSession.Start"/>.
     /// </para>
     /// </summary>
     public static class LogPaths
@@ -19,26 +21,41 @@ namespace Mfr.Engine.Logging
         public const string CrashFilePrefix = "crash-";
 
         /// <summary>
-        /// Default diagnostic log directory:
-        /// <see cref="AppDataPaths.LocalRoot"/> + <c>logs</c>.
+        /// Parent diagnostic log directory:
+        /// <see cref="AppDataPaths.LocalRoot"/> + <c>logs</c> (crash files; host session defaults are subfolders).
         /// </summary>
         public static string DefaultDirectoryPath => AppDataPaths.LocalRoot().CombinePath("logs");
+
+        /// <summary>
+        /// Default session-log directory for the desktop UI when <see cref="LogConfig.DirectoryPath"/> is blank.
+        /// </summary>
+        public static string UiDefaultDirectoryPath => DefaultDirectoryPath.CombinePath("ui");
+
+        /// <summary>
+        /// Default session-log directory for the console host when <see cref="LogConfig.DirectoryPath"/> is blank.
+        /// </summary>
+        public static string CliDefaultDirectoryPath => DefaultDirectoryPath.CombinePath("cli");
 
         /// <summary>
         /// Resolves the directory used for session log files.
         /// </summary>
         /// <param name="configuredLogDirectoryPath">
-        /// Override directory. When blank, <see cref="DefaultDirectoryPath"/> is used.
+        /// Override directory. When blank, <paramref name="blankDefault"/> is used.
         /// </param>
-        /// <returns>The trimmed override path, or the default directory.</returns>
-        public static string ResolveDirectoryPath(string? configuredLogDirectoryPath)
+        /// <param name="blankDefault">
+        /// Host default when the configured path is blank (e.g. <see cref="UiDefaultDirectoryPath"/>).
+        /// </param>
+        /// <returns>The trimmed override path, or <paramref name="blankDefault"/>.</returns>
+        public static string ResolveDirectoryPath(string? configuredLogDirectoryPath, string blankDefault)
         {
+            ArgumentException.ThrowIfNullOrWhiteSpace(blankDefault);
+
             if (!configuredLogDirectoryPath.IsBlank())
             {
                 return configuredLogDirectoryPath.Trim();
             }
 
-            return DefaultDirectoryPath;
+            return blankDefault;
         }
 
         /// <summary>

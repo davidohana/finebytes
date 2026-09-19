@@ -31,7 +31,8 @@ namespace Mfr.Tests.Engine
 
             LogSession.Start(
                 logLevel: LogEventLevel.Information,
-                logConfig: new LogConfig { DirectoryPath = logDirectoryPath }
+                logConfig: new LogConfig { DirectoryPath = logDirectoryPath },
+                blankDirectoryDefault: LogPaths.UiDefaultDirectoryPath
             );
 
             var logFilePath = LogSession.LogFilePath;
@@ -75,7 +76,11 @@ namespace Mfr.Tests.Engine
                 File.SetCreationTimeUtc(existingPath, baseTime.AddMinutes(i));
             }
 
-            LogSession.Start(logLevel: LogEventLevel.Information, logConfig: config);
+            LogSession.Start(
+                logLevel: LogEventLevel.Information,
+                logConfig: config,
+                blankDirectoryDefault: LogPaths.UiDefaultDirectoryPath
+            );
 
             Assert.True(File.Exists(LogSession.LogFilePath));
 
@@ -96,15 +101,19 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies a blank <see cref="LogConfig.DirectoryPath"/> uses the default log directory.
+        /// Verifies a blank <see cref="LogConfig.DirectoryPath"/> uses the host blank default.
         /// </summary>
-        public void Start_Uses_Default_Directory_When_DirectoryPath_Blank()
+        public void Start_Uses_Blank_Directory_Default_When_DirectoryPath_Blank()
         {
             string? createdLogFilePath = null;
 
             try
             {
-                LogSession.Start(logLevel: LogEventLevel.Information, logConfig: new LogConfig());
+                LogSession.Start(
+                    logLevel: LogEventLevel.Information,
+                    logConfig: new LogConfig(),
+                    blankDirectoryDefault: LogPaths.UiDefaultDirectoryPath
+                );
 
                 createdLogFilePath = LogSession.LogFilePath;
 
@@ -112,7 +121,7 @@ namespace Mfr.Tests.Engine
 
                 Assert.NotNull(createdLogFilePath);
 
-                Assert.Equal(LogPaths.DefaultDirectoryPath, Path.GetDirectoryName(createdLogFilePath));
+                Assert.Equal(LogPaths.UiDefaultDirectoryPath, Path.GetDirectoryName(createdLogFilePath));
             }
             finally
             {

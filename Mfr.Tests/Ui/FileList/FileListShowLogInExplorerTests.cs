@@ -39,7 +39,7 @@ namespace Mfr.Tests.Ui.FileList
 
             var logDirectoryPath = _tempDirectoryFixture.CreateTempDir();
             var logConfig = new LogConfig { DirectoryPath = logDirectoryPath };
-            LogSession.Start(LogEventLevel.Information, logConfig);
+            LogSession.Start(LogEventLevel.Information, logConfig, LogPaths.UiDefaultDirectoryPath);
             var logFilePath = LogSession.LogFilePath;
             Assert.NotNull(logFilePath);
 

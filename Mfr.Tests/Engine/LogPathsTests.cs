@@ -19,15 +19,26 @@ namespace Mfr.Tests.Engine
 
         [Fact]
         /// <summary>
-        /// Verifies a blank override resolves to the LocalAppData diagnostic folder.
+        /// Verifies a blank override resolves to the supplied host default.
         /// </summary>
-        public void ResolveDirectoryPath_Uses_Default_When_Blank()
+        public void ResolveDirectoryPath_Uses_Blank_Default_When_Configured_Blank()
         {
-            var path = LogPaths.ResolveDirectoryPath(null);
+            var path = LogPaths.ResolveDirectoryPath(null, LogPaths.UiDefaultDirectoryPath);
             Assert.Contains(AppDataPaths.VendorDirectoryName, path, StringComparison.OrdinalIgnoreCase);
             Assert.Contains(AppDataPaths.ProductDirectoryName, path, StringComparison.OrdinalIgnoreCase);
-            Assert.EndsWith("logs", path, StringComparison.OrdinalIgnoreCase);
-            Assert.Equal(LogPaths.DefaultDirectoryPath, path);
+            Assert.EndsWith(Path.Combine("logs", "ui"), path, StringComparison.OrdinalIgnoreCase);
+            Assert.Equal(LogPaths.UiDefaultDirectoryPath, path);
+        }
+
+        [Fact]
+        /// <summary>
+        /// Verifies console and UI blank defaults are distinct subfolders under <c>logs</c>.
+        /// </summary>
+        public void Host_Blank_Defaults_Are_Distinct_Under_Logs()
+        {
+            Assert.Equal(LogPaths.DefaultDirectoryPath, Path.GetDirectoryName(LogPaths.UiDefaultDirectoryPath));
+            Assert.Equal(LogPaths.DefaultDirectoryPath, Path.GetDirectoryName(LogPaths.CliDefaultDirectoryPath));
+            Assert.NotEqual(LogPaths.UiDefaultDirectoryPath, LogPaths.CliDefaultDirectoryPath);
         }
 
         [Fact]
@@ -37,7 +48,7 @@ namespace Mfr.Tests.Engine
         public void ResolveDirectoryPath_Uses_Override()
         {
             var overridePath = _tempDirectoryFixture.CreateTempDir();
-            var resolved = LogPaths.ResolveDirectoryPath("  " + overridePath + "  ");
+            var resolved = LogPaths.ResolveDirectoryPath("  " + overridePath + "  ", LogPaths.CliDefaultDirectoryPath);
             Assert.Equal(overridePath, resolved);
         }
 

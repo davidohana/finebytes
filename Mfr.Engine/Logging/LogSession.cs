@@ -27,23 +27,30 @@ namespace Mfr.Engine.Logging
         /// Creates a session log file, assigns <see cref="Log.Logger"/>, and prunes old sessions.
         /// <para>
         /// Call once per process; then <see cref="Shutdown"/> at exit.
-        /// Directory comes from <see cref="LogConfig.DirectoryPath"/> (blank uses the default under LocalApplicationData).
+        /// Directory comes from <see cref="LogConfig.DirectoryPath"/>; when blank,
+        /// <paramref name="blankDirectoryDefault"/> is used (UI: <see cref="LogPaths.UiDefaultDirectoryPath"/>,
+        /// console: <see cref="LogPaths.CliDefaultDirectoryPath"/>).
         /// </para>
         /// </summary>
         /// <param name="logLevel">Minimum level written to the file (and any host extras).</param>
         /// <param name="logConfig">Directory, file naming, retention, and file output template.</param>
+        /// <param name="blankDirectoryDefault">
+        /// Host default directory when <see cref="LogConfig.DirectoryPath"/> is blank.
+        /// </param>
         /// <param name="configureAdditionalSinks">
         /// Optional host extras (CLI console). Invoked after the file target is added.
         /// </param>
         public static void Start(
             LogEventLevel logLevel,
             LogConfig logConfig,
+            string blankDirectoryDefault,
             Action<LoggerConfiguration>? configureAdditionalSinks = null
         )
         {
             ArgumentNullException.ThrowIfNull(logConfig);
+            ArgumentException.ThrowIfNullOrWhiteSpace(blankDirectoryDefault);
 
-            var (resolvedLogDirectoryPath, logFilePath) = _PrepareSessionPaths(logConfig);
+            var (resolvedLogDirectoryPath, logFilePath) = _PrepareSessionPaths(logConfig, blankDirectoryDefault);
             _AssignProcessLogger(
                 logLevel: logLevel,
                 logFilePath: logFilePath,
@@ -79,9 +86,12 @@ namespace Mfr.Engine.Logging
         /// <summary>
         /// Resolves the log directory, creates it, and builds a new session file path.
         /// </summary>
-        private static (string LogDirectoryPath, string LogFilePath) _PrepareSessionPaths(LogConfig logConfig)
+        private static (string LogDirectoryPath, string LogFilePath) _PrepareSessionPaths(
+            LogConfig logConfig,
+            string blankDirectoryDefault
+        )
         {
-            var logDirectoryPath = LogPaths.ResolveDirectoryPath(logConfig.DirectoryPath);
+            var logDirectoryPath = LogPaths.ResolveDirectoryPath(logConfig.DirectoryPath, blankDirectoryDefault);
             Directory.CreateDirectory(logDirectoryPath);
             var logFilePath = LogPaths.CreateSessionFilePath(logDirectoryPath: logDirectoryPath, logConfig: logConfig);
             return (logDirectoryPath, logFilePath);
