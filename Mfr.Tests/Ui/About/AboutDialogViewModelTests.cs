@@ -19,9 +19,12 @@ namespace Mfr.Tests.Ui.About
 
             Assert.Equal(AppProductInfo.GetProductName(), viewModel.ProductName);
             Assert.Equal(AppProductInfo.GetDisplayVersion(), viewModel.DisplayVersion);
+            Assert.Equal(AppProductInfo.GetBetaExpiryNotice(), viewModel.BetaExpiryNotice);
             Assert.Equal(AppProductInfo.GetCopyright(), viewModel.Copyright);
             Assert.False(string.IsNullOrWhiteSpace(viewModel.DisplayVersion));
             Assert.Contains("8.0.0-beta", viewModel.DisplayVersion, StringComparison.Ordinal);
+            Assert.Contains("1 January 2027", viewModel.BetaExpiryNotice, StringComparison.Ordinal);
+            Assert.Contains("Beta expires", viewModel.BetaExpiryNotice, StringComparison.Ordinal);
             Assert.False(string.IsNullOrWhiteSpace(viewModel.Copyright));
             Assert.Contains("1999", viewModel.Copyright, StringComparison.Ordinal);
             Assert.Contains("FineBytes", viewModel.Copyright, StringComparison.Ordinal);

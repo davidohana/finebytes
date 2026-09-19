@@ -1,9 +1,7 @@
-using System.Reflection;
-using Mfr.Utils;
-#if BETA
 using System.Globalization;
+using System.Reflection;
 using Mfr.Engine.Beta;
-#endif
+using Mfr.Utils;
 
 namespace Mfr.App.Ui.Services
 {
@@ -44,7 +42,7 @@ namespace Mfr.App.Ui.Services
         /// Assembly to read. When null, uses the UI assembly that defines this type.
         /// </param>
         /// <returns>
-        /// Display version, or <c>unknown</c> when unavailable. Beta builds append channel and expiry.
+        /// Display version, or <c>unknown</c> when unavailable.
         /// </returns>
         public static string GetDisplayVersion(Assembly? assembly = null)
         {
@@ -55,12 +53,17 @@ namespace Mfr.App.Ui.Services
             var version = !string.IsNullOrWhiteSpace(informational)
                 ? informational
                 : source.GetName().Version?.ToString(3) ?? "unknown";
-#if BETA
-            var expiry = BetaExpiryGate.ExpiresUtc.ToString("d MMM yyyy", CultureInfo.InvariantCulture);
-            return $"{version} (beta; expires {expiry} UTC)";
-#else
             return version;
-#endif
+        }
+
+        /// <summary>
+        /// Returns a short About-dialog line for the beta expiry date.
+        /// </summary>
+        /// <returns>One-line notice including <see cref="BetaExpiryGate.ExpiresUtc"/>.</returns>
+        public static string GetBetaExpiryNotice()
+        {
+            var expiry = BetaExpiryGate.ExpiresUtc.ToString("d MMMM yyyy", CultureInfo.InvariantCulture);
+            return $"Beta expires {expiry} UTC — after that, GO is blocked until you install a newer build.";
         }
 
         /// <summary>

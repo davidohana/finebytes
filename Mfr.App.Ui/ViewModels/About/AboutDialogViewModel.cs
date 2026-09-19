@@ -25,6 +25,11 @@ namespace Mfr.App.Ui.ViewModels.About
         public string DisplayVersion { get; } = AppProductInfo.GetDisplayVersion();
 
         /// <summary>
+        /// Gets the time-limited beta expiry notice shown below the version.
+        /// </summary>
+        public string BetaExpiryNotice { get; } = AppProductInfo.GetBetaExpiryNotice();
+
+        /// <summary>
         /// Gets the assembly copyright notice.
         /// </summary>
         public string Copyright { get; } = AppProductInfo.GetCopyright();

@@ -107,9 +107,15 @@
               Foreground="{DynamicResource AppChromeMutedForegroundBrush}"
             />
             <TextBlock
+              Text="{Binding BetaExpiryNotice}"
+              TextWrapping="Wrap"
+              Margin="0,8,0,0"
+              Foreground="{DynamicResource AppChromeMutedForegroundBrush}"
+            />
+            <TextBlock
               Text="{Binding Copyright}"
               TextWrapping="Wrap"
-              Margin="0,4,0,0"
+              Margin="0,8,0,0"
               Foreground="{DynamicResource AppChromeMutedForegroundBrush}"
             />
           </StackPanel>
