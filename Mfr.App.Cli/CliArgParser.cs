@@ -208,7 +208,7 @@ namespace Mfr.App.Cli
             public bool DryRun { get; init; }
 
             [CommandOption("-l|--log-level <LEVEL>")]
-            [Description("Minimum log level: debug | info | warn | error.")]
+            [Description("Minimum log level: debug | info | warn | error (default info).")]
             public string? LogLevel { get; init; }
 
             [CommandOption("--config <PATH>")]
