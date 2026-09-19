@@ -82,7 +82,10 @@ namespace Mfr.Engine.RenameList
         /// Optional mutable holder; set <see cref="RenameListAddCancelDisposition.KeepPartial"/> at cancel
         /// time to insert the staging batch instead of discarding it.
         /// </param>
-        /// <returns>Summary of sources that were skipped during resolution.</returns>
+        /// <returns>
+        /// Skipped-source count plus whether the add was canceled and whether a KeepPartial cancel
+        /// inserted the staging batch.
+        /// </returns>
         /// <remarks>
         /// <para>
         /// One call builds a <c>batch</c>: a staging list of new <see cref="RenameItem"/>s that is not
@@ -90,8 +93,10 @@ namespace Mfr.Engine.RenameList
         /// in the batch. On success the batch is inserted at <paramref name="insertAtIndex"/> and
         /// reindexed. On cancel, the batch is discarded unless
         /// <paramref name="cancelDisposition"/>.<see cref="RenameListAddCancelDisposition.KeepPartial"/>
-        /// is set (then the staging batch is inserted; mid-metadata cancel keeps partial hydrate).
-        /// Unexpected failure always discards (dedupe keys released).
+        /// is set and the batch is non-empty (then the staging batch is inserted; mid-metadata cancel
+        /// keeps partial hydrate). Metadata is skipped when cancel already happened during resolve so
+        /// Keep after resolve-only cancel does not force a full hydrate pass. Unexpected failure
+        /// always discards (dedupe keys released).
         /// </para>
         /// </remarks>
         public RenameListAddSummary AddSources(
@@ -130,6 +135,7 @@ namespace Mfr.Engine.RenameList
             var batch = new List<RenameItem>();
             var skippedSourceCount = 0;
             var inserted = false;
+            var keepPartial = false;
             try
             {
                 skippedSourceCount = RenameListBatchResolver.FillBatch(
@@ -139,13 +145,12 @@ namespace Mfr.Engine.RenameList
                     batch,
                     _includedResolvedPaths
                 );
-                // Skip metadata when already canceled (Keep after resolve-only cancel inserts without a full pass).
                 if (!tracker.IsCanceled)
                 {
                     _EnsureMetadataLoaded(batch, metadataRequirement, tracker);
                 }
 
-                var keepPartial = cancelDisposition?.KeepPartial == true;
+                keepPartial = cancelDisposition?.KeepPartial == true;
                 var shouldInsert = !tracker.IsCanceled || (keepPartial && batch.Count > 0);
                 if (shouldInsert)
                 {
@@ -166,7 +171,7 @@ namespace Mfr.Engine.RenameList
             return new RenameListAddSummary(
                 SkippedSourceCount: skippedSourceCount,
                 WasCanceled: wasCanceled,
-                KeptPartial: wasCanceled && inserted
+                KeptPartial: wasCanceled && keepPartial && inserted
             );
         }
 

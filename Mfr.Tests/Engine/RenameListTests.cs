@@ -1289,6 +1289,30 @@ namespace Mfr.Tests.Engine
             Assert.False(summary.KeptPartial);
         }
 
+        /// <summary>
+        /// Verifies KeepPartial with an empty staging batch still discards and does not claim KeptPartial.
+        /// </summary>
+        [Fact]
+        public void AddSources_PreCanceled_KeepPartial_Adds_Nothing()
+        {
+            TestHelpers.CreateFiles(_tempRoot, "a.txt", "b.txt");
+
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+            var renameList = new RenameList();
+            var summary = renameList.AddSources(
+                sources: [_tempRoot.CombinePath("*.txt")],
+                includeFiles: true,
+                includeFolders: false,
+                cancellationToken: cts.Token,
+                cancelDisposition: new RenameListAddCancelDisposition { KeepPartial = true }
+            );
+
+            Assert.Empty(renameList.RenameItems);
+            Assert.True(summary.WasCanceled);
+            Assert.False(summary.KeptPartial);
+        }
+
         [Fact]
         /// <summary>
         /// Verifies canceling mid-walk returns without throwing and does not keep a partial batch.
