@@ -78,14 +78,20 @@ namespace Mfr.Engine.RenameList
         /// <param name="metadataRequirement">
         /// Metadata buckets to hydrate on the staging batch before insert; default is none (CLI / filter preview stay lazy).
         /// </param>
+        /// <param name="cancelDisposition">
+        /// Optional mutable holder; set <see cref="RenameListAddCancelDisposition.KeepPartial"/> at cancel
+        /// time to insert the staging batch instead of discarding it.
+        /// </param>
         /// <returns>Summary of sources that were skipped during resolution.</returns>
         /// <remarks>
         /// <para>
         /// One call builds a <c>batch</c>: a staging list of new <see cref="RenameItem"/>s that is not
         /// part of <see cref="RenameItems"/> yet. Paths are reserved in the dedupe set while they sit
         /// in the batch. On success the batch is inserted at <paramref name="insertAtIndex"/> and
-        /// reindexed; on cancel or unexpected failure it is discarded (dedupe keys released) so the
-        /// live list never shows a partial add.
+        /// reindexed. On cancel, the batch is discarded unless
+        /// <paramref name="cancelDisposition"/>.<see cref="RenameListAddCancelDisposition.KeepPartial"/>
+        /// is set (then the staging batch is inserted; mid-metadata cancel keeps partial hydrate).
+        /// Unexpected failure always discards (dedupe keys released).
         /// </para>
         /// </remarks>
         public RenameListAddSummary AddSources(
@@ -98,7 +104,8 @@ namespace Mfr.Engine.RenameList
             CancellationToken cancellationToken = default,
             IProgress<RenameListProgress>? progress = null,
             int? insertAtIndex = null,
-            RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None
+            RenameListMetadataRequirement metadataRequirement = RenameListMetadataRequirement.None,
+            RenameListAddCancelDisposition? cancelDisposition = null
         )
         {
             var sourceList = sources.ToList();
@@ -132,12 +139,15 @@ namespace Mfr.Engine.RenameList
                     batch,
                     _includedResolvedPaths
                 );
+                // Skip metadata when already canceled (Keep after resolve-only cancel inserts without a full pass).
                 if (!tracker.IsCanceled)
                 {
                     _EnsureMetadataLoaded(batch, metadataRequirement, tracker);
                 }
 
-                if (!tracker.IsCanceled)
+                var keepPartial = cancelDisposition?.KeepPartial == true;
+                var shouldInsert = !tracker.IsCanceled || (keepPartial && batch.Count > 0);
+                if (shouldInsert)
                 {
                     _InsertCollectedItems(batch, insertAtIndex ?? _renameItems.Count);
                     inserted = true;
@@ -152,7 +162,12 @@ namespace Mfr.Engine.RenameList
             }
 
             tracker.ReportFinal();
-            return new RenameListAddSummary(skippedSourceCount);
+            var wasCanceled = tracker.IsCanceled;
+            return new RenameListAddSummary(
+                SkippedSourceCount: skippedSourceCount,
+                WasCanceled: wasCanceled,
+                KeptPartial: wasCanceled && inserted
+            );
         }
 
         private void _InsertCollectedItems(List<RenameItem> batch, int insertAt)

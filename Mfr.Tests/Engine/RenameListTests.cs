@@ -1277,7 +1277,7 @@ namespace Mfr.Tests.Engine
             using var cts = new CancellationTokenSource();
             cts.Cancel();
             var renameList = new RenameList();
-            renameList.AddSources(
+            var summary = renameList.AddSources(
                 sources: [_tempRoot.CombinePath("*.txt")],
                 includeFiles: true,
                 includeFolders: false,
@@ -1285,6 +1285,8 @@ namespace Mfr.Tests.Engine
             );
 
             Assert.Empty(renameList.RenameItems);
+            Assert.True(summary.WasCanceled);
+            Assert.False(summary.KeptPartial);
         }
 
         [Fact]
@@ -1305,7 +1307,7 @@ namespace Mfr.Tests.Engine
             var renameList = new RenameList();
             renameList.AddSources([keepPath]);
 
-            renameList.AddSources(
+            var summary = renameList.AddSources(
                 sources: [_tempRoot.CombinePath("*.txt")],
                 includeFiles: true,
                 includeFolders: false,
@@ -1321,7 +1323,50 @@ namespace Mfr.Tests.Engine
             );
 
             Assert.True(cts.IsCancellationRequested);
+            Assert.True(summary.WasCanceled);
+            Assert.False(summary.KeptPartial);
             Assert.Equal([keepPath], renameList.RenameItems.Select(entry => entry.Original.FullPath));
+        }
+
+        /// <summary>
+        /// Verifies cancel mid-walk with KeepPartial inserts the staging batch collected so far.
+        /// </summary>
+        [Fact]
+        public void AddSources_Cancel_KeepPartial_Inserts_Staging_Batch()
+        {
+            for (var i = 0; i < 500; i++)
+            {
+                var nested = _tempRoot.CombinePath($"d{i:D3}");
+                Directory.CreateDirectory(nested);
+                File.WriteAllText(nested.CombinePath($"f{i:D3}.txt"), "x");
+            }
+
+            using var cts = new CancellationTokenSource();
+            var disposition = new RenameListAddCancelDisposition();
+            var renameList = new RenameList();
+            var summary = renameList.AddSources(
+                sources: [_tempRoot.CombinePath("*.txt")],
+                includeFiles: true,
+                includeFolders: false,
+                includeSubdirs: true,
+                cancellationToken: cts.Token,
+                cancelDisposition: disposition,
+                progress: new SynchronousProgress<RenameListProgress>(report =>
+                {
+                    // First OnScanned reports immediately; cancel then still finishes the current item into the batch.
+                    if (report.Phase == RenameListProgressPhase.ResolveSources && report.ScannedCount >= 1)
+                    {
+                        disposition.KeepPartial = true;
+                        cts.Cancel();
+                    }
+                })
+            );
+
+            Assert.True(cts.IsCancellationRequested);
+            Assert.True(summary.WasCanceled);
+            Assert.True(summary.KeptPartial);
+            Assert.NotEmpty(renameList.RenameItems);
+            Assert.True(renameList.RenameItems.Count < 500);
         }
 
         [Fact]
@@ -1725,7 +1770,7 @@ namespace Mfr.Tests.Engine
 
             using var cts = new CancellationTokenSource();
             var renameList = new RenameList();
-            renameList.AddSources(
+            var summary = renameList.AddSources(
                 [path],
                 metadataRequirement: RenameListMetadataRequirement.TagLib,
                 cancellationToken: cts.Token,
@@ -1739,6 +1784,45 @@ namespace Mfr.Tests.Engine
             );
 
             Assert.Empty(renameList.RenameItems);
+            Assert.True(summary.WasCanceled);
+            Assert.False(summary.KeptPartial);
+        }
+
+        /// <summary>
+        /// Verifies mid-metadata cancel with KeepPartial inserts the batch and keeps partial hydrate.
+        /// </summary>
+        [Fact]
+        public void AddSources_Cancel_During_Metadata_KeepPartial_Inserts_Partial_Hydrate()
+        {
+            var firstPath = Path.Combine(_tempRoot, $"first_{Guid.NewGuid():N}.wav");
+            var secondPath = Path.Combine(_tempRoot, $"second_{Guid.NewGuid():N}.wav");
+            TaggedMinimalWav.WriteTagged(firstPath, title: "FirstTitle", album: null);
+            TaggedMinimalWav.WriteTagged(secondPath, title: "SecondTitle", album: null);
+
+            using var cts = new CancellationTokenSource();
+            var disposition = new RenameListAddCancelDisposition();
+            var renameList = new RenameList();
+            var summary = renameList.AddSources(
+                [firstPath, secondPath],
+                metadataRequirement: RenameListMetadataRequirement.TagLib,
+                cancellationToken: cts.Token,
+                cancelDisposition: disposition,
+                progress: new SynchronousProgress<RenameListProgress>(report =>
+                {
+                    if (report.Phase == RenameListProgressPhase.LoadMetadata && report.MetadataProcessedCount >= 1)
+                    {
+                        disposition.KeepPartial = true;
+                        cts.Cancel();
+                    }
+                })
+            );
+
+            Assert.True(summary.WasCanceled);
+            Assert.True(summary.KeptPartial);
+            Assert.Equal(2, renameList.RenameItems.Count);
+            Assert.True(renameList.RenameItems[0].TagLibLoadAttempted);
+            Assert.Equal("FirstTitle", renameList.RenameItems[0].Original.AudioTagOverlay.Semantic().Title);
+            Assert.False(renameList.RenameItems[1].TagLibLoadAttempted);
         }
 
         /// <summary>
