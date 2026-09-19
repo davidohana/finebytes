@@ -75,6 +75,9 @@ tests never hit disk. Integration-style tests construct an unmarked `RenameItem`
 
 ## Empty vs PreviewError
 
+- **Soft load then token** — If the Rename List grid soft-stores a load failure first,
+  a later `Ensure*` (shared `RenameItemMetadataEnsure`) rethrows that error so tokens still
+  PreviewError instead of expanding empty.
 - **Directory row** — `InvalidOperationException` from ensure → PreviewError
 - **Missing / relative path** — `ArgumentException` from the reader → PreviewError
 - **Unknown format / ME processing or IO failure (e.g. `.txt`)** — Propagated ME exception → PreviewError

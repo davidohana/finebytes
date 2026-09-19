@@ -1,7 +1,5 @@
-using System.Runtime.ExceptionServices;
 using Mfr.Metadata.GeoNames;
 using Mfr.Models.RenameList;
-using Mfr.Utils;
 
 namespace Mfr.Filters
 {
@@ -19,50 +17,31 @@ namespace Mfr.Filters
         /// <remarks>
         /// <para>
         /// Success always stores a non-null <see cref="FileMeta.GeoNames"/> snapshot (empty when no GPS).
-        /// Failures are stored as soft load errors and rethrown so a later <c>geo-*</c> token still
-        /// surfaces PreviewError instead of expanding empty (empty is a valid no-GPS success).
+        /// Failures soft-store and rethrow via <see cref="RenameItemMetadataEnsure"/> so a later
+        /// <c>geo-*</c> token still surfaces PreviewError (empty is a valid no-GPS success).
         /// </para>
         /// </remarks>
         internal static void EnsureGeoNamesLoaded(this RenameItem item)
         {
-            ArgumentNullException.ThrowIfNull(item);
-
-            if (item.WasMetadataLoadAttempted(RenameListMetadataRequirement.GeoNames))
-            {
-                if (item.GetMetadataLoadError(RenameListMetadataRequirement.GeoNames) is { } loadError)
+            RenameItemMetadataEnsure.EnsureLoaded(
+                item,
+                RenameListMetadataRequirement.GeoNames,
+                "Cannot read GeoNames data for a directory.",
+                () =>
                 {
-                    ExceptionDispatchInfo.Capture(loadError).Throw();
+                    item.EnsureImagePropertiesLoaded();
+
+                    var latitude = item.Original.Exif?.GpsLatitude;
+                    var longitude = item.Original.Exif?.GpsLongitude;
+                    if (latitude is null || longitude is null)
+                    {
+                        item.SetGeoNamesInfo(new GeoNamesInfo());
+                        return;
+                    }
+
+                    item.SetGeoNamesInfo(GeoNamesClient.Shared.FindNearby(latitude.Value, longitude.Value));
                 }
-
-                return;
-            }
-
-            item.MarkMetadataLoadAttempted(RenameListMetadataRequirement.GeoNames);
-
-            try
-            {
-                if (item.Original.Attributes.IsDirectory())
-                {
-                    throw new InvalidOperationException("Cannot read GeoNames data for a directory.");
-                }
-
-                item.EnsureImagePropertiesLoaded();
-
-                var latitude = item.Original.Exif?.GpsLatitude;
-                var longitude = item.Original.Exif?.GpsLongitude;
-                if (latitude is null || longitude is null)
-                {
-                    item.SetGeoNamesInfo(new GeoNamesInfo());
-                    return;
-                }
-
-                item.SetGeoNamesInfo(GeoNamesClient.Shared.FindNearby(latitude.Value, longitude.Value));
-            }
-            catch (Exception ex) when (ex is InvalidOperationException or IOException or UnauthorizedAccessException)
-            {
-                item.SetMetadataLoadError(RenameListMetadataRequirement.GeoNames, ex);
-                throw;
-            }
+            );
         }
     }
 }

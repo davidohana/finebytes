@@ -34,6 +34,7 @@
         also change when related writable fields change (for example File Name Length after renaming).
       </li>
     </ul>
+    <p>Fields without Write are read-only.</p>
 
     <h2 id="basic">File Name</h2>
     <p>Basic path and name information.</p>
@@ -166,110 +167,816 @@
     <h2 id="audiotag">Audio Tag</h2>
     <p>
       Semantic tag fields for common audio formats (MP3/ID3, Ogg, FLAC, Apple, ASF, and others via
-      TagLib). Writable fields can be edited in the grid and targeted by audio tag filters. Multi-value
-      fields (Artist, Album Artist, Composer, Genre) also have a matching
-      <span class="quote">(first)</span> column. <span class="quote">Tag Types</span> is read-only and
-      lists present tag blocks.
-    </p>
-    <p>
-      Core columns include Title, Artist, Album Artist, Album, Year, Genre, Track, Track Count, Disc,
-      Disc Count, Comment, Composer, Lyrics, Copyright, Grouping, BPM, Conductor, plus MusicBrainz /
-      MusicIP / Amazon identifiers. Matching tokens are listed under
+      TagLib). Matching tokens are under
       <a href="../tokens/audiofp.html">Audio Tag formatting tokens</a>.
-    </p>
-
-    <h2 id="mediaproperties">Media Properties</h2>
-    <p>
-      Read-only TagLib stream properties for audio and video (MIME, duration, audio stream, video frame
-      size). Raster size is under
-      <a href="#image">Image</a>.
     </p>
     <table class="ref-table">
       <thead>
         <tr>
           <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Album</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Album / release title.</td>
+        </tr>
+        <tr>
+          <td>Album Artist</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>
+            Album-level credit (compilations / Various Artists). Distinct from Artist. Multiple values
+            joined with <code>;</code>.
+          </td>
+        </tr>
+        <tr>
+          <td>Album Artist (first)</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>First Album Artist value before <code>;</code>.</td>
+        </tr>
+        <tr>
+          <td>Artist</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Track performers. Multiple values joined with <code>;</code>.</td>
+        </tr>
+        <tr>
+          <td>Artist (first)</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>First Artist value before <code>;</code>.</td>
+        </tr>
+        <tr>
+          <td>ASIN</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Amazon Standard Identification Number.</td>
+        </tr>
+        <tr>
+          <td>BPM</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Tempo in beats per minute.</td>
+        </tr>
+        <tr>
+          <td>Comment</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Free-text comment / notes.</td>
+        </tr>
+        <tr>
+          <td>Composer</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Composer(s). Multiple values joined with <code>;</code>.</td>
+        </tr>
+        <tr>
+          <td>Composer (first)</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>First Composer value before <code>;</code>.</td>
+        </tr>
+        <tr>
+          <td>Conductor</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Conductor or musical director.</td>
+        </tr>
+        <tr>
+          <td>Copyright</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Copyright notice for the recording or release.</td>
+        </tr>
+        <tr>
+          <td>Disc</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Disc number in a multi-disc set.</td>
+        </tr>
+        <tr>
+          <td>Disc Count</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Total number of discs in a multi-disc set.</td>
+        </tr>
+        <tr>
+          <td>Genre</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Genre. Multiple values joined with <code>;</code>.</td>
+        </tr>
+        <tr>
+          <td>Genre (first)</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>First Genre value before <code>;</code>.</td>
+        </tr>
+        <tr>
+          <td>Grouping</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Content group / work set.</td>
+        </tr>
+        <tr>
+          <td>Lyrics</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Song lyrics text.</td>
+        </tr>
+        <tr>
+          <td>MusicBrainz Album Artist Id</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>MusicBrainz release artist (album artist) UUID.</td>
+        </tr>
+        <tr>
+          <td>MusicBrainz Album Id</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>MusicBrainz release (album) UUID.</td>
+        </tr>
+        <tr>
+          <td>MusicBrainz Album Release Country</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>MusicBrainz release country code.</td>
+        </tr>
+        <tr>
+          <td>MusicBrainz Album Status</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>MusicBrainz release status (e.g. official, promotion).</td>
+        </tr>
+        <tr>
+          <td>MusicBrainz Album Type</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>MusicBrainz release type (e.g. album, single, EP).</td>
+        </tr>
+        <tr>
+          <td>MusicBrainz Artist Id</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>MusicBrainz artist UUID.</td>
+        </tr>
+        <tr>
+          <td>MusicBrainz Disc Id</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>MusicBrainz disc ID (TOC fingerprint).</td>
+        </tr>
+        <tr>
+          <td>MusicBrainz Track Id</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>MusicBrainz recording / track UUID.</td>
+        </tr>
+        <tr>
+          <td>MusicIP PUID</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>MusicIP acoustic fingerprint PUID.</td>
+        </tr>
+        <tr>
+          <td>Tag Types</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Present tag blocks (e.g. <code>Id3v2;Xiph</code>).</td>
+        </tr>
+        <tr>
+          <td>Title</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Track title.</td>
+        </tr>
+        <tr>
+          <td>Track</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Track number within the album (or disc).</td>
+        </tr>
+        <tr>
+          <td>Track Count</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Total number of tracks on the album (or disc).</td>
+        </tr>
+        <tr>
+          <td>Year</td>
+          <td class="center">+</td>
+          <td class="center">+</td>
+          <td>Release or recording year.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2 id="mediaproperties">Media Properties</h2>
+    <p>
+      Read-only TagLib stream properties for audio and video. Raster size is under
+      <a href="#image">Image</a>. See also <a href="../tokens/mediafp.html">Media formatting tokens</a>.
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
           <th>Description</th>
         </tr>
       </thead>
       <tbody>
         <tr>
           <td>MIME Type</td>
+          <td class="center"></td>
+          <td class="center"></td>
           <td>Internet media type.</td>
         </tr>
         <tr>
           <td>Possibly Corrupt</td>
+          <td class="center"></td>
+          <td class="center"></td>
           <td>Whether TagLib flagged the file as possibly corrupt.</td>
         </tr>
         <tr>
-          <td>Duration / Duration (Seconds)</td>
-          <td>Media duration as formatted time or whole seconds.</td>
+          <td>Duration</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Formatted duration (<code>h:mm:ss</code>).</td>
+        </tr>
+        <tr>
+          <td>Duration (Seconds)</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Same duration as a whole-second number.</td>
         </tr>
         <tr>
           <td>Media Types</td>
+          <td class="center"></td>
+          <td class="center"></td>
           <td>TagLib media-type flags text.</td>
         </tr>
         <tr>
           <td>Description</td>
+          <td class="center"></td>
+          <td class="center"></td>
           <td>Codec / media description.</td>
         </tr>
         <tr>
-          <td>Audio Bitrate / Sample Rate / Bits Per Sample / Channels</td>
-          <td>Audio stream properties when present.</td>
+          <td>Audio Bitrate</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Audio stream bitrate when present.</td>
         </tr>
         <tr>
-          <td>Video Width / Height</td>
-          <td>Video frame size in pixels.</td>
+          <td>Audio Channels</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Audio channel count when present.</td>
+        </tr>
+        <tr>
+          <td>Audio Sample Rate</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Audio sample rate when present.</td>
+        </tr>
+        <tr>
+          <td>Bits Per Sample</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Bits per sample when present.</td>
+        </tr>
+        <tr>
+          <td>Video Width</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Video stream width in pixels (not still-image / cover art).</td>
+        </tr>
+        <tr>
+          <td>Video Height</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Video stream height in pixels (not still-image / cover art).</td>
         </tr>
       </tbody>
     </table>
-    <p>See also <a href="../tokens/mediafp.html">Media formatting tokens</a>.</p>
 
     <h2 id="mp3">MP3 Properties</h2>
-    <p>Read-only MPEG audio properties for MP3 files (bitrate, encoding, frequency, layer, version,
-      mode, duration, copyright/original/protection flags, and related values). See
+    <p>
+      Read-only MPEG audio-header properties for MP3 files. See
       <a href="../tokens/mp3fp.html">MP3 Properties formatting tokens</a>.
     </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Bitrate</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>MPEG header bitrate.</td>
+        </tr>
+        <tr>
+          <td>VBR</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Whether the stream is VBR / encoding flag.</td>
+        </tr>
+        <tr>
+          <td>Frequency</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Sample rate in Hz (MPEG header).</td>
+        </tr>
+        <tr>
+          <td>Duration</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>MPEG header duration as <code>h:mm:ss</code>.</td>
+        </tr>
+        <tr>
+          <td>Duration (Seconds)</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Same MPEG header duration as a whole-second number.</td>
+        </tr>
+        <tr>
+          <td>Layer</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>MPEG audio layer (I / II / III).</td>
+        </tr>
+        <tr>
+          <td>Level</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>MPEG version (e.g. Version 1).</td>
+        </tr>
+        <tr>
+          <td>Mode</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Channel mode.</td>
+        </tr>
+        <tr>
+          <td>Copyright</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>MPEG header copyright bit — not the audio-tag Copyright text.</td>
+        </tr>
+        <tr>
+          <td>Original</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>MPEG header original/copy bit.</td>
+        </tr>
+        <tr>
+          <td>Protection</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>MPEG header CRC protection bit.</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2 id="image">Image</h2>
     <p>
-      Read-only basic image properties (format, width, height, bit depth, horizontal/vertical DPI,
-      frame count) for JPEG, PNG, GIF, TIFF, BMP, ICO, WebP, and HEIF/HEIC. See
+      Read-only basic image properties for JPEG, PNG, GIF, TIFF, BMP, ICO, WebP, and HEIF/HEIC. See
       <a href="../tokens/basicimagefp.html">Image Properties tokens</a>.
     </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Format</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Image format name.</td>
+        </tr>
+        <tr>
+          <td>Width</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Width in pixels.</td>
+        </tr>
+        <tr>
+          <td>Height</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Height in pixels.</td>
+        </tr>
+        <tr>
+          <td>Bit Depth</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Bits per pixel.</td>
+        </tr>
+        <tr>
+          <td>Horizontal Resolution</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Horizontal DPI.</td>
+        </tr>
+        <tr>
+          <td>Vertical Resolution</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Vertical DPI.</td>
+        </tr>
+        <tr>
+          <td>Frames Count</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Frame count (e.g. animated GIF).</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2 id="jpeg">Jpeg Tag</h2>
     <p>
-      Read-only EXIF-derived columns commonly shown in the Rename List (Title, Subject, Author,
-      Keywords, Comments, Date/Time taken, Make, Model, Description, Artist, Image Number, User
-      Comment, Exposure, F-Number, ISO, Focal Length, Focal Length 35mm, Latitude, Longitude). For
-      arbitrary EXIF tags use the <a href="../tokens/eximagefp.html">EXIF formatting tokens</a>.
-      Latitude and Longitude are decimal degrees when GPS is present; otherwise empty (no network).
-      Nearby Place / Region / Country reverse-geocode GPS via GeoNames (may use the network on a
-      cache miss); see <a href="../tokens/geofp.html">Nearby / GeoNames tokens</a>.
+      Read-only EXIF-derived columns commonly shown in the Rename List. For arbitrary EXIF tags use the
+      <a href="../tokens/eximagefp.html">EXIF formatting tokens</a>. Nearby Place / Region / Country
+      reverse-geocode GPS via GeoNames (may use the network on a cache miss); see
+      <a href="../tokens/geofp.html">Nearby / GeoNames tokens</a>.
     </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Title</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Windows XP Title tag.</td>
+        </tr>
+        <tr>
+          <td>Subject</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Windows XP Subject tag.</td>
+        </tr>
+        <tr>
+          <td>Author</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Windows XP Author tag (distinct from EXIF Artist).</td>
+        </tr>
+        <tr>
+          <td>Keywords</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Windows XP Keywords tag.</td>
+        </tr>
+        <tr>
+          <td>Comments</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Windows XP Comments tag.</td>
+        </tr>
+        <tr>
+          <td>Date/Time Taken</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>EXIF DateTimeOriginal.</td>
+        </tr>
+        <tr>
+          <td>Make</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Camera make.</td>
+        </tr>
+        <tr>
+          <td>Model</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Camera model.</td>
+        </tr>
+        <tr>
+          <td>Description</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>EXIF ImageDescription.</td>
+        </tr>
+        <tr>
+          <td>Artist</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>EXIF IFD0 Artist (photographer). Not the audio-tag Artist field.</td>
+        </tr>
+        <tr>
+          <td>Image Number</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>EXIF ImageNumber.</td>
+        </tr>
+        <tr>
+          <td>User Comment</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>EXIF UserComment.</td>
+        </tr>
+        <tr>
+          <td>Exposure Time</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Shutter speed.</td>
+        </tr>
+        <tr>
+          <td>FNumber</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Aperture f-number.</td>
+        </tr>
+        <tr>
+          <td>ISO Speed Ratings</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>ISO speed.</td>
+        </tr>
+        <tr>
+          <td>Focal Length</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Focal length.</td>
+        </tr>
+        <tr>
+          <td>Focal Length In 35mm Film</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>35mm-equivalent focal length.</td>
+        </tr>
+        <tr>
+          <td>Latitude</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>GPS latitude in decimal degrees when present; otherwise empty (no network).</td>
+        </tr>
+        <tr>
+          <td>Longitude</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>GPS longitude in decimal degrees when present; otherwise empty (no network).</td>
+        </tr>
+        <tr>
+          <td>Nearby Place</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Nearby place name from GeoNames for the GPS coordinates.</td>
+        </tr>
+        <tr>
+          <td>Nearby Region</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Nearby region from GeoNames for the GPS coordinates.</td>
+        </tr>
+        <tr>
+          <td>Nearby Country</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Nearby country from GeoNames for the GPS coordinates.</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2 id="pdf">PDF Document</h2>
     <p>
-      Read-only PDF Info dictionary fields (Title, Author, Subject, Keywords, Creator, Producer,
-      Created, Modified) and page count. See
+      Read-only PDF Info dictionary fields and page count. See
       <a href="../tokens/pdffp.html">PDF Document tokens</a>.
     </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Title</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PDF Info Title.</td>
+        </tr>
+        <tr>
+          <td>Author</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Document author from the PDF Info dictionary.</td>
+        </tr>
+        <tr>
+          <td>Subject</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PDF Info Subject.</td>
+        </tr>
+        <tr>
+          <td>Keywords</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PDF Info Keywords.</td>
+        </tr>
+        <tr>
+          <td>Creator</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Application that created the original document before it was converted to PDF.</td>
+        </tr>
+        <tr>
+          <td>Producer</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Application that produced/converted this PDF file.</td>
+        </tr>
+        <tr>
+          <td>Created</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PDF Info CreationDate.</td>
+        </tr>
+        <tr>
+          <td>Modified</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PDF Info ModDate.</td>
+        </tr>
+        <tr>
+          <td>Page Count</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Number of pages.</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2 id="epub">EPUB Document</h2>
     <p>
-      Read-only EPUB Dublin Core package fields (Title, Creator, Publisher, Language, Date,
-      Identifier, Subject, Description). Creator is the document author (person or organization),
-      not a creating application. See
+      Read-only EPUB Dublin Core package fields. See
       <a href="../tokens/epubfp.html">EPUB Document tokens</a>.
     </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Title</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Dublin Core title.</td>
+        </tr>
+        <tr>
+          <td>Creator</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>
+            Dublin Core creator / author (person or organization), not a creating application.
+          </td>
+        </tr>
+        <tr>
+          <td>Publisher</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Dublin Core publisher.</td>
+        </tr>
+        <tr>
+          <td>Language</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Dublin Core language.</td>
+        </tr>
+        <tr>
+          <td>Date</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Dublin Core date (literal string).</td>
+        </tr>
+        <tr>
+          <td>Identifier</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Package unique-identifier when set; otherwise the first non-blank dc:identifier.</td>
+        </tr>
+        <tr>
+          <td>Subject</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Dublin Core subject.</td>
+        </tr>
+        <tr>
+          <td>Description</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>First non-blank dc:description from the EPUB package.</td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2 id="office">Office Document</h2>
     <p>
-      Read-only Office PackageProperties fields (Title, Author, Subject, Keywords, Category,
-      Description, Last Modified By, Created, Modified) for readable DOCX files. Author maps from the
-      OPC Creator core property (document author, not a creating application). See
+      Read-only Office PackageProperties fields for readable DOCX files. See
       <a href="../tokens/officefp.html">Office Document tokens</a>.
     </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th class="center">Write</th>
+          <th class="center">Preview</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Title</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PackageProperties Title.</td>
+        </tr>
+        <tr>
+          <td>Author</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>
+            Document author from PackageProperties Creator (OPC core prop), not a creating
+            application.
+          </td>
+        </tr>
+        <tr>
+          <td>Subject</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PackageProperties Subject.</td>
+        </tr>
+        <tr>
+          <td>Keywords</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PackageProperties Keywords.</td>
+        </tr>
+        <tr>
+          <td>Category</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Document category from PackageProperties.</td>
+        </tr>
+        <tr>
+          <td>Description</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PackageProperties Description.</td>
+        </tr>
+        <tr>
+          <td>Last Modified By</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>Name of the user who last saved the document.</td>
+        </tr>
+        <tr>
+          <td>Created</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PackageProperties Created.</td>
+        </tr>
+        <tr>
+          <td>Modified</td>
+          <td class="center"></td>
+          <td class="center"></td>
+          <td>PackageProperties Modified.</td>
+        </tr>
+      </tbody>
+    </table>
   </body>
 </html>
-

@@ -124,6 +124,28 @@ namespace Mfr.Metadata.GeoNames
         }
 
         /// <summary>
+        /// Flushes pending L3 <c>LastAccessUtc</c> updates on the shared client when it exists.
+        /// </summary>
+        /// <remarks>
+        /// Does not create the shared instance. Hosts call this at process exit.
+        /// </remarks>
+        public static void FlushSharedDiskCache()
+        {
+            lock (s_SharedGate)
+            {
+                s_Shared?.FlushDiskCache();
+            }
+        }
+
+        /// <summary>
+        /// Writes pending L3 <c>LastAccessUtc</c> updates to disk when dirty.
+        /// </summary>
+        public void FlushDiskCache()
+        {
+            _cache.Flush();
+        }
+
+        /// <summary>
         /// Looks up nearby place/region/country for GPS coordinates (sync; uses L2/L3 then HTTP).
         /// </summary>
         /// <param name="latitude">GPS latitude in decimal degrees.</param>
@@ -221,6 +243,7 @@ namespace Mfr.Metadata.GeoNames
         /// <inheritdoc />
         public void Dispose()
         {
+            _cache.Flush();
             _http.Dispose();
         }
 

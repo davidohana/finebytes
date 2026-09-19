@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using Mfr.Models.RenameList;
 using Mfr.Utils;
 
@@ -6,6 +7,12 @@ namespace Mfr.Filters
     /// <summary>
     /// Shared lazy-load shell for disk metadata buckets on <see cref="RenameItem"/>.
     /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Soft load errors stored by the Rename List grid (or by a prior Ensure* failure) are rethrown
+    /// on later Ensure* calls so formatter tokens still surface PreviewError instead of expanding empty.
+    /// </para>
+    /// </remarks>
     internal static class RenameItemMetadataEnsure
     {
         /// <summary>
@@ -29,17 +36,36 @@ namespace Mfr.Filters
 
             if (item.WasMetadataLoadAttempted(bucket))
             {
+                _RethrowSoftLoadErrorIfAny(item, bucket);
                 return;
             }
 
             item.MarkMetadataLoadAttempted(bucket);
 
-            if (item.Original.Attributes.IsDirectory())
+            try
             {
-                throw new InvalidOperationException(directoryErrorMessage);
+                if (item.Original.Attributes.IsDirectory())
+                {
+                    throw new InvalidOperationException(directoryErrorMessage);
+                }
+
+                loadFromDisk();
+            }
+            catch (Exception ex) when (RenameItemMetadataLoadFailures.IsReadFailure(ex))
+            {
+                item.SetMetadataLoadError(bucket, ex);
+                throw;
+            }
+        }
+
+        private static void _RethrowSoftLoadErrorIfAny(RenameItem item, RenameListMetadataRequirement bucket)
+        {
+            if (item.GetMetadataLoadError(bucket) is not { } loadError)
+            {
+                return;
             }
 
-            loadFromDisk();
+            ExceptionDispatchInfo.Capture(loadError).Throw();
         }
     }
 }

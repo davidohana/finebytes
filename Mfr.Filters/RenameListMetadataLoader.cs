@@ -110,47 +110,10 @@ namespace Mfr.Filters
             {
                 ensure(item);
             }
-            catch (Exception ex) when (_IsMetadataReadFailure(ex))
+            catch (Exception ex) when (RenameItemMetadataLoadFailures.IsReadFailure(ex))
             {
                 item.SetMetadataLoadError(bucket, ex);
             }
-        }
-
-        private static bool _IsMetadataReadFailure(Exception ex)
-        {
-            if (
-                ex
-                is InvalidOperationException
-                    or IOException
-                    or InvalidDataException
-                    or ArgumentException
-                    or UnauthorizedAccessException
-            )
-            {
-                return true;
-            }
-
-            // TagLib / MetadataExtractor / PdfPig / VersOne.Epub / OpenXml without a Filters package reference.
-            // Walk bases so VersOne concretes (EpubPackageException, …) match EpubReaderException.
-            for (var type = ex.GetType(); type is not null && type != typeof(object); type = type.BaseType)
-            {
-                if (
-                    type.Name
-                    is "UnsupportedFormatException"
-                        or "CorruptFileException"
-                        or "ImageProcessingException"
-                        or "PdfDocumentFormatException"
-                        or "PdfDocumentEncryptedException"
-                        or "EpubReaderException"
-                        or "OpenXmlPackageException"
-                        or "FileFormatException"
-                )
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
     }
 }

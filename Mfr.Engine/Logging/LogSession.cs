@@ -78,6 +78,7 @@ namespace Mfr.Engine.Logging
         /// </summary>
         public static void Shutdown()
         {
+            Metadata.GeoNames.GeoNamesClient.FlushSharedDiskCache();
             Log.CloseAndFlush();
             LogFilePath = null;
             LogDirectoryPath = null;

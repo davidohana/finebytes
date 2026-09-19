@@ -14,6 +14,10 @@ namespace Mfr.Metadata.GeoNames
     /// Failures are never persisted. Soft cap is ~5 000 L3 entries. Circuit-breaker trip state
     /// lives here so Options username changes can clear L2 + breaker together.
     /// </para>
+    /// <para>
+    /// L3 hits update <c>LastAccessUtc</c> in memory only; disk is rewritten on <see cref="Put"/>
+    /// and <see cref="Flush"/> (app shutdown), not on every cache hit.
+    /// </para>
     /// </remarks>
     public sealed class GeoNamesResponseCache
     {
@@ -34,6 +38,7 @@ namespace Mfr.Metadata.GeoNames
         private readonly Lock _diskGate = new();
         private readonly string _cacheFilePath;
         private Dictionary<string, DiskEntry>? _diskEntries;
+        private bool _diskDirty;
 
         /// <summary>
         /// Initializes a cache that reads/writes <paramref name="cacheFilePath"/>.
@@ -71,9 +76,9 @@ namespace Mfr.Metadata.GeoNames
                 if (_diskEntries!.TryGetValue(cacheKey, out var entry))
                 {
                     entry.LastAccessUtc = DateTime.UtcNow;
+                    _diskDirty = true;
                     info = entry.ToInfo();
                     _processCache[cacheKey] = info;
-                    _SaveDiskUnlocked();
                     return true;
                 }
             }
@@ -83,7 +88,7 @@ namespace Mfr.Metadata.GeoNames
         }
 
         /// <summary>
-        /// Stores a successful lookup in L2 and L3.
+        /// Stores a successful lookup in L2 and L3 (writes disk immediately).
         /// </summary>
         /// <param name="cacheKey"><see cref="GeoNamesCacheKey"/> string.</param>
         /// <param name="info">Successful snapshot (may have blank fields).</param>
@@ -99,6 +104,24 @@ namespace Mfr.Metadata.GeoNames
                 _EnsureDiskLoaded();
                 _diskEntries![cacheKey] = DiskEntry.FromInfo(info, DateTime.UtcNow);
                 _TrimIfNeededUnlocked();
+                _diskDirty = true;
+                _SaveDiskUnlocked();
+            }
+        }
+
+        /// <summary>
+        /// Writes pending L3 <c>LastAccessUtc</c> updates to disk when dirty.
+        /// </summary>
+        public void Flush()
+        {
+            lock (_diskGate)
+            {
+                if (!_diskDirty)
+                {
+                    return;
+                }
+
+                _EnsureDiskLoaded();
                 _SaveDiskUnlocked();
             }
         }
@@ -191,6 +214,7 @@ namespace Mfr.Metadata.GeoNames
             )
             {
                 _diskEntries.Remove(key);
+                _diskDirty = true;
             }
         }
 
@@ -210,6 +234,7 @@ namespace Mfr.Metadata.GeoNames
             var file = new DiskFile { Entries = [.. _diskEntries.Select(pair => pair.Value with { Key = pair.Key })] };
             var json = JsonSerializer.Serialize(file, s_JsonOptions);
             File.WriteAllText(_cacheFilePath, json);
+            _diskDirty = false;
         }
 
         private sealed class DiskFile
