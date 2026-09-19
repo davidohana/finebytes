@@ -27,7 +27,7 @@
       items in the list continue as usual.
     </p>
 
-    <h2 id="audio">Audio tags (read and write)</h2>
+    <h2 id="audio">Audio tags</h2>
     <p>
       Embedded audio tags load and save through TagLibSharp. Generic fields (title, artist, album,
       and so on) work across these containers; format-specific targets (for example an ID3v2 frame
@@ -41,6 +41,7 @@
         <tr>
           <th>Container</th>
           <th>Typical extensions</th>
+          <th>Access</th>
           <th>Tag blocks</th>
           <th>Default when empty</th>
         </tr>
@@ -49,42 +50,49 @@
         <tr>
           <td>MP3 (MPEG)</td>
           <td><span class="quote">.mp3</span></td>
+          <td>Read / write</td>
           <td>ID3v1, ID3v2</td>
           <td>ID3v2 (v2.3)</td>
         </tr>
         <tr>
           <td>FLAC</td>
           <td><span class="quote">.flac</span></td>
+          <td>Read / write</td>
           <td>Xiph comment, APEv2</td>
           <td>Xiph</td>
         </tr>
         <tr>
           <td>Ogg</td>
           <td><span class="quote">.ogg</span>, <span class="quote">.opus</span>, Ogg FLAC</td>
+          <td>Read / write</td>
           <td>Xiph comment</td>
           <td>Xiph</td>
         </tr>
         <tr>
           <td>MP4 / M4A</td>
           <td><span class="quote">.m4a</span>, <span class="quote">.mp4</span>, <span class="quote">.m4b</span></td>
+          <td>Read / write</td>
           <td>Apple / iTunes</td>
           <td>Apple</td>
         </tr>
         <tr>
           <td>WMA / ASF</td>
           <td><span class="quote">.wma</span>, <span class="quote">.asf</span></td>
+          <td>Read / write</td>
           <td>ASF</td>
           <td>ASF</td>
         </tr>
         <tr>
           <td>WAV (RIFF)</td>
           <td><span class="quote">.wav</span></td>
+          <td>Read / write</td>
           <td>RIFF INFO</td>
           <td>RIFF INFO</td>
         </tr>
         <tr>
           <td>Monkey’s Audio</td>
           <td><span class="quote">.ape</span></td>
+          <td>Read / write</td>
           <td>APEv2</td>
           <td>APEv2</td>
         </tr>
@@ -95,7 +103,7 @@
       <a href="../tokens/mp3fp.html">MP3 Properties</a> on files that expose an MPEG audio header.
     </p>
 
-    <h2 id="image">Image properties and EXIF (read-only)</h2>
+    <h2 id="image">Image properties and EXIF</h2>
     <p>
       Raster size, bit depth, DPI, frame count, format name, and EXIF camera fields come from
       MetadataExtractor. There is no write path for these values in the current build. See
@@ -109,6 +117,7 @@
         <tr>
           <th>Format</th>
           <th>Typical extensions</th>
+          <th>Access</th>
           <th>Notes</th>
         </tr>
       </thead>
@@ -116,41 +125,49 @@
         <tr>
           <td>JPEG</td>
           <td><span class="quote">.jpg</span>, <span class="quote">.jpeg</span></td>
+          <td>Read only</td>
           <td>Dimensions and EXIF when present</td>
         </tr>
         <tr>
           <td>PNG</td>
           <td><span class="quote">.png</span></td>
+          <td>Read only</td>
           <td>Dimensions; EXIF when embedded</td>
         </tr>
         <tr>
           <td>GIF</td>
           <td><span class="quote">.gif</span></td>
+          <td>Read only</td>
           <td>Dimensions and frame count</td>
         </tr>
         <tr>
           <td>BMP</td>
           <td><span class="quote">.bmp</span></td>
+          <td>Read only</td>
           <td>Dimensions</td>
         </tr>
         <tr>
           <td>TIFF</td>
           <td><span class="quote">.tif</span>, <span class="quote">.tiff</span></td>
+          <td>Read only</td>
           <td>Dimensions; EXIF when present</td>
         </tr>
         <tr>
           <td>ICO</td>
           <td><span class="quote">.ico</span></td>
+          <td>Read only</td>
           <td>Dimensions and frame count</td>
         </tr>
         <tr>
           <td>WebP</td>
           <td><span class="quote">.webp</span></td>
+          <td>Read only</td>
           <td>Dimensions; EXIF when embedded</td>
         </tr>
         <tr>
           <td>HEIF</td>
           <td><span class="quote">.heic</span>, <span class="quote">.heif</span></td>
+          <td>Read only</td>
           <td>Still images; not camera RAW</td>
         </tr>
       </tbody>
@@ -160,7 +177,7 @@
       treated as images here — image and EXIF tokens still fail preview on those files.
     </p>
 
-    <h2 id="documents">Document Info (read-only)</h2>
+    <h2 id="documents">Document Info</h2>
     <p>
       PDF, EPUB, and Office package Info fields are read-only. Missing fields expand empty after a
       successful open; wrong type or corrupt files fail preview. There is no write path.
@@ -170,6 +187,7 @@
         <tr>
           <th>Format</th>
           <th>Typical extensions</th>
+          <th>Access</th>
           <th>Source</th>
           <th>Notes</th>
         </tr>
@@ -178,6 +196,7 @@
         <tr id="pdf">
           <td>PDF</td>
           <td><span class="quote">.pdf</span></td>
+          <td>Read only</td>
           <td>PdfPig</td>
           <td>
             Info dictionary and page count. See
@@ -188,6 +207,7 @@
         <tr id="epub">
           <td>EPUB</td>
           <td><span class="quote">.epub</span></td>
+          <td>Read only</td>
           <td>VersOne.Epub</td>
           <td>
             Dublin Core package fields (title, creator/author, publisher, language, literal date,
@@ -200,6 +220,7 @@
         <tr id="office">
           <td>Office (DOCX)</td>
           <td><span class="quote">.docx</span></td>
+          <td>Read only</td>
           <td>DocumentFormat.OpenXml</td>
           <td>
             PackageProperties (title, author from Creator, subject, keywords, category, description,
@@ -211,7 +232,7 @@
       </tbody>
     </table>
 
-    <h2 id="media">Media stream properties (read-only)</h2>
+    <h2 id="media">Media stream properties</h2>
     <p>
       Duration, MIME type, audio stream details, and video frame size are read-only via TagLib for
       the <a href="#audio">audio</a> formats above and the video containers below. Photo dimensions
@@ -224,6 +245,7 @@
         <tr>
           <th>Container</th>
           <th>Typical extensions</th>
+          <th>Access</th>
           <th>Notes</th>
         </tr>
       </thead>
@@ -234,6 +256,7 @@
             <span class="quote">.mp4</span>, <span class="quote">.m4v</span>,
             <span class="quote">.m4p</span>
           </td>
+          <td>Read only</td>
           <td>
             Duration and frame size when TagLib opens the file. Apple tags on the same container use
             the <a href="#audio">Audio tags</a> path.
@@ -242,6 +265,7 @@
         <tr>
           <td>ASF / WMV</td>
           <td><span class="quote">.wmv</span>, <span class="quote">.asf</span></td>
+          <td>Read only</td>
           <td>
             Duration and frame size; ASF tags when present use the
             <a href="#audio">Audio tags</a> path.
@@ -250,16 +274,19 @@
         <tr>
           <td>AVI (RIFF)</td>
           <td><span class="quote">.avi</span></td>
+          <td>Read only</td>
           <td>Duration and frame size when TagLib recognizes the file.</td>
         </tr>
         <tr>
           <td>Matroska</td>
           <td><span class="quote">.mkv</span></td>
+          <td>Read only</td>
           <td>Duration and frame size when TagLib recognizes the file.</td>
         </tr>
         <tr>
           <td>Ogg Video</td>
           <td><span class="quote">.ogv</span></td>
+          <td>Read only</td>
           <td>Duration and frame size when TagLib recognizes the file.</td>
         </tr>
         <tr>
@@ -268,6 +295,7 @@
             <span class="quote">.mpg</span>, <span class="quote">.mpeg</span>,
             <span class="quote">.mpe</span>, <span class="quote">.m2v</span>
           </td>
+          <td>Read only</td>
           <td>Duration and frame size when TagLib recognizes the file.</td>
         </tr>
       </tbody>
