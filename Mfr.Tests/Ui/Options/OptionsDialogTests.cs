@@ -37,11 +37,10 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies the Options dialog General and Undo tabs host Session, Confirmations, File List,
-        /// Rename List, Location, and Undo &amp; Rename Log retention controls.
+        /// Verifies the Options dialog General / Rename / Misc tabs host the expected fieldsets and controls.
         /// </summary>
         [AvaloniaFact]
-        public void OptionsDialog_shows_general_and_undo_tabs()
+        public void OptionsDialog_shows_general_rename_and_misc_tabs()
         {
             var dialogVm = new OptionsDialogViewModel();
             var dialog = new OptionsDialog(dialogVm);
@@ -52,8 +51,11 @@ namespace Mfr.Tests.Ui.Options
             {
                 var tabs = dialog.FindControl<TabControl>("OptionsTabs");
                 Assert.NotNull(tabs);
-                var tabHeaders = tabs.Items.OfType<TabItem>().Select(item => item.Header?.ToString()).ToList();
-                Assert.Equal(["General", "Undo & Rename Log"], tabHeaders);
+                var tabHeaders = tabs
+                    .Items.OfType<TabItem>()
+                    .Select(item => (item.Header as TextBlock)?.Text ?? item.Header?.ToString())
+                    .ToList();
+                Assert.Equal(["General", "Rename", "Misc"], tabHeaders);
                 Assert.Equal(0, tabs.SelectedIndex);
 
                 var labels = dialog
@@ -64,7 +66,7 @@ namespace Mfr.Tests.Ui.Options
 
                 Assert.Contains("Remember last folder", labels);
                 Assert.Contains("Remember window size and position", labels);
-                Assert.Contains("Add folder contents", labels);
+                Assert.DoesNotContain("Add folder contents", labels);
 
                 var radioLabels = dialog
                     .GetVisualDescendants()
@@ -74,11 +76,9 @@ namespace Mfr.Tests.Ui.Options
                 Assert.DoesNotContain("Fewer", radioLabels);
                 Assert.DoesNotContain("Normal", radioLabels);
                 Assert.DoesNotContain("More", radioLabels);
-                Assert.Contains("Open", radioLabels);
-                Assert.Contains("Add to Rename List", radioLabels);
-                Assert.Contains("Add files", radioLabels);
-                Assert.Contains("Add folders", radioLabels);
-                Assert.Contains("Add files and folders", radioLabels);
+                Assert.DoesNotContain("Open", radioLabels);
+                Assert.DoesNotContain("Add to Rename List", radioLabels);
+                Assert.DoesNotContain("Add files", radioLabels);
 
                 var groupHeaders = dialog
                     .GetVisualDescendants()
@@ -88,8 +88,8 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Session", groupHeaders);
                 Assert.Contains("Confirmations", groupHeaders);
                 Assert.Contains("File List", groupHeaders);
-                Assert.Contains("Rename List", groupHeaders);
-                Assert.Contains("Location", groupHeaders);
+                Assert.DoesNotContain("Rename List", groupHeaders);
+                Assert.DoesNotContain("Location", groupHeaders);
                 Assert.DoesNotContain("Undo & Rename Log", groupHeaders);
 
                 var confirmationsBlurb = dialog
@@ -118,8 +118,8 @@ namespace Mfr.Tests.Ui.Options
                     .OfType<FilterEditorLabeledRow>()
                     .Select(row => row.Label)
                     .ToList();
-                Assert.Contains("Double-click:", rowLabels);
-                Assert.Contains("GeoNames username:", rowLabels);
+                Assert.DoesNotContain("Double-click:", rowLabels);
+                Assert.DoesNotContain("GeoNames username:", rowLabels);
                 Assert.DoesNotContain("Add:", rowLabels);
 
                 var checkTips = dialog
@@ -130,51 +130,90 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains(AppTips.OptionsRememberLastFolder, checkTips);
                 Assert.Contains(AppTips.OptionsRememberWindowState, checkTips);
                 Assert.Contains("dialog", AppTips.OptionsRememberWindowState, StringComparison.OrdinalIgnoreCase);
-                Assert.Contains(AppTips.OptionsAddFolderContents, checkTips);
                 Assert.Contains(AppTips.OptionsIncludeHidden, checkTips);
-                Assert.Contains(AppTips.OptionsRememberColumnWidths, checkTips);
-
-                var radioTips = dialog
-                    .GetVisualDescendants()
-                    .OfType<CompactRadioButton>()
-                    .Select(radio => ToolTip.GetTip(radio)?.ToString())
-                    .ToList();
-                Assert.Contains(AppTips.OptionsDoubleClickOpen, radioTips);
-                Assert.Contains(AppTips.OptionsDoubleClickAdd, radioTips);
-                Assert.Contains(AppTips.OptionsAddModeFiles, radioTips);
-                Assert.Contains(AppTips.OptionsAddModeFolders, radioTips);
-                Assert.Contains(AppTips.OptionsAddModeFilesAndFolders, radioTips);
 
                 tabs.SelectedIndex = 1;
                 Dispatcher.UIThread.RunJobs();
 
-                var undoGroupHeaders = dialog
+                var renameGroupHeaders = dialog
                     .GetVisualDescendants()
                     .OfType<FieldsetGroup>()
                     .Select(group => group.Header?.ToString())
                     .ToList();
-                Assert.Contains("Undo & Rename Log", undoGroupHeaders);
-                Assert.DoesNotContain("Session", undoGroupHeaders);
+                Assert.Contains("Rename List", renameGroupHeaders);
+                Assert.Contains("Undo & Rename Log", renameGroupHeaders);
+                Assert.DoesNotContain("Session", renameGroupHeaders);
 
-                var undoRadioLabels = dialog
+                var renameLabels = dialog
+                    .GetVisualDescendants()
+                    .OfType<CompactCheckBox>()
+                    .Select(box => box.Content?.ToString())
+                    .ToList();
+                Assert.Contains("Add folder contents", renameLabels);
+
+                var renameRowLabels = dialog
+                    .GetVisualDescendants()
+                    .OfType<FilterEditorLabeledRow>()
+                    .Select(row => row.Label)
+                    .ToList();
+                Assert.Contains("Double-click:", renameRowLabels);
+
+                var renameRadioLabels = dialog
                     .GetVisualDescendants()
                     .OfType<CompactRadioButton>()
                     .Select(radio => radio.Content?.ToString())
                     .ToList();
-                Assert.Contains("Rename Log disabled (Undo for last renaming operation only)", undoRadioLabels);
-                Assert.Contains("Limited to:", undoRadioLabels);
-                Assert.Contains("Unlimited", undoRadioLabels);
+                Assert.Contains("Open", renameRadioLabels);
+                Assert.Contains("Add to Rename List", renameRadioLabels);
+                Assert.Contains("Add files", renameRadioLabels);
+                Assert.Contains("Add folders", renameRadioLabels);
+                Assert.Contains("Add files and folders", renameRadioLabels);
+                Assert.Contains("Rename Log disabled (Undo for last renaming operation only)", renameRadioLabels);
+                Assert.Contains("Limited to:", renameRadioLabels);
+                Assert.Contains("Unlimited", renameRadioLabels);
 
                 Assert.NotNull(dialog.FindControl<CompactNumericUpDown>("RenameLogLimitSpinner"));
 
-                var undoRadioTips = dialog
+                var renameCheckTips = dialog
+                    .GetVisualDescendants()
+                    .OfType<CompactCheckBox>()
+                    .Select(box => ToolTip.GetTip(box)?.ToString())
+                    .ToList();
+                Assert.Contains(AppTips.OptionsAddFolderContents, renameCheckTips);
+                Assert.Contains(AppTips.OptionsRememberColumnWidths, renameCheckTips);
+
+                var renameRadioTips = dialog
                     .GetVisualDescendants()
                     .OfType<CompactRadioButton>()
                     .Select(radio => ToolTip.GetTip(radio)?.ToString())
                     .ToList();
-                Assert.Contains(AppTips.OptionsRenameLogDisabled, undoRadioTips);
-                Assert.Contains(AppTips.OptionsRenameLogLimited, undoRadioTips);
-                Assert.Contains(AppTips.OptionsRenameLogUnlimited, undoRadioTips);
+                Assert.Contains(AppTips.OptionsDoubleClickOpen, renameRadioTips);
+                Assert.Contains(AppTips.OptionsDoubleClickAdd, renameRadioTips);
+                Assert.Contains(AppTips.OptionsAddModeFiles, renameRadioTips);
+                Assert.Contains(AppTips.OptionsAddModeFolders, renameRadioTips);
+                Assert.Contains(AppTips.OptionsAddModeFilesAndFolders, renameRadioTips);
+                Assert.Contains(AppTips.OptionsRenameLogDisabled, renameRadioTips);
+                Assert.Contains(AppTips.OptionsRenameLogLimited, renameRadioTips);
+                Assert.Contains(AppTips.OptionsRenameLogUnlimited, renameRadioTips);
+
+                tabs.SelectedIndex = 2;
+                Dispatcher.UIThread.RunJobs();
+
+                var miscGroupHeaders = dialog
+                    .GetVisualDescendants()
+                    .OfType<FieldsetGroup>()
+                    .Select(group => group.Header?.ToString())
+                    .ToList();
+                Assert.Contains("Location", miscGroupHeaders);
+                Assert.DoesNotContain("Session", miscGroupHeaders);
+                Assert.DoesNotContain("Rename List", miscGroupHeaders);
+
+                var miscRowLabels = dialog
+                    .GetVisualDescendants()
+                    .OfType<FilterEditorLabeledRow>()
+                    .Select(row => row.Label)
+                    .ToList();
+                Assert.Contains("GeoNames username:", miscRowLabels);
             }
             finally
             {
