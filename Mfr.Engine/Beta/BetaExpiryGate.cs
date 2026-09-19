@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Mfr.Utils;
+using Serilog;
 
 namespace Mfr.Engine.Beta
 {
@@ -195,9 +196,10 @@ namespace Mfr.Engine.Beta
                 using var cts = new CancellationTokenSource(ProbeTimeout);
                 networkUtc = _FetchNetworkUtc(cts.Token);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // Offline, timeout, or bad response: fall back to local UTC.
+                Log.Debug(ex, "Beta network time probe failed; using local UTC.");
                 networkUtc = null;
             }
 
@@ -205,10 +207,26 @@ namespace Mfr.Engine.Beta
             {
                 // Concurrent first callers may both fetch; keep the first success (or a late success
                 // if an earlier failure marked the probe complete with an empty cache).
+                var alreadyCompleted = _probeCompleted;
+                var hadCachedNetworkUtc = _cachedNetworkUtc is not null;
+
                 if (networkUtc is { } utc && _cachedNetworkUtc is null)
                 {
                     _cachedNetworkUtc = DateTime.SpecifyKind(utc, DateTimeKind.Utc);
                     _sinceNetworkProbe = Stopwatch.StartNew();
+                    Log.Debug(
+                        "Beta network time probe succeeded from {ProbeUrl}: {NetworkUtc:O} UTC.",
+                        ProductUrls.WebSite,
+                        _cachedNetworkUtc
+                    );
+                }
+                else if (!alreadyCompleted && !hadCachedNetworkUtc)
+                {
+                    Log.Debug(
+                        "Beta network time probe unavailable from {ProbeUrl}; using local UTC {LocalUtc:O}.",
+                        ProductUrls.WebSite,
+                        _utcNow()
+                    );
                 }
 
                 _probeCompleted = true;
