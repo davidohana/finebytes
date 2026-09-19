@@ -6,9 +6,9 @@
   x:DataType="vm:RenameListProgressViewModel"
   Title="{Binding DialogTitle}"
   Icon="/Assets/mfr.ico"
-  Width="560"
+  Width="580"
   Height="254"
-  MinWidth="520"
+  MinWidth="540"
   MinHeight="234"
   WindowStartupLocation="CenterOwner"
   CanResize="False"
@@ -23,20 +23,20 @@
       Margin="0,16,0,0"
     >
       <Button
-        Content="Keep added"
-        MinWidth="100"
-        HorizontalContentAlignment="Center"
-        VerticalContentAlignment="Center"
-        IsVisible="{Binding ShowKeepAdded}"
-        Command="{Binding KeepAddedCommand}"
-      />
-      <Button
         Content="Cancel"
         MinWidth="80"
         HorizontalContentAlignment="Center"
         VerticalContentAlignment="Center"
         IsCancel="True"
         Command="{Binding CancelCommand}"
+      />
+      <Button
+        Content="Cancel and keep added"
+        MinWidth="160"
+        HorizontalContentAlignment="Center"
+        VerticalContentAlignment="Center"
+        IsVisible="{Binding ShowKeepAdded}"
+        Command="{Binding KeepAddedCommand}"
       />
     </StackPanel>
 

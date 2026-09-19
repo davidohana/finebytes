@@ -19,8 +19,8 @@
     <p>
       Magic File Renamer can rename any file or folder Windows can see. This page lists the formats
       where MFR also reads or writes <strong>embedded metadata</strong> — audio tags, image and EXIF
-      facts, document Info, and media stream properties — for the Rename List, Formatter tokens, and
-      related filters.
+      facts, document Info, and audio/video media stream properties — for the Rename List, Formatter
+      tokens, and related filters.
     </p>
     <p class="note">
       Unsupported or unreadable metadata on a row surfaces as a preview error for that item; other
@@ -213,12 +213,69 @@
 
     <h2 id="media">Media stream properties (read-only)</h2>
     <p>
-      MIME type, duration, audio stream facts, and video frame size come from TagLib for containers
-      it can open — including the audio formats above and common video containers such as MP4 / M4V
-      and ASF / WMV when TagLib recognizes the file. Raster photo size uses the
-      <a href="#image">Image</a> path instead. See
+      Duration, MIME type, audio stream details, and video frame size are read-only via TagLib for
+      the <a href="#audio">audio</a> formats above and the video containers below. Photo dimensions
+      use the <a href="#image">Image</a> path instead. See
       <a href="../tokens/mediafp.html">Media tokens</a> and
       <a href="../reference/fields.html#mediaproperties">Media Properties fields</a>.
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Container</th>
+          <th>Typical extensions</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>MP4 / M4V</td>
+          <td>
+            <span class="quote">.mp4</span>, <span class="quote">.m4v</span>,
+            <span class="quote">.m4p</span>
+          </td>
+          <td>
+            Duration and frame size when TagLib opens the file. Apple tags on the same container use
+            the <a href="#audio">Audio tags</a> path.
+          </td>
+        </tr>
+        <tr>
+          <td>ASF / WMV</td>
+          <td><span class="quote">.wmv</span>, <span class="quote">.asf</span></td>
+          <td>
+            Duration and frame size; ASF tags when present use the
+            <a href="#audio">Audio tags</a> path.
+          </td>
+        </tr>
+        <tr>
+          <td>AVI (RIFF)</td>
+          <td><span class="quote">.avi</span></td>
+          <td>Duration and frame size when TagLib recognizes the file.</td>
+        </tr>
+        <tr>
+          <td>Matroska</td>
+          <td><span class="quote">.mkv</span></td>
+          <td>Duration and frame size when TagLib recognizes the file.</td>
+        </tr>
+        <tr>
+          <td>Ogg Video</td>
+          <td><span class="quote">.ogv</span></td>
+          <td>Duration and frame size when TagLib recognizes the file.</td>
+        </tr>
+        <tr>
+          <td>MPEG Program</td>
+          <td>
+            <span class="quote">.mpg</span>, <span class="quote">.mpeg</span>,
+            <span class="quote">.mpe</span>, <span class="quote">.m2v</span>
+          </td>
+          <td>Duration and frame size when TagLib recognizes the file.</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="note">
+      Writable title/artist tags on video files only apply to containers under
+      <a href="#audio">Audio tags</a> (for example Apple on MP4). Other video types are stream
+      properties only.
     </p>
 
     <h2 id="names">Names, dates, and attributes</h2>

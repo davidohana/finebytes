@@ -121,7 +121,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private string _lastPath = string.Empty;
 
         /// <summary>
-        /// Gets whether the Keep added button should be shown (Add with cancel disposition only).
+        /// Gets whether the Cancel and keep added button should be shown (Add with cancel disposition only).
         /// </summary>
         public bool ShowKeepAdded => _addCancelDisposition is not null;
 
@@ -215,7 +215,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         /// <param name="work">Engine work invoked with the operation cancel token and progress sink.</param>
         /// <param name="addCancelDisposition">
-        /// Optional mutable holder for Keep added; when non-null, the dialog shows Keep added and the
+        /// Optional mutable holder for Cancel and keep added; when non-null, the dialog shows that button and the
         /// command sets <see cref="RenameListAddCancelDisposition.KeepPartial"/> before canceling.
         /// </param>
         /// <returns>Completed when finished without cancel; Canceled or CanceledKeep when canceled.</returns>
