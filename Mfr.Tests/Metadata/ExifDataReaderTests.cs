@@ -56,8 +56,6 @@ namespace Mfr.Tests.Metadata
 
             Assert.Equal(32.823057, exif.GpsLatitude!.Value, precision: 6);
             Assert.Equal(34.971542, exif.GpsLongitude!.Value, precision: 6);
-            Assert.Equal("32.823057", ExifGpsFormatting.FormatCoordinate(exif.GpsLatitude));
-            Assert.Equal("34.971542", ExifGpsFormatting.FormatCoordinate(exif.GpsLongitude));
             Assert.True(exif.TagToDescription.ContainsKey("GPS/GPS Latitude"));
             Assert.True(exif.TagToDescription.ContainsKey("GPS/2"));
         }

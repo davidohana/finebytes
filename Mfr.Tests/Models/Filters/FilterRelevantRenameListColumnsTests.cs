@@ -535,6 +535,8 @@ namespace Mfr.Tests.Models.Filters
         [InlineData("<image-width>", ImageRenameListFields.Group, ImageRenameListFields.Key.Width)]
         [InlineData("<exif-make>", JpegRenameListFields.Group, JpegRenameListFields.Key.Make)]
         [InlineData("<exif-date:yyyy-MM-dd>", JpegRenameListFields.Group, JpegRenameListFields.Key.DateTaken)]
+        [InlineData("<exif-gps-lat>", JpegRenameListFields.Group, JpegRenameListFields.Key.Latitude)]
+        [InlineData("<exif-gps-lon>", JpegRenameListFields.Group, JpegRenameListFields.Key.Longitude)]
         [InlineData("<pdf-title>", PdfRenameListFields.Group, PdfRenameListFields.Key.Title)]
         [InlineData("<pdf-page-count>", PdfRenameListFields.Group, PdfRenameListFields.Key.PageCount)]
         [InlineData("<epub-title>", EpubRenameListFields.Group, EpubRenameListFields.Key.Title)]

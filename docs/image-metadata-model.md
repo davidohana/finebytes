@@ -57,7 +57,8 @@ flowchart LR
   `ImagePropertiesFormatting` under `RenameList/Fields/Image/`;
   `Format(..., PropertyDisplayContext)` with tokens using `Token` and Rename List
   columns using `Grid` (`PropertyDisplayContext` at `RenameList/`; Image arms are
-  culture-identical today)
+  culture-identical today). Typed GPS display uses `ExifGpsFormatting.FormatCoordinate`
+  (tokens via `ExifDataFormatting`, Jpeg Lat/Lon columns via `JpegRenameListFieldDisplay`).
 - **Tokens**
   - `Mfr.Filters` — `ImagePropertyTokenBase` (`image-*`); `ExifPropertyTokenBase`, `ExifDateToken`, `ExifToken`
 - **Commit cache clear** — `Mfr.Engine` — `RenameList.Commit` calls `ClearMetadataCaches`
