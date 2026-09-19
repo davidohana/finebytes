@@ -19,7 +19,7 @@
     <p>
       Magic File Renamer can rename any file or folder Windows can see. This page lists the formats
       where MFR also reads or writes <strong>embedded metadata</strong> — audio tags, image and EXIF
-      facts, PDF Info, and media stream properties — for the Rename List, Formatter tokens, and
+      facts, document Info, and media stream properties — for the Rename List, Formatter tokens, and
       related filters.
     </p>
     <p class="note">
@@ -160,35 +160,56 @@
       treated as images here — image and EXIF tokens still fail preview on those files.
     </p>
 
-    <h2 id="pdf">PDF document Info (read-only)</h2>
+    <h2 id="documents">Document Info (read-only)</h2>
     <p>
-      PDF Info dictionary fields and page count come from PdfPig for readable
-      <span class="quote">.pdf</span> files. Missing Info fields expand empty after a successful
-      open; non-PDF or corrupt files fail preview. There is no write path. See
-      <a href="../tokens/pdffp.html">PDF Document tokens</a> and
-      <a href="../reference/fields.html#pdf">PDF Document fields</a>.
+      PDF, EPUB, and Office package Info fields are read-only. Missing fields expand empty after a
+      successful open; wrong type or corrupt files fail preview. There is no write path.
     </p>
-
-    <h2 id="epub">EPUB document Info (read-only)</h2>
-    <p>
-      EPUB Dublin Core package fields (title, creator/author, publisher, language, literal date,
-      identifier, subject, description) come from VersOne.Epub for readable
-      <span class="quote">.epub</span> packages. Multi-value DC lists use the first non-blank entry
-      only. Missing Info fields expand empty after a successful open; non-EPUB or corrupt packages
-      fail preview. There is no write path. See
-      <a href="../tokens/epubfp.html">EPUB Document tokens</a> and
-      <a href="../reference/fields.html#epub">EPUB Document fields</a>.
-    </p>
-
-    <h2 id="office">Office document Info (read-only)</h2>
-    <p>
-      Office PackageProperties (title, author from Creator, subject, keywords, category, description,
-      last modified by, created, modified) come from DocumentFormat.OpenXml for readable
-      <span class="quote">.docx</span> files. Missing Info fields expand empty after a successful
-      open; non-DOCX or corrupt packages fail preview. There is no write path. See
-      <a href="../tokens/officefp.html">Office Document tokens</a> and
-      <a href="../reference/fields.html#office">Office Document fields</a>.
-    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Format</th>
+          <th>Typical extensions</th>
+          <th>Source</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr id="pdf">
+          <td>PDF</td>
+          <td><span class="quote">.pdf</span></td>
+          <td>PdfPig</td>
+          <td>
+            Info dictionary and page count. See
+            <a href="../tokens/pdffp.html">PDF Document tokens</a> and
+            <a href="../reference/fields.html#pdf">fields</a>.
+          </td>
+        </tr>
+        <tr id="epub">
+          <td>EPUB</td>
+          <td><span class="quote">.epub</span></td>
+          <td>VersOne.Epub</td>
+          <td>
+            Dublin Core package fields (title, creator/author, publisher, language, literal date,
+            identifier, subject, description). Multi-value DC lists use the first non-blank entry
+            only. See
+            <a href="../tokens/epubfp.html">EPUB Document tokens</a> and
+            <a href="../reference/fields.html#epub">fields</a>.
+          </td>
+        </tr>
+        <tr id="office">
+          <td>Office (DOCX)</td>
+          <td><span class="quote">.docx</span></td>
+          <td>DocumentFormat.OpenXml</td>
+          <td>
+            PackageProperties (title, author from Creator, subject, keywords, category, description,
+            last modified by, created, modified). See
+            <a href="../tokens/officefp.html">Office Document tokens</a> and
+            <a href="../reference/fields.html#office">fields</a>.
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <h2 id="media">Media stream properties (read-only)</h2>
     <p>
