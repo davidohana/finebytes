@@ -38,7 +38,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             _RefreshFieldDisplay();
 
             CommitPlan? plan = null;
-            var previewCompleted = await _RunProgressAsync(
+            var previewResult = await _RunProgressAsync(
                     RenameListProgressOperation.Preview,
                     (token, progress) =>
                     {
@@ -56,6 +56,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 _RefreshFieldDisplay();
             }
 
+            var previewCompleted = previewResult == RenameListProgressResult.Completed;
             if (!previewCompleted || plan is null)
             {
                 if (!previewCompleted)
@@ -72,10 +73,10 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             IReadOnlyList<RenameResultItem>? results = null;
-            bool commitCompleted;
+            RenameListProgressResult commitResult;
             try
             {
-                commitCompleted = await _RunProgressAsync(
+                commitResult = await _RunProgressAsync(
                         RenameListProgressOperation.Commit,
                         (token, progress) =>
                         {
@@ -103,7 +104,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             LastStatusMessage = _FormatGoOutcome(
                 renamedCount: renamedCount,
                 errorCount: commitErrorCount,
-                stopped: !commitCompleted
+                stopped: commitResult != RenameListProgressResult.Completed
             );
 
             return true;

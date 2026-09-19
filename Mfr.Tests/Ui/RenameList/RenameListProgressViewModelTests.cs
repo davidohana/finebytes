@@ -23,9 +23,9 @@ namespace Mfr.Tests.Ui.RenameList
                 }
             };
 
-            var completed = await viewModel.RunAsync((_, _) => { }).ConfigureAwait(true);
+            var result = await viewModel.RunAsync((_, _) => { }).ConfigureAwait(true);
 
-            Assert.True(completed);
+            Assert.Equal(RenameListProgressResult.Completed, result);
             Assert.False(dialogBecameVisible);
             Assert.False(viewModel.IsBusy);
             Assert.False(viewModel.IsDialogVisible);
@@ -57,16 +57,16 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.True(viewModel.CancelCommand.CanExecute(null));
 
             holdWork.Set();
-            Assert.True(await run.ConfigureAwait(true));
+            Assert.Equal(RenameListProgressResult.Completed, await run.ConfigureAwait(true));
             Assert.False(viewModel.IsBusy);
             Assert.False(viewModel.IsDialogVisible);
         }
 
         /// <summary>
-        /// Verifies cancel stops the worker and reports the add as not completed.
+        /// Verifies cancel stops the worker and reports Canceled.
         /// </summary>
         [Fact]
-        public async Task RunAsync_Cancel_Returns_False()
+        public async Task RunAsync_Cancel_Returns_Canceled()
         {
             var viewModel = new RenameListProgressViewModel();
             var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -84,13 +84,80 @@ namespace Mfr.Tests.Ui.RenameList
             await started.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
             Assert.True(viewModel.IsBusy);
             Assert.True(viewModel.CancelCommand.CanExecute(null));
+            Assert.False(viewModel.ShowKeepAdded);
+            Assert.False(viewModel.KeepAddedCommand.CanExecute(null));
 
             viewModel.CancelCommand.Execute(null);
 
-            Assert.False(await run.ConfigureAwait(true));
+            Assert.Equal(RenameListProgressResult.Canceled, await run.ConfigureAwait(true));
             Assert.False(viewModel.IsBusy);
             Assert.False(viewModel.IsDialogVisible);
             Assert.False(viewModel.CancelCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Keep added sets KeepPartial and reports CanceledKeep.
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_KeepAdded_Returns_CanceledKeep()
+        {
+            var viewModel = new RenameListProgressViewModel();
+            var disposition = new RenameListAddCancelDisposition();
+            var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var run = viewModel.RunAsync(
+                (token, _) =>
+                {
+                    started.TrySetResult();
+                    while (!token.IsCancellationRequested)
+                    {
+                        Thread.Sleep(20);
+                    }
+                },
+                addCancelDisposition: disposition
+            );
+
+            await started.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
+            Assert.True(viewModel.IsBusy);
+            Assert.True(viewModel.ShowKeepAdded);
+            Assert.True(viewModel.KeepAddedCommand.CanExecute(null));
+
+            viewModel.KeepAddedCommand.Execute(null);
+
+            Assert.Equal(RenameListProgressResult.CanceledKeep, await run.ConfigureAwait(true));
+            Assert.True(disposition.KeepPartial);
+            Assert.False(viewModel.IsBusy);
+            Assert.False(viewModel.ShowKeepAdded);
+            Assert.False(viewModel.KeepAddedCommand.CanExecute(null));
+        }
+
+        /// <summary>
+        /// Verifies Cancel with an Add disposition discards (KeepPartial stays false).
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_Cancel_With_Disposition_Returns_Canceled()
+        {
+            var viewModel = new RenameListProgressViewModel();
+            var disposition = new RenameListAddCancelDisposition();
+            var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var run = viewModel.RunAsync(
+                (token, _) =>
+                {
+                    started.TrySetResult();
+                    while (!token.IsCancellationRequested)
+                    {
+                        Thread.Sleep(20);
+                    }
+                },
+                addCancelDisposition: disposition
+            );
+
+            await started.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
+            Assert.True(viewModel.ShowKeepAdded);
+
+            viewModel.CancelCommand.Execute(null);
+
+            Assert.Equal(RenameListProgressResult.Canceled, await run.ConfigureAwait(true));
+            Assert.False(disposition.KeepPartial);
         }
 
         /// <summary>
@@ -112,7 +179,7 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.True(completed);
+            Assert.Equal(RenameListProgressResult.Completed, completed);
             Assert.Equal(4, viewModel.ScannedCount);
             Assert.Equal(2, viewModel.AddedCount);
             Assert.Equal(lastPath, viewModel.LastPath);
@@ -147,7 +214,7 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.True(completed);
+            Assert.Equal(RenameListProgressResult.Completed, completed);
             Assert.Equal("Reading file metadata", viewModel.DialogTitle);
             Assert.Equal("Reading metadata: 3 of 10 files", viewModel.MetadataProgressText);
             Assert.True(viewModel.ShowMetadataProgress);
@@ -186,7 +253,7 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.True(completed);
+            Assert.Equal(RenameListProgressResult.Completed, completed);
             Assert.Equal("Refreshing Rename List", viewModel.DialogTitle);
             Assert.Equal("Refreshing: 4 of 10 files", viewModel.MetadataProgressText);
             Assert.True(viewModel.ShowMetadataProgress);
@@ -223,7 +290,7 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.True(completed);
+            Assert.Equal(RenameListProgressResult.Completed, completed);
             Assert.Equal(RenameListProgressPhase.LoadMetadata, viewModel.Phase);
             Assert.Equal("Reading file metadata", viewModel.DialogTitle);
             Assert.Equal("Scanned 100 files", viewModel.PrimaryProgressText);
@@ -262,7 +329,7 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.True(completed);
+            Assert.Equal(RenameListProgressResult.Completed, completed);
             Assert.Equal(RenameListProgressPhase.LoadMetadata, viewModel.Phase);
             Assert.Equal("Scanned 100 files", viewModel.PrimaryProgressText);
             Assert.Equal("Added 50 files", viewModel.SecondaryProgressText);
@@ -307,7 +374,7 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.True(completed);
+            Assert.Equal(RenameListProgressResult.Completed, completed);
             Assert.Equal("Reading metadata: 5 of 10 files", viewModel.MetadataProgressText);
         }
 
@@ -339,7 +406,7 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.True(completed);
+            Assert.Equal(RenameListProgressResult.Completed, completed);
             Assert.Equal(RenameListProgressPhase.ApplyPreview, viewModel.Phase);
             Assert.Equal("Previewing ...", viewModel.DialogTitle);
             Assert.Equal("Previewing: 4 of 10 files", viewModel.MetadataProgressText);
@@ -376,7 +443,7 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.True(completed);
+            Assert.Equal(RenameListProgressResult.Completed, completed);
             Assert.Equal("Renaming: 4 of 10 files", viewModel.MetadataProgressText);
             Assert.True(viewModel.ShowMetadataProgress);
             Assert.True(viewModel.ShowProgressBar);
@@ -416,14 +483,14 @@ namespace Mfr.Tests.Ui.RenameList
                 )
                 .ConfigureAwait(true);
 
-            Assert.False(second);
+            Assert.Equal(RenameListProgressResult.Canceled, second);
             Assert.False(secondWorkRan);
             Assert.True(viewModel.IsBusy);
             Assert.True(viewModel.CancelCommand.CanExecute(null));
 
             viewModel.CancelCommand.Execute(null);
 
-            Assert.False(await first.ConfigureAwait(true));
+            Assert.Equal(RenameListProgressResult.Canceled, await first.ConfigureAwait(true));
             Assert.False(viewModel.IsBusy);
         }
 

@@ -68,7 +68,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             using (SuspendPreviewInputs())
             {
                 RenameListPrepareUndoResult? prepareResult = null;
-                var prepareCompleted = await _RunProgressAsync(
+                var prepareResultStatus = await _RunProgressAsync(
                         RenameListProgressOperation.Add,
                         (token, progress) =>
                         {
@@ -99,7 +99,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 LastStatusMessage = _FormatPrepareUndoOutcome(
                     preparedCount: preparedCount,
                     notLoadedCount: notLoadedCount,
-                    stopped: !prepareCompleted
+                    stopped: prepareResultStatus != RenameListProgressResult.Completed
                 );
             }
 

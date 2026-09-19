@@ -72,4 +72,4 @@ In [`RenameListViewModel.Add.cs`](../../Mfr.App.Ui/ViewModels/RenameList/RenameL
 - Scope: Progress VM/`RunAsync` result, AXAML buttons, `_RunProgressAsync`, `RenameListViewModel.Add.cs`, VM tests, help whatsnew.
 - Exit: Cancel discards; Keep added stops and list shows resolved items; Esc still discard; non-Add dialogs unchanged (single Cancel).
 - Tests: discard + keep UI tests; progress result enum coverage.
-- Status: Open
+- Status: Done
