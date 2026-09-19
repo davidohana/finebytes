@@ -153,6 +153,51 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
+        /// Verifies soft-load binds <c>options.geoNamesUsername</c>.
+        /// </summary>
+        [Fact]
+        public void Options_geoNamesUsername_soft_binds_string()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """
+                {
+                  "options": {
+                    "geoNamesUsername": "my-geo-user"
+                  }
+                }
+                """
+            );
+            var root = new PrefsRootForTest();
+            Assert.Equal(string.Empty, root.Options.GeoNamesUsername);
+
+            ConfigJsonApplier.ApplySoft(doc.RootElement, root);
+
+            Assert.Equal("my-geo-user", root.Options.GeoNamesUsername);
+        }
+
+        /// <summary>
+        /// Verifies soft-load leaves GeoNames username empty when the leaf is missing.
+        /// </summary>
+        [Fact]
+        public void Options_geoNamesUsername_missing_stays_empty()
+        {
+            using var doc = JsonDocument.Parse( /*lang=json,strict*/
+                """
+                {
+                  "options": {
+                    "rememberLastFolder": "false"
+                  }
+                }
+                """
+            );
+            var root = new PrefsRootForTest();
+            ConfigJsonApplier.ApplySoft(doc.RootElement, root);
+
+            Assert.Equal(string.Empty, root.Options.GeoNamesUsername);
+            Assert.False(root.Options.RememberLastFolder);
+        }
+
+        /// <summary>
         /// Minimal prefs root mirroring <see cref="ConfigStore"/> private binder shape for applier tests.
         /// </summary>
         private sealed class PrefsRootForTest

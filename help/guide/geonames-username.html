@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>GeoNames Username</title>
+    <link rel="stylesheet" href="../help.css" />
+    <script src="../help.js" defer></script>
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt;
+      <a href="../index.html#howto">How To</a>
+      &gt;
+      <strong>GeoNames Username</strong>
+    </nav>
+    <hr />
+    <h1>How to get a GeoNames username</h1>
+    <p>
+      Nearby place tokens (<a href="../tokens/geofp.html"><span class="quote">&lt;geo-*&gt;</span></a>)
+      call the free GeoNames web service. Magic File Renamer ships with a built-in username
+      (<span class="quote">fbmfr</span>) so lookups work without setup. That account shares a daily
+      credit pool across all installs. Enter your own username in Options → Location if you want a
+      private quota.
+    </p>
+    <ol>
+      <li>
+        Create a free account at
+        <a href="https://www.geonames.org/login">geonames.org</a>.
+      </li>
+      <li>
+        Open Manage account / your account settings and enable
+        <strong>free web services</strong> (required; registration alone is not enough).
+      </li>
+      <li>
+        Copy your GeoNames <strong>username</strong> (not your password) into Options → Location →
+        GeoNames username.
+      </li>
+      <li>
+        Leave the field blank to keep using the built-in Magic File Renamer account.
+      </li>
+    </ol>
+    <h2>Credits and attribution</h2>
+    <ul>
+      <li>
+        Free accounts have hourly and daily credit limits. Each
+        <span class="quote">findNearby</span> call costs several credits. Cached coordinates do not
+        spend credits again.
+      </li>
+      <li>
+        The built-in account is shared: heavy use of Nearby on GPS-diverse lists can exhaust the
+        free tier for everyone until the window resets. Prefer your own username for large batches.
+      </li>
+      <li>
+        GeoNames data is Creative Commons Attribution (CC-BY). Credit
+        <a href="https://www.geonames.org/">GeoNames</a> when you publish derived place names.
+      </li>
+    </ul>
+    <p class="note">
+      Related: <a href="../tokens/geofp.html">Nearby / GeoNames tokens</a>,
+      <a href="../tokens/eximagefp.html">EXIF GPS tokens</a>.
+    </p>
+  </body>
+</html>

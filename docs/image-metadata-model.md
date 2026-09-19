@@ -116,7 +116,20 @@ becomes null. That keeps display strings such as `1/60 sec`, `f/8.0`, `50 mm`.
   - Display: invariant culture, up to six decimal places, trim trailing zeros (`0.######`) via
     `ExifGpsFormatting.FormatCoordinate`
   - Tokens: `<exif-gps-lat>` / `<exif-gps-lon>`; Rename List Jpeg Tag columns Latitude / Longitude
-  - Missing GPS → empty (no network). Nearby GeoNames (`<geo-*>`) is a later slice.
+  - Missing GPS → empty (no network). Nearby GeoNames: `<geo-*>` tokens and Nearby columns (see below)
+
+### Nearby GeoNames (5c)
+
+Online reverse geocoding via HTTPS GeoNames `findNearby` (not an offline cities dump):
+
+- Snapshot: `FileMeta.GeoNames` (`GeoNamesInfo`: Place / Region / Country)
+- Client + L2/L3 cache: `Mfr.Metadata.GeoNames` (`GeoNamesClient`, `geonames-cache.json` under LocalRoot)
+- Lazy load: `EnsureGeoNamesLoaded` (loads image/EXIF first; no GPS → empty snapshot, no HTTP)
+- Tokens: `<geo-place>` / `<geo-region>` / `<geo-country>` (`Image\Nearby`)
+- Rename List: Nearby Place / Region / Country after Longitude (`RenameListMetadataRequirement.GeoNames`)
+- Options → Location: optional `GeoNamesUsername` override (blank = bundled `fbmfr`)
+- Empty vs error: no GPS → empty; network/HTTP/XML/rate-limit when geo is used → PreviewError
+- Help: `help/tokens/geofp.html`, `help/guide/geonames-username.html`
 
 JPEG Tag extras (Title, Subject, Author, Keywords, Comments, Artist, UserComment, Description) are
 stored for later columns and reachable via `<exif:Exif,…>` / `<exif:ExifSub,User Comment>`. There are
@@ -143,5 +156,3 @@ two keys are stored (existing keys are not overwritten): `{Alias}/{Tag.Name}` an
 | `Thumb`    | `ExifThumbnailDirectory`                                                                   |
 
 FileType, JPEG SOF, XMP, and anything else are skipped. Thumbnail DateTime is not copied into `DateTaken`.
-
-GeoNames reverse geocoding (`<geo-*>` tokens and Nearby Rename List columns) stays deferred.

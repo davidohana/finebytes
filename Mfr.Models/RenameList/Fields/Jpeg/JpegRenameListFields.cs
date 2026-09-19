@@ -1,3 +1,5 @@
+using Mfr.Models.Media;
+
 namespace Mfr.Models.RenameList.Fields.Jpeg
 {
     /// <summary>
@@ -76,6 +78,15 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
 
             /// <summary>GPS longitude (decimal degrees).</summary>
             public const string Longitude = "Longitude";
+
+            /// <summary>Nearby place name from GeoNames.</summary>
+            public const string NearbyPlace = "NearbyPlace";
+
+            /// <summary>Nearby region from GeoNames.</summary>
+            public const string NearbyRegion = "NearbyRegion";
+
+            /// <summary>Nearby country from GeoNames.</summary>
+            public const string NearbyCountry = "NearbyCountry";
         }
 
         /// <summary>
@@ -168,6 +179,14 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 "Longitude",
                 JpegRenameListExifProperty.Longitude,
                 defaultWidth: 100
+            ),
+            new JpegNearbyRenameListField(Key.NearbyPlace, "Nearby Place", GeoNamesField.Place, defaultWidth: 140),
+            new JpegNearbyRenameListField(Key.NearbyRegion, "Nearby Region", GeoNamesField.Region, defaultWidth: 120),
+            new JpegNearbyRenameListField(
+                Key.NearbyCountry,
+                "Nearby Country",
+                GeoNamesField.Country,
+                defaultWidth: 120
             ),
         ];
     }

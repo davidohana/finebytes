@@ -266,6 +266,18 @@ namespace Mfr.Models.Rename
         public OfficeDocumentInfo? Office { get; set; }
 
         /// <summary>
+        /// Gets or sets the lazy GeoNames nearby-place read cache (place / region / country).
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Read-only; never written on commit. <see langword="null"/> until first <c>geo-*</c> load
+        /// (or Nearby Rename List column). Successful lookups with blank fields store an empty/partial
+        /// snapshot. No GPS yields an empty snapshot without network. Failures are not cached here.
+        /// </para>
+        /// </remarks>
+        public GeoNamesInfo? GeoNames { get; set; }
+
+        /// <summary>
         /// Creates a detached copy of this metadata instance.
         /// </summary>
         /// <returns>A cloned metadata instance.</returns>
@@ -293,6 +305,7 @@ namespace Mfr.Models.Rename
                 Pdf = Pdf,
                 Epub = Epub,
                 Office = Office,
+                GeoNames = GeoNames,
             };
         }
     }

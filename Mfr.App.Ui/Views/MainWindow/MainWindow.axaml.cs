@@ -194,7 +194,9 @@ namespace Mfr.App.Ui.Views.MainWindow
             _optionsDialogInProgress = true;
             try
             {
-                var dialogVm = new OptionsDialogViewModel();
+                var dialogVm = new OptionsDialogViewModel(onHelpMissing: helpFileName =>
+                    Dispatcher.UIThread.Post(() => _ = _ShowHelpMissingAsync(helpFileName))
+                );
                 var hooks = OptionsDialogHooks;
                 bool? accepted;
                 if (hooks?.Show is not null)

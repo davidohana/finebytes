@@ -256,7 +256,7 @@ Reads from **`Original.Exif`** (read-only MetadataExtractor EXIF cache). The sam
 
 **Directory rows**, files whose format cannot be determined (typical `.txt`), and files that are **not a mapped raster** surface **`RenameStatus.PreviewError`** — including MP3/WAV. A mapped raster with no EXIF (or a missing field) expands **empty**, not an error. PNG/TIFF/WebP/HEIF with EXIF work; the allowlist is the same as **`image-*`**.
 
-Keep later **`<imagetag-*>`** (TagLib Image Tag) separate; values may differ from **`<exif-*>`**. **`<geo-*>`** (Nearby / GeoNames) is not in this slice.
+Keep later **`<imagetag-*>`** (TagLib Image Tag) separate; values may differ from **`<exif-*>`**.
 
 Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image/EXIF load as already attempted so seeded **`FileMeta.Exif`** is used without disk I/O.
 
@@ -275,6 +275,18 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image/EXIF load as 
 | `<exif:source,name>` | Extended tag by directory alias and tag name or decimal id; empty when missing. Example: `<exif:ExifSub,36867>`. |
 
 **Arguments:** No-arg tokens (`<exif-make>` only) reject a stray **`<exif-make:…>`** at compile. **`<exif-date>`** requires a non-empty format string (the pattern is not validated). **`<exif>`** requires **`source,name`** split on the first comma; both parts non-empty; **`source`** must be a known alias (`Exif`, `ExifSub`, `GPS`, `IPTC`, `Canon`, `Casio`, `FujiFilm`, `Nikon`, `Olympus`, `Interop`, or `Thumb`). Unknown tag names expand empty.
+
+#### Nearby / GeoNames
+
+Reads from **`Original.GeoNames`**. First **`geo-*`** use calls **`EnsureGeoNamesLoaded`** (which also ensures image/EXIF). No GPS → empty snapshot, no HTTP. Cache miss may call HTTPS GeoNames **`findNearby`** (bundled username **`fbmfr`**, or Options **`GeoNamesUsername`** override). **`RenameList.Commit`** clears the row cache; process/disk caches are shared.
+
+| Token           | Output                                          |
+| --------------- | ----------------------------------------------- |
+| `<geo-place>`   | Nearby place name; empty when unset / no GPS.   |
+| `<geo-region>`  | Nearby admin region; empty when unset / no GPS. |
+| `<geo-country>` | Nearby country name; empty when unset / no GPS. |
+
+**Arguments:** No argument. Network/HTTP/XML/rate-limit failure → **`PreviewError`**.
 
 #### ID3v2 Custom Field (MFR7 `<id3v2:…>`)
 

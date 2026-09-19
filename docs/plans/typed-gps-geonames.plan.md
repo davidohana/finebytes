@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-online-geo
     content: "P2: findNearby client, Options override + help link, geo-* tokens/columns, L1/L2/L3 cache, docs"
-    status: pending
+    status: completed
 isProject: false
 ---
 

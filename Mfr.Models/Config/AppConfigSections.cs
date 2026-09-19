@@ -67,6 +67,16 @@ namespace Mfr.Models.Config
         /// <para>Persisted as <c>options.rememberColumnWidths</c> (JSON string <c>true</c>/<c>false</c>). Default on.</para>
         /// </summary>
         public bool RememberColumnWidths = true;
+
+        /// <summary>
+        /// Optional GeoNames API username override for nearby place lookups.
+        /// <para>
+        /// Blank (default) uses the bundled FineBytes account. Non-blank wins for HTTPS
+        /// <c>findNearby</c> and cache keys. Persisted as <c>options.geoNamesUsername</c>.
+        /// </para>
+        /// </summary>
+        [ConfigStringMaxLength(200)]
+        public string GeoNamesUsername = string.Empty;
     }
 
     /// <summary>

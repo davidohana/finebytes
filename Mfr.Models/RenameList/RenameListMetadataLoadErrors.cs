@@ -162,6 +162,11 @@ namespace Mfr.Models.RenameList
                 return "This file could not be read as Office document Info.";
             }
 
+            if (requirement.HasFlag(RenameListMetadataRequirement.GeoNames))
+            {
+                return "Nearby place data could not be loaded from GeoNames.";
+            }
+
             return "This field could not be loaded from disk.";
         }
     }

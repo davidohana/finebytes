@@ -89,6 +89,59 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
     }
 
     /// <summary>
+    /// One read-only Nearby GeoNames column under the Jpeg Tag group.
+    /// </summary>
+    /// <param name="propertyKey">Property key within the Jpeg group.</param>
+    /// <param name="displayName">User-visible column label.</param>
+    /// <param name="field">GeoNames property to format.</param>
+    /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
+    /// <param name="tip">Optional tooltip clarifying the field.</param>
+    internal sealed class JpegNearbyRenameListField(
+        string propertyKey,
+        string displayName,
+        GeoNamesField field,
+        int? defaultWidth = 120,
+        string? tip = null
+    )
+        : OriginalOnlyRenameListField(
+            JpegRenameListFields.Group,
+            JpegRenameListFields.GroupLabel,
+            propertyKey,
+            displayName,
+            defaultWidth,
+            RenameListMetadataRequirement.GeoNames,
+            tip
+        )
+    {
+        /// <summary>
+        /// Gets the GeoNames property addressed by this column.
+        /// </summary>
+        public GeoNamesField Field { get; } = field;
+
+        /// <summary>
+        /// Maps a <see cref="GeoNamesField"/> to its Rename List catalog property key.
+        /// </summary>
+        /// <param name="field">GeoNames property field.</param>
+        /// <returns>Catalog key under <see cref="JpegRenameListFields.Key"/>.</returns>
+        internal static string CatalogPropertyKey(GeoNamesField field)
+        {
+            return field switch
+            {
+                GeoNamesField.Place => JpegRenameListFields.Key.NearbyPlace,
+                GeoNamesField.Region => JpegRenameListFields.Key.NearbyRegion,
+                GeoNamesField.Country => JpegRenameListFields.Key.NearbyCountry,
+                _ => throw new System.Diagnostics.UnreachableException(),
+            };
+        }
+
+        /// <inheritdoc />
+        public override string Resolve(FileMeta meta)
+        {
+            return GeoNamesFormatting.Format(meta.GeoNames, Field);
+        }
+    }
+
+    /// <summary>
     /// EXIF properties exposed as MFR7 Jpeg Tag Rename List columns.
     /// </summary>
     internal enum JpegRenameListExifProperty

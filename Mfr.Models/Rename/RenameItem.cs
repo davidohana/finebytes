@@ -163,6 +163,11 @@ namespace Mfr.Models.Rename
         internal bool OfficeLoadAttempted { get; private set; }
 
         /// <summary>
+        /// Gets whether GeoNames nearby place data was loaded for this preview cycle.
+        /// </summary>
+        internal bool GeoNamesLoadAttempted { get; private set; }
+
+        /// <summary>
         /// Gets the last TagLib read failure for audio-tag and media columns on this row, when present.
         /// </summary>
         internal Exception? TagLibMetadataLoadError { get; private set; }
@@ -186,6 +191,11 @@ namespace Mfr.Models.Rename
         /// Gets the last Office-metadata read failure for this row, when present.
         /// </summary>
         internal Exception? OfficeLoadError { get; private set; }
+
+        /// <summary>
+        /// Gets the last GeoNames lookup failure for this row, when present.
+        /// </summary>
+        internal Exception? GeoNamesLoadError { get; private set; }
 
         /// <summary>
         /// Records a TagLib read failure for audio-tag and media columns on this row.
@@ -233,6 +243,15 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Records a GeoNames lookup failure for this row.
+        /// </summary>
+        /// <param name="ex">Failure from GeoNames while resolving nearby place data.</param>
+        internal void SetGeoNamesLoadError(Exception ex)
+        {
+            SetMetadataLoadError(RenameListMetadataRequirement.GeoNames, ex);
+        }
+
+        /// <summary>
         /// Marks TagLib metadata load as attempted for this preview cycle.
         /// </summary>
         internal void MarkTagLibLoadAttempted()
@@ -270,6 +289,14 @@ namespace Mfr.Models.Rename
         internal void MarkOfficeLoadAttempted()
         {
             MarkMetadataLoadAttempted(RenameListMetadataRequirement.Office);
+        }
+
+        /// <summary>
+        /// Marks GeoNames nearby load as attempted for this preview cycle.
+        /// </summary>
+        internal void MarkGeoNamesLoadAttempted()
+        {
+            MarkMetadataLoadAttempted(RenameListMetadataRequirement.GeoNames);
         }
 
         /// <summary>
@@ -354,6 +381,18 @@ namespace Mfr.Models.Rename
         }
 
         /// <summary>
+        /// Stores a GeoNames nearby snapshot on <see cref="Original"/> (and mirrors onto <see cref="Preview"/>).
+        /// </summary>
+        /// <param name="geoNames">Read-only nearby place/region/country from GeoNames.</param>
+        internal void SetGeoNamesInfo(GeoNamesInfo geoNames)
+        {
+            ArgumentNullException.ThrowIfNull(geoNames);
+
+            Original.GeoNames = geoNames;
+            Preview.GeoNames = geoNames;
+        }
+
+        /// <summary>
         /// Clears lazy metadata caches after commit so subsequent previews reload from disk.
         /// </summary>
         internal void ClearMetadataCaches()
@@ -364,6 +403,7 @@ namespace Mfr.Models.Rename
             ClearPdfCache();
             ClearEpubCache();
             ClearOfficeCache();
+            ClearGeoNamesCache();
         }
 
         /// <summary>
@@ -440,6 +480,16 @@ namespace Mfr.Models.Rename
             ClearMetadataLoadState(bucket);
             clear(Original);
             clear(Preview);
+        }
+
+        /// <summary>
+        /// Clears the GeoNames nearby cache after commit so subsequent previews reload.
+        /// </summary>
+        internal void ClearGeoNamesCache()
+        {
+            ClearMetadataLoadState(RenameListMetadataRequirement.GeoNames);
+            Original.GeoNames = null;
+            Preview.GeoNames = null;
         }
 
         /// <summary>

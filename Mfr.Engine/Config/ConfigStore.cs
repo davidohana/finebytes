@@ -55,6 +55,19 @@ namespace Mfr.Engine.Config
         private static string? s_ActiveConfigFilePath;
         private static PrefsRoot s_Prefs = new();
 
+        static ConfigStore()
+        {
+            Metadata.GeoNames.GeoNamesClient.UsernameOverrideProvider = static () => Options.GeoNamesUsername;
+        }
+
+        /// <summary>
+        /// Clears the process GeoNames L2 cache and circuit breaker (not the L3 disk file).
+        /// </summary>
+        public static void ClearGeoNamesProcessCache()
+        {
+            Metadata.GeoNames.GeoNamesClient.ClearSharedProcessState();
+        }
+
         /// <summary>
         /// Gets the diagnostic session-log options for this process.
         /// </summary>

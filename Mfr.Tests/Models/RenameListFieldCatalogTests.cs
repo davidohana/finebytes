@@ -567,6 +567,23 @@ namespace Mfr.Tests.Models
                 )
             );
             Assert.Equal(
+                RenameListMetadataRequirement.GeoNames,
+                RenameListFieldCatalog.GetMetadataRequirement(
+                    RenameListFieldKey.Original(JpegRenameListFields.Group, JpegRenameListFields.Key.NearbyPlace)
+                )
+            );
+
+            item.Original.GeoNames = new GeoNamesInfo
+            {
+                Place = "Haifa",
+                Region = "Haifa District",
+                Country = "Israel",
+            };
+            _AssertField(item, JpegRenameListFields.Group, JpegRenameListFields.Key.NearbyPlace, "Haifa");
+            _AssertField(item, JpegRenameListFields.Group, JpegRenameListFields.Key.NearbyRegion, "Haifa District");
+            _AssertField(item, JpegRenameListFields.Group, JpegRenameListFields.Key.NearbyCountry, "Israel");
+
+            Assert.Equal(
                 RenameListMetadataRequirement.None,
                 RenameListFieldCatalog.GetMetadataRequirement(RenameListFieldKey.Original("Unknown", "Missing"))
             );
