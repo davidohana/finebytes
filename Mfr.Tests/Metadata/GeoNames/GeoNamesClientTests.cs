@@ -21,7 +21,7 @@ namespace Mfr.Tests.Metadata.GeoNames
             GeoNamesClient.SetSharedForTests(null);
             GeoNamesClient.SharedHttpHandlerOverride = null;
             GeoNamesClient.SharedCacheFilePathOverride = null;
-            GeoNamesClient.UsernameOverrideProvider = null;
+            GeoNamesClient.UsernameProvider = null;
         }
 
         public void Dispose()
@@ -29,7 +29,7 @@ namespace Mfr.Tests.Metadata.GeoNames
             GeoNamesClient.SetSharedForTests(null);
             GeoNamesClient.SharedHttpHandlerOverride = null;
             GeoNamesClient.SharedCacheFilePathOverride = null;
-            GeoNamesClient.UsernameOverrideProvider = null;
+            GeoNamesClient.UsernameProvider = null;
             try
             {
                 if (Directory.Exists(_cacheDir))
@@ -44,7 +44,7 @@ namespace Mfr.Tests.Metadata.GeoNames
         }
 
         [Fact]
-        public void ResolveEffectiveUsername_blank_uses_fbmfr()
+        public void ResolveEffectiveUsername_blank_uses_default()
         {
             Assert.Equal(GeoNamesClient.DefaultUsername, GeoNamesClient.ResolveEffectiveUsername(null));
             Assert.Equal(GeoNamesClient.DefaultUsername, GeoNamesClient.ResolveEffectiveUsername(""));
@@ -52,7 +52,7 @@ namespace Mfr.Tests.Metadata.GeoNames
         }
 
         [Fact]
-        public void ResolveEffectiveUsername_override_wins_when_non_blank()
+        public void ResolveEffectiveUsername_trims_configured_username()
         {
             Assert.Equal("myuser", GeoNamesClient.ResolveEffectiveUsername(" myuser "));
         }

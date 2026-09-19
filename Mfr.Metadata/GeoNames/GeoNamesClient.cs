@@ -9,8 +9,9 @@ namespace Mfr.Metadata.GeoNames
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Bundled default username is <see cref="DefaultUsername"/>. Prefer
-    /// <see cref="UsernameOverrideProvider"/> (wired from Options) when non-blank.
+    /// Default username is <see cref="DefaultUsername"/> (same as Options / config).
+    /// <see cref="UsernameProvider"/> supplies the Options value (wired from
+    /// <c>ConfigStore</c>). Blank provider values still resolve to <see cref="DefaultUsername"/>.
     /// Failures throw <see cref="InvalidOperationException"/> (rate limits use
     /// <see cref="GeoNamesRateLimitException"/>). Failures are never written to L3.
     /// </para>
@@ -18,9 +19,9 @@ namespace Mfr.Metadata.GeoNames
     public sealed class GeoNamesClient : IDisposable
     {
         /// <summary>
-        /// Bundled FineBytes GeoNames username used when Options override is blank.
+        /// Built-in FineBytes GeoNames username (Options / config default).
         /// </summary>
-        public const string DefaultUsername = "fbmfr";
+        public const string DefaultUsername = GeoNamesDefaults.Username;
 
         private static readonly Lock s_SharedGate = new();
         private static GeoNamesClient? s_Shared;
@@ -29,9 +30,9 @@ namespace Mfr.Metadata.GeoNames
         private readonly GeoNamesResponseCache _cache;
 
         /// <summary>
-        /// Optional Options override provider. Return blank/null to use <see cref="DefaultUsername"/>.
+        /// Options username provider. Blank/null resolves to <see cref="DefaultUsername"/>.
         /// </summary>
-        public static Func<string>? UsernameOverrideProvider { get; set; }
+        public static Func<string>? UsernameProvider { get; set; }
 
         /// <summary>
         /// Test hook replacing the default <see cref="HttpClient"/> handler for the shared instance.
@@ -84,27 +85,22 @@ namespace Mfr.Metadata.GeoNames
         }
 
         /// <summary>
-        /// Resolves the effective GeoNames username (override wins when non-blank).
+        /// Resolves the effective GeoNames username (blank → <see cref="DefaultUsername"/>).
         /// </summary>
-        /// <param name="overrideUsername">Options override, or <see langword="null"/>/blank for bundled.</param>
+        /// <param name="username">Options / config username, or <see langword="null"/>/blank for default.</param>
         /// <returns>Trimmed username used in HTTP and cache keys.</returns>
-        public static string ResolveEffectiveUsername(string? overrideUsername)
+        public static string ResolveEffectiveUsername(string? username)
         {
-            if (string.IsNullOrWhiteSpace(overrideUsername))
-            {
-                return DefaultUsername;
-            }
-
-            return overrideUsername.Trim();
+            return GeoNamesDefaults.ResolveUsername(username);
         }
 
         /// <summary>
-        /// Resolves the effective username from <see cref="UsernameOverrideProvider"/>.
+        /// Resolves the effective username from <see cref="UsernameProvider"/>.
         /// </summary>
         /// <returns>Trimmed username used in HTTP and cache keys.</returns>
         public static string EffectiveUsername()
         {
-            return ResolveEffectiveUsername(UsernameOverrideProvider?.Invoke());
+            return ResolveEffectiveUsername(UsernameProvider?.Invoke());
         }
 
         /// <summary>

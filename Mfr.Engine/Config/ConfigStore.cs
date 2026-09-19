@@ -57,7 +57,7 @@ namespace Mfr.Engine.Config
 
         static ConfigStore()
         {
-            Metadata.GeoNames.GeoNamesClient.UsernameOverrideProvider = static () => Options.GeoNamesUsername;
+            Metadata.GeoNames.GeoNamesClient.UsernameProvider = static () => Options.GeoNamesUsername;
         }
 
         /// <summary>

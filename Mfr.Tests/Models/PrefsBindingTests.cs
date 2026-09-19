@@ -168,7 +168,7 @@ namespace Mfr.Tests.Models
                 """
             );
             var root = new PrefsRootForTest();
-            Assert.Equal(string.Empty, root.Options.GeoNamesUsername);
+            Assert.Equal(GeoNamesDefaults.Username, root.Options.GeoNamesUsername);
 
             ConfigJsonApplier.ApplySoft(doc.RootElement, root);
 
@@ -176,10 +176,10 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
-        /// Verifies soft-load leaves GeoNames username empty when the leaf is missing.
+        /// Verifies soft-load leaves the GeoNames username default when the leaf is missing.
         /// </summary>
         [Fact]
-        public void Options_geoNamesUsername_missing_stays_empty()
+        public void Options_geoNamesUsername_missing_keeps_default()
         {
             using var doc = JsonDocument.Parse( /*lang=json,strict*/
                 """
@@ -193,7 +193,7 @@ namespace Mfr.Tests.Models
             var root = new PrefsRootForTest();
             ConfigJsonApplier.ApplySoft(doc.RootElement, root);
 
-            Assert.Equal(string.Empty, root.Options.GeoNamesUsername);
+            Assert.Equal(GeoNamesDefaults.Username, root.Options.GeoNamesUsername);
             Assert.False(root.Options.RememberLastFolder);
         }
 

@@ -278,7 +278,7 @@ Unit tests via **`FilterTestHelpers.CreateRenameItem`** mark image/EXIF load as 
 
 #### Nearby / GeoNames
 
-Reads from **`Original.GeoNames`**. First **`geo-*`** use calls **`EnsureGeoNamesLoaded`** (which also ensures image/EXIF). No GPS → empty snapshot, no HTTP. Cache miss may call HTTPS GeoNames **`findNearby`** (bundled username **`fbmfr`**, or Options **`GeoNamesUsername`** override). **`RenameList.Commit`** clears the row cache; process/disk caches are shared.
+Reads from **`Original.GeoNames`**. First **`geo-*`** use calls **`EnsureGeoNamesLoaded`** (which also ensures image/EXIF). No GPS → empty snapshot, no HTTP. Cache miss may call HTTPS GeoNames **`findNearby`** using Options **`GeoNamesUsername`** (defaults to **`fbmfr`**). **`RenameList.Commit`** clears the row cache; process/disk caches are shared.
 
 | Token           | Output                                          |
 | --------------- | ----------------------------------------------- |

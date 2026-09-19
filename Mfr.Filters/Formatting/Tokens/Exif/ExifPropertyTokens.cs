@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Mfr.Models.RenameList.Fields.Jpeg;
 
 namespace Mfr.Filters.Formatting.Tokens.Exif
@@ -17,19 +16,7 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         public bool TryGetFixedField(out string groupId, out string propertyKey)
         {
             groupId = JpegRenameListFields.Group;
-            propertyKey = propertyField switch
-            {
-                ExifPropertyField.Make => JpegRenameListFields.Key.Make,
-                ExifPropertyField.Model => JpegRenameListFields.Key.Model,
-                ExifPropertyField.Exposure => JpegRenameListFields.Key.Exposure,
-                ExifPropertyField.FNumber => JpegRenameListFields.Key.FNumber,
-                ExifPropertyField.Iso => JpegRenameListFields.Key.Iso,
-                ExifPropertyField.FocalLength => JpegRenameListFields.Key.FocalLength,
-                ExifPropertyField.FocalLength35mm => JpegRenameListFields.Key.FocalLength35mm,
-                ExifPropertyField.GpsLatitude => JpegRenameListFields.Key.Latitude,
-                ExifPropertyField.GpsLongitude => JpegRenameListFields.Key.Longitude,
-                _ => throw new UnreachableException(),
-            };
+            propertyKey = JpegExifRenameListField.CatalogPropertyKey(propertyField);
             return true;
         }
 

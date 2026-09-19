@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Mfr.App.Ui.Services.Help;
 using Mfr.Engine.Config;
 using Mfr.Models.Config;
+using Mfr.Models.Media;
 
 namespace Mfr.App.Ui.ViewModels.Options
 {
@@ -48,7 +49,7 @@ namespace Mfr.App.Ui.ViewModels.Options
             AddFolderContents = options.AddFolderContents;
             IncludeHidden = options.IncludeHidden;
             RememberColumnWidths = options.RememberColumnWidths;
-            GeoNamesUsername = options.GeoNamesUsername ?? string.Empty;
+            GeoNamesUsername = GeoNamesDefaults.ResolveUsername(options.GeoNamesUsername);
             _LoadRenameLogRetention(ConfigStore.RenameLog.Limit);
         }
 
@@ -124,10 +125,10 @@ namespace Mfr.App.Ui.ViewModels.Options
         private bool _rememberColumnWidths;
 
         /// <summary>
-        /// Draft GeoNames username override (blank = bundled FineBytes account).
+        /// Draft GeoNames username (defaults to the built-in FineBytes account).
         /// </summary>
         [ObservableProperty]
-        private string _geoNamesUsername = string.Empty;
+        private string _geoNamesUsername = GeoNamesDefaults.Username;
 
         /// <summary>
         /// Draft rename-log retention mode (maps to <c>renameLog.limit</c>).
@@ -180,8 +181,8 @@ namespace Mfr.App.Ui.ViewModels.Options
         public void Commit()
         {
             var options = ConfigStore.Options;
-            var previousUsername = (options.GeoNamesUsername ?? string.Empty).Trim();
-            var nextUsername = (GeoNamesUsername ?? string.Empty).Trim();
+            var previousUsername = GeoNamesDefaults.ResolveUsername(options.GeoNamesUsername);
+            var nextUsername = GeoNamesDefaults.ResolveUsername(GeoNamesUsername);
             options.RememberLastFolder = RememberLastFolder;
             options.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
             options.RememberWindowState = RememberWindowState;

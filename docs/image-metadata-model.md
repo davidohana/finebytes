@@ -57,8 +57,9 @@ flowchart LR
   `ImagePropertiesFormatting` under `RenameList/Fields/Image/`;
   `Format(..., PropertyDisplayContext)` with tokens using `Token` and Rename List
   columns using `Grid` (`PropertyDisplayContext` at `RenameList/`; Image arms are
-  culture-identical today). Typed GPS display uses `ExifGpsFormatting.FormatCoordinate`
-  (tokens via `ExifDataFormatting`, Jpeg Lat/Lon columns via `JpegRenameListFieldDisplay`).
+  culture-identical today). Typed EXIF fields (including GPS) use shared
+  `ExifPropertyField` + `ExifDataFormatting` / `ExifGpsFormatting` in `Media/`
+  for both tokens and Jpeg Tag columns.
 - **Tokens**
   - `Mfr.Filters` — `ImagePropertyTokenBase` (`image-*`); `ExifPropertyTokenBase`, `ExifDateToken`, `ExifToken`
 - **Commit cache clear** — `Mfr.Engine` — `RenameList.Commit` calls `ClearMetadataCaches`
@@ -127,7 +128,7 @@ Online reverse geocoding via HTTPS GeoNames `findNearby` (not an offline cities 
 - Lazy load: `EnsureGeoNamesLoaded` (loads image/EXIF first; no GPS → empty snapshot, no HTTP)
 - Tokens: `<geo-place>` / `<geo-region>` / `<geo-country>` (`Image\Nearby`)
 - Rename List: Nearby Place / Region / Country after Longitude (`RenameListMetadataRequirement.GeoNames`)
-- Options → Location: optional `GeoNamesUsername` override (blank = bundled `fbmfr`)
+- Options → Location: `GeoNamesUsername` (defaults to built-in `fbmfr`; change for a private quota)
 - Empty vs error: no GPS → empty; network/HTTP/XML/rate-limit when geo is used → PreviewError
 - Help: `help/tokens/geofp.html`, `help/guide/geonames-username.html`
 

@@ -94,92 +94,67 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
         /// </summary>
         public static IReadOnlyList<RenameListField> All { get; } =
         [
-            new JpegExifRenameListField(Key.Title, "Title", JpegRenameListExifProperty.Title, defaultWidth: 160),
-            new JpegExifRenameListField(Key.Subject, "Subject", JpegRenameListExifProperty.Subject, defaultWidth: 160),
+            new JpegExifRenameListField(Key.Title, "Title", ExifPropertyField.Title, defaultWidth: 160),
+            new JpegExifRenameListField(Key.Subject, "Subject", ExifPropertyField.Subject, defaultWidth: 160),
             new JpegExifRenameListField(
                 Key.Author,
                 "Author",
-                JpegRenameListExifProperty.Author,
+                ExifPropertyField.Author,
                 defaultWidth: 160,
                 tip: JpegRenameListFieldTips.Author
             ),
-            new JpegExifRenameListField(
-                Key.Keywords,
-                "Keywords",
-                JpegRenameListExifProperty.Keywords,
-                defaultWidth: 160
-            ),
-            new JpegExifRenameListField(
-                Key.Comments,
-                "Comments",
-                JpegRenameListExifProperty.Comments,
-                defaultWidth: 160
-            ),
+            new JpegExifRenameListField(Key.Keywords, "Keywords", ExifPropertyField.Keywords, defaultWidth: 160),
+            new JpegExifRenameListField(Key.Comments, "Comments", ExifPropertyField.Comments, defaultWidth: 160),
             new JpegExifRenameListField(
                 Key.DateTaken,
                 "Date/Time Taken",
-                JpegRenameListExifProperty.DateTaken,
+                ExifPropertyField.DateTaken,
                 defaultWidth: 60
             ),
-            new JpegExifRenameListField(Key.Make, "Make", JpegRenameListExifProperty.Make),
-            new JpegExifRenameListField(Key.Model, "Model", JpegRenameListExifProperty.Model, defaultWidth: 60),
+            new JpegExifRenameListField(Key.Make, "Make", ExifPropertyField.Make),
+            new JpegExifRenameListField(Key.Model, "Model", ExifPropertyField.Model, defaultWidth: 60),
             new JpegExifRenameListField(
                 Key.Description,
                 "Description",
-                JpegRenameListExifProperty.Description,
+                ExifPropertyField.Description,
                 defaultWidth: 160
             ),
             new JpegExifRenameListField(
                 Key.Artist,
                 "Artist",
-                JpegRenameListExifProperty.Artist,
+                ExifPropertyField.Artist,
                 defaultWidth: 120,
                 tip: JpegRenameListFieldTips.Artist
             ),
             new JpegExifRenameListField(
                 Key.ImageNumber,
                 "Image Number",
-                JpegRenameListExifProperty.ImageNumber,
+                ExifPropertyField.ImageNumber,
                 defaultWidth: 40
             ),
             new JpegExifRenameListField(
                 Key.UserComment,
                 "User Comment",
-                JpegRenameListExifProperty.UserComment,
+                ExifPropertyField.UserComment,
                 defaultWidth: 140
             ),
-            new JpegExifRenameListField(
-                Key.Exposure,
-                "Exposure Time",
-                JpegRenameListExifProperty.Exposure,
-                defaultWidth: 60
-            ),
-            new JpegExifRenameListField(Key.FNumber, "FNumber", JpegRenameListExifProperty.FNumber, defaultWidth: 40),
-            new JpegExifRenameListField(Key.Iso, "ISO Speed Ratings", JpegRenameListExifProperty.Iso, defaultWidth: 60),
+            new JpegExifRenameListField(Key.Exposure, "Exposure Time", ExifPropertyField.Exposure, defaultWidth: 60),
+            new JpegExifRenameListField(Key.FNumber, "FNumber", ExifPropertyField.FNumber, defaultWidth: 40),
+            new JpegExifRenameListField(Key.Iso, "ISO Speed Ratings", ExifPropertyField.Iso, defaultWidth: 60),
             new JpegExifRenameListField(
                 Key.FocalLength,
                 "Focal Length",
-                JpegRenameListExifProperty.FocalLength,
+                ExifPropertyField.FocalLength,
                 defaultWidth: 40
             ),
             new JpegExifRenameListField(
                 Key.FocalLength35mm,
                 "Focal Length In 35mm Film",
-                JpegRenameListExifProperty.FocalLength35mm,
+                ExifPropertyField.FocalLength35mm,
                 defaultWidth: 80
             ),
-            new JpegExifRenameListField(
-                Key.Latitude,
-                "Latitude",
-                JpegRenameListExifProperty.Latitude,
-                defaultWidth: 100
-            ),
-            new JpegExifRenameListField(
-                Key.Longitude,
-                "Longitude",
-                JpegRenameListExifProperty.Longitude,
-                defaultWidth: 100
-            ),
+            new JpegExifRenameListField(Key.Latitude, "Latitude", ExifPropertyField.GpsLatitude, defaultWidth: 100),
+            new JpegExifRenameListField(Key.Longitude, "Longitude", ExifPropertyField.GpsLongitude, defaultWidth: 100),
             new JpegNearbyRenameListField(Key.NearbyPlace, "Nearby Place", GeoNamesField.Place, defaultWidth: 140),
             new JpegNearbyRenameListField(Key.NearbyRegion, "Nearby Region", GeoNamesField.Region, defaultWidth: 120),
             new JpegNearbyRenameListField(

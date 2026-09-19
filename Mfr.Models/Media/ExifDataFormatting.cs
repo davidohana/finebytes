@@ -1,15 +1,16 @@
+using System.Diagnostics;
 using System.Globalization;
 using Mfr.Utils;
 
-namespace Mfr.Filters.Formatting.Tokens.Exif
+namespace Mfr.Models.Media
 {
     /// <summary>
-    /// Formats <see cref="ExifData"/> fields for formatter tokens.
+    /// Formats <see cref="ExifData"/> for formatter tokens and Jpeg Rename List columns.
     /// </summary>
-    internal static class ExifDataFormatting
+    public static class ExifDataFormatting
     {
         /// <summary>
-        /// Formats a semantic EXIF field for token expansion.
+        /// Formats a semantic EXIF field for token or grid display.
         /// </summary>
         /// <param name="exif">Loaded snapshot, or <see langword="null"/> when unset.</param>
         /// <param name="field">Which field to format.</param>
@@ -23,8 +24,18 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
 
             return field switch
             {
+                ExifPropertyField.Title => _FormatText(exif.Title),
+                ExifPropertyField.Subject => _FormatText(exif.Subject),
+                ExifPropertyField.Author => _FormatText(exif.Author),
+                ExifPropertyField.Keywords => _FormatText(exif.Keywords),
+                ExifPropertyField.Comments => _FormatText(exif.Comments),
+                ExifPropertyField.DateTaken => FormatDateTaken(exif),
                 ExifPropertyField.Make => _FormatText(exif.Make),
                 ExifPropertyField.Model => _FormatText(exif.Model),
+                ExifPropertyField.Description => _FormatText(exif.Description),
+                ExifPropertyField.Artist => _FormatText(exif.Artist),
+                ExifPropertyField.ImageNumber => FormatExtendedTag(exif, source: "ExifSub", name: "37393"),
+                ExifPropertyField.UserComment => _FormatText(exif.UserComment),
                 ExifPropertyField.Exposure => _FormatText(exif.Exposure),
                 ExifPropertyField.FNumber => _FormatText(exif.FNumber),
                 ExifPropertyField.Iso => _FormatText(exif.Iso),
@@ -32,12 +43,27 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
                 ExifPropertyField.FocalLength35mm => _FormatText(exif.FocalLength35mm),
                 ExifPropertyField.GpsLatitude => ExifGpsFormatting.FormatCoordinate(exif.GpsLatitude),
                 ExifPropertyField.GpsLongitude => ExifGpsFormatting.FormatCoordinate(exif.GpsLongitude),
-                _ => string.Empty,
+                _ => throw new UnreachableException(),
             };
         }
 
         /// <summary>
-        /// Formats <see cref="ExifData.DateTaken"/> with a .NET date format string.
+        /// Formats <see cref="ExifData.DateTaken"/> with general date/time long pattern (with seconds).
+        /// </summary>
+        /// <param name="exif">Loaded snapshot, or <see langword="null"/> when unset.</param>
+        /// <returns>Culture-formatted date/time, or empty when absent.</returns>
+        public static string FormatDateTaken(ExifData? exif)
+        {
+            if (exif?.DateTaken is not { } dateTaken || dateTaken == default)
+            {
+                return string.Empty;
+            }
+
+            return dateTaken.ToString("G", CultureInfo.CurrentCulture);
+        }
+
+        /// <summary>
+        /// Formats <see cref="ExifData.DateTaken"/> with a .NET date format string (formatter tokens).
         /// </summary>
         /// <param name="exif">Loaded snapshot, or <see langword="null"/> when unset.</param>
         /// <param name="format">.NET date format string (not validated).</param>
@@ -73,21 +99,5 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         {
             return value.IsBlank() ? string.Empty : value;
         }
-    }
-
-    /// <summary>
-    /// Semantic fields exposed by no-arg <c>exif-*</c> formatter tokens.
-    /// </summary>
-    internal enum ExifPropertyField
-    {
-        Make,
-        Model,
-        Exposure,
-        FNumber,
-        Iso,
-        FocalLength,
-        FocalLength35mm,
-        GpsLatitude,
-        GpsLongitude,
     }
 }

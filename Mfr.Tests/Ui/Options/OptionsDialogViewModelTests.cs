@@ -27,7 +27,7 @@ namespace Mfr.Tests.Ui.Options
             Assert.True(vm.AddFolderContents);
             Assert.False(vm.IncludeHidden);
             Assert.True(vm.RememberColumnWidths);
-            Assert.Equal(string.Empty, vm.GeoNamesUsername);
+            Assert.Equal(GeoNamesDefaults.Username, vm.GeoNamesUsername);
             Assert.Equal(RenameLogRetentionMode.Limited, vm.RenameLogRetentionMode);
             Assert.Equal(OptionsDialogViewModel.DefaultLimitedCount, vm.RenameLogLimitedCount);
         }
@@ -87,7 +87,7 @@ namespace Mfr.Tests.Ui.Options
             ConfigStore.Options.AddFolderContents = true;
             ConfigStore.Options.IncludeHidden = false;
             ConfigStore.Options.RememberColumnWidths = true;
-            ConfigStore.Options.GeoNamesUsername = string.Empty;
+            ConfigStore.Options.GeoNamesUsername = GeoNamesDefaults.Username;
             ConfigStore.RenameLog.Limit = RenameLogConfig.DefaultLimit;
 
             var vm = new OptionsDialogViewModel()
@@ -122,12 +122,23 @@ namespace Mfr.Tests.Ui.Options
         [Fact]
         public void Commit_trims_geonames_username()
         {
-            ConfigStore.Options.GeoNamesUsername = string.Empty;
+            ConfigStore.Options.GeoNamesUsername = GeoNamesDefaults.Username;
 
             var vm = new OptionsDialogViewModel() { GeoNamesUsername = "  my-geo  " };
             vm.Commit();
 
             Assert.Equal("my-geo", ConfigStore.Options.GeoNamesUsername);
+        }
+
+        [Fact]
+        public void Commit_blank_geonames_username_normalizes_to_default()
+        {
+            ConfigStore.Options.GeoNamesUsername = "custom-user";
+
+            var vm = new OptionsDialogViewModel() { GeoNamesUsername = "   " };
+            vm.Commit();
+
+            Assert.Equal(GeoNamesDefaults.Username, ConfigStore.Options.GeoNamesUsername);
         }
 
         [Fact]

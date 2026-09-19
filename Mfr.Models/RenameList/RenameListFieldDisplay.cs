@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Globalization;
-using Mfr.Models.Media;
 using Mfr.Models.Rename;
 using Mfr.Utils;
 
@@ -172,33 +171,6 @@ namespace Mfr.Models.RenameList
         internal static string FormatOptionalText(string? value)
         {
             return value.IsBlank() ? string.Empty : value;
-        }
-
-        /// <summary>
-        /// Formats <see cref="ExifData.DateTaken"/> with general date/time long pattern (with seconds).
-        /// </summary>
-        /// <param name="exif">Loaded EXIF snapshot, or <see langword="null"/>.</param>
-        /// <returns>Formatted date/time, or empty when absent.</returns>
-        internal static string FormatExifDateTaken(ExifData? exif)
-        {
-            return exif?.DateTaken is { } dateTaken ? FormatFileDate(dateTaken) : string.Empty;
-        }
-
-        /// <summary>
-        /// Looks up a flattened extended EXIF tag description.
-        /// </summary>
-        /// <param name="exif">Loaded EXIF snapshot, or <see langword="null"/>.</param>
-        /// <param name="source">Directory alias (for example <c>ExifSub</c>).</param>
-        /// <param name="tagId">Decimal MetadataExtractor tag id.</param>
-        /// <returns>Stored description, or empty when missing.</returns>
-        internal static string FormatExifTagId(ExifData? exif, string source, int tagId)
-        {
-            if (exif is null)
-            {
-                return string.Empty;
-            }
-
-            return exif.TagToDescription.TryGetValue($"{source}/{tagId}", out var value) ? value : string.Empty;
         }
 
         /// <summary>

@@ -76,9 +76,9 @@ namespace Mfr.App.Ui.Resources
         public const string OptionsRememberColumnWidths =
             "Reuse the last resized width when a Rename List column is shown again";
 
-        /// <summary>Options: GeoNames username override (blank uses the built-in account).</summary>
+        /// <summary>Options: GeoNames username (defaults to the built-in account).</summary>
         public const string OptionsGeoNamesUsername =
-            "Leave blank to use the built-in Magic File Renamer GeoNames account, or enter your own username for a private quota";
+            "Defaults to the built-in Magic File Renamer GeoNames account (fbmfr). Change it to use your own username for a private quota";
 
         /// <summary>Options: open GeoNames username registration help.</summary>
         public const string OptionsGeoNamesUsernameHelp =
