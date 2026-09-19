@@ -1,6 +1,5 @@
 using Mfr.Metadata;
 using Mfr.Models.RenameList;
-using Mfr.Utils;
 
 namespace Mfr.Filters
 {
@@ -16,21 +15,12 @@ namespace Mfr.Filters
         /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
         internal static void EnsureOfficeLoaded(this RenameItem item)
         {
-            ArgumentNullException.ThrowIfNull(item);
-
-            if (item.WasMetadataLoadAttempted(RenameListMetadataRequirement.Office))
-            {
-                return;
-            }
-
-            item.MarkMetadataLoadAttempted(RenameListMetadataRequirement.Office);
-
-            if (item.Original.Attributes.IsDirectory())
-            {
-                throw new InvalidOperationException("Cannot read Office document Info for a directory.");
-            }
-
-            item.SetOfficeDocumentInfo(OfficeFileReader.Read(item.Original.FullPath));
+            RenameItemMetadataEnsure.EnsureLoaded(
+                item,
+                RenameListMetadataRequirement.Office,
+                "Cannot read Office document Info for a directory.",
+                () => item.SetOfficeDocumentInfo(OfficeFileReader.Read(item.Original.FullPath))
+            );
         }
     }
 }

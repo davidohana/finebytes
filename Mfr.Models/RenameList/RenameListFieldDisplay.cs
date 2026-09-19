@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using Mfr.Models.Media;
 using Mfr.Models.Rename;
@@ -23,6 +24,30 @@ namespace Mfr.Models.RenameList
             }
 
             return value.ToString("G", CultureInfo.CurrentCulture);
+        }
+
+        /// <summary>
+        /// Formats optional document Info dates for tokens vs Rename List columns.
+        /// </summary>
+        /// <param name="value">Parsed creation/modification instant, or <see langword="null"/> when absent.</param>
+        /// <param name="context">
+        /// Token keeps Invariant <see cref="DateTimeOffset"/> <c>"G"</c>; Grid uses
+        /// <see cref="FormatFileDate"/> on <see cref="DateTimeOffset.LocalDateTime"/>.
+        /// </param>
+        /// <returns>Formatted text, or empty when <paramref name="value"/> is null.</returns>
+        internal static string FormatOptionalDateTimeOffset(DateTimeOffset? value, PropertyDisplayContext context)
+        {
+            if (value is not { } date)
+            {
+                return string.Empty;
+            }
+
+            return context switch
+            {
+                PropertyDisplayContext.Token => date.ToString("G", CultureInfo.InvariantCulture),
+                PropertyDisplayContext.Grid => FormatFileDate(date.LocalDateTime),
+                _ => throw new UnreachableException(),
+            };
         }
 
         /// <summary>

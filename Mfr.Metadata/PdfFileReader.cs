@@ -28,26 +28,16 @@ namespace Mfr.Metadata
             var information = document.Information;
             return new PdfDocumentInfo
             {
-                Title = _NormalizeText(information.Title),
-                Author = _NormalizeText(information.Author),
-                Subject = _NormalizeText(information.Subject),
-                Keywords = _NormalizeText(information.Keywords),
-                Creator = _NormalizeText(information.Creator),
-                Producer = _NormalizeText(information.Producer),
+                Title = information.Title.NormalizeMetadataText(),
+                Author = information.Author.NormalizeMetadataText(),
+                Subject = information.Subject.NormalizeMetadataText(),
+                Keywords = information.Keywords.NormalizeMetadataText(),
+                Creator = information.Creator.NormalizeMetadataText(),
+                Producer = information.Producer.NormalizeMetadataText(),
                 Created = information.GetCreatedDateTimeOffset(),
                 Modified = information.GetModifiedDateTimeOffset(),
                 PageCount = document.NumberOfPages,
             };
-        }
-
-        private static string? _NormalizeText(string? value)
-        {
-            if (value.IsBlank())
-            {
-                return null;
-            }
-
-            return value.Replace('\n', ' ').Replace('\r', ' ').Trim();
         }
     }
 }

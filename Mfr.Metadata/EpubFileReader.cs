@@ -60,7 +60,7 @@ namespace Mfr.Metadata
                         continue;
                     }
 
-                    var matched = _NormalizeText(entry.Identifier);
+                    var matched = entry.Identifier.NormalizeMetadataText();
                     if (matched is not null)
                     {
                         return matched;
@@ -80,7 +80,7 @@ namespace Mfr.Metadata
         {
             foreach (var entry in entries)
             {
-                var normalized = _NormalizeText(selectText(entry));
+                var normalized = selectText(entry).NormalizeMetadataText();
                 if (normalized is not null)
                 {
                     return normalized;
@@ -88,19 +88,6 @@ namespace Mfr.Metadata
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Treats blank as absent and collapses newlines to spaces (same policy as PDF Info text).
-        /// </summary>
-        private static string? _NormalizeText(string? value)
-        {
-            if (value.IsBlank())
-            {
-                return null;
-            }
-
-            return value.Replace('\n', ' ').Replace('\r', ' ').Trim();
         }
     }
 }

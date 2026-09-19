@@ -1,6 +1,5 @@
 using Mfr.Metadata;
 using Mfr.Models.RenameList;
-using Mfr.Utils;
 
 namespace Mfr.Filters
 {
@@ -16,21 +15,12 @@ namespace Mfr.Filters
         /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
         internal static void EnsurePdfLoaded(this RenameItem item)
         {
-            ArgumentNullException.ThrowIfNull(item);
-
-            if (item.WasMetadataLoadAttempted(RenameListMetadataRequirement.Pdf))
-            {
-                return;
-            }
-
-            item.MarkMetadataLoadAttempted(RenameListMetadataRequirement.Pdf);
-
-            if (item.Original.Attributes.IsDirectory())
-            {
-                throw new InvalidOperationException("Cannot read PDF Info for a directory.");
-            }
-
-            item.SetPdfDocumentInfo(PdfFileReader.Read(item.Original.FullPath));
+            RenameItemMetadataEnsure.EnsureLoaded(
+                item,
+                RenameListMetadataRequirement.Pdf,
+                "Cannot read PDF Info for a directory.",
+                () => item.SetPdfDocumentInfo(PdfFileReader.Read(item.Original.FullPath))
+            );
         }
     }
 }

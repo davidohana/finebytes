@@ -32,29 +32,16 @@ namespace Mfr.Metadata
 #pragma warning restore OOXML0001
             return new OfficeDocumentInfo
             {
-                Title = _NormalizeText(properties.Title),
-                Author = _NormalizeText(properties.Creator),
-                Subject = _NormalizeText(properties.Subject),
-                Keywords = _NormalizeText(properties.Keywords),
-                Category = _NormalizeText(properties.Category),
-                Description = _NormalizeText(properties.Description),
-                LastModifiedBy = _NormalizeText(properties.LastModifiedBy),
+                Title = properties.Title.NormalizeMetadataText(),
+                Author = properties.Creator.NormalizeMetadataText(),
+                Subject = properties.Subject.NormalizeMetadataText(),
+                Keywords = properties.Keywords.NormalizeMetadataText(),
+                Category = properties.Category.NormalizeMetadataText(),
+                Description = properties.Description.NormalizeMetadataText(),
+                LastModifiedBy = properties.LastModifiedBy.NormalizeMetadataText(),
                 Created = _MapDate(properties.Created),
                 Modified = _MapDate(properties.Modified),
             };
-        }
-
-        /// <summary>
-        /// Treats blank as absent and collapses newlines to spaces (same policy as PDF/EPUB Info text).
-        /// </summary>
-        private static string? _NormalizeText(string? value)
-        {
-            if (value.IsBlank())
-            {
-                return null;
-            }
-
-            return value.Replace('\n', ' ').Replace('\r', ' ').Trim();
         }
 
         /// <summary>

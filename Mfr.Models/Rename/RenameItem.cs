@@ -332,10 +332,7 @@ namespace Mfr.Models.Rename
         /// <param name="pdf">Read-only PDF Info + page count from PdfPig.</param>
         internal void SetPdfDocumentInfo(PdfDocumentInfo pdf)
         {
-            ArgumentNullException.ThrowIfNull(pdf);
-
-            Original.Pdf = pdf;
-            Preview.Pdf = pdf;
+            _MirrorDocumentInfo(pdf, static (meta, value) => meta.Pdf = value);
         }
 
         /// <summary>
@@ -344,10 +341,7 @@ namespace Mfr.Models.Rename
         /// <param name="epub">Read-only Dublin Core Info from VersOne.Epub.</param>
         internal void SetEpubDocumentInfo(EpubDocumentInfo epub)
         {
-            ArgumentNullException.ThrowIfNull(epub);
-
-            Original.Epub = epub;
-            Preview.Epub = epub;
+            _MirrorDocumentInfo(epub, static (meta, value) => meta.Epub = value);
         }
 
         /// <summary>
@@ -356,10 +350,7 @@ namespace Mfr.Models.Rename
         /// <param name="office">Read-only PackageProperties from OpenXml.</param>
         internal void SetOfficeDocumentInfo(OfficeDocumentInfo office)
         {
-            ArgumentNullException.ThrowIfNull(office);
-
-            Original.Office = office;
-            Preview.Office = office;
+            _MirrorDocumentInfo(office, static (meta, value) => meta.Office = value);
         }
 
         /// <summary>
@@ -413,9 +404,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void ClearPdfCache()
         {
-            ClearMetadataLoadState(RenameListMetadataRequirement.Pdf);
-            Original.Pdf = null;
-            Preview.Pdf = null;
+            _ClearMirroredDocumentInfo(RenameListMetadataRequirement.Pdf, static meta => meta.Pdf = null);
         }
 
         /// <summary>
@@ -423,9 +412,7 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void ClearEpubCache()
         {
-            ClearMetadataLoadState(RenameListMetadataRequirement.Epub);
-            Original.Epub = null;
-            Preview.Epub = null;
+            _ClearMirroredDocumentInfo(RenameListMetadataRequirement.Epub, static meta => meta.Epub = null);
         }
 
         /// <summary>
@@ -433,9 +420,26 @@ namespace Mfr.Models.Rename
         /// </summary>
         internal void ClearOfficeCache()
         {
-            ClearMetadataLoadState(RenameListMetadataRequirement.Office);
-            Original.Office = null;
-            Preview.Office = null;
+            _ClearMirroredDocumentInfo(RenameListMetadataRequirement.Office, static meta => meta.Office = null);
+        }
+
+        private void _MirrorDocumentInfo<T>(T value, Action<FileMeta, T> assign)
+            where T : class
+        {
+            ArgumentNullException.ThrowIfNull(value);
+            ArgumentNullException.ThrowIfNull(assign);
+
+            assign(Original, value);
+            assign(Preview, value);
+        }
+
+        private void _ClearMirroredDocumentInfo(RenameListMetadataRequirement bucket, Action<FileMeta> clear)
+        {
+            ArgumentNullException.ThrowIfNull(clear);
+
+            ClearMetadataLoadState(bucket);
+            clear(Original);
+            clear(Preview);
         }
 
         /// <summary>
