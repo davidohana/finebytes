@@ -164,6 +164,12 @@ namespace Mfr.Models.RenameList
 
             if (requirement.HasFlag(RenameListMetadataRequirement.GeoNames))
             {
+                // GeoNamesClient messages are already truncated, user-facing text (rate limits, HTTP, XML).
+                if (!string.IsNullOrWhiteSpace(error.Message))
+                {
+                    return error.Message.Trim();
+                }
+
                 return "Nearby place data could not be loaded from GeoNames.";
             }
 

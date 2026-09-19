@@ -120,6 +120,17 @@ namespace Mfr.Tests.Ui.Options
         }
 
         [Fact]
+        public void Commit_trims_geonames_username()
+        {
+            ConfigStore.Options.GeoNamesUsername = string.Empty;
+
+            var vm = new OptionsDialogViewModel() { GeoNamesUsername = "  my-geo  " };
+            vm.Commit();
+
+            Assert.Equal("my-geo", ConfigStore.Options.GeoNamesUsername);
+        }
+
+        [Fact]
         public void Commit_writes_options_without_creating_session_sections()
         {
             ConfigStore.Options.SuppressedConfirmations = [ConfirmationKind.UndoRename];

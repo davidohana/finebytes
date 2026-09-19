@@ -108,6 +108,36 @@ namespace Mfr.Tests.Metadata.GeoNames
         }
 
         [Fact]
+        public void FindNearby_place_name_containing_credit_is_not_rate_limit()
+        {
+            const string xml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <geonames>
+                  <geoname>
+                    <name>Crediton</name>
+                    <adminName1>England</adminName1>
+                    <countryName>United Kingdom</countryName>
+                  </geoname>
+                </geonames>
+                """;
+            using var client = _CreateClient(
+                new StubHandler(_ =>
+                {
+                    Interlocked.Increment(ref _httpCalls);
+                    return new HttpResponseMessage(HttpStatusCode.OK)
+                    {
+                        Content = new StringContent(xml, Encoding.UTF8, "application/xml"),
+                    };
+                })
+            );
+
+            var info = client.FindNearby(50.79, -3.65, "fbmfr");
+
+            Assert.Equal("Crediton", info.Place);
+            Assert.Equal(1, _httpCalls);
+        }
+
+        [Fact]
         public void FindNearby_cache_hit_skips_second_http()
         {
             using var client = _CreateClient(_SuccessHandler());

@@ -85,6 +85,11 @@ namespace Mfr.Tests.Models.Filters
                 {
                     item.MarkMetadataLoadAttempted(bucket);
                 }
+
+                if (item.Original.GeoNames is null)
+                {
+                    item.SetGeoNamesInfo(new GeoNamesInfo());
+                }
             }
 
             return item;

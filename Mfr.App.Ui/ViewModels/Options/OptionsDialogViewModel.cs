@@ -180,8 +180,8 @@ namespace Mfr.App.Ui.ViewModels.Options
         public void Commit()
         {
             var options = ConfigStore.Options;
-            var previousUsername = options.GeoNamesUsername ?? string.Empty;
-            var nextUsername = GeoNamesUsername ?? string.Empty;
+            var previousUsername = (options.GeoNamesUsername ?? string.Empty).Trim();
+            var nextUsername = (GeoNamesUsername ?? string.Empty).Trim();
             options.RememberLastFolder = RememberLastFolder;
             options.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
             options.RememberWindowState = RememberWindowState;
@@ -193,7 +193,7 @@ namespace Mfr.App.Ui.ViewModels.Options
             options.GeoNamesUsername = nextUsername;
             ConfigStore.RenameLog.Limit = _LimitFromDraft();
 
-            if (!string.Equals(previousUsername.Trim(), nextUsername.Trim(), StringComparison.Ordinal))
+            if (!string.Equals(previousUsername, nextUsername, StringComparison.Ordinal))
             {
                 ConfigStore.ClearGeoNamesProcessCache();
             }

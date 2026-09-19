@@ -105,6 +105,23 @@ namespace Mfr.Tests.Models
         }
 
         /// <summary>
+        /// Verifies GeoNames failures surface the client message (rate limits, HTTP, XML).
+        /// </summary>
+        [Fact]
+        public void DescribeLoadError_uses_geonames_exception_message()
+        {
+            var item = _UnmarkedItem(@"D:\Photos\shot.jpg");
+            item.SetGeoNamesLoadError(new InvalidOperationException("GeoNames rate limit exceeded. hourly limit"));
+
+            var explanation = RenameListMetadataLoadErrors.DescribeUserMessage(
+                item.GeoNamesLoadError!,
+                RenameListMetadataRequirement.GeoNames
+            );
+
+            Assert.Equal("GeoNames rate limit exceeded. hourly limit", explanation);
+        }
+
+        /// <summary>
         /// Verifies listing returns TagLib, image, PDF, EPUB, and Office failures for one row.
         /// </summary>
         [Fact]

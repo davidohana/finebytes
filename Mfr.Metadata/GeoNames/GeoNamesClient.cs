@@ -27,7 +27,6 @@ namespace Mfr.Metadata.GeoNames
 
         private readonly HttpClient _http;
         private readonly GeoNamesResponseCache _cache;
-        private readonly bool _ownsHttp;
 
         /// <summary>
         /// Optional Options override provider. Return blank/null to use <see cref="DefaultUsername"/>.
@@ -51,17 +50,9 @@ namespace Mfr.Metadata.GeoNames
         /// <param name="cacheFilePath">Optional L3 path; when null, uses <see cref="GeoNamesResponseCache.DefaultCacheFilePath"/>.</param>
         public GeoNamesClient(HttpMessageHandler? handler = null, string? cacheFilePath = null)
         {
-            if (handler is null)
-            {
-                _http = new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-                _ownsHttp = true;
-            }
-            else
-            {
-                _http = new HttpClient(handler, disposeHandler: false) { Timeout = TimeSpan.FromSeconds(10) };
-                _ownsHttp = true;
-            }
-
+            _http = handler is null
+                ? new HttpClient { Timeout = TimeSpan.FromSeconds(10) }
+                : new HttpClient(handler, disposeHandler: false) { Timeout = TimeSpan.FromSeconds(10) };
             _cache = new GeoNamesResponseCache(cacheFilePath ?? GeoNamesResponseCache.DefaultCacheFilePath);
         }
 
@@ -230,10 +221,7 @@ namespace Mfr.Metadata.GeoNames
         /// <inheritdoc />
         public void Dispose()
         {
-            if (_ownsHttp)
-            {
-                _http.Dispose();
-            }
+            _http.Dispose();
         }
 
         private GeoNamesInfo _FetchFindNearby(double latitude, double longitude, string effectiveUsername)
@@ -270,7 +258,10 @@ namespace Mfr.Metadata.GeoNames
                     throw new InvalidOperationException("GeoNames request failed.", ex);
                 }
 
-                if (response.StatusCode == HttpStatusCode.TooManyRequests || _LooksLikeRateLimit(body))
+                // Do not scan the full success body for rate-limit phrases — place names like
+                // "Crediton" contain "credit" and would false-trip the breaker. Status XML and
+                // HTTP 429 are the authoritative signals; ParseFindNearbyXml handles status nodes.
+                if (response.StatusCode == HttpStatusCode.TooManyRequests)
                 {
                     var message = _RateLimitUserMessage(_ExtractStatusMessage(body) ?? body);
                     throw new GeoNamesRateLimitException(message);

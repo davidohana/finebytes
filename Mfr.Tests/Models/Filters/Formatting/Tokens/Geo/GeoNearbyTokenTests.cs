@@ -52,5 +52,17 @@ namespace Mfr.Tests.Models.Filters.Formatting.Tokens.Geo
             Assert.True(new GeoCountryToken().TryGetFixedField(out _, out var countryKey));
             Assert.Equal(JpegRenameListFields.Key.NearbyCountry, countryKey);
         }
+
+        [Fact]
+        public void Geo_tokens_rethrow_stored_geonames_load_error()
+        {
+            var item = FilterTestHelpers.CreateRenameItem();
+            item.ClearGeoNamesCache();
+            item.MarkGeoNamesLoadAttempted();
+            item.SetGeoNamesLoadError(new InvalidOperationException("GeoNames rate limit exceeded."));
+
+            var ex = Assert.Throws<InvalidOperationException>(() => new GeoPlaceToken().Compile(string.Empty)(item));
+            Assert.Equal("GeoNames rate limit exceeded.", ex.Message);
+        }
     }
 }
