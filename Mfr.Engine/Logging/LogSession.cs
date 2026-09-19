@@ -67,7 +67,7 @@ namespace Mfr.Engine.Logging
                 sessionLogExtension: logConfig.FileExtension
             );
 
-            Log.Debug("Logging initialized. Level: {LogLevel}. File: {LogFilePath}", logLevel, logFilePath);
+            Log.Information("Logging initialized. Level: {LogLevel}. File: {LogFilePath}", logLevel, logFilePath);
         }
 
         /// <summary>
