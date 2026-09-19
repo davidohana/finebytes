@@ -6,7 +6,7 @@ todos:
     content: "P1: Shared log-level parse + Program.Main apply before LogSession.Start; UiStartupArgsParser accepts -l/--log-level"
     status: completed
   - id: p2-help-tests
-    content: "P2: Parser/Program tests + help/cml + whatsnew"
+    content: "P2: help/cml + whatsnew"
     status: completed
 isProject: false
 ---
