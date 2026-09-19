@@ -37,10 +37,10 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies the Options dialog UI / Rename / Misc tabs host the expected fieldsets and controls.
+        /// Verifies the Options dialog General / Rename / Misc tabs host the expected fieldsets and controls.
         /// </summary>
         [AvaloniaFact]
-        public void OptionsDialog_shows_ui_rename_and_misc_tabs()
+        public void OptionsDialog_shows_general_rename_and_misc_tabs()
         {
             var dialogVm = new OptionsDialogViewModel();
             var dialog = new OptionsDialog(dialogVm);
@@ -55,7 +55,7 @@ namespace Mfr.Tests.Ui.Options
                     .Items.OfType<TabItem>()
                     .Select(item => (item.Header as TextBlock)?.Text ?? item.Header?.ToString())
                     .ToList();
-                Assert.Equal(["UI", "Rename", "Misc"], tabHeaders);
+                Assert.Equal(["General", "Rename", "Misc"], tabHeaders);
                 Assert.Equal(0, tabs.SelectedIndex);
 
                 var labels = dialog

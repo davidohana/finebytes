@@ -45,7 +45,7 @@
     <TabControl x:Name="OptionsTabs" Classes="options-tabs">
       <TabItem>
         <TabItem.Header>
-          <TextBlock Classes="options-tab-header" Text="UI" />
+          <TextBlock Classes="options-tab-header" Text="General" />
         </TabItem.Header>
         <StackPanel Margin="0,8,0,0" Spacing="10" Grid.IsSharedSizeScope="True">
           <controls:FieldsetGroup Header="Session">
