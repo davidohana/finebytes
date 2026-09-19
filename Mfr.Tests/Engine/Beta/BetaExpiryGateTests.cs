@@ -99,28 +99,13 @@ namespace Mfr.Tests.Engine.Beta
             Assert.Equal(1, fetchCount);
         }
 
-#if !BETA
         [Fact]
-        public void ThrowIfCommitDisallowed_no_op_when_enforcement_off()
+        public void ThrowIfCommitDisallowed_throws_when_expired()
         {
             BetaExpiryGate.ConfigureForTests(
                 utcNow: () => BetaExpiryGate.ExpiresUtc,
                 tryFetchNetworkUtc: static _ => null
             );
-            BetaExpiryGate.SetEnforceForTests(false);
-
-            BetaExpiryGate.ThrowIfCommitDisallowed(dryRun: false);
-        }
-#endif
-
-        [Fact]
-        public void ThrowIfCommitDisallowed_throws_when_enforced_and_expired()
-        {
-            BetaExpiryGate.ConfigureForTests(
-                utcNow: () => BetaExpiryGate.ExpiresUtc,
-                tryFetchNetworkUtc: static _ => null
-            );
-            BetaExpiryGate.SetEnforceForTests(true);
 
             var ex = Assert.Throws<BetaExpiredException>(() => BetaExpiryGate.ThrowIfCommitDisallowed(dryRun: false));
             Assert.Equal(BetaExpiryGate.ExpiresUtc, ex.ExpiresUtc);
@@ -134,7 +119,6 @@ namespace Mfr.Tests.Engine.Beta
                 utcNow: () => BetaExpiryGate.ExpiresUtc,
                 tryFetchNetworkUtc: static _ => null
             );
-            BetaExpiryGate.SetEnforceForTests(true);
 
             BetaExpiryGate.ThrowIfCommitDisallowed(dryRun: true);
         }
@@ -165,20 +149,10 @@ namespace Mfr.Tests.Engine.Beta
             Assert.Contains("Download a newer beta or the release.", message, StringComparison.Ordinal);
         }
 
-#if !BETA
         [Fact]
-        public void IsEnforcementEnabled_false_by_default_in_non_beta_builds()
-        {
-            Assert.False(BetaExpiryGate.IsEnforcementEnabled);
-        }
-#endif
-
-#if BETA
-        [Fact]
-        public void IsEnforcementEnabled_true_in_beta_builds()
+        public void IsEnforcementEnabled_is_always_true()
         {
             Assert.True(BetaExpiryGate.IsEnforcementEnabled);
         }
-#endif
     }
 }

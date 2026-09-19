@@ -6,7 +6,7 @@ namespace Mfr.Utils
     public static class ProductUrls
     {
         /// <summary>
-        /// Product web site (HTTPS), used for About links, beta time probes, and rename-script headers.
+        /// Product web site (HTTPS), used for About links and rename-script headers.
         /// </summary>
         public const string WebSite = "https://www.finebytes.com/mfr";
     }

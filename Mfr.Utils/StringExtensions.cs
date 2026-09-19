@@ -32,5 +32,20 @@ namespace Mfr.Utils
             var trimmed = value.Trim();
             return trimmed.Length == 0 ? null : trimmed;
         }
+
+        /// <summary>
+        /// Normalizes optional document Info text: blank → <see langword="null"/>; newlines → spaces; trim.
+        /// </summary>
+        /// <param name="value">Raw field from PDF Info, EPUB Dublin Core, or Office PackageProperties.</param>
+        /// <returns>Normalized text, or <see langword="null"/> when blank.</returns>
+        public static string? NormalizeMetadataText(this string? value)
+        {
+            if (value.IsBlank())
+            {
+                return null;
+            }
+
+            return value.Replace('\n', ' ').Replace('\r', ' ').Trim();
+        }
     }
 }

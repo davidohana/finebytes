@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using Mfr.Utils;
 using Serilog;
 
 namespace Mfr.Engine.Beta
@@ -9,9 +8,9 @@ namespace Mfr.Engine.Beta
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Always compiled so unit tests can inject clock and network without <c>-p:BETA=true</c>.
-    /// Commit enforcement is active in <c>BETA</c> builds; non-BETA builds stay inactive unless
-    /// tests opt in via <see cref="SetEnforceForTests"/>.
+    /// Enforcement is always on while Magic File Renamer 8 ships as a time-limited beta.
+    /// Unit tests inject clock/network via <see cref="ConfigureForTests"/>;
+    /// <see cref="ResetForTests"/> restores an offline network stub so the suite never hits HTTPS.
     /// </para>
     /// </remarks>
     public static class BetaExpiryGate
@@ -21,7 +20,13 @@ namespace Mfr.Engine.Beta
         /// </summary>
         public static readonly DateTime ExpiresUtc = new(2027, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
+        /// <summary>
+        /// Stable HTTPS host used only for the response <c>Date</c> header (not the product site).
+        /// </summary>
+        private const string NetworkTimeUrl = "https://www.microsoft.com/";
+
         private static readonly TimeSpan ProbeTimeout = TimeSpan.FromSeconds(2);
+        private static readonly Func<CancellationToken, DateTime?> OfflineNetworkStub = static _ => null;
 
         private static readonly Lock Sync = new();
         private static Func<DateTime> _utcNow = static () => DateTime.UtcNow;
@@ -29,25 +34,14 @@ namespace Mfr.Engine.Beta
         private static bool _probeCompleted;
         private static DateTime? _cachedNetworkUtc;
         private static Stopwatch? _sinceNetworkProbe;
-#if !BETA
-        private static bool EnforceForTests { get; set; }
-#endif
 
         /// <summary>
         /// Gets whether commit enforcement is active for this process.
         /// </summary>
         /// <remarks>
-        /// <para>
-        /// <c>true</c> in <c>BETA</c> builds. In non-BETA builds, <c>false</c> unless tests call
-        /// <see cref="SetEnforceForTests"/>.
-        /// </para>
+        /// <para>Always <see langword="true"/> for the current beta product window.</para>
         /// </remarks>
-        public static bool IsEnforcementEnabled =>
-#if BETA
-            true;
-#else
-            EnforceForTests;
-#endif
+        public static bool IsEnforcementEnabled => true;
 
         /// <summary>
         /// Gets whether the effective UTC clock is on or after <see cref="ExpiresUtc"/>.
@@ -103,15 +97,10 @@ namespace Mfr.Engine.Beta
         /// Throws <see cref="BetaExpiredException"/> when a non-dry-run commit is disallowed.
         /// </summary>
         /// <param name="dryRun">When <see langword="true"/>, never throws.</param>
-        /// <exception cref="BetaExpiredException">Thrown when enforcement is on and the beta has expired.</exception>
+        /// <exception cref="BetaExpiredException">Thrown when the beta has expired.</exception>
         public static void ThrowIfCommitDisallowed(bool dryRun)
         {
             if (dryRun)
-            {
-                return;
-            }
-
-            if (!IsEnforcementEnabled)
             {
                 return;
             }
@@ -146,35 +135,16 @@ namespace Mfr.Engine.Beta
         }
 
         /// <summary>
-        /// Test hook: restores default clock/network and clears probe cache and non-BETA enforce flag.
+        /// Test hook: restores default clock and an offline network stub (no real HTTPS), and clears probe cache.
         /// </summary>
         internal static void ResetForTests()
         {
             lock (Sync)
             {
                 _utcNow = static () => DateTime.UtcNow;
-                _tryFetchNetworkUtc = null;
+                _tryFetchNetworkUtc = OfflineNetworkStub;
                 _ClearProbeStateUnlocked();
-#if !BETA
-                EnforceForTests = false;
-#endif
             }
-        }
-
-        /// <summary>
-        /// Test hook: enables commit enforcement in non-BETA builds so Commit expiry can be asserted locally.
-        /// </summary>
-        /// <param name="enforce">When <see langword="true"/>, non-dry-run commits throw if expired.</param>
-        internal static void SetEnforceForTests(bool enforce)
-        {
-#if BETA
-            _ = enforce;
-#else
-            lock (Sync)
-            {
-                EnforceForTests = enforce;
-            }
-#endif
         }
 
         /// <summary>
@@ -216,7 +186,7 @@ namespace Mfr.Engine.Beta
                     _sinceNetworkProbe = Stopwatch.StartNew();
                     Log.Debug(
                         "Beta network time probe succeeded from {ProbeUrl}: {NetworkUtc:O} UTC.",
-                        ProductUrls.WebSite,
+                        NetworkTimeUrl,
                         _cachedNetworkUtc
                     );
                 }
@@ -224,7 +194,7 @@ namespace Mfr.Engine.Beta
                 {
                     Log.Debug(
                         "Beta network time probe unavailable from {ProbeUrl}; using local UTC {LocalUtc:O}.",
-                        ProductUrls.WebSite,
+                        NetworkTimeUrl,
                         _utcNow()
                     );
                 }
@@ -262,7 +232,7 @@ namespace Mfr.Engine.Beta
         private static DateTime? _FetchNetworkUtcViaHttp(CancellationToken cancellationToken)
         {
             using var client = new HttpClient { Timeout = ProbeTimeout };
-            using var request = new HttpRequestMessage(HttpMethod.Head, ProductUrls.WebSite);
+            using var request = new HttpRequestMessage(HttpMethod.Head, NetworkTimeUrl);
             using var response = client.Send(request, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
 
             if (response.Headers.Date is not { } date)

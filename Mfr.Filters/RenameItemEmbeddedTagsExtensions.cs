@@ -1,7 +1,6 @@
 using Mfr.Metadata;
 using Mfr.Models.RenameList;
 using Mfr.Models.Tags;
-using Mfr.Utils;
 
 namespace Mfr.Filters
 {
@@ -17,23 +16,17 @@ namespace Mfr.Filters
         /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
         internal static void EnsureTagLibLoaded(this RenameItem item)
         {
-            ArgumentNullException.ThrowIfNull(item);
-
-            if (item.WasMetadataLoadAttempted(RenameListMetadataRequirement.TagLib))
-            {
-                return;
-            }
-
-            item.MarkMetadataLoadAttempted(RenameListMetadataRequirement.TagLib);
-
-            if (item.Original.Attributes.IsDirectory())
-            {
-                throw new InvalidOperationException("Cannot read TagLib metadata for a directory.");
-            }
-
-            var snapshot = TagLibFileAccess.Read(item.Original.FullPath);
-            item.SetEmbeddedTagOverlay(snapshot.Overlay);
-            item.SetMediaProperties(snapshot.Media);
+            RenameItemMetadataEnsure.EnsureLoaded(
+                item,
+                RenameListMetadataRequirement.TagLib,
+                "Cannot read TagLib metadata for a directory.",
+                () =>
+                {
+                    var snapshot = TagLibFileAccess.Read(item.Original.FullPath);
+                    item.SetEmbeddedTagOverlay(snapshot.Overlay);
+                    item.SetMediaProperties(snapshot.Media);
+                }
+            );
         }
 
         /// <summary>

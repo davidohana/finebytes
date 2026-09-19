@@ -29,7 +29,6 @@ namespace Mfr.Tests.Ui.MainWindow
                 utcNow: () => BetaExpiryGate.ExpiresUtc,
                 tryFetchNetworkUtc: static _ => null
             );
-            BetaExpiryGate.SetEnforceForTests(true);
 
             var dir = _tempDirectoryFixture.CreateTempDir();
             var path = Path.Combine(dir, "alpha.txt");
@@ -52,7 +51,6 @@ namespace Mfr.Tests.Ui.MainWindow
                 utcNow: () => BetaExpiryGate.ExpiresUtc,
                 tryFetchNetworkUtc: static _ => null
             );
-            BetaExpiryGate.SetEnforceForTests(true);
 
             var dir = _tempDirectoryFixture.CreateTempDir();
             var path = Path.Combine(dir, "alpha.txt");
