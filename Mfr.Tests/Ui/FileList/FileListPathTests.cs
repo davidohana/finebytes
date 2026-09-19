@@ -15,9 +15,18 @@ namespace Mfr.Tests.Ui.FileList
         public void StripSurroundingQuotes_Removes_Matching_Outer_Quotes()
         {
             Assert.Null(FileListPath.StripSurroundingQuotes(null));
-            Assert.Equal(@"C:\Users\liats\My Drive", FileListPath.StripSurroundingQuotes(@"""C:\Users\liats\My Drive"""));
-            Assert.Equal(@"C:\Users\liats\My Drive", FileListPath.StripSurroundingQuotes(@"  ""C:\Users\liats\My Drive""  "));
-            Assert.Equal(@"""C:\Users\liats\My Drive", FileListPath.StripSurroundingQuotes(@"""C:\Users\liats\My Drive"));
+            Assert.Equal(
+                @"C:\Users\liats\My Drive",
+                FileListPath.StripSurroundingQuotes(@"""C:\Users\liats\My Drive""")
+            );
+            Assert.Equal(
+                @"C:\Users\liats\My Drive",
+                FileListPath.StripSurroundingQuotes(@"  ""C:\Users\liats\My Drive""  ")
+            );
+            Assert.Equal(
+                @"""C:\Users\liats\My Drive",
+                FileListPath.StripSurroundingQuotes(@"""C:\Users\liats\My Drive")
+            );
             Assert.Equal(@"C:\Users\liats\My Drive", FileListPath.StripSurroundingQuotes(@"C:\Users\liats\My Drive"));
         }
 

@@ -15,17 +15,30 @@
   ShowInTaskbar="False"
 >
   <DockPanel Margin="16">
-    <Button
+    <StackPanel
       DockPanel.Dock="Bottom"
-      Content="Cancel"
-      MinWidth="80"
+      Orientation="Horizontal"
       HorizontalAlignment="Center"
-      HorizontalContentAlignment="Center"
-      VerticalContentAlignment="Center"
+      Spacing="12"
       Margin="0,16,0,0"
-      IsCancel="True"
-      Command="{Binding CancelCommand}"
-    />
+    >
+      <Button
+        Content="Keep added"
+        MinWidth="100"
+        HorizontalContentAlignment="Center"
+        VerticalContentAlignment="Center"
+        IsVisible="{Binding ShowKeepAdded}"
+        Command="{Binding KeepAddedCommand}"
+      />
+      <Button
+        Content="Cancel"
+        MinWidth="80"
+        HorizontalContentAlignment="Center"
+        VerticalContentAlignment="Center"
+        IsCancel="True"
+        Command="{Binding CancelCommand}"
+      />
+    </StackPanel>
 
     <StackPanel Spacing="12" VerticalAlignment="Center">
       <TextBlock

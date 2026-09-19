@@ -1805,6 +1805,44 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies Keep added stops a long add and inserts the staging batch collected so far.
+        /// </summary>
+        [Fact]
+        public async Task AddSelected_KeepAdded_Keeps_Partial_Batch()
+        {
+            var parent = _context.CreateTempDir();
+            var tree = Path.Combine(parent, "tree");
+            Directory.CreateDirectory(tree);
+            // Large enough that resolve stays busy long enough to Keep mid-walk on a fast machine.
+            for (var i = 0; i < 2000; i++)
+            {
+                var nested = Path.Combine(tree, $"d{i:D4}");
+                Directory.CreateDirectory(nested);
+                File.WriteAllText(Path.Combine(nested, $"f{i:D4}.txt"), "x");
+            }
+
+            var fileListViewModel = _context.CreateFileListViewModel(parent);
+            var renameListViewModel = new RenameListViewModel(fileListViewModel);
+            fileListViewModel.SetSelectedEntries([_FolderEntry(tree)]);
+
+            var addTask = renameListViewModel.AddSelectedCommand.ExecuteAsync(null);
+            await _WaitUntil(() => renameListViewModel.IsBusy).ConfigureAwait(true);
+            await Task.Delay(50).ConfigureAwait(true);
+
+            Assert.True(renameListViewModel.IsBusy);
+            Assert.True(renameListViewModel.Progress.KeepAddedCommand.CanExecute(null));
+            renameListViewModel.Progress.KeepAddedCommand.Execute(null);
+            await addTask.ConfigureAwait(true);
+
+            Assert.False(renameListViewModel.IsBusy);
+            Assert.NotEmpty(renameListViewModel.Entries);
+            Assert.Equal(renameListViewModel.Entries.Count, renameListViewModel.ItemCount);
+            Assert.True(renameListViewModel.ItemCount < 4000);
+            Assert.Contains("(stopped)", renameListViewModel.LastStatusMessage.ToPlainText(), StringComparison.Ordinal);
+            Assert.True(renameListViewModel.AddSelectedCommand.CanExecute(null));
+        }
+
+        /// <summary>
         /// Sets Options-owned Rename List add policy on <see cref="ConfigStore.Options"/>.
         /// </summary>
         private static void _SetAddPolicy(RenameListAddMode addMode, bool addFolderContents = true)

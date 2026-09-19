@@ -134,7 +134,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             }
 
             CommitPlan? plan = null;
-            var completed = await _RunProgressAsync(
+            var progressResult = await _RunProgressAsync(
                     RenameListProgressOperation.Preview,
                     (token, progress) =>
                     {
@@ -153,7 +153,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 _RefreshFieldDisplay();
             }
 
-            return completed;
+            return progressResult == RenameListProgressResult.Completed;
         }
 
         private void _ClearPreviewCounts()

@@ -13,33 +13,38 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="operation">Dialog copy and phase for this run.</param>
         /// <param name="work">Engine work invoked with the operation cancel token and progress sink.</param>
         /// <param name="onCancel">
-        /// Optional UI-thread callback when the run was canceled or refused because another operation is busy
-        /// (e.g. rollback add, disable Auto-Preview). Omit for no-op cancel (refresh / metadata).
+        /// Optional UI-thread callback when the run was plain-canceled or refused because another
+        /// operation is busy (e.g. rollback add, disable Auto-Preview). Not invoked for
+        /// <see cref="RenameListProgressResult.CanceledKeep"/>. Omit for no-op cancel (refresh / metadata).
+        /// </param>
+        /// <param name="addCancelDisposition">
+        /// Optional Add cancel disposition so Keep added can set KeepPartial before canceling.
         /// </param>
         /// <returns>
-        /// <see langword="true"/> when the work finished; <see langword="false"/> when canceled or when
-        /// another operation was already running.
+        /// Completed when work finished; Canceled when canceled/busy-refused; CanceledKeep when Add
+        /// was stopped with Keep added.
         /// </returns>
-        private async Task<bool> _RunProgressAsync(
+        private async Task<RenameListProgressResult> _RunProgressAsync(
             RenameListProgressOperation operation,
             Action<CancellationToken, IProgress<RenameListProgress>> work,
-            Action? onCancel = null
+            Action? onCancel = null,
+            RenameListAddCancelDisposition? addCancelDisposition = null
         )
         {
             ArgumentNullException.ThrowIfNull(work);
 
             if (IsBusy)
             {
-                return false;
+                return RenameListProgressResult.Canceled;
             }
 
-            var completed = await Progress.RunAsync(operation, work).ConfigureAwait(true);
-            if (!completed)
+            var result = await Progress.RunAsync(operation, work, addCancelDisposition).ConfigureAwait(true);
+            if (result == RenameListProgressResult.Canceled)
             {
                 onCancel?.Invoke();
             }
 
-            return completed;
+            return result;
         }
     }
 }

@@ -157,17 +157,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return true;
             }
 
-            var completed = await _RunProgressAsync(
+            var progressResult = await _RunProgressAsync(
                     RenameListProgressOperation.MetadataHydrate,
                     (token, progress) => _renameList.EnsureMetadataLoaded(requirement, token, progress)
                 )
                 .ConfigureAwait(true);
-            if (completed)
+            if (progressResult == RenameListProgressResult.Completed)
             {
                 _RefreshFieldDisplay();
             }
 
-            return completed;
+            return progressResult == RenameListProgressResult.Completed;
         }
 
         private async Task _HydrateThenSetSortKeysAsync(IReadOnlyList<RenameListSortKey> keys, bool resort)

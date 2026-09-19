@@ -172,16 +172,17 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                     : null;
             var metadataRequirement = _CurrentMetadataRequirement();
             var addSummary = new RenameListAddSummary(0);
+            var cancelDisposition = new RenameListAddCancelDisposition();
             void OnAddCanceled()
             {
                 _RollbackAddedItems(insertAt, oldCount);
                 _NotifyListChangedAfterAdd(oldCount);
             }
 
-            var completed = false;
+            var progressResult = RenameListProgressResult.Canceled;
             try
             {
-                completed = await _RunProgressAsync(
+                progressResult = await _RunProgressAsync(
                         RenameListProgressOperation.Add,
                         (token, progress) =>
                             addSummary = _renameList.AddSources(
@@ -194,9 +195,11 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                                 cancellationToken: token,
                                 progress: progress,
                                 insertAtIndex: insertAt,
-                                metadataRequirement: metadataRequirement
+                                metadataRequirement: metadataRequirement,
+                                cancelDisposition: cancelDisposition
                             ),
-                        onCancel: OnAddCanceled
+                        onCancel: OnAddCanceled,
+                        addCancelDisposition: cancelDisposition
                     )
                     .ConfigureAwait(true);
             }
@@ -208,7 +211,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return null;
             }
 
-            if (!completed)
+            if (progressResult == RenameListProgressResult.Canceled)
             {
                 return null;
             }
@@ -232,9 +235,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 SetSelectedEntries([Entries[insertAt]]);
             }
 
+            // Trust engine KeptPartial (not Progress CanceledKeep alone) so empty-batch Keep and any
+            // Progress/engine mismatch do not claim "(stopped)" when nothing was inserted.
             LastStatusMessage = _FormatAddOutcome(
                 addedCount: addedCount,
-                skippedSourceCount: addSummary.SkippedSourceCount
+                skippedSourceCount: addSummary.SkippedSourceCount,
+                stopped: addSummary.KeptPartial
             );
             _LogAddOutcome(
                 addedCount: addedCount,
@@ -284,20 +290,28 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         }
 
         /// <summary>
-        /// Builds the status-bar message after a completed add.
+        /// Builds the status-bar message after a completed or Keep-stopped add.
         /// </summary>
-        private static StyledTextDisplay _FormatAddOutcome(int addedCount, int skippedSourceCount)
+        /// <param name="addedCount">How many rows were inserted.</param>
+        /// <param name="skippedSourceCount">How many sources could not be resolved.</param>
+        /// <param name="stopped">Whether the add stopped via Keep added (partial batch kept).</param>
+        private static StyledTextDisplay _FormatAddOutcome(int addedCount, int skippedSourceCount, bool stopped = false)
         {
             if (skippedSourceCount > 0)
             {
-                return StatusBarText.Warning(
-                    $"Added {addedCount} item(s). Skipped {skippedSourceCount} inaccessible source(s)."
-                );
+                var skippedMessage =
+                    $"Added {addedCount} item(s){(stopped ? " (stopped)" : string.Empty)}. Skipped {skippedSourceCount} inaccessible source(s).";
+                return StatusBarText.Warning(skippedMessage);
             }
 
             if (addedCount == 0)
             {
                 return StatusBarText.Warning("No items were added.");
+            }
+
+            if (stopped)
+            {
+                return StatusBarText.Neutral($"Added {addedCount} item(s) (stopped).");
             }
 
             return StatusBarText.Neutral($"Added {addedCount} item(s).");
@@ -332,8 +346,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <param name="oldCount">Engine list size before this add; used to count new rows.</param>
         /// <remarks>
         /// <para>
-        /// Called only after a successful <c>AddSources</c> that inserted its staging batch. Creates
-        /// UI rows for the newly inserted engine items at the same index.
+        /// Called after a successful <c>AddSources</c> or a Keep-partial cancel that inserted its
+        /// staging batch. Creates UI rows for the newly inserted engine items at the same index.
         /// </para>
         /// </remarks>
         private void _SyncEntriesAfterAdd(int insertAt, int oldCount)
