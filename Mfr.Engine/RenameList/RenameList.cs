@@ -1055,7 +1055,7 @@ namespace Mfr.Engine.RenameList
         {
             ArgumentNullException.ThrowIfNull(plan);
 
-            // BETA builds always enforce; non-BETA is a no-op unless tests call SetEnforceForTests.
+            // Always enforces the beta expiry window (time-limited MFR 8 beta).
             BetaExpiryGate.ThrowIfCommitDisallowed(dryRun);
 
             var isUndo = !dryRun && _pendingUndoCommit;

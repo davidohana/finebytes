@@ -72,19 +72,11 @@ dotnet format analyzers ./finebytes.slnx --verify-no-changes
 
 CSharpier formats `.cs`, `.csproj`, `.axaml`, and `.slnx` (see `.csharpierignore`). Code style and diagnostic severities live in `.editorconfig`.
 
-## Beta builds
+## Beta expiry
 
-Official release builds omit the beta expiry gate. To cut a beta that enforces the hardcoded expiry (1 Jan 2027 UTC) and shows the beta label in the UI:
+Magic File Renamer 8 currently ships as a time-limited beta: non-dry-run commits are blocked on or after **1 January 2027 UTC** (browse/preview still work). The HTTPS Date probe and commit gate run in normal Debug/Release builds — no special MSBuild flag is required.
 
-```powershell
-dotnet build .\finebytes.slnx -c Release -p:BETA=true
-```
-
-```bash
-dotnet build ./finebytes.slnx -c Release -p:BETA=true
-```
-
-`-p:BETA=true` defines the `BETA` compile symbol via `Directory.Build.props`. Without it, commit enforcement stays off.
+The optional `-p:BETA=true` define in `Directory.Build.props` remains available for other `#if BETA` branding if needed later; it is not required for expiry enforcement.
 
 ## Markdown formatting and linting
 

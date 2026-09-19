@@ -6,7 +6,7 @@
         <AvaloniaDiagnosticsSupportVersion>2.2.3</AvaloniaDiagnosticsSupportVersion>
     </PropertyGroup>
 
-    <!-- Beta builds: dotnet build -p:BETA=true (defines BETA for #if / commit enforcement). -->
+    <!-- Optional: dotnet build -p:BETA=true adds BETA for #if branding (expiry enforcement is always on). -->
     <PropertyGroup Condition="'$(BETA)' == 'true'">
         <DefineConstants>$(DefineConstants);BETA</DefineConstants>
     </PropertyGroup>

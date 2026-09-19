@@ -8,12 +8,6 @@ namespace Mfr.Tests.Engine.Beta
     /// <summary>
     /// Commit-path tests for beta expiry enforcement on <see cref="RenameList.Commit"/>.
     /// </summary>
-    /// <remarks>
-    /// <para>
-    /// Uses <see cref="BetaExpiryGate.SetEnforceForTests"/> so non-BETA local test runs can assert
-    /// the throw/dry-run behavior without <c>-p:BETA=true</c>.
-    /// </para>
-    /// </remarks>
     [Collection(BetaExpiryGateCollection.Name)]
     public sealed class RenameListBetaExpiryTests : IDisposable
     {
@@ -35,7 +29,6 @@ namespace Mfr.Tests.Engine.Beta
                 utcNow: () => BetaExpiryGate.ExpiresUtc,
                 tryFetchNetworkUtc: static _ => null
             );
-            BetaExpiryGate.SetEnforceForTests(true);
 
             var (renameList, plan, sourcePath) = _PrepareSimpleRename();
 
@@ -51,7 +44,6 @@ namespace Mfr.Tests.Engine.Beta
                 utcNow: () => BetaExpiryGate.ExpiresUtc,
                 tryFetchNetworkUtc: static _ => null
             );
-            BetaExpiryGate.SetEnforceForTests(true);
 
             var (renameList, plan, sourcePath) = _PrepareSimpleRename();
             var destPath = Path.Combine(Path.GetDirectoryName(sourcePath)!, "renamed.txt");
@@ -62,27 +54,6 @@ namespace Mfr.Tests.Engine.Beta
             Assert.True(File.Exists(sourcePath));
             Assert.False(File.Exists(destPath));
         }
-
-#if !BETA
-        [Fact]
-        public void Commit_does_not_throw_when_expired_if_enforcement_off()
-        {
-            BetaExpiryGate.ConfigureForTests(
-                utcNow: () => BetaExpiryGate.ExpiresUtc,
-                tryFetchNetworkUtc: static _ => null
-            );
-            BetaExpiryGate.SetEnforceForTests(false);
-
-            var (renameList, plan, sourcePath) = _PrepareSimpleRename();
-            var destPath = Path.Combine(Path.GetDirectoryName(sourcePath)!, "renamed.txt");
-
-            var results = renameList.Commit(plan, failFast: false, dryRun: false);
-
-            Assert.Equal(RenameStatus.CommitOk, Assert.Single(results).Status);
-            Assert.False(File.Exists(sourcePath));
-            Assert.True(File.Exists(destPath));
-        }
-#endif
 
         private (RenameList RenameList, CommitPlan Plan, string SourcePath) _PrepareSimpleRename()
         {
