@@ -9,6 +9,19 @@ namespace Mfr.Tests.Ui.FileList
     public sealed class FileListPathTests
     {
         /// <summary>
+        /// Verifies pasted paths wrapped in double quotes unwrap to the inner path.
+        /// </summary>
+        [Fact]
+        public void StripSurroundingQuotes_Removes_Matching_Outer_Quotes()
+        {
+            Assert.Null(FileListPath.StripSurroundingQuotes(null));
+            Assert.Equal(@"C:\Users\liats\My Drive", FileListPath.StripSurroundingQuotes(@"""C:\Users\liats\My Drive"""));
+            Assert.Equal(@"C:\Users\liats\My Drive", FileListPath.StripSurroundingQuotes(@"  ""C:\Users\liats\My Drive""  "));
+            Assert.Equal(@"""C:\Users\liats\My Drive", FileListPath.StripSurroundingQuotes(@"""C:\Users\liats\My Drive"));
+            Assert.Equal(@"C:\Users\liats\My Drive", FileListPath.StripSurroundingQuotes(@"C:\Users\liats\My Drive"));
+        }
+
+        /// <summary>
         /// Verifies a typed drive letter such as <c>D:</c> is the drive root, not the current folder on that drive.
         /// </summary>
         [Fact]

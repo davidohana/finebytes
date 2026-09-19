@@ -34,6 +34,33 @@ namespace Mfr.App.Ui.Services.FileList
         public const string UnixRootPath = "/";
 
         /// <summary>
+        /// Removes a matching pair of surrounding double quotes from typed address-bar text.
+        /// <para>
+        /// Paste sources often wrap paths that contain spaces (e.g. <c>"C:\Users\…\My Drive"</c>).
+        /// </para>
+        /// </summary>
+        /// <param name="path">Typed path, alias, or sentinel; may be <see langword="null"/>.</param>
+        /// <returns>
+        /// Inner text when <paramref name="path"/> (after trim) is quote-wrapped; otherwise
+        /// <paramref name="path"/> unchanged.
+        /// </returns>
+        public static string? StripSurroundingQuotes(string? path)
+        {
+            if (path is null)
+            {
+                return null;
+            }
+
+            var trimmed = path.Trim();
+            if (trimmed.Length < 2 || trimmed[0] != '"' || trimmed[^1] != '"')
+            {
+                return path;
+            }
+
+            return trimmed[1..^1].Trim();
+        }
+
+        /// <summary>
         /// Whether <paramref name="path"/> is the Windows drive list.
         /// </summary>
         /// <param name="path">Path or display name to classify.</param>

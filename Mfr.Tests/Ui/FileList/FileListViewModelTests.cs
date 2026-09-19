@@ -545,6 +545,24 @@ namespace Mfr.Tests.Ui.FileList
         }
 
         /// <summary>
+        /// Verifies committing a double-quoted path (paste with spaces) opens the folder.
+        /// </summary>
+        [Fact]
+        public void CommitPath_Accepts_Surrounding_Double_Quotes()
+        {
+            var dir = _CreateTree();
+            var child = Path.Combine(dir, "zeta-folder");
+            var viewModel = _CreateViewModel(dir);
+
+            viewModel.BeginPathEdit();
+            viewModel.PathText = $"\"{child}\"";
+            viewModel.CommitPath();
+
+            Assert.False(viewModel.IsPathEditing);
+            Assert.Equal(new DirectoryInfo(child).FullName, viewModel.CurrentPath);
+        }
+
+        /// <summary>
         /// Verifies an invalid committed path leaves the current folder unchanged and sets an error status.
         /// </summary>
         [Fact]

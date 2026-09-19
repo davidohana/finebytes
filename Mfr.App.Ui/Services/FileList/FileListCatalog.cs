@@ -132,6 +132,8 @@ namespace Mfr.App.Ui.Services.FileList
         /// <returns><see langword="true"/> when the location can be listed.</returns>
         public static bool TryResolvePath(string? path, [NotNullWhen(true)] out string resolved)
         {
+            path = FileListPath.StripSurroundingQuotes(path);
+
             if (FileListPath.IsComputerPath(path))
             {
                 if (!OperatingSystem.IsWindows())
