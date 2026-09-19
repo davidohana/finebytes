@@ -37,8 +37,8 @@ namespace Mfr.Tests.Ui.Options
         }
 
         /// <summary>
-        /// Verifies the Options dialog constructs Session, Confirmations, File List, Rename List,
-        /// and Undo &amp; Rename Log retention controls.
+        /// Verifies the Options dialog tabs host Session, Confirmations, File List, Rename List,
+        /// Location, and Undo &amp; Rename Log retention controls.
         /// </summary>
         [AvaloniaFact]
         public void OptionsDialog_shows_session_confirmations_file_list_rename_list_and_undo_log()
@@ -50,6 +50,12 @@ namespace Mfr.Tests.Ui.Options
 
             try
             {
+                var tabs = dialog.FindControl<TabControl>("OptionsTabs");
+                Assert.NotNull(tabs);
+                var tabHeaders = tabs.Items.OfType<TabItem>().Select(item => item.Header?.ToString()).ToList();
+                Assert.Equal(["General", "Undo & Rename Log"], tabHeaders);
+                Assert.Equal(0, tabs.SelectedIndex);
+
                 var labels = dialog
                     .GetVisualDescendants()
                     .OfType<CompactCheckBox>()
@@ -73,9 +79,6 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Add files", radioLabels);
                 Assert.Contains("Add folders", radioLabels);
                 Assert.Contains("Add files and folders", radioLabels);
-                Assert.Contains("Rename Log disabled (Undo for last renaming operation only)", radioLabels);
-                Assert.Contains("Limited to:", radioLabels);
-                Assert.Contains("Unlimited", radioLabels);
 
                 var groupHeaders = dialog
                     .GetVisualDescendants()
@@ -86,7 +89,8 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains("Confirmations", groupHeaders);
                 Assert.Contains("File List", groupHeaders);
                 Assert.Contains("Rename List", groupHeaders);
-                Assert.Contains("Undo & Rename Log", groupHeaders);
+                Assert.Contains("Location", groupHeaders);
+                Assert.DoesNotContain("Undo & Rename Log", groupHeaders);
 
                 var confirmationsBlurb = dialog
                     .GetVisualDescendants()
@@ -115,9 +119,8 @@ namespace Mfr.Tests.Ui.Options
                     .Select(row => row.Label)
                     .ToList();
                 Assert.Contains("Double-click:", rowLabels);
+                Assert.Contains("GeoNames username:", rowLabels);
                 Assert.DoesNotContain("Add:", rowLabels);
-
-                Assert.NotNull(dialog.FindControl<CompactNumericUpDown>("RenameLogLimitSpinner"));
 
                 var checkTips = dialog
                     .GetVisualDescendants()
@@ -141,9 +144,36 @@ namespace Mfr.Tests.Ui.Options
                 Assert.Contains(AppTips.OptionsAddModeFiles, radioTips);
                 Assert.Contains(AppTips.OptionsAddModeFolders, radioTips);
                 Assert.Contains(AppTips.OptionsAddModeFilesAndFolders, radioTips);
-                Assert.Contains(AppTips.OptionsRenameLogDisabled, radioTips);
-                Assert.Contains(AppTips.OptionsRenameLogLimited, radioTips);
-                Assert.Contains(AppTips.OptionsRenameLogUnlimited, radioTips);
+
+                tabs.SelectedIndex = 1;
+                Dispatcher.UIThread.RunJobs();
+
+                var undoGroupHeaders = dialog
+                    .GetVisualDescendants()
+                    .OfType<FieldsetGroup>()
+                    .Select(group => group.Header?.ToString())
+                    .ToList();
+                Assert.Contains("Undo & Rename Log", undoGroupHeaders);
+
+                var undoRadioLabels = dialog
+                    .GetVisualDescendants()
+                    .OfType<CompactRadioButton>()
+                    .Select(radio => radio.Content?.ToString())
+                    .ToList();
+                Assert.Contains("Rename Log disabled (Undo for last renaming operation only)", undoRadioLabels);
+                Assert.Contains("Limited to:", undoRadioLabels);
+                Assert.Contains("Unlimited", undoRadioLabels);
+
+                Assert.NotNull(dialog.FindControl<CompactNumericUpDown>("RenameLogLimitSpinner"));
+
+                var undoRadioTips = dialog
+                    .GetVisualDescendants()
+                    .OfType<CompactRadioButton>()
+                    .Select(radio => ToolTip.GetTip(radio)?.ToString())
+                    .ToList();
+                Assert.Contains(AppTips.OptionsRenameLogDisabled, undoRadioTips);
+                Assert.Contains(AppTips.OptionsRenameLogLimited, undoRadioTips);
+                Assert.Contains(AppTips.OptionsRenameLogUnlimited, undoRadioTips);
             }
             finally
             {
