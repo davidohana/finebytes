@@ -7,7 +7,7 @@ todos:
     status: completed
   - id: p2-help-tests
     content: "P2: Parser/Program tests + help/cml + whatsnew"
-    status: pending
+    status: completed
 isProject: false
 ---
 

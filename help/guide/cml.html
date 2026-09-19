@@ -32,7 +32,7 @@
 
     <h3>Usage</h3>
     <p>
-      <code>Mfr.App.Ui.exe [&lt;SOURCES&gt;…] [--initial-folder &lt;PATH&gt;] [add options]</code>
+      <code>Mfr.App.Ui.exe [&lt;SOURCES&gt;…] [--initial-folder &lt;PATH&gt;] [-l|--log-level &lt;LEVEL&gt;] [add options]</code>
     </p>
     <p>
       <span class="quote">SOURCES</span> are one or more files, directories, or filemasks
@@ -62,6 +62,16 @@
             paths by itself (UI-only; the console has no File List). When both sources and this
             option are set, sources still seed the Rename List and this path wins for File List
             location.
+          </td>
+        </tr>
+        <tr>
+          <td><code>-l</code>, <code>--log-level &lt;LEVEL&gt;</code></td>
+          <td>
+            Minimum log level for this process:
+            <span class="quote">debug</span>, <span class="quote">info</span>,
+            <span class="quote">warn</span>, or <span class="quote">error</span> (same names as
+            console; default <span class="quote">info</span>). Session only — not saved in Options
+            or <span class="quote">config.json</span>.
           </td>
         </tr>
       </tbody>
@@ -116,6 +126,7 @@
       <code>Mfr.App.Ui.exe D:\photos --files yes --folders no -r</code>
       <code>Mfr.App.Ui.exe --initial-folder D:\photos</code>
       <code>Mfr.App.Ui.exe D:\batch\a.jpg D:\batch\b.jpg --initial-folder D:\batch</code>
+      <code>Mfr.App.Ui.exe --log-level debug</code>
     </div>
 
     <p class="note">
