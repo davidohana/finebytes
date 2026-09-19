@@ -21,17 +21,17 @@
     <hr />
     <h1>Options</h1>
     <figure class="screenshot">
-      <img src="../images/ui/options.png" alt="Options" width="480" height="620" />
-      <figcaption>Options (General tab).</figcaption>
+      <img src="../images/ui/options.png" alt="Options" width="480" height="520" />
+      <figcaption>Options (UI tab).</figcaption>
     </figure>
     <p>
       <span class="quote">Tools → Options</span> (<span class="quote">Ctrl+,</span>) opens preferences
       stored in <span class="quote">config.json</span> under your AppData finebytes MFR folder. The
-      dialog has two tabs: <span class="quote">General</span> and
-      <span class="quote">Undo &amp; Rename Log</span>.
+      dialog has three tabs: <span class="quote">UI</span>, <span class="quote">Rename</span>, and
+      <span class="quote">Misc</span>.
     </p>
 
-    <h2 id="additems">General</h2>
+    <h2 id="additems">UI</h2>
     <ul>
       <li><span class="quote">Remember window size and position</span> — restore main window and dialogs.</li>
       <li>
@@ -39,16 +39,7 @@
         (<span class="quote">Reset confirmations</span>).
       </li>
       <li>
-        File List: remember last folder; include hidden/system files; double-click Open vs Add to
-        Rename List.
-      </li>
-      <li>
-        Rename List add mode: files, folders, or both; optional
-        <span class="quote">Add folder contents</span> (recurse); remember column widths.
-      </li>
-      <li>
-        Location — optional GeoNames username for GPS place names (leave blank for the built-in
-        account).
+        File List: remember last folder; include hidden/system files.
       </li>
       <li>
         Masks and Exclude masks on the <a href="fileexp.html">File List</a> still filter what gets
@@ -56,12 +47,32 @@
       </li>
     </ul>
 
+    <h2 id="rename">Rename</h2>
+    <ul>
+      <li>
+        Double-click in File List: Open vs Add to Rename List.
+      </li>
+      <li>
+        Rename List add mode: files, folders, or both; optional
+        <span class="quote">Add folder contents</span> (recurse); remember column widths.
+      </li>
+    </ul>
+
     <h2 id="log">Undo &amp; Rename Log</h2>
     <ul>
       <li>
-        Rename Log can be disabled (Undo Last only), limited to N operations, or unlimited.
-        History is used by the <a href="log.html">Rename Log</a> dialog and
+        On the <span class="quote">Rename</span> tab, Rename Log can be disabled (Undo Last only),
+        limited to N operations, or unlimited. History is used by the
+        <a href="log.html">Rename Log</a> dialog and
         <a href="../guide/undolast.html">Undo Last</a>.
+      </li>
+    </ul>
+
+    <h2 id="misc">Misc</h2>
+    <ul>
+      <li>
+        Location — optional GeoNames username for GPS place names (leave blank for the built-in
+        account).
       </li>
     </ul>
     <p class="note">

@@ -11,7 +11,7 @@
   Title="Options"
   Icon="/Assets/Options.png"
   Width="480"
-  Height="620"
+  Height="520"
   MinWidth="420"
   WindowStartupLocation="CenterOwner"
   ShowInTaskbar="False"
@@ -23,7 +23,19 @@
   <Window.Styles>
     <Style Selector="TabControl.options-tabs">
       <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
-      <Setter Property="FontSize" Value="{StaticResource AppChromeFontSize}" />
+      <Setter Property="FontSize" Value="11" />
+    </Style>
+    <!-- Fluent TabItem headers use larger theme typography; TextBlock headers force a smaller caption. -->
+    <Style Selector="TabControl.options-tabs TabItem">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="Normal" />
+      <Setter Property="Padding" Value="10,4" />
+    </Style>
+    <Style Selector="TextBlock.options-tab-header">
+      <Setter Property="FontFamily" Value="{StaticResource AppChromeFont}" />
+      <Setter Property="FontSize" Value="11" />
+      <Setter Property="FontWeight" Value="Normal" />
     </Style>
   </Window.Styles>
 
@@ -31,7 +43,10 @@
     <controls:ModalOkCancelFooter x:Name="Footer" DockPanel.Dock="Bottom" Margin="0,14,0,0" Spacing="12" />
 
     <TabControl x:Name="OptionsTabs" Classes="options-tabs">
-      <TabItem Header="General">
+      <TabItem>
+        <TabItem.Header>
+          <TextBlock Classes="options-tab-header" Text="UI" />
+        </TabItem.Header>
         <StackPanel Margin="0,8,0,0" Spacing="10" Grid.IsSharedSizeScope="True">
           <controls:FieldsetGroup Header="Session">
             <controls:CompactCheckBox
@@ -76,6 +91,18 @@
                 Content="Include hidden/system files"
                 ToolTip.Tip="{x:Static resources:AppTips.OptionsIncludeHidden}"
               />
+            </StackPanel>
+          </controls:FieldsetGroup>
+        </StackPanel>
+      </TabItem>
+
+      <TabItem>
+        <TabItem.Header>
+          <TextBlock Classes="options-tab-header" Text="Rename" />
+        </TabItem.Header>
+        <StackPanel Margin="0,8,0,0" Spacing="10" Grid.IsSharedSizeScope="True">
+          <controls:FieldsetGroup Header="Rename List">
+            <StackPanel Spacing="8">
               <controls:FilterEditorLabeledRow Label="Double-click:">
                 <StackPanel Orientation="Horizontal" Spacing="12">
                   <controls:CompactRadioButton
@@ -92,11 +119,6 @@
                   />
                 </StackPanel>
               </controls:FilterEditorLabeledRow>
-            </StackPanel>
-          </controls:FieldsetGroup>
-
-          <controls:FieldsetGroup Header="Rename List">
-            <StackPanel Spacing="8">
               <StackPanel Orientation="Horizontal" Spacing="12">
                 <controls:CompactRadioButton
                   GroupName="RenameListAddMode"
@@ -130,32 +152,6 @@
             </StackPanel>
           </controls:FieldsetGroup>
 
-          <controls:FieldsetGroup Header="Location">
-            <StackPanel Spacing="8">
-              <controls:FilterEditorLabeledRow Label="GeoNames username:">
-                <TextBox
-                  x:Name="GeoNamesUsernameBox"
-                  Classes="filter-editor-field"
-                  PlaceholderText="Leave blank for built-in account"
-                  ToolTip.Tip="{x:Static resources:AppTips.OptionsGeoNamesUsername}"
-                  Text="{Binding GeoNamesUsername}"
-                />
-              </controls:FilterEditorLabeledRow>
-              <HyperlinkButton
-                x:Name="GeoNamesUsernameHelpLink"
-                Classes="filter-editor-hint-link"
-                HorizontalAlignment="Left"
-                Content="How to get a GeoNames username"
-                ToolTip.Tip="{x:Static resources:AppTips.OptionsGeoNamesUsernameHelp}"
-                Command="{Binding OpenGeoNamesUsernameHelpCommand}"
-              />
-            </StackPanel>
-          </controls:FieldsetGroup>
-        </StackPanel>
-      </TabItem>
-
-      <TabItem Header="Undo &amp; Rename Log">
-        <StackPanel Margin="0,8,0,0" Spacing="10">
           <controls:FieldsetGroup Header="Undo &amp; Rename Log">
             <StackPanel Spacing="6">
               <controls:CompactRadioButton
@@ -193,6 +189,35 @@
                 Content="Unlimited"
                 ToolTip.Tip="{x:Static resources:AppTips.OptionsRenameLogUnlimited}"
                 IsChecked="{Binding RenameLogRetentionMode, Converter={x:Static converters:EnumToBooleanConverter.Instance}, ConverterParameter={x:Static vm:RenameLogRetentionMode.Unlimited}, Mode=TwoWay}"
+              />
+            </StackPanel>
+          </controls:FieldsetGroup>
+        </StackPanel>
+      </TabItem>
+
+      <TabItem>
+        <TabItem.Header>
+          <TextBlock Classes="options-tab-header" Text="Misc" />
+        </TabItem.Header>
+        <StackPanel Margin="0,8,0,0" Spacing="10" Grid.IsSharedSizeScope="True">
+          <controls:FieldsetGroup Header="Location">
+            <StackPanel Spacing="8">
+              <controls:FilterEditorLabeledRow Label="GeoNames username:">
+                <TextBox
+                  x:Name="GeoNamesUsernameBox"
+                  Classes="filter-editor-field"
+                  PlaceholderText="Leave blank for built-in account"
+                  ToolTip.Tip="{x:Static resources:AppTips.OptionsGeoNamesUsername}"
+                  Text="{Binding GeoNamesUsername}"
+                />
+              </controls:FilterEditorLabeledRow>
+              <HyperlinkButton
+                x:Name="GeoNamesUsernameHelpLink"
+                Classes="filter-editor-hint-link"
+                HorizontalAlignment="Left"
+                Content="How to get a GeoNames username"
+                ToolTip.Tip="{x:Static resources:AppTips.OptionsGeoNamesUsernameHelp}"
+                Command="{Binding OpenGeoNamesUsernameHelpCommand}"
               />
             </StackPanel>
           </controls:FieldsetGroup>
