@@ -119,6 +119,36 @@ namespace Mfr.Tests.Ui
         }
 
         /// <summary>
+        /// Verifies <c>--log-level</c> is consumed (not unknown) alongside sources and browse path.
+        /// </summary>
+        [Fact]
+        public void Parse_Accepts_LogLevel_Long_With_Sources_And_InitialFolder()
+        {
+            var result = UiStartupArgsParser.Parse([
+                "C:\\batch\\a.jpg",
+                "--log-level",
+                "debug",
+                "--initial-folder",
+                "C:\\batch",
+            ]);
+            Assert.Equal(["C:\\batch\\a.jpg"], result.Sources);
+            Assert.Equal("C:\\batch", result.InitialFolder);
+            Assert.True(result.HasAnyIntent);
+        }
+
+        /// <summary>
+        /// Verifies <c>-l</c> is consumed (not unknown) alongside sources and browse path.
+        /// </summary>
+        [Fact]
+        public void Parse_Accepts_LogLevel_Short_With_Sources_And_InitialFolder()
+        {
+            var result = UiStartupArgsParser.Parse(["-l", "warn", "C:\\Music\\*.mp3", "--initial-folder", "C:\\Music"]);
+            Assert.Equal(["C:\\Music\\*.mp3"], result.Sources);
+            Assert.Equal("C:\\Music", result.InitialFolder);
+            Assert.True(result.HasAnyIntent);
+        }
+
+        /// <summary>
         /// Verifies whitespace-only positionals are dropped and yield an empty result.
         /// </summary>
         [Fact]
@@ -158,6 +188,8 @@ namespace Mfr.Tests.Ui
         [InlineData(new[] { "--initial-folder" }, "--initial-folder")]
         [InlineData(new[] { "--files", "--folders", "yes" }, "--files")]
         [InlineData(new[] { "--initial-folder", "   " }, "--initial-folder")]
+        [InlineData(new[] { "--log-level" }, "--log-level")]
+        [InlineData(new[] { "-l", "--initial-folder", "C:\\x" }, "-l")]
         public void Parse_Rejects_Missing_Option_Value(string[] args, string optionName)
         {
             var ex = Assert.Throws<UserException>(() => UiStartupArgsParser.Parse(args));

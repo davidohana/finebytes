@@ -2,7 +2,6 @@ using Avalonia;
 using Mfr.App.Ui.Diagnostics;
 using Mfr.Engine.Config;
 using Mfr.Engine.Logging;
-using Serilog.Events;
 
 namespace Mfr.App.Ui
 {
@@ -21,7 +20,8 @@ namespace Mfr.App.Ui
             {
                 ConfigStore.Load();
                 ConfigStore.EnsureDefaultFile();
-                LogSession.Start(logLevel: LogEventLevel.Information, logConfig: ConfigStore.Log);
+                var logLevel = UiLogLevelArgs.ResolveAndRememberWarning(args);
+                LogSession.Start(logLevel: logLevel, logConfig: ConfigStore.Log);
                 return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
             }
             catch (Exception ex)

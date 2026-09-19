@@ -33,6 +33,7 @@ namespace Mfr.App.Ui
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
                 var args = desktop.Args ?? [];
+                var logLevelWarning = UiLogLevelArgs.TakeSoftWarning();
                 var (startupArgs, parseWarning) = _TryParseStartupArgs(args);
                 var initialFolder = startupArgs.InitialFolder ?? _RememberedFileListFolder();
 
@@ -47,7 +48,7 @@ namespace Mfr.App.Ui
                 UiSessionPersistence.TryRestore(mainWindow, mainWindow.GetPaneGrids());
 
                 desktop.MainWindow = mainWindow;
-                _ScheduleStartupArgsApply(mainWindowViewModel, startupArgs, parseWarning);
+                _ScheduleStartupArgsApply(mainWindowViewModel, startupArgs, parseWarning, logLevelWarning);
                 _StartBetaExpiryProbe(mainWindowViewModel);
 #if DEBUG
                 this.AttachDeveloperTools();
@@ -113,16 +114,23 @@ namespace Mfr.App.Ui
         /// <param name="mainWindowViewModel">Root view model with File List and Rename List panes.</param>
         /// <param name="startupArgs">Already-parsed desktop intents (<c>--initial-folder</c> already used for ctor).</param>
         /// <param name="parseWarning">Soft-fail parse message when argv was invalid; otherwise <c>null</c>.</param>
+        /// <param name="logLevelWarning">Soft-fail from invalid <c>--log-level</c> (Program already fell back to info).</param>
         private static void _ScheduleStartupArgsApply(
             MainWindowViewModel mainWindowViewModel,
             UiStartupArgs startupArgs,
-            string? parseWarning
+            string? parseWarning,
+            string? logLevelWarning
         )
         {
             if (parseWarning is not null)
             {
                 Dispatcher.UIThread.Post(() => mainWindowViewModel.StatusHint = StatusBarText.Warning(parseWarning));
                 return;
+            }
+
+            if (logLevelWarning is not null)
+            {
+                Dispatcher.UIThread.Post(() => mainWindowViewModel.StatusHint = StatusBarText.Warning(logLevelWarning));
             }
 
             if (startupArgs.Sources.Count == 0 && startupArgs.InitialFolder is null)

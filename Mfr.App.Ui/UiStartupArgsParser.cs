@@ -77,6 +77,12 @@ namespace Mfr.App.Ui
                         includeHidden = true;
                         break;
 
+                    case "-l":
+                    case "--log-level":
+                        // Consumed here so Program can apply the level before LogSession.Start; value ignored.
+                        _ = _RequireOptionValue(optionName: token, args: args, index: ref i);
+                        break;
+
                     default:
                         throw new UserException($"Unknown option '{token}'.");
                 }
