@@ -16,6 +16,19 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         private RenameListAddCancelDisposition? _addCancelDisposition;
 
         /// <summary>
+        /// Whether Keep/Cancel already chose an Add cancel disposition for this run.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// First gesture wins so a late Keep after Cancel (or after the engine already discarded) cannot
+        /// flip <see cref="RenameListAddCancelDisposition.KeepPartial"/> before the progress result is
+        /// snapshotted — that mismatch would report <see cref="RenameListProgressResult.CanceledKeep"/>
+        /// while the engine discarded (or the reverse if Cancel cleared Keep after insert).
+        /// </para>
+        /// </remarks>
+        private bool _addCancelIntentChosen;
+
+        /// <summary>
         /// Creates progress state with the production dialog delay.
         /// </summary>
         public RenameListProgressViewModel()
@@ -62,7 +75,6 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         [NotifyPropertyChangedFor(nameof(ShowResolveProgress))]
         [NotifyPropertyChangedFor(nameof(DialogTitle))]
         [NotifyPropertyChangedFor(nameof(MetadataProgressText))]
-        [NotifyCanExecuteChangedFor(nameof(KeepAddedCommand))]
         private RenameListProgressOperation _operation = RenameListProgressOperation.Add;
 
         /// <summary>
@@ -165,12 +177,15 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// <remarks>
         /// <para>
         /// During add, cancel discards the staging batch (items not yet in the rename list) unless
-        /// <see cref="KeepAdded"/> was used. Canceling preview also disables Auto-Preview.
+        /// <see cref="KeepAdded"/> already chose Keep for this run (first gesture wins). Esc /
+        /// <c>IsCancel</c> / window-close while busy all route here. Canceling preview also disables
+        /// Auto-Preview.
         /// </para>
         /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanCancel))]
         public void Cancel()
         {
+            _TryChooseAddCancelIntent(keepPartial: false);
             _cts?.Cancel();
         }
 
@@ -179,8 +194,8 @@ namespace Mfr.App.Ui.ViewModels.RenameList
         /// </summary>
         /// <remarks>
         /// <para>
-        /// Sets <see cref="RenameListAddCancelDisposition.KeepPartial"/> then cancels. Available only
-        /// while an Add run that supplied a cancel disposition is in progress.
+        /// Sets <see cref="RenameListAddCancelDisposition.KeepPartial"/> then cancels when this is the
+        /// first cancel gesture for the run. Ignored if Cancel / Esc / close already chose discard.
         /// </para>
         /// </remarks>
         [RelayCommand(CanExecute = nameof(_CanKeepAdded))]
@@ -191,7 +206,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 return;
             }
 
-            _addCancelDisposition.KeepPartial = true;
+            _TryChooseAddCancelIntent(keepPartial: true);
             _cts?.Cancel();
         }
 
@@ -252,6 +267,7 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             Operation = operation;
             Phase = RenameListProgressCopy.For(operation).InitialPhase;
             _addCancelDisposition = addCancelDisposition;
+            _addCancelIntentChosen = false;
             OnPropertyChanged(nameof(ShowKeepAdded));
             KeepAddedCommand.NotifyCanExecuteChanged();
             IsBusy = true;
@@ -286,11 +302,13 @@ namespace Mfr.App.Ui.ViewModels.RenameList
             {
                 // Engine stops the walk without throwing; treat a signaled token as user cancel.
                 canceled = canceled || token.IsCancellationRequested;
+                // Snapshot before clearing; KeepPartial is latched by the first Keep/Cancel gesture.
                 var keptPartial = _addCancelDisposition?.KeepPartial == true;
                 // Clear IsBusy before hiding the dialog so programmatic Close is not canceled.
                 IsBusy = false;
                 IsDialogVisible = false;
                 _addCancelDisposition = null;
+                _addCancelIntentChosen = false;
                 OnPropertyChanged(nameof(ShowKeepAdded));
                 KeepAddedCommand.NotifyCanExecuteChanged();
                 _cts.Dispose();
@@ -325,7 +343,25 @@ namespace Mfr.App.Ui.ViewModels.RenameList
 
         private bool _CanKeepAdded()
         {
-            return IsBusy && _addCancelDisposition is not null;
+            return IsBusy && _addCancelDisposition is not null && !_addCancelIntentChosen;
+        }
+
+        /// <summary>
+        /// Records the first Add cancel disposition for this run (Keep vs discard).
+        /// </summary>
+        /// <param name="keepPartial">
+        /// <see langword="true"/> for Keep added; <see langword="false"/> for Cancel / Esc / close.
+        /// </param>
+        private void _TryChooseAddCancelIntent(bool keepPartial)
+        {
+            if (_addCancelDisposition is null || _addCancelIntentChosen)
+            {
+                return;
+            }
+
+            _addCancelIntentChosen = true;
+            _addCancelDisposition.KeepPartial = keepPartial;
+            KeepAddedCommand.NotifyCanExecuteChanged();
         }
     }
 }

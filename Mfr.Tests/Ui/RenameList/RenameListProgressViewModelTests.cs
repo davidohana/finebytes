@@ -161,6 +161,70 @@ namespace Mfr.Tests.Ui.RenameList
         }
 
         /// <summary>
+        /// Verifies Cancel then Keep keeps discard (first gesture wins; late Keep cannot flip disposition).
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_Cancel_Then_Keep_Returns_Canceled()
+        {
+            var viewModel = new RenameListProgressViewModel();
+            var disposition = new RenameListAddCancelDisposition();
+            var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var run = viewModel.RunAsync(
+                (token, _) =>
+                {
+                    started.TrySetResult();
+                    while (!token.IsCancellationRequested)
+                    {
+                        Thread.Sleep(20);
+                    }
+                },
+                addCancelDisposition: disposition
+            );
+
+            await started.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
+
+            viewModel.CancelCommand.Execute(null);
+            Assert.False(viewModel.KeepAddedCommand.CanExecute(null));
+            // Call the method directly so CanExecute cannot mask a late Keep gesture.
+            viewModel.KeepAdded();
+
+            Assert.Equal(RenameListProgressResult.Canceled, await run.ConfigureAwait(true));
+            Assert.False(disposition.KeepPartial);
+        }
+
+        /// <summary>
+        /// Verifies Keep then Cancel keeps Keep (first gesture wins; Esc/Cancel cannot clear KeepPartial).
+        /// </summary>
+        [Fact]
+        public async Task RunAsync_Keep_Then_Cancel_Returns_CanceledKeep()
+        {
+            var viewModel = new RenameListProgressViewModel();
+            var disposition = new RenameListAddCancelDisposition();
+            var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var run = viewModel.RunAsync(
+                (token, _) =>
+                {
+                    started.TrySetResult();
+                    while (!token.IsCancellationRequested)
+                    {
+                        Thread.Sleep(20);
+                    }
+                },
+                addCancelDisposition: disposition
+            );
+
+            await started.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
+
+            viewModel.KeepAdded();
+            Assert.True(disposition.KeepPartial);
+            Assert.False(viewModel.KeepAddedCommand.CanExecute(null));
+            viewModel.Cancel();
+
+            Assert.Equal(RenameListProgressResult.CanceledKeep, await run.ConfigureAwait(true));
+            Assert.True(disposition.KeepPartial);
+        }
+
+        /// <summary>
         /// Verifies engine progress snapshots are copied onto the view-model properties.
         /// </summary>
         [Fact]

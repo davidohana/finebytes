@@ -235,11 +235,12 @@ namespace Mfr.App.Ui.ViewModels.RenameList
                 SetSelectedEntries([Entries[insertAt]]);
             }
 
-            var stopped = progressResult == RenameListProgressResult.CanceledKeep;
+            // Trust engine KeptPartial (not Progress CanceledKeep alone) so empty-batch Keep and any
+            // Progress/engine mismatch do not claim "(stopped)" when nothing was inserted.
             LastStatusMessage = _FormatAddOutcome(
                 addedCount: addedCount,
                 skippedSourceCount: addSummary.SkippedSourceCount,
-                stopped: stopped
+                stopped: addSummary.KeptPartial
             );
             _LogAddOutcome(
                 addedCount: addedCount,

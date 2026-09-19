@@ -23,5 +23,39 @@ namespace Mfr.Tests.Ui.RenameList
             Assert.Equal("Adding to Rename List", dialog.Title);
             Assert.False(viewModel.ShowKeepAdded);
         }
+
+        /// <summary>
+        /// Verifies closing the dialog while busy requests Cancel (discard), not Keep.
+        /// </summary>
+        [AvaloniaFact]
+        public async Task Closing_while_busy_requests_cancel_not_keep()
+        {
+            var viewModel = new RenameListProgressViewModel();
+            var disposition = new RenameListAddCancelDisposition();
+            var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            var run = viewModel.RunAsync(
+                (token, _) =>
+                {
+                    started.TrySetResult();
+                    while (!token.IsCancellationRequested)
+                    {
+                        Thread.Sleep(20);
+                    }
+                },
+                addCancelDisposition: disposition
+            );
+
+            await started.Task.WaitAsync(TimeSpan.FromSeconds(2)).ConfigureAwait(true);
+            Assert.True(viewModel.IsBusy);
+            Assert.True(viewModel.ShowKeepAdded);
+
+            var dialog = new RenameListProgressDialog(viewModel);
+            dialog.Show();
+            dialog.Close();
+
+            Assert.Equal(RenameListProgressResult.Canceled, await run.ConfigureAwait(true));
+            Assert.False(disposition.KeepPartial);
+            Assert.False(viewModel.IsBusy);
+        }
     }
 }
