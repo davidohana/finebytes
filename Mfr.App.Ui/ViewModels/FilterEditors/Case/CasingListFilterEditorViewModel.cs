@@ -38,9 +38,7 @@ namespace Mfr.App.Ui.ViewModels.FilterEditors.Case
         [RelayCommand]
         public void LoadDefaults()
         {
-            ApplyDiscreteFill(() =>
-                WordsText = CasingListParser.FormatEditorText(CasingListOptions.DefaultWords)
-            );
+            ApplyDiscreteFill(() => WordsText = CasingListParser.FormatEditorText(CasingListOptions.DefaultWords));
         }
 
         partial void OnWordsTextChanged(string value)

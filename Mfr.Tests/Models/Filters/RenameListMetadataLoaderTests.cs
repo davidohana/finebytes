@@ -327,7 +327,8 @@ namespace Mfr.Tests.Models.Filters
                 | RenameListMetadataRequirement.ImageProperties
                 | RenameListMetadataRequirement.Pdf
                 | RenameListMetadataRequirement.Epub
-                | RenameListMetadataRequirement.Office;
+                | RenameListMetadataRequirement.Office
+                | RenameListMetadataRequirement.GeoNames;
 
             Assert.True(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
             RenameListMetadataLoader.TryEnsureLoaded(item, requirement);
@@ -337,6 +338,7 @@ namespace Mfr.Tests.Models.Filters
             Assert.True(item.PdfLoadAttempted);
             Assert.True(item.EpubLoadAttempted);
             Assert.True(item.OfficeLoadAttempted);
+            Assert.True(item.GeoNamesLoadAttempted);
             Assert.False(RenameListMetadataLoader.AnyItemNeedsLoad([item], requirement));
         }
     }

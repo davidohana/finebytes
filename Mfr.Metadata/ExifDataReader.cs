@@ -44,9 +44,12 @@ namespace Mfr.Metadata
         {
             var ifd0 = directories.OfType<ExifIfd0Directory>().FirstOrDefault();
             var subIfd = directories.OfType<ExifSubIfdDirectory>().FirstOrDefault();
+            var (gpsLatitude, gpsLongitude) = _ReadGpsCoordinates(directories);
             return new ExifData
             {
                 DateTaken = _ReadDateTaken(subIfd),
+                GpsLatitude = gpsLatitude,
+                GpsLongitude = gpsLongitude,
                 Make = _ReadDescription(ifd0, ExifDirectoryBase.TagMake),
                 Model = _ReadDescription(ifd0, ExifDirectoryBase.TagModel),
                 Artist = _ReadDescription(ifd0, ExifDirectoryBase.TagArtist),
@@ -64,6 +67,17 @@ namespace Mfr.Metadata
                 UserComment = _ReadDescription(subIfd, ExifDirectoryBase.TagUserComment),
                 TagToDescription = _FlattenTagToDescription(directories),
             };
+        }
+
+        private static (double? Latitude, double? Longitude) _ReadGpsCoordinates(IReadOnlyList<MeDirectory> directories)
+        {
+            var gps = directories.OfType<GpsDirectory>().FirstOrDefault();
+            if (gps is null || !gps.TryGetGeoLocation(out var location))
+            {
+                return (null, null);
+            }
+
+            return (location.Latitude, location.Longitude);
         }
 
         private static DateTime? _ReadDateTaken(ExifSubIfdDirectory? subIfd)

@@ -100,16 +100,24 @@ can still create the recommended block). It is **excluded** from equality (dirty
   table name are treated as unrecognized for this block.
 
 - **Id3v2**
+
   - `byte Version` + modeled text frames. Singletons keyed by FrameId; multi-instance by FrameId + language/description
+
 - **Xiph** — Known-key multimap (covers `SemanticAudioTag` fields). Unknown keys left on disk
+
 - **Ape**
+
   - Known text key map. Read folds alias spellings (`ALBUMARTIST` → `Album Artist`) and splits `number/total` pairs
     into `Track`/`TrackCount` and `Disc`/`DiscCount`; item lookup is case-insensitive
+
 - **RiffInfo**
+
   - INFO key → string map. Standard fourCCs (`INAM`, `IPRD`, `IART`, `IGNR`, `ICMT`, `ICOP`, `ICRD`, `ITRK`)
     read/written by key, not through TagLib's `InfoTag` façade properties (those map to non-standard ids such as `DIRC`
     for album)
+
 - **Apple** — Text atom rows (track/disc/BPM binary atoms not modeled yet)
+
 - **Asf** — Content Description fields + extended descriptors (see below)
 
 ### Presence and pruning

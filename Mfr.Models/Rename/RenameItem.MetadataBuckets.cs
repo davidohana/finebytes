@@ -23,6 +23,7 @@ namespace Mfr.Models.Rename
                 RenameListMetadataRequirement.Pdf => PdfLoadAttempted,
                 RenameListMetadataRequirement.Epub => EpubLoadAttempted,
                 RenameListMetadataRequirement.Office => OfficeLoadAttempted,
+                RenameListMetadataRequirement.GeoNames => GeoNamesLoadAttempted,
                 RenameListMetadataRequirement.None => throw new UnreachableException(),
                 _ => throw new UnreachableException(),
             };
@@ -52,6 +53,9 @@ namespace Mfr.Models.Rename
                 case RenameListMetadataRequirement.Office:
                     OfficeLoadAttempted = true;
                     break;
+                case RenameListMetadataRequirement.GeoNames:
+                    GeoNamesLoadAttempted = true;
+                    break;
                 case RenameListMetadataRequirement.None:
                 default:
                     throw new UnreachableException();
@@ -73,6 +77,7 @@ namespace Mfr.Models.Rename
                 RenameListMetadataRequirement.Pdf => PdfLoadError,
                 RenameListMetadataRequirement.Epub => EpubLoadError,
                 RenameListMetadataRequirement.Office => OfficeLoadError,
+                RenameListMetadataRequirement.GeoNames => GeoNamesLoadError,
                 RenameListMetadataRequirement.None => throw new UnreachableException(),
                 _ => throw new UnreachableException(),
             };
@@ -103,6 +108,9 @@ namespace Mfr.Models.Rename
                     break;
                 case RenameListMetadataRequirement.Office:
                     OfficeLoadError = ex;
+                    break;
+                case RenameListMetadataRequirement.GeoNames:
+                    GeoNamesLoadError = ex;
                     break;
                 case RenameListMetadataRequirement.None:
                 default:
@@ -138,6 +146,10 @@ namespace Mfr.Models.Rename
                 case RenameListMetadataRequirement.Office:
                     OfficeLoadAttempted = false;
                     OfficeLoadError = null;
+                    break;
+                case RenameListMetadataRequirement.GeoNames:
+                    GeoNamesLoadAttempted = false;
+                    GeoNamesLoadError = null;
                     break;
                 case RenameListMetadataRequirement.None:
                 default:

@@ -96,8 +96,8 @@ Document each option’s **JSON / options-record default** (what you get when th
 record parameter default applies). When the **parameterless filter ctor** (palette add and title-bar
 Reset) uses a different value, say so on the same bullet:
 
-- Same value: `default \`X\`` (or `default \`X\` on the options record / omitted JSON key`).
-- Different: `default \`X\` in JSON; add-to-list / title-bar Reset use \`Y\``.
+- Same value: write `default X` (or note the same default applies on the options record / omitted JSON key).
+- Different: write `default X` in JSON; note that add-to-list / title-bar Reset use `Y`.
 
 Do **not** call a Load-defaults / Current-style editor button an “add-to-list default” — that is a
 separate inject path (document it under the option or Editor section when present).

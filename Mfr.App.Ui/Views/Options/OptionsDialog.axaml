@@ -121,6 +121,28 @@
         </StackPanel>
       </controls:FieldsetGroup>
 
+      <controls:FieldsetGroup Header="Location">
+        <StackPanel Spacing="8">
+          <controls:FilterEditorLabeledRow Label="GeoNames username:">
+            <TextBox
+              x:Name="GeoNamesUsernameBox"
+              Classes="filter-editor-field"
+              PlaceholderText="Leave blank for built-in account"
+              ToolTip.Tip="{x:Static resources:AppTips.OptionsGeoNamesUsername}"
+              Text="{Binding GeoNamesUsername}"
+            />
+          </controls:FilterEditorLabeledRow>
+          <HyperlinkButton
+            x:Name="GeoNamesUsernameHelpLink"
+            Classes="filter-editor-hint-link"
+            HorizontalAlignment="Left"
+            Content="How to get a GeoNames username"
+            ToolTip.Tip="{x:Static resources:AppTips.OptionsGeoNamesUsernameHelp}"
+            Command="{Binding OpenGeoNamesUsernameHelpCommand}"
+          />
+        </StackPanel>
+      </controls:FieldsetGroup>
+
       <controls:FieldsetGroup Header="Undo &amp; Rename Log">
         <StackPanel Spacing="6">
           <controls:CompactRadioButton

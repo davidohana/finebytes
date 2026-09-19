@@ -63,12 +63,81 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 return RenameListFieldSortCompare.DateTime(leftDate, rightDate);
             }
 
+            if (Field == JpegRenameListExifProperty.Latitude)
+            {
+                return RenameListFieldSortCompare.Double(
+                    left.Exif?.GpsLatitude ?? default,
+                    right.Exif?.GpsLatitude ?? default
+                );
+            }
+
+            if (Field == JpegRenameListExifProperty.Longitude)
+            {
+                return RenameListFieldSortCompare.Double(
+                    left.Exif?.GpsLongitude ?? default,
+                    right.Exif?.GpsLongitude ?? default
+                );
+            }
+
             if (Field == JpegRenameListExifProperty.ImageNumber)
             {
                 return RenameListFieldSortCompare.ParsedInt64(Resolve(left), Resolve(right));
             }
 
             return base.CompareForSort(left, right);
+        }
+    }
+
+    /// <summary>
+    /// One read-only Nearby GeoNames column under the Jpeg Tag group.
+    /// </summary>
+    /// <param name="propertyKey">Property key within the Jpeg group.</param>
+    /// <param name="displayName">User-visible column label.</param>
+    /// <param name="field">GeoNames property to format.</param>
+    /// <param name="defaultWidth">Optional grid column width override in pixels.</param>
+    /// <param name="tip">Optional tooltip clarifying the field.</param>
+    internal sealed class JpegNearbyRenameListField(
+        string propertyKey,
+        string displayName,
+        GeoNamesField field,
+        int? defaultWidth = 120,
+        string? tip = null
+    )
+        : OriginalOnlyRenameListField(
+            JpegRenameListFields.Group,
+            JpegRenameListFields.GroupLabel,
+            propertyKey,
+            displayName,
+            defaultWidth,
+            RenameListMetadataRequirement.GeoNames,
+            tip
+        )
+    {
+        /// <summary>
+        /// Gets the GeoNames property addressed by this column.
+        /// </summary>
+        public GeoNamesField Field { get; } = field;
+
+        /// <summary>
+        /// Maps a <see cref="GeoNamesField"/> to its Rename List catalog property key.
+        /// </summary>
+        /// <param name="field">GeoNames property field.</param>
+        /// <returns>Catalog key under <see cref="JpegRenameListFields.Key"/>.</returns>
+        internal static string CatalogPropertyKey(GeoNamesField field)
+        {
+            return field switch
+            {
+                GeoNamesField.Place => JpegRenameListFields.Key.NearbyPlace,
+                GeoNamesField.Region => JpegRenameListFields.Key.NearbyRegion,
+                GeoNamesField.Country => JpegRenameListFields.Key.NearbyCountry,
+                _ => throw new System.Diagnostics.UnreachableException(),
+            };
+        }
+
+        /// <inheritdoc />
+        public override string Resolve(FileMeta meta)
+        {
+            return GeoNamesFormatting.Format(meta.GeoNames, Field);
         }
     }
 
@@ -127,6 +196,12 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
 
         /// <summary>Focal length in 35mm film.</summary>
         FocalLength35mm,
+
+        /// <summary>GPS latitude (decimal degrees).</summary>
+        Latitude,
+
+        /// <summary>GPS longitude (decimal degrees).</summary>
+        Longitude,
     }
 
     /// <summary>
@@ -172,6 +247,8 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 JpegRenameListExifProperty.FocalLength35mm => RenameListFieldDisplay.FormatOptionalText(
                     exif.FocalLength35mm
                 ),
+                JpegRenameListExifProperty.Latitude => ExifGpsFormatting.FormatCoordinate(exif.GpsLatitude),
+                JpegRenameListExifProperty.Longitude => ExifGpsFormatting.FormatCoordinate(exif.GpsLongitude),
                 _ => string.Empty,
             };
         }

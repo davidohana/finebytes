@@ -1,3 +1,5 @@
+using Mfr.Models.Media;
+
 namespace Mfr.Models.RenameList.Fields.Jpeg
 {
     /// <summary>
@@ -70,6 +72,21 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
 
             /// <summary>35mm-equivalent focal length.</summary>
             public const string FocalLength35mm = "ExifDirectory*41989";
+
+            /// <summary>GPS latitude (decimal degrees).</summary>
+            public const string Latitude = "Latitude";
+
+            /// <summary>GPS longitude (decimal degrees).</summary>
+            public const string Longitude = "Longitude";
+
+            /// <summary>Nearby place name from GeoNames.</summary>
+            public const string NearbyPlace = "NearbyPlace";
+
+            /// <summary>Nearby region from GeoNames.</summary>
+            public const string NearbyRegion = "NearbyRegion";
+
+            /// <summary>Nearby country from GeoNames.</summary>
+            public const string NearbyCountry = "NearbyCountry";
         }
 
         /// <summary>
@@ -150,6 +167,26 @@ namespace Mfr.Models.RenameList.Fields.Jpeg
                 "Focal Length In 35mm Film",
                 JpegRenameListExifProperty.FocalLength35mm,
                 defaultWidth: 80
+            ),
+            new JpegExifRenameListField(
+                Key.Latitude,
+                "Latitude",
+                JpegRenameListExifProperty.Latitude,
+                defaultWidth: 100
+            ),
+            new JpegExifRenameListField(
+                Key.Longitude,
+                "Longitude",
+                JpegRenameListExifProperty.Longitude,
+                defaultWidth: 100
+            ),
+            new JpegNearbyRenameListField(Key.NearbyPlace, "Nearby Place", GeoNamesField.Place, defaultWidth: 140),
+            new JpegNearbyRenameListField(Key.NearbyRegion, "Nearby Region", GeoNamesField.Region, defaultWidth: 120),
+            new JpegNearbyRenameListField(
+                Key.NearbyCountry,
+                "Nearby Country",
+                GeoNamesField.Country,
+                defaultWidth: 120
             ),
         ];
     }

@@ -26,6 +26,8 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
                 ExifPropertyField.Iso => JpegRenameListFields.Key.Iso,
                 ExifPropertyField.FocalLength => JpegRenameListFields.Key.FocalLength,
                 ExifPropertyField.FocalLength35mm => JpegRenameListFields.Key.FocalLength35mm,
+                ExifPropertyField.GpsLatitude => JpegRenameListFields.Key.Latitude,
+                ExifPropertyField.GpsLongitude => JpegRenameListFields.Key.Longitude,
                 _ => throw new UnreachableException(),
             };
             return true;
@@ -105,5 +107,23 @@ namespace Mfr.Filters.Formatting.Tokens.Exif
         /// <summary>Registers <c>&lt;exif-focal-35&gt;</c>.</summary>
         public ExifFocal35Token()
             : base(["exif-focal-35"], ExifPropertyField.FocalLength35mm) { }
+    }
+
+    /// <inheritdoc />
+    [FormatTokenInfo("GPS Latitude", "Image\\EXIF", "GPS latitude in decimal degrees", "exif-gps-lat")]
+    internal sealed class ExifGpsLatitudeToken : ExifPropertyTokenBase
+    {
+        /// <summary>Registers <c>&lt;exif-gps-lat&gt;</c>.</summary>
+        public ExifGpsLatitudeToken()
+            : base(["exif-gps-lat"], ExifPropertyField.GpsLatitude) { }
+    }
+
+    /// <inheritdoc />
+    [FormatTokenInfo("GPS Longitude", "Image\\EXIF", "GPS longitude in decimal degrees", "exif-gps-lon")]
+    internal sealed class ExifGpsLongitudeToken : ExifPropertyTokenBase
+    {
+        /// <summary>Registers <c>&lt;exif-gps-lon&gt;</c>.</summary>
+        public ExifGpsLongitudeToken()
+            : base(["exif-gps-lon"], ExifPropertyField.GpsLongitude) { }
     }
 }

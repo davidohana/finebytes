@@ -72,17 +72,8 @@
         MinHeight="210"
       >
         <DockPanel>
-          <StackPanel
-            DockPanel.Dock="Bottom"
-            Orientation="Horizontal"
-            Spacing="14"
-            Margin="0,16,0,0"
-          >
-            <HyperlinkButton
-              Classes="about-link"
-              Content="Web Site"
-              Command="{Binding OpenWebSiteCommand}"
-            />
+          <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="14" Margin="0,16,0,0">
+            <HyperlinkButton Classes="about-link" Content="Web Site" Command="{Binding OpenWebSiteCommand}" />
             <TextBlock
               Text="·"
               VerticalAlignment="Center"
@@ -96,12 +87,7 @@
           </StackPanel>
 
           <StackPanel Spacing="6" VerticalAlignment="Top">
-            <TextBlock
-              Text="{Binding ProductName}"
-              FontWeight="SemiBold"
-              FontSize="18"
-              TextWrapping="Wrap"
-            />
+            <TextBlock Text="{Binding ProductName}" FontWeight="SemiBold" FontSize="18" TextWrapping="Wrap" />
             <TextBlock
               Text="{Binding DisplayVersion, StringFormat=Version {0}}"
               Foreground="{DynamicResource AppChromeMutedForegroundBrush}"

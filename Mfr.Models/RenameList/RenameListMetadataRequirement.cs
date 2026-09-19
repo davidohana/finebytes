@@ -35,5 +35,10 @@ namespace Mfr.Models.RenameList
         /// Field reads OpenXml Office PackageProperties document Info from disk.
         /// </summary>
         Office = 16,
+
+        /// <summary>
+        /// Field reads GeoNames nearby place/region/country (may hit network on cache miss).
+        /// </summary>
+        GeoNames = 32,
     }
 }

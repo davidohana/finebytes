@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Mfr.App.Ui.Services.Help;
 using Mfr.Engine.Config;
 using Mfr.Models.Config;
 
@@ -25,13 +26,19 @@ namespace Mfr.App.Ui.ViewModels.Options
         /// </summary>
         public const decimal MaxLimitedCount = 1000;
 
+        private readonly HelpHost _helpHost;
+        private readonly Action<string>? _helpMissing;
         private bool _suppressLimitedCountModeSelect;
 
         /// <summary>
         /// Initializes the dialog from live <see cref="ConfigStore"/> sections.
         /// </summary>
-        public OptionsDialogViewModel()
+        /// <param name="helpHost">Optional Help opener for the GeoNames username instructions link.</param>
+        /// <param name="onHelpMissing">Optional callback when the GeoNames help file cannot be opened.</param>
+        public OptionsDialogViewModel(HelpHost? helpHost = null, Action<string>? onHelpMissing = null)
         {
+            _helpHost = helpHost ?? new HelpHost();
+            _helpMissing = onHelpMissing;
             var options = ConfigStore.Options;
             RememberLastFolder = options.RememberLastFolder;
             RememberWindowState = options.RememberWindowState;
@@ -41,6 +48,7 @@ namespace Mfr.App.Ui.ViewModels.Options
             AddFolderContents = options.AddFolderContents;
             IncludeHidden = options.IncludeHidden;
             RememberColumnWidths = options.RememberColumnWidths;
+            GeoNamesUsername = options.GeoNamesUsername ?? string.Empty;
             _LoadRenameLogRetention(ConfigStore.RenameLog.Limit);
         }
 
@@ -116,6 +124,12 @@ namespace Mfr.App.Ui.ViewModels.Options
         private bool _rememberColumnWidths;
 
         /// <summary>
+        /// Draft GeoNames username override (blank = bundled FineBytes account).
+        /// </summary>
+        [ObservableProperty]
+        private string _geoNamesUsername = string.Empty;
+
+        /// <summary>
         /// Draft rename-log retention mode (maps to <c>renameLog.limit</c>).
         /// </summary>
         [ObservableProperty]
@@ -140,16 +154,34 @@ namespace Mfr.App.Ui.ViewModels.Options
         }
 
         /// <summary>
+        /// Opens the in-app GeoNames username help page.
+        /// </summary>
+        [RelayCommand]
+        public void OpenGeoNamesUsernameHelp()
+        {
+            const string helpFileName = "geonames-username.html";
+            if (_helpHost.TryOpen(helpFileName, out _))
+            {
+                return;
+            }
+
+            _helpMissing?.Invoke(helpFileName);
+        }
+
+        /// <summary>
         /// Writes draft values into live <see cref="ConfigStore"/> sections.
         /// <para>
         /// Does not write <c>config.json</c>; the host calls <see cref="ConfigStore.Save"/>
         /// (whole prefs document, including the mutated sections) and may prune on-disk
-        /// <c>.mfrlog</c> files to the new <c>renameLog.limit</c>.
+        /// <c>.mfrlog</c> files to the new <c>renameLog.limit</c>. Changing the GeoNames
+        /// username clears the process GeoNames cache and circuit breaker (not the disk cache).
         /// </para>
         /// </summary>
         public void Commit()
         {
             var options = ConfigStore.Options;
+            var previousUsername = (options.GeoNamesUsername ?? string.Empty).Trim();
+            var nextUsername = (GeoNamesUsername ?? string.Empty).Trim();
             options.RememberLastFolder = RememberLastFolder;
             options.DoubleClickAddsToRenameList = DoubleClickAddsToRenameList;
             options.RememberWindowState = RememberWindowState;
@@ -158,7 +190,13 @@ namespace Mfr.App.Ui.ViewModels.Options
             options.AddFolderContents = AddFolderContents;
             options.IncludeHidden = IncludeHidden;
             options.RememberColumnWidths = RememberColumnWidths;
+            options.GeoNamesUsername = nextUsername;
             ConfigStore.RenameLog.Limit = _LimitFromDraft();
+
+            if (!string.Equals(previousUsername, nextUsername, StringComparison.Ordinal))
+            {
+                ConfigStore.ClearGeoNamesProcessCache();
+            }
         }
 
         /// <summary>

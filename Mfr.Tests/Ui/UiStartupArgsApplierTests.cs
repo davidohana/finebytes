@@ -3,7 +3,6 @@ using Mfr.App.Ui;
 using Mfr.App.Ui.Services.FileList;
 using Mfr.App.Ui.Services.Shell;
 using Mfr.App.Ui.ViewModels.MainWindow;
-using Mfr.Models.Config;
 using Mfr.Utils;
 
 namespace Mfr.Tests.Ui

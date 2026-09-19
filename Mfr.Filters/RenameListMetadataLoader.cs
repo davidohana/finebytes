@@ -20,6 +20,7 @@ namespace Mfr.Filters
             (RenameListMetadataRequirement.Pdf, static item => item.EnsurePdfLoaded()),
             (RenameListMetadataRequirement.Epub, static item => item.EnsureEpubLoaded()),
             (RenameListMetadataRequirement.Office, static item => item.EnsureOfficeLoaded()),
+            (RenameListMetadataRequirement.GeoNames, static item => item.EnsureGeoNamesLoaded()),
         ];
 
         /// <summary>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Nearby / GeoNames Tokens</title>
+    <link rel="stylesheet" href="../help.css" />
+    <script src="../help.js" defer></script>
+  </head>
+  <body>
+    <div class="brand">Magic File Renamer Help</div>
+    <hr />
+    <nav class="breadcrumb">
+      <a href="../index.html">Index</a>
+      &gt;
+      <a href="../index.html#reference">Reference</a>
+      &gt;
+      <a href="fp.html">Formatting Tokens</a>
+      &gt;
+      <strong>Nearby / GeoNames</strong>
+    </nav>
+    <hr />
+    <h1>Nearby / GeoNames Tokens</h1>
+    <p>
+      Reverse-geocode GPS coordinates from image EXIF into nearby place names via the online GeoNames
+      <span class="quote">findNearby</span> service. GPS itself comes from
+      <a href="eximagefp.html">&lt;exif-gps-lat&gt; / &lt;exif-gps-lon&gt;</a>. Nearby Country /
+      Region / Place also appear under
+      <a href="../reference/fields.html#jpeg">Jpeg Tag</a> Rename List columns.
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Signature</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Nearby Place</td>
+          <td><code class="sig">&lt;geo-place&gt;</code></td>
+        </tr>
+        <tr>
+          <td>Nearby Region</td>
+          <td><code class="sig">&lt;geo-region&gt;</code></td>
+        </tr>
+        <tr>
+          <td>Nearby Country</td>
+          <td><code class="sig">&lt;geo-country&gt;</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <p>
+      Example:
+      <code class="sig">&lt;geo-place&gt; - &lt;exif-date:yyyy-MM-dd&gt;</code>
+    </p>
+    <h2>Empty vs error</h2>
+    <ul>
+      <li>No GPS on the image → the token expands empty (no network call).</li>
+      <li>Successful lookup with a blank field → that token expands empty.</li>
+      <li>
+        Network, HTTP, XML, or rate-limit failure when a <span class="quote">geo-*</span> token or
+        Nearby column is used → PreviewError (or a Rename List load error for that row).
+      </li>
+    </ul>
+    <h2>Account and cache</h2>
+    <p>
+      By default Magic File Renamer uses a built-in GeoNames username shared across installs. You can
+      enter your own username under Options → Location — see
+      <a href="../guide/geonames-username.html">How to get a GeoNames username</a>. Results are cached
+      in memory and on disk so repeated coordinates do not spend credits again. Large lists with many
+      distinct GPS locations can exhaust the free daily quota; after a rate-limit response, further
+      uncached lookups fail fast without more HTTP until you restart or change the Options username.
+    </p>
+    <p class="note">
+      GeoNames data is provided under Creative Commons Attribution. See
+      <a href="https://www.geonames.org/">geonames.org</a> and
+      <a href="../about/credits.html">Credits</a>.
+    </p>
+  </body>
+</html>

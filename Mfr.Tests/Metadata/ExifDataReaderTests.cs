@@ -27,6 +27,8 @@ namespace Mfr.Tests.Metadata
             Assert.Equal("Canon", exif.TagToDescription["Exif/271"]);
             Assert.True(exif.TagToDescription.ContainsKey("ExifSub/Date/Time Original"));
             Assert.True(exif.TagToDescription.ContainsKey("ExifSub/36867"));
+            Assert.Null(exif.GpsLatitude);
+            Assert.Null(exif.GpsLongitude);
         }
 
         [Fact]
@@ -40,7 +42,22 @@ namespace Mfr.Tests.Metadata
             Assert.Null(exif.Model);
             Assert.Null(exif.DateTaken);
             Assert.Null(exif.Exposure);
+            Assert.Null(exif.GpsLatitude);
+            Assert.Null(exif.GpsLongitude);
             Assert.Empty(exif.TagToDescription);
+        }
+
+        [Fact]
+        public void Read_GpsJpegFixture_MapsTypedLatLonAndGpsTagDescriptions()
+        {
+            var path = FixturePaths.Require("tiny-gps.jpeg");
+
+            var exif = ExifDataReader.Read(path);
+
+            Assert.Equal(32.823057, exif.GpsLatitude!.Value, precision: 6);
+            Assert.Equal(34.971542, exif.GpsLongitude!.Value, precision: 6);
+            Assert.True(exif.TagToDescription.ContainsKey("GPS/GPS Latitude"));
+            Assert.True(exif.TagToDescription.ContainsKey("GPS/2"));
         }
 
         [Fact]

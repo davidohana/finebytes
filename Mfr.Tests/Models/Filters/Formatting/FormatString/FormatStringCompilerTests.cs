@@ -116,6 +116,11 @@ namespace Mfr.Tests.Models.Filters.Formatting.FormatString
         [InlineData("exif-iso")]
         [InlineData("exif-focal")]
         [InlineData("exif-focal-35")]
+        [InlineData("exif-gps-lat")]
+        [InlineData("exif-gps-lon")]
+        [InlineData("geo-place")]
+        [InlineData("geo-region")]
+        [InlineData("geo-country")]
         [InlineData("exif-date:yyyy")]
         [InlineData("exif:Exif,Make")]
         public void ResolveTemplate_ShippedToken_ResolvesWithoutThrowing(string tokenInner)
