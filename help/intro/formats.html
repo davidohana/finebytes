@@ -27,6 +27,59 @@
       items in the list continue as usual.
     </p>
 
+    <h2 id="any">Any file</h2>
+    <p>
+      Names, extensions, folder location, attributes, and timestamps work for any path Windows can
+      rename or update. Embedded metadata in the sections below applies only to those formats —
+      outside them, those columns and tokens stay empty or error.
+    </p>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>What</th>
+          <th>Typical extensions</th>
+          <th>Access</th>
+          <th>Notes</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Name and extension</td>
+          <td>Any</td>
+          <td>Read / write</td>
+          <td>
+            See <a href="../reference/fields.html#basic">File Name fields</a>.
+          </td>
+        </tr>
+        <tr>
+          <td>Folder location</td>
+          <td>Any</td>
+          <td>Read / write</td>
+          <td>
+            <a href="../filters/misc/PathMover.html">Path Mover</a> and Parent Directory.
+          </td>
+        </tr>
+        <tr>
+          <td>Attributes</td>
+          <td>Any</td>
+          <td>Read / write</td>
+          <td>
+            <a href="../filters/attributes/AttributesSetter.html">Attributes Setter</a>.
+          </td>
+        </tr>
+        <tr>
+          <td>Timestamps</td>
+          <td>Any</td>
+          <td>Read / write</td>
+          <td>
+            Creation, last-write, and last-access —
+            <a href="../filters/attributes/DateTimeSetter.html">Date/Time Setter</a>,
+            <a href="../filters/attributes/TimeShifter.html">Time Shifter</a>.
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
     <h2 id="audio">Audio tags</h2>
     <p>
       Embedded audio tags load and save through TagLibSharp. Generic fields (title, artist, album,
@@ -304,14 +357,6 @@
       Writable title/artist tags on video files only apply to containers under
       <a href="#audio">Audio tags</a> (for example Apple on MP4). Other video types are stream
       properties only.
-    </p>
-
-    <h2 id="names">Names, dates, and attributes</h2>
-    <p>
-      Changing names, extensions, folder location (Path Mover), file attributes, and timestamps is
-      not limited to the formats in this page. Any path Windows can rename or update is eligible;
-      metadata columns and tokens simply stay empty or error when a format is outside the lists
-      above.
     </p>
   </body>
 </html>
