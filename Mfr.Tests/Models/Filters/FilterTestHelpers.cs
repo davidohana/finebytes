@@ -80,11 +80,10 @@ namespace Mfr.Tests.Models.Filters
             var item = new RenameItem(meta);
             if (isFileRow)
             {
-                item.MarkTagLibLoadAttempted();
-                item.MarkImagePropertiesLoadAttempted();
-                item.MarkPdfLoadAttempted();
-                item.MarkEpubLoadAttempted();
-                item.MarkOfficeLoadAttempted();
+                foreach (var bucket in RenameListMetadataBuckets.All)
+                {
+                    item.MarkMetadataLoadAttempted(bucket);
+                }
             }
 
             return item;

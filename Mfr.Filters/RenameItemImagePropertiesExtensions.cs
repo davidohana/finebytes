@@ -1,6 +1,5 @@
 using Mfr.Metadata;
 using Mfr.Models.RenameList;
-using Mfr.Utils;
 
 namespace Mfr.Filters
 {
@@ -16,23 +15,17 @@ namespace Mfr.Filters
         /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
         internal static void EnsureImagePropertiesLoaded(this RenameItem item)
         {
-            ArgumentNullException.ThrowIfNull(item);
-
-            if (item.WasMetadataLoadAttempted(RenameListMetadataRequirement.ImageProperties))
-            {
-                return;
-            }
-
-            item.MarkMetadataLoadAttempted(RenameListMetadataRequirement.ImageProperties);
-
-            if (item.Original.Attributes.IsDirectory())
-            {
-                throw new InvalidOperationException("Cannot read image properties for a directory.");
-            }
-
-            var snapshot = ImageFileReader.Read(item.Original.FullPath);
-            item.SetImageProperties(snapshot.Image);
-            item.SetExifData(snapshot.Exif);
+            RenameItemMetadataEnsure.EnsureLoaded(
+                item,
+                RenameListMetadataRequirement.ImageProperties,
+                "Cannot read image properties for a directory.",
+                () =>
+                {
+                    var snapshot = ImageFileReader.Read(item.Original.FullPath);
+                    item.SetImageProperties(snapshot.Image);
+                    item.SetExifData(snapshot.Exif);
+                }
+            );
         }
     }
 }

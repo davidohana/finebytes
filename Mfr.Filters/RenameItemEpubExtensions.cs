@@ -1,6 +1,5 @@
 using Mfr.Metadata;
 using Mfr.Models.RenameList;
-using Mfr.Utils;
 
 namespace Mfr.Filters
 {
@@ -16,21 +15,12 @@ namespace Mfr.Filters
         /// <exception cref="InvalidOperationException">The rename row is a directory.</exception>
         internal static void EnsureEpubLoaded(this RenameItem item)
         {
-            ArgumentNullException.ThrowIfNull(item);
-
-            if (item.WasMetadataLoadAttempted(RenameListMetadataRequirement.Epub))
-            {
-                return;
-            }
-
-            item.MarkMetadataLoadAttempted(RenameListMetadataRequirement.Epub);
-
-            if (item.Original.Attributes.IsDirectory())
-            {
-                throw new InvalidOperationException("Cannot read EPUB document Info for a directory.");
-            }
-
-            item.SetEpubDocumentInfo(EpubFileReader.Read(item.Original.FullPath));
+            RenameItemMetadataEnsure.EnsureLoaded(
+                item,
+                RenameListMetadataRequirement.Epub,
+                "Cannot read EPUB document Info for a directory.",
+                () => item.SetEpubDocumentInfo(EpubFileReader.Read(item.Original.FullPath))
+            );
         }
     }
 }
